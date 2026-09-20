@@ -1,0 +1,51 @@
+{
+  "version": "1.0",
+  "reviewed": "2026-09-19",
+  "basis": "Guided examples derived from a read-only Orbit review of three participant schedules, 30 bookings, linked service orders and coordination comments. These are generalized workflow stories, not individual charts or a live Orbit connection.",
+  "privacy": "Participant identities, record IDs, dates of service, addresses, diagnoses, contact information and staff names are omitted. Room choices and travel scenes are illustrative. Bookings do not prove attendance.",
+  "journeys": [
+    {
+      "id": "therapy-and-support",
+      "title": "Therapy and care coordination",
+      "summary": "A pair of center appointments without a recorded day-center session.",
+      "basis": "An actual schedule contained a 40-minute therapy booking followed, after a 20-minute interval, by a 30-minute social-work booking. The participant had no recurring day-center attendance recorded.",
+      "caveat": "The schedule does not establish arrival, departure, activities during the interval or completed attendance. The displayed rooms are representative service locations.",
+      "steps": [
+        {"id":"arrival","title":"Arrive for appointments","place":"Reception","role":"Participant and reception team","detail":"Orient the visitor to the center. Reception is a scene setting; the reviewed schedule does not record a check-in time.","timing":"Arrival time not recorded","evidence":"scene","zoneId":"lobby","roomId":"lobby-arrival","scene":"center"},
+        {"id":"therapy","title":"Physical therapy","place":"Therapy space","role":"Participant and therapist","detail":"A scheduled therapy visit can take place independently of a day-center session. Show the therapy area for this booking.","timing":"40-minute booking","evidence":"recorded","zoneId":"rehab","roomId":"rehab-open","scene":"center"},
+        {"id":"interval","title":"Between appointments","place":"Location not recorded","role":"Participant","detail":"There is a 20-minute interval between the two bookings. It is not evidence of a particular activity, meal or waiting location.","timing":"20-minute interval","evidence":"recorded","zoneId":null,"scene":"center"},
+        {"id":"support","title":"Social-work support","place":"Private meeting space","role":"Participant and social worker","detail":"The next booking is a wellness check with social work. This room illustrates a private conversation; the source names the center rather than a specific room.","timing":"30-minute booking","evidence":"recorded","zoneId":"admin","roomId":"admin-conference","scene":"coordination"},
+        {"id":"next","title":"Confirm the next step","place":"Care coordination","role":"Coordination team","detail":"Departure, transport and any further activity are not established by these bookings. Keep them open until documented.","timing":"Not recorded","evidence":"unknown","zoneId":"upper-office","scene":"coordination"}
+      ]
+    },
+    {
+      "id": "external-appointment",
+      "title": "An external appointment",
+      "summary": "A clinical request becomes a confirmed appointment, with transport and escort arranged separately.",
+      "basis": "One booked external visit linked both a specialist order and an escort order. Coordination comments recorded a proposed time becoming unavailable and a different time being confirmed. The escort order specified meeting at the appointment, 15 minutes before it, and named Seen Health transportation.",
+      "caveat": "The order and booking were coordinated, with the visit still ahead at review. Do not treat this as completed care. Pickup time, travel duration, return journey and completion handoff were not established.",
+      "steps": [
+        {"id":"request","title":"Clinical request","place":"Clinic","role":"Ordering clinician","detail":"A specialist service order starts the coordination process. The order describes the requested service; it is separate from the eventual appointment.","timing":"Before the visit","evidence":"recorded","zoneId":"clinic","roomId":"clinic-nurse","scene":"center"},
+        {"id":"coordinate","title":"Confirm with the provider","place":"Coordination workspace","role":"Scheduling team and external office","detail":"The first proposed time is no longer available. Staff confirm a revised appointment and handle authorization. This is a communication handoff, not participant travel.","timing":"Before the visit","evidence":"recorded","zoneId":"upper-office","scene":"coordination"},
+        {"id":"transport","title":"Arrange transportation","place":"Seen Health fleet","role":"Transport coordination and driver","detail":"The escort order identifies a Seen Health driver. Van placement illustrates the transport connection; pickup, routing and vehicle assignment are not specified in the reviewed evidence.","timing":"Pickup time not recorded","evidence":"recorded","zoneId":null,"scene":"transport"},
+        {"id":"escort","title":"Meet the escort","place":"External provider","role":"Participant and escort","detail":"The escort meets the participant at the appointment location. This is a distinct handoff from the driver.","timing":"15 minutes before the appointment","evidence":"recorded","zoneId":null,"scene":"partner"},
+        {"id":"visit","title":"Booked specialist visit","place":"External provider","role":"Participant and specialist","detail":"The booking links the specialist and escort orders. The partner node is schematic; it does not place the provider on the center's block.","timing":"60-minute booking","evidence":"recorded","zoneId":null,"scene":"partner"},
+        {"id":"followup","title":"Completion and follow-up","place":"Care coordination","role":"External provider and coordination team","detail":"The source had not yet established completion or the return journey. Those steps remain pending rather than being shown as completed.","timing":"Not yet established","evidence":"unknown","zoneId":"upper-office","scene":"coordination"}
+      ]
+    },
+    {
+      "id": "home-support",
+      "title": "Renewing support at home",
+      "summary": "The center coordinates a service renewal with the home-care vendor and interdisciplinary team.",
+      "basis": "A home-care order and its comments recorded renewal sent to the vendor, retention of the weekly schedule and utilization hours, interdisciplinary care-plan approval, and an effectuated order state.",
+      "caveat": "Exact weekly hours and visits were referenced elsewhere rather than enumerated in the reviewed order. An authorization-date field conflicted with the renewal context and needs review. An effectuated order is not proof of every home visit.",
+      "steps": [
+        {"id":"renewal","title":"Prepare the renewal","place":"Coordination workspace","role":"Home-care coordination team","detail":"Create a renewal request for continuing support. The order calls for schedule coordination with the participant.","timing":"Renewal cycle","evidence":"recorded","zoneId":"upper-office","scene":"coordination"},
+        {"id":"vendor","title":"Send to the home-care vendor","place":"Vendor handoff","role":"Coordination team and home-care vendor","detail":"The recorded handoff retains the weekly schedule and utilization hours. The exact hours are not supplied in this reviewed record.","timing":"After the renewal request","evidence":"recorded","zoneId":null,"scene":"home"},
+        {"id":"team","title":"Care-team review","place":"Conference space","role":"Interdisciplinary team","detail":"The comments record approval of the renewed care plan. The upstairs conference room illustrates this team handoff; its actual meeting location is not specified.","timing":"Review milestone","evidence":"recorded","zoneId":"upper-office","roomId":"upperfit-conference","scene":"coordination"},
+        {"id":"service","title":"Renewal marked effectuated","place":"Home support","role":"Home-care coordination and vendor","detail":"The order state records that the renewal was put into effect. It does not provide a visit-by-visit attendance log or task duration.","timing":"Order milestone","evidence":"recorded","zoneId":null,"scene":"home"},
+        {"id":"reconcile","title":"Reconcile dates and visit details","place":"Care coordination","role":"Coordination team","detail":"Resolve the conflicting authorization-date field and consult the referenced utilization schedule before using this case as a timed home-visit simulation.","timing":"Details still to verify","evidence":"unknown","zoneId":"upper-office","scene":"coordination"}
+      ]
+    }
+  ]
+}

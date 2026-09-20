@@ -1,0 +1,181 @@
+{
+  "version": "1.0",
+  "source": "Owner-requested day-center activity repertoire and flexible front-of-room layout, September 2026. Illustrative rotation, not a verified daily timetable.",
+  "removedObjectIds": [
+    "day-diamond-table-01",
+    "day-diamond-table-01-chair-1",
+    "day-diamond-table-01-chair-2",
+    "day-diamond-table-01-chair-3",
+    "day-diamond-table-01-chair-4",
+    "day-diamond-table-02",
+    "day-diamond-table-02-chair-1",
+    "day-diamond-table-02-chair-2",
+    "day-diamond-table-02-chair-3",
+    "day-diamond-table-02-chair-4",
+    "day-diamond-table-03",
+    "day-diamond-table-03-chair-1",
+    "day-diamond-table-03-chair-2",
+    "day-diamond-table-03-chair-3",
+    "day-diamond-table-03-chair-4"
+  ],
+  "layoutNote": "Three front tables and their twelve chairs are cleared for a flexible activity floor. The original furniture plan remains in the source comparison. Other tables remain for small groups and quieter participation.",
+  "stations": [
+    {
+      "actorId": "activities-lead",
+      "position": [
+        -7,
+        10.6
+      ],
+      "heading": 0,
+      "mode": "leader"
+    },
+    {
+      "actorId": "member-group-01",
+      "position": [
+        -9,
+        12.25
+      ],
+      "heading": 3.141592653589793,
+      "mode": "standing"
+    },
+    {
+      "actorId": "member-group-02",
+      "position": [
+        -6.8,
+        12.25
+      ],
+      "heading": 3.141592653589793,
+      "mode": "chair"
+    },
+    {
+      "actorId": "member-wheelchair",
+      "position": [
+        -4.5,
+        12.25
+      ],
+      "heading": 3.141592653589793,
+      "mode": "wheelchair"
+    },
+    {
+      "actorId": "care-aide-03",
+      "position": [
+        -3.4,
+        12.1
+      ],
+      "heading": -1.5707963267948966,
+      "mode": "support"
+    }
+  ],
+  "programs": [
+    {
+      "id": "performance",
+      "label": "Performances",
+      "start": 0,
+      "end": 72,
+      "leaderAction": "perform",
+      "action": "clap",
+      "title": "Familiar songs & community performances",
+      "culture": "Songs and stories chosen with participants; a bilingual host invites requests.",
+      "access": "Watch, clap or join in from a chair, wheelchair or standing position."
+    },
+    {
+      "id": "language",
+      "label": "Language circle",
+      "start": 72,
+      "end": 144,
+      "leaderAction": "present",
+      "action": "conversation",
+      "title": "Language & conversation",
+      "culture": "Picture prompts, familiar sayings and conversation in preferred languages; Mandarin, Cantonese and English are example options.",
+      "access": "Listen, point to a picture or speak at your own pace."
+    },
+    {
+      "id": "devices",
+      "label": "Device class",
+      "start": 144,
+      "end": 216,
+      "leaderAction": "device",
+      "action": "device",
+      "title": "Everyday device skills",
+      "culture": "Practice video calls, photos and larger text using step-by-step visual prompts.",
+      "access": "One-to-one help, a supported tablet and repeatable small steps."
+    },
+    {
+      "id": "exercise",
+      "label": "Exercise",
+      "start": 216,
+      "end": 288,
+      "leaderAction": "exercise",
+      "action": "exercise",
+      "title": "Everyday movement",
+      "culture": "A staff-led group with familiar music and easy-to-follow demonstrations.",
+      "access": "Standing, chair-based or wheelchair upper-body movement; rest whenever needed."
+    },
+    {
+      "id": "dance",
+      "label": "Dance",
+      "start": 288,
+      "end": 360,
+      "leaderAction": "dance",
+      "action": "dance",
+      "title": "Music & dance",
+      "culture": "Participant-selected music, familiar rhythms and a simple shared sequence.",
+      "access": "Standing steps or seated rhythm and arm movements."
+    },
+    {
+      "id": "tai-chi",
+      "label": "Tai chi",
+      "start": 360,
+      "end": 432,
+      "leaderAction": "tai-chi",
+      "action": "tai-chi",
+      "title": "Tai chi together",
+      "culture": "Slow, flowing gestures with a visible leader and time to follow.",
+      "access": "A seated version mirrors the upper-body sequence; a care aide stays nearby."
+    },
+    {
+      "id": "calligraphy",
+      "label": "Calligraphy",
+      "start": 432,
+      "end": 504,
+      "leaderAction": "write",
+      "action": "write",
+      "title": "Calligraphy & brushwork",
+      "culture": "Explore personally meaningful characters and brush strokes, with large sample cards.",
+      "access": "Thick-handled brushes, supported paper and hand-over-hand help when requested."
+    },
+    {
+      "id": "crafts",
+      "label": "Arts & crafts",
+      "start": 504,
+      "end": 576,
+      "leaderAction": "craft",
+      "action": "craft",
+      "title": "Seasonal arts & crafts",
+      "culture": "Paper, color and collage inspired by the group’s interests and celebrations.",
+      "access": "Choose, arrange or create with large pieces and individual assistance."
+    },
+    {
+      "id": "instruments",
+      "label": "Instruments",
+      "start": 576,
+      "end": 648,
+      "leaderAction": "music",
+      "action": "music",
+      "title": "Rhythm & instruments",
+      "culture": "Simple percussion, listening and shared rhythms around favorite songs.",
+      "access": "Lightweight shakers and a supported hand drum; listening is welcome."
+    },
+    {
+      "id": "tcm",
+      "label": "TCM talk",
+      "start": 648,
+      "end": 720,
+      "leaderAction": "present",
+      "action": "listen",
+      "title": "TCM & cultural wellness talks",
+      "culture": "A hosted educational conversation about traditional Chinese medicine, with bilingual discussion and questions.",
+      "access": "Seated listening, visual prompts and time for questions; a quiet table option stays available."
+    }
+  ]
+}

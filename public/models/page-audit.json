@@ -1,0 +1,912 @@
+[
+  {
+    "page": 1,
+    "title": "JANUARY 10, 2024 \u00b7 PACE CENTER",
+    "group": "Design language",
+    "image": "/reference/final/01.jpg",
+    "text": "JANUARY 10, 2024\n\n\nPACE CENTER\n1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "January 10, 2024 title date; facility address 1839 W. Valley Blvd.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 2,
+    "title": "LOOK & FEEL \u00b7 DESIGN PRINCIPLE",
+    "group": "Design language",
+    "image": "/reference/final/02.jpg",
+    "text": "LOOK & FEEL\nDESIGN PRINCIPLE\n\n\n\n\n                                                                              COMMUNITY\n                                                                               CONNECTED\nNATURE                                                        CALM & SERENE\n\n                                        HAPPY PLACE\n\n\n                                                                                   HOME\n\n\n                   PACE CENTER\n                   1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Design principles: nature, calm, community and home. Inspiration, not installed-condition evidence.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "inspiration"
+  },
+  {
+    "page": 3,
+    "title": "LOOK & FEEL \u00b7 LOBBY",
+    "group": "Design language",
+    "image": "/reference/final/03.jpg",
+    "text": "LOOK & FEEL\nLOBBY\n\n\n\n\n          PACE CENTER\n          1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Lobby inspiration: planting, vertical timber slats, upholstered niches.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "inspiration"
+  },
+  {
+    "page": 4,
+    "title": "LOOK & FEEL \u00b7 DAY SPACE | BANQUETTE WALL | TREE LOUNGE",
+    "group": "Design language",
+    "image": "/reference/final/04.jpg",
+    "text": "LOOK & FEEL\nDAY SPACE | BANQUETTE WALL | TREE LOUNGE\n\n\n\n\n                   PACE CENTER\n                   1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Day-space inspiration: layered landscape battens and tree seating.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "inspiration"
+  },
+  {
+    "page": 5,
+    "title": "LOOK & FEEL \u00b7 DAY SPACE | LIBRARY",
+    "group": "Design language",
+    "image": "/reference/final/05.jpg",
+    "text": "LOOK & FEEL\nDAY SPACE | LIBRARY\n\n\n\n\n                      PACE CENTER\n                      1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Library inspiration: joinery, glazing and seating.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "inspiration"
+  },
+  {
+    "page": 6,
+    "title": "LOOK & FEEL \u00b7 RESTAURANT",
+    "group": "Design language",
+    "image": "/reference/final/06.jpg",
+    "text": "LOOK & FEEL\nRESTAURANT\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Restaurant inspiration: timber doors, round vision panels and lattice.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "inspiration"
+  },
+  {
+    "page": 7,
+    "title": "LOOK & FEEL \u00b7 VERANDA",
+    "group": "Design language",
+    "image": "/reference/final/07.jpg",
+    "text": "LOOK & FEEL\nVERANDA\n\n\n\n\n          PACE CENTER\n          1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Veranda inspiration: patterned tile, planting and furniture; no as-built exterior dimensions.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "inspiration"
+  },
+  {
+    "page": 8,
+    "title": "LOOK & FEEL \u00b7 PHYSICAL THERAPY",
+    "group": "Design language",
+    "image": "/reference/final/08.jpg",
+    "text": "LOOK & FEEL\nPHYSICAL THERAPY\n\n\n\n\n                   PACE CENTER\n                   1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Therapy inspiration: open movement areas and equipment.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "inspiration"
+  },
+  {
+    "page": 9,
+    "title": "LOOK & FEEL \u00b7 CLINIC",
+    "group": "Design language",
+    "image": "/reference/final/09.jpg",
+    "text": "LOOK & FEEL\nCLINIC\n\n\n\n\n          PACE CENTER\n          1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Clinic inspiration: numbering, clinical rooms and nurse counter.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "inspiration"
+  },
+  {
+    "page": 10,
+    "title": "LOOK & FEEL \u00b7 ADMIN",
+    "group": "Design language",
+    "image": "/reference/final/10.jpg",
+    "text": "LOOK & FEEL\nADMIN\n\n\n\n\n          PACE CENTER\n          1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Admin inspiration: workstations, partitions and collaboration.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "inspiration"
+  },
+  {
+    "page": 11,
+    "title": "LOOK & FEEL \u00b7 COLOR & MATERIAL",
+    "group": "Design language",
+    "image": "/reference/final/11.jpg",
+    "text": "LOOK & FEEL\nCOLOR & MATERIAL\n\n\n\n\n                                                                                         CARPET\n\n\n\n\n       CORRUGATED\n       WOOD ON\n       RECEPTION\n       DESK FACIA                                                                        GENERAL\n                                                                                         PLASTIC LAMINATE\n\n                             VINYL COLOR        VINYL COLOR\n\n\n\n\n                                                                           GENERAL\n                                                               CERAMIC     LVT WITH\n                                                TILE IN        TILE IN     HERRINGBONE   PORCELAIN TILE\n                             VINYL COLOR        VERRANDA       BATHROOMS   PATTERN       IN LOBBY/VERANDA\n\n\n\n                    PACE CENTER\n                    1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Material families: moss, timber, upholstery, tile, LVT and carpet. Not a complete procurement schedule.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "inspiration"
+  },
+  {
+    "page": 12,
+    "title": "Overall Planning \u00b7 00 LOBBY/BACK OF HOUSE",
+    "group": "Building & levels",
+    "image": "/reference/final/12.jpg",
+    "text": "Overall Planning\n\n                                                       00 LOBBY/BACK OF HOUSE\n                                                       01 CLINIC\n                                                       02 PHYSICAL THERAPY\n                                                       03 DAYROOM/\n                                                          MEMORY CARE/\n                                                          VERANDA\n                                                       04 DINING/KITCHEN\n                                                       05 ADMIN\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Final furnished top view: canonical tracing and site-image source. No dimension strings or scale bar on the overall plan.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-drawing"
+  },
+  {
+    "page": 13,
+    "title": "Overall Planning \u00b7 BASEMENT",
+    "group": "Building & levels",
+    "image": "/reference/final/13.jpg",
+    "text": "Overall Planning\nBASEMENT\n\n\n                                                       Zone   Area       Sq.Ft.\n                                                       06     Basement   6,191\n\n\n                              06\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Basement stated at 6,191 sq ft. Highlight is a stacking footprint, not a basement partition plan.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 14,
+    "title": "Overall Planning \u00b7 GROUND",
+    "group": "Building & levels",
+    "image": "/reference/final/14.jpg",
+    "text": "Overall Planning\nGROUND\n\n\n                                                           Zone   Area             Sq.Ft.\n                                                                             00 LOBBY/BACK OF HOUSE\n                                                           00     Lobby / Back 3,150 SF\n                                                                                  3,150 S.F.\n                           02                                     of House 01 CLINIC\n               01\n                                                                                3,254 SF\n                                04                                           02 PHYSICAL THERAPY\n                                                           01     Clinic           3,254 S.F.\n                                                                                3,080 SF\n                                       05                  02     Physical 03 DAYROOM/\n                                                                                 3,080 S.F.\n                      03                                          Therapy / OTMEMORY CARE/\n                                                                                VERANDA\n\n          02                                                                    3,665 SF\n                                                           03     Dayroom /04 DINING\n                                                                                 3,665 S.F.\n                                                                  Memory Care815 SF/KITCHEN 638 SF\n                                                                             05 ADMIN\n\n                                                           04     Dining /          815\n                                                                                 2,716 SF S.F.\n\n                                                                  Kitchen          638 S.F.\n                                                           05     Admin            2,716 S.F.\n\n\n                PACE CENTER\n                1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Program areas: 3,150; 3,254; 3,080; 3,665; 815; 638; 2,716 sq ft, total 17,318. Program boundaries/net-versus-gross basis are not fully defined.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 15,
+    "title": "Overall Planning \u00b7 MEZZANINE-SECOND FLOOR",
+    "group": "Building & levels",
+    "image": "/reference/final/15.jpg",
+    "text": "Overall Planning\nMEZZANINE-SECOND FLOOR\n\n\n                                                             Zone   Area           Sq.Ft.\n                                                                                 LEGEND\n                                                             07     Equipment 07 1,MED\n                                                                                    267EQUIP DECK\n                                                                    Mezz          1,267 SF\n                                                             08     Future      08 2,FUTURE\n                                                                                      885 OFFICE\n                                                                    Office space 2,885 SF\n                                  08\n\n\n\n\n           07\n\n\n\n\n                  PACE CENTER\n                  1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Equipment mezzanine 1,267 sq ft and future office 2,885 sq ft. No floor elevations or office fit-out.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 16,
+    "title": "Overall Planning - Stacking Diagram \u00b7 BASEMENT",
+    "group": "Building & levels",
+    "image": "/reference/final/16.jpg",
+    "text": "Overall Planning - Stacking Diagram\nBASEMENT\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Basement stacking view: surrounding streets and massing retained. Internal basement geometry cannot be verified.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 17,
+    "title": "Overall Planning - Stacking Diagram \u00b7 GROUND",
+    "group": "Building & levels",
+    "image": "/reference/final/17.jpg",
+    "text": "Overall Planning - Stacking Diagram\nGROUND\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Ground stacking view: final massing and cutaway room relationships.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 18,
+    "title": "Overall Planning - Stacking Diagram \u00b7 MEZZANINE-SECOND FLOOR",
+    "group": "Building & levels",
+    "image": "/reference/final/18.jpg",
+    "text": "Overall Planning - Stacking Diagram\nMEZZANINE-SECOND FLOOR\n\n\n\n\n                  PACE CENTER\n                  1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Mezzanine/second-floor stacking: southwest L-shaped mezzanine and southeast upper office.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 19,
+    "title": "Overall Planning - Stacking Diagram \u00b7 ROOF",
+    "group": "Building & levels",
+    "image": "/reference/final/19.jpg",
+    "text": "Overall Planning - Stacking Diagram\nROOF\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Roof stacking: long central curved roof, southwest roof and east roof volumes. Roof equipment shapes visible; specifications absent.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 20,
+    "title": "Visuals - Exterior Entry \u00b7 RENDERED ELEVATION",
+    "group": "Exterior & streets",
+    "image": "/reference/final/20.jpg",
+    "text": "Visuals - Exterior Entry\nRENDERED ELEVATION\n\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "West entry facade elevation: signage, canopy, glazing and entry; no readable overall dimensions.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 21,
+    "title": "Visuals - Exterior Entry \u00b7 PACE CENTER",
+    "group": "Exterior & streets",
+    "image": "/reference/final/21.jpg",
+    "text": "Visuals - Exterior Entry\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "West parking/drop-off top view: accessible bays, marked access aisle and van approach.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 22,
+    "title": "Visuals - Exterior Entry \u00b7 PACE CENTER",
+    "group": "Exterior & streets",
+    "image": "/reference/final/22.jpg",
+    "text": "Visuals - Exterior Entry\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "West entry perspective: railings, canopy, stairs/ramp and exterior wall treatment.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 23,
+    "title": "Visuals - Exterior Entry \u00b7 PACE CENTER",
+    "group": "Exterior & streets",
+    "image": "/reference/final/23.jpg",
+    "text": "Visuals - Exterior Entry\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "West entry perspective with van: arrival relationship and signage.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 24,
+    "title": "Visuals - Exterior Entry \u00b7 PACE CENTER",
+    "group": "Exterior & streets",
+    "image": "/reference/final/24.jpg",
+    "text": "Visuals - Exterior Entry\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Oblique west drop-off: ramp, wall, parking islands and markings.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 25,
+    "title": "Visuals - Exterior Entry \u00b7 PACE CENTER",
+    "group": "Exterior & streets",
+    "image": "/reference/final/25.jpg",
+    "text": "Visuals - Exterior Entry\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Alternate west drop-off view: confirms site access context.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 26,
+    "title": "Overall Material Boards \u00b7 FLOOR FINISH PLAN",
+    "group": "Materials",
+    "image": "/reference/final/26.jpg",
+    "text": "Overall Material Boards\nFLOOR FINISH PLAN\n\n\n\n\n                                                                    01 PORCELAIN TILE                   02 SHEET VINYL\n                                    02\n\n\n\n\n                                                                    03 LUXURY VINYL TILE \u2013 HERRINGBONE PATTERN\n                               01                  01\n\n\n\n                                                03\n\n                    05        03\n\n\n                                                                                   04 CARPET TILE\n                                                                                  Herringbone pattern\n             06\n\n                                              04\n\n\n\n                                                                    06 VINYL SPORTS FLOORING            CERAMIC TILE\n\n\n\n                         PACE CENTER\n                         1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Floor-finish plan: porcelain, sheet vinyl, herringbone LVT, carpet tile, sports vinyl and ceramic. Zone 05 labeling needs schedule clarification.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-drawing"
+  },
+  {
+    "page": 27,
+    "title": "Bathroom                                                       INTERIOR FINISHES \u00b7 MATERIALS AND FINISHES                                                       1     2, 4",
+    "group": "Materials",
+    "image": "/reference/final/27.jpg",
+    "text": "Bathroom                                                       INTERIOR FINISHES\nMATERIALS AND FINISHES                                                       1     2, 4\n                                                                         PT-04     CT-04, CT-03\n                                                                      SW 6205      0790 MATT\n                                                                 COMFORT GRAY      ARCTIC WHITE\n\n\n\n\n                                                                             3     5\n                                                                         CT-05     CT-07\n                                                                  RESTORE 0058     A53 RESTORE\n                                                                                   2X2 MOSAIC\n\n\n\n\n                                                                             6     7\n                                                                          SS-02    LP-03\n                                                                  ROYALE BLANC     LAMINATE PLASTIC\n                                                                                   SOLICOR COMPACT\n\n\n\n\n                                                               MILLWORK\n                                                                             8     9\n                                                                          SS-02    LP-03\n                                                                       QUARTZ      LAMINATE PLASTIC\n                                                                   ROYAL BLANC     SOLICOR COMPACT\n\n\n\n\n                    PACE CENTER\n                    1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Bathroom finish codes PT-04, CT-03/04/05/07, SS-02, LP-03; Comfort Gray, Arctic White, Royale/Royal Blanc and Solicor Compact named.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 28,
+    "title": "Visuals - Lobby \u00b7 INTERIOR ELEVATION",
+    "group": "Lobby",
+    "image": "/reference/final/28.jpg",
+    "text": "Visuals - Lobby\nINTERIOR ELEVATION\n\n\n\n\n  NORTH                                                         SOUTH\n\n\n\n\n  EAST                                                          WEST\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Lobby line elevations: four orientations, doors, niches, benches and counter. No dimension strings.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-drawing"
+  },
+  {
+    "page": 29,
+    "title": "Visuals - Lobby \u00b7 RENDERED ELEVATION",
+    "group": "Lobby",
+    "image": "/reference/final/29.jpg",
+    "text": "Visuals - Lobby\nRENDERED ELEVATION\n\n\n\n\n  NORTH\n\n\n\n\n  SOUTH\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Lobby north/south render elevations: warm upholstery, landscape niche panels, doors and fountain.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 30,
+    "title": "Visuals - Lobby \u00b7 RENDERED ELEVATION",
+    "group": "Lobby",
+    "image": "/reference/final/30.jpg",
+    "text": "Visuals - Lobby\nRENDERED ELEVATION\n\n\n\n\nEAST                                                            WEST\n\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Lobby east/west render elevations: planting/slats, counter, entry and timber doors.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 31,
+    "title": "Visuals - Lobby \u00b7 PACE CENTER",
+    "group": "Lobby",
+    "image": "/reference/final/31.jpg",
+    "text": "Visuals - Lobby\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Reception perspective: white counter, timber fluting, moss wall and ceiling slats.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 32,
+    "title": "Visuals - Lobby \u00b7 PACE CENTER",
+    "group": "Lobby",
+    "image": "/reference/final/32.jpg",
+    "text": "Visuals - Lobby\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Alternate reception perspective: paired upholstered niches and floor tiles.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 33,
+    "title": "Visuals - Lobby \u00b7 PACE CENTER",
+    "group": "Lobby",
+    "image": "/reference/final/33.jpg",
+    "text": "Visuals - Lobby\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Lobby corridor perspective: wood doors, floor tile and wall-mounted fixtures.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 34,
+    "title": "Visuals - Lobby \u00b7 PACE CENTER",
+    "group": "Lobby",
+    "image": "/reference/final/34.jpg",
+    "text": "Visuals - Lobby\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Lobby transition: reception axis, fountain and adjacent corridor.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 35,
+    "title": "Visuals - East Hallway \u00b7 INTERIOR ELEVATION - 1010",
+    "group": "East hallway",
+    "image": "/reference/final/35.jpg",
+    "text": "Visuals - East Hallway\nINTERIOR ELEVATION - 1010\n\n\n\n\n NORTH                                                         EAST\n\n\n\n\n SOUTH                                                         WEST\n\n\n\n\n                    PACE CENTER\n                    1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Hallway 1010 line elevations: two cubby banks, doors and exit glazing.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-drawing"
+  },
+  {
+    "page": 36,
+    "title": "Visuals - East Hallway \u00b7 RENDERED ELEVATION - 1010",
+    "group": "East hallway",
+    "image": "/reference/final/36.jpg",
+    "text": "Visuals - East Hallway\nRENDERED ELEVATION - 1010\n\n\n\n\n NORTH                                                        EAST\n\n\n\n\n SOUTH                                                        WEST\n\n\n\n\n                   PACE CENTER\n                   1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Hallway 1010 finish elevations: cubbies, wall panels, handrails and door colors.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 37,
+    "title": "Visuals - East Hallway \u00b7 PACE CENTER",
+    "group": "East hallway",
+    "image": "/reference/final/37.jpg",
+    "text": "Visuals - East Hallway\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Hallway perspective confirms cubbies and suspended ceiling.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 38,
+    "title": "Visuals - East Hallway \u00b7 PACE CENTER",
+    "group": "East hallway",
+    "image": "/reference/final/38.jpg",
+    "text": "Visuals - East Hallway\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Hallway axis confirms sequence of doors, handrail and ceiling lights.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 39,
+    "title": "Visuals - East Hallway \u00b7 PACE CENTER",
+    "group": "East hallway",
+    "image": "/reference/final/39.jpg",
+    "text": "Visuals - East Hallway\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Hallway cubby perspective, alternate direction.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 40,
+    "title": "Visuals - Clinic Overall - 1129 \u00b7 INTERIOR ELEVATION",
+    "group": "Clinic",
+    "image": "/reference/final/40.jpg",
+    "text": "Visuals - Clinic Overall - 1129\nINTERIOR ELEVATION\n\n\n\n\n        EAST\n\n\n\n\n        WEST\n\n\n\n\n        NORTH                                                   SOUTH\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Clinic 1129 line elevations: nurse desk, door sequence and wall rails.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-drawing"
+  },
+  {
+    "page": 41,
+    "title": "Visuals - Clinic Overall - 1129 \u00b7 RENDERED ELEVATION",
+    "group": "Clinic",
+    "image": "/reference/final/41.jpg",
+    "text": "Visuals - Clinic Overall - 1129\nRENDERED ELEVATION\n\n\n\n\n WEST\n\n\n\n\n EAST\n\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Clinic 1129 rendered long elevations: six doors and numbered wayfinding.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 42,
+    "title": "Visuals - Clinic Overall - 1129 \u00b7 RENDERED ELEVATION",
+    "group": "Clinic",
+    "image": "/reference/final/42.jpg",
+    "text": "Visuals - Clinic Overall - 1129\nRENDERED ELEVATION\n\n\n\n\n        NORTH\n\n\n\n\n        SOUTH\n\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Clinic 1129 north/south render elevations: desk, consultation furniture and clinical equipment.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 43,
+    "title": "Visuals - Clinic Overall - 1130 \u00b7 INTERIOR ELEVATION",
+    "group": "Clinic",
+    "image": "/reference/final/43.jpg",
+    "text": "Visuals - Clinic Overall - 1130\nINTERIOR ELEVATION\n\n\n\n\nWEST\n\n\n\n\nEAST\n\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Clinic 1130 line elevations: numbered doors 1\u20136 opposite clinical desk.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-drawing"
+  },
+  {
+    "page": 44,
+    "title": "Visuals - Clinic Overall - 1130 \u00b7 RENDERED ELEVATION",
+    "group": "Clinic",
+    "image": "/reference/final/44.jpg",
+    "text": "Visuals - Clinic Overall - 1130\nRENDERED ELEVATION\n\n\n\n\n  EAST\n\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Clinic 1130 east finish elevation: six numbered exam doors. Numeric order cannot be mapped confidently to pixel plan without a room schedule.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 45,
+    "title": "Visuals - Clinic Overall \u00b7 PACE CENTER",
+    "group": "Clinic",
+    "image": "/reference/final/45.jpg",
+    "text": "Visuals - Clinic Overall\n\n\n\n\n              PACE CENTER\n              1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Clinic circulation and nurse station perspective.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 46,
+    "title": "Visuals - Clinic Overall \u00b7 PACE CENTER",
+    "group": "Clinic",
+    "image": "/reference/final/46.jpg",
+    "text": "Visuals - Clinic Overall\n\n\n\n\n              PACE CENTER\n              1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Nurse station and clinic perspective with people; furniture/finish evidence only.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 47,
+    "title": "Visuals - Clinic Overall \u00b7 PACE CENTER",
+    "group": "Clinic",
+    "image": "/reference/final/47.jpg",
+    "text": "Visuals - Clinic Overall\n\n\n\n\n              PACE CENTER\n              1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Clinic nurse-station return and teal bulkhead.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 48,
+    "title": "Visuals - Clinic Overall \u00b7 PACE CENTER",
+    "group": "Clinic",
+    "image": "/reference/final/48.jpg",
+    "text": "Visuals - Clinic Overall\n\n\n\n\n              PACE CENTER\n              1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Alternate nurse-station perspective with people.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 49,
+    "title": "Visuals - Clinic Overall \u00b7 PACE CENTER",
+    "group": "Clinic",
+    "image": "/reference/final/49.jpg",
+    "text": "Visuals - Clinic Overall\n\n\n\n\n              PACE CENTER\n              1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Clinic end-on nurse counter: fluted timber, white top and teal bulkhead.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 50,
+    "title": "Visuals - Clinic Overall \u00b7 PACE CENTER",
+    "group": "Clinic",
+    "image": "/reference/final/50.jpg",
+    "text": "Visuals - Clinic Overall\n\n\n\n\n              PACE CENTER\n              1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Empty nurse-counter perspective confirms counter form.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 51,
+    "title": "Visuals - Clinic Overall \u00b7 PACE CENTER",
+    "group": "Clinic",
+    "image": "/reference/final/51.jpg",
+    "text": "Visuals - Clinic Overall\n\n\n\n\n              PACE CENTER\n              1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Clinic circulation, room 1126 sign visible; exact placement needs a numbered plan.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 52,
+    "title": "Visuals - Clinic Overall \u00b7 PACE CENTER",
+    "group": "Clinic",
+    "image": "/reference/final/52.jpg",
+    "text": "Visuals - Clinic Overall\n\n\n\n\n              PACE CENTER\n              1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Alternate view of same circulation and room 1126 signage.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 53,
+    "title": "Visuals - Clinic - 1110 Consult Room \u00b7 INTERIOR ELEVATION",
+    "group": "Clinic",
+    "image": "/reference/final/53.jpg",
+    "text": "Visuals - Clinic - 1110 Consult Room\nINTERIOR ELEVATION\n\n\n\n\n                     NORTH                                      SOUTH\n\n\n\n\n                     EAST                                               WEST\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Consult room 1110: four line elevations, central table, chairs and display.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-drawing"
+  },
+  {
+    "page": 54,
+    "title": "Visuals - Clinic - 1110 Consult Room \u00b7 PACE CENTER",
+    "group": "Clinic",
+    "image": "/reference/final/54.jpg",
+    "text": "Visuals - Clinic - 1110 Consult Room\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Consult room 1110 perspective: wall display, table and blue chairs.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 55,
+    "title": "Visuals - Clinic \u2013 Exam Room Typical \u00b7 PACE CENTER",
+    "group": "Clinic",
+    "image": "/reference/final/55.jpg",
+    "text": "Visuals - Clinic \u2013 Exam Room Typical\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Typical exam-room top view: angled exam recliner, side chair and cabinet. No dimensions or room number.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 56,
+    "title": "Visuals - Clinic \u2013 Exam Room Typical \u00b7 PACE CENTER",
+    "group": "Clinic",
+    "image": "/reference/final/56.jpg",
+    "text": "Visuals - Clinic \u2013 Exam Room Typical\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Typical exam room: recliner, side chair, sink/cabinet run and wood door.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 57,
+    "title": "Visuals - Clinic - 1111 Triage \u00b7 PACE CENTER",
+    "group": "Clinic",
+    "image": "/reference/final/57.jpg",
+    "text": "Visuals - Clinic - 1111 Triage\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Triage room 1111 perspective. Model-to-plan location cannot be established uniquely from the compressed plan.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 58,
+    "title": "Visuals - Clinic \u2013 Exam Room Typical \u00b7 PACE CENTER",
+    "group": "Clinic",
+    "image": "/reference/final/58.jpg",
+    "text": "Visuals - Clinic \u2013 Exam Room Typical\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Typical exam room cabinetry, sink and side chair.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 59,
+    "title": "Visuals - Clinic \u2013 Exam Room Typical \u00b7 PACE CENTER",
+    "group": "Clinic",
+    "image": "/reference/final/59.jpg",
+    "text": "Visuals - Clinic \u2013 Exam Room Typical\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Reverse typical exam-room view, diagnostic wall equipment.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 60,
+    "title": "Visuals - Physical Therapy Overall \u00b7 INTERIOR ELEVATION",
+    "group": "Physical therapy",
+    "image": "/reference/final/60.jpg",
+    "text": "Visuals - Physical Therapy Overall\nINTERIOR ELEVATION\n\n\n\n\n                 NORTH                                                 SOUTH\n\n\n\n\n     EAST                                                       WEST\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "PT line elevations: mezzanine guardrail, glazed openings and double-height volume; no dimension strings.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-drawing"
+  },
+  {
+    "page": 61,
+    "title": "Visuals - Physical Therapy Overall \u00b7 RENDERED ELEVATION",
+    "group": "Physical therapy",
+    "image": "/reference/final/61.jpg",
+    "text": "Visuals - Physical Therapy Overall\nRENDERED ELEVATION\n\n\n\n\n              NORTH                                             SOUTH\n\n\n\n\n EAST                                                             WEST\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "PT finish elevations: mezzanine edge and lower glazing.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 62,
+    "title": "Visuals - Physical Therapy Overall \u00b7 PACE CENTER",
+    "group": "Physical therapy",
+    "image": "/reference/final/62.jpg",
+    "text": "Visuals - Physical Therapy Overall\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "PT perspective: treatment tables, trainer, bike, mezzanine railing.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 63,
+    "title": "Visuals - Physical Therapy Overall \u00b7 PACE CENTER",
+    "group": "Physical therapy",
+    "image": "/reference/final/63.jpg",
+    "text": "Visuals - Physical Therapy Overall\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "PT perimeter: exercise bikes, training steps, ball rack and glazing.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 64,
+    "title": "Visuals - Physical Therapy Overall \u00b7 PACE CENTER",
+    "group": "Physical therapy",
+    "image": "/reference/final/64.jpg",
+    "text": "Visuals - Physical Therapy Overall\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "PT treatment table arrangement under mezzanine.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 65,
+    "title": "Visuals - Physical Therapy Overall \u00b7 PACE CENTER",
+    "group": "Physical therapy",
+    "image": "/reference/final/65.jpg",
+    "text": "Visuals - Physical Therapy Overall\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "PT reverse perspective and inset orientation plan; treatment tables and demonstration kitchen visible.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 66,
+    "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 INTERIOR ELEVATION",
+    "group": "Day room",
+    "image": "/reference/final/66.jpg",
+    "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\nINTERIOR ELEVATION\n\n\n\n\n                                                           NORTH\n\n\n\n\n                                                           SOUTH\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Day-room north/south sections: 12 ft finish datum; 4 ft lower + 8 ft upper; 4 in base; bowstring trusses. Roof crown is not explicitly dimensioned.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-drawing"
+  },
+  {
+    "page": 67,
+    "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 INTERIOR ELEVATION",
+    "group": "Day room",
+    "image": "/reference/final/67.jpg",
+    "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\nINTERIOR ELEVATION\n\n\n\n\n                                                           EAST\n\n\n\n\n                                                           WEST\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Day-room east/west elevations repeat 12 ft, 4 ft, 8 ft and 4 in datums. Landscape wall and library are clearly placed.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-drawing"
+  },
+  {
+    "page": 68,
+    "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 RENDERED ELEVATION",
+    "group": "Day room",
+    "image": "/reference/final/68.jpg",
+    "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\nRENDERED ELEVATION\n\n\n\n\n                                                            NORTH\n\n\n\n\n                                                            SOUTH\n\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Day-room north/south rendered elevations: tree, screens, openings and living wall.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 69,
+    "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 RENDERED ELEVATION",
+    "group": "Day room",
+    "image": "/reference/final/69.jpg",
+    "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\nRENDERED ELEVATION\n\n\n\n\n              EAST\n\n\n\n\n                                                            SOUTH\n\n              WEST\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Day-room rendered elevations: landscape battens east; library and screen west. Page also contains a SOUTH label without a distinct separate elevation.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 70,
+    "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 PACE CENTER",
+    "group": "Day room",
+    "image": "/reference/final/70.jpg",
+    "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\n\n\n\n\n           PACE CENTER\n           1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Day-room perspective: round blue tree lounge, rectangular tables and timber roof/trusses.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 71,
+    "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 PACE CENTER",
+    "group": "Day room",
+    "image": "/reference/final/71.jpg",
+    "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\n\n\n\n\n           PACE CENTER\n           1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Alternate tree lounge view, timber chair frames and tabletops.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 72,
+    "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 PACE CENTER",
+    "group": "Day room",
+    "image": "/reference/final/72.jpg",
+    "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\n\n\n\n\n           PACE CENTER\n           1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Landscape wall perspective: layered slats, blue banquette and tables.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 73,
+    "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 PACE CENTER",
+    "group": "Day room",
+    "image": "/reference/final/73.jpg",
+    "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\n\n\n\n\n           PACE CENTER\n           1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Alternate banquette/landscape wall perspective.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 74,
+    "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 PACE CENTER",
+    "group": "Day room",
+    "image": "/reference/final/74.jpg",
+    "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\n\n\n\n\n           PACE CENTER\n           1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Tree lounge close view: branches, planting and blue seating.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 75,
+    "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 PACE CENTER",
+    "group": "Day room",
+    "image": "/reference/final/75.jpg",
+    "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\n\n\n\n\n           PACE CENTER\n           1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Library-wall view with pale chair variant; conflicts with darker chair variant on p.76.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 76,
+    "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 PACE CENTER",
+    "group": "Day room",
+    "image": "/reference/final/76.jpg",
+    "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\n\n\n\n\n           PACE CENTER\n           1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Same library-wall view with darker timber chair variant. Final installed chair specification is unresolved.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 77,
+    "title": "Visuals - Day Room - Dining 1421 \u00b7 INTERIOR ELEVATION",
+    "group": "Dining",
+    "image": "/reference/final/77.jpg",
+    "text": "Visuals - Day Room - Dining 1421\nINTERIOR ELEVATION\n\n\n\n\n      NORTH                                                     SOUTH\n\n\n\n\n      EAST                                                      WEST\n\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Dining 1421 line elevations: four orientations, screen, service opening and doors.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-drawing"
+  },
+  {
+    "page": 78,
+    "title": "Visuals - Day Room - Dining 1421 \u00b7 RENDERED ELEVATION",
+    "group": "Dining",
+    "image": "/reference/final/78.jpg",
+    "text": "Visuals - Day Room - Dining 1421\nRENDERED ELEVATION\n\n\n\n\n     NORTH                                                      SOUTH\n\n\n\n\n     EAST                                                       WEST\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Dining 1421 rendered elevations: timber lattice, green doors, service opening and artwork.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 79,
+    "title": "Visuals - Day Room - Dining 1421 \u00b7 PACE CENTER",
+    "group": "Dining",
+    "image": "/reference/final/79.jpg",
+    "text": "Visuals - Day Room - Dining 1421\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Dining perspective: TV wall, lattice partition and small tables.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 80,
+    "title": "Visuals - Day Room - Dining 1421 \u00b7 PACE CENTER",
+    "group": "Dining",
+    "image": "/reference/final/80.jpg",
+    "text": "Visuals - Day Room - Dining 1421\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Alternate dining view: lattice and tile ceiling grid.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 81,
+    "title": "Visuals - Day Room - Dining 1421 \u00b7 PACE CENTER",
+    "group": "Dining",
+    "image": "/reference/final/81.jpg",
+    "text": "Visuals - Day Room - Dining 1421\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Dining service wall with roller opening and beverage counter.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 82,
+    "title": "Visuals - Day Room - Dining 1421 \u00b7 PACE CENTER",
+    "group": "Dining",
+    "image": "/reference/final/82.jpg",
+    "text": "Visuals - Day Room - Dining 1421\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Reverse dining view: service window, art and tables.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 83,
+    "title": "Visuals - Day Room - Dining 1421 \u00b7 PACE CENTER",
+    "group": "Dining",
+    "image": "/reference/final/83.jpg",
+    "text": "Visuals - Day Room - Dining 1421\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Dining service corner and lattice detail.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 84,
+    "title": "Visuals - Admin \u00b7 INTERIOR ELEVATION",
+    "group": "Administration",
+    "image": "/reference/final/84.jpg",
+    "text": "Visuals - Admin\nINTERIOR ELEVATION\n\n\n\n\n  NORTH                                                         SOUTH\n\n\n\n\n  EAST                                                          WEST\n\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Admin line elevations: four directions, partition openings and glazed meeting room.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-drawing"
+  },
+  {
+    "page": 85,
+    "title": "Visuals - Admin \u00b7 PACE CENTER",
+    "group": "Administration",
+    "image": "/reference/final/85.jpg",
+    "text": "Visuals - Admin\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Admin shared workstations: bench desks, dividers and task chairs.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 86,
+    "title": "Visuals - Admin \u00b7 PACE CENTER",
+    "group": "Administration",
+    "image": "/reference/final/86.jpg",
+    "text": "Visuals - Admin\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Admin central passage and workstations.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 87,
+    "title": "Visuals - Admin \u00b7 PACE CENTER",
+    "group": "Administration",
+    "image": "/reference/final/87.jpg",
+    "text": "Visuals - Admin\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Admin alternate bench arrangement and shared workspace.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 88,
+    "title": "Visuals - Admin \u00b7 PACE CENTER",
+    "group": "Administration",
+    "image": "/reference/final/88.jpg",
+    "text": "Visuals - Admin\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Admin workstation-to-meeting-room relationship and glass partitions.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 89,
+    "title": "Visuals - Admin \u00b7 PACE CENTER",
+    "group": "Administration",
+    "image": "/reference/final/89.jpg",
+    "text": "Visuals - Admin\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Admin window-side desk row with shades.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 90,
+    "title": "Visuals - Admin \u00b7 PACE CENTER",
+    "group": "Administration",
+    "image": "/reference/final/90.jpg",
+    "text": "Visuals - Admin\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Admin long meeting table and chairs.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  },
+  {
+    "page": 91,
+    "title": "Visuals - Admin \u00b7 PACE CENTER",
+    "group": "Administration",
+    "image": "/reference/final/91.jpg",
+    "text": "Visuals - Admin\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+    "findings": "Small admin consultation/meeting room: table, display and chairs.",
+    "reviewStatus": "visually-inventoried",
+    "evidenceType": "source-render-or-schedule"
+  }
+]

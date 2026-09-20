@@ -1,0 +1,520 @@
+{
+  "version": "2.0",
+  "style": "Rounded isometric editorial figures, derived from supplied illustration references",
+  "identity": "Composite stable profiles; not a verified employee roster",
+  "roles": {
+    "participant": {
+      "wardrobe": "casual",
+      "color": "#c26743",
+      "skeleton": "seen-rounded-16"
+    },
+    "doctor": {
+      "wardrobe": "coat",
+      "color": "#f8f3e4",
+      "skeleton": "seen-rounded-16"
+    },
+    "nurse": {
+      "wardrobe": "scrubs",
+      "color": "#238e94",
+      "skeleton": "seen-rounded-16"
+    },
+    "pt": {
+      "wardrobe": "scrubs",
+      "color": "#357f8b",
+      "skeleton": "seen-rounded-16"
+    },
+    "ot": {
+      "wardrobe": "scrubs",
+      "color": "#51a3a0",
+      "skeleton": "seen-rounded-16"
+    },
+    "aide": {
+      "wardrobe": "scrubs",
+      "color": "#2a8e84",
+      "skeleton": "seen-rounded-16"
+    },
+    "driver": {
+      "wardrobe": "uniform",
+      "color": "#1d6671",
+      "skeleton": "seen-rounded-16"
+    },
+    "reception": {
+      "wardrobe": "uniform",
+      "color": "#32868b",
+      "skeleton": "seen-rounded-16"
+    },
+    "coordinator": {
+      "wardrobe": "uniform",
+      "color": "#468e91",
+      "skeleton": "seen-rounded-16"
+    },
+    "social-worker": {
+      "wardrobe": "uniform",
+      "color": "#377c84",
+      "skeleton": "seen-rounded-16"
+    },
+    "activities": {
+      "wardrobe": "uniform",
+      "color": "#2e9290",
+      "skeleton": "seen-rounded-16"
+    },
+    "nutrition": {
+      "wardrobe": "uniform",
+      "color": "#559599",
+      "skeleton": "seen-rounded-16"
+    }
+  },
+  "people": [
+    {
+      "id": "member-escort",
+      "role": "participant",
+      "appearance": 0,
+      "skin": "#e6a575",
+      "hair": "#d4d5c9",
+      "hairStyle": 0,
+      "glasses": true,
+      "accent": "#b75c3d",
+      "height": 0.96
+    },
+    {
+      "id": "aide-escort",
+      "role": "aide",
+      "appearance": 1,
+      "skin": "#d49366",
+      "hair": "#453429",
+      "hairStyle": 1,
+      "glasses": false,
+      "accent": "#2a8e84",
+      "height": 1
+    },
+    {
+      "id": "doctor-01",
+      "role": "doctor",
+      "appearance": 0,
+      "skin": "#e6a575",
+      "hair": "#213c40",
+      "hairStyle": 0,
+      "glasses": true,
+      "accent": "#f8f3e4",
+      "height": 1
+    },
+    {
+      "id": "member-clinic",
+      "role": "participant",
+      "appearance": 1,
+      "skin": "#d49366",
+      "hair": "#b6b9b0",
+      "hairStyle": 1,
+      "glasses": true,
+      "accent": "#327c78",
+      "height": 0.96
+    },
+    {
+      "id": "doctor-02",
+      "role": "doctor",
+      "appearance": 1,
+      "skin": "#d49366",
+      "hair": "#453429",
+      "hairStyle": 1,
+      "glasses": false,
+      "accent": "#f8f3e4",
+      "height": 1
+    },
+    {
+      "id": "member-consult",
+      "role": "participant",
+      "appearance": 2,
+      "skin": "#f1bd8f",
+      "hair": "#ebe8db",
+      "hairStyle": 2,
+      "glasses": true,
+      "accent": "#d4a145",
+      "height": 0.96
+    },
+    {
+      "id": "nurse-01",
+      "role": "nurse",
+      "appearance": 0,
+      "skin": "#e6a575",
+      "hair": "#213c40",
+      "hairStyle": 0,
+      "glasses": true,
+      "accent": "#238e94",
+      "height": 1
+    },
+    {
+      "id": "nurse-02",
+      "role": "nurse",
+      "appearance": 3,
+      "skin": "#9b694b",
+      "hair": "#213c40",
+      "hairStyle": 0,
+      "glasses": true,
+      "accent": "#238e94",
+      "height": 1
+    },
+    {
+      "id": "member-pt",
+      "role": "participant",
+      "appearance": 3,
+      "skin": "#9b694b",
+      "hair": "#d4d5c9",
+      "hairStyle": 0,
+      "glasses": true,
+      "accent": "#7b8698",
+      "height": 0.96
+    },
+    {
+      "id": "physical-therapist",
+      "role": "pt",
+      "appearance": 0,
+      "skin": "#e6a575",
+      "hair": "#213c40",
+      "hairStyle": 0,
+      "glasses": true,
+      "accent": "#357f8b",
+      "height": 1
+    },
+    {
+      "id": "occupational-therapist",
+      "role": "ot",
+      "appearance": 1,
+      "skin": "#d49366",
+      "hair": "#453429",
+      "hairStyle": 1,
+      "glasses": false,
+      "accent": "#51a3a0",
+      "height": 1
+    },
+    {
+      "id": "member-ot",
+      "role": "participant",
+      "appearance": 4,
+      "skin": "#e6a575",
+      "hair": "#b6b9b0",
+      "hairStyle": 1,
+      "glasses": true,
+      "accent": "#b75c3d",
+      "height": 0.96
+    },
+    {
+      "id": "aide-02",
+      "role": "aide",
+      "appearance": 2,
+      "skin": "#f1bd8f",
+      "hair": "#272f32",
+      "hairStyle": 2,
+      "glasses": false,
+      "accent": "#2a8e84",
+      "height": 1
+    },
+    {
+      "id": "activities-lead",
+      "role": "activities",
+      "appearance": 0,
+      "skin": "#e6a575",
+      "hair": "#213c40",
+      "hairStyle": 0,
+      "glasses": true,
+      "accent": "#2e9290",
+      "height": 1
+    },
+    {
+      "id": "member-walk",
+      "role": "participant",
+      "appearance": 2,
+      "skin": "#f1bd8f",
+      "hair": "#ebe8db",
+      "hairStyle": 2,
+      "glasses": true,
+      "accent": "#d4a145",
+      "height": 0.96
+    },
+    {
+      "id": "member-social",
+      "role": "participant",
+      "appearance": 5,
+      "skin": "#d49366",
+      "hair": "#ebe8db",
+      "hairStyle": 2,
+      "glasses": true,
+      "accent": "#327c78",
+      "height": 0.96
+    },
+    {
+      "id": "member-group-01",
+      "role": "participant",
+      "appearance": 6,
+      "skin": "#f1bd8f",
+      "hair": "#d4d5c9",
+      "hairStyle": 0,
+      "glasses": true,
+      "accent": "#d4a145",
+      "height": 0.96
+    },
+    {
+      "id": "member-group-02",
+      "role": "participant",
+      "appearance": 7,
+      "skin": "#9b694b",
+      "hair": "#b6b9b0",
+      "hairStyle": 1,
+      "glasses": true,
+      "accent": "#7b8698",
+      "height": 0.96
+    },
+    {
+      "id": "member-wheelchair",
+      "role": "participant",
+      "appearance": 0,
+      "skin": "#e6a575",
+      "hair": "#ebe8db",
+      "hairStyle": 2,
+      "glasses": true,
+      "accent": "#b75c3d",
+      "height": 0.96
+    },
+    {
+      "id": "care-aide-03",
+      "role": "aide",
+      "appearance": 4,
+      "skin": "#e6a575",
+      "hair": "#453429",
+      "hairStyle": 1,
+      "glasses": false,
+      "accent": "#2a8e84",
+      "height": 1
+    },
+    {
+      "id": "social-worker",
+      "role": "social-worker",
+      "appearance": 2,
+      "skin": "#f1bd8f",
+      "hair": "#272f32",
+      "hairStyle": 2,
+      "glasses": false,
+      "accent": "#377c84",
+      "height": 1
+    },
+    {
+      "id": "member-support",
+      "role": "participant",
+      "appearance": 1,
+      "skin": "#d49366",
+      "hair": "#d4d5c9",
+      "hairStyle": 0,
+      "glasses": true,
+      "accent": "#327c78",
+      "height": 0.96
+    },
+    {
+      "id": "receptionist",
+      "role": "reception",
+      "appearance": 1,
+      "skin": "#d49366",
+      "hair": "#453429",
+      "hairStyle": 1,
+      "glasses": false,
+      "accent": "#32868b",
+      "height": 1
+    },
+    {
+      "id": "food-service-01",
+      "role": "nutrition",
+      "appearance": 1,
+      "skin": "#d49366",
+      "hair": "#453429",
+      "hairStyle": 1,
+      "glasses": false,
+      "accent": "#559599",
+      "height": 1
+    },
+    {
+      "id": "food-service-02",
+      "role": "nutrition",
+      "appearance": 2,
+      "skin": "#f1bd8f",
+      "hair": "#272f32",
+      "hairStyle": 2,
+      "glasses": false,
+      "accent": "#559599",
+      "height": 1
+    },
+    {
+      "id": "seated-0",
+      "role": "participant",
+      "appearance": 2,
+      "skin": "#f1bd8f",
+      "hair": "#ebe8db",
+      "hairStyle": 2,
+      "glasses": true,
+      "accent": "#d4a145",
+      "height": 0.96
+    },
+    {
+      "id": "seated-1",
+      "role": "participant",
+      "appearance": 3,
+      "skin": "#9b694b",
+      "hair": "#d4d5c9",
+      "hairStyle": 0,
+      "glasses": true,
+      "accent": "#7b8698",
+      "height": 0.96
+    },
+    {
+      "id": "seated-2",
+      "role": "participant",
+      "appearance": 4,
+      "skin": "#e6a575",
+      "hair": "#b6b9b0",
+      "hairStyle": 1,
+      "glasses": true,
+      "accent": "#b75c3d",
+      "height": 0.96
+    },
+    {
+      "id": "seated-3",
+      "role": "participant",
+      "appearance": 5,
+      "skin": "#d49366",
+      "hair": "#ebe8db",
+      "hairStyle": 2,
+      "glasses": true,
+      "accent": "#327c78",
+      "height": 0.96
+    },
+    {
+      "id": "seated-4",
+      "role": "coordinator",
+      "appearance": 6,
+      "skin": "#f1bd8f",
+      "hair": "#213c40",
+      "hairStyle": 0,
+      "glasses": true,
+      "accent": "#468e91",
+      "height": 1
+    },
+    {
+      "id": "seated-5",
+      "role": "coordinator",
+      "appearance": 7,
+      "skin": "#9b694b",
+      "hair": "#453429",
+      "hairStyle": 1,
+      "glasses": false,
+      "accent": "#468e91",
+      "height": 1
+    },
+    {
+      "id": "seated-6",
+      "role": "social-worker",
+      "appearance": 0,
+      "skin": "#e6a575",
+      "hair": "#272f32",
+      "hairStyle": 2,
+      "glasses": false,
+      "accent": "#377c84",
+      "height": 1
+    },
+    {
+      "id": "receptionist-02",
+      "variant": 4,
+      "skin": "#edb083",
+      "hair": "#253f48",
+      "hairStyle": 1,
+      "glasses": false,
+      "accent": "#32868b",
+      "height": 1,
+      "role": "reception"
+    },
+    {
+      "id": "arrival-walker",
+      "variant": 10,
+      "skin": "#f2bd94",
+      "hair": "#e7e4d8",
+      "hairStyle": 1,
+      "glasses": false,
+      "accent": "#cf9362",
+      "height": 0.96,
+      "role": "participant"
+    },
+    {
+      "id": "arrival-cane",
+      "variant": 11,
+      "skin": "#9b6647",
+      "hair": "#e7e4d8",
+      "hairStyle": 2,
+      "glasses": false,
+      "accent": "#658085",
+      "height": 0.96,
+      "role": "participant"
+    },
+    {
+      "id": "arrival-aide-a",
+      "variant": 12,
+      "skin": "#edb083",
+      "hair": "#253f48",
+      "hairStyle": 0,
+      "glasses": true,
+      "accent": "#2a8e84",
+      "height": 1,
+      "role": "aide"
+    },
+    {
+      "id": "arrival-independent",
+      "variant": 12,
+      "skin": "#edb083",
+      "hair": "#e7e4d8",
+      "hairStyle": 0,
+      "glasses": true,
+      "accent": "#b75e42",
+      "height": 0.96,
+      "role": "participant"
+    },
+    {
+      "id": "arrival-wheelchair",
+      "variant": 13,
+      "skin": "#bd805a",
+      "hair": "#e7e4d8",
+      "hairStyle": 1,
+      "glasses": false,
+      "accent": "#3d7776",
+      "height": 0.96,
+      "role": "participant"
+    },
+    {
+      "id": "arrival-aide-b",
+      "variant": 14,
+      "skin": "#f2bd94",
+      "hair": "#253f48",
+      "hairStyle": 2,
+      "glasses": false,
+      "accent": "#2a8e84",
+      "height": 1,
+      "role": "aide"
+    },
+    {
+      "id": "driver-1",
+      "role": "driver",
+      "appearance": 0,
+      "skin": "#e6a575",
+      "hair": "#213c40",
+      "hairStyle": 0,
+      "glasses": true,
+      "accent": "#1d6671",
+      "height": 1
+    },
+    {
+      "id": "driver-2",
+      "role": "driver",
+      "appearance": 1,
+      "skin": "#d49366",
+      "hair": "#453429",
+      "hairStyle": 1,
+      "glasses": false,
+      "accent": "#1d6671",
+      "height": 1
+    }
+  ]
+}

@@ -1,0 +1,210 @@
+{
+  "sourceRootDescription": "User-supplied SGV Center media folder",
+  "assets": [
+    {
+      "reference": 93,
+      "sourceName": "Center Photo redited-8.jpg",
+      "sourceRelativePath": "Center interior photos/Edited by Ricky/Center Photo redited-8.jpg",
+      "sha256": "8579a979944f2709929099edb29da8dc6c0cb2b687f97c27b6e3de836af343b2",
+      "originalSize": [
+        3108,
+        1231
+      ],
+      "deliveredFile": "center-08.jpg"
+    },
+    {
+      "reference": 94,
+      "sourceName": "Center Photo redited-13.jpg",
+      "sourceRelativePath": "Center interior photos/Edited by Ricky/Center Photo redited-13.jpg",
+      "sha256": "a014f56aa547c163610f9b7dfe45af1213e91011f9ec6b538e78db978a35d3d7",
+      "originalSize": [
+        6741,
+        4498
+      ],
+      "deliveredFile": "center-13.jpg"
+    },
+    {
+      "reference": 95,
+      "sourceName": "Center Photo redited-18.jpg",
+      "sourceRelativePath": "Center interior photos/Edited by Ricky/Center Photo redited-18.jpg",
+      "sha256": "167ce3674167c496f0f4730bbc6cc9be9a5d19a808d8cff803988fecb4169f52",
+      "originalSize": [
+        6741,
+        4498
+      ],
+      "deliveredFile": "center-18.jpg"
+    },
+    {
+      "reference": 96,
+      "sourceName": "Center Photo redited-15.jpg",
+      "sourceRelativePath": "Center interior photos/Edited by Ricky/Center Photo redited-15.jpg",
+      "sha256": "9ca7b6620d371eca54a359333ddc24aea53d627c758479da43ee45ff6c308a2d",
+      "originalSize": [
+        6740,
+        4497
+      ],
+      "deliveredFile": "center-15.jpg"
+    },
+    {
+      "reference": 97,
+      "sourceName": "Center Photo redited-10.jpg",
+      "sourceRelativePath": "Center interior photos/Edited by Ricky/Center Photo redited-10.jpg",
+      "sha256": "fd31495a1408a337743e62126f04e116c343655933cc97a7cd23324bc118bcf5",
+      "originalSize": [
+        6741,
+        4498
+      ],
+      "deliveredFile": "center-10.jpg"
+    },
+    {
+      "reference": 98,
+      "sourceName": "Center Photo redited-7.jpg",
+      "sourceRelativePath": "Center interior photos/Edited by Ricky/Center Photo redited-7.jpg",
+      "sha256": "a64dc5120bef1464efae4bfc451d736512e3ea0b0df6bb71a6956f4951021370",
+      "originalSize": [
+        6740,
+        4497
+      ],
+      "deliveredFile": "center-07.jpg"
+    },
+    {
+      "reference": 99,
+      "sourceName": "Center Photo redited-1.jpg",
+      "sourceRelativePath": "Center interior photos/Edited by Ricky/Center Photo redited-1.jpg",
+      "sha256": "0cbcd26dce09287689e074d37d310bb28ab048e7305a210d47732d97f5587805",
+      "originalSize": [
+        6741,
+        4498
+      ],
+      "deliveredFile": "center-01.jpg"
+    },
+    {
+      "reference": 100,
+      "sourceName": "Center Photo redited-9.jpg",
+      "sourceRelativePath": "Center interior photos/Edited by Ricky/Center Photo redited-9.jpg",
+      "sha256": "9a1adc9d752941f1335f05362198820c33e92721289f23faaacd697fd5695a10",
+      "originalSize": [
+        6741,
+        4498
+      ],
+      "deliveredFile": "center-09.jpg"
+    },
+    {
+      "reference": 101,
+      "sourceName": "Center Photo redited-5.jpg",
+      "sourceRelativePath": "Center interior photos/Edited by Ricky/Center Photo redited-5.jpg",
+      "sha256": "f049f0a877539a84bdaf72cc8d1d820a7a4c4a6b0782974329f88280a5500115",
+      "originalSize": [
+        6740,
+        4497
+      ],
+      "deliveredFile": "center-05.jpg"
+    },
+    {
+      "reference": 102,
+      "sourceName": "Center Photo redited-3.jpg",
+      "sourceRelativePath": "Center interior photos/Edited by Ricky/Center Photo redited-3.jpg",
+      "sha256": "6c41dee7c8e72ef855074ccda60c03b9d36a1be2038fab81b427b748b9f3f9a0",
+      "originalSize": [
+        6740,
+        4497
+      ],
+      "deliveredFile": "center-03.jpg"
+    },
+    {
+      "reference": 103,
+      "sourceName": "Center Photo redited-6.jpg",
+      "sourceRelativePath": "Center interior photos/Edited by Ricky/Center Photo redited-6.jpg",
+      "sha256": "91f8aeba3a378b871a25fecca5c4f23db5bafcd2bb1d30cd6d886adc237f97b1",
+      "originalSize": [
+        6740,
+        4497
+      ],
+      "deliveredFile": "center-06.jpg"
+    },
+    {
+      "reference": 104,
+      "sourceName": "Center Photo redited-2.jpg",
+      "sourceRelativePath": "Center interior photos/Edited by Ricky/Center Photo redited-2.jpg",
+      "sha256": "86c773e6152d3e8d37ac909223cf3bd64469fa0d8ba5ec328c3972e145ae68ca",
+      "originalSize": [
+        6740,
+        4497
+      ],
+      "deliveredFile": "center-02.jpg"
+    },
+    {
+      "reference": 105,
+      "sourceName": "Center Photo redited-4.jpg",
+      "sourceRelativePath": "Center interior photos/Edited by Ricky/Center Photo redited-4.jpg",
+      "sha256": "cbf11383255cab342a4ef8cddbd3ce85f8d99ef97bb7ee2e66e30250b2413cf0",
+      "originalSize": [
+        6740,
+        4497
+      ],
+      "deliveredFile": "center-04.jpg"
+    },
+    {
+      "reference": 106,
+      "sourceName": "Center Photo redited-16.jpg",
+      "sourceRelativePath": "Center interior photos/Edited by Ricky/Center Photo redited-16.jpg",
+      "sha256": "1a9d828f1043ea3e8a0ae093fcc7018f7beca073f3a95aee8837a6085cbc4315",
+      "originalSize": [
+        6741,
+        4498
+      ],
+      "deliveredFile": "center-16.jpg"
+    },
+    {
+      "reference": 107,
+      "sourceName": "Sean Health Care 29A.jpg",
+      "sourceRelativePath": "Center interior photos/Langdon Wilson Photos/Sean Health Care 29A.jpg",
+      "sha256": "28c2d2f38ac1d4ebedd6cc3e51a59e56fcd4bde90bb51c3b892138f92d36e165",
+      "originalSize": [
+        1391,
+        3478
+      ],
+      "deliveredFile": "lockers.jpg"
+    },
+    {
+      "reference": 108,
+      "sourceName": "Sean Health Care 29.jpg",
+      "sourceRelativePath": "Center interior photos/Langdon Wilson Photos/Sean Health Care 29.jpg",
+      "sha256": "94516f9b9ccde9f1924daf9d8d2732e351aa16d6da4cebfd0bb086f8fbd9dbf5",
+      "originalSize": [
+        6741,
+        4498
+      ],
+      "deliveredFile": "staff-lounge.jpg"
+    },
+    {
+      "reference": 109,
+      "sourceName": "WechatIMG1941.jpg",
+      "sourceRelativePath": "Exterior Photos/WechatIMG1941.jpg",
+      "sha256": "4006cf0194e7c58bccebda70e6d4dbad1588669a7d1713a7790ea71a4f051907",
+      "originalSize": [
+        2880,
+        1920
+      ],
+      "deliveredFile": "dropoff-entry.jpg"
+    },
+    {
+      "reference": 110,
+      "sourceName": "WechatIMG1942.jpg",
+      "sourceRelativePath": "Exterior Photos/WechatIMG1942.jpg",
+      "sha256": "e59ab64e330ad714a0ef5c16609527c68068cca6f986e841384dc9dc8a8f4067",
+      "originalSize": [
+        2326,
+        1429
+      ],
+      "deliveredFile": "valley-facade.jpg"
+    },
+    {
+      "reference": 111,
+      "sourceName": "\u89c1\u5fc3\u9890\u517b\u822a\u62cd-Yan Xu.mp4",
+      "sourceRelativePath": "Exterior Photos/\u89c1\u5fc3\u9890\u517b\u822a\u62cd-Yan Xu.mp4",
+      "sha256": "4edc502cf544d5bdb2139840918a1dc18dd1966f80ce51ec75b984ea8b242875",
+      "deliveredFile": "exterior-drone.mp4"
+    }
+  ]
+}

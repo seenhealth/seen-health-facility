@@ -1,0 +1,1149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Portable facility model",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": "2.0"
+    },
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "units": {
+      "const": "m"
+    },
+    "coordinateSystem": {
+      "type": "string"
+    },
+    "revision": {
+      "type": "string"
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "pages": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "author": {
+          "type": "string"
+        },
+        "file": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "date",
+        "pages",
+        "author",
+        "file"
+      ]
+    },
+    "calibration": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "pixelsPerMeter": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "sourcePixelOrigin": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "referencePage": {
+          "type": "number"
+        },
+        "areaPage": {
+          "type": "number"
+        },
+        "anchorAreaSqFt": {
+          "type": "number"
+        },
+        "anchorPolygonPixels": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "minItems": 3
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "method",
+        "status",
+        "pixelsPerMeter",
+        "sourcePixelOrigin",
+        "referencePage",
+        "areaPage",
+        "anchorAreaSqFt",
+        "anchorPolygonPixels",
+        "notes"
+      ]
+    },
+    "levels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "referencePages": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "elevation": {
+            "type": "number"
+          },
+          "order": {
+            "type": "number"
+          },
+          "elevationStatus": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "referencePages",
+          "name",
+          "elevation",
+          "order",
+          "elevationStatus",
+          "notes"
+        ]
+      }
+    },
+    "zones": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "referencePages": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "short": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "levelId": {
+            "type": "string"
+          },
+          "polygon": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "minItems": 3
+          },
+          "floorMaterial": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "publishedAreaSqFt": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "tracedFootprintSqFt": {
+            "type": "number"
+          },
+          "programId": {
+            "type": "string"
+          },
+          "wallHeight": {
+            "type": "number"
+          },
+          "wallHeightStatus": {
+            "type": "string"
+          },
+          "geometryStatus": {
+            "type": "string"
+          },
+          "spread": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          }
+        },
+        "required": [
+          "id",
+          "referencePages",
+          "name",
+          "short",
+          "color",
+          "levelId",
+          "polygon",
+          "floorMaterial",
+          "notes",
+          "publishedAreaSqFt",
+          "tracedFootprintSqFt",
+          "programId",
+          "wallHeight",
+          "wallHeightStatus",
+          "geometryStatus",
+          "spread"
+        ]
+      }
+    },
+    "rooms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "referencePages": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "zoneId": {
+            "type": "string"
+          },
+          "levelId": {
+            "type": "string"
+          },
+          "polygon": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "minItems": 3
+          },
+          "kind": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "floorMaterial": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "referencePages",
+          "name",
+          "zoneId",
+          "levelId",
+          "polygon",
+          "kind",
+          "status",
+          "notes"
+        ]
+      }
+    },
+    "walls": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "referencePages": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "zoneId": {
+            "type": "string"
+          },
+          "levelId": {
+            "type": "string"
+          },
+          "a": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "b": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "height": {
+            "type": "number"
+          },
+          "thickness": {
+            "type": "number"
+          },
+          "material": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "referencePages",
+          "zoneId",
+          "levelId",
+          "a",
+          "b",
+          "height",
+          "thickness",
+          "material",
+          "status"
+        ]
+      }
+    },
+    "assets": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "dimensions": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "material": {
+            "type": "string"
+          },
+          "modelUrl": {
+            "type": "string"
+          },
+          "materials": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "parameters": {
+            "type": "object",
+            "additionalProperties": {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            }
+          }
+        },
+        "required": [
+          "kind",
+          "dimensions",
+          "material"
+        ]
+      }
+    },
+    "objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "referencePages": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "assetId": {
+            "type": "string"
+          },
+          "zoneId": {
+            "type": "string"
+          },
+          "levelId": {
+            "type": "string"
+          },
+          "position": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "rotation": {
+            "type": "number"
+          },
+          "scale": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "roomId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "layer": {
+            "enum": [
+              "furniture",
+              "architecture",
+              "wall-finish",
+              "ceiling",
+              "exterior",
+              "roof"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "referencePages",
+          "assetId",
+          "zoneId",
+          "levelId",
+          "position",
+          "rotation",
+          "scale",
+          "roomId",
+          "status",
+          "notes"
+        ]
+      }
+    },
+    "materials": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "color": {
+            "type": "string"
+          },
+          "roughness": {
+            "type": "number"
+          },
+          "metalness": {
+            "type": "number"
+          },
+          "pattern": {
+            "type": "string"
+          },
+          "opacity": {
+            "type": "number"
+          },
+          "textureUrl": {
+            "type": "string"
+          },
+          "emissive": {
+            "type": "string"
+          },
+          "emissiveIntensity": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "color",
+          "roughness"
+        ]
+      }
+    },
+    "programs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "publishedSqFt": {
+            "type": "number"
+          },
+          "sourcePage": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "publishedSqFt",
+          "sourcePage"
+        ]
+      }
+    },
+    "referencePages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "title": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "findings": {
+            "type": "string"
+          },
+          "reviewStatus": {
+            "type": "string"
+          },
+          "evidenceType": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          },
+          "mediaType": {
+            "enum": [
+              "image",
+              "video"
+            ]
+          },
+          "sourceName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "page",
+          "title",
+          "group",
+          "image",
+          "text",
+          "findings",
+          "reviewStatus",
+          "evidenceType"
+        ]
+      }
+    },
+    "accuracyIssues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "pages": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "detail",
+          "status",
+          "pages"
+        ]
+      }
+    },
+    "site": {
+      "type": "object",
+      "properties": {
+        "image": {
+          "type": "string"
+        },
+        "imageSize": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "bounds": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "imagePixelBounds": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "buildingOutline": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "minItems": 3
+        },
+        "referencePages": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "image",
+        "imageSize",
+        "bounds",
+        "imagePixelBounds",
+        "buildingOutline",
+        "referencePages",
+        "notes"
+      ]
+    },
+    "roofSections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "referencePages": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "kind": {
+            "enum": [
+              "flat",
+              "barrel"
+            ]
+          },
+          "bounds": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "eaveHeight": {
+            "type": "number"
+          },
+          "rise": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string"
+          },
+          "structure": {
+            "enum": [
+              "generic",
+              "components"
+            ]
+          },
+          "polygon": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "minItems": 3
+          },
+          "parapet": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "referencePages",
+          "kind",
+          "bounds",
+          "eaveHeight",
+          "rise",
+          "status"
+        ]
+      }
+    },
+    "details": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "referencePages": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "position": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "dimensions": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "material": {
+            "type": "string"
+          },
+          "surface": {
+            "enum": [
+              "exterior",
+              "site",
+              "structure",
+              "detail"
+            ]
+          },
+          "rotation": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "zoneId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "referencePages",
+          "position",
+          "dimensions",
+          "material",
+          "surface",
+          "rotation",
+          "zoneId",
+          "status"
+        ]
+      }
+    },
+    "facade": {
+      "type": "object",
+      "properties": {
+        "height": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string"
+        },
+        "wallMaterial": {
+          "type": "string"
+        },
+        "glazingMaterial": {
+          "type": "string"
+        },
+        "referencePages": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "required": [
+        "height",
+        "status",
+        "wallMaterial",
+        "glazingMaterial",
+        "referencePages"
+      ]
+    },
+    "dimensions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "sourceValue": {
+            "type": "string"
+          },
+          "pages": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "status": {
+            "type": "string"
+          },
+          "meaning": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "value",
+          "unit",
+          "sourceValue",
+          "pages",
+          "status",
+          "meaning"
+        ]
+      }
+    },
+    "photoSurvey": {
+      "type": "object",
+      "description": "Photographic source priority, user-confirmed mappings and remaining uncertainties."
+    },
+    "exportFiles": {
+      "type": "object",
+      "properties": {
+        "glb": {
+          "type": "string"
+        },
+        "audit": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "glb",
+        "audit"
+      ]
+    },
+    "planningTrace": {
+      "type": "object",
+      "description": "Original image hash, source coordinate frame and furniture counts for an image-traced revision."
+    },
+    "envelope": {
+      "type": "object",
+      "properties": {
+        "notes": {
+          "type": "string"
+        },
+        "loops": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "wallIds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "wallIds"
+            ]
+          }
+        },
+        "walls": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "referencePages": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "zoneId": {
+                "type": "string"
+              },
+              "a": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "b": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "height": {
+                "type": "number"
+              },
+              "thickness": {
+                "type": "number"
+              },
+              "material": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "openings": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "offset": {
+                      "type": "number"
+                    },
+                    "width": {
+                      "type": "number"
+                    },
+                    "sill": {
+                      "type": "number"
+                    },
+                    "height": {
+                      "type": "number"
+                    },
+                    "kind": {
+                      "enum": [
+                        "door",
+                        "window"
+                      ]
+                    },
+                    "material": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "offset",
+                    "width",
+                    "sill",
+                    "height",
+                    "kind",
+                    "material"
+                  ]
+                }
+              },
+              "profile": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "detailIds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "referencePages",
+              "zoneId",
+              "a",
+              "b",
+              "height",
+              "thickness",
+              "material",
+              "status",
+              "openings"
+            ]
+          }
+        }
+      },
+      "required": [
+        "notes",
+        "loops",
+        "walls"
+      ]
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "id",
+    "name",
+    "address",
+    "units",
+    "coordinateSystem",
+    "revision",
+    "source",
+    "calibration",
+    "levels",
+    "zones",
+    "rooms",
+    "walls",
+    "assets",
+    "objects",
+    "materials",
+    "programs",
+    "referencePages",
+    "accuracyIssues",
+    "site",
+    "roofSections",
+    "details",
+    "facade",
+    "dimensions"
+  ]
+}
