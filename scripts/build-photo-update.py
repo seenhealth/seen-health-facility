@@ -336,3 +336,9 @@ _review_spec=spec_from_file_location("interior_photos",ROOT/"scripts/apply-inter
 _review_module=module_from_spec(_review_spec);_review_spec.loader.exec_module(_review_module)
 m=_review_module.apply_update(m)
 (OUT/"seen-alhambra-planning.json").write_text(json.dumps(m,indent=2)+"\n")
+
+# User-directed orientations and circulation supersede provisional photo placements.
+_correction_spec=spec_from_file_location("layout_corrections",ROOT/"scripts/apply-layout-corrections.py")
+_correction_module=module_from_spec(_correction_spec);_correction_spec.loader.exec_module(_correction_module)
+m=_correction_module.apply_update(m, fresh=True)
+(OUT/"seen-alhambra-planning.json").write_text(json.dumps(m,indent=2)+"\n")

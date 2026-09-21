@@ -61,3 +61,7 @@ Model rooms: day-open, rehab-wc-east, rehab-wc-south.
 ## Rebuild
 
 After earlier plan/photo/fleet layers, run `python3 scripts/apply-interior-photos.py`, then rebuild activity routes, validate the model and activity, and export the building. The earlier blanket furniture restoration is superseded only in the reviewed rooms.
+
+## User-directed spatial corrections · September 21
+
+The upstairs fit-out is rotated counterclockwise, stair/lift connections have real floor apertures, clinic layouts are reversed, the second-from-entrance room has a dental chair, and personal-care showers/hair care connect with back-room laundry and linen storage. See [the layout correction audit](/models/layout-corrections.md) for room mapping, validation and remaining measurement limits.

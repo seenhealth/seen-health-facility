@@ -18,3 +18,7 @@ Run the earlier plan/photo/fleet generators, then `python3 scripts/apply-interio
 ## Accuracy
 
 Plan-derived scale is area calibrated, not surveyed. Room numbers, equipment dimensions, exact offsets, the library passage registration and hidden bathroom details need confirmation before this can be treated as an accurate as-built simulation. Geometry checks confirm model clearances only; they do not certify real-world clearances.
+
+## User-directed spatial corrections · September 21
+
+The upstairs fit-out is rotated counterclockwise, stair/lift connections have real floor apertures, clinic layouts are reversed, the second-from-entrance room has a dental chair, and personal-care showers/hair care connect with back-room laundry and linen storage. See [the layout correction audit](/models/layout-corrections.md) for room mapping, validation and remaining measurement limits.

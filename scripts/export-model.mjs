@@ -94,6 +94,7 @@ source = source.replace(
 source = source
   .replace("from './assets'", "from './assets.mjs'")
   .replace("from './schema'", "from './schema.mjs'")
+  .replace("from './floor-geometry'", "from './floor-geometry.mjs'")
   .replace("from './envelope'", "from './envelope.mjs'");
 source = source
   .replace("from './activity'", "from './activity.mjs'")

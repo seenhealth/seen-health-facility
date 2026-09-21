@@ -23,6 +23,7 @@ for (const name of [
 mkdirSync('work/validation', { recursive: true });
 for (const name of [
   'schema',
+  'floor-geometry',
   'photo-assets',
   'clinical-assets',
   'assets',
@@ -328,7 +329,8 @@ if (m.photoSurvey) {
         );
       else
         assert.ok(
-          ['day', 'clinic', 'rehab', 'dining'].includes(o.zoneId),
+          ['day', 'clinic', 'rehab', 'dining'].includes(o.zoneId) ||
+            m.layoutCorrections?.changedPlanObjectIds.includes(o.id),
           `Photo override stays within reviewed rooms: ${o.id}`,
         );
     }

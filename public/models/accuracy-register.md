@@ -75,3 +75,7 @@ Status: open.
 Continuous walls follow the Overall Planning perimeter, including the clinic east face, rear setbacks, service exits, admin stair projection and adjoining building. Unphotographed wall heights, opening heights and finishes are inferred. The full shell is complete for viewing, not certified as-built geometry.
 
 Status: inferred.
+
+## User-directed spatial corrections · September 21
+
+The upstairs fit-out is rotated counterclockwise, stair/lift connections have real floor apertures, clinic layouts are reversed, the second-from-entrance room has a dental chair, and personal-care showers/hair care connect with back-room laundry and linen storage. See [the layout correction audit](/models/layout-corrections.md) for room mapping, validation and remaining measurement limits.

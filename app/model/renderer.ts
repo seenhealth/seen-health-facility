@@ -1,3 +1,4 @@
+import { floorShapes } from './floor-geometry';
 import dayProgram from '../data/day-program.json';
 import * as T from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -287,7 +288,12 @@ export function createViewer(
     g.position.y = model.levels.find((l) => l.id === z.levelId)!.elevation;
     scene.add(g);
     groups.set(z.id, g);
-    const sh = shape(z.polygon),
+    const sh = floorShapes(
+        z.polygon,
+        (model.floorOpenings || []).filter(
+          (o) => o.zoneId === z.id && o.levelId === z.levelId,
+        ),
+      ),
       slab = new T.ExtrudeGeometry(sh, { depth: 0.19, bevelEnabled: false });
     slab.rotateX(-Math.PI / 2);
     mesh(g, slab, mat('concrete'), 0, -0.2, 0);
@@ -330,7 +336,14 @@ export function createViewer(
     labels.set(z.id, label);
   });
   model.rooms.forEach((r) => {
-    const geo = new T.ShapeGeometry(shape(r.polygon));
+    const geo = new T.ShapeGeometry(
+      floorShapes(
+        r.polygon,
+        (model.floorOpenings || []).filter(
+          (o) => o.zoneId === r.zoneId && o.levelId === r.levelId,
+        ),
+      ),
+    );
     geo.rotateX(-Math.PI / 2);
     if (r.floorMaterial) {
       const floorGeo = geo.clone(),
@@ -501,6 +514,32 @@ export function createViewer(
       );
     }
   });
+  // Display the same incoming flight from its destination level. The proxy is
+  // hidden whenever the original flight is visible and omitted from exports.
+  const incomingStairs: {
+    root: T.Object3D;
+    source: T.Object3D;
+    fromLevel: string;
+    toLevel: string;
+  }[] = [];
+  for (const c of model.verticalConnections || []) {
+    if (c.kind !== 'stair') continue;
+    const original = furnitureRoots.find((o) => o.name === c.objectId)!;
+    const destination = model.floorOpenings?.find(
+      (o) => o.connectionId === c.id,
+    );
+    if (!original || !destination) continue;
+    const proxy = original.clone();
+    proxy.name = 'incoming-stair-' + c.objectId;
+    proxy.position.y += c.bottom[1] - c.top[1];
+    groups.get(destination.zoneId)!.add(proxy);
+    incomingStairs.push({
+      root: proxy,
+      source: original,
+      fromLevel: c.fromLevel,
+      toLevel: c.toLevel,
+    });
+  }
   // Architectural details use normalized geometry and source positions, stored independently from furniture instances.
   const ceiling = new T.Group();
   ceiling.name = 'roof-structure';
@@ -880,6 +919,10 @@ export function createViewer(
           : 'none';
       label.classList.toggle('selected', state.selected === z.id);
     });
+    for (const c of incomingStairs) {
+      c.root.visible =
+        state.level === c.toLevel && state.walls !== 'hidden' && !state.plan;
+    }
     roomFinishes.forEach((f) => {
       f.visible = !state.colors;
     });
@@ -1159,6 +1202,8 @@ export function createViewer(
           0,
         );
         g.visible = true;
+        for (const child of [...g.children])
+          if (child.name.startsWith('incoming-stair-')) g.remove(child);
         const wg = g.getObjectByName('walls');
         wg?.children.forEach((o) => {
           const h = o.userData.height;

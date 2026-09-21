@@ -119,9 +119,11 @@ if m.get('interiorReview'):
  # a seated patient to an arbitrary nearby piece of free floor.
  for actorid,objectid,heading in [('member-consult','clinic-exam-05-recliner',0),('nurse-02','clinic-nurse-task-chair-0',math.pi/2),('occupational-therapist','rehab-ot-chair-therapist',0),('member-ot','rehab-ot-chair-participant',math.pi)]:
   a=next(a for a in actors if a['id']==actorid);o=next(o for o in m['objects'] if o['id']==objectid);a['seatId']=objectid;a['seated']=True
+  if m.get('layoutCorrections') and actorid=='member-consult':heading=o['rotation']
+  if m.get('layoutCorrections') and actorid=='nurse-02':heading=o['rotation']
   for s in a['segments']:s.update(path=[[o['position'][0],o['position'][2]]]*2,heading=heading)
  doctor=next(a for a in actors if a['id']=='doctor-02')
- for s in doctor['segments']:s.update(path=[[-3.12,-8.83]]*2,heading=math.pi/2)
+ for s in doctor['segments']:s.update(path=[[-3.08,-9.35]]*2,heading=math.pi/2)
 track('aide-02','aide',2,[(-23.8,20.8,'greet',30,0),(-26,24,'consult',38,1.5)],offset=120)
 # Activities, social connection, walking and food service.
 track('activities-lead','activities',0,[(-11.3,14.8,'exercise',60,1.5),(-11.9,18,'greet',25,1.5)],offset=0)

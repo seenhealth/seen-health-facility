@@ -154,6 +154,17 @@ export type Facility = {
     anchorPolygonPixels: Vec2[];
     notes: string;
   };
+  floorOpenings?: import('./floor-geometry').FloorOpening[];
+  verticalConnections?: {
+    id: string;
+    kind: 'stair' | 'lift';
+    objectId: string;
+    fromLevel: string;
+    toLevel: string;
+    bottom: Vec3;
+    top: Vec3;
+    landing: Vec3;
+  }[];
   levels: Level[];
   zones: Zone[];
   rooms: Room[];
@@ -659,6 +670,44 @@ export function validateFacility(input: unknown): Facility {
     }
     if (assigned.size !== envelopeIds.size)
       fail('An envelope wall is missing from its perimeter.');
+  }
+  const connectionIds = new Set<string>();
+  for (const c of m.verticalConnections || []) {
+    if (
+      !str(c.id) ||
+      connectionIds.has(c.id) ||
+      !['stair', 'lift'].includes(c.kind) ||
+      !levels.has(c.fromLevel) ||
+      !levels.has(c.toLevel) ||
+      !m.objects.some((o) => o.id === c.objectId) ||
+      ![c.bottom, c.top, c.landing].every(vec)
+    )
+      fail('Invalid vertical connection.');
+    const lower = m.levels.find((l) => l.id === c.fromLevel)!.elevation;
+    const upper = m.levels.find((l) => l.id === c.toLevel)!.elevation;
+    if (
+      upper <= lower ||
+      Math.abs(c.bottom[1] - lower) > 0.001 ||
+      Math.abs(c.top[1] - upper) > 0.001 ||
+      Math.abs(c.landing[1] - upper) > 0.001
+    )
+      fail('Vertical connection does not meet its levels.');
+    connectionIds.add(c.id);
+  }
+  for (const o of m.floorOpenings || []) {
+    unique(o.id);
+    if (
+      !zones.has(o.zoneId) ||
+      !levels.has(o.levelId) ||
+      !connectionIds.has(o.connectionId) ||
+      !Array.isArray(o.bounds) ||
+      o.bounds.length !== 2 ||
+      !o.bounds.every(pair) ||
+      o.bounds[0][0] >= o.bounds[1][0] ||
+      o.bounds[0][1] >= o.bounds[1][1] ||
+      m.zones.find((z) => z.id === o.zoneId)!.levelId !== o.levelId
+    )
+      fail('Invalid floor aperture.');
   }
   if (m.exportFiles && (!url(m.exportFiles.glb) || !url(m.exportFiles.audit)))
     fail('Invalid model download links.');

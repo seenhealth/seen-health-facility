@@ -9,6 +9,15 @@ export function buildClinicalAsset(
   material: (id: string) => T.Material,
 ): T.Group | null {
   const supported = [
+    'connected-stair',
+    'landing-guard',
+    'care-shower',
+    'barber-chair',
+    'hair-wash-basin',
+    'laundry-machine',
+    'linen-rack',
+    'dental-chair',
+    'dental-delivery',
     'dining-lattice',
     'exam-lamp',
     'rehab-pulley',
@@ -136,7 +145,219 @@ export function buildClinicalAsset(
   };
   const handles = (x: number, y: number, z: number, len: number) =>
     rod([x - len / 2, y, z], [x + len / 2, y, z], 0.012);
-  if (spec.kind === 'dining-lattice') {
+  if (spec.kind === 'connected-stair') {
+    // Keep tread elevations exact: fitting the handrails with the stair body
+    // would shrink the last tread below the destination floor.
+    const rise = Number(p.rise),
+      count = Math.ceil(rise / 0.18),
+      step = d / count;
+    for (let i = 0; i < count; i++) {
+      box(
+        0,
+        0,
+        -d / 2 + (i + 0.5) * step,
+        w,
+        (rise * (i + 1)) / count,
+        step,
+        teal,
+      );
+      box(
+        0,
+        (rise * (i + 1)) / count - 0.005,
+        -d / 2 + (i + 0.08) * step,
+        w * 0.94,
+        0.005,
+        0.03,
+        metal,
+      );
+    }
+    for (const x of [-w / 2 + 0.035, w / 2 - 0.035]) {
+      rod([x, 0.93, -d / 2 + 0.025], [x, h - 0.018, d / 2 - 0.025], 0.018);
+      for (let i = 0; i <= count; i += 3) {
+        const z = -d / 2 + 0.025 + (i * (d - 0.05)) / count,
+          y = (rise * i) / count;
+        rod([x, y, z], [x, y + 0.93, z], 0.014);
+      }
+      rod([x, rise, d / 2 - 0.025], [x, h - 0.018, d / 2 - 0.025], 0.018);
+      mesh(
+        new T.SphereGeometry(0.018, 12, 8),
+        metal,
+        x,
+        h - 0.018,
+        d / 2 - 0.025,
+      );
+    }
+    return g;
+  } else if (spec.kind === 'landing-guard') {
+    for (const y of [0.47, h - 0.023])
+      rod([0, y, -d / 2 + 0.023], [0, y, d / 2 - 0.023], 0.0225);
+    for (let i = 0; i <= 5; i++)
+      rod(
+        [0, 0, -d / 2 + 0.023 + (i * (d - 0.046)) / 5],
+        [0, h - 0.023, -d / 2 + 0.023 + (i * (d - 0.046)) / 5],
+        0.0225,
+      );
+  } else if (spec.kind === 'care-shower') {
+    box(0, 0, 0, w, 0.035, d, 'photo-mosaic');
+    box(0, 0.035, -d / 2 + 0.025, w, h - 0.035, 0.05, teal);
+    box(-w / 2 + 0.025, 0.035, 0, 0.05, h - 0.035, d, teal);
+    box(0.24, 0.037, 0.15, 0.13, 0.003, 0.13, metal);
+    for (let i = 0; i < 5; i++)
+      box(0.24, 0.041, 0.1 + i * 0.025, 0.1, 0.002, 0.004, dark);
+    rod([0.32, 0.75, -d / 2 + 0.08], [0.32, 1.86, -d / 2 + 0.08], 0.016);
+    box(0.32, 1.62, -d / 2 + 0.12, 0.075, 0.16, 0.055, metal, 0.02);
+    cable(
+      [
+        [0.32, 1.65, -d / 2 + 0.15],
+        [0.57, 1.2, -d / 2 + 0.2],
+        [0.35, 0.85, -d / 2 + 0.15],
+      ],
+      metal,
+      0.012,
+    );
+    cyl(0.32, 0.93, -d / 2 + 0.15, 0.055, 0.06, metal);
+    rod([-0.56, 0.87, -d / 2 + 0.16], [0.09, 0.87, -d / 2 + 0.16], 0.025);
+    rod([-w / 2 + 0.16, 0.87, -0.55], [-w / 2 + 0.16, 0.87, 0.52], 0.025);
+    box(-0.4, 0.46, -0.36, 0.49, 0.045, 0.44, white, 0.015);
+    for (const x of [-0.58, -0.23])
+      rod([x, 0.43, -0.2], [x, 0.15, -0.6], 0.019);
+    rod(
+      [-w / 2 + 0.05, h - 0.025, d / 2 - 0.04],
+      [w / 2 - 0.04, h - 0.025, d / 2 - 0.04],
+      0.018,
+    );
+    // Curtain gathered at the side; the roll-in entrance stays open.
+    for (let i = 0; i < 6; i++)
+      box(
+        w / 2 - 0.23 + i * 0.032,
+        0.22,
+        d / 2 - 0.05 + (i % 2) * 0.022,
+        0.034,
+        h - 0.28,
+        0.035,
+        'photo-white',
+      );
+  } else if (spec.kind === 'barber-chair') {
+    cyl(0, 0, -0.1, 0.31, 0.075, metal);
+    cyl(0, 0.075, -0.1, 0.07, 0.34, metal);
+    box(0, 0.42, 0, 0.61, 0.16, 0.59, dark, 0.07);
+    const b = box(0, 0.57, -0.27, 0.59, 0.47, 0.13, dark, 0.06);
+    b.rotation.x = -0.13;
+    box(0, 1.06, -0.33, 0.32, 0.14, 0.12, dark, 0.04);
+    for (const x of [-0.35, 0.35]) {
+      rod([x, 0.32, -0.17], [x, 0.75, -0.17], 0.032);
+      box(x, 0.75, 0.04, 0.12, 0.09, 0.53, dark, 0.03);
+    }
+    rod([-0.24, 0.4, 0.22], [-0.24, 0.17, 0.58], 0.027);
+    rod([0.24, 0.4, 0.22], [0.24, 0.17, 0.58], 0.027);
+    box(0, 0.13, 0.58, 0.57, 0.05, 0.27, metal, 0.025);
+    for (let i = 0; i < 5; i++)
+      box(0, 0.185, 0.49 + i * 0.04, 0.49, 0.006, 0.01, dark);
+  } else if (spec.kind === 'hair-wash-basin') {
+    box(0, 0, -0.08, 0.42, 0.75, 0.4, dark, 0.09);
+    const bowl = mesh(
+      new T.SphereGeometry(0.32, 28, 14, 0, Math.PI * 2, 0, Math.PI / 2),
+      dark,
+      0,
+      0.96,
+      0,
+    );
+    bowl.rotation.z = Math.PI;
+    bowl.scale.set(1, 0.58, 1);
+    const rim = mesh(new T.TorusGeometry(0.32, 0.032, 8, 32), dark, 0, 0.96, 0);
+    rim.rotation.x = Math.PI / 2;
+    box(0, 0.92, 0.29, 0.19, 0.065, 0.095, metal, 0.025);
+    cyl(-0.18, 0.96, -0.2, 0.022, 0.14);
+    box(-0.18, 1.08, -0.16, 0.025, 0.025, 0.12, metal);
+    cable(
+      [
+        [0.2, 0.99, -0.18],
+        [0.29, 0.82, -0.1],
+        [0.21, 0.83, 0.08],
+        [0.17, 1.01, -0.13],
+      ],
+      metal,
+      0.013,
+    );
+    cyl(0, 0.78, 0, 0.037, 0.006, metal);
+  } else if (spec.kind === 'laundry-machine') {
+    box(0, 0, 0, w, h, d, white, 0.025);
+    box(0, h * 0.81, d / 2 + 0.003, w * 0.93, h * 0.15, 0.016, 'photo-silver');
+    box(
+      -w * 0.22,
+      h * 0.84,
+      d / 2 + 0.014,
+      w * 0.35,
+      h * 0.08,
+      0.008,
+      'screen',
+      0.005,
+    );
+    const knob = cyl(w * 0.27, h * 0.88, d / 2 + 0.026, 0.041, 0.025, white);
+    knob.rotation.x = Math.PI / 2;
+    const rim = mesh(
+      new T.TorusGeometry(w * 0.31, 0.038, 10, 32),
+      metal,
+      0,
+      h * 0.44,
+      d / 2 + 0.031,
+    );
+    const window = mesh(
+      new T.CircleGeometry(w * 0.26, 32),
+      dark,
+      0,
+      h * 0.44,
+      d / 2 + 0.04,
+    );
+    mesh(
+      new T.CircleGeometry(w * 0.2, 32),
+      'glass',
+      0,
+      h * 0.44,
+      d / 2 + 0.044,
+    );
+    box(w * 0.28, h * 0.39, d / 2 + 0.071, 0.045, 0.12, 0.035, white, 0.015);
+  } else if (spec.kind === 'linen-rack') {
+    for (const x of [-w / 2 + 0.018, w / 2 - 0.018])
+      for (const z of [-d / 2 + 0.018, d / 2 - 0.018])
+        rod([x, 0, z], [x, h, z], 0.018);
+    for (let i = 0; i < 5; i++) {
+      const y = 0.1 + (i * (h - 0.2)) / 4;
+      box(0, y, 0, w, 0.025, d, metal);
+      if (i < 4)
+        for (const x of [-w * 0.3, 0, w * 0.3])
+          for (let j = 0; j < 3; j++)
+            box(
+              x,
+              y + 0.03 + j * 0.055,
+              0,
+              w * 0.27,
+              0.05,
+              d * 0.74,
+              i % 2 ? 'photo-blue-seat' : white,
+              0.018,
+            );
+    }
+  } else if (spec.kind === 'dental-delivery') {
+    box(0, 0, 0, 0.48, 0.06, 0.46, white, 0.035);
+    rod([0, 0.06, 0], [0, 0.88, 0], 0.035);
+    box(0, 0.88, 0.035, 0.61, 0.11, 0.47, white, 0.025);
+    box(-0.12, 0.994, 0.035, 0.22, 0.008, 0.15, 'screen');
+    for (let i = 0; i < 4; i++) {
+      const x = -0.2 + i * 0.13;
+      rod([x, 0.82, 0.23], [x, 1.03, 0.23], 0.019, metal);
+      cable(
+        [
+          [x, 0.85, 0.23],
+          [x, 0.48, 0.26],
+          [x + 0.07, 0.32, 0.25],
+          [x + 0.1, 0.74, 0.13],
+        ],
+        dark,
+        0.008,
+      );
+    }
+  } else if (spec.kind === 'dining-lattice') {
     for (const x of [-w / 2 + 0.03, w / 2 - 0.03])
       box(x, 0, 0, 0.06, h, d, oak);
     for (const y of [0, h - 0.06]) box(0, y, 0, w, 0.06, d, oak);
@@ -153,16 +374,19 @@ export function buildClinicalAsset(
     mesh(new T.TorusGeometry(w * 0.17, 0.023, 8, 32), oak, 0, h / 2, 0);
     for (const x of [-w * 0.36, w * 0.36])
       box(x, h * 0.41, 0, w * 0.23, h * 0.18, d * 0.36, oak);
-  } else if (spec.kind === 'clinical-recliner') {
+  } else if (
+    spec.kind === 'clinical-recliner' ||
+    spec.kind === 'dental-chair'
+  ) {
     // Front is +Z. Separate upholstered seat, back, headrest and leg rest.
     box(0, 0.02, 0, 0.62, 0.09, 1.05, white, 0.055);
     box(0, 0.11, -0.03, 0.35, 0.29, 0.42, white, 0.05);
     rod([0, 0.19, -0.24], [0, 0.51, 0.2], 0.085, metal);
     box(0, 0.43, 0.04, 0.59, 0.15, 0.57, teal, 0.065);
     const back = box(0, 0.6, -0.3, 0.57, 0.66, 0.14, teal, 0.065);
-    back.rotation.x = -0.24;
+    back.rotation.x = spec.kind === 'dental-chair' ? -0.4 : -0.24;
     const head = box(0, 1.24, -0.4, 0.36, 0.19, 0.13, teal, 0.055);
-    head.rotation.x = -0.24;
+    head.rotation.x = spec.kind === 'dental-chair' ? -0.4 : -0.24;
     const leg = box(0, 0.29, 0.49, 0.52, 0.12, 0.41, teal, 0.045);
     leg.rotation.x = 0.3;
     box(0, 0.17, 0.74, 0.45, 0.065, 0.22, white, 0.025);

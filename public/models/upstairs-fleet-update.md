@@ -32,3 +32,7 @@ The [journey definitions](care-journeys.json) preserve recorded durations and wo
 - The downloadable model specification and GLB include this fit-out and both static vans.
 
 Earlier evidence remains available in [the plan audit](planning-update.md), [the finish audit](photo-update.md) and [the accuracy register](accuracy-register.md).
+
+## User-directed spatial corrections · September 21
+
+The upstairs fit-out is rotated counterclockwise, stair/lift connections have real floor apertures, clinic layouts are reversed, the second-from-entrance room has a dental chair, and personal-care showers/hair care connect with back-room laundry and linen storage. See [the layout correction audit](/models/layout-corrections.md) for room mapping, validation and remaining measurement limits.
