@@ -1,37 +1,22 @@
-# Facility update — plan furniture restored
+# Seven-photo interior review — September 21, 2026
 
-Furniture follows Overall Planning.jpg at the user’s latest direction. All 306 original plan instances have their original asset definitions, counts, positions, rotations and scales. Photographs remain available as references and continue to inform architectural finishes.
+Photographs establish appearance and visible relationships. The existing plan supplies the footprint. No survey dimensions, manufacturer specifications or hidden bathroom configurations have been certified.
 
-## Changes
+The September 21 photo review supersedes the earlier blanket furniture restoration in the day room, clinic, rehabilitation and dining areas. Unrelated plan furniture, room boundaries, van arrivals, upstairs fit-out and staff templates remain retained. Three front table settings stay cleared for activities.
 
-- Day room: diamond-oriented square tables and chairs, original tree and surrounding table locations, west banquette, four lounge chairs and two small lounge tables.
-- Clinic and reception: original plan counters, seats and equipment. Photo-only furniture and replacement counter assemblies are removed.
-- Administration: plan meeting tables and chairs. Photo-only staff stools, counters, kitchenette, lockers and meeting screens are removed; user-confirmed room locations are retained.
-- Restrooms: plan plumbing fixture positions restored; photographed partitions, tile and mirrors retained.
-- Building: completed rear and side walls, stepped roofs, doors, architectural finishes and all viewing controls retained.
-- All 18 photos and the drone video remain in the source library.
+- Clinic: two photographed equipment families, a staffed nurse station and accessible low counter. Individual exam-room assignments are provisional.
+- Rehabilitation: mat plinths, parallel bars, steppers, training steps/ramp, mobile resistance rack, pulleys, balls and stools. OT task seating is a simulation assumption.
+- Bathrooms: photographed shared wash areas and cubicle finishes; closed stall interiors remain unverified and retain the plan layout.
+- Day room/dining: tree seating, blue lattice cabinetry, landscape banquette, marble tables and cream timber-arm chairs.
+
+[Read the seven-photo review](public/models/interior-photo-review.md) for each source, modeled element and unresolved detail. The model contains 570 catalog objects; the active arrangement omits the 15 stored front-table objects. The care-day loop retains 41 people, 12 roles and 4× default speed.
+
+## Rebuild
+
+Run the earlier plan/photo/fleet generators, then `python3 scripts/apply-interior-photos.py`, `python3 scripts/build-activity.py`, model/interior/activity validation and GLB export. `build-photo-update.py` also applies the interior layer last. Repeating the old plan restoration alone would discard the approved photo update.
 
 ## Accuracy
 
-Furniture matches the saved trace of the supplied plan. Physical scale still uses the stated clinic area; the plan is not a dimensioned survey. Hidden elevations, upper-floor interiors and estimated heights retain their existing uncertainty labels.
+Plan-derived scale is area calibrated, not surveyed. Room numbers, equipment dimensions, exact offsets, the library passage registration and hidden bathroom details need confirmation before this can be treated as an accurate as-built simulation. Geometry checks confirm model clearances only; they do not certify real-world clearances.
 
-## Portable components
-
-Furniture, materials, walls and openings remain separate JSON definitions. Rebuild with build-planning.py, then build-photo-update.py; the final plan_furniture.py step enforces the latest furniture authority while retaining the envelope. GLB export includes the complete building.
-
-
-## Complete building shell
-
-The registered main building and adjoining wing now have two closed perimeter loops, including the clinic east face, rear service-room setbacks, side walls, west drop-off wall and admin stair projection. Roof slabs follow the stepped plan, with raised roof junction walls and curved barrel end closures. Documented door/window locations are retained; rear elevation heights and unseen finishes remain inferred.
-
-Whole building and Rear views show the assembled shell. Cutaway, per-area isolation, levels and adjustable section planes reveal the interior. JSON stores walls, openings, profiles and source evidence; GLB export always includes the full assembled geometry, independent of section controls.
-
-## September 19 follow-up
-
-Upstairs administration now includes a photo-informed open office, conference room, storage, restroom and lift landing. Placement and dimensions remain estimated. Both static Van A/B models use the final supplied wrap sheet. Staff clothing uses solid colors and the supplied cut without ginkgo printing. The September 20 update adds 41 rounded isometric 3D people across 12 roles in a controllable twelve-minute care-day loop with accessible van arrival, a sliding entrance, two reception colleagues and separate person/interaction tracks, plus 3D street context. Three generalized Orbit-informed journeys retain separate guided playback and room focus. See [the animation audit](public/models/animation-update.md). See [the upstairs and fleet audit](public/models/upstairs-fleet-update.md).
-
-## Day-room repertoire and flexible layout — September 20, 2026
-
-The owner authorized clearing front tables for activities. The active 3D arrangement and GLB omit day-diamond-table-01 through -03 and their twelve chairs (15 objects), while all 518 original source objects remain in the facility JSON and plan comparison. The active GLB therefore contains 503 catalog objects. Do not restore those front tables from the baseline during routine rebuilds. `app/data/day-program.json` is the explicit layout and repertoire override.
-
-Ten owner-requested session types share the care-day clock, with standing, chair-based and wheelchair participants, a staff facilitator, a care aide and a quiet calligraphy/craft alternative. Actual daily timing and language preferences are illustrative. See `public/models/animation-update.md` for behavior and source distinctions.
+See [animation details](public/models/animation-update.md) and [upstairs/fleet details](public/models/upstairs-fleet-update.md).

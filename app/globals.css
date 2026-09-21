@@ -2562,3 +2562,29 @@ td a {
     padding: 12px;
   }
 }
+
+.interior-photo-review {
+  margin: 24px 0 32px;
+}
+.interior-photo-review details {
+  padding: 14px 0;
+  border-bottom: 1px solid #dce3dc;
+}
+.interior-photo-review summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #355343;
+}
+.interior-photo-review details p {
+  font-size: 13px;
+  line-height: 1.65;
+  max-width: 76ch;
+}
+.interior-photo-review details button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  color: #355343;
+  font-size: 13px;
+}

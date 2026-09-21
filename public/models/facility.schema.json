@@ -483,6 +483,17 @@
               "exterior",
               "roof"
             ]
+          },
+          "navigationFootprints": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            }
           }
         },
         "required": [
@@ -942,6 +953,10 @@
           "meaning"
         ]
       }
+    },
+    "interiorReview": {
+      "type": "object",
+      "description": "Ordered photo evidence, scoped object overrides and unresolved physical measurements."
     },
     "photoSurvey": {
       "type": "object",

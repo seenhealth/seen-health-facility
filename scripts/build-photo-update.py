@@ -329,3 +329,10 @@ _fitout_module.apply_update(m)
 (OUT/'seen-alhambra-planning.json').write_text(json.dumps(m,indent=2)+'\n')
 _followup_note='\n## September 19 follow-up\n\nUpstairs administration now includes a photo-informed open office, conference room, storage, restroom and lift landing. Placement and dimensions remain estimated. Both static Van A/B models use the final supplied wrap sheet. Staff clothing uses solid colors and the supplied cut without ginkgo printing. The September 20 update adds 34 animated 3D people across 12 roles in a controllable six-minute loop, plus 3D street context. Three generalized Orbit-informed journeys retain separate guided playback and room focus. See [the animation audit](public/models/animation-update.md). See [the upstairs and fleet audit](public/models/upstairs-fleet-update.md).\n'
 (ROOT/'MODEL_NOTES.md').write_text((ROOT/'MODEL_NOTES.md').read_text()+_followup_note)
+
+# The latest seven-photo request supersedes the older blanket furniture reset.
+from importlib.util import spec_from_file_location, module_from_spec
+_review_spec=spec_from_file_location("interior_photos",ROOT/"scripts/apply-interior-photos.py")
+_review_module=module_from_spec(_review_spec);_review_spec.loader.exec_module(_review_module)
+m=_review_module.apply_update(m)
+(OUT/"seen-alhambra-planning.json").write_text(json.dumps(m,indent=2)+"\n")

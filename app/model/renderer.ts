@@ -869,14 +869,9 @@ export function createViewer(
       overlayMap.get(z.id)!.visible = state.plan && z.levelId === 'ground';
       const f = floorMap.get(z.id)!.material as T.MeshStandardMaterial;
       f.color.set(
-        state.colors || state.selected === z.id
-          ? z.color
-          : model.materials[z.floorMaterial].color,
+        state.colors ? z.color : model.materials[z.floorMaterial].color,
       );
-      f.map =
-        state.colors || state.selected === z.id
-          ? null
-          : mat(z.floorMaterial).map;
+      f.map = state.colors ? null : mat(z.floorMaterial).map;
       f.needsUpdate = true;
       const label = labels.get(z.id)!;
       label.style.display =
@@ -886,11 +881,11 @@ export function createViewer(
       label.classList.toggle('selected', state.selected === z.id);
     });
     roomFinishes.forEach((f) => {
-      f.visible = !state.colors && state.selected !== f.userData.zone;
+      f.visible = !state.colors;
     });
     rooms.forEach((m, id) => {
       (m.material as T.MeshBasicMaterial).opacity =
-        state.room === id ? 0.42 : 0;
+        state.room === id ? 0.06 : 0;
     });
     context.visible =
       state.site &&

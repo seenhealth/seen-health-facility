@@ -407,7 +407,8 @@ export function createActivity(
         };
         pathRoot.add(l);
       }
-  // A compact tabletop task station, kept separate from the source-traced furniture.
+  // OT task objects sit on the model-owned table. Furniture and collision footprints
+  // are shared with the building instead of creating duplicate chairs here.
   const propMat = new T.MeshStandardMaterial({
       color: '#d5ac72',
       roughness: 0.86,
@@ -429,16 +430,6 @@ export function createActivity(
     props.add(p);
     return p;
   };
-  propBox(-24.5, 0.7, 15.25, 2.1, 0.05, 0.65);
-  for (const x of [-24.42, -23.58])
-    for (const z of [15, 15.5]) propBox(x, 0, z, 0.045, 0.7, 0.045);
-  for (const z of [14.5, 16]) {
-    propBox(-24, 0.42, z, 0.44, 0.05, 0.44, teal);
-    propBox(-24, 0.47, z + (z < 15 ? -0.22 : 0.22), 0.44, 0.42, 0.045, teal);
-    for (const dx of [-0.17, 0.17])
-      for (const dz of [-0.17, 0.17])
-        propBox(-24 + dx, 0, z + dz, 0.035, 0.42, 0.035);
-  }
   for (let i = 0; i < 7; i++) {
     const p = propBox(
       -24.34 + i * 0.105,

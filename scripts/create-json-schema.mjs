@@ -224,6 +224,12 @@ Object.assign(schema.properties.materials.additionalProperties.properties, {
   emissive: s,
   emissiveIntensity: n,
 });
+schema.properties.objects.items.properties.navigationFootprints = arr(vec(4));
+schema.properties.interiorReview = {
+  type: 'object',
+  description:
+    'Ordered photo evidence, scoped object overrides and unresolved physical measurements.',
+};
 schema.properties.photoSurvey = {
   type: 'object',
   description:

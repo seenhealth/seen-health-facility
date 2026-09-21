@@ -24,6 +24,7 @@ mkdirSync('work/validation', { recursive: true });
 for (const name of [
   'schema',
   'photo-assets',
+  'clinical-assets',
   'assets',
   'envelope',
   'characters',
@@ -38,6 +39,7 @@ for (const name of [
     ts.transpileModule(
       source
         .replace("from './photo-assets'", "from './photo-assets.mjs'")
+        .replace("from './clinical-assets'", "from './clinical-assets.mjs'")
         .replace("from './characters'", "from './characters.mjs'")
         .replace("from './assets'", "from './assets.mjs'")
         .replace("from './arrival'", "from './arrival.mjs'")
@@ -271,7 +273,7 @@ if (m.photoSurvey) {
   assert.equal(
     m.referencePages.filter((p) => p.evidenceType === 'facility-photograph')
       .length,
-    18,
+    m.interiorReview ? 21 : 18,
   );
   assert.equal(
     m.referencePages.filter((p) => p.mediaType === 'video').length,
@@ -311,6 +313,49 @@ if (m.photoSurvey) {
       ),
       'No replacement cabinet/counter overlaps the restored plan',
     );
+  } else if (m.interiorReview) {
+    const baseline = JSON.parse(
+      readFileSync('public/models/seen-alhambra-planning-base.json', 'utf8'),
+    );
+    const changed = new Set(m.interiorReview.changedPlanObjectIds);
+    const current = new Map(m.objects.map((o) => [o.id, o]));
+    for (const o of baseline.objects) {
+      if (!changed.has(o.id))
+        assert.deepEqual(
+          current.get(o.id),
+          o,
+          `Unreviewed furniture preserved: ${o.id}`,
+        );
+      else
+        assert.ok(
+          ['day', 'clinic', 'rehab', 'dining'].includes(o.zoneId),
+          `Photo override stays within reviewed rooms: ${o.id}`,
+        );
+    }
+    for (const id of new Set(baseline.objects.map((o) => o.assetId)))
+      assert.deepEqual(
+        m.assets[id],
+        baseline.assets[id],
+        `Base asset retained: ${id}`,
+      );
+    assert.deepEqual(
+      m.interiorReview.items.map((r) => r.photo),
+      [1, 2, 3, 10, 23, 25, 26],
+    );
+    assert.ok(!current.has('day-west-banquette'));
+    assert.ok(!current.has('clinic-nurse-counter-0'));
+    for (const id of [
+      'rehab-parallel-bars',
+      'rehab-training-stairs',
+      'rehab-recumbent-stepper-1',
+      'clinic-exam-01-sink',
+      'clinic-exam-06-diagnostics',
+      'rehab-wc-east-double-vanity',
+    ])
+      assert.ok(current.has(id), id);
+    for (const o of m.objects.filter((o) => o.navigationFootprints))
+      for (const [x, z, w, d] of o.navigationFootprints)
+        assert.ok([x, z, w, d].every(Number.isFinite) && w > 0 && d > 0);
   } else {
     assert.equal(
       m.objects.filter((o) => o.id.startsWith('day-photo-lounge-chair-'))
@@ -332,7 +377,10 @@ if (m.photoSurvey) {
       m.rooms.find((r) => r.id === id).floorMaterial,
       'photo-carpet',
     );
-  if (m.planningTrace?.furnitureAuthority !== 'Overall Planning.jpg') {
+  if (
+    m.planningTrace?.furnitureAuthority !== 'Overall Planning.jpg' &&
+    !m.interiorReview
+  ) {
     assert.equal(
       m.objects.find((o) => o.id === 'admin-entry-locker-bank').roomId,
       'east-service',

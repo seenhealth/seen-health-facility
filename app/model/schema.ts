@@ -71,6 +71,7 @@ export type Instance = {
   referencePages: number[];
   status: string;
   notes: string;
+  navigationFootprints?: [number, number, number, number][];
   layer?:
     | 'furniture'
     | 'architecture'
@@ -172,6 +173,19 @@ export type Facility = {
     sourcePage: number;
   }[];
   referencePages: SourcePage[];
+  interiorReview?: {
+    date: string;
+    title: string;
+    accuracy: string;
+    items: {
+      photo: number;
+      page: number;
+      title: string;
+      rooms: string[];
+      matched: string;
+      unresolved: string;
+    }[];
+  };
   accuracyIssues: {
     id: string;
     title: string;

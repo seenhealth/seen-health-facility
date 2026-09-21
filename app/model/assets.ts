@@ -1,11 +1,14 @@
 import * as T from 'three';
 import type { Asset } from './schema';
 import { buildPhotoAsset } from './photo-assets';
+import { buildClinicalAsset } from './clinical-assets';
 // Each asset is modeled around a local, floor-level origin. Dimensions and transforms live in JSON.
 export function buildAsset(
   spec: Asset,
   material: (id: string) => T.MeshStandardMaterial,
 ) {
+  const clinical = buildClinicalAsset(spec, material);
+  if (clinical) return clinical;
   const g = new T.Group(),
     [w, h, d] = spec.dimensions;
   const box = (

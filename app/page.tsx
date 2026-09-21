@@ -1275,6 +1275,28 @@ export default function Home() {
                       pixels / meter
                     </span>
                   </div>
+                  {model.interiorReview && (
+                    <section className="interior-photo-review">
+                      <h3>{model.interiorReview.title}</h3>
+                      <p className="table-note">
+                        {model.interiorReview.accuracy}
+                      </p>
+                      {model.interiorReview.items.map((item) => (
+                        <details key={item.photo}>
+                          <summary>
+                            Photo {item.photo} · {item.title}
+                          </summary>
+                          <p>{item.matched}</p>
+                          <p>
+                            <strong>To verify:</strong> {item.unresolved}
+                          </p>
+                          <button onClick={() => source(item.page)}>
+                            View reference <ArrowUpRight size={12} />
+                          </button>
+                        </details>
+                      ))}
+                    </section>
+                  )}
                   <h3>Dimensions explicitly shown</h3>
                   <table>
                     <thead>

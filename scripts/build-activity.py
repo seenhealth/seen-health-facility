@@ -23,7 +23,9 @@ for o in m['objects']:
  if o['levelId']!='ground' or o.get('layer','furniture')!='furniture':continue
  a=m['assets'][o['assetId']];w,h,d=[v*s for v,s in zip(a['dimensions'],o['scale'])]
  if h<.15 or o['position'][1]>1.4:continue
- obstacles.append((o['position'][0],o['position'][2],w/2+.19,d/2+.19,math.cos(o['rotation']),math.sin(o['rotation'])))
+ c,s=math.cos(o['rotation']),math.sin(o['rotation'])
+ for x,z,fw,fd in o.get('navigationFootprints',[[0,0,w,d]]):
+  obstacles.append((o['position'][0]+c*x+s*z,o['position'][2]-s*x+c*z,fw/2+.19,fd/2+.19,c,s))
 # Reserve the flexible group stations and presentation screen so circulating routes go around them.
 for station in program['stations']:
  x,z=station['position'];obstacles.append((x,z,.64,.65,1,0))
@@ -108,10 +110,18 @@ stationary('member-consult','participant',2,-1.8,-9.3,'idle',-.3)
 track('nurse-01','nurse',0,[(-10,-10,'treat',42,-1.5),(-10,-4.0,'document',35,0)],offset=90)
 stationary('nurse-02','nurse',3,-7.8,-11.9,'document',1.5)
 # Shared rehabilitation movement and tabletop occupational-therapy task.
-track('member-pt','participant',3,[(-25,19.0,'exercise',45,0),(-25,23,'idle',25,3.14)],offset=35,mobility='walker')
-track('physical-therapist','pt',0,[(-24.1,19,'exercise',45,0),(-24.1,23,'consult',25,3.14)],offset=35)['pairedWith']='member-pt'
+track('member-pt','participant',3,[(-22.8,20.6,'exercise',45,0),(-22.8,23.5,'idle',25,3.14)],offset=35,mobility='walker')
+track('physical-therapist','pt',0,[(-23.8,20.6,'exercise',45,0),(-23.8,23.5,'consult',25,3.14)],offset=35)['pairedWith']='member-pt'
 stationary('occupational-therapist','ot',1,-24,14.5,'tabletop',0)['seated']=True
 stationary('member-ot','participant',4,-24,16.0,'tabletop',math.pi)['seated']=True
+if m.get('interiorReview'):
+ # Fixed interactions attach to actual furniture, avoiding navigation snapping
+ # a seated patient to an arbitrary nearby piece of free floor.
+ for actorid,objectid,heading in [('member-consult','clinic-exam-05-recliner',0),('nurse-02','clinic-nurse-task-chair-0',math.pi/2),('occupational-therapist','rehab-ot-chair-therapist',0),('member-ot','rehab-ot-chair-participant',math.pi)]:
+  a=next(a for a in actors if a['id']==actorid);o=next(o for o in m['objects'] if o['id']==objectid);a['seatId']=objectid;a['seated']=True
+  for s in a['segments']:s.update(path=[[o['position'][0],o['position'][2]]]*2,heading=heading)
+ doctor=next(a for a in actors if a['id']=='doctor-02')
+ for s in doctor['segments']:s.update(path=[[-3.12,-8.83]]*2,heading=math.pi/2)
 track('aide-02','aide',2,[(-23.8,20.8,'greet',30,0),(-26,24,'consult',38,1.5)],offset=120)
 # Activities, social connection, walking and food service.
 track('activities-lead','activities',0,[(-11.3,14.8,'exercise',60,1.5),(-11.9,18,'greet',25,1.5)],offset=0)
@@ -204,7 +214,7 @@ def make_arrival(id,label,variant,mobility,van,start,board,visits,escort=None):
 
  nodes=original_nodes
 
-make_arrival('arrival-walker','Morgan · walker',10,'walker','van-a',46,568,[((-25.8,19),'Physical therapy','exercise',45,['physical-therapist'],'rehab'),((-11.8,16),'Group movement','exercise',38,['activities-lead'],'activities')])
+make_arrival('arrival-walker','Morgan · walker',10,'walker','van-a',46,568,[((-23.8,19.4),'Physical therapy','exercise',45,['physical-therapist'],'rehab'),((-11.8,16),'Group movement','exercise',38,['activities-lead'],'activities')])
 make_arrival('arrival-cane','Lin · cane + escort',11,'cane','van-a',66,586,[((-10,-11),'Nursing visit','idle',42,['nurse-01'],'clinical'),((-12.5,13.7),'Social activities','greet',38,['activities-lead'],'activities')],'arrival-aide-a')
 make_arrival('arrival-independent','Jordan · independent',12,None,'van-b',176,680,[((-10.6,17),'Group exercise','exercise',40,['activities-lead'],'activities'),((-1.4,10),'Social time','greet',35,[],'activities')])
 make_arrival('arrival-wheelchair','Avery · wheelchair + escort',13,'wheelchair','van-b',196,698,[((-25,16),'Occupational therapy','tabletop',45,['occupational-therapist'],'rehab'),((-12.5,13.7),'Supported activities','greet',32,['activities-lead'],'activities')],'arrival-aide-b')
