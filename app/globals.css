@@ -77,42 +77,14 @@ input[type='range'] {
   z-index: 6;
 }
 .brand {
-  display: flex;
-  gap: 12px;
+  display: inline-flex;
   align-items: center;
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  white-space: nowrap;
+  flex-shrink: 0;
 }
-.brandmark {
-  width: 32px;
-  height: 32px;
-  position: relative;
-  transform: rotate(15deg);
-}
-.brandmark i {
-  position: absolute;
-  width: 15px;
-  height: 15px;
-  border-radius: 8px 8px 2px 8px;
-  background: #238c7e;
-}
-.brandmark i:nth-child(2) {
-  left: 16px;
-  background: #a0c8ad;
-  transform: rotate(90deg);
-}
-.brandmark i:nth-child(3) {
-  left: 16px;
-  top: 16px;
-  background: #58ab98;
-  transform: rotate(180deg);
-}
-.brandmark i:nth-child(4) {
-  top: 16px;
-  background: #81b694;
-  transform: rotate(270deg);
+.brand-logo {
+  display: block;
+  width: 240px;
+  height: auto;
 }
 .header-location {
   font-size: 12px;
@@ -1377,11 +1349,8 @@ td a {
     padding: 0 16px;
     gap: 10px;
   }
-  .brand {
-    font-size: 14px;
-  }
-  .brandmark {
-    transform: scale(0.85) rotate(15deg);
+  .brand-logo {
+    width: 190px;
   }
   .header-actions button span {
     display: none;

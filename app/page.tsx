@@ -395,13 +395,13 @@ export default function Home() {
     <main className={`facility-app ${collapsed ? 'collapsed' : ''}`}>
       <header className="app-header">
         <a href="/" className="brand">
-          <span className="brandmark">
-            <i />
-            <i />
-            <i />
-            <i />
-          </span>
-          <span>SEEN HEALTH</span>
+          <img
+            className="brand-logo"
+            src="/brand/seen-health-horizontal.png"
+            alt="Seen Health"
+            width={1309}
+            height={160}
+          />
         </a>
         <div className="header-location">
           {model?.address || 'Alhambra center'}
