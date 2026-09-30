@@ -26,6 +26,7 @@ for (const name of [
   'floor-geometry',
   'photo-assets',
   'clinical-assets',
+  'recreation-assets',
   'assets',
   'envelope',
   'characters',
@@ -41,6 +42,7 @@ for (const name of [
       source
         .replace("from './photo-assets'", "from './photo-assets.mjs'")
         .replace("from './clinical-assets'", "from './clinical-assets.mjs'")
+        .replace("from './recreation-assets'", "from './recreation-assets.mjs'")
         .replace("from './characters'", "from './characters.mjs'")
         .replace("from './assets'", "from './assets.mjs'")
         .replace("from './arrival'", "from './arrival.mjs'")
@@ -397,7 +399,7 @@ if (m.photoSurvey) {
     );
   }
   assert.equal(
-    m.details.filter((d) => /^photo-therapy-slit-/.test(d.id)).length,
+    m.details.filter((d) => d.id.startsWith('photo-therapy-slit-')).length,
     7,
   );
   const baseline = JSON.parse(

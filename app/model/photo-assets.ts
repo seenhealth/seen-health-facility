@@ -762,17 +762,20 @@ export function buildPhotoAsset(
         wood,
       );
     }
-    for (let i = 0; i < 53; i++) {
+    // A calm, rounded canopy: a few smooth volumes rather than leaf facets.
+    const canopy = new T.SphereGeometry(1, 28, 18);
+    for (let i = 0; i < 11; i++) {
       const a = i * 2.399,
-        r = w * (0.12 + (i % 5) * 0.065);
+        r = i ? w * (0.13 + (i % 3) * 0.065) : 0,
+        k = w * (i ? 0.15 + (i % 3) * 0.022 : 0.23);
       const leaf = add(
-        new T.IcosahedronGeometry(w * (0.09 + (i % 3) * 0.016), 1),
+        canopy,
         palette('leaf', 'leaf'),
         Math.sin(a) * r,
-        h * (0.66 + (i % 5) * 0.056),
+        h * (i ? 0.72 + (i % 4) * 0.045 : 0.8),
         Math.cos(a) * r,
       );
-      leaf.scale.set(1, 0.62, 1);
+      leaf.scale.set(k, k * 0.72, k);
     }
   } else if (spec.kind === 'timber-truss') {
     const beam = (a: T.Vector3, b: T.Vector3, size: number) => {

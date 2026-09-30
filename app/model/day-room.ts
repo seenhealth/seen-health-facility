@@ -77,27 +77,28 @@ export function buildDayRoom(actors: Person[]) {
   screen.name = 'day-program-display';
   screen.position.set(-7, 0, 9.72);
   root.add(screen);
-  box(screen, '#34555b', 0, 1.44, 0, 1.95, 1.12, 0.09);
-  box(screen, '#dcebe2', 0, 1.44, 0.054, 1.8, 0.97, 0.025);
+  box(screen, '#3b403f', 0, 1.44, 0, 1.95, 1.12, 0.09);
+  box(screen, '#eef0ea', 0, 1.44, 0.054, 1.8, 0.97, 0.025);
   for (const x of [-0.63, 0.63]) {
-    box(screen, '#647d7c', x, 0.63, 0, 0.045, 1.26, 0.05);
-    box(screen, '#647d7c', x, 0.08, 0, 0.32, 0.06, 0.42);
+    box(screen, '#8f928d', x, 0.63, 0, 0.045, 1.26, 0.05);
+    box(screen, '#8f928d', x, 0.08, 0, 0.32, 0.06, 0.42);
   }
   const screenPanels = program.programs.map((p, i) => {
     const group = new T.Group();
     group.name = 'display-' + p.id;
     screen.add(group);
+    // Muted program accents, one per session.
     const colors = [
-      '#c7865c',
-      '#4f9691',
-      '#658fa1',
-      '#7a9c72',
-      '#b87166',
-      '#5c9690',
-      '#514b4a',
-      '#cda168',
-      '#9a7364',
-      '#7b8b66',
+      '#c99d7e',
+      '#80a6a1',
+      '#8fa6b1',
+      '#9aae91',
+      '#c09189',
+      '#88a9a4',
+      '#7a7471',
+      '#d0b489',
+      '#a98e82',
+      '#9ba588',
     ];
     for (let j = 0; j < 3; j++)
       box(
@@ -110,7 +111,7 @@ export function buildDayRoom(actors: Person[]) {
         0.38 + (j % 2) * 0.13,
         0.018,
       );
-    box(group, '#94b6aa', 0, 1.12, 0.085, 1.35, 0.06, 0.018);
+    box(group, '#b6c7be', 0, 1.12, 0.085, 1.35, 0.06, 0.018);
     return group;
   });
   const chairs: { actor: Person; root: T.Group }[] = [];
@@ -128,11 +129,12 @@ export function buildDayRoom(actors: Person[]) {
       chair.position.set(station.position[0], 0, station.position[1]);
       chair.rotation.y = station.heading;
       chair.scale.setScalar(actor.profile.height);
-      box(chair, '#538f8a', 0, 0.455, 0, 0.49, 0.05, 0.49);
-      box(chair, '#538f8a', 0, 0.68, -0.23, 0.49, 0.42, 0.055);
+      // Stackable activity chairs: oatmeal seat on light oak legs.
+      box(chair, '#dcd3c3', 0, 0.455, 0, 0.49, 0.05, 0.49);
+      box(chair, '#dcd3c3', 0, 0.68, -0.23, 0.49, 0.42, 0.055);
       for (const x of [-0.19, 0.19])
         for (const z of [-0.18, 0.18])
-          box(chair, '#a6b6b0', x, 0.22, z, 0.035, 0.44, 0.035);
+          box(chair, '#b8996f', x, 0.22, z, 0.035, 0.44, 0.035);
       root.add(chair);
       chairs.push({ actor, root: chair });
     }
@@ -146,7 +148,7 @@ export function buildDayRoom(actors: Person[]) {
     // Shared lap surfaces permit wheelchair access without an extra fixed table.
     if (mode && mode !== 'support') {
       const lap = prop('lap-work-surface', ['write', 'craft'], actor.root);
-      box(lap, '#c9a578', 0, 0.78, 0.36, 0.59, 0.035, 0.38);
+      box(lap, '#cfb48c', 0, 0.78, 0.36, 0.59, 0.035, 0.38);
       box(lap, '#faf1de', 0, 0.804, 0.37, 0.44, 0.006, 0.28);
       const ink = prop('calligraphy-paper', ['write'], actor.root);
       for (let i = 0; i < 3; i++)
@@ -164,7 +166,7 @@ export function buildDayRoom(actors: Person[]) {
       for (let i = 0; i < 6; i++) {
         const q = box(
           collage,
-          ['#b6654c', '#4e918b', '#ddbc6c'][i % 3],
+          ['#bb7c64', '#80a49e', '#d8c18c'][i % 3],
           -0.17 + (i % 3) * 0.14,
           0.815,
           0.29 + Math.floor(i / 3) * 0.15,
@@ -180,8 +182,8 @@ export function buildDayRoom(actors: Person[]) {
     rod(brush, '#9c7048', 0, 0.06, 0.035, 0.011, 0.17);
     rod(brush, '#233d3a', 0, -0.035, 0.035, 0.009, 0.02);
     const tablet = prop('tablet', ['device'], actor.joints.handL);
-    box(tablet, '#294c57', 0.14, -0.03, 0.08, 0.3, 0.22, 0.025);
-    box(tablet, '#9bc8c2', 0.14, -0.027, 0.096, 0.26, 0.18, 0.008);
+    box(tablet, '#34393b', 0.14, -0.03, 0.08, 0.3, 0.22, 0.025);
+    box(tablet, '#bcd0cc', 0.14, -0.027, 0.096, 0.26, 0.18, 0.008);
     for (let i = 0; i < 4; i++)
       box(
         tablet,
@@ -198,8 +200,8 @@ export function buildDayRoom(actors: Person[]) {
     ball(shaker, '#c79451', 0, 0.085, 0.03, 0.073);
     if (mode === 'leader') {
       const microphone = prop('microphone', ['perform'], actor.joints.handR);
-      rod(microphone, '#365255', 0, -0.015, 0.045, 0.022, 0.18);
-      ball(microphone, '#819992', 0, -0.125, 0.045, 0.041);
+      rod(microphone, '#3b403f', 0, -0.015, 0.045, 0.022, 0.18);
+      ball(microphone, '#a4aba7', 0, -0.125, 0.045, 0.041);
     }
     const drum = prop('hand-drum', ['music'], actor.root);
     const drumY = mode === 'leader' ? 0.98 : 0.77;
