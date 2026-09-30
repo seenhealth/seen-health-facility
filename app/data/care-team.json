@@ -1,0 +1,95 @@
+{
+  "version": "1.0",
+  "title": "The interdisciplinary team",
+  "basis": "The eleven disciplines a PACE interdisciplinary team (IDT) must include under 42 CFR 460.102(b). Titles are disciplines, not named employees.",
+  "members": [
+    {
+      "id": "pcp",
+      "title": "Primary care provider",
+      "short": "PCP",
+      "characterRole": "doctor",
+      "group": "clinical",
+      "focus": "Leads medical care, reviews changes and writes orders the rest of the team carries out."
+    },
+    {
+      "id": "rn",
+      "title": "Registered nurse",
+      "short": "RN",
+      "characterRole": "nurse",
+      "group": "clinical",
+      "focus": "Checks vitals and medications each visit and is first to notice a change in condition."
+    },
+    {
+      "id": "msw",
+      "title": "Social worker",
+      "short": "MSW",
+      "characterRole": "social-worker",
+      "group": "support",
+      "focus": "Supports wellbeing, family, caregivers and benefits; connects the plan to life at home."
+    },
+    {
+      "id": "pt",
+      "title": "Physical therapist",
+      "short": "PT",
+      "characterRole": "pt",
+      "group": "therapy",
+      "focus": "Builds strength, balance and safe walking to prevent falls."
+    },
+    {
+      "id": "ot",
+      "title": "Occupational therapist",
+      "short": "OT",
+      "characterRole": "ot",
+      "group": "therapy",
+      "focus": "Keeps everyday tasks possible: dressing, bathing, cooking and using devices."
+    },
+    {
+      "id": "rec",
+      "title": "Recreation therapist",
+      "short": "Rec",
+      "characterRole": "activities",
+      "group": "therapy",
+      "focus": "Designs activities for connection, cognition and joy; tracks engagement."
+    },
+    {
+      "id": "dietitian",
+      "title": "Dietitian",
+      "short": "RD",
+      "characterRole": "dietitian",
+      "group": "clinical",
+      "focus": "Plans meals and texture for each participant's conditions and preferences."
+    },
+    {
+      "id": "center-manager",
+      "title": "Center manager",
+      "short": "CM",
+      "characterRole": "center-manager",
+      "group": "operations",
+      "focus": "Runs the day: staffing, schedule, safety and the flow of every participant through the center."
+    },
+    {
+      "id": "home-care",
+      "title": "Home care coordinator",
+      "short": "HCC",
+      "characterRole": "coordinator",
+      "group": "operations",
+      "focus": "Arranges support at home so care continues after the van drops off."
+    },
+    {
+      "id": "pca",
+      "title": "Personal care attendant",
+      "short": "PCA",
+      "characterRole": "aide",
+      "group": "support",
+      "focus": "Helps with walking, meals, toileting and personal care throughout the day."
+    },
+    {
+      "id": "driver",
+      "title": "Driver",
+      "short": "Driver",
+      "characterRole": "driver",
+      "group": "operations",
+      "focus": "Brings participants safely to and from the center; often the first to see how the morning is going."
+    }
+  ]
+}

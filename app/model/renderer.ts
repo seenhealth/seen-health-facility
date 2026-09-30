@@ -9,7 +9,7 @@ import {
 import { buildAsset } from './assets';
 import { buildEnvelopeWall, buildRoofGeometry } from './envelope';
 import { buildNeighborhood } from './neighborhood';
-import { createActivity } from './activity';
+import { createActivity, type ActivitySource } from './activity';
 import { center, type Facility, type Vec2 } from './schema';
 export type ViewerState = {
   selected: string | null;
@@ -49,10 +49,29 @@ export const defaultState: ViewerState = {
   sectionAxis: 'none',
   section: 0.5,
 };
+/**
+ * A declarative camera position for scripted views such as the scroll story.
+ * The camera orbits `target`; azimuth is measured around +y from +z and
+ * elevation is the angle above the ground plane (both radians).
+ */
+export type CameraShot = {
+  target: [number, number, number];
+  zoom: number;
+  azimuth: number;
+  elevation: number;
+};
+export type ViewerOptions = {
+  /** Activity tracks to animate. Defaults to the bundled care-day loop. */
+  activity?: ActivitySource;
+  /** False disables orbit/pan/zoom and picking, for scripted presentations. */
+  interactive?: boolean;
+};
+const SHOT_DISTANCE = 150;
 export function createViewer(
   host: HTMLElement,
   model: Facility,
   onSelect: (zone: string | null, room?: string | null) => void,
+  options: ViewerOptions = {},
 ) {
   const scene = new T.Scene();
   scene.background = new T.Color('#e5eae7');
@@ -81,6 +100,7 @@ export function createViewer(
   controls.maxZoom = 20;
   controls.maxPolarAngle = Math.PI * 0.495;
   controls.dampingFactor = 0.1;
+  controls.enabled = options.interactive !== false;
   controls.update();
   scene.add(new T.HemisphereLight('#f5faf8', '#647a67', 2.5));
   const sun = new T.DirectionalLight('#fff2db', 3.2);
@@ -441,7 +461,7 @@ export function createViewer(
   ground.name = 'source-plan-context';
   const neighborhood = buildNeighborhood(model);
   context.add(neighborhood.root);
-  const activity = createActivity(model, scene, mat);
+  const activity = createActivity(model, scene, mat, options.activity);
   const furnitureRoots: T.Group[] = [];
   const exteriorAssets: T.Group[] = [],
     roofAssets: T.Group[] = [];
@@ -1044,6 +1064,7 @@ export function createViewer(
   };
   const pu = (e: PointerEvent) => {
     if (
+      !controls.enabled ||
       e.button !== 0 ||
       Math.hypot(e.clientX - start[0], e.clientY - start[1]) > 5
     )
@@ -1167,6 +1188,36 @@ export function createViewer(
       }
     },
     view,
+    /** Place the camera exactly; cancels any in-flight focus animation. */
+    setShot(shot: CameraShot) {
+      focusTarget = null;
+      zoomTarget = null;
+      const [x, y, z] = shot.target,
+        horizontal = Math.cos(shot.elevation) * SHOT_DISTANCE;
+      controls.target.set(x, y, z);
+      camera.position.set(
+        x + Math.sin(shot.azimuth) * horizontal,
+        y + Math.sin(shot.elevation) * SHOT_DISTANCE,
+        z + Math.cos(shot.azimuth) * horizontal,
+      );
+      camera.zoom = shot.zoom;
+      camera.updateProjectionMatrix();
+      controls.update();
+    },
+    getShot(): CameraShot {
+      const offset = camera.position.clone().sub(controls.target);
+      return {
+        target: controls.target.toArray() as [number, number, number],
+        zoom: camera.zoom,
+        azimuth: Math.atan2(offset.x, offset.z),
+        elevation: Math.asin(
+          T.MathUtils.clamp(offset.y / (offset.length() || 1), -1, 1),
+        ),
+      };
+    },
+    setInteractive(on: boolean) {
+      controls.enabled = on;
+    },
     zoom: (n: number) =>
       (zoomTarget = T.MathUtils.clamp(camera.zoom * n, 0.3, 20)),
     reset: () => {

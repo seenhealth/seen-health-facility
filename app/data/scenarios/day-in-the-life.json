@@ -1,0 +1,378 @@
+{
+  "version": "1.0",
+  "id": "day-in-the-life",
+  "title": "A day at Seen Health",
+  "basis": "Composite, illustrative itinerary for one participant on the shared 8 AM–4 PM care-day clock. Not a participant record; times are compressed (720 loop seconds = 480 minutes).",
+  "clock": {
+    "duration": 720,
+    "dayStartMinutes": 480,
+    "dayDurationMinutes": 480
+  },
+  "hero": {
+    "id": "hero-lin",
+    "name": "Mrs. Lin",
+    "age": 84,
+    "role": "participant",
+    "mobility": "cane",
+    "summary": "Lives with her daughter, attends three days a week, loves karaoke and is working on her balance after a fall last spring.",
+    "replacesActor": "arrival-cane",
+    "note": "The hero takes over the arrival-cane itinerary (Van A, escorted by arrival-aide-a) so the shared loop has no duplicate person; interactions for the replaced actor are re-derived from the steps."
+  },
+  "steps": [
+    {
+      "id": "huddle",
+      "window": [
+        0,
+        40
+      ],
+      "zoneId": "upper-office",
+      "roomId": "upperfit-conference",
+      "title": "Before the doors open",
+      "kicker": "8:00 AM · Morning huddle",
+      "body": "Eleven disciplines meet around one table. Who is coming today, what changed overnight, and who needs to see whom.",
+      "roles": [
+        "pcp",
+        "rn",
+        "msw",
+        "pt",
+        "ot",
+        "rec",
+        "dietitian",
+        "center-manager",
+        "home-care",
+        "pca",
+        "driver"
+      ],
+      "handoffs": [
+        {
+          "from": "home-care",
+          "to": "rn",
+          "note": "Daughter reported a dizzy spell on Sunday"
+        },
+        {
+          "from": "rn",
+          "to": "pcp",
+          "note": "Add a blood-pressure recheck to today's visit"
+        }
+      ],
+      "heroPresent": false
+    },
+    {
+      "id": "pickup",
+      "window": [
+        40,
+        120
+      ],
+      "zoneId": "site",
+      "roomId": null,
+      "title": "Door to door",
+      "kicker": "8:30 AM · Van A arrives",
+      "body": "The driver deploys the ramp and walks Mrs. Lin to the entrance. He noticed she was slower on the steps this morning, and passes it on.",
+      "roles": [
+        "driver",
+        "pca"
+      ],
+      "handoffs": [
+        {
+          "from": "driver",
+          "to": "center-manager",
+          "note": "Slower on the steps this morning"
+        }
+      ],
+      "heroPresent": true
+    },
+    {
+      "id": "checkin",
+      "window": [
+        120,
+        140
+      ],
+      "zoneId": "lobby",
+      "roomId": "lobby-arrival",
+      "title": "Known by name",
+      "kicker": "9:05 AM · Front desk",
+      "body": "Check-in takes a minute. Her plan for the day is already waiting: clinic first, then therapy, lunch, and karaoke after.",
+      "roles": [
+        "center-manager"
+      ],
+      "handoffs": [
+        {
+          "from": "center-manager",
+          "to": "rn",
+          "note": "Mrs. Lin is in; clinic first"
+        }
+      ],
+      "heroPresent": true
+    },
+    {
+      "id": "clinic",
+      "window": [
+        140,
+        185
+      ],
+      "zoneId": "clinic",
+      "roomId": "clinic-nurse",
+      "title": "Care, down the hall",
+      "kicker": "9:25 AM · Clinic",
+      "body": "The nurse rechecks her blood pressure. Her doctor adjusts a medication on the spot. No separate trip, no waiting room across town.",
+      "roles": [
+        "rn",
+        "pcp"
+      ],
+      "handoffs": [
+        {
+          "from": "rn",
+          "to": "pcp",
+          "note": "Orthostatic drop confirmed"
+        },
+        {
+          "from": "pcp",
+          "to": "pt",
+          "note": "Clear for balance work; seated rests"
+        }
+      ],
+      "heroPresent": true
+    },
+    {
+      "id": "therapy",
+      "window": [
+        185,
+        240
+      ],
+      "zoneId": "rehab",
+      "roomId": "rehab-open",
+      "title": "Stronger every week",
+      "kicker": "10:00 AM · Physical & occupational therapy",
+      "body": "Parallel bars and step training with her physical therapist, then practice getting safely in and out of a shower with her occupational therapist.",
+      "roles": [
+        "pt",
+        "ot",
+        "pca"
+      ],
+      "handoffs": [
+        {
+          "from": "pt",
+          "to": "ot",
+          "note": "Balance improving; still needs a grab bar"
+        },
+        {
+          "from": "ot",
+          "to": "home-care",
+          "note": "Order a shower chair for home"
+        }
+      ],
+      "heroPresent": true
+    },
+    {
+      "id": "program",
+      "window": [
+        240,
+        295
+      ],
+      "zoneId": "day",
+      "roomId": "day-open",
+      "title": "Everyday movement",
+      "kicker": "10:40 AM · Day room",
+      "body": "Chair exercise with friends in the day room. Standing, seated or in a wheelchair, everyone takes part.",
+      "roles": [
+        "rec",
+        "pca"
+      ],
+      "handoffs": [],
+      "heroPresent": true
+    },
+    {
+      "id": "lunch",
+      "window": [
+        295,
+        355
+      ],
+      "zoneId": "dining",
+      "roomId": "dining-1421",
+      "title": "A meal made for her",
+      "kicker": "11:20 AM · Dining",
+      "body": "Low sodium and soft textures, planned by the dietitian and served warm. An attendant sits nearby, just in case.",
+      "roles": [
+        "dietitian",
+        "pca"
+      ],
+      "handoffs": [
+        {
+          "from": "dietitian",
+          "to": "pca",
+          "note": "Watch fluids today"
+        }
+      ],
+      "heroPresent": true
+    },
+    {
+      "id": "social-work",
+      "window": [
+        355,
+        400
+      ],
+      "zoneId": "admin",
+      "roomId": "admin-meeting-west",
+      "title": "Someone to talk to",
+      "kicker": "12:00 PM · Social work",
+      "body": "A quiet conversation about her daughter's trip next week, and who will be home when the van drops her off.",
+      "roles": [
+        "msw"
+      ],
+      "handoffs": [
+        {
+          "from": "msw",
+          "to": "home-care",
+          "note": "Arrange an evening check while daughter travels"
+        }
+      ],
+      "heroPresent": true
+    },
+    {
+      "id": "recreation",
+      "window": [
+        400,
+        470
+      ],
+      "zoneId": "ot",
+      "roomId": "rear-north",
+      "title": "The best part of the day",
+      "kicker": "12:30 PM · Table tennis & karaoke",
+      "body": "A gentle rally at the ping-pong table, then the karaoke room, where Mrs. Lin always sings first.",
+      "roles": [
+        "rec",
+        "pca"
+      ],
+      "handoffs": [
+        {
+          "from": "rec",
+          "to": "msw",
+          "note": "In great spirits today"
+        }
+      ],
+      "heroPresent": true,
+      "stops": [
+        {
+          "roomId": "rear-north",
+          "window": [
+            400,
+            432
+          ],
+          "activity": "table-tennis"
+        },
+        {
+          "roomId": "lobby-office-w2",
+          "window": [
+            438,
+            470
+          ],
+          "activity": "karaoke"
+        }
+      ]
+    },
+    {
+      "id": "personal-care",
+      "window": [
+        470,
+        525
+      ],
+      "zoneId": "ot",
+      "roomId": "rear-wc-east",
+      "title": "Dignity, privately",
+      "kicker": "1:15 PM · Personal care",
+      "body": "A supported shower and hair care, with the grab bars and shower chair her OT recommended for home.",
+      "roles": [
+        "pca",
+        "rn"
+      ],
+      "handoffs": [
+        {
+          "from": "pca",
+          "to": "rn",
+          "note": "Skin check normal"
+        }
+      ],
+      "heroPresent": true
+    },
+    {
+      "id": "farewell",
+      "window": [
+        525,
+        552
+      ],
+      "zoneId": "lobby",
+      "roomId": "lobby-arrival",
+      "title": "The plan goes home with her",
+      "kicker": "2:00 PM · Getting ready to leave",
+      "body": "Her home care coordinator confirms tonight's check-in visit and the shower chair delivery before she heads out.",
+      "roles": [
+        "home-care",
+        "center-manager"
+      ],
+      "handoffs": [
+        {
+          "from": "home-care",
+          "to": "driver",
+          "note": "Drop-off to the side door; neighbor meets her"
+        }
+      ],
+      "heroPresent": true
+    },
+    {
+      "id": "ride-home",
+      "window": [
+        552,
+        624
+      ],
+      "zoneId": "site",
+      "roomId": null,
+      "title": "Safely home",
+      "kicker": "2:10 PM · Van A departs",
+      "body": "The same driver, the same ramp, a known face at the other end.",
+      "roles": [
+        "driver",
+        "pca"
+      ],
+      "handoffs": [],
+      "heroPresent": true
+    },
+    {
+      "id": "care-plan",
+      "window": [
+        624,
+        720
+      ],
+      "zoneId": "upper-office",
+      "roomId": "upperfit-conference",
+      "title": "One plan, eleven perspectives",
+      "kicker": "3:00 PM · The team closes the loop",
+      "body": "Every observation from today lands in one shared care plan: a medication change, a shower chair, an evening visit. Tomorrow starts where today left off.",
+      "roles": [
+        "pcp",
+        "rn",
+        "msw",
+        "pt",
+        "ot",
+        "rec",
+        "dietitian",
+        "center-manager",
+        "home-care",
+        "pca",
+        "driver"
+      ],
+      "handoffs": [
+        {
+          "from": "pcp",
+          "to": "rn",
+          "note": "Recheck blood pressure in two days"
+        },
+        {
+          "from": "home-care",
+          "to": "center-manager",
+          "note": "Evening visits scheduled for the week"
+        }
+      ],
+      "heroPresent": false
+    }
+  ]
+}

@@ -15,7 +15,9 @@ export type CharacterRole =
   | 'coordinator'
   | 'social-worker'
   | 'activities'
-  | 'nutrition';
+  | 'nutrition'
+  | 'dietitian'
+  | 'center-manager';
 export type Action =
   | 'idle'
   | 'walk'
@@ -63,6 +65,8 @@ export const roleNames: Record<CharacterRole, string> = {
   'social-worker': 'Social worker',
   activities: 'Activities team',
   nutrition: 'Food service',
+  dietitian: 'Dietitian',
+  'center-manager': 'Center manager',
 };
 export const roleColors: Record<CharacterRole, string> = {
   participant: '#c26743',
@@ -77,6 +81,8 @@ export const roleColors: Record<CharacterRole, string> = {
   'social-worker': '#377c84',
   activities: '#2e9290',
   nutrition: '#559599',
+  dietitian: '#e8efe6',
+  'center-manager': '#2f5d4b',
 };
 export const characterLibrary = templates;
 const roles = templates.roles as Record<

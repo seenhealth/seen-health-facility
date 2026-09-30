@@ -62,6 +62,16 @@
       "wardrobe": "uniform",
       "color": "#559599",
       "skeleton": "seen-rounded-16"
+    },
+    "dietitian": {
+      "wardrobe": "coat",
+      "color": "#e8efe6",
+      "skeleton": "seen-rounded-16"
+    },
+    "center-manager": {
+      "wardrobe": "uniform",
+      "color": "#2f5d4b",
+      "skeleton": "seen-rounded-16"
     }
   },
   "people": [

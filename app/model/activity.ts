@@ -43,7 +43,7 @@ export type Interaction = {
   zoneId: string;
   description: string;
 };
-export const activityData = source as unknown as {
+export type ActivitySource = {
   duration: number;
   dayStartMinutes: number;
   dayDurationMinutes: number;
@@ -54,6 +54,7 @@ export const activityData = source as unknown as {
   roles: CharacterRole[];
   evidence: string[];
 };
+export const activityData = source as unknown as ActivitySource;
 export type ActivityOptions = {
   enabled: boolean;
   playing: boolean;
@@ -327,7 +328,13 @@ export function createActivity(
   model: Facility,
   scene: T.Scene,
   material?: (id: string) => T.MeshStandardMaterial,
+  data: ActivitySource = activityData,
 ) {
+  // Vans, the day-room program and sampling share the bundled loop clock.
+  if (data.duration !== activityData.duration)
+    throw new Error(
+      `Activity source must use the ${activityData.duration}s care-day clock`,
+    );
   const arrival = buildArrival(model, material);
   scene.add(arrival.root);
   const root = new T.Group();
@@ -363,7 +370,7 @@ export function createActivity(
     },
     noticeTime = 0;
   const listeners = new Set<(s: ActivitySnapshot) => void>();
-  const actors = activityData.actors.map((a) => ({
+  const actors = data.actors.map((a) => ({
     spec: a,
     ...createCharacter(a),
     sample: sampleActor(a, 0),
@@ -544,7 +551,7 @@ export function createActivity(
     );
     pathRoot.children.forEach((l) => {
       const a = actorMap.get(l.userData.actorId)!;
-      const interaction = activityData.interactions.find(
+      const interaction = data.interactions.find(
         (i) => 'interaction:' + i.id === options.follow,
       );
       l.visible =
@@ -586,7 +593,7 @@ export function createActivity(
         return sampleVan(id === 'van-a' ? 0 : 1, options.time)
           .position.clone()
           .add(new T.Vector3(0, 1, 0));
-      const interaction = activityData.interactions.find(
+      const interaction = data.interactions.find(
         (i) => 'interaction:' + i.id === id,
       );
       const people = (interaction?.actorIds || [id])
@@ -611,7 +618,7 @@ export function createActivity(
     async exportCast() {
       const exportScene = new T.Scene(),
         animations: T.AnimationClip[] = [];
-      for (const [i, role] of activityData.roles.entries()) {
+      for (const [i, role] of data.roles.entries()) {
         const c = createCharacter({ id: `cast-${role}`, role, variant: i });
         c.root.position.set((i % 4) * 2.4, 0, Math.floor(i / 4) * 2.4);
         exportScene.add(c.root);
