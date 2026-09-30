@@ -1,8 +1,8 @@
 # Care-day animation, accessible arrival and person templates
 
-Updated September 20, 2026.
+Updated September 20, 2026. Characters restyled September 30, 2026.
 
-The center contains 41 stable composite people across 12 roles. All characters use a rebuilt rounded isometric model: fuller torsos and limbs, shaped faces, detailed hair, glasses, hands and mobility equipment. Doctors wear white coats. Nurses, PT, OT and CNAs wear V-neck scrubs. Other staff wear solid Seen uniforms with the reference cut and no ginkgo print. These are reusable role and person templates, not a verified staff roster or employee portraits.
+The center contains 41 stable composite people across 12 roles; the rig library also covers the dietitian and center manager, so all eleven PACE interdisciplinary-team disciplines can appear. Characters follow an architectural scale-model style rendered as matte clay: realistic adult proportions (about 7.4 heads), smooth continuous limbs that bend at blended knees and elbows, sculpted hair volumes and no drawn facial features. Participants are slightly shorter, with a gentle forward posture, and wear warm casual clothing (sweaters, cardigans and collared shirts) from the shared participant palette. Each staff role has one clothing signature in its care-team colour: white coats for the primary care provider and dietitian; V-neck scrubs for nurses, PT, OT and personal care attendants; polos with a lanyard for the front desk, coordinators, social work, recreation and the center manager; a cream apron for food service; and a cap for drivers. Canes, walkers and wheelchairs are slim aluminium designs that move with their users. These are reusable role and person templates, not a verified staff roster or employee portraits.
 
 ## Arrival through departure
 
@@ -29,7 +29,7 @@ Use **Activities** to open the program, choose a session or move to the next one
 ## Templates and downloads
 
 - [Animated role models](seen-health-animated-cast.glb): 15 reusable rigs with 18 named clips each, 270 clips total. Contextual care, documentation, service and wheelchair-pushing poses are applied by the scene.
-- [Role and person templates](character-templates.json): wardrobe per role, stable appearance per person and the shared skeleton identifier.
+- [Role and person templates](character-templates.json): wardrobe and clothing signature per role (colours from the care-team roster), stable appearance per person (skin, hair style, silhouette and participant wardrobe) and the shared skeleton identifier.
 - [Care-day tracks](activity-loop.json): participant and staff stages, routes, elevations, visibility, vehicle bindings and shared interactions.
 - [Facility specification](seen-alhambra-planning.json) and [facility model](seen-alhambra-planning.glb): the building, active furniture layout, final vans and 3D surroundings. Character rigs are supplied separately.
 

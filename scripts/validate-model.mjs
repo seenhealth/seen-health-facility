@@ -54,6 +54,10 @@ for (const name of [
           `const templates=${readFileSync('app/data/character-templates.json', 'utf8')};`,
         )
         .replace(
+          "import careTeam from '../data/care-team.json';",
+          `const careTeam=${readFileSync('app/data/care-team.json', 'utf8')};`,
+        )
+        .replace(
           "import source from '../data/activity-loop.json';",
           `const source = ${readFileSync('public/models/activity-loop.json', 'utf8')};`,
         ),
