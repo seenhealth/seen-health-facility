@@ -97,6 +97,9 @@ const inside = (p: Vec2, poly: Vec2[]) => {
   }
   return odd;
 };
+/** Speed (m per loop second) at which the character walk cycle was tuned. */
+const REFERENCE_GAIT = 0.78;
+const MOVING_ACTIONS = new Set<Action>(['walk', 'escort', 'roll']);
 const cumulative = new WeakMap<Segment, number[]>();
 export function sampleSegment(
   s: Segment,
@@ -524,7 +527,11 @@ export function createActivity(
           s.action === 'walk'
           ? 'escort'
           : s.action,
-        options.time + a.spec.offset,
+        // Gait cycles advance with distance walked, so faster tracks take
+        // quicker steps instead of sliding feet.
+        MOVING_ACTIONS.has(s.action) && s.distance > 0
+          ? a.spec.offset + s.distance / REFERENCE_GAIT
+          : options.time + a.spec.offset,
         a.spec.programMode === 'wheelchair' ? 0.65 : 1,
         s.seated,
       );
