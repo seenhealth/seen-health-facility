@@ -55,7 +55,11 @@
           "note": "Add a blood-pressure recheck to today's visit"
         }
       ],
-      "heroPresent": false
+      "heroPresent": false,
+      "placement": {
+        "mode": "meeting",
+        "category": "coordination"
+      }
     },
     {
       "id": "pickup",
@@ -79,7 +83,14 @@
           "note": "Slower on the steps this morning"
         }
       ],
-      "heroPresent": true
+      "heroPresent": true,
+      "placement": {
+        "mode": "arrival",
+        "category": "arrivals",
+        "partners": [
+          "driver-1"
+        ]
+      }
     },
     {
       "id": "checkin",
@@ -102,7 +113,29 @@
           "note": "Mrs. Lin is in; clinic first"
         }
       ],
-      "heroPresent": true
+      "heroPresent": true,
+      "placement": {
+        "mode": "checkin",
+        "category": "arrivals",
+        "partners": [
+          "receptionist-02"
+        ],
+        "duties": [
+          {
+            "id": "idt-cm",
+            "window": [
+              112,
+              142
+            ],
+            "anchor": [
+              -8.2,
+              2.6
+            ],
+            "action": "greet",
+            "title": "Welcome at the front desk"
+          }
+        ]
+      }
     },
     {
       "id": "clinic",
@@ -131,7 +164,74 @@
           "note": "Clear for balance work; seated rests"
         }
       ],
-      "heroPresent": true
+      "heroPresent": true,
+      "placement": {
+        "mode": "visit",
+        "stops": [
+          {
+            "id": "clinic",
+            "walkTitle": "Walk to the clinic",
+            "window": [
+              140,
+              185
+            ],
+            "roomId": "clinic-treatment-south",
+            "seat": "clinic-south-recliner",
+            "seated": true,
+            "action": "idle",
+            "approach": [
+              [
+                -9.8,
+                -3.1
+              ],
+              [
+                -8.8,
+                -3.3
+              ],
+              [
+                -8.75,
+                -3.9
+              ]
+            ],
+            "title": "Blood-pressure recheck and medication review",
+            "category": "clinical",
+            "companions": [
+              {
+                "id": "idt-rn",
+                "anchor": [
+                  -6.8,
+                  -4.35
+                ],
+                "action": "treat",
+                "approach": [
+                  [
+                    -5.2,
+                    -4.6
+                  ]
+                ],
+                "leave": 5,
+                "title": "Orthostatic blood-pressure recheck"
+              },
+              {
+                "id": "idt-pcp",
+                "seat": "clinic-south-stool",
+                "heading": 2.22,
+                "seated": true,
+                "action": "consult",
+                "approach": [
+                  [
+                    -9.8,
+                    -2.9
+                  ]
+                ],
+                "join": 5,
+                "leave": -2,
+                "title": "Medication review on the spot"
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "therapy",
@@ -161,7 +261,86 @@
           "note": "Order a shower chair for home"
         }
       ],
-      "heroPresent": true
+      "heroPresent": true,
+      "placement": {
+        "mode": "visit",
+        "stops": [
+          {
+            "id": "pt-bars",
+            "walkTitle": "Walk to the therapy gym",
+            "window": [
+              185,
+              212
+            ],
+            "minDwell": 9.0,
+            "roomId": "rehab-open",
+            "anchor": [
+              -22.8,
+              23.3
+            ],
+            "heading": 3.1416,
+            "action": "exercise",
+            "approach": [
+              [
+                -22.8,
+                24.7
+              ]
+            ],
+            "title": "Parallel bars with her physical therapist",
+            "category": "rehab",
+            "companions": [
+              {
+                "id": "idt-pt",
+                "anchor": [
+                  -21.75,
+                  22.9
+                ],
+                "action": "treat",
+                "join": 2,
+                "leave": 1,
+                "title": "Balance and gait training"
+              }
+            ]
+          },
+          {
+            "id": "ot-transfer",
+            "walkTitle": "Walk to the mat table",
+            "window": [
+              212,
+              240
+            ],
+            "roomId": "rehab-open",
+            "anchor": [
+              -25.0,
+              12.7
+            ],
+            "heading": 1.5708,
+            "seated": true,
+            "action": "tabletop",
+            "approach": [
+              [
+                -24.35,
+                13.5
+              ]
+            ],
+            "title": "Transfer practice with her occupational therapist",
+            "category": "rehab",
+            "companions": [
+              {
+                "id": "idt-ot",
+                "anchor": [
+                  -24.4,
+                  12.0
+                ],
+                "action": "treat",
+                "join": -4,
+                "leave": 3,
+                "title": "Shower-transfer practice"
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "program",
@@ -179,7 +358,43 @@
         "pca"
       ],
       "handoffs": [],
-      "heroPresent": true
+      "heroPresent": true,
+      "placement": {
+        "mode": "visit",
+        "stops": [
+          {
+            "id": "program",
+            "walkTitle": "Walk to the day room",
+            "window": [
+              240,
+              295
+            ],
+            "roomId": "day-open",
+            "anchor": [
+              -7.9,
+              12.25
+            ],
+            "heading": 3.1416,
+            "action": "exercise",
+            "approach": [
+              [
+                -8.8,
+                11.35
+              ]
+            ],
+            "followProgram": true,
+            "title": "Group movement in the day room",
+            "category": "activities",
+            "partners": [
+              "activities-lead",
+              "care-aide-03",
+              "member-group-01",
+              "member-group-02",
+              "member-wheelchair"
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "lunch",
@@ -203,7 +418,50 @@
           "note": "Watch fluids today"
         }
       ],
-      "heroPresent": true
+      "heroPresent": true,
+      "placement": {
+        "mode": "visit",
+        "stops": [
+          {
+            "id": "lunch",
+            "walkTitle": "Walk to lunch",
+            "window": [
+              295,
+              355
+            ],
+            "roomId": "dining-1421",
+            "seat": "dining-table-01-chair-2",
+            "seated": true,
+            "action": "seated",
+            "approach": [
+              [
+                3.95,
+                0.8
+              ]
+            ],
+            "title": "Lunch planned by her dietitian",
+            "category": "meals",
+            "partners": [
+              "seated-2",
+              "seated-3",
+              "food-service-01"
+            ],
+            "companions": [
+              {
+                "id": "idt-rd",
+                "anchor": [
+                  4.2,
+                  1.95
+                ],
+                "action": "consult",
+                "join": 2,
+                "leave": -3,
+                "title": "Low-sodium, soft-texture plan"
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "social-work",
@@ -226,7 +484,56 @@
           "note": "Arrange an evening check while daughter travels"
         }
       ],
-      "heroPresent": true
+      "heroPresent": true,
+      "placement": {
+        "mode": "visit",
+        "stops": [
+          {
+            "id": "social-work",
+            "walkTitle": "Walk to the social worker",
+            "window": [
+              355,
+              400
+            ],
+            "roomId": "admin-meeting-west",
+            "seat": "admin-meeting-chair-0-0",
+            "seated": true,
+            "action": "conversation",
+            "approach": [
+              [
+                5.55,
+                16.6
+              ],
+              [
+                6.55,
+                16.45
+              ]
+            ],
+            "title": "A quiet talk with her social worker",
+            "category": "coordination",
+            "companions": [
+              {
+                "id": "idt-msw",
+                "seat": "admin-meeting-chair-0-2",
+                "seated": true,
+                "action": "consult",
+                "approach": [
+                  [
+                    5.55,
+                    16.95
+                  ],
+                  [
+                    6.7,
+                    17.15
+                  ]
+                ],
+                "join": -6,
+                "title": "Planning for the daughter's trip"
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "recreation",
@@ -268,7 +575,100 @@
           ],
           "activity": "karaoke"
         }
-      ]
+      ],
+      "placement": {
+        "mode": "visit",
+        "stops": [
+          {
+            "id": "table-tennis",
+            "walkTitle": "Walk to the ping-pong table",
+            "window": [
+              400,
+              432
+            ],
+            "minDwell": 9.0,
+            "roomId": "rear-north",
+            "anchor": [
+              9.15,
+              -13.3
+            ],
+            "heading": 0,
+            "action": "tabletop",
+            "approach": [
+              [
+                10.75,
+                -13.55
+              ]
+            ],
+            "title": "A gentle rally at the ping-pong table",
+            "category": "activities",
+            "companions": [
+              {
+                "id": "idt-rec",
+                "anchor": [
+                  9.45,
+                  -9.0
+                ],
+                "heading": 3.1416,
+                "action": "tabletop",
+                "join": -4,
+                "leave": -3,
+                "title": "Table-tennis partner"
+              }
+            ]
+          },
+          {
+            "id": "karaoke",
+            "walkTitle": "Walk to the karaoke room",
+            "window": [
+              438,
+              470
+            ],
+            "minDwell": 9.0,
+            "roomId": "lobby-office-w2",
+            "anchor": [
+              -13.3,
+              7.2
+            ],
+            "heading": 3.1416,
+            "action": "perform",
+            "approach": [
+              [
+                -14.0,
+                9.4
+              ],
+              [
+                -14.0,
+                8.3
+              ]
+            ],
+            "title": "Karaoke: she always sings first",
+            "category": "activities",
+            "companions": [
+              {
+                "id": "idt-rec",
+                "anchor": [
+                  -12.45,
+                  7.9
+                ],
+                "action": "clap",
+                "approach": [
+                  [
+                    -14.0,
+                    9.4
+                  ],
+                  [
+                    -14.0,
+                    8.3
+                  ]
+                ],
+                "join": -2,
+                "title": "Karaoke host"
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "personal-care",
@@ -292,7 +692,62 @@
           "note": "Skin check normal"
         }
       ],
-      "heroPresent": true
+      "heroPresent": true,
+      "placement": {
+        "mode": "visit",
+        "stops": [
+          {
+            "id": "personal-care",
+            "walkTitle": "Walk to personal care",
+            "window": [
+              470,
+              525
+            ],
+            "roomId": "rear-wc-east",
+            "seat": "access-barber-chair",
+            "seated": true,
+            "action": "seated",
+            "approach": [
+              [
+                4.9,
+                -2.95
+              ],
+              [
+                6.0,
+                -2.95
+              ]
+            ],
+            "title": "Supported shower and hair care",
+            "category": "clinical",
+            "companions": [
+              {
+                "id": "idt-rn",
+                "anchor": [
+                  7.6,
+                  -3.3
+                ],
+                "action": "treat",
+                "approach": [
+                  [
+                    4.9,
+                    -2.95
+                  ],
+                  [
+                    6.0,
+                    -2.95
+                  ],
+                  [
+                    6.6,
+                    -2.72
+                  ]
+                ],
+                "join": -3,
+                "title": "Skin check"
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "farewell",
@@ -316,7 +771,52 @@
           "note": "Drop-off to the side door; neighbor meets her"
         }
       ],
-      "heroPresent": true
+      "heroPresent": true,
+      "placement": {
+        "mode": "visit",
+        "stops": [
+          {
+            "id": "farewell",
+            "walkTitle": "Walk back to the lobby",
+            "window": [
+              525,
+              552
+            ],
+            "roomId": "lobby-arrival",
+            "anchor": [
+              -12.4,
+              1.9
+            ],
+            "heading": 1.5708,
+            "action": "greet",
+            "title": "The plan goes home with her",
+            "category": "coordination",
+            "partners": [
+              "receptionist-02"
+            ],
+            "companions": [
+              {
+                "id": "idt-hcc",
+                "anchor": [
+                  -11.45,
+                  2.55
+                ],
+                "action": "consult",
+                "title": "Tonight's visit and the shower chair"
+              },
+              {
+                "id": "idt-cm",
+                "anchor": [
+                  -11.5,
+                  1.2
+                ],
+                "action": "greet",
+                "title": "See you Thursday"
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "ride-home",
@@ -334,7 +834,14 @@
         "pca"
       ],
       "handoffs": [],
-      "heroPresent": true
+      "heroPresent": true,
+      "placement": {
+        "mode": "departure",
+        "category": "arrivals",
+        "partners": [
+          "driver-1"
+        ]
+      }
     },
     {
       "id": "care-plan",
@@ -372,7 +879,217 @@
           "note": "Evening visits scheduled for the week"
         }
       ],
-      "heroPresent": false
+      "heroPresent": false,
+      "placement": {
+        "mode": "meeting",
+        "category": "coordination"
+      }
     }
-  ]
+  ],
+  "placement": {
+    "note": "Placement fields are compiled by app/sim/scenario.ts (npm run build:scenario). Story copy (title, kicker, body) is owned by the story.",
+    "heroGait": {
+      "preferred": 0.78,
+      "max": 1.45,
+      "clearance": 0.26,
+      "step": 0.02
+    },
+    "staffGait": {
+      "preferred": 0.95,
+      "max": 1.5
+    },
+    "minDwellFraction": 0.3,
+    "minDwellSeconds": 8,
+    "replaced": {
+      "arrivalThroughTitle": "Front desk greeting & check-in",
+      "departureTitle": "Escorted departure · board van",
+      "escortId": "arrival-aide-a",
+      "escortLabel": "PCA · Alex",
+      "boardingSpeed": 0.64
+    },
+    "reservations": [
+      {
+        "id": "member-pt-parallel-bars",
+        "position": [
+          -22.8,
+          20.6
+        ],
+        "halfWidth": 0.35,
+        "halfDepth": 0.5
+      }
+    ],
+    "reserveBaseDwell": {
+      "minSeconds": 40,
+      "halfSize": 0.3
+    },
+    "companions": [
+      {
+        "id": "idt-cm",
+        "team": "center-manager",
+        "name": "Helen",
+        "variant": 21,
+        "home": [
+          -4.1,
+          2.0
+        ]
+      },
+      {
+        "id": "idt-rn",
+        "team": "rn",
+        "name": "Grace",
+        "variant": 22,
+        "home": [
+          -1.9,
+          -3.0
+        ]
+      },
+      {
+        "id": "idt-pcp",
+        "team": "pcp",
+        "name": "Dr. Chen",
+        "variant": 23,
+        "home": [
+          -1.0,
+          -3.4
+        ]
+      },
+      {
+        "id": "idt-pt",
+        "team": "pt",
+        "name": "Marco",
+        "variant": 24,
+        "home": [
+          -28.1,
+          20.1
+        ]
+      },
+      {
+        "id": "idt-ot",
+        "team": "ot",
+        "name": "Priya",
+        "variant": 25,
+        "home": [
+          -25.2,
+          10.0
+        ]
+      },
+      {
+        "id": "idt-rd",
+        "team": "dietitian",
+        "name": "Rosa",
+        "variant": 26,
+        "home": [
+          12.2,
+          8.6
+        ]
+      },
+      {
+        "id": "idt-msw",
+        "team": "msw",
+        "name": "Ben",
+        "variant": 27,
+        "home": [
+          1.85,
+          21.0
+        ]
+      },
+      {
+        "id": "idt-rec",
+        "team": "rec",
+        "name": "Dani",
+        "variant": 28,
+        "home": [
+          12.0,
+          12.4
+        ],
+        "exit": [
+          -13.3,
+          4.3
+        ]
+      },
+      {
+        "id": "idt-hcc",
+        "team": "home-care",
+        "name": "Nadia",
+        "variant": 29,
+        "home": [
+          -4.8,
+          5.3
+        ]
+      }
+    ],
+    "meeting": {
+      "levelId": "upper",
+      "roomId": "upperfit-conference",
+      "steps": [
+        "huddle",
+        "care-plan"
+      ],
+      "entry": [
+        4.97,
+        13.99
+      ],
+      "door": [
+        4.7,
+        13.3
+      ],
+      "aisles": {
+        "south": 12.93,
+        "north": 9.45,
+        "east": 12.82
+      },
+      "tableCenterZ": 11.2,
+      "speed": 1.0,
+      "stagger": 1.1,
+      "turnSeconds": 8,
+      "seats": [
+        {
+          "team": "pcp",
+          "seat": "upperfit-conference-end-chair"
+        },
+        {
+          "team": "rn",
+          "seat": "upperfit-meeting-chair-6-14"
+        },
+        {
+          "team": "msw",
+          "seat": "upperfit-meeting-chair-5-14"
+        },
+        {
+          "team": "home-care",
+          "seat": "upperfit-meeting-chair-4-14"
+        },
+        {
+          "team": "dietitian",
+          "seat": "upperfit-meeting-chair-3-14"
+        },
+        {
+          "team": "driver",
+          "seat": "upperfit-meeting-chair-2-14",
+          "profileFrom": "driver-1"
+        },
+        {
+          "team": "center-manager",
+          "seat": "upperfit-meeting-chair-6-11.6"
+        },
+        {
+          "team": "pt",
+          "seat": "upperfit-meeting-chair-5-11.6"
+        },
+        {
+          "team": "ot",
+          "seat": "upperfit-meeting-chair-4-11.6"
+        },
+        {
+          "team": "rec",
+          "seat": "upperfit-meeting-chair-3-11.6"
+        },
+        {
+          "team": "pca",
+          "seat": "upperfit-meeting-chair-2-11.6",
+          "profileFrom": "arrival-aide-a"
+        }
+      ]
+    }
+  }
 }

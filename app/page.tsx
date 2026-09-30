@@ -1,9 +1,10 @@
 'use client';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import {
   ArrowDownToLine,
   ArrowUpRight,
   Box,
+  ChartArea,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -42,6 +43,8 @@ import type { createViewer } from './model/renderer';
 import { JourneyPanel } from './components/journey-panel';
 import type { JourneyStep } from './model/journeys';
 import { ActivityPanel } from './components/activity-panel';
+// Charts load only when the Measure panel opens.
+const MetricsPanel = lazy(() => import('./components/metrics-panel'));
 const download = (data: Blob, name: string) => {
   const url = URL.createObjectURL(data),
     a = document.createElement('a');
@@ -81,10 +84,12 @@ export default function Home() {
     [showControls, setShowControls] = useState(false),
     [journeyOpen, setJourneyOpen] = useState(false),
     [activityOpen, setActivityOpen] = useState(true),
+    [measureOpen, setMeasureOpen] = useState(false),
     [exporting, setExporting] = useState(false),
     [notice, setNotice] = useState(''),
     [dataTab, setDataTab] = useState<'overview' | 'assets'>('overview');
   const patch = (s: Partial<ViewerState>) => setState((p) => ({ ...p, ...s }));
+  const getViewer = useCallback(() => viewer.current, []);
   const focusActivity = useCallback(
     (zoneId: string, actor?: string | null) => {
       if (!model || !viewer.current) return;
@@ -414,10 +419,23 @@ export default function Home() {
             onClick={() => {
               setActivityOpen(!activityOpen);
               setJourneyOpen(false);
+              setMeasureOpen(false);
             }}
           >
             <Users size={16} />
             <span>Animated care day</span>
+          </button>
+          <button
+            aria-label="Measure"
+            aria-pressed={measureOpen}
+            onClick={() => {
+              setMeasureOpen(!measureOpen);
+              setActivityOpen(false);
+              setJourneyOpen(false);
+            }}
+          >
+            <ChartArea size={16} />
+            <span>Measure</span>
           </button>
           <button
             aria-label="Participant journeys"
@@ -425,6 +443,7 @@ export default function Home() {
             onClick={() => {
               setJourneyOpen(!journeyOpen);
               setActivityOpen(false);
+              setMeasureOpen(false);
               if (window.innerWidth < 800) setCollapsed(true);
             }}
           >
@@ -722,13 +741,23 @@ export default function Home() {
             onClose={() => setActivityOpen(false)}
           />
         )}
+        {measureOpen && model && (
+          <Suspense fallback={null}>
+            <MetricsPanel
+              model={model}
+              ready={ready}
+              getViewer={getViewer}
+              onClose={() => setMeasureOpen(false)}
+            />
+          </Suspense>
+        )}
         {journeyOpen && (
           <JourneyPanel
             onFocus={focusJourney}
             onClose={() => setJourneyOpen(false)}
           />
         )}
-        {zone && !journeyOpen && !activityOpen && (
+        {zone && !journeyOpen && !activityOpen && !measureOpen && (
           <article
             className="space-card"
             style={{ '--zone': zone.color } as React.CSSProperties}
