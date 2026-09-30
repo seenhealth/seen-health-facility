@@ -217,6 +217,12 @@ furniture), the base loop or the scenario. Validation checks:
 - it reports walks through furniture footprints and close contacts (< 0.45 m)
   between new people and anyone else, for review.
 
+`node scripts/validate-activity.mjs --tracks app/data/scenarios/day-in-the-life.tracks.json`
+(after `npm run validate:model`) also runs the activity engine's own checks on
+the merged source: pause, seek, loop, pairs, levels, arrivals and the day-room
+program, plus identity: tracks sharing a `profileId` resolve to the same person
+and appearance and are never visible at the same time.
+
 ## Using the story source
 
 ```ts
@@ -254,7 +260,11 @@ attendee and the same person downstairs) are one person.
 The **Measure** panel (header → Measure) shows occupancy small multiples by zone
 (click to jump the playback), staff time by role and, for the story scenario,
 Mrs. Lin's care team, with a marker synced to the viewer clock. Compare the base
-loop and "With Mrs. Lin's day" with the scenario toggle.
+loop and "With Mrs. Lin's day" with the scenario toggle. The toggle is shared
+with the care-day panel (`useScenario` in `app/components/scenario-toggle.tsx`):
+choosing the story recreates the main viewer with the merged source, keeping the
+camera and clock, so the scene, the cast and tracks lists and the metrics
+always describe the same tracks.
 
 ## Limitations
 

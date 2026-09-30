@@ -131,7 +131,7 @@ function hash(text: string) {
 }
 export function characterProfile(spec: CharacterSpec): Profile {
   const found = people.find((p) => p.id === (spec.profileId || spec.id));
-  const id = found?.id ?? spec.id,
+  const id = found?.id ?? spec.profileId ?? spec.id,
     v = found?.appearance ?? found?.variant ?? spec.variant,
     h = hash(id),
     senior = spec.role === 'participant',

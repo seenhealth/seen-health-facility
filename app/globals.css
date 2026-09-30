@@ -2038,6 +2038,17 @@ td a {
   background: #168c82;
   box-shadow: 0 0 0 4px #168c8218;
 }
+.activity-heading .scenario-toggle {
+  margin: 0 10px 0 auto;
+}
+.activity-panel .scenario-toggle button {
+  min-height: 28px;
+  border: 0;
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 13px;
+  white-space: nowrap;
+}
 .activity-panel button,
 .activity-panel select {
   min-height: 34px;
@@ -2225,6 +2236,14 @@ td a {
   }
   .activity-heading strong {
     font-size: 17px;
+  }
+  .activity-heading {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+  .activity-heading .scenario-toggle {
+    order: 1;
+    margin: 0;
   }
   .activity-transport {
     gap: 6px;

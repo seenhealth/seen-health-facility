@@ -22,6 +22,11 @@ export function storyActivitySource(): { source: ActivitySource; heroId: string 
     };
   return memo;
 }
+export type StoryScenario = { source: ActivitySource; heroId: string; steps: CompiledStep[] };
+/** Source, hero and steps together, for views that animate and measure the story. */
+export function storyScenario(): StoryScenario {
+  return { ...storyActivitySource(), steps: storySteps() };
+}
 /** Compiled steps: hero stops, arrive/depart times, focus times and companions. */
 export function storySteps(): CompiledStep[] {
   return storyTracks.steps;
