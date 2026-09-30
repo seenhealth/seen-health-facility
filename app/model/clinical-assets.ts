@@ -295,14 +295,14 @@ export function buildClinicalAsset(
     );
     const knob = cyl(w * 0.27, h * 0.88, d / 2 + 0.026, 0.041, 0.025, white);
     knob.rotation.x = Math.PI / 2;
-    const rim = mesh(
+    mesh(
       new T.TorusGeometry(w * 0.31, 0.038, 10, 32),
       metal,
       0,
       h * 0.44,
       d / 2 + 0.031,
     );
-    const window = mesh(
+    mesh(
       new T.CircleGeometry(w * 0.26, 32),
       dark,
       0,
@@ -449,7 +449,7 @@ export function buildClinicalAsset(
       rod([x, 0.07, 0], [x, h - 0.1, 0], 0.014);
       for (let i = 0; i < 12; i++)
         box(x, 0.15 + (i * (h - 0.3)) / 12, 0.015, 0.045, 0.015, 0.015, dark);
-      const wheel = mesh(
+      mesh(
         new T.TorusGeometry(0.065, 0.01, 6, 16),
         metal,
         x,
@@ -468,7 +468,7 @@ export function buildClinicalAsset(
       rod([x - 0.11, h * 0.37, 0.17], [x + 0.01, h * 0.37, 0.17], 0.019, dark);
     }
   } else if (spec.kind === 'therapy-balls') {
-    const colors = ['photo-teal', 'photo-red-cart', 'photo-moss'];
+    const colors = ['photo-teal', 'photo-landscape-red', 'photo-blue-grey'];
     for (let i = 0; i < 3; i++) {
       const r = 0.24 + i * 0.035;
       mesh(
@@ -665,8 +665,7 @@ export function buildClinicalAsset(
   } else if (spec.kind === 'rehab-training-stairs') {
     const deck = 0.6,
       landing = 0.75,
-      stepD = 0.28,
-      run = d - landing - stepD * 4;
+      stepD = 0.28;
     for (let i = 0; i < 4; i++)
       box(
         0,

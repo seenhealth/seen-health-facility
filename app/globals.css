@@ -336,6 +336,8 @@ input[type='range'] {
   position: relative;
   overflow: hidden;
   min-width: 0;
+  /* Matches the viewer's paper backdrop while the canvas loads. */
+  background: #f3f0e9;
 }
 .model-canvas {
   position: absolute;

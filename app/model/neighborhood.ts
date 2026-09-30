@@ -1,5 +1,29 @@
 import * as T from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import type { Facility, Vec2 } from './schema';
+
+// Presentation-model site palette: warm light asphalt, soft white markings,
+// pale concrete and muted sage planting.
+const SITE = {
+  asphalt: '#c2beb7',
+  street: '#bbb7b0',
+  sidewalk: '#e4e0d7',
+  curb: '#dcd7cd',
+  planting: '#b4bea2',
+  marking: '#f8f6f1',
+  accessible: '#a3b6bf',
+  trunk: '#8f8472',
+  canopy: ['#a9b598', '#9fad8d', '#b3bda3'],
+  pole: '#a3a5a0',
+  lamp: '#f6f4ee',
+  neighbor: '#e3ded4',
+  coping: '#d2ccc0',
+  neighborGlass: '#bcc6c5',
+  glass: '#56605f',
+  tyre: '#3d4040',
+  headlight: '#f7f4ea',
+  cars: ['#ebe8e2', '#d7d3cb', '#cacdca', '#efeee9', '#c0bdb6'],
+};
 
 /** Owned plan-derived ground geometry; surrounding building heights are illustrative. */
 export function buildNeighborhood(model: Facility) {
@@ -15,7 +39,10 @@ export function buildNeighborhood(model: Facility) {
     if (!materials.has(c))
       materials.set(
         c,
-        new T.MeshStandardMaterial({ color: c, roughness: 0.91 }),
+        new T.MeshStandardMaterial({
+          color: c,
+          roughness: c === SITE.glass ? 0.3 : 0.92,
+        }),
       );
     return materials.get(c)!;
   };
@@ -85,15 +112,15 @@ export function buildNeighborhood(model: Facility) {
     ],
     -0.42,
     0.2,
-    '#3a4650',
+    SITE.asphalt,
     'parking-and-street-bed',
     model.site.buildingOutline,
   );
   // Streets continue beyond the crop; their length is presentation context, not a site survey.
-  box(4, -0.43, 41.3, 105, 0.2, 10, '#45505a');
-  box(-44.4, -0.43, 5, 8, 0.2, 82, '#45505a');
-  box(3, -0.43, -32.3, 105, 0.2, 7, '#45505a');
-  box(54, -0.43, 5, 8, 0.2, 82, '#45505a');
+  box(4, -0.43, 41.3, 105, 0.2, 10, SITE.street);
+  box(-44.4, -0.43, 5, 8, 0.2, 82, SITE.street);
+  box(3, -0.43, -32.3, 105, 0.2, 7, SITE.street);
+  box(54, -0.43, 5, 8, 0.2, 82, SITE.street);
   const sidewalks = [
     [
       [180, 260],
@@ -124,7 +151,7 @@ export function buildNeighborhood(model: Facility) {
       p.map((q) => px(...q)),
       -0.23,
       0.18,
-      '#b9c4c3',
+      SITE.sidewalk,
       `raised-sidewalk-${i}`,
     ),
   );
@@ -176,14 +203,14 @@ export function buildNeighborhood(model: Facility) {
   ] as Vec2[][];
   islands.forEach((p, i) => {
     const pts = p.map((q) => px(...q));
-    patch(pts, -0.23, 0.2, '#c4cdc6', `island-curb-${i}`);
+    patch(pts, -0.23, 0.2, SITE.curb, `island-curb-${i}`);
     const cx = pts.reduce((s, q) => s + q[0], 0) / pts.length,
       cz = pts.reduce((s, q) => s + q[1], 0) / pts.length;
     patch(
       pts.map((q) => [cx + (q[0] - cx) * 0.92, cz + (q[1] - cz) * 0.92]),
       -0.025,
       0.015,
-      '#658054',
+      SITE.planting,
       `planting-bed-${i}`,
     );
   });
@@ -202,58 +229,70 @@ export function buildNeighborhood(model: Facility) {
     o.rotation.y = -Math.atan2(dz, dx);
   };
   for (let y = 420; y <= 1220; y += 100)
-    strip(px(384, y), px(555, y), 0.075, '#e1e2d8');
+    strip(px(384, y), px(555, y), 0.075, SITE.marking);
   for (let y = 305; y < 1070; y += 148)
-    strip(px(780, y + 160), px(1032, y + 25), 0.075, '#e1e2d8');
+    strip(px(780, y + 160), px(1032, y + 25), 0.075, SITE.marking);
   for (let y = 535; y < 2120; y += 138)
-    strip(px(3170, y + 166), px(3390, y - 47), 0.075, '#e1e2d8');
+    strip(px(3170, y + 166), px(3390, y - 47), 0.075, SITE.marking);
   for (let x = -40; x < 52; x += 6)
-    strip([x, 41.4], [x + 3, 41.4], 0.12, '#e9debf', -0.217);
+    strip([x, 41.4], [x + 3, 41.4], 0.12, SITE.marking, -0.217);
   for (let z = -26; z < 37; z += 6)
-    strip([-44.4, z], [-44.4, z + 3], 0.12, '#e9debf', -0.217);
+    strip([-44.4, z], [-44.4, z + 3], 0.12, SITE.marking, -0.217);
   for (let x = -40; x < 50; x += 5)
-    strip([x, -32.3], [x + 2.5, -32.3], 0.1, '#e5dec9', -0.217);
+    strip([x, -32.3], [x + 2.5, -32.3], 0.1, SITE.marking, -0.217);
   // Crosswalks, blue loading access and parking bays are geometry rather than a photograph.
   for (let z = 38; z < 45; z += 0.85)
-    box(-36, -0.208, z, 3.2, 0.012, 0.4, '#e4e7df');
+    box(-36, -0.208, z, 3.2, 0.012, 0.4, SITE.marking);
   for (let i = 0; i < 10; i++)
-    strip(px(351 + i * 42, 1010), px(393 + i * 42, 1060), 0.07, '#4fa3b6');
+    strip(px(351 + i * 42, 1010), px(393 + i * 42, 1060), 0.07, SITE.accessible);
   for (const y of [936, 1160]) {
     const [x, z] = px(530, y);
-    box(x, -0.208, z, 1.2, 0.012, 1.2, '#368cb0');
+    box(x, -0.208, z, 1.2, 0.012, 1.2, SITE.accessible);
     const ring = add(
-      new T.TorusGeometry(0.31, 0.04, 6, 18),
-      '#f4f0d9',
+      new T.TorusGeometry(0.31, 0.035, 6, 32),
+      SITE.marking,
       x,
       -0.191,
       z,
     );
     ring.rotation.x = -Math.PI / 2;
   }
+  // Abstract model trees: a slender trunk under soft, smooth canopy volumes.
+  const canopyGeometry = new T.SphereGeometry(1, 28, 18);
   function tree(x: number, z: number, r: number, h: number, i: number) {
     const [a, b] = px(x, z),
       g = new T.Group();
     g.name = `street-tree-${i}`;
     g.position.set(a, 0, b);
     root.add(g);
+    const trunk = Math.max(0.045, Math.min(0.1, r * 0.045));
     add(
-      new T.CylinderGeometry(0.12, 0.19, h * 0.65, 8),
-      '#766549',
+      new T.CylinderGeometry(trunk * 0.7, trunk, h, 10),
+      SITE.trunk,
       0,
-      h * 0.325,
+      h / 2 - 0.2,
       0,
       g,
     );
-    for (let j = 0; j < 5; j++) {
-      const angle = (j * Math.PI * 2) / 5;
-      add(
-        new T.IcosahedronGeometry(r * (j % 2 ? 0.72 : 0.85), 1),
-        j % 2 ? '#60814e' : '#729557',
-        Math.cos(angle) * r * 0.4,
-        h + Math.sin(j) * 0.25,
-        Math.sin(angle) * r * 0.4,
+    const tone = SITE.canopy[i % SITE.canopy.length];
+    const lobes =
+      r > 1.5
+        ? [
+            [0, 0, 0, 1],
+            [0.42, -0.18, 0.2, 0.72],
+            [-0.36, -0.12, -0.28, 0.68],
+          ]
+        : [[0, 0, 0, 1]];
+    for (const [ox, oy, oz, k] of lobes) {
+      const canopy = add(
+        canopyGeometry,
+        tone,
+        ox * r,
+        h + r * 0.22 + oy * r,
+        oz * r,
         g,
       );
+      canopy.scale.set(r * k, r * k * 0.86, r * k);
     }
   }
   [
@@ -275,8 +314,8 @@ export function buildNeighborhood(model: Facility) {
     [44, -24],
     [-36, -23],
   ]) {
-    add(new T.CylinderGeometry(0.065, 0.09, 5.2, 8), '#5d696b', x, 2.4, z);
-    box(x + 0.42, 4.98, z, 0.9, 0.09, 0.24, '#e8eddd');
+    add(new T.CylinderGeometry(0.045, 0.065, 5.2, 10), SITE.pole, x, 2.4, z);
+    box(x + 0.42, 4.98, z, 0.9, 0.07, 0.2, SITE.lamp);
   }
   // Partial neighboring footprint visible along the right-hand boundary of the supplied plan.
   const a = px(3430, 310),
@@ -288,7 +327,7 @@ export function buildNeighborhood(model: Facility) {
     b[0] - a[0],
     5.5,
     b[1] - a[1],
-    '#c4c8bf',
+    SITE.neighbor,
   ).name = 'neighbor-east-estimated-height';
   box(
     (a[0] + b[0]) / 2,
@@ -297,33 +336,43 @@ export function buildNeighborhood(model: Facility) {
     b[0] - a[0] + 0.16,
     0.16,
     b[1] - a[1] + 0.16,
-    '#9eaead',
+    SITE.coping,
   );
   for (let z = a[1] + 2; z < b[1] - 1; z += 3.2)
-    box(a[0] - 0.015, 0.65, z, 0.025, 2, 1.7, '#62898b');
+    box(a[0] - 0.015, 0.65, z, 0.025, 2, 1.7, SITE.neighborGlass);
+  // Simplified, softly rounded vehicles: stone bodies with dark glazing.
   function car(id: string, x: number, z: number, angle: number, color: string) {
     const g = new T.Group();
     g.name = id;
     g.position.set(x, -0.18, z);
     g.rotation.y = angle;
     root.add(g);
-    box(0, 0.35, 0, 1.74, 0.54, 3.9, color, g);
-    box(0, 0.88, -0.1, 1.55, 0.6, 2.1, '#759a9e', g);
-    box(0, 1.43, -0.1, 1.52, 0.07, 1.6, color, g);
-    for (const sx of [-0.86, 0.86])
+    const rounded = (
+      w: number,
+      h: number,
+      d: number,
+      r: number,
+      c: string,
+      y: number,
+      zz = 0,
+    ) => add(new RoundedBoxGeometry(w, h, d, 3, r), c, 0, y + h / 2, zz, g);
+    rounded(1.76, 0.58, 3.94, 0.16, color, 0.3);
+    rounded(1.5, 0.52, 2.05, 0.14, SITE.glass, 0.84, -0.12);
+    rounded(1.46, 0.08, 1.7, 0.04, color, 1.33, -0.14);
+    for (const sx of [-0.8, 0.8])
       for (const sz of [-1.27, 1.27]) {
         const w = add(
-          new T.CylinderGeometry(0.32, 0.32, 0.18, 12),
-          '#24363f',
+          new T.CylinderGeometry(0.31, 0.31, 0.2, 18),
+          SITE.tyre,
           sx,
-          0.32,
+          0.31,
           sz,
           g,
         );
         w.rotation.z = Math.PI / 2;
       }
-    for (const sx of [-0.55, 0.55])
-      box(sx, 0.61, 1.962, 0.3, 0.17, 0.025, '#f6edc8', g);
+    for (const sx of [-0.56, 0.56])
+      box(sx, 0.62, 1.955, 0.32, 0.1, 0.03, SITE.headlight, g);
     return g;
   }
   [
@@ -339,12 +388,12 @@ export function buildNeighborhood(model: Facility) {
       x,
       z,
       p[2],
-      ['#769297', '#d9dfd7', '#316e78', '#577e81', '#e3e3d9'][i],
+      SITE.cars[i],
     );
   });
   const traffic = [
-    car('street-car-1', 0, 39.4, Math.PI / 2, '#d9e4dc'),
-    car('street-car-2', 0, 43.4, -Math.PI / 2, '#33747b'),
+    car('street-car-1', 0, 39.4, Math.PI / 2, SITE.cars[3]),
+    car('street-car-2', 0, 43.4, -Math.PI / 2, SITE.cars[1]),
   ];
   const circuits = traffic.map((_, i) => {
     const o = i * 2.3;

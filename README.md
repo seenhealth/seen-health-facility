@@ -12,7 +12,8 @@ The scene opens on the day room and runs at **4× speed** by default. Use the wo
 - A reusable cast of 41 composite people covers 12 roles and independent, cane, walker and wheelchair mobility.
 - The day room rotates through performances, language and device classes, exercise, dance, tai chi, calligraphy, arts and crafts, instruments, and TCM talks. Standing, chair-based, wheelchair and quieter table participation are represented.
 - Three front tables and their chairs are cleared in the active layout. Original source drawings remain available for comparison.
-- The building, upstairs administration area, streets and surroundings can be explored in 3D. Facility and animated-character models can be downloaded from the application.
+- Back-of-house recreation: a table-tennis game room and two karaoke rooms, the main one a short walk from the day room. Their placement in previously empty rooms is an owner-confirmable assumption; see [MODEL_NOTES.md](MODEL_NOTES.md).
+- The building, upstairs administration area, streets and surroundings can be explored in 3D as a calm architectural presentation model, with ambient occlusion and a lighter `?quality=balanced` mode. Facility and animated-character models can be downloaded from the application; the facility GLB predates the recreation rooms and the presentation finishes.
 
 ## Run locally
 
@@ -43,6 +44,7 @@ The application uses React, Three.js, Vinext/Vite and a Cloudflare-compatible ru
 | Character templates and animation | `app/model/characters.ts`, `app/data/character-templates.json` |
 | Arrivals and accessible entrance | `app/model/arrival.ts` |
 | Day-room equipment and gestures | `app/model/day-room.ts` |
+| Recreation-room furniture | `app/model/recreation-assets.ts`, `scripts/apply-recreation-rooms.py` |
 | Activity rotation and cleared furniture | `app/data/day-program.json` |
 | Shared actor and interaction tracks | `app/data/activity-loop.json` |
 | Facility geometry and source references | `public/models/seen-alhambra-planning.json` |
@@ -57,6 +59,8 @@ The checked-in model assets already work without regeneration. For model validat
 ```bash
 cat sources/planning/overall-planning.part-* > 'sources/planning/Overall Planning.jpg'
 node scripts/validate-model.mjs
+node scripts/validate-layout.mjs
+node scripts/validate-interior.mjs
 node scripts/validate-activity.mjs
 npx tsc --noEmit --incremental false
 ```

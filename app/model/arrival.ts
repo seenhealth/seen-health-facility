@@ -105,11 +105,12 @@ export function buildArrival(
       opacity,
       depthWrite: opacity === 1,
     });
-  const stone = mat('#c9c8b7'),
-    silver = mat('#a8bab8'),
-    teal = mat('#25777c'),
-    glass = mat('#78b5ba', 0.32),
-    black = mat('#243f49');
+  // Pale concrete ramp, satin rails and a deep-green entrance header.
+  const stone = mat('#e2ddd3'),
+    silver = mat('#c4c7c4'),
+    teal = mat('#1f4d3a'),
+    glass = mat('#d4e0df', 0.36),
+    black = mat('#34393a');
   const box = (
     parent: T.Object3D,
     x: number,
@@ -206,7 +207,7 @@ export function buildArrival(
     const deck = box(pivot, 1.48, -0.04, 0, 2.96, 0.055, 1.02, silver);
     deck.name = 'deployable-wheelchair-ramp';
     for (const z of [-0.52, 0.52])
-      box(pivot, 1.48, 0, z, 2.96, 0.055, 0.035, teal);
+      box(pivot, 1.48, 0, z, 2.96, 0.055, 0.035, black);
     for (let x = 0.15; x < 2.94; x += 0.17)
       box(pivot, x, 0.016, 0, 0.026, 0.006, 0.91, black);
     return {

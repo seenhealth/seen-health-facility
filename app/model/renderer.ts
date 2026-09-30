@@ -2,6 +2,16 @@ import { floorShapes } from './floor-geometry';
 import dayProgram from '../data/day-program.json';
 import * as T from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
+import {
+  GTAOShader,
+  generateMagicSquareNoise,
+} from 'three/addons/shaders/GTAOShader.js';
+import {
+  PoissonDenoiseShader,
+  generatePdSamplePointInitializer,
+} from 'three/addons/shaders/PoissonDenoiseShader.js';
 import {
   mergeGeometries,
   mergeVertices,
@@ -10,7 +20,339 @@ import { buildAsset } from './assets';
 import { buildEnvelopeWall, buildRoofGeometry } from './envelope';
 import { buildNeighborhood } from './neighborhood';
 import { createActivity, type ActivitySource } from './activity';
-import { center, type Facility, type Vec2 } from './schema';
+import {
+  center,
+  type Facility,
+  type MaterialSpec,
+  type Vec2,
+} from './schema';
+
+/** Warm drawing-paper backdrop shared with the page behind the canvas. */
+export const PAPER = '#f3f0e9';
+/**
+ * Presentation finishes for the architectural-model look: warm whites, light
+ * oak, pale stone and muted accents. Hues follow the photographed interior;
+ * the facility JSON keeps its source colors, so this is a rendering layer only.
+ */
+const PRESENTATION: Record<string, Partial<MaterialSpec>> = {
+  wall: { color: '#f5f3ee', roughness: 0.92 },
+  tile: { color: '#ebe6dc', roughness: 0.55, pattern: 'stone' },
+  vinyl: { color: '#ece8e0', roughness: 0.6 },
+  wood: { color: '#e4d1b0', roughness: 0.6 },
+  sports: { color: '#decdaf', roughness: 0.6 },
+  carpet: { color: '#cdc6b8', roughness: 1 },
+  pattern: { color: '#e2ded5', roughness: 0.8 },
+  concrete: { color: '#dedad2', roughness: 0.95 },
+  oak: { color: '#dcc49c', roughness: 0.6 },
+  chair: { color: '#eee7d9', roughness: 0.8 },
+  table: { color: '#f5f3ee', roughness: 0.4 },
+  'clinical-blue': { color: '#a9b9ba' },
+  blue: { color: '#8ea9b3' },
+  metal: { color: '#c2c2bc', roughness: 0.35, metalness: 0.5 },
+  porcelain: { color: '#f4f3ee', roughness: 0.3 },
+  leaf: { color: '#8e9f7e', roughness: 0.95 },
+  cabinet: { color: '#ece8df' },
+  screen: { color: '#262c2e', roughness: 0.28 },
+  car: { color: '#d9d6cf' },
+  glass: { color: '#d3dfde', roughness: 0.08, metalness: 0.1, opacity: 0.42 },
+  frame: { color: '#5f6461' },
+  canopy: { color: '#5c7690' },
+  light: { color: '#f6efe0' },
+  'wet-tile': { color: '#d5dcd6', roughness: 0.5 },
+  'dining-chair': { color: '#936f53' },
+  'office-blue': { color: '#91a3a7' },
+  'lounge-blue': { color: '#8f9fb0' },
+  'grey-seat': { color: '#d4d1c9' },
+  'clinical-seat': { color: '#d5dbce' },
+  'photo-carpet': { color: '#d9d2c3' },
+  'photo-teal': { color: '#88aba9' },
+  'photo-tan-mesh': { color: '#bb9f7e' },
+  'photo-blue-grey': { color: '#b4c0bc' },
+  'photo-blue-seat': { color: '#b5ccc9' },
+  'photo-chair-wood': { color: '#a47d57' },
+  'photo-brown-counter': { color: '#aa9587' },
+  'photo-mustard': { color: '#c6ad73' },
+  'photo-yellow': { color: '#e8ddbd' },
+  'photo-lattice-blue': { color: '#6f9fb1' },
+  'photo-landscape-red': { color: '#ab6a53' },
+  'photo-landscape-ochre': { color: '#c9a579' },
+  'photo-moss': { color: '#5e7752' },
+  'photo-teal-tile': { color: '#bccdc8' },
+  'photo-facade': { color: '#e4dbcc' },
+  'photo-black': { color: '#2e3130' },
+  'photo-red-cart': { color: '#b4675c' },
+  'upperfit-floor': { color: '#d8cebe' },
+  'upperfit-wall': { color: '#ece5d8' },
+  'upperfit-blue': { color: '#b3c5c5' },
+  'upperfit-divider': { color: '#b6b7b1' },
+  'upperfit-wood': { color: '#cfb086' },
+  'upperfit-mesh': { color: '#c2b79e' },
+  'fleet-teal': { color: '#174a49' },
+  'fleet-glass': { color: '#2b3335', roughness: 0.25 },
+  'rehab-blue': { color: '#8199a9' },
+  '#e4e5df': { color: '#f0eee9', roughness: 0.9 },
+  '#dfdfd8': { color: '#ebe8e2', roughness: 0.9 },
+};
+/** Thin, slightly darker coping on cut interior walls: a drawn section line. */
+const WALL_CAP = '#b9b1a4';
+/** 'high' adds ambient occlusion and larger soft shadows; 'balanced' renders directly. */
+export type ViewerQuality = 'high' | 'balanced';
+const prefersBalanced = () =>
+  typeof window !== 'undefined' &&
+  (window.devicePixelRatio > 2 ||
+    Math.min(window.screen?.width || 1e4, window.screen?.height || 1e4) < 720);
+
+// Depth-only screen-space ambient occlusion: normals are reconstructed once
+// from the main pass depth, so no second geometry pass is needed.
+const NORMAL_FROM_DEPTH = /* glsl */ `
+  uniform highp sampler2D tDepth;
+  uniform mat4 cameraProjectionMatrixInverse;
+  varying vec2 vUv;
+  #include <packing>
+  vec3 viewPosition(vec2 uv, float depth) {
+    vec4 p = cameraProjectionMatrixInverse * vec4(vec3(uv, depth) * 2.0 - 1.0, 1.0);
+    return p.xyz / p.w;
+  }
+  float fetchDepth(ivec2 p) { return texelFetch(tDepth, p, 0).x; }
+  void main() {
+    vec2 size = vec2(textureSize(tDepth, 0));
+    ivec2 p = ivec2(vUv * size);
+    float c0 = fetchDepth(p);
+    if (c0 >= 1.0) { gl_FragColor = vec4(0.5, 0.5, 1.0, 1.0); return; }
+    float l2 = fetchDepth(p - ivec2(2, 0)), l1 = fetchDepth(p - ivec2(1, 0));
+    float r1 = fetchDepth(p + ivec2(1, 0)), r2 = fetchDepth(p + ivec2(2, 0));
+    float b2 = fetchDepth(p - ivec2(0, 2)), b1 = fetchDepth(p - ivec2(0, 1));
+    float t1 = fetchDepth(p + ivec2(0, 1)), t2 = fetchDepth(p + ivec2(0, 2));
+    vec2 uv = (vec2(p) + 0.5) / size;
+    vec3 ce = viewPosition(uv, c0);
+    vec3 dpdx = abs((2.0 * l1 - l2) - c0) < abs((2.0 * r1 - r2) - c0)
+      ? ce - viewPosition(uv - vec2(1.0 / size.x, 0.0), l1)
+      : viewPosition(uv + vec2(1.0 / size.x, 0.0), r1) - ce;
+    vec3 dpdy = abs((2.0 * b1 - b2) - c0) < abs((2.0 * t1 - t2) - c0)
+      ? ce - viewPosition(uv - vec2(0.0, 1.0 / size.y), b1)
+      : viewPosition(uv + vec2(0.0, 1.0 / size.y), t1) - ce;
+    gl_FragColor = vec4(packNormalToRGB(normalize(cross(dpdx, dpdy))), 1.0);
+  }`;
+const COMPOSITE = /* glsl */ `
+  uniform sampler2D tDiffuse;
+  uniform sampler2D tAO;
+  uniform sampler2D tNormal;
+  uniform highp sampler2D tDepth;
+  uniform float aoIntensity;
+  uniform float lineStrength;
+  uniform float depthRange;
+  uniform vec2 texel;
+  uniform vec2 normalTexel;
+  uniform vec3 paper;
+  varying vec2 vUv;
+  float depthAt(vec2 uv) { return texture2D(tDepth, uv).x; }
+  vec3 normalAt(vec2 uv) { return texture2D(tNormal, uv).xyz * 2.0 - 1.0; }
+  void main() {
+    vec4 color = vec4(paper, 1.0);
+    float d0 = depthAt(vUv);
+    if (d0 < 1.0) {
+      color = texture2D(tDiffuse, vUv);
+      color.rgb *= mix(1.0, texture2D(tAO, vUv).r, aoIntensity);
+      // Hairline drawing edges: creases from the reconstructed normals and
+      // silhouettes from the depth Laplacian (zero on planar surfaces).
+      float lx = abs(depthAt(vUv + vec2(texel.x, 0.0)) + depthAt(vUv - vec2(texel.x, 0.0)) - 2.0 * d0);
+      float ly = abs(depthAt(vUv + vec2(0.0, texel.y)) + depthAt(vUv - vec2(0.0, texel.y)) - 2.0 * d0);
+      float silhouette = smoothstep(0.02, 0.1, (lx + ly) * depthRange);
+      vec3 n0 = normalAt(vUv);
+      float bend = 1.0 - min(dot(n0, normalAt(vUv + vec2(normalTexel.x, 0.0))), dot(n0, normalAt(vUv + vec2(0.0, normalTexel.y))));
+      float crease = smoothstep(0.2, 0.5, bend);
+      color.rgb *= 1.0 - lineStrength * max(silhouette, crease);
+      #ifdef TONE_MAPPING
+        color.rgb = toneMapping(color.rgb);
+      #endif
+    }
+    gl_FragColor = linearToOutputTexel(color);
+  }`;
+const FULLSCREEN_VERTEX = /* glsl */ `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }`;
+function createPostPipeline(
+  renderer: T.WebGLRenderer,
+  scene: T.Scene,
+  camera: T.OrthographicCamera,
+  paper: T.Color,
+) {
+  const depthTexture = new T.DepthTexture(1, 1);
+  const sceneTarget = new T.WebGLRenderTarget(1, 1, {
+    type: T.HalfFloatType,
+    depthTexture,
+  });
+  const nearest = {
+    minFilter: T.NearestFilter,
+    magFilter: T.NearestFilter,
+    depthBuffer: false,
+  };
+  const normalTarget = new T.WebGLRenderTarget(1, 1, nearest);
+  const aoTarget = new T.WebGLRenderTarget(1, 1, { depthBuffer: false });
+  const denoiseTarget = aoTarget.clone();
+  const noise = new Uint8Array(64 * 64 * 4);
+  for (let i = 0, s = 7; i < noise.length; i++)
+    noise[i] = (s = (s * 16807) % 2147483647) & 255;
+  const denoiseNoise = new T.DataTexture(noise, 64, 64);
+  denoiseNoise.wrapS = denoiseNoise.wrapT = T.RepeatWrapping;
+  denoiseNoise.needsUpdate = true;
+  const gtaoNoise = generateMagicSquareNoise();
+  const normalMaterial = new T.ShaderMaterial({
+    uniforms: {
+      tDepth: { value: depthTexture },
+      cameraProjectionMatrixInverse: { value: new T.Matrix4() },
+    },
+    vertexShader: FULLSCREEN_VERTEX,
+    fragmentShader: NORMAL_FROM_DEPTH,
+    depthTest: false,
+    depthWrite: false,
+  });
+  const gtaoMaterial = new T.ShaderMaterial({
+    defines: {
+      ...GTAOShader.defines,
+      PERSPECTIVE_CAMERA: 0,
+      NORMAL_VECTOR_TYPE: 1,
+      SAMPLES: 16,
+    },
+    uniforms: T.UniformsUtils.clone(GTAOShader.uniforms),
+    vertexShader: GTAOShader.vertexShader,
+    fragmentShader: GTAOShader.fragmentShader,
+    blending: T.NoBlending,
+    depthTest: false,
+    depthWrite: false,
+  });
+  const gu = gtaoMaterial.uniforms;
+  gu.tNormal.value = normalTarget.texture;
+  gu.tDepth.value = depthTexture;
+  gu.tNoise.value = gtaoNoise;
+  // World-space radius (m): contact shading under furniture, wall bases and
+  // corners without darkening open floor.
+  gu.radius.value = 1.25;
+  gu.thickness.value = 2.5;
+  gu.distanceExponent.value = 1.25;
+  gu.distanceFallOff.value = 1;
+  gu.scale.value = 1.7;
+  const denoiseMaterial = new T.ShaderMaterial({
+    defines: {
+      ...PoissonDenoiseShader.defines,
+      NORMAL_VECTOR_TYPE: 1,
+      SAMPLES: 16,
+      SAMPLE_VECTORS: generatePdSamplePointInitializer(16, 2, 2),
+    },
+    uniforms: T.UniformsUtils.clone(PoissonDenoiseShader.uniforms),
+    vertexShader: PoissonDenoiseShader.vertexShader,
+    fragmentShader: PoissonDenoiseShader.fragmentShader,
+    depthTest: false,
+    depthWrite: false,
+  });
+  const du = denoiseMaterial.uniforms;
+  du.tDiffuse.value = aoTarget.texture;
+  du.tNormal.value = normalTarget.texture;
+  du.tDepth.value = depthTexture;
+  du.tNoise.value = denoiseNoise;
+  du.lumaPhi.value = 10;
+  du.depthPhi.value = 2;
+  du.normalPhi.value = 3;
+  du.radius.value = 10;
+  const compositeMaterial = new T.ShaderMaterial({
+    uniforms: {
+      tDiffuse: { value: sceneTarget.texture },
+      tAO: { value: aoTarget.texture },
+      tNormal: { value: normalTarget.texture },
+      tDepth: { value: depthTexture },
+      aoIntensity: { value: 0.8 },
+      lineStrength: { value: 0.2 },
+      depthRange: { value: 1 },
+      texel: { value: new T.Vector2() },
+      normalTexel: { value: new T.Vector2() },
+      paper: { value: paper },
+    },
+    vertexShader: FULLSCREEN_VERTEX,
+    fragmentShader: COMPOSITE,
+    depthTest: false,
+    depthWrite: false,
+  });
+  const quad = new FullScreenQuad(normalMaterial);
+  const white = new T.Color('#ffffff'),
+    previousClear = new T.Color();
+  const pass = (material: T.Material, target: T.WebGLRenderTarget | null) => {
+    renderer.setRenderTarget(target);
+    quad.material = material;
+    quad.render(renderer);
+  };
+  return {
+    setSize(width: number, height: number, pixelRatio: number) {
+      const w = Math.max(1, Math.round(width * pixelRatio)),
+        h = Math.max(1, Math.round(height * pixelRatio));
+      // Multisampling is only worth its memory below retina densities.
+      sceneTarget.samples = pixelRatio < 1.75 ? 4 : 0;
+      sceneTarget.setSize(w, h);
+      // Occlusion is low-frequency: evaluate it at CSS-pixel resolution.
+      const aw = Math.max(1, Math.round(width * Math.min(pixelRatio, 1))),
+        ah = Math.max(1, Math.round(height * Math.min(pixelRatio, 1)));
+      for (const t of [normalTarget, aoTarget, denoiseTarget])
+        t.setSize(aw, ah);
+      gu.resolution.value.set(aw, ah);
+      du.resolution.value.set(aw, ah);
+      compositeMaterial.uniforms.texel.value.set(1 / w, 1 / h);
+      compositeMaterial.uniforms.normalTexel.value.set(1 / aw, 1 / ah);
+    },
+    render() {
+      renderer.getClearColor(previousClear);
+      const clearAlpha = renderer.getClearAlpha();
+      renderer.setRenderTarget(sceneTarget);
+      renderer.render(scene, camera);
+      normalMaterial.uniforms.cameraProjectionMatrixInverse.value.copy(
+        camera.projectionMatrixInverse,
+      );
+      pass(normalMaterial, normalTarget);
+      gu.cameraNear.value = camera.near;
+      gu.cameraFar.value = camera.far;
+      gu.cameraProjectionMatrix.value.copy(camera.projectionMatrix);
+      gu.cameraProjectionMatrixInverse.value.copy(
+        camera.projectionMatrixInverse,
+      );
+      gu.cameraWorldMatrix.value.copy(camera.matrixWorld);
+      du.cameraProjectionMatrixInverse.value.copy(
+        camera.projectionMatrixInverse,
+      );
+      renderer.setClearColor(white, 1);
+      for (const t of [aoTarget, denoiseTarget]) {
+        renderer.setRenderTarget(t);
+        renderer.clear(true, false, false);
+      }
+      compositeMaterial.uniforms.depthRange.value = camera.far - camera.near;
+      pass(gtaoMaterial, aoTarget);
+      // Two rotated denoise iterations, ending back in aoTarget.
+      du.tDiffuse.value = aoTarget.texture;
+      du.index.value = 0;
+      pass(denoiseMaterial, denoiseTarget);
+      du.tDiffuse.value = denoiseTarget.texture;
+      du.index.value = 1;
+      pass(denoiseMaterial, aoTarget);
+      renderer.setClearColor(previousClear, clearAlpha);
+      pass(compositeMaterial, null);
+    },
+    dispose() {
+      for (const t of [sceneTarget, normalTarget, aoTarget, denoiseTarget])
+        t.dispose();
+      depthTexture.dispose();
+      denoiseNoise.dispose();
+      gtaoNoise.dispose();
+      for (const m of [
+        normalMaterial,
+        gtaoMaterial,
+        denoiseMaterial,
+        compositeMaterial,
+      ])
+        m.dispose();
+      quad.dispose();
+    },
+  };
+}
 export type ViewerState = {
   selected: string | null;
   room: string | null;
@@ -65,6 +407,14 @@ export type ViewerOptions = {
   activity?: ActivitySource;
   /** False disables orbit/pan/zoom and picking, for scripted presentations. */
   interactive?: boolean;
+  /** Backdrop color behind the site; defaults to the warm paper tone. */
+  background?: string;
+  /**
+   * Rendering quality. Omitted: 'high' on desktop, 'balanced' on dense or
+   * small screens, stepping down once if 'high' runs persistently slowly.
+   * A `?quality=high|balanced` URL parameter overrides the default.
+   */
+  quality?: ViewerQuality;
 };
 const SHOT_DISTANCE = 150;
 export function createViewer(
@@ -74,18 +424,33 @@ export function createViewer(
   options: ViewerOptions = {},
 ) {
   const scene = new T.Scene();
-  scene.background = new T.Color('#e5eae7');
+  const paper = new T.Color(options.background || PAPER);
+  scene.background = paper;
   const renderer = new T.WebGLRenderer({
     antialias: true,
     preserveDrawingBuffer: true,
   });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  const requestedQuality = (() => {
+    if (options.quality) return options.quality;
+    const q =
+      typeof location === 'undefined'
+        ? null
+        : new URLSearchParams(location.search).get('quality');
+    return q === 'high' || q === 'balanced' ? q : null;
+  })();
+  let quality: ViewerQuality =
+    requestedQuality || (prefersBalanced() ? 'balanced' : 'high');
+  const pixelRatio = () =>
+    Math.min(devicePixelRatio, quality === 'high' ? 2 : 1.5);
+  renderer.setPixelRatio(pixelRatio());
   renderer.localClippingEnabled = true;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = T.PCFShadowMap;
   renderer.outputColorSpace = T.SRGBColorSpace;
-  renderer.toneMapping = T.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.4;
+  // Neutral keeps finish colors true to the palette; ACES shifted and
+  // saturated them.
+  renderer.toneMapping = T.NeutralToneMapping;
+  renderer.toneMappingExposure = 1;
   host.appendChild(renderer.domElement);
   renderer.domElement.setAttribute(
     'aria-label',
@@ -102,11 +467,17 @@ export function createViewer(
   controls.dampingFactor = 0.1;
   controls.enabled = options.interactive !== false;
   controls.update();
-  scene.add(new T.HemisphereLight('#f5faf8', '#647a67', 2.5));
-  const sun = new T.DirectionalLight('#fff2db', 3.2);
+  // Soft, even architectural light: a pale sky/ground fill, a gentle room
+  // environment for material response and a warm, low-contrast key.
+  scene.add(new T.HemisphereLight('#fbfaf6', '#d8d4cc', 1.1));
+  const pmrem = new T.PMREMGenerator(renderer);
+  const environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  pmrem.dispose();
+  scene.environment = environment;
+  scene.environmentIntensity = 0.45;
+  const sun = new T.DirectionalLight('#fff5ea', 2.45);
   sun.position.set(-45, 85, 50);
   sun.castShadow = true;
-  sun.shadow.mapSize.set(2048, 2048);
   Object.assign(sun.shadow.camera, {
     left: -65,
     right: 65,
@@ -117,92 +488,172 @@ export function createViewer(
   });
   sun.shadow.bias = -0.0003;
   sun.shadow.normalBias = 0.035;
+  sun.shadow.intensity = 0.8;
   scene.add(sun);
+  const applyShadowQuality = () => {
+    const size = quality === 'high' ? 4096 : 2048;
+    if (sun.shadow.mapSize.x !== size) {
+      sun.shadow.map?.dispose();
+      sun.shadow.map = null;
+      sun.shadow.mapSize.set(size, size);
+    }
+    sun.shadow.radius = quality === 'high' ? 3 : 2;
+  };
+  applyShadowQuality();
+  const maxAnisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
   const textures: T.Texture[] = [],
     materials = new Map<string, T.MeshStandardMaterial>();
+  const finish = (id: string): MaterialSpec => ({
+    ...(model.materials[id] || {
+      color: id.startsWith('#') ? id : '#dce1d8',
+      roughness: 0.8,
+    }),
+    ...PRESENTATION[id],
+  });
   const materialLoads: Promise<void>[] = [];
   const materialLoadErrors: string[] = [];
+  // Procedural finishes on a 512 px tile (floors map one tile to 2 m). Tones
+  // stay close to white: the material color carries the finish.
   function pattern(kind: string) {
-    const c = document.createElement('canvas');
-    c.width = c.height = 256;
+    const size = 512,
+      c = document.createElement('canvas');
+    c.width = c.height = size;
     const ctx = c.getContext('2d')!;
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, 256, 256);
-    if (kind === 'herringbone') {
-      ctx.translate(128, 128);
-      ctx.rotate(Math.PI / 4);
-      for (let y = -256; y < 256; y += 32)
-        for (let x = -256; x < 256; x += 64) {
-          ctx.fillStyle = (x / 64 + y / 32) % 3 ? '#f6eddb' : '#d6c7b1';
-          ctx.fillRect(x, y, 62, 30);
-          ctx.strokeStyle = '#bbab95';
-          ctx.strokeRect(x, y, 62, 30);
+    const img = ctx.createImageData(size, size),
+      px = img.data;
+    const hash = (a: number, b: number) => {
+      const s = Math.sin(a * 127.1 + b * 311.7) * 43758.5453;
+      return s - Math.floor(s);
+    };
+    // Grayscale shade per pixel with an optional warm bias for timber.
+    const shade = (
+      fn: (x: number, y: number) => number,
+      warm = [1, 1, 1],
+    ) => {
+      for (let y = 0; y < size; y++)
+        for (let x = 0; x < size; x++) {
+          const v = Math.max(0, Math.min(1, fn(x, y))) * 255,
+            i = (y * size + x) * 4;
+          px[i] = v * warm[0];
+          px[i + 1] = v * warm[1];
+          px[i + 2] = v * warm[2];
+          px[i + 3] = 255;
         }
-    } else if (kind === 'marble') {
-      ctx.fillStyle = '#fafaf7';
-      ctx.fillRect(0, 0, 256, 256);
-      for (let i = 0; i < 16; i++) {
-        ctx.strokeStyle = i % 3 ? '#c7c6c0' : '#9c9f9c';
-        ctx.lineWidth = i % 3 ? 0.5 : 1.2;
-        ctx.beginPath();
-        ctx.moveTo(-30, i * 23 - 30);
-        ctx.bezierCurveTo(80, i * 17 - 25, 125, i * 25 + 30, 286, i * 21 + 55);
-        ctx.stroke();
-      }
-    } else if (kind === 'woodgrain') {
-      for (let i = 0; i < 150; i++) {
-        ctx.strokeStyle = i % 4 ? '#f0dec0' : '#cdb18b';
-        ctx.lineWidth = 0.3 + (i % 3) * 0.2;
-        ctx.beginPath();
-        ctx.moveTo(i * 2, 0);
-        ctx.bezierCurveTo(i * 2 + 6, 90, i * 2 - 5, 180, i * 2 + 3, 256);
-        ctx.stroke();
-      }
+      ctx.putImageData(img, 0, 0);
+    };
+    const grout = (d: number, width = 1.2, depth = 0.1) =>
+      d < width ? 1 - depth * (1 - d / width) : 1;
+    if (kind === 'herringbone') {
+      // Chevron-laid oak: 25 cm strips of ~9 cm boards at 45 degrees.
+      const strip = 64,
+        pitch = 32;
+      shade(
+        (x, y) => {
+          const col = Math.floor(x / strip),
+            u = x - col * strip,
+            sign = col % 2 ? 1 : -1,
+            t = y + sign * u,
+            board = Math.floor(t / pitch),
+            along = y - sign * u,
+            tone = 0.9 + 0.09 * hash(((board % 16) + 16) % 16, col),
+            grain = 0.018 * Math.sin(along * 0.55 + hash(board, col) * 40);
+          return (
+            (tone + grain) *
+            grout(t - board * pitch, 1.1, 0.12) *
+            grout(Math.min(u, strip - u), 1, 0.1)
+          );
+        },
+        [1, 0.985, 0.96],
+      );
+    } else if (kind === 'plank') {
+      // 25 cm boards in 1 m lengths with staggered end joints.
+      const w = 64,
+        len = 256;
+      shade(
+        (x, y) => {
+          const col = Math.floor(x / w),
+            offset = Math.floor(hash(col, 3) * 8) * 32,
+            t = (y + offset) % size,
+            board = Math.floor(t / len),
+            tone = 0.91 + 0.08 * hash(col, board),
+            grain = 0.02 * Math.sin(x * 0.9 + Math.sin(y * 0.02 + col) * 3);
+          return (
+            (tone + grain) *
+            grout(Math.min(x - col * w, w - (x - col * w)), 1, 0.12) *
+            grout(Math.min(t % len, len - (t % len)), 1, 0.14)
+          );
+        },
+        [1, 0.99, 0.97],
+      );
+    } else if (kind === 'stone') {
+      // Large-format pale stone, 100 x 50 cm in running bond.
+      const tw = 256,
+        th = 128;
+      shade((x, y) => {
+        const row = Math.floor(y / th),
+          xx = (x + (row % 2) * (tw / 2)) % size,
+          col = Math.floor(xx / tw),
+          tone = 0.955 + 0.04 * hash(col, row),
+          speck = 0.012 * (hash(x, y) - 0.5);
+        return (
+          (tone + speck) *
+          grout(Math.min(xx % tw, tw - (xx % tw)), 1.2, 0.09) *
+          grout(Math.min(y % th, th - (y % th)), 1.2, 0.09)
+        );
+      });
+    } else if (kind === 'tile' || kind === 'mosaic') {
+      const t = kind === 'mosaic' ? 16 : 64;
+      shade((x, y) => {
+        const tone = 0.95 + 0.045 * hash(Math.floor(x / t), Math.floor(y / t));
+        return (
+          tone *
+          grout(Math.min(x % t, t - (x % t)), 1.3, 0.12) *
+          grout(Math.min(y % t, t - (y % t)), 1.3, 0.12)
+        );
+      });
     } else if (kind === 'carpet') {
-      for (let i = 0; i < 7000; i++) {
-        const x = (i * 73) % 256,
-          y = (i * 113 + Math.floor(i / 256) * 7) % 256;
-        ctx.fillStyle = i % 2 ? '#bfbcb5' : '#f6f4ed';
-        ctx.fillRect(x, y, 1.5, 1.5);
-      }
+      shade((x, y) => 0.9 + 0.08 * hash(x, y) + 0.02 * Math.sin(y * 0.8));
+    } else if (kind === 'woodgrain') {
+      shade(
+        (x, y) =>
+          0.9 +
+          0.05 * Math.sin(x * 0.19 + Math.sin(y * 0.013 + x * 0.004) * 4) +
+          0.03 * Math.sin(x * 0.61 + 1.3) +
+          0.02 * hash(Math.floor(x / 3), 7),
+        [1, 0.985, 0.955],
+      );
+    } else if (kind === 'marble') {
+      shade(
+        (x, y) =>
+          0.975 -
+          0.07 *
+            Math.pow(
+              Math.abs(
+                Math.sin((x + y * 0.6) * 0.012 + Math.sin(y * 0.02) * 1.6),
+              ),
+              18,
+            ) -
+          0.012 * hash(x, y),
+      );
     } else {
-      ctx.strokeStyle = '#cbc9ba';
-      ctx.lineWidth = 2;
-      const spacing = kind === 'plank' ? 32 : kind === 'mosaic' ? 8 : 128;
-      for (let x = 0; x < 256; x += spacing) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, 256);
-        ctx.stroke();
-      }
-      for (let y = 0; y < 256; y += kind === 'mosaic' ? 8 : 128) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(256, y);
-        ctx.stroke();
-      }
-      if (kind === 'pattern') {
-        ctx.fillStyle = '#849390';
-        for (const x of [64, 192])
-          for (const y of [64, 192]) {
-            ctx.beginPath();
-            ctx.arc(x, y, 25, 0, Math.PI * 2);
-            ctx.fill();
-          }
-      }
+      // 'pattern' and unknown kinds: a quiet 1 m grid.
+      shade(
+        (x, y) =>
+          0.97 *
+          grout(Math.min(x % 256, 256 - (x % 256)), 1.2, 0.08) *
+          grout(Math.min(y % 256, 256 - (y % 256)), 1.2, 0.08),
+      );
     }
     const tex = new T.CanvasTexture(c);
     tex.wrapS = tex.wrapT = T.RepeatWrapping;
     tex.colorSpace = T.SRGBColorSpace;
+    tex.anisotropy = maxAnisotropy;
     textures.push(tex);
     return tex;
   }
   const mat = (id: string) => {
     if (!materials.has(id)) {
-      const d = model.materials[id] || {
-        color: id.startsWith('#') ? id : '#dce1d8',
-        roughness: 0.8,
-      };
+      const d = finish(id);
       let surfaceMap: T.Texture | null = d.pattern ? pattern(d.pattern) : null;
       if (d.textureUrl) {
         materialLoads.push(
@@ -217,6 +668,7 @@ export function createViewer(
               },
             );
             map.colorSpace = T.SRGBColorSpace;
+            map.anisotropy = maxAnisotropy;
             textures.push(map);
             surfaceMap = map;
           }),
@@ -237,12 +689,6 @@ export function createViewer(
       );
     }
     return materials.get(id)!;
-  };
-  const shape = (p: Vec2[]) => {
-    const s = new T.Shape();
-    p.forEach(([x, z], i) => (i ? s.lineTo(x, -z) : s.moveTo(x, -z)));
-    s.closePath();
-    return s;
   };
   const mesh = (
     g: T.Object3D,
@@ -422,11 +868,12 @@ export function createViewer(
       (w.a[0] + w.b[0]) / 2,
       w.height,
       (w.a[1] + w.b[1]) / 2,
-      Math.hypot(dx, dz),
-      0.035,
-      w.thickness + 0.02,
-      '#fffdf4',
+      Math.hypot(dx, dz) + 0.004,
+      0.02,
+      w.thickness + 0.006,
+      WALL_CAP,
     );
+    cap.castShadow = false;
     cap.rotation.y = m.rotation.y;
     cap.userData = { cap: true, height: w.height };
   });
@@ -918,7 +1365,7 @@ export function createViewer(
               : state.walls === 'cutaway'
                 ? Math.min(1.2, h)
                 : h;
-        if (o.userData.cap) o.position.y = cut + 0.0175;
+        if (o.userData.cap) o.position.y = cut - 0.004;
         else {
           o.scale.y = cut / h;
           o.position.y = cut / 2;
@@ -927,9 +1374,7 @@ export function createViewer(
       });
       overlayMap.get(z.id)!.visible = state.plan && z.levelId === 'ground';
       const f = floorMap.get(z.id)!.material as T.MeshStandardMaterial;
-      f.color.set(
-        state.colors ? z.color : model.materials[z.floorMaterial].color,
-      );
+      f.color.set(state.colors ? z.color : finish(z.floorMaterial).color);
       f.map = state.colors ? null : mat(z.floorMaterial).map;
       f.needsUpdate = true;
       const label = labels.get(z.id)!;
@@ -1040,6 +1485,7 @@ export function createViewer(
     else camera.position.copy(c).add(new T.Vector3(65, 85, 100));
     controls.update();
   }
+  let post: ReturnType<typeof createPostPipeline> | null = null;
   const resize = () => {
     const w = host.clientWidth,
       h = host.clientHeight;
@@ -1050,10 +1496,29 @@ export function createViewer(
     camera.bottom = -40;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
+    post?.setSize(w, h, renderer.getPixelRatio());
   };
+  // Post-processing exists only while 'high' is active; 'balanced' renders
+  // straight to the canvas with the context's own multisampling.
+  const applyQuality = () => {
+    renderer.setPixelRatio(pixelRatio());
+    applyShadowQuality();
+    if (quality === 'high' && !post)
+      post = createPostPipeline(renderer, scene, camera, paper);
+    else if (quality !== 'high' && post) {
+      post.dispose();
+      post = null;
+    }
+    resize();
+  };
+  const draw = () => (post ? post.render() : renderer.render(scene, camera));
   const observer = new ResizeObserver(resize);
   observer.observe(host);
-  resize();
+  applyQuality();
+  // Without an explicit choice, step down once if 'high' stays slow.
+  let autoQuality = !requestedQuality,
+    sampledFrames = -120,
+    slowFrames = 0;
   let start: [number, number] = [0, 0];
   const ray = new T.Raycaster();
   const pd = (e: PointerEvent) => {
@@ -1125,6 +1590,17 @@ export function createViewer(
     frame = requestAnimationFrame(loop);
     const dt = Math.max(0, (now - lastTime) / 1000);
     lastTime = now;
+    if (autoQuality && quality === 'high' && dt < 0.5 && !document.hidden) {
+      if (++sampledFrames > 0 && dt > 0.045) slowFrames++;
+      if (sampledFrames >= 180) {
+        if (slowFrames > 120) {
+          quality = 'balanced';
+          autoQuality = false;
+          applyQuality();
+        }
+        sampledFrames = slowFrames = 0;
+      }
+    }
     activity.tick(typeof document !== 'undefined' && document.hidden ? 0 : dt);
     neighborhood.tick(activity.getState().time);
     for (const g of exteriorAssets)
@@ -1161,7 +1637,7 @@ export function createViewer(
       if (Math.abs(camera.zoom - zoomTarget) < 0.001) zoomTarget = null;
     }
     controls.update();
-    renderer.render(scene, camera);
+    draw();
   }
   update(defaultState);
   loop();
@@ -1218,6 +1694,14 @@ export function createViewer(
     setInteractive(on: boolean) {
       controls.enabled = on;
     },
+    /** 'high' adds ambient occlusion and finer shadows; 'balanced' is lighter. */
+    setQuality(next: ViewerQuality) {
+      autoQuality = false;
+      if (next === quality) return;
+      quality = next;
+      applyQuality();
+    },
+    getQuality: (): ViewerQuality => quality,
     zoom: (n: number) =>
       (zoomTarget = T.MathUtils.clamp(camera.zoom * n, 0.3, 20)),
     reset: () => {
@@ -1225,7 +1709,7 @@ export function createViewer(
       focus(null);
     },
     snapshot: () => {
-      renderer.render(scene, camera);
+      draw();
       return renderer.domElement.toDataURL('image/png');
     },
     exportGLB: async () => {
@@ -1253,13 +1737,13 @@ export function createViewer(
           0,
         );
         g.visible = true;
-        for (const child of [...g.children])
+        for (const child of g.children.slice())
           if (child.name.startsWith('incoming-stair-')) g.remove(child);
         const wg = g.getObjectByName('walls');
         wg?.children.forEach((o) => {
           const h = o.userData.height;
           o.visible = true;
-          if (o.userData.cap) o.position.y = h + 0.0175;
+          if (o.userData.cap) o.position.y = h - 0.004;
           else {
             o.scale.y = 1;
             o.position.y = h / 2;
@@ -1345,6 +1829,8 @@ export function createViewer(
       materials.forEach((m) => mats.add(m));
       mats.forEach((m) => m.dispose());
       textures.forEach((t) => t.dispose());
+      post?.dispose();
+      environment.dispose();
       renderer.dispose();
       renderer.domElement.remove();
       labels.forEach((l) => l.remove());

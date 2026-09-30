@@ -1,13 +1,16 @@
 import * as T from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import type { Asset } from './schema';
 import { buildPhotoAsset } from './photo-assets';
 import { buildClinicalAsset } from './clinical-assets';
+import { buildRecreationAsset } from './recreation-assets';
 // Each asset is modeled around a local, floor-level origin. Dimensions and transforms live in JSON.
 export function buildAsset(
   spec: Asset,
   material: (id: string) => T.MeshStandardMaterial,
 ) {
-  const clinical = buildClinicalAsset(spec, material);
+  const clinical =
+    buildClinicalAsset(spec, material) || buildRecreationAsset(spec, material);
   if (clinical) return clinical;
   const g = new T.Group(),
     [w, h, d] = spec.dimensions;
@@ -137,27 +140,27 @@ export function buildAsset(
       ring.position.y = 0.46;
       g.add(ring);
     }
-    cyl(0, 0.4, 0, w * 0.025, h * 0.65, 'oak', w * 0.012);
-    for (let i = 0; i < 17; i++) {
-      const a = i * 2.399,
-        r = w * (0.1 + (i % 4) * 0.05);
-      const leaf = new T.Mesh(
-        new T.IcosahedronGeometry(w * (0.13 + (i % 3) * 0.027), 2),
-        material('leaf'),
-      );
-      leaf.position.set(
-        Math.cos(a) * r,
-        h * 0.7 + (i % 3) * h * 0.075,
-        Math.sin(a) * r,
-      );
-      leaf.scale.y = 0.7;
-      leaf.castShadow = true;
+    cyl(0, 0.4, 0, w * 0.02, h * 0.62, 'oak', w * 0.01);
+    // Soft canopy volumes instead of faceted leaf clusters.
+    const canopy = new T.SphereGeometry(1, 24, 16);
+    const lobes = [
+      [0, 0.78, 0, 0.27],
+      [0.17, 0.72, 0.08, 0.2],
+      [-0.16, 0.73, -0.07, 0.2],
+      [0.05, 0.86, -0.15, 0.18],
+      [-0.07, 0.88, 0.15, 0.17],
+    ];
+    for (const [x, y, z, r] of lobes) {
+      const leaf = new T.Mesh(canopy, material('leaf'));
+      leaf.position.set(x * w, y * h, z * w);
+      leaf.scale.set(r * w, r * w * 0.82, r * w);
+      leaf.castShadow = leaf.receiveShadow = true;
       g.add(leaf);
     }
     if (tree)
-      for (let i = 0; i < 5; i++) {
-        const limb = cyl(0, h * 0.48, 0, 0.045, h * 0.34, 'oak', 0.015);
-        limb.rotation.z = (i - 2) * 0.25;
+      for (let i = 0; i < 4; i++) {
+        const limb = cyl(0, h * 0.5, 0, 0.03, h * 0.28, 'oak', 0.012);
+        limb.rotation.z = (i - 1.5) * 0.28;
         limb.rotation.y = i * 1.7;
       }
   } else if (spec.kind === 'bench') {
@@ -208,12 +211,18 @@ export function buildAsset(
     box(0, 0.4, -d * 0.28, 0.05, 0.7, 0.05, 'metal');
     box(0, 1.07, -d * 0.28, w * 0.7, 0.05, 0.05, 'metal');
   } else if (spec.kind === 'car') {
-    box(0, 0.23, 0, w, h * 0.4, d, spec.material);
-    box(0, h * 0.53, -d * 0.03, w * 0.92, h * 0.47, d * 0.56, spec.material);
-    box(0, h * 0.72, -d * 0.3, w * 0.86, 0.35, 0.04, 'screen');
-    for (const x of [-w * 0.46, w * 0.46])
+    const rounded = (y: number, a: number, b: number, c: number, r: number, m: string, z = 0) => {
+      const o = new T.Mesh(new RoundedBoxGeometry(a, b, c, 3, r), material(m));
+      o.position.set(0, y + b / 2, z);
+      o.castShadow = o.receiveShadow = true;
+      g.add(o);
+    };
+    rounded(0.2, w, h * 0.42, d, 0.14, spec.material);
+    rounded(h * 0.56, w * 0.86, h * 0.36, d * 0.54, 0.12, 'screen', -d * 0.03);
+    rounded(h * 0.9, w * 0.83, h * 0.06, d * 0.44, 0.03, spec.material, -d * 0.03);
+    for (const x of [-w * 0.44, w * 0.44])
       for (const z of [-d * 0.31, d * 0.31]) {
-        const wheel = cyl(x, 0.12, z, 0.28, 0.12, 'screen');
+        const wheel = cyl(x, 0.12, z, 0.28, 0.14, 'photo-black');
         wheel.rotation.z = Math.PI / 2;
       }
   } else if (spec.kind === 'screen') {

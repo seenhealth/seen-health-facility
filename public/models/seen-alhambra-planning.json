@@ -250,7 +250,7 @@
         17
       ],
       "floorMaterial": "vinyl",
-      "notes": "Personal care opposite dining: two shower suites, hair care in the east suite, laundry and linen racks behind. Rear stair connects the basement to this floor.",
+      "notes": "Personal care opposite dining: two shower suites, hair care in the east suite, laundry and linen racks behind. Rear stair connects the basement to this floor. Recreation: table-tennis game room in the former rear support north room (assumed use).",
       "publishedAreaSqFt": null,
       "programId": "therapy",
       "wallHeight": 2.9,
@@ -2038,7 +2038,7 @@
     },
     {
       "id": "rear-north",
-      "name": "Rear support north",
+      "name": "Game room \u00b7 table tennis",
       "zoneId": "ot",
       "levelId": "ground",
       "polygon": [
@@ -2063,8 +2063,8 @@
       "referencePages": [
         92
       ],
-      "status": "image-traced",
-      "notes": "Boundary traced from Overall Planning.jpg. Stable trace ID; room name is descriptive unless shown in the architectural set.",
+      "status": "image-traced / recreation use assumed (owner to confirm)",
+      "notes": "Boundary traced from Overall Planning.jpg. Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan. Entry: South doorway x 9.46\u201311.35 at z \u22127.02, from the corridor beside the back laundry; rear exit x 10.13\u201311.20 in the north wall kept clear.",
       "sourcePolygonPixels": [
         [
           944,
@@ -2528,7 +2528,7 @@
     },
     {
       "id": "lobby-office-w2",
-      "name": "Reception-side room W2",
+      "name": "Karaoke room 2",
       "zoneId": "lobby",
       "levelId": "ground",
       "polygon": [
@@ -2553,8 +2553,8 @@
       "referencePages": [
         92
       ],
-      "status": "image-traced",
-      "notes": "Boundary traced from Overall Planning.jpg. Stable trace ID; room name is descriptive unless shown in the architectural set.",
+      "status": "image-traced / recreation use assumed (owner to confirm)",
+      "notes": "Boundary traced from Overall Planning.jpg. Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan. Entry: South-west doorway x \u221214.50 to \u221213.53 at z 8.80, opening from the day room.",
       "sourcePolygonPixels": [
         [
           526,
@@ -2773,7 +2773,7 @@
     },
     {
       "id": "lobby-office-c3",
-      "name": "Central support room C3",
+      "name": "Karaoke room",
       "zoneId": "lobby",
       "levelId": "ground",
       "polygon": [
@@ -2798,8 +2798,8 @@
       "referencePages": [
         92
       ],
-      "status": "image-traced",
-      "notes": "Boundary traced from Overall Planning.jpg. Stable trace ID; room name is descriptive unless shown in the architectural set.",
+      "status": "image-traced / recreation use assumed (owner to confirm)",
+      "notes": "Boundary traced from Overall Planning.jpg. Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan. Entry: South doorway x \u22124.07 to \u22122.95 at z 7.33 from the day room; north openings to reception rooms N1 (x \u22126.31 to \u22125.44) and N2 (x \u22125.24 to \u22122.85) kept clear.",
       "sourcePolygonPixels": [
         [
           678,
@@ -15503,6 +15503,146 @@
       ],
       "material": "upperfit-metal",
       "parameters": {}
+    },
+    "rec-table-tennis": {
+      "kind": "table-tennis-table",
+      "dimensions": [
+        1.83,
+        0.915,
+        2.74
+      ],
+      "material": "rec-table-green",
+      "materials": {
+        "line": "photo-white",
+        "frame": "photo-black",
+        "net": "rec-net"
+      }
+    },
+    "rec-paddle-rack": {
+      "kind": "paddle-rack",
+      "dimensions": [
+        0.9,
+        1.15,
+        0.3
+      ],
+      "material": "oak",
+      "materials": {
+        "wood": "oak",
+        "frame": "photo-black",
+        "white": "photo-white",
+        "metal": "photo-silver",
+        "board": "photo-white",
+        "rubber": "photo-red-cart",
+        "accent": "photo-mustard",
+        "ball": "photo-white"
+      }
+    },
+    "rec-bench": {
+      "kind": "rec-bench",
+      "dimensions": [
+        1.8,
+        0.45,
+        0.42
+      ],
+      "material": "oak",
+      "materials": {
+        "wood": "oak",
+        "frame": "photo-black"
+      }
+    },
+    "rec-karaoke-media-large": {
+      "kind": "karaoke-media",
+      "dimensions": [
+        1.9,
+        1.6,
+        0.42
+      ],
+      "material": "oak",
+      "materials": {
+        "wood": "oak",
+        "frame": "photo-black",
+        "glow": "rec-glow",
+        "screen": "rec-screen",
+        "lyrics": "rec-glow"
+      },
+      "parameters": {
+        "screenWidth": 1.66
+      }
+    },
+    "rec-karaoke-media": {
+      "kind": "karaoke-media",
+      "dimensions": [
+        1.5,
+        1.5,
+        0.4
+      ],
+      "material": "oak",
+      "materials": {
+        "wood": "oak",
+        "frame": "photo-black",
+        "glow": "rec-glow",
+        "screen": "rec-screen",
+        "lyrics": "rec-glow"
+      },
+      "parameters": {
+        "screenWidth": 1.34
+      }
+    },
+    "rec-tower-speaker": {
+      "kind": "tower-speaker",
+      "dimensions": [
+        0.24,
+        1.0,
+        0.26
+      ],
+      "material": "rec-speaker",
+      "materials": {
+        "frame": "photo-black",
+        "driver": "photo-black"
+      }
+    },
+    "rec-mic-stand": {
+      "kind": "mic-stand",
+      "dimensions": [
+        0.3,
+        1.5,
+        0.55
+      ],
+      "material": "photo-black",
+      "materials": {
+        "frame": "photo-black",
+        "metal": "photo-silver"
+      }
+    },
+    "rec-sofa-3": {
+      "kind": "compact-sofa",
+      "dimensions": [
+        1.8,
+        0.8,
+        0.78
+      ],
+      "material": "rec-sofa",
+      "materials": {
+        "wood": "oak"
+      },
+      "parameters": {
+        "seats": 3
+      }
+    },
+    "rec-side-table-lamp": {
+      "kind": "side-table-lamp",
+      "dimensions": [
+        0.44,
+        0.81,
+        0.44
+      ],
+      "material": "oak",
+      "materials": {
+        "wood": "oak",
+        "frame": "photo-black",
+        "base": "photo-white",
+        "shade": "rec-lamp"
+      }
     }
   },
   "objects": [
@@ -30960,6 +31100,428 @@
       ],
       "status": "user-directed arrangement / dimensions estimated",
       "notes": "September 21 user-directed layout correction. Component dimensions estimated."
+    },
+    {
+      "id": "rec-game-table-tennis",
+      "assetId": "rec-table-tennis",
+      "zoneId": "ot",
+      "levelId": "ground",
+      "position": [
+        9.3,
+        0,
+        -12.35
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rear-north",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-requested program / use assumed / dimensions estimated",
+      "notes": "Table-tennis table, long axis north\u2013south with 1.26\u20131.37 m run-back at each end. Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan.",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0,
+          1.525,
+          2.74
+        ],
+        [
+          0,
+          0,
+          1.83,
+          0.06
+        ]
+      ]
+    },
+    {
+      "id": "rec-game-bench",
+      "assetId": "rec-bench",
+      "zoneId": "ot",
+      "levelId": "ground",
+      "position": [
+        6.945,
+        0,
+        -12.0
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rear-north",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-requested program / use assumed / dimensions estimated",
+      "notes": "Slatted oak spectator bench for three along the west wall. Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rec-game-paddle-rack",
+      "assetId": "rec-paddle-rack",
+      "zoneId": "ot",
+      "levelId": "ground",
+      "position": [
+        6.88,
+        0,
+        -14.4
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rear-north",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-requested program / use assumed / dimensions estimated",
+      "notes": "Paddle and ball rack against the west wall, clear of the rear exit. Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rec-karaoke-main-media",
+      "assetId": "rec-karaoke-media-large",
+      "zoneId": "lobby",
+      "levelId": "ground",
+      "position": [
+        -6.578,
+        0,
+        5.29
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "lobby-office-c3",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-requested program / use assumed / dimensions estimated",
+      "notes": "Wall-hung large screen with warm backlight over a low oak console. Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rec-karaoke-main-speaker-north",
+      "assetId": "rec-tower-speaker",
+      "zoneId": "lobby",
+      "levelId": "ground",
+      "position": [
+        -6.65,
+        0,
+        4.1
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "lobby-office-c3",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-requested program / use assumed / dimensions estimated",
+      "notes": "Floor-standing speaker. Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rec-karaoke-main-speaker-south",
+      "assetId": "rec-tower-speaker",
+      "zoneId": "lobby",
+      "levelId": "ground",
+      "position": [
+        -6.65,
+        0,
+        6.48
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "lobby-office-c3",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-requested program / use assumed / dimensions estimated",
+      "notes": "Floor-standing speaker. Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rec-karaoke-main-mic",
+      "assetId": "rec-mic-stand",
+      "zoneId": "lobby",
+      "levelId": "ground",
+      "position": [
+        -5.75,
+        0,
+        4.55
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "lobby-office-c3",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-requested program / use assumed / dimensions estimated",
+      "notes": "Microphone stand beside the singing spot. Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rec-karaoke-main-sofa",
+      "assetId": "rec-sofa-3",
+      "zoneId": "lobby",
+      "levelId": "ground",
+      "position": [
+        -3.224,
+        0,
+        5.2
+      ],
+      "rotation": -1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "lobby-office-c3",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-requested program / use assumed / dimensions estimated",
+      "notes": "Three-seat sofa on the east wall facing the screen. Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rec-karaoke-main-table",
+      "assetId": "interior-plan-lounge-table",
+      "zoneId": "lobby",
+      "levelId": "ground",
+      "position": [
+        -4.37,
+        0,
+        5.2
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "lobby-office-c3",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-requested program / use assumed / dimensions estimated",
+      "notes": "Marble lounge table (day-room family) in front of the sofa. Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rec-karaoke-main-armchair",
+      "assetId": "photo-lounge-chair",
+      "zoneId": "lobby",
+      "levelId": "ground",
+      "position": [
+        -5.62,
+        0,
+        6.55
+      ],
+      "rotation": 0.558,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "lobby-office-c3",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-requested program / use assumed / dimensions estimated",
+      "notes": "High-back lounge chair (day-room family) angled toward the screen. Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rec-karaoke-main-side-table",
+      "assetId": "rec-side-table-lamp",
+      "zoneId": "lobby",
+      "levelId": "ground",
+      "position": [
+        -6.5,
+        0,
+        6.95
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "lobby-office-c3",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-requested program / use assumed / dimensions estimated",
+      "notes": "Low side table with a warm lamp. Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rec-karaoke-2-media",
+      "assetId": "rec-karaoke-media",
+      "zoneId": "lobby",
+      "levelId": "ground",
+      "position": [
+        -14.323,
+        0,
+        6.7
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "lobby-office-w2",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-requested program / use assumed / dimensions estimated",
+      "notes": "Wall-hung large screen with warm backlight over a low oak console. Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rec-karaoke-2-speaker-north",
+      "assetId": "rec-tower-speaker",
+      "zoneId": "lobby",
+      "levelId": "ground",
+      "position": [
+        -14.39,
+        0,
+        5.8
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "lobby-office-w2",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-requested program / use assumed / dimensions estimated",
+      "notes": "Floor-standing speaker. Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rec-karaoke-2-speaker-south",
+      "assetId": "rec-tower-speaker",
+      "zoneId": "lobby",
+      "levelId": "ground",
+      "position": [
+        -14.39,
+        0,
+        7.6
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "lobby-office-w2",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-requested program / use assumed / dimensions estimated",
+      "notes": "Floor-standing speaker. Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rec-karaoke-2-mic",
+      "assetId": "rec-mic-stand",
+      "zoneId": "lobby",
+      "levelId": "ground",
+      "position": [
+        -13.75,
+        0,
+        7.72
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "lobby-office-w2",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-requested program / use assumed / dimensions estimated",
+      "notes": "Microphone stand beside the singing spot. Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rec-karaoke-2-sofa",
+      "assetId": "rec-sofa-3",
+      "zoneId": "lobby",
+      "levelId": "ground",
+      "position": [
+        -12.482,
+        0,
+        6.7
+      ],
+      "rotation": -1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "lobby-office-w2",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-requested program / use assumed / dimensions estimated",
+      "notes": "Compact three-seat sofa facing the screen. Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rec-karaoke-2-side-table",
+      "assetId": "rec-side-table-lamp",
+      "zoneId": "lobby",
+      "levelId": "ground",
+      "position": [
+        -12.33,
+        0,
+        7.9
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "lobby-office-w2",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-requested program / use assumed / dimensions estimated",
+      "notes": "Low side table with a warm lamp. Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan.",
+      "layer": "furniture"
     }
   ],
   "materials": {
@@ -31276,6 +31838,41 @@
     "rehab-blue": {
       "color": "#2c62ac",
       "roughness": 0.75
+    },
+    "rec-table-green": {
+      "color": "#1f4d3a",
+      "roughness": 0.5
+    },
+    "rec-net": {
+      "color": "#f2f1ec",
+      "roughness": 0.85,
+      "opacity": 0.6
+    },
+    "rec-sofa": {
+      "color": "#9aa68f",
+      "roughness": 0.92
+    },
+    "rec-speaker": {
+      "color": "#35393a",
+      "roughness": 0.82
+    },
+    "rec-screen": {
+      "color": "#1d2a33",
+      "roughness": 0.25,
+      "emissive": "#2b4a5c",
+      "emissiveIntensity": 0.45
+    },
+    "rec-glow": {
+      "color": "#fff1dc",
+      "roughness": 0.6,
+      "emissive": "#ffcf94",
+      "emissiveIntensity": 0.9
+    },
+    "rec-lamp": {
+      "color": "#fbf1e0",
+      "roughness": 0.75,
+      "emissive": "#ffd8a3",
+      "emissiveIntensity": 0.75
     }
   },
   "programs": [
@@ -32730,6 +33327,15 @@
         109,
         110,
         111
+      ]
+    },
+    {
+      "id": "recreation-rooms",
+      "title": "Recreation room uses are assumed",
+      "detail": "The owner asked for table tennis and karaoke. They are placed in empty image-traced rooms (rear support north; central support room C3; reception-side room W2) as an assumption for the owner to confirm. Equipment follows standard sizes; placement is estimated.",
+      "status": "open",
+      "pages": [
+        92
       ]
     }
   ],
@@ -37145,7 +37751,24 @@
       "access-admin-stair-south-guard-1",
       "access-lift-ground",
       "access-lift-guide-0",
-      "access-lift-guide-1"
+      "access-lift-guide-1",
+      "rec-game-table-tennis",
+      "rec-game-bench",
+      "rec-game-paddle-rack",
+      "rec-karaoke-main-media",
+      "rec-karaoke-main-speaker-north",
+      "rec-karaoke-main-speaker-south",
+      "rec-karaoke-main-mic",
+      "rec-karaoke-main-sofa",
+      "rec-karaoke-main-table",
+      "rec-karaoke-main-armchair",
+      "rec-karaoke-main-side-table",
+      "rec-karaoke-2-media",
+      "rec-karaoke-2-speaker-north",
+      "rec-karaoke-2-speaker-south",
+      "rec-karaoke-2-mic",
+      "rec-karaoke-2-sofa",
+      "rec-karaoke-2-side-table"
     ]
   },
   "floorOpenings": [
@@ -42274,5 +42897,63 @@
       "ot-basin-3"
     ],
     "accuracy": "User-specified orientation and uses implemented; plan-calibrated dimensions and elevations remain estimates, not a measured survey."
+  },
+  "recreationRooms": {
+    "date": "2026-09-30",
+    "accuracy": "Owner-requested recreation use of an empty image-traced room. The room assignment is an assumption for the owner to confirm; no program or furniture was recorded here in the supplied plan.",
+    "rooms": [
+      {
+        "roomId": "rear-north",
+        "name": "Game room \u00b7 table tennis",
+        "entry": "South doorway x 9.46\u201311.35 at z \u22127.02, from the corridor beside the back laundry; rear exit x 10.13\u201311.20 in the north wall kept clear."
+      },
+      {
+        "roomId": "lobby-office-c3",
+        "name": "Karaoke room",
+        "entry": "South doorway x \u22124.07 to \u22122.95 at z 7.33 from the day room; north openings to reception rooms N1 (x \u22126.31 to \u22125.44) and N2 (x \u22125.24 to \u22122.85) kept clear."
+      },
+      {
+        "roomId": "lobby-office-w2",
+        "name": "Karaoke room 2",
+        "entry": "South-west doorway x \u221214.50 to \u221213.53 at z 8.80, opening from the day room."
+      }
+    ],
+    "standingSpots": {
+      "table-tennis-north-player": [
+        9.3,
+        -14.35
+      ],
+      "table-tennis-south-player": [
+        9.3,
+        -10.35
+      ],
+      "karaoke-main-singer": [
+        -5.75,
+        5.27
+      ],
+      "karaoke-2-singer": [
+        -13.305,
+        7.199
+      ]
+    },
+    "objectIds": [
+      "rec-game-table-tennis",
+      "rec-game-bench",
+      "rec-game-paddle-rack",
+      "rec-karaoke-main-media",
+      "rec-karaoke-main-speaker-north",
+      "rec-karaoke-main-speaker-south",
+      "rec-karaoke-main-mic",
+      "rec-karaoke-main-sofa",
+      "rec-karaoke-main-table",
+      "rec-karaoke-main-armchair",
+      "rec-karaoke-main-side-table",
+      "rec-karaoke-2-media",
+      "rec-karaoke-2-speaker-north",
+      "rec-karaoke-2-speaker-south",
+      "rec-karaoke-2-mic",
+      "rec-karaoke-2-sofa",
+      "rec-karaoke-2-side-table"
+    ]
   }
 }
