@@ -10,7 +10,7 @@ import type { Facility, Vec2 } from './schema';
 import { buildArrival } from './arrival';
 import { buildSiteArrival } from './site-arrival';
 import { buildDayRoom } from './day-room';
-import { buildDeliveries } from './deliveries';
+import { buildDeliveries, deliveryStops, sampleDelivery } from './deliveries';
 
 export type Segment = {
   start: number;
@@ -24,6 +24,15 @@ export type Segment = {
   title?: string;
   vehicleId?: string;
   seated?: boolean;
+  /**
+   * Seat inside `vehicleId`, as a local offset [x, y, z] in the vehicle's
+   * frame (x = vehicle right, y = up, z = vehicle local +z). When present and
+   * the vehicle is registered, the person moves with the vehicle instead of
+   * standing on `path`.
+   */
+  seat?: [number, number, number];
+  /** Facing relative to the vehicle heading while seated (default 0). */
+  seatHeading?: number;
 };
 export type ActorSpec = CharacterSpec & {
   label: string;
@@ -87,7 +96,53 @@ export type ActorSample = {
   title?: string;
   vehicleId?: string;
   seated?: boolean;
+  seat?: [number, number, number];
+  seatHeading?: number;
 };
+/** Where a vehicle is at a moment of the care day. */
+export type VehiclePose = {
+  position: T.Vector3;
+  heading: number;
+  visible: boolean;
+  phase?: string;
+  door?: number;
+  ramp?: number;
+};
+export type VehicleSampler = (time: number) => VehiclePose;
+/**
+ * Every animated vehicle (vans, delivery trucks, couriers, partner shuttles)
+ * registers a pure sampler here so riders can be seated in it, the camera can
+ * follow it and metrics can locate it, whichever module built its body.
+ */
+export function createVehicleRegistry() {
+  const samplers = new Map<string, VehicleSampler>();
+  return {
+    register(id: string, sample: VehicleSampler) {
+      if (samplers.has(id)) throw new Error(`Vehicle ${id} is already registered`);
+      samplers.set(id, sample);
+    },
+    has: (id: string) => samplers.has(id),
+    sample: (id: string, time: number) => samplers.get(id)?.(time) ?? null,
+    ids: () => [...samplers.keys()],
+  };
+}
+export type VehicleRegistry = ReturnType<typeof createVehicleRegistry>;
+/** World placement of a seat offset in a vehicle frame (rotation.y = heading). */
+export function seatInVehicle(
+  pose: VehiclePose,
+  seat: [number, number, number],
+  seatHeading = 0,
+) {
+  const [sx, sy, sz] = seat,
+    c = Math.cos(pose.heading),
+    sn = Math.sin(pose.heading);
+  return {
+    x: pose.position.x + sx * c + sz * sn,
+    y: pose.position.y + sy,
+    z: pose.position.z - sx * sn + sz * c,
+    heading: pose.heading + seatHeading,
+  };
+}
 export type ActivitySnapshot = ActivityOptions & {
   count: number;
   elapsedLabel: string;
@@ -141,6 +196,8 @@ export function sampleSegment(
       title: s.title,
       vehicleId: s.vehicleId,
       seated: s.seated,
+      seat: s.seat,
+      seatHeading: s.seatHeading,
     };
   let i = 1;
   while (i < lengths.length - 1 && lengths[i] < distance) i++;
@@ -161,6 +218,8 @@ export function sampleSegment(
     title: s.title,
     vehicleId: s.vehicleId,
     seated: s.seated,
+    seat: s.seat,
+    seatHeading: s.seatHeading,
   };
 }
 export function sampleActor(actor: ActorSpec, time: number): ActorSample {
@@ -349,6 +408,14 @@ export function createActivity(
   scene.add(arrival.root);
   const deliveries = data.siteSpecific ? null : buildDeliveries();
   if (deliveries) scene.add(deliveries.root);
+  const vehicles = createVehicleRegistry();
+  arrival.vans.forEach((_, i) =>
+    vehicles.register(`van-${String.fromCharCode(97 + i)}`, (t) => arrival.sampleVan(i, t)),
+  );
+  if (deliveries)
+    deliveryStops.forEach((stop, i) =>
+      vehicles.register(stop.id, (t) => sampleDelivery(i, t)),
+    );
   const root = new T.Group();
   root.name = 'care-day-actors';
   scene.add(root);
@@ -511,9 +578,18 @@ export function createActivity(
         paired.set(a.spec.pairedWith, pair.participant);
       }
     for (const a of actors) {
-      const s = a.spec.escortFor
+      let s = a.spec.escortFor
         ? sampleEscort(actorMap.get(a.spec.escortFor)!.spec, options.time)
         : paired.get(a.spec.id) || sampleActor(a.spec, options.time);
+      // An escort rides in its own seat rather than on top of its partner.
+      if (a.spec.escortFor && s.vehicleId && s.seat)
+        s = sampleActor(a.spec, options.time);
+      const ride =
+        s.vehicleId && s.seat ? vehicles.sample(s.vehicleId, options.time) : null;
+      if (ride) {
+        const placed = seatInVehicle(ride, s.seat!, s.seatHeading);
+        s = { ...s, ...placed, visible: s.visible !== false && ride.visible };
+      }
       if (
         (!data.siteSpecific || a.spec.arrivalVehicleId) &&
         a.spec.levelId === 'ground'
@@ -620,12 +696,10 @@ export function createActivity(
         listeners.delete(fn);
       };
     },
+    vehicles,
     actorPosition(id: string) {
-      if (id.startsWith('van-'))
-        return arrival
-          .sampleVan(Math.max(0, id.charCodeAt(4) - 97), options.time)
-          .position.clone()
-          .add(new T.Vector3(0, 1, 0));
+      const own = vehicles.sample(id, options.time);
+      if (own) return own.position.clone().add(new T.Vector3(0, 1, 0));
       const interaction = data.interactions.find(
         (i) => 'interaction:' + i.id === id,
       );
@@ -643,12 +717,8 @@ export function createActivity(
             .map((id) => actorMap.get(id))
             .find((actor) => actor?.sample.vehicleId),
         vehicle = a?.sample.vehicleId;
-      return vehicle
-        ? arrival
-            .sampleVan(Math.max(0, vehicle.charCodeAt(4) - 97), options.time)
-            .position.clone()
-            .add(new T.Vector3(0, 1, 0))
-        : null;
+      const pose = vehicle ? vehicles.sample(vehicle, options.time) : null;
+      return pose ? pose.position.clone().add(new T.Vector3(0, 1, 0)) : null;
     },
     actorSample(id: string) {
       return actorMap.get(id)?.sample;

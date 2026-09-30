@@ -283,6 +283,10 @@ export default function Home() {
           }
         });
         viewer.current.update(state);
+        // Same console hook as the story (?debug=1): lets screenshot and
+        // tuning scripts drive the viewer without UI automation.
+        if (new URLSearchParams(window.location.search).get('debug') === '1')
+          (window as unknown as { __viewer: unknown }).__viewer = viewer.current;
         if (model.contextStyle) viewer.current.focus(null, null, true);
         else viewer.current.focus('day');
         if (state.exterior) viewer.current.view('exterior');
