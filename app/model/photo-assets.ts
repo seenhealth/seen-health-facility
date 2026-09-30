@@ -12,15 +12,15 @@ export type VanSeat = [number, number, number];
 export const FLEET_VAN_SEATS = {
   floorY: 0.58,
   driver: [-0.55, 0.62, -1.95] as VanSeat,
-  /** Three left-hand benches, two seats each, front to back. */
+  /** Three left-hand benches (2+1 layout), two seats each, front to back: outer seat first. */
   benches: [0.77, 1.67, 2.57].flatMap((z): VanSeat[] => [
-    [-0.7, 0.62, z],
-    [-0.25, 0.62, z],
+    [-0.72, 0.62, z],
+    [-0.28, 0.62, z],
   ]),
   /** Wheelchair bay on the door side, behind the sliding-door opening. */
-  wheelchair: [0.55, 0.62, 1.5] as VanSeat,
+  wheelchair: [0.7, 0.62, 1.45] as VanSeat,
   /** Fold-down attendant seat behind the wheelchair bay. */
-  attendant: [0.55, 0.62, 2.52] as VanSeat,
+  attendant: [0.72, 0.62, 2.37] as VanSeat,
   /** Sill of the sliding-door opening, where the ramp hinges (`pivot` in arrival.ts). */
   door: [1.035, 0.58, -0.19] as VanSeat,
 };
@@ -388,12 +388,12 @@ export function buildPhotoAsset(
     const wheel = add(new T.TorusGeometry(0.18, 0.022, 8, 24), black, -0.55, 1.2, -2.32);
     wheel.rotation.x = -Math.PI / 2 + 0.55;
     for (const zRow of [0.65, 1.55, 2.45]) {
-      box(-0.47, 0.97, zRow, 0.95, 0.12, 0.48, seat);
-      box(-0.47, 1.09, zRow + 0.27, 0.95, 0.5, 0.09, seat);
+      box(-0.5, 0.97, zRow, 0.9, 0.12, 0.48, seat);
+      box(-0.5, 1.09, zRow + 0.27, 0.9, 0.5, 0.09, seat);
     }
-    box(0.55, 0.97, 2.4, 0.5, 0.12, 0.48, seat);
-    box(0.55, 1.09, 2.67, 0.5, 0.5, 0.09, seat);
-    box(0.55, 0.58, 1.5, 0.9, 0.012, 1.3, '#4a5153');
+    box(0.72, 0.97, 2.25, 0.5, 0.12, 0.48, seat);
+    box(0.72, 1.09, 2.52, 0.5, 0.5, 0.09, seat);
+    box(0.7, 0.58, 1.45, 0.6, 0.012, 1.2, '#4a5153');
     rod(new T.Vector3(0.95, 0.9, -0.88), new T.Vector3(0.95, 1.95, -0.88), 0.015, metal);
     // Wrap decals: same sheet rectangles as before (variant B offsets the sheet
     // column), sized to the lower body so the window band stays clear.

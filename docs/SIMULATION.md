@@ -53,8 +53,11 @@ flowchart LR
 ## The clock
 
 One 720-second loop is the 8 AM–4 PM day: 1 loop second = 2/3 of a clock
-minute. Vans (`vanWindows` in `app/model/arrival.ts`), the day-room program and
-every activity source run on this clock. `app/sim/clock.ts` converts between loop
+minute. Vans (`vanWindows` in `app/model/arrival.ts`, routes in
+`app/model/alhambra-fleet.ts`), the day-room program and every activity source
+run on this clock.
+
+`app/sim/clock.ts` converts between loop
 seconds, clock minutes and labels:
 
 | Helper | Example |
@@ -64,6 +67,25 @@ seconds, clock minutes and labels:
 | `clockToLoop('12:30 PM')` | 405 |
 | `loopDurationMinutes(45)` | 30 |
 | `hourTicks()` | chart ticks for 8 AM … 4 PM |
+
+### Fleet crew (`app/model/fleet-crew.ts`)
+
+`withFleetCrew(source)` is applied by `createActivity` to every Alhambra
+source (the base loop and the story alike). It is a pure transform: riders
+whose `ride` segments name a fleet van get a cabin seat (`seat`, `seatHeading`,
+the van-local anchors in `FLEET_VAN_SEATS`) and a short cabin walk between seat
+and door sill; escorted riders sit in the front row with their escort directly
+behind, which is where `sampleEscort` places the escort the moment the rider
+stands up. Ride segments carry a long nominal path so that, while the rider is
+seated, `sampleEscort` measures its gap inside the ride segment and the engine
+hands the escort over to its own seat. Each van gets a driver (`driver-1` …
+`driver-8`) whose day follows the van timetable: hidden while parked in the bay,
+seated while the van moves or yields, and at the dock out of the cab, around the
+nose, up the ramp ahead of each rider and 0.9 m behind the rider's party on the
+way down, a handoff at the foot, then back to the cab before departure. Vans C
+and D, which arrive without actors, get two mid-day riders each who check in
+behind the front-desk queue, wait in the lobby and ride home on Van A or Van B.
+`npm run validate:fleet` checks all of this as the viewer plays it.
 
 ## Navigation (`app/sim/nav.ts`)
 

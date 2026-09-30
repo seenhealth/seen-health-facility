@@ -11,6 +11,7 @@ import { buildArrival } from './arrival';
 import { buildSiteArrival } from './site-arrival';
 import { buildDayRoom } from './day-room';
 import { buildDeliveries, deliveryStops, sampleDelivery } from './deliveries';
+import { withFleetCrew } from './fleet-crew';
 
 export type Segment = {
   start: number;
@@ -402,6 +403,7 @@ export function createActivity(
 ) {
   if (data.duration !== activityData.duration)
     throw new Error(`Activity source must use the ${activityData.duration}s care-day clock`);
+  if (!data.siteSpecific) data = withFleetCrew(data);
   const arrival = data.siteSpecific
     ? buildSiteArrival(model, material)
     : buildArrival(model, material);
