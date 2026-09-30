@@ -25,6 +25,7 @@ import {
 } from '../model/arrival';
 import { dayProgram, programAt } from '../model/day-room';
 import type { createViewer } from '../model/renderer';
+import { ScenarioToggle, type Scenario } from './scenario-toggle';
 
 export const activityViews = [
   { id: 'site', label: 'Arrivals & reception' },
@@ -79,10 +80,15 @@ type Track = {
 };
 export function ActivityPanel({
   viewer,
+  scenario,
+  onScenario,
   onScene,
   onClose,
 }: {
   viewer: ReturnType<typeof createViewer> | null;
+  /** Shown with `onScenario` where the site can animate the story source. */
+  scenario?: Scenario;
+  onScenario?: (scenario: Scenario) => void;
   onScene: (zone: string, actor?: string | null) => void;
   onClose: () => void;
 }) {
@@ -248,6 +254,9 @@ export function ActivityPanel({
             {state?.playing ? 'Care day in motion' : 'Care day paused'}
           </strong>
         </div>
+        {scenario && onScenario && (
+          <ScenarioToggle scenario={scenario} onChange={onScenario} />
+        )}
         <button onClick={onClose} aria-label="Close animation controls">
           <X size={18} />
         </button>

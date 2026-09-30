@@ -2,11 +2,7 @@
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Area, ComposedChart, Line, Tooltip, XAxis, YAxis } from 'recharts';
 import { Pause, Play, X } from 'lucide-react';
-import {
-  activityData,
-  type ActivitySnapshot,
-  type ActivitySource,
-} from '../model/activity';
+import { activityData, type ActivitySnapshot } from '../model/activity';
 import type { Facility } from '../model/schema';
 import type { createViewer } from '../model/renderer';
 import {
@@ -16,7 +12,8 @@ import {
   type StaffActivity,
 } from '../sim/metrics';
 import { clockLabel, hourTicks } from '../sim/clock';
-import type { CompiledStep } from '../sim/tracks';
+import type { StoryScenario } from '../sim/story-source';
+import { ScenarioToggle, type Scenario } from './scenario-toggle';
 
 type Viewer = ReturnType<typeof createViewer>;
 /** Occupancy series (validated pair on the panel surface). */
@@ -33,8 +30,6 @@ const STAFF_ORDER: { key: StaffActivity; color: string; label: string }[] = [
 const SMALL_MULTIPLES = 8,
   CHART_W = 188,
   CHART_H = 54;
-type Story = { source: ActivitySource; heroId: string; steps: CompiledStep[] };
-type Scenario = 'base' | 'story';
 const pct = (v: number) => `${Math.round(v * 100)}%`;
 const minutes = (seconds: number) =>
   Math.round((seconds * activityData.dayDurationMinutes) / activityData.duration);
@@ -109,21 +104,27 @@ const ZoneSpark = memo(function ZoneSpark({
 /**
  * Measure: occupancy by zone, staff time by role and (for the story scenario)
  * the hero's touchpoints, with a current-time marker synced to the viewer.
+ * The scenario is shared with the scene: `story` is the source the viewer
+ * animates, or null for the base loop.
  */
 export default function MetricsPanel({
   model,
   ready,
   getViewer,
+  scenario,
+  story,
+  onScenario,
   onClose,
 }: {
   model: Facility;
   ready: boolean;
   getViewer: () => Viewer | null;
+  scenario: Scenario;
+  story: StoryScenario | null;
+  onScenario: (scenario: Scenario) => void;
   onClose: () => void;
 }) {
   const [snap, setSnap] = useState<ActivitySnapshot | null>(null),
-    [scenario, setScenario] = useState<Scenario>('base'),
-    [story, setStory] = useState<Story | null>(null),
     [table, setTable] = useState(false),
     [hover, setHover] = useState<{ role: string; key: StaffActivity } | null>(
       null,
@@ -132,25 +133,14 @@ export default function MetricsPanel({
     if (!ready) return;
     return getViewer()?.activity.subscribe(setSnap);
   }, [ready, getViewer]);
-  useEffect(() => {
-    if (scenario !== 'story' || story) return;
-    let live = true;
-    void import('../sim/story-source').then((m) => {
-      if (live) setStory({ ...m.storyActivitySource(), steps: m.storySteps() });
-    });
-    return () => {
-      live = false;
-    };
-  }, [scenario, story]);
-  const active = scenario === 'story' ? story : null;
   const metrics: SimMetrics | null = useMemo(() => {
-    if (scenario === 'story' && !active) return null;
-    return computeMetrics(active?.source || activityData, model, {
+    if (scenario === 'story' && !story) return null;
+    return computeMetrics(story?.source || activityData, model, {
       step: 2,
-      heroId: active?.heroId,
-      steps: active?.steps,
+      heroId: story?.heroId,
+      steps: story?.steps,
     });
-  }, [scenario, active, model]);
+  }, [scenario, story, model]);
   const time = snap?.time ?? 0,
     playing = !!snap?.playing;
   const seek = useCallback(
@@ -189,21 +179,7 @@ export default function MetricsPanel({
         </button>
       </header>
       <div className="mp-controls">
-        <fieldset className="mp-segment">
-          <legend>Scenario measured</legend>
-          <button
-            aria-pressed={scenario === 'base'}
-            onClick={() => setScenario('base')}
-          >
-            Care-day loop
-          </button>
-          <button
-            aria-pressed={scenario === 'story'}
-            onClick={() => setScenario('story')}
-          >
-            With Mrs. Lin’s day
-          </button>
-        </fieldset>
+        <ScenarioToggle scenario={scenario} onChange={onScenario} />
         <div className="mp-clock">
           <button
             aria-label={playing ? 'Pause' : 'Play'}
@@ -409,8 +385,7 @@ export default function MetricsPanel({
               </ul>
               <p className="mp-note">
                 {Math.round(hero.walkMeters)} m on foot with her cane ·{' '}
-                {minutes(hero.time.seconds.moving)} min walking between stops. The
-                scene still shows the base loop; this measures the story scenario.
+                {minutes(hero.time.seconds.moving)} min walking between stops.
               </p>
             </>
           )}

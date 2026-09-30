@@ -10,18 +10,41 @@ import {
   timelineFor,
 } from '../work/validation/activity.mjs';
 import { buildNeighborhood } from '../work/validation/neighborhood.mjs';
-import { sampleVan, vanWindows, ARRIVAL } from '../work/validation/arrival.mjs';
+import { sampleVan, ARRIVAL } from '../work/validation/arrival.mjs';
 import { dayProgram, programAt } from '../work/validation/day-room.mjs';
-import { createCharacter } from '../work/validation/characters.mjs';
+import {
+  createCharacter,
+  characterProfile,
+} from '../work/validation/characters.mjs';
+import { loadSim } from './build-scenario.mjs';
+// Default: the bundled care-day loop (and export the animated cast).
+// --tracks <file>: that loop merged with compiled scenario tracks, as the story plays it.
+const at = process.argv.indexOf('--tracks'),
+  compiled =
+    at > 0 ? JSON.parse(readFileSync(process.argv[at + 1], 'utf8')) : null,
+  source = compiled
+    ? (await loadSim({ tracks: 'app/sim/tracks.ts' })).tracks.mergeTracks(
+        activityData,
+        compiled,
+      )
+    : activityData,
+  expectedActors = compiled
+    ? activityData.actors.length -
+      compiled.removedActorIds.length +
+      compiled.actors.filter(
+        (a) => !activityData.actors.some((b) => b.id === a.id),
+      ).length
+    : 167;
 const m = JSON.parse(
   readFileSync('public/models/seen-alhambra-planning.json', 'utf8'),
 );
 const scene = new T.Scene(),
-  activity = createActivity(m, scene),
+  activity = createActivity(m, scene, undefined, source),
   neighborhood = buildNeighborhood(m);
 scene.add(neighborhood.root);
-assert.equal(activity.actors.length, 167);
-assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 167);
+assert.equal(activity.actors.length, source.actors.length);
+assert.equal(source.actors.length, expectedActors);
+assert.equal(new Set(source.actors.map((a) => a.id)).size, expectedActors);
 for (const role of [
   'doctor',
   'nurse',
@@ -36,7 +59,7 @@ for (const role of [
   'nutrition',
   'participant',
 ])
-  assert.ok(activityData.roles.includes(role));
+  assert.ok(source.roles.includes(role));
 const distance = (p, a, b) => {
   const dx = b[0] - a[0],
     dz = b[1] - a[1],
@@ -52,9 +75,9 @@ const distance = (p, a, b) => {
 const walls = m.walls.filter((w) => w.levelId === 'ground');
 let samples = 0,
   minWall = Infinity;
-for (const a of activityData.actors) {
+for (const a of source.actors) {
   assert.equal(a.segments[0].start, 0);
-  assert.equal(a.segments.at(-1).end, activityData.duration);
+  assert.equal(a.segments.at(-1).end, source.duration);
   for (let i = 0; i < a.segments.length; i++) {
     const s = a.segments[i],
       next = a.segments[(i + 1) % a.segments.length];
@@ -93,10 +116,10 @@ for (const a of activityData.actors) {
   if (a.pairedWith)
     assert.equal(
       a.segments.length,
-      activityData.actors.find((b) => b.id === a.pairedWith).segments.length,
+      source.actors.find((b) => b.id === a.pairedWith).segments.length,
     );
   const start = sampleActor(a, 0),
-    end = sampleActor(a, activityData.duration);
+    end = sampleActor(a, source.duration);
   assert.deepEqual(start, end, `${a.id} repeats deterministically`);
 }
 activity.setOptions({ playing: false, time: 36 });
@@ -117,7 +140,7 @@ assert.deepEqual(
   'Backward seek restores the same scene',
 );
 activity.setOptions({
-  time: activityData.duration - 0.05,
+  time: source.duration - 0.05,
   playing: true,
   speed: 1,
 });
@@ -134,14 +157,14 @@ assert.ok(
 );
 activity.setOptions({ time: 50, playing: false });
 for (const a of activity.actors.filter((a) => a.spec.pairedWith)) {
-  const leader = activityData.actors.find((b) => b.id === a.spec.pairedWith),
+  const leader = source.actors.find((b) => b.id === a.spec.pairedWith),
     s = samplePairedActors(a.spec, leader, 50).staff;
   assert.ok(
     Math.hypot(a.root.position.x - s.x, a.root.position.z - s.z) < 1e-8,
     'Escort pair shares the coordinated timeline',
   );
   let previous = null;
-  for (let t = 0; t <= activityData.duration; t += 0.05) {
+  for (let t = 0; t <= source.duration; t += 0.05) {
     const pair = samplePairedActors(a.spec, leader, t),
       p = pair.staff,
       q = pair.participant;
@@ -223,7 +246,7 @@ assert.ok(neighborhood.root.getObjectByName('raised-sidewalk-0'));
 assert.ok(neighborhood.root.getObjectByName('neighbor-east-estimated-height'));
 neighborhood.tick(0);
 const first = neighborhood.traffic.map((c) => c.position.toArray());
-neighborhood.tick(activityData.duration);
+neighborhood.tick(source.duration);
 assert.deepEqual(
   neighborhood.traffic.map((c) => c.position.toArray()),
   first,
@@ -237,17 +260,43 @@ neighborhood.tick(10);
 assert.deepEqual(car.toArray(), neighborhood.traffic[0].position.toArray());
 // Arrival clearance, vehicle synchronization and deterministic entrance controls.
 activity.setOptions({ filter: 'all', playing: false, enabled: true, time: 0 });
-assert.equal(
-  activityData.actors.filter((a) => a.role === 'reception').length,
-  2,
-);
-for (const a of activityData.actors) {
+assert.equal(source.actors.filter((a) => a.role === 'reception').length, 2);
+for (const a of source.actors) {
   const coverage = timelineFor(a).reduce((n, s) => n + s.end - s.start, 0);
   assert.ok(
-    Math.abs(coverage - activityData.duration) < 0.001,
+    Math.abs(coverage - source.duration) < 0.001,
     `${a.id} timeline covers the full day`,
   );
-  assert.equal(a.profileId, a.id, 'Identity remains stable across every stage');
+}
+// Identity: each track draws one person profile. The base loop keeps one track
+// per person; a scenario may show a person as several tracks (downstairs, then
+// the upstairs IDT), which must look alike and never be visible at once.
+const people = Map.groupBy(source.actors, (a) => a.profileId ?? a.id);
+for (const [person, tracks] of people) {
+  for (const a of tracks) {
+    if (!compiled)
+      assert.equal(
+        a.profileId,
+        a.id,
+        'Identity remains stable across every stage',
+      );
+    assert.equal(
+      characterProfile(a).id,
+      person,
+      `${a.id} resolves to ${person}`,
+    );
+    assert.deepEqual(
+      [a.role, a.mobility, characterProfile(a)],
+      [tracks[0].role, tracks[0].mobility, characterProfile(tracks[0])],
+      `${a.id} looks like ${tracks[0].id}, the same person`,
+    );
+  }
+  if (tracks.length > 1)
+    for (let t = 0; t < source.duration; t += 0.25)
+      assert.ok(
+        tracks.filter((a) => sampleActor(a, t).visible !== false).length <= 1,
+        `${person} is in one place at ${t}`,
+      );
 }
 activity.arrival.entry.updateMatrixWorld(true);
 const rightTurnRay = new T.Raycaster(
@@ -263,7 +312,7 @@ assert.equal(
 );
 let boardingSamples = 0,
   entranceSamples = 0;
-for (let t = 0; t < activityData.duration; t += 0.25) {
+for (let t = 0; t < source.duration; t += 0.25) {
   const va = sampleVan(0, t),
     vb = sampleVan(1, t);
   for (const v of [va, vb])
@@ -287,8 +336,10 @@ for (let t = 0; t < activityData.duration; t += 0.25) {
     ),
     'Vans do not share the drop-off bay',
   );
-  for (const a of activityData.actors.filter(
-    (a) => a.id.startsWith('arrival-') && a.role === 'participant',
+  for (const a of source.actors.filter(
+    (a) =>
+      a.role === 'participant' &&
+      (a.id.startsWith('arrival-') || a.id === compiled?.heroId),
   )) {
     const p = sampleActor(a, t);
     if (p.visible === false) continue;
@@ -325,10 +376,10 @@ for (let t = 0; t < activityData.duration; t += 0.25) {
     }
   }
 }
-for (const a of activityData.actors.filter((a) => a.escortFor)) {
-  const leader = activityData.actors.find((p) => p.id === a.escortFor);
+for (const a of source.actors.filter((a) => a.escortFor)) {
+  const leader = source.actors.find((p) => p.id === a.escortFor);
   let previous;
-  for (let t = 0; t < activityData.duration; t += 0.05) {
+  for (let t = 0; t < source.duration; t += 0.05) {
     const p = sampleEscort(leader, t);
     if (p.visible !== false && previous?.visible !== false)
       assert.ok(
@@ -358,7 +409,7 @@ assert.deepEqual(
   'Seek restores vans and ramps exactly',
 );
 console.log(
-  `Arrival checks: ${boardingSamples} van-ramp samples, ${entranceSamples} doorway samples, two desk staff, ${activityData.interactions.length} interaction tracks and 167 stable person templates.`,
+  `Arrival checks: ${boardingSamples} van-ramp samples, ${entranceSamples} doorway samples, two desk staff, ${source.interactions.length} interaction tracks and ${people.size} stable person templates on ${source.actors.length} actor tracks.`,
 );
 // The flexible layout and repertoire stay in sync with animation, accessibility and scrubbing.
 assert.equal(dayProgram.programs.length, 10);
@@ -398,7 +449,7 @@ for (const session of dayProgram.programs) {
     'Activity tools restore on backward seek',
   );
   assert.ok(
-    activityData.interactions.some(
+    source.interactions.some(
       (i) =>
         i.id === 'day-' + session.id &&
         i.start === session.start &&
@@ -412,7 +463,7 @@ assert.ok(
 );
 assert.equal(programAt(720).id, programAt(0).id);
 // Passing traffic must stay outside the stationary activity group and its chairs.
-for (const a of activityData.actors.filter((a) => !groupIds.has(a.id)))
+for (const a of source.actors.filter((a) => !groupIds.has(a.id)))
   for (const s of a.segments.filter((s) =>
     ['walk', 'roll'].includes(s.action),
   )) {
@@ -433,34 +484,40 @@ for (const a of activityData.actors.filter((a) => !groupIds.has(a.id)))
 console.log(
   'Day room checks: ten sessions, cleared front tables, seated and wheelchair modes, activity props, seek/repeat and protected circulation.',
 );
-globalThis.FileReader = class {
-  readAsArrayBuffer(blob) {
-    blob.arrayBuffer().then((v) => {
-      this.result = v;
-      this.onloadend?.();
-    });
-  }
-  readAsDataURL(blob) {
-    blob.arrayBuffer().then((v) => {
-      this.result = `data:${blob.type};base64,${Buffer.from(v).toString('base64')}`;
-      this.onloadend?.();
-    });
-  }
-};
-const blob = await activity.exportCast(),
-  buffer = Buffer.from(await blob.arrayBuffer());
-assert.ok(
-  buffer.length < 25 * 1024 * 1024,
-  'Animated cast stays within the hosting asset limit',
-);
-assert.equal(buffer.readUInt32LE(0), 0x46546c67);
-const n = buffer.readUInt32LE(12),
-  gltf = JSON.parse(buffer.subarray(20, 20 + n).toString());
-assert.equal(gltf.skins.length, 15);
-assert.equal(gltf.animations.length, 270);
-assert.ok(gltf.animations.some((a) => a.name === 'cast-doctor:walk'));
-writeFileSync('public/models/seen-health-animated-cast.glb', buffer);
+// The published cast GLB is built from the base loop's roles; scenario runs
+// validate only and never overwrite it.
+let exported = '';
+if (!compiled) {
+  globalThis.FileReader = class {
+    readAsArrayBuffer(blob) {
+      blob.arrayBuffer().then((v) => {
+        this.result = v;
+        this.onloadend?.();
+      });
+    }
+    readAsDataURL(blob) {
+      blob.arrayBuffer().then((v) => {
+        this.result = `data:${blob.type};base64,${Buffer.from(v).toString('base64')}`;
+        this.onloadend?.();
+      });
+    }
+  };
+  const blob = await activity.exportCast(),
+    buffer = Buffer.from(await blob.arrayBuffer());
+  assert.ok(
+    buffer.length < 25 * 1024 * 1024,
+    'Animated cast stays within the hosting asset limit',
+  );
+  assert.equal(buffer.readUInt32LE(0), 0x46546c67);
+  const n = buffer.readUInt32LE(12),
+    gltf = JSON.parse(buffer.subarray(20, 20 + n).toString());
+  assert.equal(gltf.skins.length, 15);
+  assert.equal(gltf.animations.length, 270);
+  assert.ok(gltf.animations.some((a) => a.name === 'cast-doctor:walk'));
+  writeFileSync('public/models/seen-health-animated-cast.glb', buffer);
+  exported = ` Exported 15 rigs and 270 clips (${(buffer.length / 1024 / 1024).toFixed(2)} MB).`;
+}
 console.log(
-  `Validated ${activity.actors.length} actors, ${activityData.roles.length} roles, ${samples} path samples, ${minWall.toFixed(3)}m minimum wall clearance; pause, repeat, seek, speed, synchronized pairs, levels and 3D context. Exported 15 rigs and 270 clips (${(buffer.length / 1024 / 1024).toFixed(2)} MB).`,
+  `Validated ${activity.actors.length} actors, ${source.roles.length} roles, ${samples} path samples, ${minWall.toFixed(3)}m minimum wall clearance; pause, repeat, seek, speed, synchronized pairs, levels and 3D context.${exported}`,
 );
 activity.dispose();

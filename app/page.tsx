@@ -37,12 +37,18 @@ import {
   type Facility,
   type Room,
 } from './model/schema';
-import { defaultState, type ViewerState } from './model/renderer';
+import {
+  defaultState,
+  type CameraShot,
+  type ViewerState,
+} from './model/renderer';
 import type { createViewer } from './model/renderer';
+import type { ActivitySnapshot } from './model/activity';
 import { roomLabelCode } from './model/room-labels';
 import { JourneyPanel } from './components/journey-panel';
 import type { JourneyStep } from './model/journeys';
 import { ActivityPanel } from './components/activity-panel';
+import { useScenario } from './components/scenario-toggle';
 import { ShowcaseControls } from './components/showcase-controls';
 import { SiteMap } from './components/site-map';
 import { sites, type SiteId } from './data/sites';
@@ -67,6 +73,14 @@ export default function Home() {
     upload = useRef<HTMLInputElement>(null);
   const [showcase, setShowcase] = useState(false);
   const previousView = useRef<ViewerState | null>(null);
+  // The scene, the activity panel and Measure share one scenario.
+  const { scenario, setScenario, story } = useScenario();
+  // Camera and clock of a viewer replaced for a scenario swap on the same model.
+  const carried = useRef<{
+    model: Facility;
+    shot: CameraShot;
+    activity: ActivitySnapshot;
+  } | null>(null);
   const [siteId, setSiteId] = useState<SiteId>('alhambra');
   const [networkOpen, setNetworkOpen] = useState(false);
   const [clinicOption, setClinicOption] = useState(false);
@@ -257,35 +271,57 @@ export default function Home() {
     import('./model/renderer').then(({ createViewer }) => {
       if (ended || !host.current) return;
       try {
-        viewer.current = createViewer(host.current, model, (zone, room) => {
-          const selectedZone = model.zones.find((z) => z.id === zone);
-          setState((s) => ({
-            ...s,
-            selected: zone,
-            room: room || null,
-            isolate: zone ? s.isolate : false,
-            ...(selectedZone && s.exterior && s.sectionAxis === 'none'
-              ? ({
-                  level: selectedZone.levelId,
-                  roof: false,
-                  exterior: false,
-                  ceilings: false,
-                  walls: 'cutaway',
-                  stack: 0,
-                  explode: 0,
-                } as const)
-              : {}),
-          }));
-          if (selectedZone) {
-            setView('iso');
-            viewer.current?.view('iso');
-            requestAnimationFrame(() => viewer.current?.focus(zone, room));
-          }
-        });
+        viewer.current = createViewer(
+          host.current,
+          model,
+          (zone, room) => {
+            const selectedZone = model.zones.find((z) => z.id === zone);
+            setState((s) => ({
+              ...s,
+              selected: zone,
+              room: room || null,
+              isolate: zone ? s.isolate : false,
+              ...(selectedZone && s.exterior && s.sectionAxis === 'none'
+                ? ({
+                    level: selectedZone.levelId,
+                    roof: false,
+                    exterior: false,
+                    ceilings: false,
+                    walls: 'cutaway',
+                    stack: 0,
+                    explode: 0,
+                  } as const)
+                : {}),
+            }));
+            if (selectedZone) {
+              setView('iso');
+              viewer.current?.view('iso');
+              requestAnimationFrame(() => viewer.current?.focus(zone, room));
+            }
+          },
+          { activity: story?.source },
+        );
         viewer.current.update(state);
-        if (model.contextStyle) viewer.current.focus(null, null, true);
-        else viewer.current.focus('day');
-        if (state.exterior) viewer.current.view('exterior');
+        const kept = carried.current?.model === model ? carried.current : null;
+        carried.current = null;
+        if (kept) {
+          const { time, playing, speed, paths, filter, scale, enabled } =
+            kept.activity;
+          viewer.current.setShot(kept.shot);
+          viewer.current.activity.setOptions({
+            time,
+            playing,
+            speed,
+            paths,
+            filter,
+            scale,
+            enabled,
+          });
+        } else {
+          if (model.contextStyle) viewer.current.focus(null, null, true);
+          else viewer.current.focus('day');
+          if (state.exterior) viewer.current.view('exterior');
+        }
         setReady(true);
       } catch (e) {
         console.error(e);
@@ -294,10 +330,16 @@ export default function Home() {
     });
     return () => {
       ended = true;
+      if (viewer.current)
+        carried.current = {
+          model,
+          shot: viewer.current.getShot(),
+          activity: viewer.current.activity.getState(),
+        };
       viewer.current?.dispose();
       viewer.current = null;
     };
-  }, [model]);
+  }, [model, story]);
   useEffect(() => viewer.current?.update(state), [state, ready]);
   useEffect(() => {
     if (!ready || !viewer.current) return;
@@ -936,6 +978,8 @@ export default function Home() {
           <ActivityPanel
             key={model?.id || siteId}
             viewer={ready ? viewer.current : null}
+            scenario={siteId === 'alhambra' ? scenario : undefined}
+            onScenario={setScenario}
             onScene={focusActivity}
             onClose={() => setActivityOpen(false)}
           />
@@ -946,6 +990,9 @@ export default function Home() {
               model={model}
               ready={ready}
               getViewer={getViewer}
+              scenario={scenario}
+              story={story}
+              onScenario={setScenario}
               onClose={() => setMeasureOpen(false)}
             />
           </Suspense>

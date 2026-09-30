@@ -11,7 +11,7 @@ Interactive planning models of **Alhambra (1839 W Valley), 1630 Olympic and Alve
 - Eight Alhambra vans run staggered trips, park in marked bays, yield at shared driveways and deploy ramps. Package and food deliveries use the rear employee entrance and receiving area. Olympic and Alveare have site-specific van arrivals, escorts and activity; Alveare drop-off is on the east side beside reception.
 - Video mode holds the camera still, speeds up the activities and can record a one-minute 1080p clip. Tilt shift is optional. Hide all controls for a clean view; **H** or **Esc** restores them and **R** starts recording.
 - The viewer includes the pull request's architectural presentation palette, clay figures, soft lighting and optional ambient occlusion. `?quality=balanced` selects lighter rendering; `?quality=high` enables the full pipeline.
-- **Measure** shows occupancy and staff-time metrics for Alhambra's base loop or the participant story.
+- At Alhambra, the care-day panel and **Measure** share one toggle: the base loop or the loop with Mrs. Lin's day. The scene, the cast and tracks lists, and the occupancy and staff-time metrics all follow it, so Mrs. Lin (`hero-lin`) can be found and followed in the main viewer.
 
 ## A day at Seen Health
 
@@ -63,7 +63,7 @@ npm run build
 npm run build:story
 ```
 
-`validate:model` prepares the headless model modules used by the other validators. `validate-activity.mjs` also exports the animated cast GLB. The production build sanitizes the public model data and checks that no architectural PDFs, drawing images or extracted source text are published.
+`validate:model` prepares the headless model modules used by the other validators. `validate-activity.mjs` also exports the animated cast GLB; `node scripts/validate-activity.mjs --tracks app/data/scenarios/day-in-the-life.tracks.json` runs the same engine checks on the merged story source instead (no export). The production build sanitizes the public model data and checks that no architectural PDFs, drawing images or extracted source text are published.
 
 ## Editing and model generation
 
