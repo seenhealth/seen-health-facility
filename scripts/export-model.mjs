@@ -90,7 +90,7 @@ let source = readFileSync('app/model/renderer.ts', 'utf8').replace(
 );
 source = source.replace(
   "import * as T from 'three';",
-  `import * as Real from 'three';const T={...Real,WebGLRenderer:class{domElement={setAttribute(){},addEventListener(){},removeEventListener(){},remove(){}};shadowMap={};setPixelRatio(){}setSize(){}render(scene,camera){globalThis.__facilityScene=scene;globalThis.__facilityCamera=camera;}dispose(){}},TextureLoader:class{load(url,onLoad){const tex=new Real.Texture(globalThis.__facilityMaterialImages[url]||globalThis.__facilitySiteImage);tex.needsUpdate=true;queueMicrotask(()=>onLoad?.(tex));return tex;}}};`,
+  `import * as Real from 'three';const T={...Real,WebGLRenderer:class{domElement={setAttribute(){},addEventListener(){},removeEventListener(){},remove(){}};shadowMap={};capabilities={getMaxAnisotropy:()=>1};setPixelRatio(){}getPixelRatio(){return 1;}setSize(){}getSize(v){return v.set(1400,950);}getClearColor(c){return c;}getClearAlpha(){return 1;}setClearColor(){}getRenderTarget(){return null;}setRenderTarget(){}clear(){}render(scene,camera){if(scene.isScene){globalThis.__facilityScene=scene;globalThis.__facilityCamera=camera;}}dispose(){}},PMREMGenerator:class{fromScene(){return {texture:new Real.Texture()};}dispose(){}},TextureLoader:class{load(url,onLoad){const tex=new Real.Texture(globalThis.__facilityMaterialImages[url]||globalThis.__facilitySiteImage);tex.needsUpdate=true;queueMicrotask(()=>onLoad?.(tex));return tex;}}};`,
 );
 source = source.replace(
   /import\s*\{\s*OrbitControls\s*\}\s*from\s*'three\/addons\/controls\/OrbitControls.js';/,
@@ -135,18 +135,21 @@ assert.equal(
   'Opens with the assembled building',
 );
 api.update({ ...defaultState, plan: true });
-assert.equal(
-  scene.getObjectByName('clinic').getObjectByName('furniture').visible,
-  false,
-  'Source overlay does not double-render furniture',
-);
-assert.ok(
-  scene
-    .getObjectByName('clinic')
-    .getObjectByName('walls')
-    .children.every((w) => !w.visible),
-  'Source overlay retains exact unobstructed wall strokes',
-);
+// Public models have their plan image stripped, so there is no source overlay.
+if (m.site.image) {
+  assert.equal(
+    scene.getObjectByName('clinic').getObjectByName('furniture').visible,
+    false,
+    'Source overlay does not double-render furniture',
+  );
+  assert.ok(
+    scene
+      .getObjectByName('clinic')
+      .getObjectByName('walls')
+      .children.every((w) => !w.visible),
+    'Source overlay retains exact unobstructed wall strokes',
+  );
+}
 api.update(defaultState);
 assert.equal(
   scene.getObjectByName('clinic').getObjectByName('furniture').visible,
@@ -186,6 +189,18 @@ if (m.envelope) {
     assert.ok(group, `Perimeter ${w.id} rendered`);
     for (const t of [0.1, 0.3, 0.5, 0.7, 0.9])
       for (const y of [0.3, 1.5, 3, w.height - 0.12]) {
+        // Operable openings are intentional passages (e.g. rear deliveries).
+        if (
+          w.openings.some(
+            (o) =>
+              o.operable &&
+              t * len > o.offset &&
+              t * len < o.offset + o.width &&
+              y > o.sill &&
+              y < o.sill + o.height,
+          )
+        )
+          continue;
         const local = new T.Vector3(t * len, y, 0.6),
           start = group.localToWorld(local),
           direction = new T.Vector3(0, 0, -1).transformDirection(
@@ -302,7 +317,13 @@ for (const journey of journeys.journeys) {
           scene.getObjectByName(zone.id).visible,
           'Journey level is visible',
         );
-      } else expected = new T.Vector3();
+      } else
+        // Zone-less steps show the site; the brochure exterior frames its
+        // facade rather than the plan origin.
+        expected =
+          m.exteriorAppearance === 'alhambra-brochure'
+            ? new T.Vector3(0, 3, 4)
+            : new T.Vector3();
     }
     assert.ok(
       globalThis.__facilityControls.target.distanceTo(expected) < 0.02,

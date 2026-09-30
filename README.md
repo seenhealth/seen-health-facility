@@ -82,7 +82,7 @@ npm run build:story
 
 Keep the downloadable activity/template/program JSON copies synchronized with `app/data/`. Authoring scripts are retained, but many regenerate earlier stages or require private source material; do not run the old generation chain blindly over the reviewed models. `apply-recreation-rooms.py` preserves the newer community layout when present. Recompile the story after changing room geometry, seats or the base activity tracks.
 
-Facility GLB regeneration additionally needs `@napi-rs/canvas` (its location can be supplied with `FACILITY_CANVAS_MODULE`). Runtime presentation finishes and activity overlays are rendered by the viewer.
+Regenerate the facility GLB with `node scripts/export-model.mjs` after `npm run validate:model`. Its canvas runtime, `@napi-rs/canvas`, is a devDependency; `FACILITY_CANVAS_MODULE` can point to another install. Runtime presentation finishes and activity overlays are rendered by the viewer.
 
 ## GitHub and publication
 
