@@ -9,11 +9,32 @@ An interactive model of the Seen Health Alhambra center, with animated participa
 The scene opens on the day room and runs at **4× speed** by default. Use the workflow buttons to visit arrivals, clinical care, rehabilitation, activities, meals, or upstairs coordination. Playback supports pause, speed changes, seeking, and following an individual or a shared interaction.
 
 - Two vans deploy ramps for arrivals and departures, with escorts, a sliding entrance and two reception staff.
-- A reusable cast of 41 composite people covers 12 roles and independent, cane, walker and wheelchair mobility.
+- A reusable cast of 41 composite people covers 12 roles and independent, cane, walker and wheelchair mobility, drawn as architectural scale figures colored by care-team role. Dietitian and center-manager templates complete the eleven PACE interdisciplinary-team disciplines.
+- **Measure** charts occupancy by zone and staff time by role over the day, for the care-day loop or with Mrs. Lin's day added.
 - The day room rotates through performances, language and device classes, exercise, dance, tai chi, calligraphy, arts and crafts, instruments, and TCM talks. Standing, chair-based, wheelchair and quieter table participation are represented.
 - Three front tables and their chairs are cleared in the active layout. Original source drawings remain available for comparison.
 - Back-of-house recreation: a table-tennis game room and two karaoke rooms, the main one a short walk from the day room. Their placement in previously empty rooms is an owner-confirmable assumption; see [MODEL_NOTES.md](MODEL_NOTES.md).
 - The building, upstairs administration area, streets and surroundings can be explored in 3D as a calm architectural presentation model, with ambient occlusion and a lighter `?quality=balanced` mode. Facility and animated-character models can be downloaded from the application; the facility GLB predates the recreation rooms and the presentation finishes.
+
+## A day at Seen Health (scroll story)
+
+`/story` is a scroll-driven walkthrough of one composite participant's day (Mrs. Lin, 84) through the real 3D center, with an overlay of the eleven-discipline interdisciplinary team: who is involved at each moment, the handoffs between them, and a full-day swimlane at the end. It also builds as a standalone static site for the Seen Health website:
+
+```bash
+npm run dev:story        # standalone preview
+npm run build:story      # → dist/story-site/ (STORY_BASE=/subpath/ for a subpath; ?embed=1 for iframes)
+```
+
+See [docs/STORY.md](docs/STORY.md) for hosting, embedding and editing the copy.
+
+## Simulation
+
+Scenarios are programmable: an itinerary in `app/data/scenarios/*.json` compiles, through a TypeScript navigation planner, into tracks on the shared care-day clock, and `app/sim/metrics.ts` measures occupancy, staff utilization and participant touchpoints. See [docs/SIMULATION.md](docs/SIMULATION.md).
+
+```bash
+npm run build:scenario   # compile + validate Mrs. Lin's day → day-in-the-life.tracks.json
+npm run sim:report       # print metrics; writes public/models/sim-report.json
+```
 
 ## Run locally
 
@@ -48,6 +69,11 @@ The application uses React, Three.js, Vinext/Vite and a Cloudflare-compatible ru
 | Activity rotation and cleared furniture | `app/data/day-program.json` |
 | Shared actor and interaction tracks | `app/data/activity-loop.json` |
 | Facility geometry and source references | `public/models/seen-alhambra-planning.json` |
+| Interdisciplinary team roster and colors | `app/data/care-team.json` |
+| Participant scenario (itinerary, handoffs, story copy) | `app/data/scenarios/day-in-the-life.json` |
+| Navigation, scenario compiler and metrics | `app/sim/` |
+| Measure panel | `app/components/metrics-panel.tsx` |
+| Scroll story | `app/story/`, `story/site/`, `vite.story.config.ts` |
 | Modeling decisions and limits | [MODEL_NOTES.md](MODEL_NOTES.md) |
 
 The JSON files under `app/data/` have matching downloadable copies in `public/models/`. Keep those copies synchronized. `scripts/build-activity.py` regenerates the care-day tracks from the facility geometry and activity program.

@@ -1587,7 +1587,8 @@ export function createCharacter(spec: CharacterSpec) {
   // One mesh per material for each aid; wheels stay separate so they can spin.
   const consolidate = (parent: T.Object3D) => {
     const byMaterial = new Map<T.Material, T.BufferGeometry[]>();
-    for (const o of [...parent.children])
+    // Copy: meshes are removed from `parent` while iterating.
+    for (const o of parent.children.slice())
       if (o instanceof T.Mesh) {
         o.updateMatrix();
         const list = byMaterial.get(o.material) ?? [];
