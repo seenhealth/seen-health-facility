@@ -12,6 +12,7 @@ Interactive planning models of **Alhambra (1839 W Valley), 1630 Olympic and Alve
 - Video mode holds the camera still, speeds up the activities and can record a one-minute 1080p clip. Tilt shift is optional. Hide all controls for a clean view; **H** or **Esc** restores them and **R** starts recording.
 - The viewer includes the pull request's architectural presentation palette, clay figures, soft lighting and optional ambient occlusion. `?quality=balanced` selects lighter rendering; `?quality=high` enables the full pipeline.
 - **Measure** shows occupancy and staff-time metrics for Alhambra's base loop or the participant story.
+- **Community** frames the distributed-care settings around the Alhambra center on the same care-day clock: Mrs. Lin's home (personal care, home health, pill packs, meals, home modifications), the partner pharmacy, the community hospital, a specialist clinic and a partner adult day center, joined by a Seen van, a courier, a meals car and an ambulance. The "Homes, pharmacy, hospital & partners" workflow lists their touchpoints; the toggle under Layers hides the layer. See [community documentation](docs/COMMUNITY.md).
 
 ## A day at Seen Health
 
@@ -58,6 +59,7 @@ node scripts/validate-site-activity.mjs
 node scripts/validate-site-arrivals.mjs
 node scripts/validate-additional-sites.mjs
 npm run validate:traffic
+npm run validate:community
 npm run build:scenario -- --check
 npm run build
 npm run build:story
@@ -74,6 +76,7 @@ npm run build:story
 | People and day-room program | `app/model/characters.ts`, `app/model/day-room.ts`, `app/data/` |
 | Vans, traffic and deliveries | `app/model/arrival.ts`, `app/model/traffic-routes.ts`, `app/model/deliveries.ts` |
 | Additional-site activity and arrivals | `app/model/site-activity.ts`, `app/model/site-arrival.ts` |
+| Distributed-care settings, vehicles and people | `app/model/community-*.ts`, [docs/COMMUNITY.md](docs/COMMUNITY.md) |
 | Exterior models | `app/model/alhambra-exterior.ts`, `app/model/olympic-exterior.ts`, `app/model/alveare-exterior.ts` |
 | Reviewed activity furniture | `app/model/community-assets.ts` |
 | Facility specifications and exports | `public/models/` |
