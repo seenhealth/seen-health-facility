@@ -586,8 +586,9 @@ export function ActivityPanel({
           </div>
           <p className="template-note">
             One shared model per role, one consistent appearance per person.
-            Doctors wear white coats; nurses, PT, OT and CNAs wear scrubs; other
-            staff wear solid uniforms.
+            Doctors and dietitians wear white coats; nurses, PT, OT and aides
+            wear V-neck scrubs; desk, coordination, social work, recreation and
+            the center manager wear lanyards; food service wears an apron.
           </p>
           <div className="activity-cast">
             {activityData.actors
@@ -609,13 +610,9 @@ export function ActivityPanel({
                     {a.label}
                     <small>
                       {roleNames[a.role]} ·{' '}
-                      {characterLibrary.roles[a.role].wardrobe === 'coat'
-                        ? 'white coat'
-                        : characterLibrary.roles[a.role].wardrobe === 'scrubs'
-                          ? 'scrubs'
-                          : a.role === 'participant'
-                            ? a.mobility || 'independent'
-                            : 'solid uniform'}
+                      {a.role === 'participant'
+                        ? a.mobility || 'independent'
+                        : characterLibrary.roles[a.role].detail.toLowerCase()}
                     </small>
                   </div>
                 </button>
