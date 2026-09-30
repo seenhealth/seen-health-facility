@@ -9,7 +9,8 @@
       "short": "PCP",
       "characterRole": "doctor",
       "group": "clinical",
-      "focus": "Leads medical care, reviews changes and writes orders the rest of the team carries out."
+      "focus": "Leads medical care, reviews changes and writes orders the rest of the team carries out.",
+      "color": "#2F5D7C"
     },
     {
       "id": "rn",
@@ -17,7 +18,8 @@
       "short": "RN",
       "characterRole": "nurse",
       "group": "clinical",
-      "focus": "Checks vitals and medications each visit and is first to notice a change in condition."
+      "focus": "Checks vitals and medications each visit and is first to notice a change in condition.",
+      "color": "#3E8C86"
     },
     {
       "id": "msw",
@@ -25,7 +27,8 @@
       "short": "MSW",
       "characterRole": "social-worker",
       "group": "support",
-      "focus": "Supports wellbeing, family, caregivers and benefits; connects the plan to life at home."
+      "focus": "Supports wellbeing, family, caregivers and benefits; connects the plan to life at home.",
+      "color": "#C29A4A"
     },
     {
       "id": "pt",
@@ -33,7 +36,8 @@
       "short": "PT",
       "characterRole": "pt",
       "group": "therapy",
-      "focus": "Builds strength, balance and safe walking to prevent falls."
+      "focus": "Builds strength, balance and safe walking to prevent falls.",
+      "color": "#5A7FA8"
     },
     {
       "id": "ot",
@@ -41,7 +45,8 @@
       "short": "OT",
       "characterRole": "ot",
       "group": "therapy",
-      "focus": "Keeps everyday tasks possible: dressing, bathing, cooking and using devices."
+      "focus": "Keeps everyday tasks possible: dressing, bathing, cooking and using devices.",
+      "color": "#7FA07A"
     },
     {
       "id": "rec",
@@ -49,7 +54,8 @@
       "short": "Rec",
       "characterRole": "activities",
       "group": "therapy",
-      "focus": "Designs activities for connection, cognition and joy; tracks engagement."
+      "focus": "Designs activities for connection, cognition and joy; tracks engagement.",
+      "color": "#D4846A"
     },
     {
       "id": "dietitian",
@@ -57,7 +63,8 @@
       "short": "RD",
       "characterRole": "dietitian",
       "group": "clinical",
-      "focus": "Plans meals and texture for each participant's conditions and preferences."
+      "focus": "Plans meals and texture for each participant's conditions and preferences.",
+      "color": "#A7A04E"
     },
     {
       "id": "center-manager",
@@ -65,7 +72,8 @@
       "short": "CM",
       "characterRole": "center-manager",
       "group": "operations",
-      "focus": "Runs the day: staffing, schedule, safety and the flow of every participant through the center."
+      "focus": "Runs the day: staffing, schedule, safety and the flow of every participant through the center.",
+      "color": "#1F4D3A"
     },
     {
       "id": "home-care",
@@ -73,7 +81,8 @@
       "short": "HCC",
       "characterRole": "coordinator",
       "group": "operations",
-      "focus": "Arranges support at home so care continues after the van drops off."
+      "focus": "Arranges support at home so care continues after the van drops off.",
+      "color": "#8A6A93"
     },
     {
       "id": "pca",
@@ -81,7 +90,8 @@
       "short": "PCA",
       "characterRole": "aide",
       "group": "support",
-      "focus": "Helps with walking, meals, toileting and personal care throughout the day."
+      "focus": "Helps with walking, meals, toileting and personal care throughout the day.",
+      "color": "#B8747E"
     },
     {
       "id": "driver",
@@ -89,7 +99,23 @@
       "short": "Driver",
       "characterRole": "driver",
       "group": "operations",
-      "focus": "Brings participants safely to and from the center; often the first to see how the morning is going."
+      "focus": "Brings participants safely to and from the center; often the first to see how the morning is going.",
+      "color": "#34405A"
     }
-  ]
+  ],
+  "palette": {
+    "note": "Shared by character wardrobe accents and the story overlay. Participants wear warm neutrals.",
+    "participantWardrobe": [
+      "#D8CBB5",
+      "#B8674A",
+      "#8FA3B8",
+      "#8B9A6B",
+      "#7D5C73",
+      "#BD9A6A"
+    ],
+    "brandDeep": "#1F4D3A",
+    "brandLeaf": "#8CBF5E",
+    "paper": "#F3F0E9",
+    "ink": "#1E2A26"
+  }
 }
