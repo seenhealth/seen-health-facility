@@ -12,11 +12,12 @@
  * Runs in the browser and in Node (scripts/build-scenario.mjs); the app loads
  * the precompiled result through `story-source.ts` instead of compiling live.
  */
-import type {
-  ActivitySource,
-  ActorSpec,
-  Interaction,
-  Segment,
+import {
+  activityData,
+  type ActivitySource,
+  type ActorSpec,
+  type Interaction,
+  type Segment,
 } from '../model/activity';
 import type { Action, CharacterRole } from '../model/characters';
 import type { Facility, Vec2 } from '../model/schema';
@@ -484,7 +485,7 @@ export type CompileOptions = {
 export function compileScenario(
   model: Facility,
   scenario: Scenario,
-  base: ActivitySource,
+  base: ActivitySource = activityData,
   options: CompileOptions = {},
 ): CompileResult {
   const P = scenario.placement;
