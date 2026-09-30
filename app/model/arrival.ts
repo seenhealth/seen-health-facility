@@ -15,12 +15,15 @@ export const ARRIVAL = {
   streetY: -0.23,
   vanFloorY: 0.35,
 };
+// Unload windows close once the last rider is off the ramp and the driver has
+// stowed it, so the driver is back in the cab before the outbound trip starts
+// (fleet-crew.ts times the ramp duty against these door/ramp curves).
 export const vanWindows = [
   {
     id: 'van-a',
     name: 'Van A',
     inbound: [0, 36],
-    unload: [42, 108],
+    unload: [42, 96],
     outbound: [112, 142],
     returning: [510, 546],
     boarding: [552, 590],
@@ -30,7 +33,7 @@ export const vanWindows = [
     id: 'van-b',
     name: 'Van B',
     inbound: [146, 166],
-    unload: [172, 238],
+    unload: [172, 226],
     outbound: [242, 272],
     returning: [628, 656],
     boarding: [662, 702],
@@ -152,12 +155,17 @@ export function buildArrival(
     root.add(van.root);
     return van;
   });
-  // Paint real 6.9m van stalls around the parked vehicle footprints.
+  // Paint real 6.9m van stalls around the parked vehicle footprints, in each
+  // bay's own frame (local +z is the rear of the parked van).
   for (const bay of fleetParking) {
-    for (const z of [bay.z - 1.4, bay.z + 1.4])
-      box(root, -28.1, -0.208, z, 6.9, 0.012, 0.07, mat('#ebe9dc'));
-    box(root, -31.55, -0.208, bay.z, 0.07, 0.012, 2.8, mat('#ebe9dc'));
-    box(root, -30.8, -0.19, bay.z, 0.14, 0.09, 1.8, mat('#d7c389'));
+    const stall = new T.Group();
+    stall.position.set(bay.x, 0, bay.z);
+    stall.rotation.y = bay.heading;
+    root.add(stall);
+    for (const x of [-1.4, 1.4])
+      box(stall, x, -0.208, 0, 0.07, 0.012, 6.9, mat('#ebe9dc'));
+    box(stall, 0, -0.208, 3.45, 2.8, 0.012, 0.07, mat('#ebe9dc'));
+    box(stall, 0, -0.19, 2.7, 1.8, 0.09, 0.14, mat('#d7c389'));
   }
   let doorOpen = 0;
   function tick(
