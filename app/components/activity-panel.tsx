@@ -13,13 +13,16 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import {
-  activityData,
+  activityData as alhambraActivityData,
   dayTime,
   timelineFor,
   type ActivitySnapshot,
 } from '../model/activity';
 import { roleNames, roleColors, characterLibrary } from '../model/characters';
-import { vanWindows } from '../model/arrival';
+import {
+  vanWindows as siteVanWindows,
+  alhambraVanWindows,
+} from '../model/arrival';
 import { dayProgram, programAt } from '../model/day-room';
 import type { createViewer } from '../model/renderer';
 
@@ -83,6 +86,11 @@ export function ActivityPanel({
   onScene: (zone: string, actor?: string | null) => void;
   onClose: () => void;
 }) {
+  const activityData = viewer?.activity.data || alhambraActivityData;
+  const siteSpecific = !!activityData.siteSpecific;
+  const vanWindows = siteSpecific ? siteVanWindows : alhambraVanWindows;
+  const dayRoomId = activityData.dayRoomId || 'day';
+  const views = activityData.views || activityViews;
   const [state, setState] = useState<ActivitySnapshot | null>(null),
     [expanded, setExpanded] = useState(false),
     [showTracks, setShowTracks] = useState(false),
@@ -90,7 +98,7 @@ export function ActivityPanel({
     [category, setCategory] = useState('activities'),
     [horizon, setHorizon] = useState(720),
     [search, setSearch] = useState(''),
-    [activityView, setActivityView] = useState(true);
+    [activityView, setActivityView] = useState(!siteSpecific);
   useEffect(() => viewer?.activity.subscribe(setState), [viewer]);
   const time = state?.time || 0,
     change = (p: Partial<ActivitySnapshot>) => viewer?.activity.setOptions(p);
@@ -100,7 +108,7 @@ export function ActivityPanel({
     change({ time: p.start + 3, enabled: true, filter: 'all' });
     setCategory('activities');
     setActivityView(true);
-    onScene('day', 'interaction:day-' + p.id);
+    onScene(dayRoomId, 'interaction:day-' + p.id);
   };
   const interactions = activityData.interactions.filter(
       (i) => category === 'all' || i.category === category,
@@ -150,14 +158,16 @@ export function ActivityPanel({
             title: 'Home',
             action: 'ride',
           },
-        ],
+        ].filter((stage) => stage.start >= 0 && stage.end > stage.start),
       })),
       ...activityData.actors.map((a) => ({
         id: a.id,
         label: a.label,
         role: roleNames[a.role],
         kind: 'person' as const,
-        zone: a.levelId === 'upper' ? 'upper-office' : a.segments[0].zoneId,
+        zone:
+          (a.arrivalVehicleId ? 'site' : a.roomId) ||
+          (a.levelId === 'upper' ? 'upper-office' : a.segments[0].zoneId),
         stages: timelineFor(a).map((s) => ({
           start: s.start,
           end: s.end,
@@ -185,7 +195,7 @@ export function ActivityPanel({
         ],
       })),
     ],
-    [],
+    [activityData, siteSpecific],
   );
   const visible = tracks.filter(
     (t) =>
@@ -213,12 +223,14 @@ export function ActivityPanel({
       (s) => time >= s.start && time < s.end,
     );
   const select = (track: Track, at?: number) => {
-    setActivityView(track.zone === 'day');
+    setActivityView(track.zone === dayRoomId);
     change({ filter: 'all' });
     if (at !== undefined) change({ time: at, playing: false });
     onScene(
       track.kind === 'person'
-        ? viewer?.activity.actorSample(track.id)?.zoneId || track.zone
+        ? siteSpecific
+          ? track.zone
+          : viewer?.activity.actorSample(track.id)?.zoneId || track.zone
         : track.zone,
       track.id,
     );
@@ -241,17 +253,33 @@ export function ActivityPanel({
         </button>
       </div>
       <div className="activity-scenes" aria-label="View a workflow">
-        {activityViews.map((v) => (
+        {views.map((v) => (
           <button
             key={v.id}
             onClick={() => {
               onScene(v.id);
-              setActivityView(v.id === 'day');
-              if (v.id === 'day') {
+              setActivityView(v.id === dayRoomId);
+              if (siteSpecific) {
+                setCategory(
+                  activityData.interactions.find((i) => i.zoneId === v.id)
+                    ?.category || 'all',
+                );
+              }
+              if (v.id === dayRoomId) {
                 setCategory('activities');
                 setTrackKind('interactions');
               }
-              if (v.id === 'site') setCategory('arrivals');
+              if (v.id === 'site') {
+                setCategory('arrivals');
+                if (siteSpecific)
+                  change({
+                    time: 49,
+                    enabled: true,
+                    playing: true,
+                    speed: 1,
+                    follow: null,
+                  });
+              }
             }}
           >
             {v.label}
@@ -296,8 +324,9 @@ export function ActivityPanel({
             <span>Quiet creative table</span>
           </div>
           <small>
-            Three front tables cleared · Illustrative rotation · Choose a
-            session, then play or follow its interaction track.
+            {siteSpecific
+              ? 'Activities use the existing room furniture. Choose a session, then play or follow its interaction track.'
+              : 'Three front tables cleared · Illustrative rotation · Choose a session, then play or follow its interaction track.'}
           </small>
         </div>
       )}
@@ -626,18 +655,29 @@ export function ActivityPanel({
             <a href="/models/character-templates.json" download>
               Person & wardrobe templates
             </a>
-            <a href="/models/activity-loop.json" download>
+            <button
+              onClick={() => {
+                const url = URL.createObjectURL(
+                  new Blob([JSON.stringify(activityData, null, 2)], {
+                    type: 'application/json',
+                  }),
+                );
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'care-day-tracks.json';
+                a.click();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+              }}
+            >
               Care-day tracks
-            </a>
+            </button>
           </div>
           <details>
             <summary>Workflow sources & interpretation</summary>
             <p>
-              The Orbit review informs therapy, clinical, social-work, escort
-              and coordination patterns. The arrival follows your described ramp
-              and right turn into the sliding entrance. These are stable
-              composite people and illustrative timings, shown as an 8 AM–4 PM
-              day compressed into a twelve-minute loop.
+              {siteSpecific
+                ? 'Staff and participants share the Alhambra character models and activity repertoire, placed in this site’s corresponding rooms. Walking stays within each room and avoids modeled furniture. Timings illustrate an 8 AM–4 PM day in a twelve-minute loop.'
+                : 'The Orbit review informs therapy, clinical, social-work, escort and coordination patterns. The arrival follows your described ramp and right turn into the sliding entrance. These are stable composite people and illustrative timings, shown as an 8 AM–4 PM day compressed into a twelve-minute loop.'}
             </p>
             <p>
               Upper-floor movement connections are not animated. People are

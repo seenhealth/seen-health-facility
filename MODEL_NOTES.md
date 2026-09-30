@@ -9,11 +9,11 @@ The September 21 photo review supersedes the earlier blanket furniture restorati
 - Bathrooms: photographed shared wash areas and cubicle finishes; closed stall interiors remain unverified and retain the plan layout.
 - Day room/dining: tree seating, blue lattice cabinetry, landscape banquette, marble tables and cream timber-arm chairs.
 
-[Read the seven-photo review](public/models/interior-photo-review.md) for each source, modeled element and unresolved detail. The model contains 611 catalog objects, including the 17 recreation-room objects added September 30; the active arrangement omits the 15 stored front-table objects. The care-day loop retains 41 people, 12 roles and 4× default speed.
+[Read the seven-photo review](public/models/interior-photo-review.md) for each source, modeled element and unresolved detail. The reviewed Alhambra model contains 596 catalog objects; the active arrangement omits the 15 stored front-table objects. The care-day loop has 167 people. Additional Olympic and Alveare models, exterior references and arrivals are included; see the room-review and additional-sites accuracy notes in `public/models/`.
 
 ## Rebuild
 
-Run the earlier plan/photo/fleet generators, then `python3 scripts/apply-interior-photos.py`, `python3 scripts/apply-layout-corrections.py`, `python3 scripts/apply-recreation-rooms.py`, `python3 scripts/build-activity.py`, model/layout/interior/activity validation and GLB export. `build-photo-update.py` also applies the interior layer last. Repeating the old plan restoration alone would discard the approved photo update.
+The checked-in models are the reviewed state. Earlier generators are retained for authoring, but rerunning the old chain alone would discard later room, population and passage corrections. Source-based generators require private local inputs. See the root README for public-clone validation commands. Recompile `npm run build:scenario` after geometry or activity edits.
 
 ## Accuracy
 
@@ -25,16 +25,22 @@ See [animation details](public/models/animation-update.md) and [upstairs/fleet d
 
 The upstairs fit-out is rotated counterclockwise, stair/lift connections have real floor apertures, clinic layouts are reversed, the second-from-entrance room has a dental chair, and personal-care showers/hair care connect with back-room laundry and linen storage. See [the layout correction audit](/models/layout-corrections.md) for room mapping, validation and remaining measurement limits.
 
-## Recreation rooms · September 30
+## Reviewed activity rooms and circulation
 
-At the owner's request the model shows table tennis and karaoke. No recorded room had these uses, so they are placed in empty image-traced rooms. **The room assignment is an assumption for the owner to confirm**, recorded as the open accuracy issue `recreation-rooms` and in `recreationRooms` in the specification.
+The owner's specific room conversions supersede the pull request's provisional recreation placements:
 
-- **Game room · table tennis** (`rear-north`): one regulation table (2.74 × 1.525 m, 0.76 m high) centered at x 9.30, z −12.35, long axis north–south, with 1.26–1.37 m run-back at each end. It has a three-seat spectator bench and a paddle/ball rack on the west wall. The room is entered from the south doorway beside the back laundry; the rear exit stays clear.
-- **Karaoke room** (`lobby-office-c3`, the primary room, entered from the day room through its south doorway): a large wall-hung screen with a warm backlight on the west wall, flanked by floor-standing speakers. A three-seat sofa faces it from the east wall, with a marble lounge table, a high-back lounge chair and a lamp table. The singer's spot is at x −5.75, z 5.27, about 1 m in front of the screen on the room's centre line, next to the microphone stand. The south doorway and both north openings stay clear.
-- **Karaoke room 2** (`lobby-office-w2`, entered from the day room): a smaller version with a screen on the west wall, speakers, microphone, sofa and lamp table. The singer's spot is the room centroid.
-- `lobby-office-w1` remains an unassigned reception-side room.
+- `admin-meeting-west`: mahjong, with four participants around the table.
+- `admin-meeting-east`: Wii games and television.
+- `admin-workstations`: ping pong and pool in the former desk area.
+- `admin-conference`: karaoke in the large rear corner room.
 
-`scripts/apply-recreation-rooms.py` is idempotent and asserts footprints, run-backs, standing spots and door approaches against the traced walls. Equipment follows standard sizes; the placements are estimates. The downloadable facility GLB predates this change and does not yet include these rooms or the new presentation finishes. Regenerate it with `export-model.mjs`.
+The upstairs office layout is retained. The small `admin-side-office` hosts the story's private social-work conversation. Story participants temporarily replace background occupants at shared seats and game positions; the normal facility retains the full base cast.
+
+The day-room passage crosses between the library cabinets at x −14.65, z 17.96–19.44 into the bathroom/PT cross-hall. The former behind-shelf corridor is removed and walking routes use the corrected opening. These are reviewed design directions, not surveyed as-built certification.
+
+## Public source material
+
+Architectural drawings, PDFs and extracted source text are omitted from the current public tree and build. Local source files are preserved separately. Existing older GitHub commits may retain previously committed documents.
 
 ## Presentation rendering
 

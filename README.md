@@ -1,44 +1,34 @@
-# Seen Health · 3D Center
+# Seen Health · 3D Facilities
 
-An interactive model of the Seen Health Alhambra center, with animated participants, staff, accessible transportation, and day-center workflows.
+Interactive planning models of **Alhambra (1839 W Valley), 1630 Olympic and Alveare Terrace**, with animated participants, staff, accessible vans and daily workflows.
 
-**[Open the live model](https://seen-health-facility.xingpersonal.chatgpt.site/)**
+[GitHub repository](https://github.com/seenhealth/seen-health-facility) · [Live model](https://seen-health-facility.xingpersonal.chatgpt.site/)
 
-## Explore the model
+## Explore
 
-The scene opens on the day room and runs at **4× speed** by default. Use the workflow buttons to visit arrivals, clinical care, rehabilitation, activities, meals, or upstairs coordination. Playback supports pause, speed changes, seeking, and following an individual or a shared interaction.
+- Switch between sites or see their locations together on the map. Olympic includes both floors and its upstairs option. Room labels are off by default and can be enabled for design review.
+- Alhambra has 167 distinct people, with most day-room and dining seats occupied, group activities, arts and crafts, conversation and food service. Its former administration rooms contain mahjong, Wii, ping pong, pool and karaoke. The upstairs offices remain.
+- Eight Alhambra vans run staggered trips, park in marked bays, yield at shared driveways and deploy ramps. Package and food deliveries use the rear employee entrance and receiving area. Olympic and Alveare have site-specific van arrivals, escorts and activity; Alveare drop-off is on the east side beside reception.
+- Video mode holds the camera still, speeds up the activities and can record a one-minute 1080p clip. Tilt shift is optional. Hide all controls for a clean view; **H** or **Esc** restores them and **R** starts recording.
+- The viewer includes the pull request's architectural presentation palette, clay figures, soft lighting and optional ambient occlusion. `?quality=balanced` selects lighter rendering; `?quality=high` enables the full pipeline.
+- **Measure** shows occupancy and staff-time metrics for Alhambra's base loop or the participant story.
 
-- Two vans deploy ramps for arrivals and departures, with escorts, a sliding entrance and two reception staff.
-- A reusable cast of 41 composite people covers 12 roles and independent, cane, walker and wheelchair mobility, drawn as architectural scale figures colored by care-team role. Dietitian and center-manager templates complete the eleven PACE interdisciplinary-team disciplines.
-- **Measure** charts occupancy by zone and staff time by role over the day, for the care-day loop or with Mrs. Lin's day added.
-- The day room rotates through performances, language and device classes, exercise, dance, tai chi, calligraphy, arts and crafts, instruments, and TCM talks. Standing, chair-based, wheelchair and quieter table participation are represented.
-- Three front tables and their chairs are cleared in the active layout. Original source drawings remain available for comparison.
-- Back-of-house recreation: a table-tennis game room and two karaoke rooms, the main one a short walk from the day room. Their placement in previously empty rooms is an owner-confirmable assumption; see [MODEL_NOTES.md](MODEL_NOTES.md).
-- The building, upstairs administration area, streets and surroundings can be explored in 3D as a calm architectural presentation model, with ambient occlusion and a lighter `?quality=balanced` mode. Facility and animated-character models can be downloaded from the application; the facility GLB predates the recreation rooms and the presentation finishes.
+## A day at Seen Health
 
-## A day at Seen Health (scroll story)
-
-`/story` is a scroll-driven walkthrough of one composite participant's day (Mrs. Lin, 84) through the real 3D center, with an overlay of the eleven-discipline interdisciplinary team: who is involved at each moment, the handoffs between them, and a full-day swimlane at the end. It also builds as a standalone static site for the Seen Health website:
+`/story` follows Mrs. Lin, a composite participant, through a care day with the eleven-discipline team. Scrolling controls the camera and simulation clock. Its itinerary uses the reviewed room layout: social work in the side office, table tennis in the games lounge and karaoke in the rear corner room.
 
 ```bash
-npm run dev:story        # standalone preview
-npm run build:story      # → dist/story-site/ (STORY_BASE=/subpath/ for a subpath; ?embed=1 for iframes)
+npm run build:scenario   # compile and validate the story tracks
+npm run sim:report       # refresh the downloadable simulation report
+npm run dev:story        # standalone story preview
+npm run build:story      # static output in dist/story-site/
 ```
 
-See [docs/STORY.md](docs/STORY.md) for hosting, embedding and editing the copy.
-
-## Simulation
-
-Scenarios are programmable: an itinerary in `app/data/scenarios/*.json` compiles, through a TypeScript navigation planner, into tracks on the shared care-day clock, and `app/sim/metrics.ts` measures occupancy, staff utilization and participant touchpoints. See [docs/SIMULATION.md](docs/SIMULATION.md).
-
-```bash
-npm run build:scenario   # compile + validate Mrs. Lin's day → day-in-the-life.tracks.json
-npm run sim:report       # print metrics; writes public/models/sim-report.json
-```
+See [story documentation](docs/STORY.md) and [simulation documentation](docs/SIMULATION.md). Timing, staffing and people are illustrative, not operational forecasts or participant records.
 
 ## Run locally
 
-Use Node.js **22.13 or later** and npm.
+Use Node.js 22.13 or later and npm. The application lives at the repository root.
 
 ```bash
 git clone https://github.com/seenhealth/seen-health-facility.git
@@ -47,64 +37,57 @@ npm ci
 npm run dev
 ```
 
-Open the local URL printed by the development server. No live Orbit connection is needed: the scene uses the bundled representative workflow data.
+Open the local URL printed by the server. The scene uses bundled data; no live clinical system connection is required.
 
 ```bash
 npm run build
 ```
 
-The application uses React, Three.js, Vinext/Vite and a Cloudflare-compatible runtime. Dependencies are pinned by `package-lock.json`.
+The application uses React, Three.js, Vinext/Vite and a Cloudflare-compatible runtime. `package-lock.json` pins dependencies.
 
-## Where to make changes
+## Validation
+
+The checked-in models work without private source documents or regeneration. A fresh clone can run:
+
+```bash
+npx tsc --noEmit --incremental false
+npm run validate:model
+node scripts/validate-community.mjs
+node scripts/validate-day-life.mjs
+node scripts/validate-site-activity.mjs
+node scripts/validate-site-arrivals.mjs
+node scripts/validate-additional-sites.mjs
+npm run validate:traffic
+npm run build:scenario -- --check
+npm run build
+npm run build:story
+```
+
+`validate:model` prepares the headless model modules used by the other validators. `validate-activity.mjs` also exports the animated cast GLB. The production build sanitizes the public model data and checks that no architectural PDFs, drawing images or extracted source text are published.
+
+## Editing and model generation
 
 | Area | Location |
 | --- | --- |
-| Main page and navigation | `app/page.tsx` |
-| Playback and timeline controls | `app/components/activity-panel.tsx` |
-| Facility renderer | `app/model/renderer.ts` |
-| Character templates and animation | `app/model/characters.ts`, `app/data/character-templates.json` |
-| Arrivals and accessible entrance | `app/model/arrival.ts` |
-| Day-room equipment and gestures | `app/model/day-room.ts` |
-| Recreation-room furniture | `app/model/recreation-assets.ts`, `scripts/apply-recreation-rooms.py` |
-| Activity rotation and cleared furniture | `app/data/day-program.json` |
-| Shared actor and interaction tracks | `app/data/activity-loop.json` |
-| Facility geometry and source references | `public/models/seen-alhambra-planning.json` |
-| Interdisciplinary team roster and colors | `app/data/care-team.json` |
-| Participant scenario (itinerary, handoffs, story copy) | `app/data/scenarios/day-in-the-life.json` |
-| Navigation, scenario compiler and metrics | `app/sim/` |
-| Measure panel | `app/components/metrics-panel.tsx` |
-| Scroll story | `app/story/`, `story/site/`, `vite.story.config.ts` |
-| Modeling decisions and limits | [MODEL_NOTES.md](MODEL_NOTES.md) |
+| Site navigation, map and display controls | `app/page.tsx`, `app/data/sites.ts`, `app/components/` |
+| Rendering, presentation quality and recording | `app/model/renderer.ts`, `app/model/showcase.ts` |
+| People and day-room program | `app/model/characters.ts`, `app/model/day-room.ts`, `app/data/` |
+| Vans, traffic and deliveries | `app/model/arrival.ts`, `app/model/traffic-routes.ts`, `app/model/deliveries.ts` |
+| Additional-site activity and arrivals | `app/model/site-activity.ts`, `app/model/site-arrival.ts` |
+| Exterior models | `app/model/alhambra-exterior.ts`, `app/model/olympic-exterior.ts`, `app/model/alveare-exterior.ts` |
+| Reviewed activity furniture | `app/model/community-assets.ts` |
+| Facility specifications and exports | `public/models/` |
+| Story itinerary, routes and metrics | `app/data/scenarios/`, `app/sim/`, `app/story/` |
+| Accuracy and modeling decisions | [MODEL_NOTES.md](MODEL_NOTES.md), `public/models/*review*.md` |
 
-The JSON files under `app/data/` have matching downloadable copies in `public/models/`. Keep those copies synchronized. `scripts/build-activity.py` regenerates the care-day tracks from the facility geometry and activity program.
+Keep the downloadable activity/template/program JSON copies synchronized with `app/data/`. Authoring scripts are retained, but many regenerate earlier stages or require private source material; do not run the old generation chain blindly over the reviewed models. `apply-recreation-rooms.py` preserves the newer community layout when present. Recompile the story after changing room geometry, seats or the base activity tracks.
 
-## Validation and model generation
+Facility GLB regeneration additionally needs `@napi-rs/canvas` (its location can be supplied with `FACILITY_CANVAS_MODULE`). Runtime presentation finishes and activity overlays are rendered by the viewer.
 
-The checked-in model assets already work without regeneration. For model validation, restore the lossless source image from its tracked archive parts once:
+## GitHub and publication
 
-```bash
-cat sources/planning/overall-planning.part-* > 'sources/planning/Overall Planning.jpg'
-node scripts/validate-model.mjs
-node scripts/validate-layout.mjs
-node scripts/validate-interior.mjs
-node scripts/validate-activity.mjs
-npx tsc --noEmit --incremental false
-```
+**GitHub `main` is the shared code source.** This reconciliation combines the newer three-site work with [pull request #1](https://github.com/seenhealth/seen-health-facility/pull/1), preserving the GitHub commit history. The older Sites history and local recovery copies are maintained separately and are not pushed into this public repository because they contain architectural source files.
 
-Run the model validator before the activity validator; it prepares the local validation modules. The activity validator also regenerates the animated cast GLB. Python 3 is required when authoring tracks with `python3 scripts/build-activity.py`.
+GitHub pushes do not automatically publish the live model. `.openai/hosting.json` identifies the existing Sites project; deployment to that project is a separate action.
 
-`export-model.mjs` additionally needs an installed `@napi-rs/canvas` module. Its location can be supplied with `FACILITY_CANVAS_MODULE`; this is only needed when regenerating the facility GLB.
-
-## Collaboration and publication
-
-Create a branch for changes and open a pull request against `main`. Include a brief description and the relevant validation results. Review changes in the local model before proposing publication.
-
-This repository starts from the deployed source snapshot `1f32f3214a94321e500ddc3e205b61a865b090ce` (Sites version 13, September 20, 2026). It includes the current application and its tracked assets. The earlier Sites editing history is maintained separately.
-
-GitHub pushes do **not** automatically publish the live model. `.openai/hosting.json` identifies the existing Sites project; publication requires access to that project. Coordinate live updates with its owner.
-
-## Source basis
-
-People, staffing, gestures and compressed timing are illustrative. The day-program repertoire follows the owner's direction, and care categories were informed by a read-only workflow review. This repository contains composite scene data, not live participant records. The model is for exploration and planning; source-verified dimensions and estimates are distinguished in the source notes.
-
-See [animation notes](public/models/animation-update.md), [upstairs and fleet notes](public/models/upstairs-fleet-update.md), and the [accuracy register](public/models/accuracy-register.md).
+Private architectural PDFs, original plan images, source text and local output/recovery files are excluded from the current tree and public build. Older GitHub commits may still contain previously committed documents; removing those historical copies would require a separate history cleanup. Approved material textures and modeled geometry remain public.

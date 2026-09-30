@@ -68,7 +68,7 @@ export function buildEnvelopeWall(
   for (const o of w.openings) {
     const height = Math.min(o.height, h - o.sill);
     if (height <= 0) continue;
-    if (o.id !== 'shell-lobby-west-opening-3')
+    if (!o.operable && o.id !== 'shell-lobby-west-opening-3')
       block(o.offset, o.sill, o.width, height, 0.055, o.material, o.id);
     const frame = 0.045;
     block(o.offset, o.sill, frame, height, w.thickness + 0.035, 'frame');
@@ -91,7 +91,7 @@ export function buildEnvelopeWall(
         w.thickness + 0.035,
         'frame',
       );
-    if (o.kind === 'door' && o.width > 1.3)
+    if (o.kind === 'door' && !o.operable && o.width > 1.3)
       block(
         o.offset + o.width / 2 - frame / 2,
         o.sill,
@@ -125,9 +125,29 @@ export function buildEnvelopeWall(
           [0, h],
           [length, h],
         ];
-  for (let i = 0; i < points.length - 1; i++) {
-    const [x1, y1] = points[i],
-      [x2, y2] = points[i + 1];
+  const capSpans =
+    cutHeight !== undefined
+      ? xs.slice(1).flatMap((right, i) => {
+          const left = xs[i],
+            mid = (left + right) / 2;
+          return w.openings.some(
+            (o) =>
+              o.operable &&
+              o.sill === 0 &&
+              o.height >= h &&
+              mid > o.offset &&
+              mid < o.offset + o.width,
+          )
+            ? []
+            : [
+                [
+                  [left, h],
+                  [right, h],
+                ],
+              ];
+        })
+      : points.slice(1).map((point, i) => [points[i], point]);
+  for (const [[x1, y1], [x2, y2]] of capSpans) {
     const cap = new T.Mesh(
       new T.BoxGeometry(
         Math.hypot(x2 - x1, y2 - y1) + 0.006,

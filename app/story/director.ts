@@ -45,6 +45,7 @@ const LAST_TIME = clock.duration - 0.5;
 const BLEND = 0.42;
 const BASE: ViewerState = {
   selected: null,
+  doorsOpen: true,
   room: null,
   level: 'all',
   explode: 0,

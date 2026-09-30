@@ -2,7 +2,7 @@
   "version": "1.0",
   "id": "day-in-the-life",
   "title": "A day at Seen Health",
-  "basis": "Composite, illustrative itinerary for one participant on the shared 8 AM–4 PM care-day clock. Not a participant record; times are compressed (720 loop seconds = 480 minutes).",
+  "basis": "Composite, illustrative itinerary for one participant on the shared 8 AM\u20134 PM care-day clock. Not a participant record; times are compressed (720 loop seconds = 480 minutes).",
   "clock": {
     "duration": 720,
     "dayStartMinutes": 480,
@@ -28,7 +28,7 @@
       "zoneId": "upper-office",
       "roomId": "upperfit-conference",
       "title": "Before the doors open",
-      "kicker": "8:00 AM · Morning huddle",
+      "kicker": "8:00 AM \u00b7 Morning huddle",
       "body": "Eleven disciplines meet around one table. Who is coming today, what changed overnight, and who needs to see whom.",
       "roles": [
         "pcp",
@@ -70,7 +70,7 @@
       "zoneId": "site",
       "roomId": null,
       "title": "Door to door",
-      "kicker": "8:45 AM · Van A arrives",
+      "kicker": "8:45 AM \u00b7 Van A arrives",
       "body": "The driver deploys the ramp and walks Mrs. Lin to the entrance. He noticed she was slower on the steps this morning, and passes it on.",
       "roles": [
         "driver",
@@ -101,7 +101,7 @@
       "zoneId": "lobby",
       "roomId": "lobby-arrival",
       "title": "Known by name",
-      "kicker": "9:20 AM · Front desk",
+      "kicker": "9:20 AM \u00b7 Front desk",
       "body": "Check-in takes a minute. Her plan for the day is already waiting: clinic first, then therapy, lunch, and karaoke after.",
       "roles": [
         "center-manager"
@@ -146,7 +146,7 @@
       "zoneId": "clinic",
       "roomId": "clinic-nurse",
       "title": "Care, down the hall",
-      "kicker": "9:35 AM · Clinic",
+      "kicker": "9:35 AM \u00b7 Clinic",
       "body": "The nurse rechecks her blood pressure. Her doctor adjusts a medication on the spot. No separate trip, no waiting room across town.",
       "roles": [
         "rn",
@@ -242,7 +242,7 @@
       "zoneId": "rehab",
       "roomId": "rehab-open",
       "title": "Stronger every week",
-      "kicker": "10:05 AM · Physical & occupational therapy",
+      "kicker": "10:05 AM \u00b7 Physical & occupational therapy",
       "body": "Parallel bars and step training with her physical therapist, then practice getting safely in and out of a shower with her occupational therapist.",
       "roles": [
         "pt",
@@ -351,7 +351,7 @@
       "zoneId": "day",
       "roomId": "day-open",
       "title": "Everyday movement",
-      "kicker": "10:40 AM · Day room",
+      "kicker": "10:40 AM \u00b7 Day room",
       "body": "Chair exercise with friends in the day room. Standing, seated or in a wheelchair, everyone takes part.",
       "roles": [
         "rec",
@@ -405,7 +405,7 @@
       "zoneId": "dining",
       "roomId": "dining-1421",
       "title": "A meal made for her",
-      "kicker": "11:20 AM · Dining",
+      "kicker": "11:20 AM \u00b7 Dining",
       "body": "Low sodium and soft textures, planned by the dietitian and served warm. An attendant sits nearby, just in case.",
       "roles": [
         "dietitian",
@@ -470,9 +470,9 @@
         392
       ],
       "zoneId": "admin",
-      "roomId": "admin-meeting-west",
+      "roomId": "admin-side-office",
       "title": "Someone to talk to",
-      "kicker": "12:00 PM · Social work",
+      "kicker": "12:00 PM \u00b7 Social work",
       "body": "A quiet conversation about her daughter's trip next week, and who will be home when the van drops her off.",
       "roles": [
         "msw"
@@ -495,41 +495,55 @@
               350,
               392
             ],
-            "roomId": "admin-meeting-west",
-            "seat": "admin-meeting-chair-0-0",
+            "roomId": "admin-side-office",
+            "seat": "admin-side-chair-0",
             "seated": true,
             "action": "conversation",
-            "approach": [
-              [
-                5.55,
-                16.6
-              ],
-              [
-                6.55,
-                16.45
-              ]
-            ],
             "title": "A quiet talk with her social worker",
             "category": "coordination",
             "companions": [
               {
                 "id": "idt-msw",
-                "seat": "admin-meeting-chair-0-2",
+                "seat": "admin-side-chair-1",
                 "seated": true,
                 "action": "consult",
+                "join": -6,
+                "title": "Planning for the daughter's trip",
+                "heading": 3.1416,
                 "approach": [
                   [
-                    5.55,
-                    16.95
+                    4.1,
+                    19.95
                   ],
                   [
-                    6.7,
-                    17.15
+                    3.15,
+                    19.95
+                  ],
+                  [
+                    2.55,
+                    19.95
+                  ],
+                  [
+                    2.55,
+                    21.5
                   ]
-                ],
-                "join": -6,
-                "title": "Planning for the daughter's trip"
+                ]
               }
+            ],
+            "heading": 0,
+            "approach": [
+              [
+                4.1,
+                19.95
+              ],
+              [
+                3.15,
+                19.95
+              ],
+              [
+                2.55,
+                19.95
+              ]
             ]
           }
         ]
@@ -544,7 +558,7 @@
       "zoneId": "ot",
       "roomId": "rear-wc-east",
       "title": "Dignity, privately",
-      "kicker": "12:20 PM · Personal care",
+      "kicker": "12:20 PM \u00b7 Personal care",
       "body": "A supported shower and hair care, with the grab bars and shower chair her OT recommended for home.",
       "roles": [
         "pca",
@@ -620,10 +634,10 @@
         440,
         525
       ],
-      "zoneId": "ot",
-      "roomId": "rear-north",
+      "zoneId": "admin",
+      "roomId": "admin-workstations",
       "title": "The best part of the day",
-      "kicker": "12:55 PM · Table tennis & karaoke",
+      "kicker": "12:55 PM \u00b7 Table tennis & karaoke",
       "body": "A gentle rally at the ping-pong table in the back, then the karaoke room, where Mrs. Lin always sings first.",
       "roles": [
         "rec",
@@ -639,7 +653,7 @@
       "heroPresent": true,
       "stops": [
         {
-          "roomId": "rear-north",
+          "roomId": "admin-workstations",
           "window": [
             440,
             478
@@ -647,7 +661,7 @@
           "activity": "table-tennis"
         },
         {
-          "roomId": "lobby-office-c3",
+          "roomId": "admin-conference",
           "window": [
             484,
             525
@@ -666,52 +680,24 @@
               478
             ],
             "minDwell": 9.0,
-            "roomId": "rear-north",
+            "roomId": "admin-workstations",
             "anchor": [
-              9.3,
-              -10.35
+              4.3,
+              20.25
             ],
-            "heading": 3.1416,
-            "action": "tabletop",
-            "approach": [
-              [
-                10.4,
-                -7.6
-              ],
-              [
-                10.4,
-                -9.4
-              ]
-            ],
+            "heading": 1.5708,
+            "action": "ping-pong",
             "title": "A gentle rally at the ping-pong table",
             "category": "activities",
             "companions": [
               {
                 "id": "idt-rec",
                 "anchor": [
-                  9.3,
-                  -14.35
+                  8.3,
+                  20.25
                 ],
-                "heading": 0,
-                "action": "tabletop",
-                "approach": [
-                  [
-                    10.4,
-                    -7.6
-                  ],
-                  [
-                    10.4,
-                    -9.4
-                  ],
-                  [
-                    10.6,
-                    -12.4
-                  ],
-                  [
-                    10.3,
-                    -14.35
-                  ]
-                ],
+                "heading": -1.5708,
+                "action": "ping-pong",
                 "join": -4,
                 "leave": -3,
                 "title": "Table-tennis partner"
@@ -726,44 +712,24 @@
               525
             ],
             "minDwell": 9.0,
-            "roomId": "lobby-office-c3",
+            "roomId": "admin-conference",
             "anchor": [
-              -5.75,
-              5.27
+              12.9,
+              24.4
             ],
-            "heading": -1.5708,
-            "action": "perform",
-            "approach": [
-              [
-                -3.5,
-                8.1
-              ],
-              [
-                -3.5,
-                6.9
-              ]
-            ],
+            "heading": 1.5708,
+            "action": "karaoke",
             "title": "Karaoke: she always sings first",
             "category": "activities",
             "companions": [
               {
                 "id": "idt-rec",
                 "anchor": [
-                  -4.35,
-                  4.1
+                  11.5,
+                  25.2
                 ],
-                "heading": -1.5708,
+                "heading": 1.5708,
                 "action": "clap",
-                "approach": [
-                  [
-                    -3.5,
-                    8.1
-                  ],
-                  [
-                    -3.5,
-                    6.9
-                  ]
-                ],
                 "join": -2,
                 "title": "Karaoke host"
               }
@@ -781,7 +747,7 @@
       "zoneId": "lobby",
       "roomId": "lobby-arrival",
       "title": "The plan goes home with her",
-      "kicker": "2:00 PM · Getting ready to leave",
+      "kicker": "2:00 PM \u00b7 Getting ready to leave",
       "body": "Her home care coordinator confirms tonight's check-in visit and the shower chair delivery before she heads out.",
       "roles": [
         "home-care",
@@ -852,7 +818,7 @@
       "zoneId": "site",
       "roomId": null,
       "title": "Safely home",
-      "kicker": "2:30 PM · Van A departs",
+      "kicker": "2:30 PM \u00b7 Van A departs",
       "body": "The same driver, the same ramp, a known face at the other end.",
       "roles": [
         "driver",
@@ -877,7 +843,7 @@
       "zoneId": "upper-office",
       "roomId": "upperfit-conference",
       "title": "One plan, eleven perspectives",
-      "kicker": "3:00 PM · The team closes the loop",
+      "kicker": "3:00 PM \u00b7 The team closes the loop",
       "body": "Every observation from today lands in one shared care plan: a medication change, a shower chair, an evening visit. Tomorrow starts where today left off.",
       "roles": [
         "pcp",
@@ -912,7 +878,7 @@
     }
   ],
   "placement": {
-    "note": "Placement fields are compiled by app/sim/scenario.ts (npm run build:scenario). Story copy (title, kicker, body) is owned by the story.",
+    "note": "Placement fields are compiled by app/sim/scenario.ts (npm run build:scenario). Story copy (title, kicker, body) is owned by the story. The story reserves the dining chair, game positions, karaoke singer and private office used by its cast; those background people remain in the normal facility view.",
     "heroGait": {
       "preferred": 0.78,
       "max": 1.45,
@@ -927,9 +893,9 @@
     "minDwellSeconds": 8,
     "replaced": {
       "arrivalThroughTitle": "Front desk greeting & check-in",
-      "departureTitle": "Escorted departure · board van",
+      "departureTitle": "Escorted departure \u00b7 board van",
       "escortId": "arrival-aide-a",
-      "escortLabel": "PCA · Alex",
+      "escortLabel": "PCA \u00b7 Alex",
       "boardingSpeed": 0.64
     },
     "reservations": [
@@ -1115,6 +1081,13 @@
           "profileFrom": "arrival-aide-a"
         }
       ]
-    }
+    },
+    "replacedBackgroundActors": [
+      "community-31",
+      "community-40",
+      "community-41",
+      "community-44",
+      "community-56"
+    ]
   }
 }

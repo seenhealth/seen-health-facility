@@ -2,15 +2,14 @@
 
 ## Controlling source
 
-The user-supplied Overall Planning.jpg (7200 × 5400 pixels) supersedes the PDF ground-floor image for walls, openings, room configuration, furniture, site context and adjacent-building footprint. The original file is preserved unchanged; the viewer uses an RGB image of the same plan.
+The user-supplied Overall Planning.jpg (7200 × 5400 pixels) supersedes the PDF ground-floor image for walls, openings, room configuration, furniture, site context and adjacent-building footprint. The original file is preserved unchanged; the public viewer displays the derived 3D model.
 
 ## Model update
 
 - 68 room/space records.
 - 266 wall segments across all levels.
 - 306 furniture and plumbing/equipment instances.
-- Exact supplied image available through Current floor plan and Source overlay.
-- Source overlay hides extruded walls/furniture to avoid doubled depictions.
+- Supplied source drawings are retained privately; the public site displays the 3D model.
 - Upper-level shells and PDF finish information are retained where the image provides no replacement.
 
 ## Seating configuration

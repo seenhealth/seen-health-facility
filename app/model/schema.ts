@@ -6,6 +6,10 @@ export type Level = {
   elevation: number;
   order: number;
   referencePages: number[];
+  planImage?: string;
+  planOrigin?: Vec2;
+  planImageSize?: Vec2;
+  planPixelsPerMeter?: number;
   elevationStatus: string;
   notes: string;
 };
@@ -26,6 +30,8 @@ export type Zone = {
   wallHeightStatus: string;
   geometryStatus: string;
   spread: Vec2;
+  elevationOffset?: number;
+  slabDepth?: number;
 };
 export type Room = {
   id: string;
@@ -108,6 +114,7 @@ export type EnvelopeWall = {
     sill: number;
     height: number;
     kind: 'window' | 'door';
+    operable?: boolean;
     material: string;
   }[];
   status: string;
@@ -117,7 +124,7 @@ export type SourcePage = {
   page: number;
   title: string;
   group: string;
-  image: string;
+  image?: string;
   text: string;
   findings: string;
   reviewStatus: string;
@@ -128,6 +135,39 @@ export type SourcePage = {
   sourceName?: string;
 };
 export type Facility = {
+  exteriorAppearance?: 'alhambra-brochure' | 'alveare-renderings';
+  contextStyle?: 'olympic' | 'alveare';
+  exteriorSurvey?: {
+    id: string;
+    bounds: [number, number, number, number];
+    roofHeight: number;
+    screenHeight: number;
+    finHeight: number;
+    status: string;
+  };
+  geography?: {
+    source: string;
+    fetched: string;
+    registration: string;
+    bearing: number;
+    features: {
+      id: string;
+      kind: string;
+      points: Vec2[];
+      height?: number;
+      heightStatus?: string;
+      name: string;
+      width?: number;
+      roadType?: string;
+    }[];
+  };
+  location?: {
+    lat: number;
+    lng: number;
+    status: string;
+    source: string;
+    planNorthDegrees: number;
+  };
   schemaVersion: '2.0';
   id: string;
   name: string;
@@ -141,7 +181,7 @@ export type Facility = {
     date: string;
     pages: number;
     author: string;
-    file: string;
+    file?: string;
   };
   calibration: {
     method: string;
@@ -205,7 +245,7 @@ export type Facility = {
     pages: number[];
   }[];
   site: {
-    image: string;
+    image?: string;
     imageSize: Vec2;
     bounds: Vec2[];
     imagePixelBounds: number[];
@@ -306,7 +346,7 @@ export function validateFacility(input: unknown): Facility {
     !str(m.source.title) ||
     !str(m.source.date) ||
     !str(m.source.author) ||
-    !url(m.source.file) ||
+    (m.source.file !== undefined && !url(m.source.file)) ||
     !Number.isInteger(m.source.pages) ||
     m.source.pages < 1
   )
@@ -339,7 +379,7 @@ export function validateFacility(input: unknown): Facility {
       p.page < 1 ||
       p.page > m.source.pages ||
       pages.has(p.page) ||
-      !url(p.image) ||
+      (p.image !== undefined && !url(p.image)) ||
       (p.file !== undefined && !url(p.file)) ||
       (p.mediaType !== undefined &&
         !['image', 'video'].includes(p.mediaType)) ||
@@ -544,7 +584,7 @@ export function validateFacility(input: unknown): Facility {
   }
   if (
     !m.site ||
-    !url(m.site.image) ||
+    (m.site.image !== undefined && !url(m.site.image)) ||
     !pair(m.site.imageSize) ||
     !Array.isArray(m.site.bounds) ||
     m.site.bounds.length !== 2 ||

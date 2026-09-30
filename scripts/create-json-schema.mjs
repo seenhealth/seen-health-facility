@@ -194,6 +194,13 @@ const schema = {
     ),
   }),
 };
+// Public model packages retain provenance without publishing source files.
+for (const [section, field] of [
+  [schema.properties.source, 'file'],
+  [schema.properties.site, 'image'],
+  [schema.properties.referencePages.items, 'image'],
+])
+  section.required = section.required.filter((k) => k !== field);
 schema.properties.rooms.items.properties.floorMaterial = s;
 schema.properties.referencePages.items.properties.label = s;
 schema.properties.referencePages.items.properties.file = s;

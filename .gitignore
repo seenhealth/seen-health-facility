@@ -37,7 +37,16 @@ next-env.d.ts
 /outputs/
 /work/
 
+# Workspace reference material, recovery backups, and scratch files stay local.
+/planning/
+/output/
+/tmp/
+
 *.tsbuildinfo
 
-# Reassembled lossless source; tracked archive parts preserve its exact bytes.
+# Reassembled source stays local with the other architectural inputs.
 /sources/planning/Overall Planning.jpg
+
+# Private architectural authoring inputs are not published to GitHub.
+/sources/*
+!/sources/public-texture-review.json

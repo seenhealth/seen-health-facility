@@ -1,7 +1,15 @@
 import { floorShapes } from './floor-geometry';
+import { animateCommunityProp } from './community-assets';
+import { showcaseFrame, type ShowcaseView } from './showcase';
 import dayProgram from '../data/day-program.json';
 import * as T from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { HorizontalTiltShiftShader } from 'three/addons/shaders/HorizontalTiltShiftShader.js';
+import { VerticalTiltShiftShader } from 'three/addons/shaders/VerticalTiltShiftShader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
 import {
@@ -19,6 +27,12 @@ import {
 import { buildAsset } from './assets';
 import { buildEnvelopeWall, buildRoofGeometry } from './envelope';
 import { buildNeighborhood } from './neighborhood';
+import { createSiteActivity } from './site-activity';
+import { buildSiteContext } from './site-context';
+import { buildOlympicExterior } from './olympic-exterior';
+import { buildAlhambraExterior } from './alhambra-exterior';
+import { buildAlveareExterior } from './alveare-exterior';
+import { buildRoomLabels } from './room-labels';
 import { createActivity, type ActivitySource } from './activity';
 import {
   center,
@@ -361,6 +375,7 @@ export type ViewerState = {
   stack: number;
   walls: 'cutaway' | 'full' | 'hidden';
   furniture: boolean;
+  doorsOpen: boolean;
   labels: boolean;
   colors: boolean;
   plan: boolean;
@@ -380,7 +395,8 @@ export const defaultState: ViewerState = {
   stack: 0,
   walls: 'full',
   furniture: true,
-  labels: true,
+  doorsOpen: true,
+  labels: false,
   colors: false,
   plan: false,
   isolate: false,
@@ -733,23 +749,37 @@ export function createViewer(
     rooms = new Map<string, T.Mesh>(),
     labels = new Map<string, HTMLButtonElement>();
   const pickables: T.Object3D[] = [];
+  const roomLabels = buildRoomLabels(host, model, (zone, room) =>
+    onSelect(zone, room),
+  );
   const roomFinishes: T.Mesh[] = [];
-  const texture = new T.TextureLoader().load(model.site.image);
-  texture.colorSpace = T.SRGBColorSpace;
-  textures.push(texture);
-  const mapUV = (geo: T.BufferGeometry) => {
+  const texture = model.site.image
+    ? new T.TextureLoader().load(model.site.image)
+    : null;
+  if (texture) {
+    texture.colorSpace = T.SRGBColorSpace;
+    textures.push(texture);
+  }
+  const levelTextures = new Map<string, T.Texture>();
+  for (const l of model.levels)
+    if (l.planImage) {
+      const t = new T.TextureLoader().load(l.planImage);
+      t.colorSpace = T.SRGBColorSpace;
+      textures.push(t);
+      levelTextures.set(l.id, t);
+    }
+  const mapUV = (geo: T.BufferGeometry, levelId?: string) => {
+    const l = model.levels.find((l) => l.id === levelId);
+    const ppm = l?.planPixelsPerMeter || model.calibration.pixelsPerMeter;
+    const origin = l?.planOrigin || model.calibration.sourcePixelOrigin;
+    const size = l?.planImageSize || model.site.imageSize;
     const p = geo.attributes.position,
       u = geo.attributes.uv;
     for (let i = 0; i < p.count; i++)
       u.setXY(
         i,
-        (p.getX(i) * model.calibration.pixelsPerMeter +
-          model.calibration.sourcePixelOrigin[0]) /
-          model.site.imageSize[0],
-        1 -
-          (p.getZ(i) * model.calibration.pixelsPerMeter +
-            model.calibration.sourcePixelOrigin[1]) /
-            model.site.imageSize[1],
+        (p.getX(i) * ppm + origin[0]) / size[0],
+        1 - (p.getZ(i) * ppm + origin[1]) / size[1],
       );
   };
   model.zones.forEach((z) => {
@@ -761,7 +791,9 @@ export function createViewer(
       sourcePages: z.referencePages,
       accuracy: z.geometryStatus,
     };
-    g.position.y = model.levels.find((l) => l.id === z.levelId)!.elevation;
+    g.position.y =
+      model.levels.find((l) => l.id === z.levelId)!.elevation +
+      (z.elevationOffset || 0);
     scene.add(g);
     groups.set(z.id, g);
     const sh = floorShapes(
@@ -770,9 +802,12 @@ export function createViewer(
           (o) => o.zoneId === z.id && o.levelId === z.levelId,
         ),
       ),
-      slab = new T.ExtrudeGeometry(sh, { depth: 0.19, bevelEnabled: false });
+      slab = new T.ExtrudeGeometry(sh, {
+        depth: z.slabDepth || 0.19,
+        bevelEnabled: false,
+      });
     slab.rotateX(-Math.PI / 2);
-    mesh(g, slab, mat('concrete'), 0, -0.2, 0);
+    mesh(g, slab, mat('concrete'), 0, -(z.slabDepth || 0.19) - 0.01, 0);
     const geo = new T.ShapeGeometry(sh);
     geo.rotateX(-Math.PI / 2);
     const uv = geo.attributes.uv;
@@ -784,11 +819,11 @@ export function createViewer(
     floorMap.set(z.id, f);
     pickables.push(f);
     const ov = geo.clone();
-    mapUV(ov);
+    mapUV(ov, z.levelId);
     const overlay = mesh(
       g,
       ov,
-      new T.MeshBasicMaterial({ map: texture }),
+      new T.MeshBasicMaterial({ map: levelTextures.get(z.levelId) || texture }),
       0,
       0.018,
       0,
@@ -861,6 +896,29 @@ export function createViewer(
   model.walls.forEach((w) => {
     const dx = w.b[0] - w.a[0],
       dz = w.b[1] - w.a[1];
+    // The traced Alhambra plan also contains solid perimeter strokes. Let
+    // the opening-aware envelope replace those strokes in assembled views.
+    const perimeter =
+      w.status.startsWith('Exterior') ||
+      (model.exteriorAppearance === 'alhambra-brochure' &&
+        (model.envelope?.walls || []).some((edge) => {
+          const ex = edge.b[0] - edge.a[0],
+            ez = edge.b[1] - edge.a[1],
+            lengthSquared = ex * ex + ez * ez;
+          if (!lengthSquared) return false;
+          return [w.a, w.b].every(([x, z]) => {
+            const t = Math.max(
+              0,
+              Math.min(
+                1,
+                ((x - edge.a[0]) * ex + (z - edge.a[1]) * ez) / lengthSquared,
+              ),
+            );
+            return (
+              Math.hypot(x - edge.a[0] - t * ex, z - edge.a[1] - t * ez) < 0.4
+            );
+          });
+        }));
     const g = wallGroups.get(w.zoneId)!;
     const m = box(
       g,
@@ -873,7 +931,11 @@ export function createViewer(
       w.material,
     );
     m.rotation.y = -Math.atan2(dz, dx);
-    m.userData = { id: w.id, height: w.height };
+    m.userData = {
+      id: w.id,
+      height: w.height,
+      perimeter,
+    };
     const cap = box(
       g,
       (w.a[0] + w.b[0]) / 2,
@@ -886,7 +948,11 @@ export function createViewer(
     );
     cap.castShadow = false;
     cap.rotation.y = m.rotation.y;
-    cap.userData = { cap: true, height: w.height };
+    cap.userData = {
+      cap: true,
+      height: w.height,
+      perimeter,
+    };
   });
   const context = new T.Group();
   context.name = 'site-context';
@@ -917,9 +983,20 @@ export function createViewer(
   );
   ground.castShadow = false;
   ground.name = 'source-plan-context';
-  const neighborhood = buildNeighborhood(model);
+  const siteContext = model.contextStyle ? buildSiteContext(model) : null;
+  const neighborhood = siteContext || buildNeighborhood(model);
+  const alhambraExterior = buildAlhambraExterior(model);
+  const alveareExterior = buildAlveareExterior(model);
+  const siteMassing = alveareExterior?.massing || siteContext?.massing;
+  if (siteMassing) scene.add(siteMassing);
   context.add(neighborhood.root);
-  const activity = createActivity(model, scene, mat, options.activity);
+  const olympicExterior = buildOlympicExterior(model);
+  if (olympicExterior) context.add(olympicExterior.site);
+  if (alhambraExterior) context.add(alhambraExterior.site);
+  if (alveareExterior) context.add(alveareExterior.site);
+  const activity = model.contextStyle
+    ? createSiteActivity(model, scene, mat)
+    : createActivity(model, scene, mat, options.activity);
   const furnitureRoots: T.Group[] = [];
   const exteriorAssets: T.Group[] = [],
     roofAssets: T.Group[] = [];
@@ -939,6 +1016,7 @@ export function createViewer(
       zoneId: o.zoneId,
       sourcePages: o.referencePages,
       status: o.status,
+      planDoor: spec.kind === 'plan-door' || spec.kind === 'folding-partition',
     };
     const layer = o.layer || 'furniture';
     let parent: T.Object3D =
@@ -1030,7 +1108,7 @@ export function createViewer(
       w = x2 - x1,
       d = z2 - z1;
     if (r.polygon || r.parapet === false) {
-      const rm = mat('#e4e5df').clone();
+      const rm = mat(olympicExterior ? '#a3a69e' : '#e4e5df').clone();
       rm.side = T.DoubleSide;
       const panel = mesh(roof, buildRoofGeometry(r), rm);
       panel.name = `roof-${r.id}`;
@@ -1116,13 +1194,22 @@ export function createViewer(
   const facade = new T.Group();
   facade.name = 'exterior-envelope';
   scene.add(facade);
+  if (olympicExterior) {
+    facade.add(olympicExterior.facade);
+    roof.add(olympicExterior.roof);
+  }
+  for (const exterior of [alhambraExterior, alveareExterior])
+    if (exterior) {
+      facade.add(exterior.facade);
+      roof.add(exterior.roof);
+    }
   exteriorAssets.forEach((g) => facade.add(g));
   roofAssets.forEach((g) => roof.add(g));
   const shellDetails = new Map<string, T.Group>();
   const interiorShells: { full: T.Group; cut: T.Group; zoneId: string }[] = [];
   for (const w of model.envelope?.walls || []) {
     const full = buildEnvelopeWall(w, mat);
-    facade.add(full);
+    if (!olympicExterior) facade.add(full);
     for (const id of w.detailIds || []) shellDetails.set(id, full);
     const interior = new T.Group();
     interior.name = `${w.id}-interior`;
@@ -1208,8 +1295,46 @@ export function createViewer(
     });
     meshes.forEach((m) => m.geometry.dispose());
   }
+  const sharedFurniture = new Map<string, T.Object3D[]>();
   furnitureRoots.forEach((g) => {
-    if (!model.assets[g.userData.assetId]?.modelUrl) batch(g);
+    const spec = model.assets[g.userData.assetId];
+    if (
+      spec?.modelUrl ||
+      g.userData.planDoor ||
+      [
+        'ping-pong-table',
+        'pool-table',
+        'wii-station',
+        'karaoke-station',
+      ].includes(spec.kind)
+    )
+      return;
+    const reusable =
+      model.contextStyle === 'olympic' &&
+      [
+        'upholstered-chair',
+        'lounge-chair',
+        'table',
+        'round-table',
+        'cabinet',
+      ].includes(spec.kind);
+    const cached = reusable
+      ? sharedFurniture.get(g.userData.assetId)
+      : undefined;
+    if (cached) {
+      g.traverse((o) => {
+        if (o instanceof T.Mesh) o.geometry.dispose();
+      });
+      g.clear();
+      g.add(...cached.map((o) => o.clone()));
+    } else {
+      batch(g);
+      if (reusable)
+        sharedFurniture.set(
+          g.userData.assetId,
+          g.children.map((o) => o.clone()),
+        );
+    }
   });
   const sectionPlane = new T.Plane();
   const sectionMaterials = new Set<T.Material>();
@@ -1233,7 +1358,13 @@ export function createViewer(
         : prepare(o.material);
     });
   }
-  for (const root of [...groups.values(), facade, roof, ceiling])
+  for (const root of [
+    ...groups.values(),
+    facade,
+    roof,
+    ceiling,
+    ...(siteMassing ? [siteMassing] : []),
+  ])
     applySectionMaterials(root);
   applySectionMaterials(activity.root);
   applySectionMaterials(activity.props);
@@ -1250,7 +1381,9 @@ export function createViewer(
     const l = model.levels.find((l) => l.id === z.levelId)!;
     return new T.Vector3(
       z.spread[0] * state.explode,
-      l.elevation + (state.level === 'all' ? l.order * state.stack * 8 : 0),
+      l.elevation +
+        (z.elevationOffset || 0) +
+        (state.level === 'all' ? l.order * state.stack * 8 : 0),
       z.spread[1] * state.explode,
     );
   };
@@ -1259,6 +1392,13 @@ export function createViewer(
     activity.updateView(next);
     ground.visible = state.plan;
     neighborhood.root.visible = !state.plan;
+    if (siteMassing)
+      siteMassing.visible =
+        state.exterior &&
+        !state.plan &&
+        !state.isolate &&
+        state.level === 'all' &&
+        state.stack === 0;
     const sectionEnabled = state.sectionAxis !== 'none' && !state.plan;
     if (sectionEnabled) {
       const bounds = new T.Box3();
@@ -1366,12 +1506,32 @@ export function createViewer(
                     ? state.exterior
                     : state.roof || state.level === 'roof');
       }
-      furnGroups.get(z.id)!.visible =
-        state.furniture && !(state.plan && z.levelId === 'ground');
+      const sourceOverlay =
+        state.plan &&
+        (model.contextStyle
+          ? levelTextures.has(z.levelId)
+          : !!texture && z.levelId === 'ground');
+      furnGroups.get(z.id)!.visible = state.furniture && !sourceOverlay;
+      g.getObjectByName('layer-architecture')?.children.forEach((o) => {
+        if (o.userData.planDoor) {
+          o.scale.y = state.walls === 'cutaway' ? 0.52 : 1;
+          const leaf = o.getObjectByName('source-door-leaf');
+          if (leaf)
+            leaf.rotation.y = -(state.doorsOpen
+              ? leaf.userData.openAngle
+              : leaf.userData.closedAngle);
+          const arc = o.getObjectByName('door-swing');
+          if (arc) arc.visible = state.doorsOpen;
+          const folded = o.getObjectByName('partition-folded');
+          const shut = o.getObjectByName('partition-closed');
+          if (folded) folded.visible = state.doorsOpen;
+          if (shut) shut.visible = !state.doorsOpen;
+        }
+      });
       wallGroups.get(z.id)!.children.forEach((o) => {
         const h = o.userData.height,
           cut =
-            state.walls === 'hidden' || (state.plan && z.levelId === 'ground')
+            state.walls === 'hidden' || sourceOverlay
               ? 0
               : state.walls === 'cutaway'
                 ? Math.min(1.2, h)
@@ -1381,9 +1541,18 @@ export function createViewer(
           o.scale.y = cut / h;
           o.position.y = cut / 2;
         }
-        o.visible = cut > 0;
+        o.visible =
+          cut > 0 &&
+          !(
+            (model.contextStyle || model.exteriorAppearance) &&
+            o.userData.perimeter &&
+            state.exterior &&
+            !state.isolate &&
+            state.stack === 0 &&
+            state.explode === 0
+          );
       });
-      overlayMap.get(z.id)!.visible = state.plan && z.levelId === 'ground';
+      overlayMap.get(z.id)!.visible = sourceOverlay;
       const f = floorMap.get(z.id)!.material as T.MeshStandardMaterial;
       f.color.set(state.colors ? z.color : finish(z.floorMaterial).color);
       f.map = state.colors ? null : mat(z.floorMaterial).map;
@@ -1391,7 +1560,7 @@ export function createViewer(
       const label = labels.get(z.id);
       if (!label) return;
       label.style.display =
-        visible && state.labels && !state.exterior && !state.plan
+        !roomLabels && visible && state.labels && !state.exterior && !state.plan
           ? 'block'
           : 'none';
       label.classList.toggle('selected', state.selected === z.id);
@@ -1461,7 +1630,19 @@ export function createViewer(
         state.level === 'all' ? state.stack * 9 : 0,
         0,
       );
-      zoomTarget = 0.9;
+      zoomTarget = model.contextStyle ? 1.35 : 0.9;
+      if (olympicExterior && state.exterior) {
+        focusTarget.set(0, 4, 10);
+        zoomTarget = 1.4;
+      }
+      if (alhambraExterior && state.exterior) {
+        focusTarget.set(0, 3, 4);
+        zoomTarget = 1.3;
+      }
+      if (model.contextStyle === 'alveare' && state.exterior) {
+        focusTarget.y = model.facade.height / 2;
+        zoomTarget = 0.85;
+      }
       finishFocus(instant);
       return;
     }
@@ -1495,14 +1676,50 @@ export function createViewer(
     if (mode === 'plan')
       camera.position.copy(c).add(new T.Vector3(0, 130, 0.01));
     else if (mode === 'rear')
-      camera.position.copy(c).add(new T.Vector3(-48, 32, -95));
+      camera.position
+        .copy(c)
+        .add(
+          olympicExterior
+            ? new T.Vector3(-38, 34, 75)
+            : new T.Vector3(-48, 32, -95),
+        );
+    else if (olympicExterior && mode === 'exterior')
+      camera.position.copy(c).add(new T.Vector3(-45, 32, -52));
+    else if (alhambraExterior && mode === 'exterior')
+      camera.position.copy(c).add(new T.Vector3(38, 27, 82));
+    else if (alveareExterior && mode === 'exterior')
+      camera.position.copy(c).add(new T.Vector3(53, 30, 75));
     else if (mode === 'street')
       camera.position.copy(c).add(new T.Vector3(48, 19, 95));
     else camera.position.copy(c).add(new T.Vector3(65, 85, 100));
     controls.update();
   }
+  let tiltComposer: EffectComposer | null = null;
+  let tiltHorizontal: ShaderPass | null = null,
+    tiltVertical: ShaderPass | null = null;
+  function sizeTilt(w: number, h: number) {
+    tiltComposer?.setPixelRatio(renderer.getPixelRatio());
+    tiltComposer?.setSize(w, h);
+    if (tiltHorizontal) tiltHorizontal.uniforms.h.value = 3.8 / w;
+    if (tiltVertical) tiltVertical.uniforms.v.value = 3.8 / h;
+  }
+  function prepareTilt() {
+    if (tiltComposer) return;
+    tiltComposer = new EffectComposer(renderer);
+    tiltComposer.addPass(new RenderPass(scene, camera));
+    tiltHorizontal = new ShaderPass(HorizontalTiltShiftShader);
+    tiltVertical = new ShaderPass(VerticalTiltShiftShader);
+    tiltHorizontal.uniforms.r.value = 0.51;
+    tiltVertical.uniforms.r.value = 0.51;
+    tiltComposer.addPass(tiltHorizontal);
+    tiltComposer.addPass(tiltVertical);
+    tiltComposer.addPass(new OutputPass());
+    sizeTilt(host.clientWidth, host.clientHeight);
+  }
+  let recordingSize = false;
   let post: ReturnType<typeof createPostPipeline> | null = null;
   const resize = () => {
+    if (recordingSize) return;
     const w = host.clientWidth,
       h = host.clientHeight;
     const aspect = w / h;
@@ -1512,6 +1729,7 @@ export function createViewer(
     camera.bottom = -40;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
+    if (tiltComposer) sizeTilt(w, h);
     post?.setSize(w, h, renderer.getPixelRatio());
   };
   // Post-processing exists only while 'high' is active; 'balanced' renders
@@ -1527,7 +1745,7 @@ export function createViewer(
     }
     resize();
   };
-  const draw = () => (post ? post.render() : renderer.render(scene, camera));
+  const draw = () => renderScene();
   const observer = new ResizeObserver(resize);
   observer.observe(host);
   applyQuality();
@@ -1544,6 +1762,7 @@ export function createViewer(
     if (activity.getState().follow) activity.setOptions({ follow: null });
   };
   const pu = (e: PointerEvent) => {
+    if (showcase) return;
     if (
       !controls.enabled ||
       e.button !== 0 ||
@@ -1604,6 +1823,134 @@ export function createViewer(
   };
   renderer.domElement.addEventListener('pointerdown', pd);
   renderer.domElement.addEventListener('pointerup', pu);
+  const gameProps: T.Object3D[] = [];
+  scene.traverse((o) => {
+    if (o.userData.gameMotion) gameProps.push(o);
+  });
+  let showcase = false,
+    showcasePlaying = true,
+    showcaseTime = 0;
+  let showcaseMode: ShowcaseView = 'tiltshift';
+  let tiltShiftEnabled = true;
+  let previousActivitySpeed = 4;
+  let recording: MediaRecorder | null = null;
+  let stopRecording: (() => void) | null = null;
+  const placeShowcase = () => {
+    const p = showcaseFrame(showcaseTime, showcaseMode);
+    focusTarget = null;
+    zoomTarget = null;
+    controls.target.set(p.x, 0, p.z);
+    camera.position.set(
+      p.x + Math.sin(p.angle) * 100,
+      110,
+      p.z + Math.cos(p.angle) * 100,
+    );
+    camera.zoom =
+      p.zoom * Math.min(1, (camera.right - camera.left) / 80 / (16 / 9));
+    camera.updateProjectionMatrix();
+    camera.lookAt(controls.target);
+  };
+  const setShowcase = (active: boolean, mode: ShowcaseView = 'tiltshift') => {
+    if (active && !showcase) previousActivitySpeed = activity.getState().speed;
+    if (!active && showcase)
+      activity.setOptions({ speed: previousActivitySpeed });
+    showcase = active;
+    showcaseMode = mode;
+    showcaseTime = 0;
+    showcasePlaying = true;
+    controls.enabled = !active;
+    if (active) {
+      if (tiltShiftEnabled) prepareTilt();
+      activity.setOptions({
+        enabled: true,
+        playing: true,
+        time: 45,
+        speed: 8,
+        filter: 'all',
+        follow: null,
+        scale: 1,
+      });
+      placeShowcase();
+    }
+  };
+  const setTiltShift = (enabled: boolean) => {
+    tiltShiftEnabled = enabled;
+    if (enabled && showcase) prepareTilt();
+  };
+  const renderScene = () => {
+    if (showcase && tiltShiftEnabled && tiltComposer) tiltComposer.render();
+    else if (post) post.render();
+    else renderer.render(scene, camera);
+  };
+  async function recordShowcase(
+    onProgress: (progress: number) => void,
+  ): Promise<Blob> {
+    if (recording) throw Error('A recording is already in progress.');
+    if (typeof MediaRecorder === 'undefined')
+      throw Error('Video recording is unavailable in this browser.');
+    const mime = [
+      'video/mp4;codecs=avc1.42E01E',
+      'video/mp4',
+      'video/webm;codecs=vp9',
+      'video/webm;codecs=vp8',
+    ].find((t) => MediaRecorder.isTypeSupported(t));
+    if (!mime) throw Error('This browser does not support video recording.');
+    setShowcase(true, showcaseMode);
+    recordingSize = true;
+    renderer.setPixelRatio(1);
+    renderer.setSize(1920, 1080, false);
+    sizeTilt(1920, 1080);
+    post?.setSize(1920, 1080, 1);
+    camera.left = (-40 * 16) / 9;
+    camera.right = (40 * 16) / 9;
+    camera.top = 40;
+    camera.bottom = -40;
+    camera.updateProjectionMatrix();
+    placeShowcase();
+    renderScene();
+    const stream = renderer.domElement.captureStream(30),
+      chunks: BlobPart[] = [];
+    const recorder = new MediaRecorder(stream, {
+      mimeType: mime,
+      videoBitsPerSecond: 12000000,
+    });
+    recording = recorder;
+    return new Promise((resolve, reject) => {
+      let timer: ReturnType<typeof setInterval>;
+      const cleanup = () => {
+        clearInterval(timer);
+        stream.getTracks().forEach((t) => t.stop());
+        recording = null;
+        stopRecording = null;
+        recordingSize = false;
+        renderer.setPixelRatio(pixelRatio());
+        resize();
+        showcaseTime = 0;
+      };
+      recorder.ondataavailable = (e) => {
+        if (e.data.size) chunks.push(e.data);
+      };
+      recorder.onerror = () => {
+        cleanup();
+        reject(Error('Recording interrupted. Please try again.'));
+      };
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: recorder.mimeType });
+        cleanup();
+        resolve(blob);
+      };
+      stopRecording = () => {
+        if (recorder.state === 'recording') recorder.stop();
+      };
+      recorder.start(1000);
+      const started = performance.now();
+      timer = setInterval(() => {
+        const elapsed = (performance.now() - started) / 1000;
+        onProgress(Math.min(1, elapsed / 60));
+        if (elapsed >= 60) stopRecording?.();
+      }, 200);
+    });
+  }
   renderer.domElement.addEventListener('wheel', wheel, { passive: true });
   let lastTime = performance.now(),
     paused = false;
@@ -1612,7 +1959,7 @@ export function createViewer(
     frame = requestAnimationFrame(loop);
     const dt = Math.max(0, (now - lastTime) / 1000);
     lastTime = now;
-    if (autoQuality && quality === 'high' && dt < 0.5 && !document.hidden) {
+    if (autoQuality && !recordingSize && quality === 'high' && dt < 0.5 && !document.hidden) {
       if (++sampledFrames > 0 && dt > 0.045) slowFrames++;
       if (sampledFrames >= 180) {
         if (slowFrames > 120) {
@@ -1625,8 +1972,37 @@ export function createViewer(
     }
     activity.tick(typeof document !== 'undefined' && document.hidden ? 0 : dt);
     neighborhood.tick(activity.getState().time);
+    // Entry leaves open for approaching transport parties, even with the design door toggle shut.
+    if (model.contextStyle) {
+      const travelers = activity.root.visible
+        ? activity.actors.filter(
+            (actor) => actor.spec.arrivalVehicleId && actor.root.visible,
+          )
+        : [];
+      for (const door of furnitureRoots.filter((g) => g.userData.planDoor)) {
+        const leaf = door.getObjectByName('source-door-leaf');
+        if (!leaf) continue;
+        const position = door.getWorldPosition(new T.Vector3());
+        const arriving = travelers.some(
+          (a) =>
+            Math.abs(a.root.position.y - position.y) < 1 &&
+            Math.hypot(
+              a.root.position.x - position.x,
+              a.root.position.z - position.z,
+            ) < 2.4,
+        );
+        const angle = -(state.doorsOpen || arriving
+          ? leaf.userData.openAngle
+          : leaf.userData.closedAngle);
+        leaf.rotation.y = T.MathUtils.lerp(
+          leaf.rotation.y,
+          angle,
+          Math.min(1, dt * 12),
+        );
+      }
+    }
     for (const g of exteriorAssets)
-      if (g.name === 'fleet-van-a' || g.name === 'fleet-van-b')
+      if (['fleet-van-a', 'fleet-van-b'].includes(g.userData.assetId))
         g.visible = !activity.getState().enabled;
     const following = activity.getState().follow;
     if (following) {
@@ -1661,18 +2037,36 @@ export function createViewer(
       camera.updateProjectionMatrix();
       if (Math.abs(camera.zoom - zoomTarget) < 0.001) zoomTarget = null;
     }
-    controls.update();
-    draw();
+    for (const prop of gameProps)
+      animateCommunityProp(prop, activity.getState().time);
+    if (showcase) {
+      if (showcasePlaying && !document.hidden)
+        showcaseTime += Math.min(dt, 0.15);
+      placeShowcase();
+    } else controls.update();
+    roomLabels?.update(camera, groups, state, sectionPlane);
+    renderScene();
   }
   update(defaultState);
   loop();
   return {
+    setShowcase,
+    setTiltShift,
+    getTiltShift: () => tiltShiftEnabled,
+    pauseShowcase: (paused: boolean) => {
+      showcasePlaying = !paused;
+      activity.setOptions({ playing: !paused });
+    },
+    recordShowcase,
+    cancelRecording: () => stopRecording?.(),
     update,
     focus,
     focusSiteObjects,
     focusArrival: () => {
-      focusTarget = new T.Vector3(-22, 0, -3);
-      zoomTarget = 2.3;
+      focusTarget = activity.arrival.focus.clone();
+      // Keep the stop and front desk above the care-day controls.
+      if (model.contextStyle) focusTarget.y = -4;
+      zoomTarget = model.contextStyle ? 3.3 : 2.3;
       finishFocus(false);
     },
     activity,
@@ -1740,7 +2134,7 @@ export function createViewer(
     zoom: (n: number) =>
       (zoomTarget = T.MathUtils.clamp(camera.zoom * n, 0.3, 20)),
     reset: () => {
-      view('iso');
+      view(state.exterior ? 'exterior' : 'iso');
       focus(null);
     },
     snapshot: () => {
@@ -1768,7 +2162,8 @@ export function createViewer(
         const g = groups.get(z.id)!.clone();
         g.position.set(
           0,
-          model.levels.find((l) => l.id === z.levelId)!.elevation,
+          model.levels.find((l) => l.id === z.levelId)!.elevation +
+            (z.elevationOffset || 0),
           0,
         );
         g.visible = true;
@@ -1777,7 +2172,7 @@ export function createViewer(
         const wg = g.getObjectByName('walls');
         wg?.children.forEach((o) => {
           const h = o.userData.height;
-          o.visible = true;
+          o.visible = !(model.exteriorAppearance && o.userData.perimeter);
           if (o.userData.cap) o.position.y = h - 0.004;
           else {
             o.scale.y = 1;
@@ -1796,6 +2191,7 @@ export function createViewer(
           )
             child.visible = false;
         g.traverse((o) => {
+          if (o.userData.planDoor) o.scale.y = 1;
           if (o.name.startsWith('room-finish-')) o.visible = true;
           if (o instanceof T.Mesh && o.name === `zone-floor-${z.id}`)
             o.material = mat(z.floorMaterial);
@@ -1808,12 +2204,17 @@ export function createViewer(
       roofCopy.visible = true;
       roofCopy.position.y = 0;
       exportScene.add(roofCopy);
+      if (siteMassing) {
+        const m = siteMassing.clone();
+        m.visible = true;
+        exportScene.add(m);
+      }
       const f = facade.clone();
       f.visible = true;
-      for (const id of ['fleet-van-a', 'fleet-van-b']) {
-        const van = f.getObjectByName(id);
-        if (van) van.visible = true;
-      }
+      f.traverse((object) => {
+        if (['fleet-van-a', 'fleet-van-b'].includes(object.userData.assetId))
+          object.visible = true;
+      });
       exportScene.add(f);
       const siteCopy = context.clone();
       siteCopy.visible = true;
@@ -1843,6 +2244,7 @@ export function createViewer(
       dimensions: model.dimensions.length,
     }),
     dispose: () => {
+      stopRecording?.();
       disposed = true;
       cancelAnimationFrame(frame);
       observer.disconnect();
@@ -1863,13 +2265,21 @@ export function createViewer(
       });
       geos.forEach((g) => g.dispose());
       materials.forEach((m) => mats.add(m));
-      mats.forEach((m) => m.dispose());
+      mats.forEach((m) => {
+        const map = (m as T.MeshStandardMaterial).map;
+        if (map) textures.push(map);
+        m.dispose();
+      });
       textures.forEach((t) => t.dispose());
+      tiltComposer?.dispose();
+      tiltHorizontal?.dispose();
+      tiltVertical?.dispose();
       post?.dispose();
       environment.dispose();
       renderer.dispose();
       renderer.domElement.remove();
       labels.forEach((l) => l.remove());
+      roomLabels?.dispose();
     },
   };
 }

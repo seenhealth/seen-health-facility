@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Seen Health · Explore our space',
-  description: 'Explore the Seen Health facility through an interactive 3D architectural model with selectable spaces and original design perspectives.',
+  title: 'Seen Health · Explore our spaces',
+  description:
+    'Explore Alhambra, 1630 Olympic and Alveare Terrace through interactive 3D facility models, original floor plans and a shared location map.',
 };
 
 export default function RootLayout({

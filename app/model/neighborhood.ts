@@ -1,6 +1,7 @@
 import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import type { Facility, Vec2 } from './schema';
+import { sampleStreetCar } from './traffic-routes';
 
 // Presentation-model site palette: warm light asphalt, soft white markings,
 // pale concrete and muted sage planting.
@@ -228,8 +229,7 @@ export function buildNeighborhood(model: Facility) {
     );
     o.rotation.y = -Math.atan2(dz, dx);
   };
-  for (let y = 420; y <= 1220; y += 100)
-    strip(px(384, y), px(555, y), 0.075, SITE.marking);
+  // The west row is reserved and striped by the animated fleet controller.
   for (let y = 305; y < 1070; y += 148)
     strip(px(780, y + 160), px(1032, y + 25), 0.075, SITE.marking);
   for (let y = 535; y < 2120; y += 138)
@@ -376,9 +376,6 @@ export function buildNeighborhood(model: Facility) {
     return g;
   }
   [
-    [480, 373, Math.PI / 2],
-    [480, 665, Math.PI / 2],
-    [882, 492, 1.03],
     [3240, 857, 0.78],
     [3290, 1520, 0.78],
   ].forEach((p, i) => {
@@ -395,31 +392,12 @@ export function buildNeighborhood(model: Facility) {
     car('street-car-1', 0, 39.4, Math.PI / 2, SITE.cars[3]),
     car('street-car-2', 0, 43.4, -Math.PI / 2, SITE.cars[1]),
   ];
-  const circuits = traffic.map((_, i) => {
-    const o = i * 2.3;
-    return new T.CatmullRomCurve3(
-      [
-        [-40.5, 39.4 + o],
-        [49, 39.4 + o],
-        [52.2 + o, 36],
-        [52.2 + o, -27.5],
-        [49, -30.7 - o],
-        [-40.5, -30.7 - o],
-        [-43.8 - o, -27.5],
-        [-43.8 - o, 36],
-      ].map((p) => new T.Vector3(p[0], -0.18, p[1])),
-      true,
-      'catmullrom',
-      0.15,
-    );
-  });
   function tick(time: number) {
     for (let i = 0; i < traffic.length; i++) {
-      const direction = i ? -1 : 1,
-        phase = ((((time / 180) * direction + i * 0.42) % 1) + 1) % 1;
-      traffic[i].position.copy(circuits[i].getPointAt(phase));
-      const v = circuits[i].getTangentAt(phase).multiplyScalar(direction);
-      traffic[i].rotation.y = Math.atan2(v.x, v.z);
+      const p = sampleStreetCar(i, time);
+      traffic[i].position.copy(p.position);
+      traffic[i].rotation.y = p.heading;
+      traffic[i].userData.trafficPhase = p.phase;
     }
   }
   return { root, tick, traffic };

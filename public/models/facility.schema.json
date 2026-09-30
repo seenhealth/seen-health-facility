@@ -48,8 +48,7 @@
         "title",
         "date",
         "pages",
-        "author",
-        "file"
+        "author"
       ]
     },
     "calibration": {
@@ -622,7 +621,6 @@
           "page",
           "title",
           "group",
-          "image",
           "text",
           "findings",
           "reviewStatus",
@@ -723,7 +721,6 @@
         }
       },
       "required": [
-        "image",
         "imageSize",
         "bounds",
         "imagePixelBounds",

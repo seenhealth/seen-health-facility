@@ -52,6 +52,9 @@ UNASSIGNED = {
 
 
 def apply_update(m):
+    # The reviewed community layout supersedes this earlier provisional fit-out.
+    if any(o['id'] == 'community-ping-pong' for o in m['objects']):
+        return m
     # Idempotency: clear everything this script owns.
     m['objects'] = [o for o in m['objects'] if not o['id'].startswith('rec-')]
     m['assets'] = {k: v for k, v in m['assets'].items() if not k.startswith('rec-')}

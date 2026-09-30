@@ -6,14 +6,12 @@ import {
   Box,
   ChartArea,
   ChevronDown,
-  ChevronLeft,
   ChevronRight,
   Compass,
   Download,
   Expand,
   Eye,
   FileJson,
-  FileText,
   Focus,
   FolderOpen,
   Info,
@@ -29,6 +27,7 @@ import {
   Settings2,
   Upload,
   Users,
+  Video,
   X,
 } from 'lucide-react';
 import {
@@ -40,9 +39,13 @@ import {
 } from './model/schema';
 import { defaultState, type ViewerState } from './model/renderer';
 import type { createViewer } from './model/renderer';
+import { roomLabelCode } from './model/room-labels';
 import { JourneyPanel } from './components/journey-panel';
 import type { JourneyStep } from './model/journeys';
 import { ActivityPanel } from './components/activity-panel';
+import { ShowcaseControls } from './components/showcase-controls';
+import { SiteMap } from './components/site-map';
+import { sites, type SiteId } from './data/sites';
 // Charts load only when the Measure panel opens.
 const MetricsPanel = lazy(() => import('./components/metrics-panel'));
 const download = (data: Blob, name: string) => {
@@ -62,6 +65,12 @@ export default function Home() {
   const host = useRef<HTMLDivElement>(null),
     viewer = useRef<ReturnType<typeof createViewer> | null>(null),
     upload = useRef<HTMLInputElement>(null);
+  const [showcase, setShowcase] = useState(false);
+  const previousView = useRef<ViewerState | null>(null);
+  const [siteId, setSiteId] = useState<SiteId>('alhambra');
+  const [networkOpen, setNetworkOpen] = useState(false);
+  const [clinicOption, setClinicOption] = useState(false);
+  const [locationReady, setLocationReady] = useState(false);
   const [model, setModel] = useState<Facility | null>(null),
     [state, setState] = useState<ViewerState>({
       ...defaultState,
@@ -77,10 +86,7 @@ export default function Home() {
     [collapsed, setCollapsed] = useState(true),
     [list, setList] = useState<'areas' | 'rooms'>('areas'),
     [roomSearch, setRoomSearch] = useState(''),
-    [modal, setModal] = useState<'sources' | 'accuracy' | 'model' | null>(null),
-    [page, setPage] = useState(12),
-    [sourceGroup, setSourceGroup] = useState('All pages'),
-    [sourceSearch, setSourceSearch] = useState(''),
+    [modal, setModal] = useState<'accuracy' | 'model' | null>(null),
     [showControls, setShowControls] = useState(false),
     [journeyOpen, setJourneyOpen] = useState(false),
     [activityOpen, setActivityOpen] = useState(true),
@@ -93,11 +99,15 @@ export default function Home() {
   const focusActivity = useCallback(
     (zoneId: string, actor?: string | null) => {
       if (!model || !viewer.current) return;
-      const zone = model.zones.find((z) => z.id === zoneId);
+      const activityRoom = model.rooms.find((r) => r.id === zoneId);
+      const zone = model.zones.find(
+        (z) => z.id === (activityRoom?.zoneId || zoneId),
+      );
       const next: ViewerState = {
         ...defaultState,
         level: zone?.levelId || 'ground',
         selected: zone?.id || null,
+        room: activityRoom?.id || null,
         roof: false,
         exterior: false,
         ceilings: false,
@@ -110,7 +120,7 @@ export default function Home() {
       viewer.current.view('iso');
       viewer.current.activity.setOptions({ enabled: true, follow: null });
       if (zoneId === 'site') viewer.current.focusArrival();
-      else viewer.current.focus(zone?.id || null);
+      else viewer.current.focus(zone?.id || null, activityRoom?.id);
       if (actor) viewer.current.followActor(actor);
     },
     [model],
@@ -150,19 +160,98 @@ export default function Home() {
     },
     [model, ready],
   );
+  const selectSite = (id: SiteId) => {
+    setShowcase(false);
+    viewer.current?.setShowcase(false);
+    if (id !== siteId || clinicOption || !locationReady) {
+      setModel(null);
+      setReady(false);
+      setError('');
+    }
+    setSiteId(id);
+    setMeasureOpen(false);
+    setClinicOption(false);
+    setNetworkOpen(false);
+    setModal(null);
+    setRoomSearch('');
+    setList(id === 'olympic' ? 'rooms' : 'areas');
+    setState({
+      ...defaultState,
+      level: 'ground',
+      walls: 'cutaway',
+      roof: false,
+      exterior: false,
+      labels: false,
+    });
+    setView('iso');
+    setActivityOpen(true);
+    setJourneyOpen(false);
+    setCollapsed(id === 'alhambra');
+    const u = new URL(window.location.href);
+    u.searchParams.set('site', id);
+    u.searchParams.delete('option');
+    u.searchParams.delete('view');
+    window.history.replaceState(null, '', u);
+  };
   useEffect(() => {
-    fetch('/models/seen-alhambra-planning.json')
+    const p = new URLSearchParams(window.location.search);
+    const id = sites.find((s) => s.id === p.get('site'))?.id || 'alhambra';
+    queueMicrotask(() => {
+      selectSite(id);
+      setClinicOption(id === 'olympic' && p.get('option') === 'clinic');
+      setNetworkOpen(p.get('view') === 'map');
+      if (
+        id === 'alhambra' &&
+        ['showcase', 'tiltshift'].includes(p.get('view') || '')
+      )
+        setShowcase(true);
+      if (p.get('view') === 'exterior') {
+        setState({
+          ...defaultState,
+          level: 'all',
+          walls: 'full',
+          exterior: true,
+          roof: true,
+          labels: false,
+          stack: 0,
+          explode: 0,
+        });
+        setView('building');
+      }
+      const u = new URL(window.location.href);
+      if (id === 'olympic' && p.get('option') === 'clinic')
+        u.searchParams.set('option', 'clinic');
+      if (p.get('view') === 'map') u.searchParams.set('view', 'map');
+      if (['showcase', 'tiltshift'].includes(p.get('view') || ''))
+        u.searchParams.set('view', 'tiltshift');
+      if (p.get('view') === 'exterior') u.searchParams.set('view', 'exterior');
+      window.history.replaceState(null, '', u);
+      setLocationReady(true);
+    });
+  }, []);
+  useEffect(() => {
+    if (!locationReady) return;
+    const controller = new AbortController();
+    const path =
+      clinicOption && siteId === 'olympic'
+        ? '/models/seen-olympic-option.json'
+        : sites.find((s) => s.id === siteId)!.model;
+    fetch(path, { signal: controller.signal })
       .then((r) => {
         if (!r.ok)
           throw Error('The facility specifications could not be loaded.');
         return r.json();
       })
-      .then((d) => setModel(validateFacility(d)))
-      .catch((e) => setError(e.message));
-  }, []);
+      .then((d) => {
+        if (!controller.signal.aborted) setModel(validateFacility(d));
+      })
+      .catch((e) => {
+        if (e.name !== 'AbortError') setError(e.message);
+      });
+    return () => controller.abort();
+  }, [siteId, clinicOption, locationReady]);
   useEffect(() => {
     if (!model || !host.current) return;
-    setPage(model.calibration.referencePage);
     let ended = false;
     setReady(false);
     import('./model/renderer').then(({ createViewer }) => {
@@ -194,13 +283,13 @@ export default function Home() {
           }
         });
         viewer.current.update(state);
-        viewer.current.focus('day');
+        if (model.contextStyle) viewer.current.focus(null, null, true);
+        else viewer.current.focus('day');
+        if (state.exterior) viewer.current.view('exterior');
         setReady(true);
       } catch (e) {
         console.error(e);
-        setError(
-          'The 3D model could not start. You can still open the source drawings and specifications.',
-        );
+        setError('The 3D model could not start. Please reload the model.');
       }
     });
     return () => {
@@ -211,24 +300,50 @@ export default function Home() {
   }, [model]);
   useEffect(() => viewer.current?.update(state), [state, ready]);
   useEffect(() => {
+    if (!ready || !viewer.current) return;
+    if (showcase) {
+      previousView.current = state;
+      const next = {
+        ...defaultState,
+        level: 'ground',
+        walls: 'cutaway' as const,
+        roof: false,
+        exterior: false,
+        labels: false,
+        ceilings: false,
+      };
+      setState(next);
+      viewer.current.update(next);
+      viewer.current.setShowcase(true);
+      setActivityOpen(false);
+      setJourneyOpen(false);
+      setShowControls(false);
+      setCollapsed(true);
+    } else viewer.current.setShowcase(false);
+  }, [showcase, ready]);
+  const enterShowcase = () => {
+    setShowcase(true);
+    const url = new URL(window.location.href);
+    url.searchParams.set('view', 'tiltshift');
+    window.history.replaceState(null, '', url);
+  };
+  const exitShowcase = () => {
+    setShowcase(false);
+    if (previousView.current) setState(previousView.current);
+    viewer.current?.view('iso');
+    viewer.current?.focus('day');
+    const url = new URL(window.location.href);
+    url.searchParams.delete('view');
+    window.history.replaceState(null, '', url);
+  };
+
+  useEffect(() => {
     if (!modal) return;
     const previous = document.activeElement as HTMLElement | null;
     const dialog = document.querySelector<HTMLElement>('[role=dialog]');
     dialog?.querySelector<HTMLElement>('button')?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setModal(null);
-      if (
-        e.key === 'ArrowRight' &&
-        modal === 'sources' &&
-        !(e.target instanceof HTMLInputElement)
-      )
-        setPage((p) => Math.min(model?.source.pages || 91, p + 1));
-      if (
-        e.key === 'ArrowLeft' &&
-        modal === 'sources' &&
-        !(e.target instanceof HTMLInputElement)
-      )
-        setPage((p) => Math.max(1, p - 1));
       if (e.key === 'Tab' && dialog) {
         const els = Array.from(
           dialog.querySelectorAll<HTMLElement>(
@@ -255,11 +370,6 @@ export default function Home() {
   const zone = model?.zones.find((z) => z.id === state.selected),
     room = model?.rooms.find((r) => r.id === state.room),
     level = model?.levels.find((l) => l.id === state.level);
-  const sourceLabel = (n: number) =>
-    model?.referencePages.find((r) => r.page === n)?.label || `PDF p.${n}`;
-  const references = room?.referencePages ||
-    zone?.referencePages ||
-    level?.referencePages || [12, 17, 18, 19, 20, 21, 22, 23, 24, 25];
   const selectZone = (id: string) => {
     const z = model?.zones.find((a) => a.id === id);
     if (z)
@@ -300,7 +410,8 @@ export default function Home() {
   };
   const selectLevel = (id: string) => {
     setView(id === 'roof' ? 'building' : 'iso');
-    patch({
+    const next: ViewerState = {
+      ...state,
       level: id,
       selected: null,
       room: null,
@@ -313,13 +424,16 @@ export default function Home() {
       ceilings: false,
       explode: 0,
       sectionAxis: 'none',
-    });
-    viewer.current?.view('iso');
+    };
+    setState(next);
+    viewer.current?.update(next);
+    viewer.current?.view(id === 'roof' ? 'exterior' : 'iso');
     viewer.current?.focus(null);
   };
   const showBuilding = (rear = false) => {
     setView(rear ? 'rear' : 'building');
-    patch({
+    const next: ViewerState = {
+      ...state,
       level: 'all',
       selected: null,
       room: null,
@@ -331,14 +445,11 @@ export default function Home() {
       explode: 0,
       stack: 0,
       sectionAxis: 'none',
-    });
-    viewer.current?.view(rear ? 'rear' : 'iso');
+    };
+    setState(next);
+    viewer.current?.update(next);
+    viewer.current?.view(rear ? 'rear' : 'exterior');
     viewer.current?.focus(null);
-  };
-  const source = (p: number) => {
-    setPage(p);
-    setSourceGroup('All pages');
-    setModal('sources');
   };
   const openModel = async (file: File) => {
     try {
@@ -360,16 +471,6 @@ export default function Home() {
       );
     }
   };
-  const pageRecord = model?.referencePages.find((p) => p.page === page),
-    pages =
-      model?.referencePages.filter(
-        (p) =>
-          (sourceGroup === 'All pages' || p.group === sourceGroup) &&
-          (!sourceSearch ||
-            `${p.title} ${p.findings} ${p.page}`
-              .toLowerCase()
-              .includes(sourceSearch.toLowerCase())),
-      ) || [];
   const shownZones =
     model?.zones.filter((z) =>
       state.level === 'all' || state.level === 'roof'
@@ -384,7 +485,9 @@ export default function Home() {
           r.levelId === state.level) &&
         (!state.selected || r.zoneId === state.selected) &&
         (!roomSearch ||
-          `${r.name} ${r.id}`.toLowerCase().includes(roomSearch.toLowerCase())),
+          `${r.name} ${r.id} ${model.contextStyle === 'olympic' ? roomLabelCode(model, r) : ''}`
+            .toLowerCase()
+            .includes(roomSearch.toLowerCase())),
     ) || [];
   const roomBounds = room
     ? {
@@ -397,7 +500,9 @@ export default function Home() {
       }
     : null;
   return (
-    <main className={`facility-app ${collapsed ? 'collapsed' : ''}`}>
+    <main
+      className={`facility-app ${showcase ? 'showcase-mode' : ''} ${collapsed ? 'collapsed' : ''} ${siteId === 'olympic' ? 'olympic-design' : ''}`}
+    >
       <header className="app-header">
         <a href="/" className="brand">
           <img
@@ -409,22 +514,46 @@ export default function Home() {
           />
         </a>
         <div className="header-location">
-          {model?.address || 'Alhambra center'}
+          {model?.address || sites.find((s) => s.id === siteId)?.address}
           <span className="header-tag">Facility model</span>
         </div>
         <div className="header-actions">
-          <button
-            aria-label="Animated care day"
-            aria-pressed={activityOpen}
-            onClick={() => {
-              setActivityOpen(!activityOpen);
-              setJourneyOpen(false);
-              setMeasureOpen(false);
-            }}
-          >
-            <Users size={16} />
-            <span>Animated care day</span>
-          </button>
+          {siteId === 'alhambra' && (
+            <button disabled={!ready} onClick={enterShowcase}>
+              <Video size={16} />
+              <span>Video view</span>
+            </button>
+          )}
+          {
+            <button
+              aria-label="Animated care day"
+              aria-pressed={activityOpen}
+              onClick={() => {
+                setActivityOpen(!activityOpen);
+                setJourneyOpen(false);
+                setMeasureOpen(false);
+              }}
+            >
+              <Users size={16} />
+              <span>Animated care day</span>
+            </button>
+          }
+          {siteId === 'alhambra' && (
+            <button
+              aria-label="Participant journeys"
+              aria-pressed={journeyOpen}
+              onClick={() => {
+                setJourneyOpen(!journeyOpen);
+                setActivityOpen(false);
+                setMeasureOpen(false);
+                if (window.innerWidth < 800) setCollapsed(true);
+              }}
+            >
+              <Route size={16} />
+              <span>Participant journeys</span>
+            </button>
+          )}
+          {siteId === 'alhambra' && (
           <button
             aria-label="Measure"
             aria-pressed={measureOpen}
@@ -437,43 +566,103 @@ export default function Home() {
             <ChartArea size={16} />
             <span>Measure</span>
           </button>
-          <button
-            aria-label="Participant journeys"
-            aria-pressed={journeyOpen}
-            onClick={() => {
-              setJourneyOpen(!journeyOpen);
-              setActivityOpen(false);
-              setMeasureOpen(false);
-              if (window.innerWidth < 800) setCollapsed(true);
-            }}
-          >
-            <Route size={16} />
-            <span>Participant journeys</span>
-          </button>
-          <button onClick={() => setModal('sources')}>
-            <FileText size={16} />
-            <span>Source library</span>
-          </button>
+          )}
           <button onClick={() => setModal('model')}>
             <FolderOpen size={16} />
             <span>Model files</span>
           </button>
         </div>
       </header>
+      <nav className="site-navigation" aria-label="Facility locations">
+        <span className="site-nav-label">EXPLORE OUR SPACES</span>
+        {sites.map((s) => (
+          <button
+            key={s.id}
+            aria-pressed={!networkOpen && s.id === siteId}
+            onClick={() => selectSite(s.id)}
+          >
+            <span className="site-dot" style={{ background: s.color }} />
+            {s.name}
+          </button>
+        ))}
+        <button
+          className="network-tab"
+          aria-pressed={networkOpen}
+          onClick={() => {
+            setNetworkOpen(!networkOpen);
+            const u = new URL(window.location.href);
+            if (!networkOpen) u.searchParams.set('view', 'map');
+            else u.searchParams.delete('view');
+            window.history.replaceState(null, '', u);
+          }}
+        >
+          <Map size={15} />
+          Site map
+        </button>
+      </nav>
+      {networkOpen && (
+        <SiteMap
+          onSelect={selectSite}
+          onClose={() => {
+            setNetworkOpen(false);
+            const u = new URL(window.location.href);
+            u.searchParams.delete('view');
+            window.history.replaceState(null, '', u);
+          }}
+        />
+      )}
       <aside className="facility-sidebar">
         <div className="sidebar-title">
           <span className="overline">BUILDING EXPLORER</span>
-          <h1>{model?.name.replace('Seen Health · ', '') || 'Alhambra'}</h1>
+          <h1>
+            {model?.name.replace('Seen Health · ', '') ||
+              sites.find((s) => s.id === siteId)?.name}
+          </h1>
           <p>{model?.source.date || 'Loading source'} design baseline</p>
           <button
             className="accuracy-badge"
             onClick={() => setModal('accuracy')}
           >
             <span />
-            Area calibrated · dimensions pending
+            {siteId !== 'alhambra'
+              ? 'Drawing scale · review notes'
+              : 'Area calibrated · dimensions pending'}
             <ChevronRight size={13} />
           </button>
         </div>
+        {siteId === 'olympic' && (
+          <div className="clinic-option">
+            <label htmlFor="clinic-layout">Level 2 clinic layout</label>
+            <select
+              id="clinic-layout"
+              value={clinicOption ? 'option' : 'main'}
+              onChange={(e) => {
+                const enabled = e.target.value === 'option';
+                setModel(null);
+                setReady(false);
+                setError('');
+                setClinicOption(enabled);
+                setState((s) => ({
+                  ...s,
+                  level: 'upper',
+                  room: null,
+                  selected: null,
+                  roof: false,
+                  exterior: false,
+                }));
+                const u = new URL(window.location.href);
+                if (enabled) u.searchParams.set('option', 'clinic');
+                else u.searchParams.delete('option');
+                window.history.replaceState(null, '', u);
+              }}
+            >
+              <option value="main">Main A-2 layout</option>
+              <option value="option">
+                Alternate · waiting aligned with PT
+              </option>
+            </select>
+          </div>
+        )}
         <div className="sidebar-tabs">
           <button
             aria-pressed={list === 'areas'}
@@ -528,6 +717,11 @@ export default function Home() {
           </nav>
         ) : (
           <div className="room-list-wrap">
+            {siteId === 'olympic' && (
+              <p className="room-label-help">
+                Hover a label for the room name.
+              </p>
+            )}
             <label className="room-search">
               <Search size={15} />
               <input
@@ -554,7 +748,11 @@ export default function Home() {
                 >
                   <span>
                     <strong>{r.name}</strong>
-                    <small>{r.id}</small>
+                    <small>
+                      {model?.contextStyle === 'olympic'
+                        ? `Room ${roomLabelCode(model, r)}`
+                        : r.id}
+                    </small>
                   </span>
                   <ChevronRight size={13} />
                 </button>
@@ -566,25 +764,24 @@ export default function Home() {
           </div>
         )}
         <div className="sidebar-bottom">
-          <button
-            onClick={() => source(model?.calibration.referencePage || 12)}
-          >
-            <Map size={16} />
-            Current floor plan
-            <ArrowUpRight size={14} />
-          </button>
           <button onClick={() => setModal('accuracy')}>
             <Info size={16} />
             Accuracy register
             <small>
-              {model?.accuracyIssues.filter((i) => i.status === 'open').length}{' '}
-              open
+              {siteId === 'alhambra'
+                ? model?.accuracyIssues.filter((i) => i.status === 'open')
+                    .length
+                : model?.accuracyIssues.length}{' '}
+              {siteId === 'alhambra' ? 'open' : 'notes'}
             </small>
           </button>
         </div>
       </aside>
       <section className="model-workspace" aria-label="Interactive facility">
         <div className="model-canvas" ref={host} />
+        {showcase && ready && viewer.current && (
+          <ShowcaseControls viewer={viewer.current} onExit={exitShowcase} />
+        )}
         {!ready && (
           <div className="model-loading">
             <Box size={30} />
@@ -592,9 +789,9 @@ export default function Home() {
             {error && (
               <button
                 className="primary"
-                onClick={() => source(model?.calibration.referencePage || 12)}
+                onClick={() => window.location.reload()}
               >
-                Open the drawings
+                Reload model
               </button>
             )}
           </div>
@@ -620,11 +817,13 @@ export default function Home() {
                 className={state.level === l.id ? 'chosen' : ''}
                 onClick={() => selectLevel(l.id)}
               >
-                {l.id === 'upper'
-                  ? 'Upstairs / mezz.'
-                  : l.id === 'ground'
-                    ? 'Ground'
-                    : l.name}
+                {siteId !== 'alhambra'
+                  ? l.name.split(' · ')[0]
+                  : l.id === 'upper'
+                    ? 'Upstairs / mezz.'
+                    : l.id === 'ground'
+                      ? 'Ground'
+                      : l.name}
               </button>
             ))}
             <button
@@ -671,8 +870,7 @@ export default function Home() {
               ? state.exterior
                 ? 'Orbit the complete shell, or use Cutaway and Section to look inside'
                 : 'Separate levels to inspect how the building fits together'
-              : level?.notes ||
-                'Select an area or room to inspect its sources.'}
+              : level?.notes || 'Select an area or room to inspect its layout.'}
           </div>
         </div>
         <div className="view-switch">
@@ -734,14 +932,15 @@ export default function Home() {
             Rear
           </button>
         </div>
-        {activityOpen && (
+        {activityOpen && ready && (
           <ActivityPanel
+            key={model?.id || siteId}
             viewer={ready ? viewer.current : null}
             onScene={focusActivity}
             onClose={() => setActivityOpen(false)}
           />
         )}
-        {measureOpen && model && (
+        {measureOpen && model && siteId === 'alhambra' && (
           <Suspense fallback={null}>
             <MetricsPanel
               model={model}
@@ -751,7 +950,7 @@ export default function Home() {
             />
           </Suspense>
         )}
-        {journeyOpen && (
+        {journeyOpen && siteId === 'alhambra' && (
           <JourneyPanel
             onFocus={focusJourney}
             onClose={() => setJourneyOpen(false)}
@@ -840,30 +1039,6 @@ export default function Home() {
               </button>
               {!room && <button onClick={() => setList('rooms')}>Rooms</button>}
             </div>
-            <div className="source-thumbs">
-              {references.slice(0, 3).map((p) => (
-                <button key={p} onClick={() => source(p)}>
-                  <img
-                    src={model?.referencePages.find((r) => r.page === p)?.image}
-                    alt={
-                      model?.referencePages.find((r) => r.page === p)?.title ||
-                      `Source ${p}`
-                    }
-                  />
-                  <span>
-                    {sourceLabel(p)}
-                    <ArrowUpRight size={12} />
-                  </span>
-                </button>
-              ))}
-            </div>
-            <button
-              className="all-references"
-              onClick={() => source(references[0])}
-            >
-              View sources <span>{references.map(sourceLabel).join(', ')}</span>
-              <ArrowUpRight size={14} />
-            </button>
           </article>
         )}
         <div className="zoom-tools">
@@ -950,31 +1125,8 @@ export default function Home() {
               checked={state.labels}
               onChange={(e) => patch({ labels: e.target.checked })}
             />
-            Labels
+            {siteId === 'olympic' ? 'Room labels' : 'Labels'}
           </label>
-          <button
-            className={state.plan ? 'dock-button chosen' : 'dock-button'}
-            onClick={() => {
-              patch({
-                plan: !state.plan,
-                roof: false,
-                exterior: false,
-                sectionAxis: 'none',
-                level:
-                  state.level === 'roof' || state.level === 'all'
-                    ? 'ground'
-                    : state.level,
-                stack: 0,
-              });
-              if (!state.plan) {
-                setView('plan');
-                viewer.current?.view('plan');
-              }
-            }}
-          >
-            <Map size={15} />
-            Source overlay
-          </button>
           <button
             className={
               state.sectionAxis !== 'none'
@@ -1011,6 +1163,16 @@ export default function Home() {
                 <X size={15} />
               </button>
             </div>
+            {model?.contextStyle && (
+              <label>
+                <input
+                  type="checkbox"
+                  checked={state.doorsOpen}
+                  onChange={(e) => patch({ doorsOpen: e.target.checked })}
+                />
+                Open doors & folding partitions
+              </label>
+            )}
             <label>
               Cut through building
               <select
@@ -1092,12 +1254,6 @@ export default function Home() {
             <Compass size={14} />
             Drag to orbit · Scroll to zoom · Right-drag to pan
           </span>
-          <button
-            onClick={() => source(model?.calibration.referencePage || 12)}
-          >
-            {sourceLabel(model?.calibration.referencePage || 12)}
-            <ArrowUpRight size={13} />
-          </button>
         </div>
       </section>
       {notice && (
@@ -1114,15 +1270,13 @@ export default function Home() {
       {modal && model && (
         <div className="dialog-shade" onClick={() => setModal(null)}>
           <section
-            className={`viewer-dialog ${modal === 'sources' ? 'source-dialog' : modal === 'accuracy' ? 'audit-dialog' : 'files-dialog'}`}
+            className={`viewer-dialog ${modal === 'accuracy' ? 'audit-dialog' : 'files-dialog'}`}
             role="dialog"
             aria-modal="true"
             aria-label={
-              modal === 'sources'
-                ? 'Source library'
-                : modal === 'accuracy'
-                  ? 'Accuracy register'
-                  : 'Portable model files'
+              modal === 'accuracy'
+                ? 'Accuracy register'
+                : 'Portable model files'
             }
             onClick={(e) => e.stopPropagation()}
           >
@@ -1133,140 +1287,7 @@ export default function Home() {
             >
               <X size={20} />
             </button>
-            {modal === 'sources' ? (
-              <>
-                <div className="dialog-title">
-                  <span className="overline">ARCHITECTURAL REFERENCES</span>
-                  <h2>
-                    Source library{' '}
-                    <em>{model.referencePages.length} references</em>
-                  </h2>
-                  <p>
-                    {model.source.author} · {model.source.date} ·{' '}
-                    {model.source.title}
-                  </p>
-                </div>
-                <div className="source-layout">
-                  <aside className="page-index">
-                    <select
-                      aria-label="Filter source category"
-                      value={sourceGroup}
-                      onChange={(e) => setSourceGroup(e.target.value)}
-                    >
-                      <option>All pages</option>
-                      {Array.from(
-                        new Set(model.referencePages.map((p) => p.group)),
-                      ).map((g) => (
-                        <option key={g}>{g}</option>
-                      ))}
-                    </select>
-                    <label className="room-search">
-                      <Search size={15} />
-                      <input
-                        placeholder="Search pages"
-                        aria-label="Search source pages"
-                        value={sourceSearch}
-                        onChange={(e) => setSourceSearch(e.target.value)}
-                      />
-                    </label>
-                    <div className="page-list">
-                      {pages.map((p) => (
-                        <button
-                          key={p.page}
-                          className={page === p.page ? 'active' : ''}
-                          onClick={() => setPage(p.page)}
-                        >
-                          <span>
-                            {p.mediaType === 'video'
-                              ? 'Film'
-                              : p.evidenceType === 'facility-photograph'
-                                ? 'Photo'
-                                : p.label
-                                  ? 'Plan'
-                                  : String(p.page).padStart(2, '0')}
-                          </span>
-                          <div>
-                            <strong>{p.title.split(' · ')[0]}</strong>
-                            <small>{p.group}</small>
-                          </div>
-                        </button>
-                      ))}
-                      {pages.length === 0 && (
-                        <p className="empty-note">No matching source pages.</p>
-                      )}
-                    </div>
-                  </aside>
-                  <div className="source-main">
-                    <div className="source-image">
-                      {pageRecord?.mediaType === 'video' ? (
-                        <video
-                          key={pageRecord.file}
-                          controls
-                          playsInline
-                          preload="metadata"
-                          poster={pageRecord.image}
-                          src={pageRecord.file}
-                          aria-label={pageRecord.title}
-                        />
-                      ) : (
-                        <img
-                          src={pageRecord?.image}
-                          alt={pageRecord?.title || `PDF page ${page}`}
-                        />
-                      )}
-                    </div>
-                    <div className="source-page-controls">
-                      <button
-                        onClick={() => setPage((p) => Math.max(1, p - 1))}
-                        disabled={page <= 1}
-                        aria-label="Previous source page"
-                      >
-                        <ChevronLeft size={18} />
-                      </button>
-                      <span>{pageRecord?.label || `PDF page ${page}`}</span>
-                      <button
-                        onClick={() =>
-                          setPage((p) => Math.min(model.source.pages, p + 1))
-                        }
-                        disabled={page >= model.source.pages}
-                        aria-label="Next source page"
-                      >
-                        <ChevronRight size={18} />
-                      </button>
-                      <a
-                        href={
-                          pageRecord?.file ||
-                          `${model.source.file}#page=${page}`
-                        }
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {pageRecord?.file
-                          ? pageRecord.mediaType === 'video'
-                            ? 'Open source video'
-                            : pageRecord.evidenceType === 'facility-photograph'
-                              ? 'Open photograph'
-                              : 'Full-resolution image'
-                          : 'Open full PDF'}
-                        <ArrowUpRight size={14} />
-                      </a>
-                    </div>
-                    <div className="page-finding">
-                      <span className="overline">SOURCE FINDINGS</span>
-                      <p>{pageRecord?.findings}</p>
-                      <details>
-                        <summary>
-                          {pageRecord?.mediaType
-                            ? 'Source file'
-                            : 'Extracted text'}
-                        </summary>
-                        <pre>{pageRecord?.text}</pre>
-                      </details>
-                    </div>
-                  </div>
-                </div>
-              </>
-            ) : modal === 'accuracy' ? (
+            {modal === 'accuracy' ? (
               <>
                 <div className="dialog-title">
                   <span className="overline">GEOMETRY & EVIDENCE</span>
@@ -1319,68 +1340,63 @@ export default function Home() {
                           <p>
                             <strong>To verify:</strong> {item.unresolved}
                           </p>
-                          <button onClick={() => source(item.page)}>
-                            View reference <ArrowUpRight size={12} />
-                          </button>
                         </details>
                       ))}
                     </section>
                   )}
-                  <h3>Dimensions explicitly shown</h3>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Element</th>
-                        <th>Drawing value</th>
-                        <th>Model value</th>
-                        <th>Source</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {model.dimensions.map((d) => (
-                        <tr key={d.id}>
-                          <td>{d.meaning}</td>
-                          <td>{d.sourceValue}</td>
-                          <td>{d.value} m</td>
-                          <td>
-                            <button onClick={() => source(d.pages[0])}>
-                              p.{d.pages.join(', ')}
-                              <ArrowUpRight size={12} />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  <h3>Published area schedule</h3>
-                  <p className="table-note">
-                    These are program areas from the PDF. A traced room or floor
-                    perimeter may use a different net/gross boundary.
-                  </p>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Program / level</th>
-                        <th>Published area</th>
-                        <th>Source</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {model.programs.map((p) => (
-                        <tr key={p.id}>
-                          <td>{p.name}</td>
-                          <td>{p.publishedSqFt.toLocaleString()} sq ft</td>
-                          <td>
-                            <button onClick={() => source(p.sourcePage)}>
-                              p.{p.sourcePage}
-                              <ArrowUpRight size={12} />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  <h3>Inputs still needed</h3>
+                  {model.dimensions.length > 0 && (
+                    <>
+                      <h3>Dimensions explicitly shown</h3>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Element</th>
+                            <th>Drawing value</th>
+                            <th>Model value</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {model.dimensions.map((d) => (
+                            <tr key={d.id}>
+                              <td>{d.meaning}</td>
+                              <td>{d.sourceValue}</td>
+                              <td>{d.value} m</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </>
+                  )}
+                  {model.programs.length > 0 && (
+                    <>
+                      <h3>Published area schedule</h3>
+                      <p className="table-note">
+                        These are program areas from the PDF. A traced room or
+                        floor perimeter may use a different net/gross boundary.
+                      </p>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Program / level</th>
+                            <th>Published area</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {model.programs.map((p) => (
+                            <tr key={p.id}>
+                              <td>{p.name}</td>
+                              <td>{p.publishedSqFt.toLocaleString()} sq ft</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </>
+                  )}
+                  <h3>
+                    {siteId === 'alhambra'
+                      ? 'Inputs still needed'
+                      : 'Source notes & assumptions'}
+                  </h3>
                   <div className="issue-list">
                     {model.accuracyIssues.map((issue, i) => (
                       <article key={issue.id}>
@@ -1388,10 +1404,6 @@ export default function Home() {
                         <div>
                           <h4>{issue.title}</h4>
                           <p>{issue.detail}</p>
-                          <button onClick={() => source(issue.pages[0])}>
-                            {issue.pages.map(sourceLabel).join(', ')}
-                            <ArrowUpRight size={12} />
-                          </button>
                         </div>
                       </article>
                     ))}
@@ -1435,8 +1447,8 @@ export default function Home() {
                   <span className="overline">PORTABLE FACILITY SYSTEM</span>
                   <h2>One viewer. Swappable buildings.</h2>
                   <p>
-                    Layout, levels, furnishings, finishes, sources, and site
-                    context are stored in a single facility specification.
+                    Layout, levels, furnishings, finishes, and site context are
+                    stored in a single facility specification.
                   </p>
                 </div>
                 <div className="file-tabs">
@@ -1473,10 +1485,7 @@ export default function Home() {
                       >
                         <FileJson size={25} />
                         <strong>Export specification</strong>
-                        <span>
-                          Portable layout, object IDs, materials and source
-                          links.
-                        </span>
+                        <span>Portable layout, object IDs, and materials.</span>
                         <Download size={17} />
                       </button>
                       <button
@@ -1535,7 +1544,7 @@ export default function Home() {
                       </button>
                     </div>
                     <div className="reuse-note">
-                      <h3>For your second center</h3>
+                      <h3>Shared Seen asset library</h3>
                       <p>
                         Replace the site, level elevations, room polygons, wall
                         segments and furniture transforms. Keep the material and
@@ -1550,8 +1559,7 @@ export default function Home() {
                       </p>
                       <a
                         href={
-                          model.exportFiles?.glb ||
-                          '/models/seen-alhambra-2024.glb'
+                          model.exportFiles?.glb || `/models/${model.id}.glb`
                         }
                         download
                       >

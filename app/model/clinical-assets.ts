@@ -9,6 +9,9 @@ export function buildClinicalAsset(
   material: (id: string) => T.Material,
 ): T.Group | null {
   const supported = [
+    'plan-door',
+    'return-stair',
+    'folding-partition',
     'connected-stair',
     'landing-guard',
     'care-shower',
@@ -145,7 +148,127 @@ export function buildClinicalAsset(
   };
   const handles = (x: number, y: number, z: number, len: number) =>
     rod([x - len / 2, y, z], [x + len / 2, y, z], 0.012);
-  if (spec.kind === 'connected-stair') {
+  if (spec.kind === 'plan-door') {
+    // The local origin is the surveyed plan hinge, not the leaf center.
+    const closed = Number(p.closedAngle),
+      open = Number(p.openAngle);
+    const leaf = new T.Group();
+    leaf.name = 'source-door-leaf';
+    leaf.userData = { closedAngle: closed, openAngle: open };
+    const panel = box(w / 2, 0.035, 0, w - 0.055, h - 0.07, d, teal);
+    g.remove(panel);
+    leaf.add(panel);
+    const handle = box(w - 0.16, 0.94, d / 2 + 0.025, 0.11, 0.028, 0.03, metal);
+    g.remove(handle);
+    leaf.add(handle);
+    leaf.rotation.y = -open;
+    g.add(leaf);
+    for (const t of [0, w])
+      box(
+        Math.cos(closed) * t,
+        0,
+        Math.sin(closed) * t,
+        0.045,
+        h,
+        0.045,
+        'photo-white',
+      );
+    const head = box(
+      (Math.cos(closed) * w) / 2,
+      h,
+      (Math.sin(closed) * w) / 2,
+      w + 0.05,
+      0.05,
+      0.1,
+      'photo-white',
+    );
+    head.rotation.y = -closed;
+    let sweep = open - closed;
+    while (sweep > Math.PI) sweep -= 2 * Math.PI;
+    while (sweep < -Math.PI) sweep += 2 * Math.PI;
+    const pts = Array.from({ length: 25 }, (_, i) => {
+      const angle = closed + (sweep * i) / 24;
+      return new T.Vector3(Math.cos(angle) * w, 0.013, Math.sin(angle) * w);
+    });
+    const arc = new T.Line(
+      new T.BufferGeometry().setFromPoints(pts),
+      new T.LineBasicMaterial({ color: '#a0a89f' }),
+    );
+    arc.name = 'door-swing';
+    g.add(arc);
+    return g;
+  } else if (spec.kind === 'folding-partition') {
+    // Two folded stacks, with a continuous overhead track matching A-1.
+    box(0, h - 0.045, 0, w, 0.045, 0.085, metal);
+    const folded = new T.Group();
+    folded.name = 'partition-folded';
+    for (const side of [-1, 1])
+      for (let i = 0; i < 6; i++) {
+        const panel = box(
+          side * (w / 2 - 0.12 - i * 0.07),
+          0.025,
+          i % 2 ? 0.12 : -0.12,
+          0.39,
+          h - 0.08,
+          0.045,
+          teal,
+        );
+        panel.rotation.y = (i % 2 ? 1 : -1) * 1.15;
+        g.remove(panel);
+        folded.add(panel);
+      }
+    g.add(folded);
+    const shut = box(0, 0.025, 0, w, h - 0.08, 0.055, teal);
+    shut.name = 'partition-closed';
+    shut.visible = false;
+    return g;
+  } else if (spec.kind === 'return-stair') {
+    const rise = Number(p.rise),
+      half = rise / 2,
+      count = Math.ceil(half / 0.18),
+      landing = Math.min(1.1, d * 0.24),
+      run = d - landing,
+      tread = run / count,
+      flight = (w - 0.16) / 2;
+    box(0, half - 0.18, d / 2 - landing / 2, w, 0.18, landing, teal);
+    for (let i = 0; i < count; i++) {
+      const y1 = (half * (i + 1)) / count,
+        z1 = -d / 2 + (i + 0.5) * tread,
+        y2 = half + (half * (i + 1)) / count,
+        z2 = d / 2 - landing - (i + 0.5) * tread;
+      box(
+        -w / 4,
+        Math.max(0, y1 - 0.18),
+        z1,
+        flight,
+        Math.min(0.18, y1),
+        tread,
+        teal,
+      );
+      box(w / 4, y2 - 0.18, z2, flight, 0.18, tread, teal);
+      box(-w / 4, y1, z1 - tread / 2 + 0.02, flight, 0.009, 0.03, metal);
+      box(w / 4, y2, z2 + tread / 2 - 0.02, flight, 0.009, 0.03, metal);
+    }
+    for (const [x, start, end] of [
+      [-w / 2 + 0.03, 0, half],
+      [-0.07, 0, half],
+      [0.07, rise, half],
+      [w / 2 - 0.03, rise, half],
+    ]) {
+      rod([x, start + 0.95, -d / 2], [x, end + 0.95, d / 2 - landing], 0.022);
+      for (let i = 0; i <= count; i += 3) {
+        const z = -d / 2 + (run * i) / count,
+          y = start + ((end - start) * i) / count;
+        rod([x, y, z], [x, y + 0.95, z], 0.016);
+      }
+    }
+    rod(
+      [-w / 2 + 0.03, half + 0.95, d / 2 - 0.04],
+      [w / 2 - 0.03, half + 0.95, d / 2 - 0.04],
+      0.022,
+    );
+    return g;
+  } else if (spec.kind === 'connected-stair') {
     // Keep tread elevations exact: fitting the handrails with the stair body
     // would shrink the last tread below the destination floor.
     const rise = Number(p.rise),

@@ -1,4 +1,5 @@
 // Headless geometry/export integration, using the bundled canvas runtime when supplied.
+import './compile-model-modules.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -14,7 +15,9 @@ const m = JSON.parse(
     'utf8',
   ),
 );
-const siteImage = await loadImage(`public${m.site.image}`);
+const siteImage = m.site.image
+  ? await loadImage(`public${m.site.image}`)
+  : createCanvas(1, 1);
 globalThis.__facilityMaterialImages = Object.fromEntries(
   await Promise.all(
     Object.values(m.materials)
@@ -60,6 +63,8 @@ globalThis.document = {
   createElement(tag) {
     if (tag === 'canvas') {
       const c = createCanvas(1, 1);
+      // Match browser canvases so GLTFExporter does not mistake data() for pixels.
+      Object.defineProperty(c, 'data', { value: undefined });
       c.toBlob = (callback, type) =>
         callback(
           new Blob([c.toBuffer('image/png')], { type: type || 'image/png' }),
@@ -95,10 +100,18 @@ source = source
   .replace("from './assets'", "from './assets.mjs'")
   .replace("from './schema'", "from './schema.mjs'")
   .replace("from './floor-geometry'", "from './floor-geometry.mjs'")
+  .replace("from './community-assets'", "from './community-assets.mjs'")
+  .replace("from './showcase'", "from './showcase.mjs'")
   .replace("from './envelope'", "from './envelope.mjs'");
 source = source
   .replace("from './activity'", "from './activity.mjs'")
-  .replace("from './neighborhood'", "from './neighborhood.mjs'");
+  .replace("from './neighborhood'", "from './neighborhood.mjs'")
+  .replace("from './site-context'", "from './site-context.mjs'")
+  .replace("from './olympic-exterior'", "from './olympic-exterior.mjs'")
+  .replace("from './alhambra-exterior'", "from './alhambra-exterior.mjs'")
+  .replace("from './alveare-exterior'", "from './alveare-exterior.mjs'")
+  .replace("from './room-labels'", "from './room-labels.mjs'")
+  .replace("from './site-activity'", "from './site-activity.mjs'");
 writeFileSync(
   'work/validation/renderer.mjs',
   ts.transpileModule(source, {

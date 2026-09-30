@@ -23,6 +23,11 @@ export type CharacterRole =
   | 'dietitian'
   | 'center-manager';
 export type Action =
+  | 'ping-pong'
+  | 'billiards'
+  | 'wii'
+  | 'mahjong'
+  | 'karaoke'
   | 'idle'
   | 'walk'
   | 'escort'
@@ -55,6 +60,7 @@ export type CharacterSpec = {
   mobility?: 'cane' | 'walker' | 'wheelchair';
   seated?: boolean;
   assisted?: boolean;
+  cargo?: 'package' | 'food';
 };
 export const roleNames: Record<CharacterRole, string> = {
   participant: 'Participant',
@@ -1608,6 +1614,87 @@ export function createCharacter(spec: CharacterSpec) {
   };
   wheels.forEach(consolidate);
   consolidate(accessory);
+  const gameAction = (
+    spec as CharacterSpec & { segments?: { action: string }[] }
+  ).segments?.[0]?.action;
+  if (['ping-pong', 'wii', 'billiards', 'karaoke'].includes(gameAction || '')) {
+    const color =
+      gameAction === 'ping-pong'
+        ? '#b85842'
+        : gameAction === 'billiards'
+          ? '#caa674'
+          : '#e7e8df';
+    const geo =
+      gameAction === 'ping-pong'
+        ? new T.CylinderGeometry(0.09, 0.09, 0.018, 16)
+        : gameAction === 'billiards'
+          ? new T.CylinderGeometry(0.012, 0.008, 1.2, 8)
+          : new T.BoxGeometry(0.035, 0.15, 0.04);
+    const prop = new T.Mesh(geo, new T.MeshStandardMaterial({ color }));
+    prop.position.set(0, -0.07, 0.03);
+    if (gameAction === 'ping-pong') prop.rotation.x = Math.PI / 2;
+    joints.handR.add(prop);
+    if (gameAction === 'karaoke') {
+      const head = new T.Mesh(
+        new T.SphereGeometry(0.035, 10, 8),
+        new T.MeshStandardMaterial({ color: '#263f48' }),
+      );
+      head.position.y = -0.16;
+      joints.handR.add(head);
+    }
+  }
+  if (spec.cargo) {
+    const trolley = new T.Group();
+    trolley.name = 'delivery-trolley';
+    root.add(trolley);
+    const part = (
+      x: number,
+      y: number,
+      z: number,
+      w: number,
+      h: number,
+      d: number,
+      color: string,
+      parent: T.Object3D = trolley,
+    ) => {
+      const m = new T.Mesh(
+        new T.BoxGeometry(w, h, d),
+        new T.MeshStandardMaterial({ color, roughness: 0.8 }),
+      );
+      m.position.set(x, y, z);
+      parent.add(m);
+      return m;
+    };
+    part(0, 0.28, 0.65, 0.55, 0.04, 0.65, '#94aaa5');
+    part(0, 0.83, 0.36, 0.53, 0.025, 0.03, '#819892');
+    for (const x of [-0.24, 0.24]) {
+      part(x, 0.54, 0.36, 0.025, 0.6, 0.025, '#819892');
+      for (const z of [0.4, 0.9]) {
+        const w = new T.Mesh(
+          new T.SphereGeometry(0.065, 10, 8),
+          new T.MeshStandardMaterial({ color: '#374e50' }),
+        );
+        w.position.set(x, 0.1, z);
+        trolley.add(w);
+      }
+    }
+    const cargo = new T.Group();
+    cargo.name = 'delivery-cargo';
+    trolley.add(cargo);
+    for (let i = 0; i < 3; i++) {
+      part(
+        0,
+        0.42 + i * 0.19,
+        0.65,
+        0.46,
+        0.18,
+        0.52,
+        spec.cargo === 'food' ? '#a4baa5' : '#b89365',
+        cargo,
+      );
+      part(0, 0.42 + i * 0.19, 0.917, 0.055, 0.18, 0.012, '#e1d0aa', cargo);
+    }
+  }
   function pose(
     action: Action,
     time: number,
@@ -1675,6 +1762,24 @@ export function createCharacter(spec: CharacterSpec) {
       joints.head.rotation.x = 0.07;
       joints.head.rotation.y = 0.06 * breath;
     }
+    if (['ping-pong', 'wii'].includes(action)) {
+      joints.armR.rotation.x = -0.7 + 0.65 * stride;
+      joints.elbowR.rotation.x = -0.45;
+      joints.torso.rotation.y = 0.17 * stride;
+      joints.armL.rotation.x = -0.35;
+    }
+    if (action === 'billiards') {
+      joints.torso.rotation.x = 0.18;
+      joints.armL.rotation.x = -0.8;
+      joints.armR.rotation.x = -0.65 + 0.1 * stride;
+      joints.elbowR.rotation.x = -0.7;
+    }
+    if (action === 'mahjong') {
+      joints.armL.rotation.x = -0.5;
+      joints.armR.rotation.x = -0.7 - 0.18 * breath;
+      joints.elbowR.rotation.x = -0.75;
+      joints.head.rotation.x = 0.12;
+    }
     if (action === 'exercise') {
       joints.armL.rotation.z = -0.65 - 0.28 * breath;
       joints.armR.rotation.z = 0.65 + 0.28 * breath;
@@ -1694,11 +1799,13 @@ export function createCharacter(spec: CharacterSpec) {
       joints.elbowR.rotation.z = 1.7 + 0.2 * stride;
     }
     const slow = Math.sin((time * Math.PI) / 4) * motion;
-    if (['present', 'conversation', 'perform'].includes(action)) {
+    if (['present', 'conversation', 'perform', 'karaoke'].includes(action)) {
       joints.armL.rotation.x = -0.4;
-      joints.elbowL.rotation.x = -0.95;
-      joints.armR.rotation.set(-0.45, 0, 0.26 + 0.12 * breath);
-      joints.elbowR.rotation.x = action === 'perform' ? -1.55 : -0.85;
+      joints.elbowL.rotation.x = -0.9;
+      joints.armR.rotation.set(-0.45, 0, 0.3 + 0.12 * breath);
+      joints.elbowR.rotation.x = ['perform', 'karaoke'].includes(action)
+        ? -1.55
+        : -0.8;
       joints.head.rotation.y = 0.12 * slow;
     }
     if (action === 'clap') {

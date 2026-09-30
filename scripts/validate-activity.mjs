@@ -20,8 +20,8 @@ const scene = new T.Scene(),
   activity = createActivity(m, scene),
   neighborhood = buildNeighborhood(m);
 scene.add(neighborhood.root);
-assert.equal(activity.actors.length, 41);
-assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 41);
+assert.equal(activity.actors.length, 167);
+assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 167);
 for (const role of [
   'doctor',
   'nurse',
@@ -278,7 +278,13 @@ for (let t = 0; t < activityData.duration; t += 0.25) {
         'Vans move only with doors closed and ramp stowed',
       );
   assert.ok(
-    !(va.visible && vb.visible && va.position.distanceTo(vb.position) < 7),
+    ![va, vb].every(
+      (v) =>
+        Math.hypot(
+          v.position.x - ARRIVAL.dock[0],
+          v.position.z - ARRIVAL.dock[1],
+        ) < 1,
+    ),
     'Vans do not share the drop-off bay',
   );
   for (const a of activityData.actors.filter(
@@ -352,7 +358,7 @@ assert.deepEqual(
   'Seek restores vans and ramps exactly',
 );
 console.log(
-  `Arrival checks: ${boardingSamples} van-ramp samples, ${entranceSamples} doorway samples, two desk staff, ${activityData.interactions.length} interaction tracks and 41 stable person templates.`,
+  `Arrival checks: ${boardingSamples} van-ramp samples, ${entranceSamples} doorway samples, two desk staff, ${activityData.interactions.length} interaction tracks and 167 stable person templates.`,
 );
 // The flexible layout and repertoire stay in sync with animation, accessibility and scrubbing.
 assert.equal(dayProgram.programs.length, 10);

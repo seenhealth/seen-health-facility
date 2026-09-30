@@ -1,7 +1,7 @@
 {
   "schemaVersion": "2.0",
   "id": "seen-alhambra-planning",
-  "name": "Seen Health \u00b7 Alhambra",
+  "name": "Seen Health · Alhambra",
   "address": "1839 W. Valley Blvd., Alhambra, CA 91803",
   "units": "m",
   "coordinateSystem": "right-handed; +x east in source plan, +y up, +z toward Valley Blvd.",
@@ -10,8 +10,7 @@
     "title": "Overall Planning.jpg + 2024 architectural presentation",
     "date": "Planning image supplied Sep 16, 2026",
     "pages": 92,
-    "author": "Langdon Wilson International",
-    "file": "/reference/final/source.pdf"
+    "author": "Langdon Wilson International"
   },
   "calibration": {
     "method": "Planning-image clinic footprint area calibration",
@@ -26,20 +25,20 @@
     "anchorAreaSqFt": 3254,
     "anchorPolygonPixels": [
       [
-        1047.0,
-        299.0
+        1047,
+        299
       ],
       [
-        1628.0,
-        299.0
+        1628,
+        299
       ],
       [
-        1628.0,
-        1103.0
+        1628,
+        1103
       ],
       [
-        1047.0,
-        1103.0
+        1047,
+        1103
       ]
     ],
     "notes": "Overall Planning.jpg controls ground-floor layout and furniture placement. Uniform scale uses the 3,254 sq ft clinic area from PDF p.14 against the clinic perimeter in this image. No linear dimensions are supplied; heights and product geometry remain provisional."
@@ -111,11 +110,11 @@
           -22.463031
         ],
         [
-          0.0,
+          0,
           -22.463031
         ],
         [
-          0.0,
+          0,
           -2.009716
         ],
         [
@@ -157,7 +156,7 @@
         -3.32557155,
         -5.50636785
       ],
-      "tracedFootprintSqFt": 3254.0
+      "tracedFootprintSqFt": 3254
     },
     {
       "id": "rehab",
@@ -203,7 +202,7 @@
         -10.31442345,
         8.11645515
       ],
-      "tracedFootprintSqFt": 3251.0
+      "tracedFootprintSqFt": 3251
     },
     {
       "id": "ot",
@@ -213,7 +212,7 @@
       "levelId": "ground",
       "polygon": [
         [
-          0.0,
+          0,
           -12.465328
         ],
         [
@@ -241,7 +240,7 @@
           -1.882519
         ],
         [
-          0.0,
+          0,
           -1.882519
         ]
       ],
@@ -276,11 +275,11 @@
           -2.009716
         ],
         [
-          0.0,
+          0,
           -2.009716
         ],
         [
-          0.0,
+          0,
           7.580955
         ],
         [
@@ -335,7 +334,7 @@
       "levelId": "ground",
       "polygon": [
         [
-          0.0,
+          0,
           -1.882519
         ],
         [
@@ -347,7 +346,7 @@
           0.305273
         ],
         [
-          0.0,
+          0,
           0.305273
         ]
       ],
@@ -400,11 +399,11 @@
           7.580955
         ],
         [
-          0.0,
+          0,
           7.580955
         ],
         [
-          0.0,
+          0,
           25.134172
         ],
         [
@@ -437,17 +436,17 @@
         -4.0811229,
         5.07135375
       ],
-      "tracedFootprintSqFt": 2832.0
+      "tracedFootprintSqFt": 2832
     },
     {
       "id": "dining",
-      "name": "Dining \u00b7 1421",
+      "name": "Dining · 1421",
       "short": "Shared meals",
       "color": "#aa89bd",
       "levelId": "ground",
       "polygon": [
         [
-          0.0,
+          0,
           0.305273
         ],
         [
@@ -467,7 +466,7 @@
           9.209079
         ],
         [
-          0.0,
+          0,
           9.209079
         ]
       ],
@@ -615,7 +614,7 @@
       "levelId": "ground",
       "polygon": [
         [
-          0.0,
+          0,
           9.209079
         ],
         [
@@ -651,7 +650,7 @@
           28.085148
         ],
         [
-          0.0,
+          0,
           28.085148
         ]
       ],
@@ -730,7 +729,7 @@
       "levelId": "basement",
       "polygon": [
         [
-          -1e-06,
+          -0.000001,
           -15.27138
         ],
         [
@@ -750,7 +749,7 @@
           26.492967
         ],
         [
-          -1e-06,
+          -0.000001,
           26.492967
         ]
       ],
@@ -769,7 +768,7 @@
         3.98855,
         -1.08869
       ],
-      "tracedFootprintSqFt": 6599.0
+      "tracedFootprintSqFt": 6599
     },
     {
       "id": "mezzanine",
@@ -834,7 +833,7 @@
       "levelId": "upper",
       "polygon": [
         [
-          0.0,
+          0,
           9.209079
         ],
         [
@@ -854,7 +853,7 @@
           28.085148
         ],
         [
-          0.0,
+          0,
           28.085148
         ]
       ],
@@ -884,7 +883,7 @@
       "levelId": "basement",
       "polygon": [
         [
-          -1e-06,
+          -0.000001,
           -15.27138
         ],
         [
@@ -904,7 +903,7 @@
           26.492967
         ],
         [
-          -1e-06,
+          -0.000001,
           26.492967
         ]
       ],
@@ -968,7 +967,7 @@
       "levelId": "upper",
       "polygon": [
         [
-          0.0,
+          0,
           9.209079
         ],
         [
@@ -988,7 +987,7 @@
           28.085148
         ],
         [
-          0.0,
+          0,
           28.085148
         ]
       ],
@@ -1395,11 +1394,11 @@
           -22.437591
         ],
         [
-          0.0,
+          0,
           -22.437591
         ],
         [
-          0.0,
+          0,
           -19.486616
         ],
         [
@@ -1443,11 +1442,11 @@
           -19.486616
         ],
         [
-          0.0,
+          0,
           -19.486616
         ],
         [
-          0.0,
+          0,
           -16.53564
         ],
         [
@@ -1491,11 +1490,11 @@
           -16.53564
         ],
         [
-          0.0,
+          0,
           -16.53564
         ],
         [
-          0.0,
+          0,
           -13.635543
         ],
         [
@@ -1539,11 +1538,11 @@
           -13.635543
         ],
         [
-          0.0,
+          0,
           -13.635543
         ],
         [
-          0.0,
+          0,
           -10.684567
         ],
         [
@@ -1587,11 +1586,11 @@
           -10.684567
         ],
         [
-          0.0,
+          0,
           -10.684567
         ],
         [
-          0.0,
+          0,
           -6.970408
         ],
         [
@@ -1635,11 +1634,11 @@
           -6.970408
         ],
         [
-          0.0,
+          0,
           -6.970408
         ],
         [
-          0.0,
+          0,
           -4.070311
         ],
         [
@@ -1683,11 +1682,11 @@
           -4.070311
         ],
         [
-          0.0,
+          0,
           -4.070311
         ],
         [
-          0.0,
+          0,
           -1.933398
         ],
         [
@@ -2066,7 +2065,7 @@
       "levelId": "ground",
       "polygon": [
         [
-          0.0,
+          0,
           -12.363571
         ],
         [
@@ -2078,7 +2077,7 @@
           -10.328415
         ],
         [
-          0.0,
+          0,
           -10.328415
         ]
       ],
@@ -2115,7 +2114,7 @@
       "levelId": "ground",
       "polygon": [
         [
-          0.0,
+          0,
           -10.328415
         ],
         [
@@ -2127,7 +2126,7 @@
           -6.970408
         ],
         [
-          0.0,
+          0,
           -6.970408
         ]
       ],
@@ -2360,7 +2359,7 @@
       "levelId": "ground",
       "polygon": [
         [
-          0.0,
+          0,
           -6.970408
         ],
         [
@@ -2372,7 +2371,7 @@
           -2.391308
         ],
         [
-          0.0,
+          0,
           -2.391308
         ]
       ],
@@ -2805,11 +2804,11 @@
           0.305273
         ],
         [
-          0.0,
+          0,
           0.305273
         ],
         [
-          0.0,
+          0,
           3.052733
         ],
         [
@@ -2854,11 +2853,11 @@
           3.052733
         ],
         [
-          0.0,
+          0,
           3.052733
         ],
         [
-          0.0,
+          0,
           5.851073
         ],
         [
@@ -2894,12 +2893,12 @@
     },
     {
       "id": "hall-1010",
-      "name": "East hallway \u00b7 1010",
+      "name": "East hallway · 1010",
       "zoneId": "hall",
       "levelId": "ground",
       "polygon": [
         [
-          0.0,
+          0,
           -1.882519
         ],
         [
@@ -2911,7 +2910,7 @@
           0.305273
         ],
         [
-          0.0,
+          0,
           0.305273
         ]
       ],
@@ -2952,11 +2951,11 @@
           -1.933398
         ],
         [
-          0.0,
+          0,
           -1.933398
         ],
         [
-          0.0,
+          0,
           0.050879
         ],
         [
@@ -3065,11 +3064,11 @@
           7.580955
         ],
         [
-          0.0,
+          0,
           7.580955
         ],
         [
-          0.0,
+          0,
           25.134172
         ],
         [
@@ -3121,12 +3120,12 @@
     },
     {
       "id": "dining-1421",
-      "name": "Dining \u00b7 1421",
+      "name": "Dining · 1421",
       "zoneId": "dining",
       "levelId": "ground",
       "polygon": [
         [
-          0.0,
+          0,
           0.305273
         ],
         [
@@ -3146,7 +3145,7 @@
           9.209079
         ],
         [
-          0.0,
+          0,
           9.209079
         ]
       ],
@@ -4003,7 +4002,7 @@
       "levelId": "ground",
       "polygon": [
         [
-          0.0,
+          0,
           9.310837
         ],
         [
@@ -4023,7 +4022,7 @@
           14.042574
         ],
         [
-          0.0,
+          0,
           14.042574
         ]
       ],
@@ -4509,7 +4508,7 @@
       "zoneId": "basement",
       "levelId": "basement",
       "a": [
-        -1e-06,
+        -0.000001,
         -15.27138
       ],
       "b": [
@@ -4597,7 +4596,7 @@
         26.492967
       ],
       "b": [
-        -1e-06,
+        -0.000001,
         26.492967
       ],
       "height": 2.7,
@@ -4614,11 +4613,11 @@
       "zoneId": "basement",
       "levelId": "basement",
       "a": [
-        -1e-06,
+        -0.000001,
         26.492967
       ],
       "b": [
-        -1e-06,
+        -0.000001,
         -15.27138
       ],
       "height": 2.7,
@@ -4635,7 +4634,7 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "a": [
-        -1e-06,
+        -0.000001,
         8.810744
       ],
       "b": [
@@ -4681,7 +4680,7 @@
         26.492967
       ],
       "b": [
-        -1e-06,
+        -0.000001,
         26.492967
       ],
       "height": 2.9,
@@ -4698,11 +4697,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "a": [
-        -1e-06,
+        -0.000001,
         26.492967
       ],
       "b": [
-        -1e-06,
+        -0.000001,
         8.810744
       ],
       "height": 2.9,
@@ -4749,11 +4748,11 @@
       "zoneId": "clinic",
       "levelId": "ground",
       "a": [
-        0.0,
+        0,
         -22.437591
       ],
       "b": [
-        0.0,
+        0,
         -1.933398
       ],
       "height": 2.9,
@@ -5533,7 +5532,7 @@
         -22.437591
       ],
       "b": [
-        0.0,
+        0,
         -22.437591
       ],
       "height": 2.9,
@@ -5863,7 +5862,7 @@
         -19.486616
       ],
       "b": [
-        0.0,
+        0,
         -19.486616
       ],
       "height": 2.9,
@@ -5893,7 +5892,7 @@
         -16.53564
       ],
       "b": [
-        0.0,
+        0,
         -16.53564
       ],
       "height": 2.9,
@@ -5923,7 +5922,7 @@
         -13.635543
       ],
       "b": [
-        0.0,
+        0,
         -13.635543
       ],
       "height": 2.9,
@@ -5953,7 +5952,7 @@
         -10.684567
       ],
       "b": [
-        0.0,
+        0,
         -10.684567
       ],
       "height": 2.9,
@@ -5983,7 +5982,7 @@
         -7.021287
       ],
       "b": [
-        0.0,
+        0,
         -7.021287
       ],
       "height": 2.9,
@@ -6013,7 +6012,7 @@
         -4.12119
       ],
       "b": [
-        0.0,
+        0,
         -4.12119
       ],
       "height": 2.9,
@@ -6073,7 +6072,7 @@
         -1.984277
       ],
       "b": [
-        0.0,
+        0,
         -1.984277
       ],
       "height": 2.9,
@@ -6939,7 +6938,7 @@
       "zoneId": "ot",
       "levelId": "ground",
       "a": [
-        0.0,
+        0,
         -12.363571
       ],
       "b": [
@@ -7029,7 +7028,7 @@
       "zoneId": "ot",
       "levelId": "ground",
       "a": [
-        0.0,
+        0,
         -10.328415
       ],
       "b": [
@@ -7179,7 +7178,7 @@
       "zoneId": "ot",
       "levelId": "ground",
       "a": [
-        0.0,
+        0,
         -6.970408
       ],
       "b": [
@@ -7359,7 +7358,7 @@
       "zoneId": "ot",
       "levelId": "ground",
       "a": [
-        0.0,
+        0,
         -2.340429
       ],
       "b": [
@@ -7419,7 +7418,7 @@
       "zoneId": "ot",
       "levelId": "ground",
       "a": [
-        0.0,
+        0,
         -1.882519
       ],
       "b": [
@@ -7749,11 +7748,11 @@
       "zoneId": "lobby",
       "levelId": "ground",
       "a": [
-        0.0,
+        0,
         0.305273
       ],
       "b": [
-        0.0,
+        0,
         7.530076
       ],
       "height": 2.9,
@@ -8383,7 +8382,7 @@
         0.407031
       ],
       "b": [
-        0.0,
+        0,
         0.407031
       ],
       "height": 2.9,
@@ -8413,7 +8412,7 @@
         3.103612
       ],
       "b": [
-        0.0,
+        0,
         3.103612
       ],
       "height": 2.9,
@@ -8473,7 +8472,7 @@
         5.851073
       ],
       "b": [
-        0.0,
+        0,
         5.851073
       ],
       "height": 2.9,
@@ -8533,7 +8532,7 @@
         7.377439
       ],
       "b": [
-        0.0,
+        0,
         7.377439
       ],
       "height": 2.9,
@@ -8559,7 +8558,7 @@
       "zoneId": "hall",
       "levelId": "ground",
       "a": [
-        0.0,
+        0,
         0.356152
       ],
       "b": [
@@ -8949,7 +8948,7 @@
       "zoneId": "dining",
       "levelId": "ground",
       "a": [
-        0.0,
+        0,
         9.361716
       ],
       "b": [
@@ -9039,11 +9038,11 @@
       "zoneId": "day",
       "levelId": "ground",
       "a": [
-        0.0,
+        0,
         9.310837
       ],
       "b": [
-        0.0,
+        0,
         25.134172
       ],
       "height": 3.6576,
@@ -9163,7 +9162,7 @@
         25.134172
       ],
       "b": [
-        0.0,
+        0,
         25.134172
       ],
       "height": 3.6576,
@@ -11679,7 +11678,7 @@
       "zoneId": "admin",
       "levelId": "ground",
       "a": [
-        0.0,
+        0,
         14.042574
       ],
       "b": [
@@ -12799,7 +12798,7 @@
       "status": "image-traced-position-and-footprint / height-inferred",
       "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
       "sourcePixelPosition": [
-        853.0,
+        853,
         615.5
       ],
       "sourcePixelFootprint": [
@@ -12892,7 +12891,7 @@
       "status": "image-traced-position-and-footprint / height-inferred",
       "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
       "sourcePixelPosition": [
-        853.0,
+        853,
         641.0999999999999
       ],
       "sourcePixelFootprint": [
@@ -13419,7 +13418,7 @@
       "status": "image-traced-position-and-footprint / height-inferred",
       "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
       "sourcePixelPosition": [
-        853.0,
+        853,
         721.8000000000001
       ],
       "sourcePixelFootprint": [
@@ -13512,7 +13511,7 @@
       "status": "image-traced-position-and-footprint / height-inferred",
       "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
       "sourcePixelPosition": [
-        853.0,
+        853,
         747.4
       ],
       "sourcePixelFootprint": [
@@ -13729,7 +13728,7 @@
       "status": "image-traced-position-and-footprint / height-inferred",
       "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
       "sourcePixelPosition": [
-        664.0,
+        664,
         805.5
       ],
       "sourcePixelFootprint": [
@@ -13822,7 +13821,7 @@
       "status": "image-traced-position-and-footprint / height-inferred",
       "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
       "sourcePixelPosition": [
-        664.0,
+        664,
         831.0999999999999
       ],
       "sourcePixelFootprint": [
@@ -13915,7 +13914,7 @@
       "status": "image-traced-position-and-footprint / height-inferred",
       "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
       "sourcePixelPosition": [
-        734.0,
+        734,
         805.5
       ],
       "sourcePixelFootprint": [
@@ -13946,7 +13945,7 @@
       "status": "image-traced-position-and-footprint / height-inferred",
       "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
       "sourcePixelPosition": [
-        734.0,
+        734,
         831.0999999999999
       ],
       "sourcePixelFootprint": [
@@ -14040,7 +14039,7 @@
       "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
       "sourcePixelPosition": [
         609.3000000000001,
-        970.0
+        970
       ],
       "sourcePixelFootprint": [
         10.000021295064503,
@@ -14071,7 +14070,7 @@
       "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
       "sourcePixelPosition": [
         634.9,
-        970.0
+        970
       ],
       "sourcePixelFootprint": [
         10.000021295064503,
@@ -14350,7 +14349,7 @@
       "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
       "sourcePixelPosition": [
         708.3000000000001,
-        970.0
+        970
       ],
       "sourcePixelFootprint": [
         10.000021295064503,
@@ -14381,7 +14380,7 @@
       "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
       "sourcePixelPosition": [
         733.9,
-        970.0
+        970
       ],
       "sourcePixelFootprint": [
         10.000021295064503,
@@ -14505,7 +14504,7 @@
       "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
       "sourcePixelPosition": [
         610.2,
-        1019.0
+        1019
       ],
       "sourcePixelFootprint": [
         10.000021295064503,
@@ -14536,7 +14535,7 @@
       "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
       "sourcePixelPosition": [
         635.8,
-        1019.0
+        1019
       ],
       "sourcePixelFootprint": [
         10.000021295064503,
@@ -14970,7 +14969,7 @@
       "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
       "sourcePixelPosition": [
         766.5,
-        801.0
+        801
       ],
       "sourcePixelFootprint": [
         8.999999511041857,
@@ -15001,7 +15000,7 @@
       "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
       "sourcePixelPosition": [
         766.5,
-        814.0
+        814
       ],
       "sourcePixelFootprint": [
         8.999999511041857,
@@ -15063,7 +15062,7 @@
       "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
       "sourcePixelPosition": [
         766.5,
-        842.0
+        842
       ],
       "sourcePixelFootprint": [
         8.999999511041857,
@@ -15094,7 +15093,7 @@
       "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
       "sourcePixelPosition": [
         766.5,
-        855.0
+        855
       ],
       "sourcePixelFootprint": [
         8.999999511041857,
@@ -15156,7 +15155,7 @@
       "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
       "sourcePixelPosition": [
         766.5,
-        883.0
+        883
       ],
       "sourcePixelFootprint": [
         8.999999511041857,
@@ -15187,7 +15186,7 @@
       "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
       "sourcePixelPosition": [
         766.5,
-        896.0
+        896
       ],
       "sourcePixelFootprint": [
         8.999999511041857,
@@ -15593,7 +15592,7 @@
         934
       ],
       "sourcePixelFootprint": [
-        293.0,
+        293,
         13.00008664713244
       ]
     },
@@ -15624,8 +15623,8 @@
         947
       ],
       "sourcePixelFootprint": [
-        275.0,
-        12.0
+        275,
+        12
       ]
     },
     {
@@ -16599,7 +16598,7 @@
         0,
         17.705854
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -16692,7 +16691,7 @@
         0,
         9.539792
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -16785,7 +16784,7 @@
         0,
         9.539792
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -18322,7 +18321,7 @@
       ],
       "sourcePixelFootprint": [
         20.000000000000004,
-        24.0
+        24
       ]
     },
     {
@@ -18397,7 +18396,7 @@
         0,
         -8.24238
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -18446,7 +18445,7 @@
       ],
       "sourcePixelFootprint": [
         20.000000000000004,
-        24.0
+        24
       ]
     },
     {
@@ -18521,7 +18520,7 @@
         0,
         -3.20537
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -18569,8 +18568,8 @@
         331
       ],
       "sourcePixelFootprint": [
-        67.0,
-        9.0
+        67,
+        9
       ]
     },
     {
@@ -18600,7 +18599,7 @@
         370
       ],
       "sourcePixelFootprint": [
-        7.0,
+        7,
         80.00000000000001
       ]
     },
@@ -18631,8 +18630,8 @@
         375
       ],
       "sourcePixelFootprint": [
-        17.0,
-        73.0
+        17,
+        73
       ]
     },
     {
@@ -18662,7 +18661,7 @@
         164
       ],
       "sourcePixelFootprint": [
-        55.0,
+        55,
         9.000000000000002
       ]
     },
@@ -18693,7 +18692,7 @@
         210
       ],
       "sourcePixelFootprint": [
-        55.0,
+        55,
         9.000000000000002
       ]
     },
@@ -18724,8 +18723,8 @@
         597
       ],
       "sourcePixelFootprint": [
-        34.0,
-        14.0
+        34,
+        14
       ]
     },
     {
@@ -18756,7 +18755,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        58.0
+        58
       ]
     },
     {
@@ -18786,8 +18785,8 @@
         351
       ],
       "sourcePixelFootprint": [
-        6.0,
-        35.0
+        6,
+        35
       ]
     },
     {
@@ -18862,7 +18861,7 @@
         0,
         21.012982
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -18924,7 +18923,7 @@
         0,
         21.012982
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -18986,7 +18985,7 @@
         0,
         21.012982
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -19048,7 +19047,7 @@
         0,
         21.012982
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -19110,7 +19109,7 @@
         0,
         21.012982
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -19172,7 +19171,7 @@
         0,
         21.012982
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -19296,7 +19295,7 @@
         0,
         16.586519
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -19420,7 +19419,7 @@
         0,
         16.586519
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -19513,7 +19512,7 @@
         0,
         25.541204
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -19575,7 +19574,7 @@
         0,
         25.541204
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -19637,7 +19636,7 @@
         0,
         25.541204
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -19699,7 +19698,7 @@
         0,
         25.541204
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -19761,7 +19760,7 @@
         0,
         25.541204
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -19823,7 +19822,7 @@
         0,
         25.541204
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -19885,7 +19884,7 @@
         0,
         25.541204
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -19947,7 +19946,7 @@
         0,
         25.541204
       ],
-      "rotation": 0.0,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -19995,8 +19994,8 @@
         1001
       ],
       "sourcePixelFootprint": [
-        12.0,
-        48.0
+        12,
+        48
       ]
     },
     {
@@ -20213,7 +20212,7 @@
       ],
       "sourcePixelFootprint": [
         23.999999999999996,
-        110.0
+        110
       ]
     },
     {
@@ -20244,7 +20243,7 @@
       ],
       "sourcePixelFootprint": [
         23.999999999999996,
-        79.0
+        79
       ]
     },
     {
@@ -20306,7 +20305,7 @@
       ],
       "sourcePixelFootprint": [
         23.999999999999996,
-        77.0
+        77
       ]
     },
     {
@@ -20460,8 +20459,8 @@
         1090
       ],
       "sourcePixelFootprint": [
-        15.0,
-        67.0
+        15,
+        67
       ]
     },
     {
@@ -20491,8 +20490,8 @@
         868
       ],
       "sourcePixelFootprint": [
-        12.0,
-        96.0
+        12,
+        96
       ]
     },
     {
@@ -20523,7 +20522,7 @@
       ],
       "sourcePixelFootprint": [
         7.999999999999999,
-        12.0
+        12
       ]
     },
     {
@@ -20554,7 +20553,7 @@
       ],
       "sourcePixelFootprint": [
         7.999999999999999,
-        12.0
+        12
       ]
     },
     {
@@ -20585,7 +20584,7 @@
       ],
       "sourcePixelFootprint": [
         7.999999999999999,
-        12.0
+        12
       ]
     },
     {
@@ -20616,7 +20615,7 @@
       ],
       "sourcePixelFootprint": [
         7.999999999999999,
-        12.0
+        12
       ]
     },
     {
@@ -20647,7 +20646,7 @@
       ],
       "sourcePixelFootprint": [
         7.999999999999999,
-        12.0
+        12
       ]
     },
     {
@@ -20678,7 +20677,7 @@
       ],
       "sourcePixelFootprint": [
         7.999999999999999,
-        12.0
+        12
       ]
     },
     {
@@ -20709,7 +20708,7 @@
       ],
       "sourcePixelFootprint": [
         7.999999999999999,
-        12.0
+        12
       ]
     },
     {
@@ -20740,7 +20739,7 @@
       ],
       "sourcePixelFootprint": [
         7.999999999999999,
-        12.0
+        12
       ]
     },
     {
@@ -20771,7 +20770,7 @@
       ],
       "sourcePixelFootprint": [
         7.999999999999999,
-        12.0
+        12
       ]
     },
     {
@@ -20802,7 +20801,7 @@
       ],
       "sourcePixelFootprint": [
         7.999999999999999,
-        12.0
+        12
       ]
     },
     {
@@ -20833,7 +20832,7 @@
       ],
       "sourcePixelFootprint": [
         7.999999999999999,
-        12.0
+        12
       ]
     },
     {
@@ -20864,7 +20863,7 @@
       ],
       "sourcePixelFootprint": [
         7.999999999999999,
-        12.0
+        12
       ]
     },
     {
@@ -20895,7 +20894,7 @@
       ],
       "sourcePixelFootprint": [
         7.999999999999999,
-        12.0
+        12
       ]
     },
     {
@@ -20926,7 +20925,7 @@
       ],
       "sourcePixelFootprint": [
         7.999999999999999,
-        12.0
+        12
       ]
     },
     {
@@ -20957,7 +20956,7 @@
       ],
       "sourcePixelFootprint": [
         7.999999999999999,
-        12.0
+        12
       ]
     },
     {
@@ -20988,7 +20987,7 @@
       ],
       "sourcePixelFootprint": [
         7.999999999999999,
-        12.0
+        12
       ]
     },
     {
@@ -21019,7 +21018,7 @@
       ],
       "sourcePixelFootprint": [
         7.999999999999999,
-        12.0
+        12
       ]
     },
     {
@@ -21050,7 +21049,7 @@
       ],
       "sourcePixelFootprint": [
         7.999999999999999,
-        12.0
+        12
       ]
     },
     {
@@ -21081,7 +21080,7 @@
       ],
       "sourcePixelFootprint": [
         7.999999999999999,
-        12.0
+        12
       ]
     },
     {
@@ -21112,7 +21111,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21143,7 +21142,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21174,7 +21173,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21205,7 +21204,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21236,7 +21235,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21267,7 +21266,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21298,7 +21297,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21329,7 +21328,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21360,7 +21359,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21391,7 +21390,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21422,7 +21421,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21453,7 +21452,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21484,7 +21483,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21515,7 +21514,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21546,7 +21545,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21577,7 +21576,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21608,7 +21607,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21639,7 +21638,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21670,7 +21669,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21701,7 +21700,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21732,7 +21731,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21763,7 +21762,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21794,7 +21793,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21825,7 +21824,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21856,7 +21855,7 @@
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
-        9.0
+        9
       ]
     },
     {
@@ -21886,8 +21885,8 @@
         680
       ],
       "sourcePixelFootprint": [
-        13.0,
-        62.0
+        13,
+        62
       ]
     },
     {
@@ -21917,8 +21916,8 @@
         680
       ],
       "sourcePixelFootprint": [
-        17.0,
-        74.0
+        17,
+        74
       ]
     },
     {
@@ -21948,8 +21947,8 @@
         674
       ],
       "sourcePixelFootprint": [
-        17.0,
-        88.0
+        17,
+        88
       ]
     },
     {
@@ -21979,8 +21978,8 @@
         771
       ],
       "sourcePixelFootprint": [
-        25.0,
-        13.0
+        25,
+        13
       ]
     },
     {
@@ -22010,8 +22009,8 @@
         771
       ],
       "sourcePixelFootprint": [
-        25.0,
-        13.0
+        25,
+        13
       ]
     },
     {
@@ -22041,7 +22040,7 @@
         744
       ],
       "sourcePixelFootprint": [
-        14.0,
+        14,
         52.99999999999999
       ]
     },
@@ -22072,7 +22071,7 @@
         733
       ],
       "sourcePixelFootprint": [
-        34.0,
+        34,
         15.000000000000002
       ]
     },
@@ -22104,7 +22103,7 @@
       ],
       "sourcePixelFootprint": [
         15.999999999999998,
-        21.0
+        21
       ]
     },
     {
@@ -22134,8 +22133,8 @@
         724
       ],
       "sourcePixelFootprint": [
-        15.0,
-        12.0
+        15,
+        12
       ]
     },
     {
@@ -22165,8 +22164,8 @@
         741
       ],
       "sourcePixelFootprint": [
-        15.0,
-        12.0
+        15,
+        12
       ]
     },
     {
@@ -22196,7 +22195,7 @@
         629
       ],
       "sourcePixelFootprint": [
-        17.0,
+        17,
         9.000000000000002
       ]
     },
@@ -22227,7 +22226,7 @@
         648
       ],
       "sourcePixelFootprint": [
-        17.0,
+        17,
         9.000000000000002
       ]
     }
@@ -22426,922 +22425,829 @@
   "referencePages": [
     {
       "page": 1,
-      "title": "JANUARY 10, 2024 \u00b7 PACE CENTER",
+      "title": "JANUARY 10, 2024 · PACE CENTER",
       "group": "Design language",
-      "image": "/reference/final/01.jpg",
-      "text": "JANUARY 10, 2024\n\n\nPACE CENTER\n1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "January 10, 2024 title date; facility address 1839 W. Valley Blvd.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 2,
-      "title": "LOOK & FEEL \u00b7 DESIGN PRINCIPLE",
+      "title": "LOOK & FEEL · DESIGN PRINCIPLE",
       "group": "Design language",
-      "image": "/reference/final/02.jpg",
-      "text": "LOOK & FEEL\nDESIGN PRINCIPLE\n\n\n\n\n                                                                              COMMUNITY\n                                                                               CONNECTED\nNATURE                                                        CALM & SERENE\n\n                                        HAPPY PLACE\n\n\n                                                                                   HOME\n\n\n                   PACE CENTER\n                   1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Design principles: nature, calm, community and home. Inspiration, not installed-condition evidence.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "inspiration"
     },
     {
       "page": 3,
-      "title": "LOOK & FEEL \u00b7 LOBBY",
+      "title": "LOOK & FEEL · LOBBY",
       "group": "Design language",
-      "image": "/reference/final/03.jpg",
-      "text": "LOOK & FEEL\nLOBBY\n\n\n\n\n          PACE CENTER\n          1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Lobby inspiration: planting, vertical timber slats, upholstered niches.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "inspiration"
     },
     {
       "page": 4,
-      "title": "LOOK & FEEL \u00b7 DAY SPACE | BANQUETTE WALL | TREE LOUNGE",
+      "title": "LOOK & FEEL · DAY SPACE | BANQUETTE WALL | TREE LOUNGE",
       "group": "Design language",
-      "image": "/reference/final/04.jpg",
-      "text": "LOOK & FEEL\nDAY SPACE | BANQUETTE WALL | TREE LOUNGE\n\n\n\n\n                   PACE CENTER\n                   1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Day-space inspiration: layered landscape battens and tree seating.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "inspiration"
     },
     {
       "page": 5,
-      "title": "LOOK & FEEL \u00b7 DAY SPACE | LIBRARY",
+      "title": "LOOK & FEEL · DAY SPACE | LIBRARY",
       "group": "Design language",
-      "image": "/reference/final/05.jpg",
-      "text": "LOOK & FEEL\nDAY SPACE | LIBRARY\n\n\n\n\n                      PACE CENTER\n                      1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Library inspiration: joinery, glazing and seating.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "inspiration"
     },
     {
       "page": 6,
-      "title": "LOOK & FEEL \u00b7 RESTAURANT",
+      "title": "LOOK & FEEL · RESTAURANT",
       "group": "Design language",
-      "image": "/reference/final/06.jpg",
-      "text": "LOOK & FEEL\nRESTAURANT\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Restaurant inspiration: timber doors, round vision panels and lattice.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "inspiration"
     },
     {
       "page": 7,
-      "title": "LOOK & FEEL \u00b7 VERANDA",
+      "title": "LOOK & FEEL · VERANDA",
       "group": "Design language",
-      "image": "/reference/final/07.jpg",
-      "text": "LOOK & FEEL\nVERANDA\n\n\n\n\n          PACE CENTER\n          1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Veranda inspiration: patterned tile, planting and furniture; no as-built exterior dimensions.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "inspiration"
     },
     {
       "page": 8,
-      "title": "LOOK & FEEL \u00b7 PHYSICAL THERAPY",
+      "title": "LOOK & FEEL · PHYSICAL THERAPY",
       "group": "Design language",
-      "image": "/reference/final/08.jpg",
-      "text": "LOOK & FEEL\nPHYSICAL THERAPY\n\n\n\n\n                   PACE CENTER\n                   1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Therapy inspiration: open movement areas and equipment.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "inspiration"
     },
     {
       "page": 9,
-      "title": "LOOK & FEEL \u00b7 CLINIC",
+      "title": "LOOK & FEEL · CLINIC",
       "group": "Design language",
-      "image": "/reference/final/09.jpg",
-      "text": "LOOK & FEEL\nCLINIC\n\n\n\n\n          PACE CENTER\n          1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Clinic inspiration: numbering, clinical rooms and nurse counter.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "inspiration"
     },
     {
       "page": 10,
-      "title": "LOOK & FEEL \u00b7 ADMIN",
+      "title": "LOOK & FEEL · ADMIN",
       "group": "Design language",
-      "image": "/reference/final/10.jpg",
-      "text": "LOOK & FEEL\nADMIN\n\n\n\n\n          PACE CENTER\n          1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Admin inspiration: workstations, partitions and collaboration.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "inspiration"
     },
     {
       "page": 11,
-      "title": "LOOK & FEEL \u00b7 COLOR & MATERIAL",
+      "title": "LOOK & FEEL · COLOR & MATERIAL",
       "group": "Design language",
-      "image": "/reference/final/11.jpg",
-      "text": "LOOK & FEEL\nCOLOR & MATERIAL\n\n\n\n\n                                                                                         CARPET\n\n\n\n\n       CORRUGATED\n       WOOD ON\n       RECEPTION\n       DESK FACIA                                                                        GENERAL\n                                                                                         PLASTIC LAMINATE\n\n                             VINYL COLOR        VINYL COLOR\n\n\n\n\n                                                                           GENERAL\n                                                               CERAMIC     LVT WITH\n                                                TILE IN        TILE IN     HERRINGBONE   PORCELAIN TILE\n                             VINYL COLOR        VERRANDA       BATHROOMS   PATTERN       IN LOBBY/VERANDA\n\n\n\n                    PACE CENTER\n                    1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Material families: moss, timber, upholstery, tile, LVT and carpet. Not a complete procurement schedule.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "inspiration"
     },
     {
       "page": 12,
-      "title": "Overall Planning \u00b7 00 LOBBY/BACK OF HOUSE",
+      "title": "Overall Planning · 00 LOBBY/BACK OF HOUSE",
       "group": "Building & levels",
-      "image": "/reference/final/12.jpg",
-      "text": "Overall Planning\n\n                                                       00 LOBBY/BACK OF HOUSE\n                                                       01 CLINIC\n                                                       02 PHYSICAL THERAPY\n                                                       03 DAYROOM/\n                                                          MEMORY CARE/\n                                                          VERANDA\n                                                       04 DINING/KITCHEN\n                                                       05 ADMIN\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Final furnished top view: canonical tracing and site-image source. No dimension strings or scale bar on the overall plan.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-drawing"
     },
     {
       "page": 13,
-      "title": "Overall Planning \u00b7 BASEMENT",
+      "title": "Overall Planning · BASEMENT",
       "group": "Building & levels",
-      "image": "/reference/final/13.jpg",
-      "text": "Overall Planning\nBASEMENT\n\n\n                                                       Zone   Area       Sq.Ft.\n                                                       06     Basement   6,191\n\n\n                              06\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Basement stated at 6,191 sq ft. Highlight is a stacking footprint, not a basement partition plan.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 14,
-      "title": "Overall Planning \u00b7 GROUND",
+      "title": "Overall Planning · GROUND",
       "group": "Building & levels",
-      "image": "/reference/final/14.jpg",
-      "text": "Overall Planning\nGROUND\n\n\n                                                           Zone   Area             Sq.Ft.\n                                                                             00 LOBBY/BACK OF HOUSE\n                                                           00     Lobby / Back 3,150 SF\n                                                                                  3,150 S.F.\n                           02                                     of House 01 CLINIC\n               01\n                                                                                3,254 SF\n                                04                                           02 PHYSICAL THERAPY\n                                                           01     Clinic           3,254 S.F.\n                                                                                3,080 SF\n                                       05                  02     Physical 03 DAYROOM/\n                                                                                 3,080 S.F.\n                      03                                          Therapy / OTMEMORY CARE/\n                                                                                VERANDA\n\n          02                                                                    3,665 SF\n                                                           03     Dayroom /04 DINING\n                                                                                 3,665 S.F.\n                                                                  Memory Care815 SF/KITCHEN 638 SF\n                                                                             05 ADMIN\n\n                                                           04     Dining /          815\n                                                                                 2,716 SF S.F.\n\n                                                                  Kitchen          638 S.F.\n                                                           05     Admin            2,716 S.F.\n\n\n                PACE CENTER\n                1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Program areas: 3,150; 3,254; 3,080; 3,665; 815; 638; 2,716 sq ft, total 17,318. Program boundaries/net-versus-gross basis are not fully defined.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 15,
-      "title": "Overall Planning \u00b7 MEZZANINE-SECOND FLOOR",
+      "title": "Overall Planning · MEZZANINE-SECOND FLOOR",
       "group": "Building & levels",
-      "image": "/reference/final/15.jpg",
-      "text": "Overall Planning\nMEZZANINE-SECOND FLOOR\n\n\n                                                             Zone   Area           Sq.Ft.\n                                                                                 LEGEND\n                                                             07     Equipment 07 1,MED\n                                                                                    267EQUIP DECK\n                                                                    Mezz          1,267 SF\n                                                             08     Future      08 2,FUTURE\n                                                                                      885 OFFICE\n                                                                    Office space 2,885 SF\n                                  08\n\n\n\n\n           07\n\n\n\n\n                  PACE CENTER\n                  1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Equipment mezzanine 1,267 sq ft and future office 2,885 sq ft. No floor elevations or office fit-out.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 16,
-      "title": "Overall Planning - Stacking Diagram \u00b7 BASEMENT",
+      "title": "Overall Planning - Stacking Diagram · BASEMENT",
       "group": "Building & levels",
-      "image": "/reference/final/16.jpg",
-      "text": "Overall Planning - Stacking Diagram\nBASEMENT\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Basement stacking view: surrounding streets and massing retained. Internal basement geometry cannot be verified.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 17,
-      "title": "Overall Planning - Stacking Diagram \u00b7 GROUND",
+      "title": "Overall Planning - Stacking Diagram · GROUND",
       "group": "Building & levels",
-      "image": "/reference/final/17.jpg",
-      "text": "Overall Planning - Stacking Diagram\nGROUND\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Ground stacking view: final massing and cutaway room relationships.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 18,
-      "title": "Overall Planning - Stacking Diagram \u00b7 MEZZANINE-SECOND FLOOR",
+      "title": "Overall Planning - Stacking Diagram · MEZZANINE-SECOND FLOOR",
       "group": "Building & levels",
-      "image": "/reference/final/18.jpg",
-      "text": "Overall Planning - Stacking Diagram\nMEZZANINE-SECOND FLOOR\n\n\n\n\n                  PACE CENTER\n                  1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Mezzanine/second-floor stacking: southwest L-shaped mezzanine and southeast upper office.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 19,
-      "title": "Overall Planning - Stacking Diagram \u00b7 ROOF",
+      "title": "Overall Planning - Stacking Diagram · ROOF",
       "group": "Building & levels",
-      "image": "/reference/final/19.jpg",
-      "text": "Overall Planning - Stacking Diagram\nROOF\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Roof stacking: long central curved roof, southwest roof and east roof volumes. Roof equipment shapes visible; specifications absent.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 20,
-      "title": "Visuals - Exterior Entry \u00b7 RENDERED ELEVATION",
+      "title": "Visuals - Exterior Entry · RENDERED ELEVATION",
       "group": "Exterior & streets",
-      "image": "/reference/final/20.jpg",
-      "text": "Visuals - Exterior Entry\nRENDERED ELEVATION\n\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "West entry facade elevation: signage, canopy, glazing and entry; no readable overall dimensions.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 21,
-      "title": "Visuals - Exterior Entry \u00b7 PACE CENTER",
+      "title": "Visuals - Exterior Entry · PACE CENTER",
       "group": "Exterior & streets",
-      "image": "/reference/final/21.jpg",
-      "text": "Visuals - Exterior Entry\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "West parking/drop-off top view: accessible bays, marked access aisle and van approach.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 22,
-      "title": "Visuals - Exterior Entry \u00b7 PACE CENTER",
+      "title": "Visuals - Exterior Entry · PACE CENTER",
       "group": "Exterior & streets",
-      "image": "/reference/final/22.jpg",
-      "text": "Visuals - Exterior Entry\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "West entry perspective: railings, canopy, stairs/ramp and exterior wall treatment.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 23,
-      "title": "Visuals - Exterior Entry \u00b7 PACE CENTER",
+      "title": "Visuals - Exterior Entry · PACE CENTER",
       "group": "Exterior & streets",
-      "image": "/reference/final/23.jpg",
-      "text": "Visuals - Exterior Entry\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "West entry perspective with van: arrival relationship and signage.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 24,
-      "title": "Visuals - Exterior Entry \u00b7 PACE CENTER",
+      "title": "Visuals - Exterior Entry · PACE CENTER",
       "group": "Exterior & streets",
-      "image": "/reference/final/24.jpg",
-      "text": "Visuals - Exterior Entry\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Oblique west drop-off: ramp, wall, parking islands and markings.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 25,
-      "title": "Visuals - Exterior Entry \u00b7 PACE CENTER",
+      "title": "Visuals - Exterior Entry · PACE CENTER",
       "group": "Exterior & streets",
-      "image": "/reference/final/25.jpg",
-      "text": "Visuals - Exterior Entry\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Alternate west drop-off view: confirms site access context.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 26,
-      "title": "Overall Material Boards \u00b7 FLOOR FINISH PLAN",
+      "title": "Overall Material Boards · FLOOR FINISH PLAN",
       "group": "Materials",
-      "image": "/reference/final/26.jpg",
-      "text": "Overall Material Boards\nFLOOR FINISH PLAN\n\n\n\n\n                                                                    01 PORCELAIN TILE                   02 SHEET VINYL\n                                    02\n\n\n\n\n                                                                    03 LUXURY VINYL TILE \u2013 HERRINGBONE PATTERN\n                               01                  01\n\n\n\n                                                03\n\n                    05        03\n\n\n                                                                                   04 CARPET TILE\n                                                                                  Herringbone pattern\n             06\n\n                                              04\n\n\n\n                                                                    06 VINYL SPORTS FLOORING            CERAMIC TILE\n\n\n\n                         PACE CENTER\n                         1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Floor-finish plan: porcelain, sheet vinyl, herringbone LVT, carpet tile, sports vinyl and ceramic. Zone 05 labeling needs schedule clarification.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-drawing"
     },
     {
       "page": 27,
-      "title": "Bathroom                                                       INTERIOR FINISHES \u00b7 MATERIALS AND FINISHES                                                       1     2, 4",
+      "title": "Bathroom                                                       INTERIOR FINISHES · MATERIALS AND FINISHES                                                       1     2, 4",
       "group": "Materials",
-      "image": "/reference/final/27.jpg",
-      "text": "Bathroom                                                       INTERIOR FINISHES\nMATERIALS AND FINISHES                                                       1     2, 4\n                                                                         PT-04     CT-04, CT-03\n                                                                      SW 6205      0790 MATT\n                                                                 COMFORT GRAY      ARCTIC WHITE\n\n\n\n\n                                                                             3     5\n                                                                         CT-05     CT-07\n                                                                  RESTORE 0058     A53 RESTORE\n                                                                                   2X2 MOSAIC\n\n\n\n\n                                                                             6     7\n                                                                          SS-02    LP-03\n                                                                  ROYALE BLANC     LAMINATE PLASTIC\n                                                                                   SOLICOR COMPACT\n\n\n\n\n                                                               MILLWORK\n                                                                             8     9\n                                                                          SS-02    LP-03\n                                                                       QUARTZ      LAMINATE PLASTIC\n                                                                   ROYAL BLANC     SOLICOR COMPACT\n\n\n\n\n                    PACE CENTER\n                    1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Bathroom finish codes PT-04, CT-03/04/05/07, SS-02, LP-03; Comfort Gray, Arctic White, Royale/Royal Blanc and Solicor Compact named.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 28,
-      "title": "Visuals - Lobby \u00b7 INTERIOR ELEVATION",
+      "title": "Visuals - Lobby · INTERIOR ELEVATION",
       "group": "Lobby",
-      "image": "/reference/final/28.jpg",
-      "text": "Visuals - Lobby\nINTERIOR ELEVATION\n\n\n\n\n  NORTH                                                         SOUTH\n\n\n\n\n  EAST                                                          WEST\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Lobby line elevations: four orientations, doors, niches, benches and counter. No dimension strings.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-drawing"
     },
     {
       "page": 29,
-      "title": "Visuals - Lobby \u00b7 RENDERED ELEVATION",
+      "title": "Visuals - Lobby · RENDERED ELEVATION",
       "group": "Lobby",
-      "image": "/reference/final/29.jpg",
-      "text": "Visuals - Lobby\nRENDERED ELEVATION\n\n\n\n\n  NORTH\n\n\n\n\n  SOUTH\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Lobby north/south render elevations: warm upholstery, landscape niche panels, doors and fountain.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 30,
-      "title": "Visuals - Lobby \u00b7 RENDERED ELEVATION",
+      "title": "Visuals - Lobby · RENDERED ELEVATION",
       "group": "Lobby",
-      "image": "/reference/final/30.jpg",
-      "text": "Visuals - Lobby\nRENDERED ELEVATION\n\n\n\n\nEAST                                                            WEST\n\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Lobby east/west render elevations: planting/slats, counter, entry and timber doors.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 31,
-      "title": "Visuals - Lobby \u00b7 PACE CENTER",
+      "title": "Visuals - Lobby · PACE CENTER",
       "group": "Lobby",
-      "image": "/reference/final/31.jpg",
-      "text": "Visuals - Lobby\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Reception perspective: white counter, timber fluting, moss wall and ceiling slats.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 32,
-      "title": "Visuals - Lobby \u00b7 PACE CENTER",
+      "title": "Visuals - Lobby · PACE CENTER",
       "group": "Lobby",
-      "image": "/reference/final/32.jpg",
-      "text": "Visuals - Lobby\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Alternate reception perspective: paired upholstered niches and floor tiles.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 33,
-      "title": "Visuals - Lobby \u00b7 PACE CENTER",
+      "title": "Visuals - Lobby · PACE CENTER",
       "group": "Lobby",
-      "image": "/reference/final/33.jpg",
-      "text": "Visuals - Lobby\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Lobby corridor perspective: wood doors, floor tile and wall-mounted fixtures.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 34,
-      "title": "Visuals - Lobby \u00b7 PACE CENTER",
+      "title": "Visuals - Lobby · PACE CENTER",
       "group": "Lobby",
-      "image": "/reference/final/34.jpg",
-      "text": "Visuals - Lobby\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Lobby transition: reception axis, fountain and adjacent corridor.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 35,
-      "title": "Visuals - East Hallway \u00b7 INTERIOR ELEVATION - 1010",
+      "title": "Visuals - East Hallway · INTERIOR ELEVATION - 1010",
       "group": "East hallway",
-      "image": "/reference/final/35.jpg",
-      "text": "Visuals - East Hallway\nINTERIOR ELEVATION - 1010\n\n\n\n\n NORTH                                                         EAST\n\n\n\n\n SOUTH                                                         WEST\n\n\n\n\n                    PACE CENTER\n                    1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Hallway 1010 line elevations: two cubby banks, doors and exit glazing.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-drawing"
     },
     {
       "page": 36,
-      "title": "Visuals - East Hallway \u00b7 RENDERED ELEVATION - 1010",
+      "title": "Visuals - East Hallway · RENDERED ELEVATION - 1010",
       "group": "East hallway",
-      "image": "/reference/final/36.jpg",
-      "text": "Visuals - East Hallway\nRENDERED ELEVATION - 1010\n\n\n\n\n NORTH                                                        EAST\n\n\n\n\n SOUTH                                                        WEST\n\n\n\n\n                   PACE CENTER\n                   1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Hallway 1010 finish elevations: cubbies, wall panels, handrails and door colors.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 37,
-      "title": "Visuals - East Hallway \u00b7 PACE CENTER",
+      "title": "Visuals - East Hallway · PACE CENTER",
       "group": "East hallway",
-      "image": "/reference/final/37.jpg",
-      "text": "Visuals - East Hallway\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Hallway perspective confirms cubbies and suspended ceiling.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 38,
-      "title": "Visuals - East Hallway \u00b7 PACE CENTER",
+      "title": "Visuals - East Hallway · PACE CENTER",
       "group": "East hallway",
-      "image": "/reference/final/38.jpg",
-      "text": "Visuals - East Hallway\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Hallway axis confirms sequence of doors, handrail and ceiling lights.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 39,
-      "title": "Visuals - East Hallway \u00b7 PACE CENTER",
+      "title": "Visuals - East Hallway · PACE CENTER",
       "group": "East hallway",
-      "image": "/reference/final/39.jpg",
-      "text": "Visuals - East Hallway\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Hallway cubby perspective, alternate direction.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 40,
-      "title": "Visuals - Clinic Overall - 1129 \u00b7 INTERIOR ELEVATION",
+      "title": "Visuals - Clinic Overall - 1129 · INTERIOR ELEVATION",
       "group": "Clinic",
-      "image": "/reference/final/40.jpg",
-      "text": "Visuals - Clinic Overall - 1129\nINTERIOR ELEVATION\n\n\n\n\n        EAST\n\n\n\n\n        WEST\n\n\n\n\n        NORTH                                                   SOUTH\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Clinic 1129 line elevations: nurse desk, door sequence and wall rails.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-drawing"
     },
     {
       "page": 41,
-      "title": "Visuals - Clinic Overall - 1129 \u00b7 RENDERED ELEVATION",
+      "title": "Visuals - Clinic Overall - 1129 · RENDERED ELEVATION",
       "group": "Clinic",
-      "image": "/reference/final/41.jpg",
-      "text": "Visuals - Clinic Overall - 1129\nRENDERED ELEVATION\n\n\n\n\n WEST\n\n\n\n\n EAST\n\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Clinic 1129 rendered long elevations: six doors and numbered wayfinding.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 42,
-      "title": "Visuals - Clinic Overall - 1129 \u00b7 RENDERED ELEVATION",
+      "title": "Visuals - Clinic Overall - 1129 · RENDERED ELEVATION",
       "group": "Clinic",
-      "image": "/reference/final/42.jpg",
-      "text": "Visuals - Clinic Overall - 1129\nRENDERED ELEVATION\n\n\n\n\n        NORTH\n\n\n\n\n        SOUTH\n\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Clinic 1129 north/south render elevations: desk, consultation furniture and clinical equipment.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 43,
-      "title": "Visuals - Clinic Overall - 1130 \u00b7 INTERIOR ELEVATION",
+      "title": "Visuals - Clinic Overall - 1130 · INTERIOR ELEVATION",
       "group": "Clinic",
-      "image": "/reference/final/43.jpg",
-      "text": "Visuals - Clinic Overall - 1130\nINTERIOR ELEVATION\n\n\n\n\nWEST\n\n\n\n\nEAST\n\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
-      "findings": "Clinic 1130 line elevations: numbered doors 1\u20136 opposite clinical desk.",
+      "text": "",
+      "findings": "Clinic 1130 line elevations: numbered doors 1–6 opposite clinical desk.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-drawing"
     },
     {
       "page": 44,
-      "title": "Visuals - Clinic Overall - 1130 \u00b7 RENDERED ELEVATION",
+      "title": "Visuals - Clinic Overall - 1130 · RENDERED ELEVATION",
       "group": "Clinic",
-      "image": "/reference/final/44.jpg",
-      "text": "Visuals - Clinic Overall - 1130\nRENDERED ELEVATION\n\n\n\n\n  EAST\n\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Clinic 1130 east finish elevation: six numbered exam doors. Numeric order cannot be mapped confidently to pixel plan without a room schedule.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 45,
-      "title": "Visuals - Clinic Overall \u00b7 PACE CENTER",
+      "title": "Visuals - Clinic Overall · PACE CENTER",
       "group": "Clinic",
-      "image": "/reference/final/45.jpg",
-      "text": "Visuals - Clinic Overall\n\n\n\n\n              PACE CENTER\n              1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Clinic circulation and nurse station perspective.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 46,
-      "title": "Visuals - Clinic Overall \u00b7 PACE CENTER",
+      "title": "Visuals - Clinic Overall · PACE CENTER",
       "group": "Clinic",
-      "image": "/reference/final/46.jpg",
-      "text": "Visuals - Clinic Overall\n\n\n\n\n              PACE CENTER\n              1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Nurse station and clinic perspective with people; furniture/finish evidence only.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 47,
-      "title": "Visuals - Clinic Overall \u00b7 PACE CENTER",
+      "title": "Visuals - Clinic Overall · PACE CENTER",
       "group": "Clinic",
-      "image": "/reference/final/47.jpg",
-      "text": "Visuals - Clinic Overall\n\n\n\n\n              PACE CENTER\n              1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Clinic nurse-station return and teal bulkhead.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 48,
-      "title": "Visuals - Clinic Overall \u00b7 PACE CENTER",
+      "title": "Visuals - Clinic Overall · PACE CENTER",
       "group": "Clinic",
-      "image": "/reference/final/48.jpg",
-      "text": "Visuals - Clinic Overall\n\n\n\n\n              PACE CENTER\n              1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Alternate nurse-station perspective with people.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 49,
-      "title": "Visuals - Clinic Overall \u00b7 PACE CENTER",
+      "title": "Visuals - Clinic Overall · PACE CENTER",
       "group": "Clinic",
-      "image": "/reference/final/49.jpg",
-      "text": "Visuals - Clinic Overall\n\n\n\n\n              PACE CENTER\n              1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Clinic end-on nurse counter: fluted timber, white top and teal bulkhead.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 50,
-      "title": "Visuals - Clinic Overall \u00b7 PACE CENTER",
+      "title": "Visuals - Clinic Overall · PACE CENTER",
       "group": "Clinic",
-      "image": "/reference/final/50.jpg",
-      "text": "Visuals - Clinic Overall\n\n\n\n\n              PACE CENTER\n              1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Empty nurse-counter perspective confirms counter form.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 51,
-      "title": "Visuals - Clinic Overall \u00b7 PACE CENTER",
+      "title": "Visuals - Clinic Overall · PACE CENTER",
       "group": "Clinic",
-      "image": "/reference/final/51.jpg",
-      "text": "Visuals - Clinic Overall\n\n\n\n\n              PACE CENTER\n              1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Clinic circulation, room 1126 sign visible; exact placement needs a numbered plan.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 52,
-      "title": "Visuals - Clinic Overall \u00b7 PACE CENTER",
+      "title": "Visuals - Clinic Overall · PACE CENTER",
       "group": "Clinic",
-      "image": "/reference/final/52.jpg",
-      "text": "Visuals - Clinic Overall\n\n\n\n\n              PACE CENTER\n              1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Alternate view of same circulation and room 1126 signage.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 53,
-      "title": "Visuals - Clinic - 1110 Consult Room \u00b7 INTERIOR ELEVATION",
+      "title": "Visuals - Clinic - 1110 Consult Room · INTERIOR ELEVATION",
       "group": "Clinic",
-      "image": "/reference/final/53.jpg",
-      "text": "Visuals - Clinic - 1110 Consult Room\nINTERIOR ELEVATION\n\n\n\n\n                     NORTH                                      SOUTH\n\n\n\n\n                     EAST                                               WEST\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Consult room 1110: four line elevations, central table, chairs and display.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-drawing"
     },
     {
       "page": 54,
-      "title": "Visuals - Clinic - 1110 Consult Room \u00b7 PACE CENTER",
+      "title": "Visuals - Clinic - 1110 Consult Room · PACE CENTER",
       "group": "Clinic",
-      "image": "/reference/final/54.jpg",
-      "text": "Visuals - Clinic - 1110 Consult Room\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Consult room 1110 perspective: wall display, table and blue chairs.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 55,
-      "title": "Visuals - Clinic \u2013 Exam Room Typical \u00b7 PACE CENTER",
+      "title": "Visuals - Clinic – Exam Room Typical · PACE CENTER",
       "group": "Clinic",
-      "image": "/reference/final/55.jpg",
-      "text": "Visuals - Clinic \u2013 Exam Room Typical\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Typical exam-room top view: angled exam recliner, side chair and cabinet. No dimensions or room number.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 56,
-      "title": "Visuals - Clinic \u2013 Exam Room Typical \u00b7 PACE CENTER",
+      "title": "Visuals - Clinic – Exam Room Typical · PACE CENTER",
       "group": "Clinic",
-      "image": "/reference/final/56.jpg",
-      "text": "Visuals - Clinic \u2013 Exam Room Typical\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Typical exam room: recliner, side chair, sink/cabinet run and wood door.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 57,
-      "title": "Visuals - Clinic - 1111 Triage \u00b7 PACE CENTER",
+      "title": "Visuals - Clinic - 1111 Triage · PACE CENTER",
       "group": "Clinic",
-      "image": "/reference/final/57.jpg",
-      "text": "Visuals - Clinic - 1111 Triage\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Triage room 1111 perspective. Model-to-plan location cannot be established uniquely from the compressed plan.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 58,
-      "title": "Visuals - Clinic \u2013 Exam Room Typical \u00b7 PACE CENTER",
+      "title": "Visuals - Clinic – Exam Room Typical · PACE CENTER",
       "group": "Clinic",
-      "image": "/reference/final/58.jpg",
-      "text": "Visuals - Clinic \u2013 Exam Room Typical\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Typical exam room cabinetry, sink and side chair.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 59,
-      "title": "Visuals - Clinic \u2013 Exam Room Typical \u00b7 PACE CENTER",
+      "title": "Visuals - Clinic – Exam Room Typical · PACE CENTER",
       "group": "Clinic",
-      "image": "/reference/final/59.jpg",
-      "text": "Visuals - Clinic \u2013 Exam Room Typical\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Reverse typical exam-room view, diagnostic wall equipment.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 60,
-      "title": "Visuals - Physical Therapy Overall \u00b7 INTERIOR ELEVATION",
+      "title": "Visuals - Physical Therapy Overall · INTERIOR ELEVATION",
       "group": "Physical therapy",
-      "image": "/reference/final/60.jpg",
-      "text": "Visuals - Physical Therapy Overall\nINTERIOR ELEVATION\n\n\n\n\n                 NORTH                                                 SOUTH\n\n\n\n\n     EAST                                                       WEST\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "PT line elevations: mezzanine guardrail, glazed openings and double-height volume; no dimension strings.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-drawing"
     },
     {
       "page": 61,
-      "title": "Visuals - Physical Therapy Overall \u00b7 RENDERED ELEVATION",
+      "title": "Visuals - Physical Therapy Overall · RENDERED ELEVATION",
       "group": "Physical therapy",
-      "image": "/reference/final/61.jpg",
-      "text": "Visuals - Physical Therapy Overall\nRENDERED ELEVATION\n\n\n\n\n              NORTH                                             SOUTH\n\n\n\n\n EAST                                                             WEST\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "PT finish elevations: mezzanine edge and lower glazing.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 62,
-      "title": "Visuals - Physical Therapy Overall \u00b7 PACE CENTER",
+      "title": "Visuals - Physical Therapy Overall · PACE CENTER",
       "group": "Physical therapy",
-      "image": "/reference/final/62.jpg",
-      "text": "Visuals - Physical Therapy Overall\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "PT perspective: treatment tables, trainer, bike, mezzanine railing.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 63,
-      "title": "Visuals - Physical Therapy Overall \u00b7 PACE CENTER",
+      "title": "Visuals - Physical Therapy Overall · PACE CENTER",
       "group": "Physical therapy",
-      "image": "/reference/final/63.jpg",
-      "text": "Visuals - Physical Therapy Overall\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "PT perimeter: exercise bikes, training steps, ball rack and glazing.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 64,
-      "title": "Visuals - Physical Therapy Overall \u00b7 PACE CENTER",
+      "title": "Visuals - Physical Therapy Overall · PACE CENTER",
       "group": "Physical therapy",
-      "image": "/reference/final/64.jpg",
-      "text": "Visuals - Physical Therapy Overall\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "PT treatment table arrangement under mezzanine.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 65,
-      "title": "Visuals - Physical Therapy Overall \u00b7 PACE CENTER",
+      "title": "Visuals - Physical Therapy Overall · PACE CENTER",
       "group": "Physical therapy",
-      "image": "/reference/final/65.jpg",
-      "text": "Visuals - Physical Therapy Overall\n\n\n\n\n             PACE CENTER\n             1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "PT reverse perspective and inset orientation plan; treatment tables and demonstration kitchen visible.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 66,
-      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 INTERIOR ELEVATION",
+      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge · INTERIOR ELEVATION",
       "group": "Day room",
-      "image": "/reference/final/66.jpg",
-      "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\nINTERIOR ELEVATION\n\n\n\n\n                                                           NORTH\n\n\n\n\n                                                           SOUTH\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Day-room north/south sections: 12 ft finish datum; 4 ft lower + 8 ft upper; 4 in base; bowstring trusses. Roof crown is not explicitly dimensioned.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-drawing"
     },
     {
       "page": 67,
-      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 INTERIOR ELEVATION",
+      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge · INTERIOR ELEVATION",
       "group": "Day room",
-      "image": "/reference/final/67.jpg",
-      "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\nINTERIOR ELEVATION\n\n\n\n\n                                                           EAST\n\n\n\n\n                                                           WEST\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Day-room east/west elevations repeat 12 ft, 4 ft, 8 ft and 4 in datums. Landscape wall and library are clearly placed.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-drawing"
     },
     {
       "page": 68,
-      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 RENDERED ELEVATION",
+      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge · RENDERED ELEVATION",
       "group": "Day room",
-      "image": "/reference/final/68.jpg",
-      "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\nRENDERED ELEVATION\n\n\n\n\n                                                            NORTH\n\n\n\n\n                                                            SOUTH\n\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Day-room north/south rendered elevations: tree, screens, openings and living wall.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 69,
-      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 RENDERED ELEVATION",
+      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge · RENDERED ELEVATION",
       "group": "Day room",
-      "image": "/reference/final/69.jpg",
-      "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\nRENDERED ELEVATION\n\n\n\n\n              EAST\n\n\n\n\n                                                            SOUTH\n\n              WEST\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Day-room rendered elevations: landscape battens east; library and screen west. Page also contains a SOUTH label without a distinct separate elevation.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 70,
-      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 PACE CENTER",
+      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge · PACE CENTER",
       "group": "Day room",
-      "image": "/reference/final/70.jpg",
-      "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\n\n\n\n\n           PACE CENTER\n           1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Day-room perspective: round blue tree lounge, rectangular tables and timber roof/trusses.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 71,
-      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 PACE CENTER",
+      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge · PACE CENTER",
       "group": "Day room",
-      "image": "/reference/final/71.jpg",
-      "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\n\n\n\n\n           PACE CENTER\n           1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Alternate tree lounge view, timber chair frames and tabletops.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 72,
-      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 PACE CENTER",
+      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge · PACE CENTER",
       "group": "Day room",
-      "image": "/reference/final/72.jpg",
-      "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\n\n\n\n\n           PACE CENTER\n           1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Landscape wall perspective: layered slats, blue banquette and tables.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 73,
-      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 PACE CENTER",
+      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge · PACE CENTER",
       "group": "Day room",
-      "image": "/reference/final/73.jpg",
-      "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\n\n\n\n\n           PACE CENTER\n           1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Alternate banquette/landscape wall perspective.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 74,
-      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 PACE CENTER",
+      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge · PACE CENTER",
       "group": "Day room",
-      "image": "/reference/final/74.jpg",
-      "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\n\n\n\n\n           PACE CENTER\n           1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Tree lounge close view: branches, planting and blue seating.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 75,
-      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 PACE CENTER",
+      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge · PACE CENTER",
       "group": "Day room",
-      "image": "/reference/final/75.jpg",
-      "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\n\n\n\n\n           PACE CENTER\n           1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Library-wall view with pale chair variant; conflicts with darker chair variant on p.76.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 76,
-      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge \u00b7 PACE CENTER",
+      "title": "Visuals - Day Room/Banquet Wall/Tree Lounge · PACE CENTER",
       "group": "Day room",
-      "image": "/reference/final/76.jpg",
-      "text": "Visuals - Day Room/Banquet Wall/Tree Lounge\n\n\n\n\n           PACE CENTER\n           1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Same library-wall view with darker timber chair variant. Final installed chair specification is unresolved.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 77,
-      "title": "Visuals - Day Room - Dining 1421 \u00b7 INTERIOR ELEVATION",
+      "title": "Visuals - Day Room - Dining 1421 · INTERIOR ELEVATION",
       "group": "Dining",
-      "image": "/reference/final/77.jpg",
-      "text": "Visuals - Day Room - Dining 1421\nINTERIOR ELEVATION\n\n\n\n\n      NORTH                                                     SOUTH\n\n\n\n\n      EAST                                                      WEST\n\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Dining 1421 line elevations: four orientations, screen, service opening and doors.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-drawing"
     },
     {
       "page": 78,
-      "title": "Visuals - Day Room - Dining 1421 \u00b7 RENDERED ELEVATION",
+      "title": "Visuals - Day Room - Dining 1421 · RENDERED ELEVATION",
       "group": "Dining",
-      "image": "/reference/final/78.jpg",
-      "text": "Visuals - Day Room - Dining 1421\nRENDERED ELEVATION\n\n\n\n\n     NORTH                                                      SOUTH\n\n\n\n\n     EAST                                                       WEST\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Dining 1421 rendered elevations: timber lattice, green doors, service opening and artwork.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 79,
-      "title": "Visuals - Day Room - Dining 1421 \u00b7 PACE CENTER",
+      "title": "Visuals - Day Room - Dining 1421 · PACE CENTER",
       "group": "Dining",
-      "image": "/reference/final/79.jpg",
-      "text": "Visuals - Day Room - Dining 1421\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Dining perspective: TV wall, lattice partition and small tables.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 80,
-      "title": "Visuals - Day Room - Dining 1421 \u00b7 PACE CENTER",
+      "title": "Visuals - Day Room - Dining 1421 · PACE CENTER",
       "group": "Dining",
-      "image": "/reference/final/80.jpg",
-      "text": "Visuals - Day Room - Dining 1421\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Alternate dining view: lattice and tile ceiling grid.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 81,
-      "title": "Visuals - Day Room - Dining 1421 \u00b7 PACE CENTER",
+      "title": "Visuals - Day Room - Dining 1421 · PACE CENTER",
       "group": "Dining",
-      "image": "/reference/final/81.jpg",
-      "text": "Visuals - Day Room - Dining 1421\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Dining service wall with roller opening and beverage counter.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 82,
-      "title": "Visuals - Day Room - Dining 1421 \u00b7 PACE CENTER",
+      "title": "Visuals - Day Room - Dining 1421 · PACE CENTER",
       "group": "Dining",
-      "image": "/reference/final/82.jpg",
-      "text": "Visuals - Day Room - Dining 1421\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Reverse dining view: service window, art and tables.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 83,
-      "title": "Visuals - Day Room - Dining 1421 \u00b7 PACE CENTER",
+      "title": "Visuals - Day Room - Dining 1421 · PACE CENTER",
       "group": "Dining",
-      "image": "/reference/final/83.jpg",
-      "text": "Visuals - Day Room - Dining 1421\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Dining service corner and lattice detail.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 84,
-      "title": "Visuals - Admin \u00b7 INTERIOR ELEVATION",
+      "title": "Visuals - Admin · INTERIOR ELEVATION",
       "group": "Administration",
-      "image": "/reference/final/84.jpg",
-      "text": "Visuals - Admin\nINTERIOR ELEVATION\n\n\n\n\n  NORTH                                                         SOUTH\n\n\n\n\n  EAST                                                          WEST\n\n\n\n\n                     PACE CENTER\n                     1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Admin line elevations: four directions, partition openings and glazed meeting room.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-drawing"
     },
     {
       "page": 85,
-      "title": "Visuals - Admin \u00b7 PACE CENTER",
+      "title": "Visuals - Admin · PACE CENTER",
       "group": "Administration",
-      "image": "/reference/final/85.jpg",
-      "text": "Visuals - Admin\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Admin shared workstations: bench desks, dividers and task chairs.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 86,
-      "title": "Visuals - Admin \u00b7 PACE CENTER",
+      "title": "Visuals - Admin · PACE CENTER",
       "group": "Administration",
-      "image": "/reference/final/86.jpg",
-      "text": "Visuals - Admin\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Admin central passage and workstations.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 87,
-      "title": "Visuals - Admin \u00b7 PACE CENTER",
+      "title": "Visuals - Admin · PACE CENTER",
       "group": "Administration",
-      "image": "/reference/final/87.jpg",
-      "text": "Visuals - Admin\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Admin alternate bench arrangement and shared workspace.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 88,
-      "title": "Visuals - Admin \u00b7 PACE CENTER",
+      "title": "Visuals - Admin · PACE CENTER",
       "group": "Administration",
-      "image": "/reference/final/88.jpg",
-      "text": "Visuals - Admin\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Admin workstation-to-meeting-room relationship and glass partitions.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 89,
-      "title": "Visuals - Admin \u00b7 PACE CENTER",
+      "title": "Visuals - Admin · PACE CENTER",
       "group": "Administration",
-      "image": "/reference/final/89.jpg",
-      "text": "Visuals - Admin\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Admin window-side desk row with shades.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 90,
-      "title": "Visuals - Admin \u00b7 PACE CENTER",
+      "title": "Visuals - Admin · PACE CENTER",
       "group": "Administration",
-      "image": "/reference/final/90.jpg",
-      "text": "Visuals - Admin\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Admin long meeting table and chairs.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 91,
-      "title": "Visuals - Admin \u00b7 PACE CENTER",
+      "title": "Visuals - Admin · PACE CENTER",
       "group": "Administration",
-      "image": "/reference/final/91.jpg",
-      "text": "Visuals - Admin\n\n\n\n\n            PACE CENTER\n            1839 W. VALLEY BLVD., ALHAMBRA, CA 91803",
+      "text": "",
       "findings": "Small admin consultation/meeting room: table, display and chairs.",
       "reviewStatus": "visually-inventoried",
       "evidenceType": "source-render-or-schedule"
     },
     {
       "page": 92,
-      "title": "Overall Planning \u00b7 current layout and furniture",
+      "title": "Overall Planning · current layout and furniture",
       "label": "Planning image",
       "group": "Current floor plan",
-      "image": "/reference/planning/plan.jpg",
-      "file": "/reference/planning/overall-full.jpg",
-      "text": "User-supplied image, 7200 \u00d7 5400 pixels. Ground-floor layout and furniture arrangement are authoritative for this revision. No dimension strings or room schedule are shown.",
+      "text": "",
       "findings": "Supersedes PDF p.12 for ground-floor walls, doors, floor finishes, furniture positions, parking and streets. PDF details and upper-level information are retained only where this image supplies no replacement.",
       "reviewStatus": "traced-and-overlaid",
       "evidenceType": "current-user-supplied-plan"
@@ -23351,7 +23257,7 @@
     {
       "id": "dimensioned-plan",
       "title": "Overall and room dimensions",
-      "detail": "Ground-floor positions and footprints are traced from the supplied 7200 \u00d7 5400 image. A dimensioned drawing is still needed to verify physical lengths; published-area calibration does not certify exact room dimensions.",
+      "detail": "Ground-floor positions and footprints are traced from the supplied 7200 × 5400 image. A dimensioned drawing is still needed to verify physical lengths; published-area calibration does not certify exact room dimensions.",
       "status": "open",
       "pages": [
         92,
@@ -23461,7 +23367,6 @@
     }
   ],
   "site": {
-    "image": "/reference/planning/plan.jpg",
     "imageSize": [
       3600,
       2700
@@ -23496,11 +23401,11 @@
         -22.437591
       ],
       [
-        0.0,
+        0,
         -22.437591
       ],
       [
-        0.0,
+        0,
         -12.465328
       ],
       [
@@ -23552,11 +23457,11 @@
         28.085148
       ],
       [
-        0.0,
+        0,
         28.085148
       ],
       [
-        0.0,
+        0,
         25.134172
       ],
       [
@@ -23587,7 +23492,7 @@
           -22.463031
         ],
         [
-          0.0,
+          0,
           25.134172
         ]
       ],
@@ -23613,7 +23518,7 @@
           27.169328
         ]
       ],
-      "eaveHeight": 6.0,
+      "eaveHeight": 6,
       "rise": 0.18,
       "referencePages": [
         19,
@@ -23627,7 +23532,7 @@
       "kind": "flat",
       "bounds": [
         [
-          0.0,
+          0,
           -15.212789
         ],
         [
@@ -25415,7 +25320,7 @@
     {
       "id": "admin-front-pier-0",
       "position": [
-        -1e-06,
+        -0.000001,
         0,
         26.660539
       ],
@@ -35273,7 +35178,6 @@
     "audit": "/models/planning-update.md"
   },
   "planningTrace": {
-    "sourceFile": "/reference/planning/overall-full.jpg",
     "originalArchivePath": "sources/planning/Overall Planning.jpg",
     "analysisImageSize": [
       1800,
@@ -35300,5 +35204,8 @@
       "conferenceSeats": 16
     },
     "sourceSha256": "ab919794396a3a6119591335dd03bd84146e824772b28c53431383335e6769be"
+  },
+  "publication": {
+    "sourceDocuments": "not-published"
   }
 }

@@ -7,8 +7,10 @@ import {
   type CharacterRole,
 } from './characters';
 import type { Facility, Vec2 } from './schema';
-import { buildArrival, sampleVan } from './arrival';
+import { buildArrival } from './arrival';
+import { buildSiteArrival } from './site-arrival';
 import { buildDayRoom } from './day-room';
+import { buildDeliveries } from './deliveries';
 
 export type Segment = {
   start: number;
@@ -32,6 +34,8 @@ export type ActorSpec = CharacterSpec & {
   seatId?: string;
   escortFor?: string;
   programMode?: string;
+  roomId?: string;
+  arrivalVehicleId?: string;
 };
 export type Interaction = {
   id: string;
@@ -43,7 +47,10 @@ export type Interaction = {
   zoneId: string;
   description: string;
 };
-export type ActivitySource = {
+export type ActivityData = {
+  siteSpecific?: boolean;
+  views?: { id: string; label: string }[];
+  dayRoomId?: string;
   duration: number;
   dayStartMinutes: number;
   dayDurationMinutes: number;
@@ -54,7 +61,8 @@ export type ActivitySource = {
   roles: CharacterRole[];
   evidence: string[];
 };
-export const activityData = source as unknown as ActivitySource;
+export type ActivitySource = ActivityData;
+export const activityData = source as unknown as ActivityData;
 export type ActivityOptions = {
   enabled: boolean;
   playing: boolean;
@@ -331,15 +339,16 @@ export function createActivity(
   model: Facility,
   scene: T.Scene,
   material?: (id: string) => T.MeshStandardMaterial,
-  data: ActivitySource = activityData,
+  data: ActivityData = activityData,
 ) {
-  // Vans, the day-room program and sampling share the bundled loop clock.
   if (data.duration !== activityData.duration)
-    throw new Error(
-      `Activity source must use the ${activityData.duration}s care-day clock`,
-    );
-  const arrival = buildArrival(model, material);
+    throw new Error(`Activity source must use the ${activityData.duration}s care-day clock`);
+  const arrival = data.siteSpecific
+    ? buildSiteArrival(model, material)
+    : buildArrival(model, material);
   scene.add(arrival.root);
+  const deliveries = data.siteSpecific ? null : buildDeliveries();
+  if (deliveries) scene.add(deliveries.root);
   const root = new T.Group();
   root.name = 'care-day-actors';
   scene.add(root);
@@ -379,7 +388,9 @@ export function createActivity(
     sample: sampleActor(a, 0),
   }));
   actors.forEach((a) => root.add(a.root));
-  const dayRoom = buildDayRoom(actors);
+  const dayRoom = data.siteSpecific
+    ? { root: new T.Group(), tick: (_time: number) => {} }
+    : buildDayRoom(actors);
   scene.add(dayRoom.root);
   const actorMap = new Map(actors.map((a) => [a.spec.id, a]));
   const groundZones = model.zones.filter((z) => z.levelId === 'ground');
@@ -395,7 +406,7 @@ export function createActivity(
   });
   for (const a of actors)
     for (const s of a.spec.segments)
-      if (['walk', 'roll'].includes(s.action)) {
+      if (['walk', 'roll', 'escort'].includes(s.action)) {
         const l = new T.Line(
           new T.BufferGeometry().setFromPoints(
             s.path.map(
@@ -440,7 +451,7 @@ export function createActivity(
     props.add(p);
     return p;
   };
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; !data.siteSpecific && i < 7; i++) {
     const p = propBox(
       -24.34 + i * 0.105,
       0.76,
@@ -469,11 +480,10 @@ export function createActivity(
   const emit = () => listeners.forEach((l) => l(getState()));
   function setOptions(p: Partial<ActivityOptions>) {
     Object.assign(options, p);
-    options.speed = T.MathUtils.clamp(options.speed, 0.25, 4);
+    options.speed = T.MathUtils.clamp(options.speed, 0.25, 12);
     options.scale = T.MathUtils.clamp(options.scale, 1, 1.6);
     options.time =
-      ((options.time % activityData.duration) + activityData.duration) %
-      activityData.duration;
+      ((options.time % data.duration) + data.duration) % data.duration;
     tick(0, true);
     emit();
   }
@@ -481,7 +491,7 @@ export function createActivity(
     if (options.enabled && options.playing)
       options.time =
         (options.time + Math.min(Math.max(dt, 0), 0.15) * options.speed) %
-        activityData.duration;
+        data.duration;
     const assembled = view.explode < 0.01 && view.stack < 0.01;
     root.visible = options.enabled && !view.plan && assembled;
     pathRoot.visible = root.visible && options.paths;
@@ -504,23 +514,35 @@ export function createActivity(
       const s = a.spec.escortFor
         ? sampleEscort(actorMap.get(a.spec.escortFor)!.spec, options.time)
         : paired.get(a.spec.id) || sampleActor(a.spec, options.time);
-      if (a.spec.levelId === 'ground')
+      if (
+        (!data.siteSpecific || a.spec.arrivalVehicleId) &&
+        a.spec.levelId === 'ground'
+      )
         s.zoneId =
           groundZones.find((z) => inside([s.x, s.z], z.polygon))?.id ||
-          s.zoneId;
+          (a.spec.arrivalVehicleId ? 'site' : s.zoneId);
       a.sample = s;
-      a.root.position.set(s.x, s.y ?? levelY(a.spec.levelId), s.z);
+      const zoneOffset =
+        model.zones.find((z) => z.id === s.zoneId)?.elevationOffset || 0;
+      a.root.position.set(s.x, s.y ?? levelY(a.spec.levelId) + zoneOffset, s.z);
       a.root.rotation.y = s.heading;
       a.root.scale.setScalar(a.profile.height * options.scale);
       a.root.visible =
         s.visible !== false &&
         visibleRole(a.spec.role) &&
+        (!a.spec.arrivalVehicleId ||
+          s.zoneId !== 'site' ||
+          (view.site && !view.isolate)) &&
         (view.level === 'all' ||
           view.level === a.spec.levelId ||
           (a.spec.levelId === 'site' &&
             view.site &&
             view.level === 'ground')) &&
         (!view.isolate || !view.selected || view.selected === s.zoneId);
+      const cargo = a.spec.id.startsWith('delivery-')
+        ? a.root.getObjectByName('delivery-cargo')
+        : null;
+      if (cargo) cargo.visible = s.title?.startsWith('Delivering') || false;
       a.pose(
         a.spec.escortFor &&
           actorMap.get(a.spec.escortFor)?.spec.mobility === 'wheelchair' &&
@@ -556,6 +578,7 @@ export function createActivity(
         visible: a.root.visible && root.visible,
       })),
     );
+    deliveries?.tick(options.time, options.enabled && arrival.root.visible);
     pathRoot.children.forEach((l) => {
       const a = actorMap.get(l.userData.actorId)!;
       const interaction = data.interactions.find(
@@ -575,6 +598,8 @@ export function createActivity(
   }
   tick(0, true);
   return {
+    data,
+    deliveries,
     root,
     arrival,
     dayRoom,
@@ -597,7 +622,8 @@ export function createActivity(
     },
     actorPosition(id: string) {
       if (id.startsWith('van-'))
-        return sampleVan(id === 'van-a' ? 0 : 1, options.time)
+        return arrival
+          .sampleVan(Math.max(0, id.charCodeAt(4) - 97), options.time)
           .position.clone()
           .add(new T.Vector3(0, 1, 0));
       const interaction = data.interactions.find(
@@ -611,10 +637,15 @@ export function createActivity(
           .reduce((v, a) => v.add(a!.root.position), new T.Vector3())
           .multiplyScalar(1 / people.length)
           .add(new T.Vector3(0, 0.8, 0));
-      const a = actorMap.get(id),
+      const a =
+          actorMap.get(id) ||
+          interaction?.actorIds
+            .map((id) => actorMap.get(id))
+            .find((actor) => actor?.sample.vehicleId),
         vehicle = a?.sample.vehicleId;
       return vehicle
-        ? sampleVan(vehicle === 'van-a' ? 0 : 1, options.time)
+        ? arrival
+            .sampleVan(Math.max(0, vehicle.charCodeAt(4) - 97), options.time)
             .position.clone()
             .add(new T.Vector3(0, 1, 0))
         : null;
@@ -667,9 +698,17 @@ export function createActivity(
       props.removeFromParent();
       arrival.root.removeFromParent();
       dayRoom.root.removeFromParent();
+      deliveries?.root.removeFromParent();
       const geos = new Set<T.BufferGeometry>(),
         mats = new Set<T.Material>();
-      for (const g of [root, pathRoot, props, arrival.root, dayRoom.root])
+      for (const g of [
+        root,
+        pathRoot,
+        props,
+        arrival.root,
+        dayRoom.root,
+        ...(deliveries ? [deliveries.root] : []),
+      ])
         g.traverse((o) => {
           if (o instanceof T.Mesh || o instanceof T.Line) {
             geos.add(o.geometry);

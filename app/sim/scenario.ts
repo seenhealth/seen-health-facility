@@ -14,6 +14,7 @@
  */
 import {
   activityData,
+  sampleEscort,
   type ActivitySource,
   type ActorSpec,
   type Interaction,
@@ -167,6 +168,8 @@ export type ScenarioPlacement = {
   reservations?: NavReservation[];
   /** Keep new routes off spots where base actors stand still for a while. */
   reserveBaseDwell?: { minSeconds: number; halfSize: number };
+  /** Background occupants replaced by this story's cast at shared activity positions. */
+  replacedBackgroundActors?: string[];
 };
 export type Scenario = {
   version: string;
@@ -490,6 +493,15 @@ export function compileScenario(
 ): CompileResult {
   const P = scenario.placement;
   if (!P) throw new Error(`Scenario ${scenario.id} has no placement block`);
+  const originalBase = base;
+  const reserved = new Set(P.replacedBackgroundActors || []);
+  for (const id of reserved)
+    if (!base.actors.some((a) => a.id === id))
+      throw new Error(`Reserved background actor ${id} not in base`);
+  base = { ...base,
+    actors: base.actors.filter((a) => !reserved.has(a.id)),
+    interactions: base.interactions.filter((i) => !i.actorIds.some((id) => reserved.has(id))),
+  };
   if (scenario.clock.duration !== base.duration)
     throw new Error('Scenario and base loop must share the care-day clock');
   const duration = base.duration,
@@ -974,6 +986,10 @@ export function compileScenario(
     return !seg || seg.visible === false ? null : positionAt(a.segments, t);
   };
   const placed: ((t: number) => Vec2 | null)[] = [trackAt(heroActor)];
+  if (escort) placed.push((t) => {
+    const pose = sampleEscort(heroActor, t);
+    return pose.visible === false ? null : [pose.x, pose.z];
+  });
   for (const c of companions) {
     const shifted = easeWalks(c, probe, placed, notes);
     placed.push(trackAt(c));
@@ -1113,9 +1129,9 @@ export function compileScenario(
     };
   });
 
-  const removedActorIds = [replaced.id];
-  const removedInteractionIds = base.interactions
-    .filter((i) => i.actorIds.includes(replaced.id))
+  const removedActorIds = [replaced.id, ...reserved];
+  const removedInteractionIds = originalBase.interactions
+    .filter((i) => i.actorIds.some((id) => removedActorIds.includes(id)))
     .map((i) => i.id);
   const roles = [...new Set(actorsOut.map((a) => a.role))].sort() as CharacterRole[];
   const tracks: CompiledTracks = {
@@ -1131,7 +1147,7 @@ export function compileScenario(
     heroSpeed: Math.round(speed * 1000) / 1000,
     notes,
   };
-  return { source: mergeTracks(base, tracks), heroId, steps, tracks };
+  return { source: mergeTracks(originalBase, tracks), heroId, steps, tracks };
 }
 
 /**

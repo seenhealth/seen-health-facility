@@ -1,5 +1,10 @@
 import * as T from 'three';
 import { buildAsset } from './assets';
+import {
+  fleetParking,
+  extraVanWindows,
+  sampleFleetVan,
+} from './alhambra-fleet';
 import type { Facility, Vec2 } from './schema';
 export const ARRIVAL = {
   dock: [-20.5, 1.5] as Vec2,
@@ -34,59 +39,9 @@ export const vanWindows = [
 ];
 const smooth = (a: number, b: number, x: number) =>
   T.MathUtils.smoothstep(x, a, b);
-const inbound = new T.CatmullRomCurve3(
-  [[-48, -30], [-44, -23], [-44, -3], [-39, 1.5], [-29, 1.5], ARRIVAL.dock].map(
-    (p) => new T.Vector3(p[0], -0.23, p[1]),
-  ),
-  false,
-  'catmullrom',
-  0.1,
-);
+export const alhambraVanWindows = [...vanWindows, ...extraVanWindows];
 export function sampleVan(index: number, time: number) {
-  const v = vanWindows[index],
-    t = ((time % 720) + 720) % 720;
-  let phase = 'Off-site',
-    visible = false,
-    progress = 0,
-    reverse = false;
-  for (const [range, label, back] of [
-    [v.inbound, 'Arriving', false],
-    [v.returning, 'Returning for pickup', false],
-    [v.outbound, 'Leaving after drop-off', true],
-    [v.leaving, 'Taking participants home', true],
-  ] as const)
-    if (t >= range[0] && t < range[1]) {
-      phase = label;
-      visible = true;
-      progress = (t - range[0]) / (range[1] - range[0]);
-      reverse = back;
-    }
-  const docked =
-    (t >= v.inbound[1] && t < v.outbound[0]) ||
-    (t >= v.returning[1] && t < v.leaving[0]);
-  if (docked) {
-    phase =
-      t < v.outbound[0] ? 'Unloading & escort handoff' : 'Boarding for home';
-    visible = true;
-    progress = 1;
-  }
-  const u = reverse ? 1 - progress : progress,
-    position = inbound.getPointAt(u),
-    direction = inbound.getTangentAt(u),
-    heading = Math.atan2(direction.x, direction.z) + Math.PI;
-  let door = 0,
-    ramp = 0;
-  for (const [start, end] of [v.unload, v.boarding]) {
-    door = Math.max(
-      door,
-      smooth(start - 5, start - 2, t) * (1 - smooth(end + 1, end + 4, t)),
-    );
-    ramp = Math.max(
-      ramp,
-      smooth(start - 2, start + 2, t) * (1 - smooth(end - 2, end + 1, t)),
-    );
-  }
-  return { position, heading, visible, door, ramp, phase };
+  return sampleFleetVan(index, time, alhambraVanWindows);
 }
 export function buildArrival(
   model: Facility,
@@ -192,33 +147,18 @@ export function buildArrival(
         color: model.materials[id]?.color || '#336e76',
         roughness: 0.75,
       }));
-  const vans = vanWindows.map((v, i) => {
-    const spec = model.assets[`fleet-van-${i ? 'b' : 'a'}`],
-      g = buildAsset(
-        { ...spec, parameters: { ...spec.parameters, operable: true } },
-        materialFor,
-      );
-    g.name = `animated-${v.id}`;
-    root.add(g);
-    const pivot = new T.Group();
-    pivot.position.set(1.035, 0.58, -0.19);
-    pivot.name = 'vehicle-ramp-hinge';
-    g.add(pivot);
-    const deck = box(pivot, 1.48, -0.04, 0, 2.96, 0.055, 1.02, silver);
-    deck.name = 'deployable-wheelchair-ramp';
-    for (const z of [-0.52, 0.52])
-      box(pivot, 1.48, 0, z, 2.96, 0.055, 0.035, black);
-    for (let x = 0.15; x < 2.94; x += 0.17)
-      box(pivot, x, 0.016, 0, 0.026, 0.006, 0.91, black);
-    return {
-      root: g,
-      pivot,
-      doors: [
-        g.getObjectByName('passenger-door-0')!,
-        g.getObjectByName('passenger-door-1')!,
-      ],
-    };
+  const vans = fleetParking.map((_, i) => {
+    const van = buildArrivalVan(model, i, materialFor);
+    root.add(van.root);
+    return van;
   });
+  // Paint real 6.9m van stalls around the parked vehicle footprints.
+  for (const bay of fleetParking) {
+    for (const z of [bay.z - 1.4, bay.z + 1.4])
+      box(root, -28.1, -0.208, z, 6.9, 0.012, 0.07, mat('#ebe9dc'));
+    box(root, -31.55, -0.208, bay.z, 0.07, 0.012, 2.8, mat('#ebe9dc'));
+    box(root, -30.8, -0.19, bay.z, 0.14, 0.09, 1.8, mat('#d7c389'));
+  }
   let doorOpen = 0;
   function tick(
     time: number,
@@ -227,16 +167,7 @@ export function buildArrival(
   ) {
     vans.forEach((v, i) => {
       const p = sampleVan(i, time);
-      v.root.position.copy(p.position);
-      v.root.rotation.y = p.heading;
-      v.root.visible = enabled && p.visible;
-      v.pivot.visible = p.ramp > 0.001;
-      v.pivot.rotation.z = T.MathUtils.lerp(
-        Math.PI / 2,
-        -Math.atan2(0.58, 2.9),
-        p.ramp,
-      );
-      v.doors.forEach((d, j) => (d.position.z = (j ? 1 : -1) * 0.6 * p.door));
+      updateArrivalVan(v, p, enabled);
     });
     const nearest = Math.min(
       ...entryUsers
@@ -249,5 +180,86 @@ export function buildArrival(
         (g.position.z = -0.992 + (i ? 1 : -1) * (0.315 + doorOpen * 0.65)),
     );
   }
-  return { root, entry, vans, tick, getDoorOpen: () => doorOpen };
+  return {
+    root,
+    entry,
+    vans,
+    tick,
+    sampleVan,
+    focus: new T.Vector3(-22, 0, -3),
+    getDoorOpen: () => doorOpen,
+  };
+}
+
+// Shared fleet body, sliding passenger doors and folding ramp for every site.
+export function buildArrivalVan(
+  model: Facility,
+  index: number,
+  material: (id: string) => T.MeshStandardMaterial,
+) {
+  const spec =
+    model.assets[`fleet-van-${index ? 'b' : 'a'}`] ||
+    model.assets['fleet-van-a'];
+  const root = buildAsset(
+    {
+      ...spec,
+      parameters: {
+        ...spec.parameters,
+        variant: String.fromCharCode(65 + index),
+        operable: true,
+      },
+    },
+    material,
+  );
+  root.name = `animated-van-${String.fromCharCode(97 + index)}`;
+  const pivot = new T.Group();
+  pivot.position.set(1.035, 0.58, -0.19);
+  pivot.name = 'vehicle-ramp-hinge';
+  root.add(pivot);
+  const box = (
+    x: number,
+    y: number,
+    z: number,
+    w: number,
+    h: number,
+    d: number,
+    color: string,
+  ) => {
+    const mesh = new T.Mesh(
+      new T.BoxGeometry(w, h, d),
+      new T.MeshStandardMaterial({ color, roughness: 0.76 }),
+    );
+    mesh.position.set(x, y + h / 2, z);
+    mesh.castShadow = mesh.receiveShadow = true;
+    pivot.add(mesh);
+    return mesh;
+  };
+  box(1.48, -0.04, 0, 2.96, 0.055, 1.02, '#a8bab8').name =
+    'deployable-wheelchair-ramp';
+  for (const z of [-0.52, 0.52]) box(1.48, 0, z, 2.96, 0.055, 0.035, '#25777c');
+  for (let x = 0.15; x < 2.94; x += 0.17)
+    box(x, 0.016, 0, 0.026, 0.006, 0.91, '#243f49');
+  return {
+    root,
+    pivot,
+    doors: [
+      root.getObjectByName('passenger-door-0')!,
+      root.getObjectByName('passenger-door-1')!,
+    ],
+  };
+}
+export function updateArrivalVan(
+  van: ReturnType<typeof buildArrivalVan>,
+  sample: Omit<ReturnType<typeof sampleVan>, 'reverse'>,
+  enabled: boolean,
+  rampAngle = -Math.atan2(0.58, 2.9),
+) {
+  van.root.position.copy(sample.position);
+  van.root.rotation.y = sample.heading;
+  van.root.visible = enabled && sample.visible;
+  van.pivot.visible = sample.ramp > 0.001;
+  van.pivot.rotation.z = T.MathUtils.lerp(Math.PI / 2, rampAngle, sample.ramp);
+  van.doors.forEach(
+    (door, i) => (door.position.z = (i ? 1 : -1) * 0.6 * sample.door),
+  );
 }

@@ -2,7 +2,7 @@
 
 The facility model can be *programmed, played and measured*. A scenario file
 describes an itinerary on the shared care-day clock; a compiler turns it into
-walking and activity tracks on real, collision-safe routes through the building;
+walking and activity tracks on navigable routes through the modeled building;
 the existing activity engine animates them; and a measurement layer samples the
 same tracks to report occupancy, staff time and a participant's touchpoints.
 
@@ -302,3 +302,7 @@ generate the day instead:
    new equipment, a second van, a different program timetable.
 7. **Calibration.** Fit durations and arrival patterns to aggregated,
    de-identified operational data, and keep the source basis visible.
+
+## Reconciled layout
+
+The story uses the reviewed community rooms from the three-site model. `placement.replacedBackgroundActors` reserves activity positions for the story cast without changing the normal facility population. The compiler checks wall clearance and continuity and reports close pedestrian encounters; this is an illustrative simulation, not a guarantee of collision-free crowds or real-world accessibility. Vehicle traffic has a separate `npm run validate:traffic` clearance check.
