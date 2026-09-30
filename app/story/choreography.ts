@@ -82,8 +82,8 @@ export const CHAPTER_SHOTS: Record<string, ShotSpec> = {
   program: { zoom: 2.6, azimuth: 0.3, elevation: 0.66, follow: 0.35, radius: 12, push: 1.08, drift: 0.12 },
   lunch: { zoom: 4.2, azimuth: 0.62, elevation: 0.66, follow: 0.5, radius: 7, push: 1.08 },
   'social-work': { zoom: 5.2, azimuth: 0.85, elevation: 0.72, follow: 0.5, radius: 6, push: 1.08 },
-  recreation: { zoom: 4.8, azimuth: -0.3, elevation: 0.66, follow: 0.5, radius: 8, push: 1.05 },
-  'personal-care': { zoom: 5.4, azimuth: 0.5, elevation: 0.74, follow: 0.5, radius: 6, push: 1.08 },
+  recreation: { zoom: 4.6, azimuth: -0.3, elevation: 0.95, follow: 0.55, radius: 8, push: 1.05 },
+  'personal-care': { zoom: 5.2, azimuth: 0.5, elevation: 0.92, follow: 0.5, radius: 6, push: 1.08 },
   farewell: { zoom: 4.6, azimuth: -0.45, elevation: 0.6, follow: 0.6, radius: 8, push: 1.06 },
   'ride-home': {
     anchor: ARRIVAL,
