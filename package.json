@@ -13,7 +13,10 @@
     "format": "oxfmt",
     "validate:model": "node scripts/validate-model.mjs",
     "build:scenario": "node scripts/build-scenario.mjs",
-    "sim:report": "node scripts/sim-report.mjs"
+    "sim:report": "node scripts/sim-report.mjs",
+    "dev:story": "vite --config vite.story.config.ts",
+    "build:story": "vite build --config vite.story.config.ts",
+    "preview:story": "vite preview --config vite.story.config.ts"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",
