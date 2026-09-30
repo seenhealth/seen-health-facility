@@ -415,6 +415,12 @@ export type ViewerOptions = {
    * A `?quality=high|balanced` URL parameter overrides the default.
    */
   quality?: ViewerQuality;
+  /** Upper bound on the device pixel ratio, e.g. for full-bleed stages. */
+  maxPixelRatio?: number;
+  /** False skips the clickable zone-name labels. */
+  labels?: boolean;
+  /** Keep the street and neighbors visible while levels are stacked apart. */
+  keepSiteWhenStacked?: boolean;
 };
 const SHOT_DISTANCE = 150;
 export function createViewer(
@@ -441,7 +447,11 @@ export function createViewer(
   let quality: ViewerQuality =
     requestedQuality || (prefersBalanced() ? 'balanced' : 'high');
   const pixelRatio = () =>
-    Math.min(devicePixelRatio, quality === 'high' ? 2 : 1.5);
+    Math.min(
+      devicePixelRatio,
+      quality === 'high' ? 2 : 1.5,
+      options.maxPixelRatio ?? Infinity,
+    );
   renderer.setPixelRatio(pixelRatio());
   renderer.localClippingEnabled = true;
   renderer.shadowMap.enabled = true;
@@ -793,6 +803,7 @@ export function createViewer(
     fg.name = 'furniture';
     g.add(fg);
     furnGroups.set(z.id, fg);
+    if (options.labels === false) return;
     const label = document.createElement('button');
     label.className = 'model-label';
     label.textContent = z.name;
@@ -1377,7 +1388,8 @@ export function createViewer(
       f.color.set(state.colors ? z.color : finish(z.floorMaterial).color);
       f.map = state.colors ? null : mat(z.floorMaterial).map;
       f.needsUpdate = true;
-      const label = labels.get(z.id)!;
+      const label = labels.get(z.id);
+      if (!label) return;
       label.style.display =
         visible && state.labels && !state.exterior && !state.plan
           ? 'block'
@@ -1398,7 +1410,11 @@ export function createViewer(
     context.visible =
       state.site &&
       state.level !== 'basement' &&
-      !(state.level === 'all' && state.stack > 0.05);
+      !(
+        state.level === 'all' &&
+        state.stack > 0.05 &&
+        !options.keepSiteWhenStacked
+      );
     facade.visible =
       state.exterior &&
       !state.plan &&
@@ -1582,11 +1598,17 @@ export function createViewer(
       hit?.object.userData.room || null,
     );
   };
+  // Wheel zoom takes over from any in-flight focus zoom instead of fighting it.
+  const wheel = () => {
+    zoomTarget = null;
+  };
   renderer.domElement.addEventListener('pointerdown', pd);
   renderer.domElement.addEventListener('pointerup', pu);
-  let lastTime = performance.now();
+  renderer.domElement.addEventListener('wheel', wheel, { passive: true });
+  let lastTime = performance.now(),
+    paused = false;
   function loop(now = performance.now()) {
-    if (disposed) return;
+    if (disposed || paused) return;
     frame = requestAnimationFrame(loop);
     const dt = Math.max(0, (now - lastTime) / 1000);
     lastTime = now;
@@ -1615,8 +1637,11 @@ export function createViewer(
       const g = groups.get(z.id)!;
       g.position.lerp(basePosition(z.id), 0.15);
       const c = center(z.polygon),
-        anchor = new T.Vector3(c[0], 2, c[1]).add(g.position).project(camera),
-        label = labels.get(z.id)!;
+        label = labels.get(z.id);
+      if (!label) continue;
+      const anchor = new T.Vector3(c[0], 2, c[1])
+        .add(g.position)
+        .project(camera);
       label.style.left = `${(anchor.x * 0.5 + 0.5) * host.clientWidth}px`;
       label.style.top = `${(-anchor.y * 0.5 + 0.5) * host.clientHeight}px`;
       label.style.visibility = anchor.z > 1 ? 'hidden' : 'visible';
@@ -1693,6 +1718,16 @@ export function createViewer(
     },
     setInteractive(on: boolean) {
       controls.enabled = on;
+    },
+    /** Stop or resume the render loop, e.g. while the stage is covered. */
+    setPaused(on: boolean) {
+      if (on === paused) return;
+      paused = on;
+      cancelAnimationFrame(frame);
+      if (!on) {
+        lastTime = performance.now();
+        loop();
+      }
     },
     /** 'high' adds ambient occlusion and finer shadows; 'balanced' is lighter. */
     setQuality(next: ViewerQuality) {
@@ -1814,6 +1849,7 @@ export function createViewer(
       controls.dispose();
       renderer.domElement.removeEventListener('pointerdown', pd);
       renderer.domElement.removeEventListener('pointerup', pu);
+      renderer.domElement.removeEventListener('wheel', wheel);
       activity.dispose();
       const geos = new Set<T.BufferGeometry>(),
         mats = new Set<T.Material>();

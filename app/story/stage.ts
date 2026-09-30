@@ -37,31 +37,6 @@ function rebase(model: Facility, base: string) {
     if (a.modelUrl) a.modelUrl = assetUrl(base, a.modelUrl);
 }
 
-/**
- * The renderer caps its pixel ratio at 2; the story caps it lower. Until the
- * renderer takes a pixel-ratio option, the global is shadowed only while the
- * viewer is constructed (it reads devicePixelRatio once, synchronously).
- */
-function withPixelRatioCap<T>(fn: () => T): T {
-  const dpr = window.devicePixelRatio || 1;
-  if (dpr <= MAX_PIXEL_RATIO) return fn();
-  const own = Object.getOwnPropertyDescriptor(window, 'devicePixelRatio');
-  try {
-    Object.defineProperty(window, 'devicePixelRatio', {
-      configurable: true,
-      get: () => MAX_PIXEL_RATIO,
-    });
-  } catch {
-    return fn();
-  }
-  try {
-    return fn();
-  } finally {
-    if (own) Object.defineProperty(window, 'devicePixelRatio', own);
-    else delete (window as unknown as Record<string, unknown>).devicePixelRatio;
-  }
-}
-
 export async function bootStage(
   host: HTMLElement,
   base: string,
@@ -79,12 +54,13 @@ export async function bootStage(
   rebase(model, base);
   if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
   const { source, heroId } = heroSource.storyActivitySource();
-  const viewer = withPixelRatioCap(() =>
-    renderer.createViewer(host, model, () => {}, {
-      activity: source,
-      interactive: false,
-    }),
-  );
+  const viewer = renderer.createViewer(host, model, () => {}, {
+    activity: source,
+    interactive: false,
+    maxPixelRatio: MAX_PIXEL_RATIO,
+    labels: false,
+    keepSiteWhenStacked: true,
+  });
   viewer.setInteractive(false);
   viewer.activity.setOptions({
     enabled: true,

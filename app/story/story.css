@@ -146,9 +146,6 @@
 .story-canvas canvas {
   display: block;
 }
-.story-canvas .model-label {
-  display: none !important;
-}
 .story-fallback {
   position: absolute;
   inset: 0;
