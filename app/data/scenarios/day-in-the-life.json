@@ -70,7 +70,7 @@
       "zoneId": "site",
       "roomId": null,
       "title": "Door to door",
-      "kicker": "8:30 AM · Van A arrives",
+      "kicker": "8:45 AM · Van A arrives",
       "body": "The driver deploys the ramp and walks Mrs. Lin to the entrance. He noticed she was slower on the steps this morning, and passes it on.",
       "roles": [
         "driver",
@@ -827,7 +827,7 @@
       "zoneId": "site",
       "roomId": null,
       "title": "Safely home",
-      "kicker": "2:10 PM · Van A departs",
+      "kicker": "2:30 PM · Van A departs",
       "body": "The same driver, the same ramp, a known face at the other end.",
       "roles": [
         "driver",
