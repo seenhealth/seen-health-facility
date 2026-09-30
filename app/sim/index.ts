@@ -1,0 +1,19 @@
+/**
+ * Node entry for scripts (bundled by scripts/build-scenario.mjs). The app
+ * imports the individual modules directly.
+ */
+export * from './nav';
+export * from './scenario';
+export * from './clock';
+export * from './metrics';
+export { validateFacility } from '../model/schema';
+export {
+  activityData,
+  sampleActor,
+  sampleEscort,
+  samplePairedActors,
+  timelineFor,
+} from '../model/activity';
+export { sampleVan, vanWindows, ARRIVAL } from '../model/arrival';
+export { default as careTeam } from '../data/care-team.json';
+export { default as dayProgram } from '../data/day-program.json';
