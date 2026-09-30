@@ -22,8 +22,7 @@ for (const name of names) {
       .outputText,
   );
 }
-const { validateFacility, polygonArea } =
-  await import('../work/validation/schema.mjs');
+const { validateFacility } = await import('../work/validation/schema.mjs');
 const { buildAsset } = await import('../work/validation/assets.mjs');
 const { floorShapes } = await import('../work/validation/floor-geometry.mjs');
 for (const key of ['olympic', 'olympic-option', 'alveare']) {

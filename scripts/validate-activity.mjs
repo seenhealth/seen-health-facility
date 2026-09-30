@@ -10,7 +10,7 @@ import {
   timelineFor,
 } from '../work/validation/activity.mjs';
 import { buildNeighborhood } from '../work/validation/neighborhood.mjs';
-import { sampleVan, vanWindows, ARRIVAL } from '../work/validation/arrival.mjs';
+import { sampleVan, ARRIVAL } from '../work/validation/arrival.mjs';
 import { dayProgram, programAt } from '../work/validation/day-room.mjs';
 import { createCharacter } from '../work/validation/characters.mjs';
 const m = JSON.parse(
