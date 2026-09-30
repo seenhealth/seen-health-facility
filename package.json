@@ -13,6 +13,7 @@
     "format": "oxfmt",
     "validate:model": "node scripts/validate-model.mjs",
     "validate:traffic": "node scripts/compile-model-modules.mjs && node scripts/validate-traffic.mjs",
+    "validate:community": "node scripts/compile-model-modules.mjs && node scripts/validate-community-traffic.mjs",
     "plan:traffic": "node scripts/compile-model-modules.mjs && node scripts/plan-street-traffic.mjs && npm run validate:traffic",
     "prebuild": "node scripts/prepare-public-models.mjs && node scripts/validate-public-assets.mjs",
     "build:scenario": "node scripts/build-scenario.mjs",

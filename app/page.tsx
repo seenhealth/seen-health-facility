@@ -99,6 +99,23 @@ export default function Home() {
   const focusActivity = useCallback(
     (zoneId: string, actor?: string | null) => {
       if (!model || !viewer.current) return;
+      if (zoneId === 'community' || zoneId.startsWith('community:')) {
+        // A distributed-care setting: whole shell, site context and the layer on.
+        const next: ViewerState = {
+          ...defaultState,
+          level: 'all',
+          walls: 'full',
+          labels: false,
+        };
+        setState(next);
+        setView('community');
+        viewer.current.update(next);
+        viewer.current.view('community');
+        viewer.current.activity.setOptions({ enabled: true, follow: null });
+        viewer.current.focusSetting(zoneId.split(':')[1]);
+        if (actor) viewer.current.followActor(actor);
+        return;
+      }
       const activityRoom = model.rooms.find((r) => r.id === zoneId);
       const zone = model.zones.find(
         (z) => z.id === (activityRoom?.zoneId || zoneId),
@@ -433,6 +450,28 @@ export default function Home() {
     viewer.current?.update(next);
     viewer.current?.view(id === 'roof' ? 'exterior' : 'iso');
     viewer.current?.focus(null);
+  };
+  const showCommunity = () => {
+    setView('community');
+    const next: ViewerState = {
+      ...state,
+      level: 'all',
+      selected: null,
+      room: null,
+      isolate: false,
+      plan: false,
+      exterior: true,
+      roof: true,
+      walls: 'full',
+      explode: 0,
+      stack: 0,
+      sectionAxis: 'none',
+      site: true,
+      community: true,
+    };
+    setState(next);
+    viewer.current?.update(next);
+    viewer.current?.view('community');
   };
   const showBuilding = (rear = false) => {
     setView(rear ? 'rear' : 'building');
@@ -935,6 +974,14 @@ export default function Home() {
           >
             Rear
           </button>
+          {!model?.contextStyle && (
+            <button
+              className={view === 'community' ? 'chosen' : ''}
+              onClick={showCommunity}
+            >
+              Community
+            </button>
+          )}
         </div>
         {activityOpen && ready && (
           <ActivityPanel
@@ -1216,8 +1263,11 @@ export default function Home() {
                 'roof',
                 'exterior',
                 'ceilings',
+                'community',
               ] as const
-            ).map((k) => (
+            )
+              .filter((k) => k !== 'community' || !model?.contextStyle)
+              .map((k) => (
               <label key={k}>
                 <input
                   type="checkbox"
@@ -1233,6 +1283,7 @@ export default function Home() {
                       roof: 'Roof surfaces',
                       exterior: 'Exterior envelope',
                       ceilings: 'Ceilings & structure',
+                      community: 'Homes, pharmacy & partner sites',
                     } as const
                   )[k]
                 }

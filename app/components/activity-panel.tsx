@@ -24,6 +24,7 @@ import {
   alhambraVanWindows,
 } from '../model/arrival';
 import { dayProgram, programAt } from '../model/day-room';
+import { COMMUNITY_CATEGORIES } from '../model/community-people';
 import type { createViewer } from '../model/renderer';
 
 export const activityViews = [
@@ -43,6 +44,7 @@ const categories = [
   ['activities', 'Activities'],
   ['meals', 'Meals'],
   ['coordination', 'Coordination'],
+  ...COMMUNITY_CATEGORIES,
 ];
 const palette: Record<string, string> = {
   walk: '#aec9bc',
