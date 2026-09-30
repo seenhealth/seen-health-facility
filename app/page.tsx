@@ -1,5 +1,13 @@
 'use client';
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+} from 'react';
 import {
   ArrowDownToLine,
   ArrowUpRight,
@@ -46,6 +54,7 @@ import { ActivityPanel } from './components/activity-panel';
 import { ShowcaseControls } from './components/showcase-controls';
 import { SiteMap } from './components/site-map';
 import { sites, type SiteId } from './data/sites';
+type Viewer = ReturnType<typeof createViewer>;
 // Charts load only when the Measure panel opens.
 const MetricsPanel = lazy(() => import('./components/metrics-panel'));
 const download = (data: Blob, name: string) => {
@@ -63,7 +72,7 @@ const jsonDownload = (data: unknown, name: string) =>
   );
 export default function Home() {
   const host = useRef<HTMLDivElement>(null),
-    viewer = useRef<ReturnType<typeof createViewer> | null>(null),
+    viewer = useRef<Viewer | null>(null),
     upload = useRef<HTMLInputElement>(null);
   const [showcase, setShowcase] = useState(false);
   const previousView = useRef<ViewerState | null>(null);
@@ -80,7 +89,8 @@ export default function Home() {
       exterior: false,
       labels: false,
     }),
-    [ready, setReady] = useState(false),
+    // Mirrors viewer.current once it is ready, so render never reads the ref.
+    [liveViewer, setLiveViewer] = useState<Viewer | null>(null),
     [error, setError] = useState(''),
     [view, setView] = useState('iso'),
     [collapsed, setCollapsed] = useState(true),
@@ -94,6 +104,7 @@ export default function Home() {
     [exporting, setExporting] = useState(false),
     [notice, setNotice] = useState(''),
     [dataTab, setDataTab] = useState<'overview' | 'assets'>('overview');
+  const ready = liveViewer !== null;
   const patch = (s: Partial<ViewerState>) => setState((p) => ({ ...p, ...s }));
   const getViewer = useCallback(() => viewer.current, []);
   const focusActivity = useCallback(
@@ -165,7 +176,7 @@ export default function Home() {
     viewer.current?.setShowcase(false);
     if (id !== siteId || clinicOption || !locationReady) {
       setModel(null);
-      setReady(false);
+      setLiveViewer(null);
       setError('');
     }
     setSiteId(id);
@@ -193,11 +204,13 @@ export default function Home() {
     u.searchParams.delete('view');
     window.history.replaceState(null, '', u);
   };
+  // Effect event: the mount-only URL restore must not re-run when selectSite changes.
+  const selectInitialSite = useEffectEvent((id: SiteId) => selectSite(id));
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
     const id = sites.find((s) => s.id === p.get('site'))?.id || 'alhambra';
     queueMicrotask(() => {
-      selectSite(id);
+      selectInitialSite(id);
       setClinicOption(id === 'olympic' && p.get('option') === 'clinic');
       setNetworkOpen(p.get('view') === 'map');
       if (
@@ -250,13 +263,41 @@ export default function Home() {
       });
     return () => controller.abort();
   }, [siteId, clinicOption, locationReady]);
+  const applyShowcase = (v: Viewer) => {
+    previousView.current = state;
+    const next = {
+      ...defaultState,
+      level: 'ground',
+      walls: 'cutaway' as const,
+      roof: false,
+      exterior: false,
+      labels: false,
+      ceilings: false,
+    };
+    setState(next);
+    v.update(next);
+    v.setShowcase(true);
+    setActivityOpen(false);
+    setJourneyOpen(false);
+    setShowControls(false);
+    setCollapsed(true);
+  };
+  // Effect event: reads the latest view state once the async renderer import
+  // resolves, without recreating the viewer whenever that state changes.
+  const startViewer = useEffectEvent((v: Viewer, m: Facility) => {
+    v.update(state);
+    if (m.contextStyle) v.focus(null, null, true);
+    else v.focus('day');
+    if (state.exterior) v.view('exterior');
+    setLiveViewer(v);
+    if (showcase) applyShowcase(v);
+  });
   useEffect(() => {
     if (!model || !host.current) return;
     let ended = false;
-    setReady(false);
-    import('./model/renderer').then(({ createViewer }) => {
-      if (ended || !host.current) return;
-      try {
+    import('./model/renderer')
+      .then(({ createViewer }) => {
+        if (ended || !host.current) return;
         viewer.current = createViewer(host.current, model, (zone, room) => {
           const selectedZone = model.zones.find((z) => z.id === zone);
           setState((s) => ({
@@ -282,53 +323,31 @@ export default function Home() {
             requestAnimationFrame(() => viewer.current?.focus(zone, room));
           }
         });
-        viewer.current.update(state);
-        if (model.contextStyle) viewer.current.focus(null, null, true);
-        else viewer.current.focus('day');
-        if (state.exterior) viewer.current.view('exterior');
-        setReady(true);
-      } catch (e) {
+        startViewer(viewer.current, model);
+      })
+      .catch((e: unknown) => {
         console.error(e);
-        setError('The 3D model could not start. Please reload the model.');
-      }
-    });
+        if (!ended)
+          setError('The 3D model could not start. Please reload the model.');
+      });
     return () => {
       ended = true;
       viewer.current?.dispose();
       viewer.current = null;
+      setLiveViewer(null);
     };
   }, [model]);
-  useEffect(() => viewer.current?.update(state), [state, ready]);
-  useEffect(() => {
-    if (!ready || !viewer.current) return;
-    if (showcase) {
-      previousView.current = state;
-      const next = {
-        ...defaultState,
-        level: 'ground',
-        walls: 'cutaway' as const,
-        roof: false,
-        exterior: false,
-        labels: false,
-        ceilings: false,
-      };
-      setState(next);
-      viewer.current.update(next);
-      viewer.current.setShowcase(true);
-      setActivityOpen(false);
-      setJourneyOpen(false);
-      setShowControls(false);
-      setCollapsed(true);
-    } else viewer.current.setShowcase(false);
-  }, [showcase, ready]);
+  useEffect(() => liveViewer?.update(state), [state, liveViewer]);
   const enterShowcase = () => {
     setShowcase(true);
+    if (viewer.current) applyShowcase(viewer.current);
     const url = new URL(window.location.href);
     url.searchParams.set('view', 'tiltshift');
     window.history.replaceState(null, '', url);
   };
   const exitShowcase = () => {
     setShowcase(false);
+    viewer.current?.setShowcase(false);
     if (previousView.current) setState(previousView.current);
     viewer.current?.view('iso');
     viewer.current?.focus('day');
@@ -639,7 +658,7 @@ export default function Home() {
               onChange={(e) => {
                 const enabled = e.target.value === 'option';
                 setModel(null);
-                setReady(false);
+                setLiveViewer(null);
                 setError('');
                 setClinicOption(enabled);
                 setState((s) => ({
@@ -779,8 +798,8 @@ export default function Home() {
       </aside>
       <section className="model-workspace" aria-label="Interactive facility">
         <div className="model-canvas" ref={host} />
-        {showcase && ready && viewer.current && (
-          <ShowcaseControls viewer={viewer.current} onExit={exitShowcase} />
+        {showcase && liveViewer && (
+          <ShowcaseControls viewer={liveViewer} onExit={exitShowcase} />
         )}
         {!ready && (
           <div className="model-loading">
@@ -935,7 +954,7 @@ export default function Home() {
         {activityOpen && ready && (
           <ActivityPanel
             key={model?.id || siteId}
-            viewer={ready ? viewer.current : null}
+            viewer={liveViewer}
             onScene={focusActivity}
             onClose={() => setActivityOpen(false)}
           />
@@ -1267,8 +1286,15 @@ export default function Home() {
           </button>
         </div>
       )}
+      {/* Backdrop click is a mouse shortcut; Esc and the close button cover keyboard users. */}
       {modal && model && (
-        <div className="dialog-shade" onClick={() => setModal(null)}>
+        <div
+          className="dialog-shade"
+          role="presentation"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setModal(null);
+          }}
+        >
           <section
             className={`viewer-dialog ${modal === 'accuracy' ? 'audit-dialog' : 'files-dialog'}`}
             role="dialog"
@@ -1278,7 +1304,6 @@ export default function Home() {
                 ? 'Accuracy register'
                 : 'Portable model files'
             }
-            onClick={(e) => e.stopPropagation()}
           >
             <button
               className="dialog-close icon-button"

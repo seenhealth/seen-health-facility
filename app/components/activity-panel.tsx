@@ -195,7 +195,7 @@ export function ActivityPanel({
         ],
       })),
     ],
-    [activityData, siteSpecific],
+    [activityData, vanWindows],
   );
   const visible = tracks.filter(
     (t) =>

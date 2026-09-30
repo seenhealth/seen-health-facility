@@ -51,6 +51,31 @@
     "typescript/no-namespace": "error",
     "typescript/no-require-imports": "error",
     "typescript/no-unnecessary-type-constraint": "error",
-    "typescript/no-unsafe-function-type": "error"
-  }
+    "typescript/no-unsafe-function-type": "error",
+    // vinext's next/image is an unoptimised @unpic passthrough and no Images binding is configured; <img> with width/height is equivalent.
+    "nextjs/no-img-element": "off",
+    // Written for the pages/ router, which this app doesn't use; the brand link's full reload to / also resets viewer state.
+    "nextjs/no-html-link-for-pages": "off",
+    // Explicit ARIA roles are valid; the suggested tags change semantics (role=status -> <output>, role=group -> <fieldset>).
+    "jsx-a11y/prefer-tag-over-role": "off"
+  },
+  "overrides": [
+    {
+      // shadcn/ui wrappers receive htmlFor, children and keyboard handling through spread props, which these rules can't see.
+      "files": ["components/ui/**"],
+      "rules": {
+        "jsx-a11y/label-has-associated-control": "off",
+        "jsx-a11y/anchor-has-content": "off",
+        "jsx-a11y/click-events-have-key-events": "off",
+        "jsx-a11y/no-noninteractive-element-interactions": "off"
+      }
+    },
+    {
+      // Node scripts shim globalThis.document; the shim's createElement is matched against lib.dom's deprecated overload.
+      "files": ["scripts/**"],
+      "rules": {
+        "typescript/no-deprecated": "off"
+      }
+    }
+  ]
 }

@@ -11,7 +11,6 @@ import {
   center,
   polygonArea,
   type Facility,
-  type Instance,
   type Room,
   type Vec2,
 } from './schema';

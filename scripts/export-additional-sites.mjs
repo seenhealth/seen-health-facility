@@ -4,7 +4,6 @@ import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import ts from 'typescript';
-import * as T from 'three';
 const req = createRequire(import.meta.url),
   canvasModule = req(process.env.FACILITY_CANVAS_MODULE || '@napi-rs/canvas');
 const { createCanvas, loadImage, Image, ImageData } = canvasModule;

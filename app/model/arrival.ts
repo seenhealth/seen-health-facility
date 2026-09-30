@@ -64,8 +64,7 @@ export function buildArrival(
   const stone = mat('#e2ddd3'),
     silver = mat('#c4c7c4'),
     teal = mat('#1f4d3a'),
-    glass = mat('#d4e0df', 0.36),
-    black = mat('#34393a');
+    glass = mat('#d4e0df', 0.36);
   const box = (
     parent: T.Object3D,
     x: number,

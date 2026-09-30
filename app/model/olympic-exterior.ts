@@ -634,7 +634,7 @@ export function buildOlympicExterior(model: Facility) {
   for (const parent of [facade, roof, site])
     parent.traverse((o) => {
       const byMaterial = new Map<T.Material, T.Mesh[]>();
-      for (const child of [...o.children])
+      for (const child of o.children)
         if (
           child instanceof T.Mesh &&
           child.material instanceof T.MeshStandardMaterial &&

@@ -198,6 +198,7 @@ export function ShowcaseControls({
             aria-label="Recorded Alhambra timelapse"
             src={video.url}
             controls
+            muted
             playsInline
           />
         </div>

@@ -50,6 +50,7 @@ The application uses React, Three.js, Vinext/Vite and a Cloudflare-compatible ru
 The checked-in models work without private source documents or regeneration. A fresh clone can run:
 
 ```bash
+npm run lint
 npx tsc --noEmit --incremental false
 npm run validate:model
 node scripts/validate-community.mjs

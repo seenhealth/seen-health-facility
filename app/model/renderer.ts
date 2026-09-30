@@ -1916,7 +1916,6 @@ export function createViewer(
     });
     recording = recorder;
     return new Promise((resolve, reject) => {
-      let timer: ReturnType<typeof setInterval>;
       const cleanup = () => {
         clearInterval(timer);
         stream.getTracks().forEach((t) => t.stop());
@@ -1944,7 +1943,7 @@ export function createViewer(
       };
       recorder.start(1000);
       const started = performance.now();
-      timer = setInterval(() => {
+      const timer = setInterval(() => {
         const elapsed = (performance.now() - started) / 1000;
         onProgress(Math.min(1, elapsed / 60));
         if (elapsed >= 60) stopRecording?.();
