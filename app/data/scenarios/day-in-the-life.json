@@ -90,7 +90,7 @@
       "zoneId": "lobby",
       "roomId": "lobby-arrival",
       "title": "Known by name",
-      "kicker": "9:05 AM · Front desk",
+      "kicker": "9:20 AM · Front desk",
       "body": "Check-in takes a minute. Her plan for the day is already waiting: clinic first, then therapy, lunch, and karaoke after.",
       "roles": [
         "center-manager"
@@ -113,7 +113,7 @@
       "zoneId": "clinic",
       "roomId": "clinic-nurse",
       "title": "Care, down the hall",
-      "kicker": "9:25 AM · Clinic",
+      "kicker": "9:35 AM · Clinic",
       "body": "The nurse rechecks her blood pressure. Her doctor adjusts a medication on the spot. No separate trip, no waiting room across town.",
       "roles": [
         "rn",
@@ -142,7 +142,7 @@
       "zoneId": "rehab",
       "roomId": "rehab-open",
       "title": "Stronger every week",
-      "kicker": "10:00 AM · Physical & occupational therapy",
+      "kicker": "10:05 AM · Physical & occupational therapy",
       "body": "Parallel bars and step training with her physical therapist, then practice getting safely in and out of a shower with her occupational therapist.",
       "roles": [
         "pt",
