@@ -110,7 +110,7 @@
       ],
       "title": "Morning care at home",
       "kicker": "8:35 AM \u00b7 The Wongs\u2019 home",
-      "body": "A personal care attendant helps Mrs. Wong with her hair, breakfast and morning medicines, the routine her home care coordinator set up. Then a Seen van takes her to a cardiology visit, with an aide riding along.",
+      "body": "A personal care attendant helps Mrs. Wong with her hair, breakfast and morning medicines, the routine her home care coordinator set up. Then a Seen van takes her to see her cardiologist, with an aide riding along.",
       "roles": [
         "pca",
         "home-care"
@@ -513,7 +513,7 @@
       ],
       "title": "Therapy that travels",
       "kicker": "11:15 AM \u00b7 Partner day center",
-      "body": "At a partner adult day center, a visiting Seen physical therapist works on strength and balance with two participants enrolled in both programs, while the partner\u2019s activities lead runs games on the patio.",
+      "body": "At a partner adult day center, a visiting Seen physical therapist works on strength and balance with two participants enrolled in both programs. The partner\u2019s own activities lead runs games on the patio.",
       "roles": [
         "pt"
       ],
@@ -888,7 +888,7 @@
       ],
       "title": "Planning the trip home",
       "kicker": "1:35 PM \u00b7 Community hospital",
-      "body": "Seen\u2019s liaison nurse joins the hospitalist and the case manager to plan Mr. Wong\u2019s discharge. His home care coordinator lines up a home health visit and meals, and a Seen van will be at the canopy at 2:10.",
+      "body": "Mr. Wong, Mrs. Wong\u2019s husband, goes home today. Seen\u2019s liaison nurse plans his discharge with the hospitalist and the case manager; his home care coordinator lines up a home health visit and meals, and a Seen van will be at the canopy at 2:10.",
       "roles": [
         "rn",
         "home-care",
