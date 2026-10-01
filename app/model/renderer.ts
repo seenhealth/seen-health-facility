@@ -33,7 +33,10 @@ import { buildOlympicExterior } from './olympic-exterior';
 import { buildAlhambraExterior } from './alhambra-exterior';
 import { buildAlveareExterior } from './alveare-exterior';
 import { buildRoomLabels } from './room-labels';
-import { createActivity, type ActivitySource } from './activity';
+import { activityData, createActivity, type ActivitySource } from './activity';
+import { composeSources } from './sources';
+import { communitySource } from './community-people';
+import { buildCommunityLayer } from './community-layer';
 import {
   center,
   type Facility,
@@ -386,6 +389,11 @@ export type ViewerState = {
   ceilings: boolean;
   sectionAxis: 'none' | 'x' | 'y' | 'z';
   section: number;
+  /**
+   * The distributed-care settings around the center (homes, pharmacy,
+   * hospital, partners). Shown with the site context; undefined means shown.
+   */
+  community?: boolean;
 };
 export const defaultState: ViewerState = {
   selected: null,
@@ -406,6 +414,7 @@ export const defaultState: ViewerState = {
   ceilings: false,
   sectionAxis: 'none',
   section: 0.5,
+  community: true,
 };
 /**
  * A declarative camera position for scripted views such as the scroll story.
@@ -994,9 +1003,24 @@ export function createViewer(
   if (olympicExterior) context.add(olympicExterior.site);
   if (alhambraExterior) context.add(alhambraExterior.site);
   if (alveareExterior) context.add(alveareExterior.site);
+  // Models without a bespoke context style (Alhambra) get the distributed-care
+  // layer: its people are composed into the care-day source, its vehicles
+  // register with the activity engine so riders sit in them.
+  const communityData = model.contextStyle ? null : communitySource(model);
   const activity = model.contextStyle
     ? createSiteActivity(model, scene, mat)
-    : createActivity(model, scene, mat, options.activity);
+    : createActivity(
+        model,
+        scene,
+        mat,
+        composeSources(options.activity || activityData, communityData!),
+      );
+  const community = communityData
+    ? buildCommunityLayer(model, mat, activity.vehicles)
+    : null;
+  if (community) context.add(community.root);
+  const communityIds = new Set((communityData?.actors || []).map((a) => a.id));
+  const communityActors = activity.actors.filter((a) => communityIds.has(a.spec.id));
   const furnitureRoots: T.Group[] = [];
   const exteriorAssets: T.Group[] = [],
     roofAssets: T.Group[] = [];
@@ -1584,6 +1608,21 @@ export function createViewer(
         state.stack > 0.05 &&
         !options.keepSiteWhenStacked
       );
+    if (community) {
+      community.root.visible = state.community !== false;
+      // Pads out to ±130 m receive shadows only while the layer is on screen;
+      // otherwise the map keeps its finer building shadows.
+      const extent = context.visible && community.root.visible ? 130 : 65;
+      if (sun.shadow.camera.right !== extent) {
+        Object.assign(sun.shadow.camera, {
+          left: -extent,
+          right: extent,
+          top: extent,
+          bottom: -extent,
+        });
+        sun.shadow.camera.updateProjectionMatrix();
+      }
+    }
     facade.visible =
       state.exterior &&
       !state.plan &&
@@ -1655,6 +1694,16 @@ export function createViewer(
     zoomTarget = T.MathUtils.clamp(30 / Math.max(size.x, size.y), 1.35, 8);
     finishFocus(instant);
   }
+  /** Frame the whole distributed-care network, or one setting's pad. */
+  function focusSetting(id?: string) {
+    const framing = community?.frame(id);
+    if (!framing) {
+      focus(null);
+      return;
+    }
+    focusTarget = new T.Vector3(...framing.target);
+    zoomTarget = framing.zoom;
+  }
   function focusSiteObjects(ids: string[], instant = false) {
     scene.updateMatrixWorld(true);
     const bounds = new T.Box3();
@@ -1693,6 +1742,7 @@ export function createViewer(
       camera.position.copy(c).add(new T.Vector3(48, 19, 95));
     else camera.position.copy(c).add(new T.Vector3(65, 85, 100));
     controls.update();
+    if (mode === 'community') focusSetting();
   }
   let tiltComposer: EffectComposer | null = null;
   let tiltHorizontal: ShaderPass | null = null,
@@ -1972,6 +2022,9 @@ export function createViewer(
     }
     activity.tick(typeof document !== 'undefined' && document.hidden ? 0 : dt);
     neighborhood.tick(activity.getState().time);
+    community?.tick(activity.getState().time);
+    if (community && state.community === false)
+      for (const a of communityActors) a.root.visible = false;
     // Entry leaves open for approaching transport parties, even with the design door toggle shut.
     if (model.contextStyle) {
       const travelers = activity.root.visible
@@ -2062,6 +2115,8 @@ export function createViewer(
     update,
     focus,
     focusSiteObjects,
+    focusSetting,
+    community,
     focusArrival: () => {
       focusTarget = activity.arrival.focus.clone();
       // Keep the stop and front desk above the care-day controls.
@@ -2218,6 +2273,7 @@ export function createViewer(
       exportScene.add(f);
       const siteCopy = context.clone();
       siteCopy.visible = true;
+      siteCopy.getObjectByName('community-layer')?.removeFromParent();
       const sourcePlan = siteCopy.getObjectByName('source-plan-context');
       if (sourcePlan) sourcePlan.visible = false;
       const neighborhoodCopy = siteCopy.getObjectByName('neighborhood-3d');

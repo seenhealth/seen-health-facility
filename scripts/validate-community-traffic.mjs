@@ -1,0 +1,349 @@
+// Run after compile-model-modules.mjs. Checks the distributed-care layer over
+// the whole 720 s day: community vehicles keep clear of the fleet, the delivery
+// trucks, the street cars and each other at 50 Hz; drive nose-first with no
+// hairpins or reversing; keep doors and ramps shut while moving; and the
+// community cast's tracks are contiguous, walk at human speeds, ride only in
+// registered seats and never stand in each other.
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { Vector3 } from 'three';
+import { sampleVan } from '../work/validation/arrival.mjs';
+import { sampleDelivery } from '../work/validation/deliveries.mjs';
+import { sampleStreetCar } from '../work/validation/traffic-routes.mjs';
+import { vehicleGap } from '../work/validation/vehicle-clearance.mjs';
+import {
+  communityVehicles,
+  sampleCommunityVehicle,
+} from '../work/validation/community-vehicles.mjs';
+import {
+  communitySource,
+  COMMUNITY_CATEGORIES,
+} from '../work/validation/community-people.mjs';
+import {
+  careSettings,
+  settingZone,
+} from '../work/validation/community-settings.mjs';
+import {
+  activityData,
+  sampleActor,
+  seatInVehicle,
+} from '../work/validation/activity.mjs';
+import { composeSources } from '../work/validation/sources.mjs';
+
+const model = JSON.parse(
+  fs.readFileSync('public/models/seen-alhambra-planning.json'),
+);
+const DIMENSIONS = {
+  van: [1.125, 3.175],
+  truck: [1.15, 2.36],
+  car: [0.96, 1.98],
+  ambulance: [1.15, 2.7],
+};
+const body = (p, kind) => ({
+  ...p,
+  halfWidth: DIMENSIONS[kind][0],
+  halfLength: DIMENSIONS[kind][1],
+});
+const parkedCars = [
+  [3240, 857, 0.78],
+  [3290, 1520, 0.78],
+].map(([x, z, heading]) =>
+  body(
+    {
+      position: new Vector3(
+        (x - model.calibration.sourcePixelOrigin[0]) /
+          model.calibration.pixelsPerMeter,
+        0,
+        (z - model.calibration.sourcePixelOrigin[1]) /
+          model.calibration.pixelsPerMeter,
+      ),
+      heading,
+    },
+    'car',
+  ),
+);
+const others = (time) => [
+  ...Array.from({ length: 8 }, (_, i) => ({
+    id: `van-${i}`,
+    ...body(sampleVan(i, time), 'van'),
+  })),
+  ...Array.from({ length: 2 }, (_, i) => ({
+    id: `truck-${i}`,
+    ...body(sampleDelivery(i, time), 'truck'),
+  })),
+  ...Array.from({ length: 2 }, (_, i) => ({
+    id: `street-${i}`,
+    street: true,
+    ...body(sampleStreetCar(i, time), 'car'),
+  })),
+  ...parkedCars.map((c, i) => ({ id: `parked-${i}`, ...c })),
+];
+const mine = (time) =>
+  communityVehicles.map((v) => ({
+    id: v.id,
+    ...body(sampleCommunityVehicle(v.id, time), v.kind),
+  }));
+
+// --- Vehicles ---------------------------------------------------------------
+let pairs = 0,
+  closest = Infinity,
+  streetClosest = Infinity;
+const motion = new Map(
+  communityVehicles.map((v) => [
+    v.id,
+    { history: [], minRadius: Infinity, minRadiusAt: 0, maxSpeed: 0 },
+  ]),
+);
+for (let frame = 0; frame < 36000; frame++) {
+  const time = frame / 50,
+    ours = mine(time),
+    rest = others(time);
+  for (let i = 0; i < ours.length; i++) {
+    const a = ours[i];
+    if (!a.visible) continue;
+    for (const b of [...ours.slice(i + 1), ...rest]) {
+      if (b.visible === false) continue;
+      const gap = vehicleGap(a, b),
+        margin = b.street ? 0.85 : 0.5;
+      assert(
+        gap >= margin,
+        `${a.id} and ${b.id} have only ${gap.toFixed(3)} m at ${time}s (${a.phase})`,
+      );
+      closest = Math.min(closest, gap);
+      if (b.street) streetClosest = Math.min(streetClosest, gap);
+      pairs++;
+    }
+    // Nose-first, no teleports, closed doors while moving.
+    const next = sampleCommunityVehicle(a.id, time + 0.002),
+      movement = next.position.clone().sub(a.position);
+    assert(movement.length() < 0.03, `${a.id} teleports at ${time}s`);
+    if (movement.length() > 0.00001 && a.phase === next.phase) {
+      const front = new Vector3(-Math.sin(a.heading), 0, -Math.cos(a.heading));
+      assert(
+        movement.clone().normalize().dot(front) > 0.97,
+        `${a.id} drives sideways or backward at ${time}s`,
+      );
+      assert(
+        (a.door ?? 0) < 0.001 && (a.ramp ?? 0) < 0.001,
+        `${a.id} moves with the door or ramp open at ${time}s`,
+      );
+    }
+    // Curvature over a 3 m window: the design arcs are ≥ 6.2 m; the spline may
+    // tighten a little where a straight meets an arc.
+    const m = motion.get(a.id),
+      prev = m.history.at(-1);
+    if (prev && prev.phase === a.phase) {
+      const d = Math.hypot(a.position.x - prev.x, a.position.z - prev.z);
+      m.maxSpeed = Math.max(m.maxSpeed, d * 50);
+      m.history.push({
+        x: a.position.x,
+        z: a.position.z,
+        heading: a.heading,
+        phase: a.phase,
+        s: prev.s + d,
+      });
+    } else
+      m.history = [
+        {
+          x: a.position.x,
+          z: a.position.z,
+          heading: a.heading,
+          phase: a.phase,
+          s: 0,
+        },
+      ];
+    const h = m.history,
+      last = h.at(-1);
+    let k = h.length - 2;
+    while (k >= 0 && last.s - h[k].s < 3) k--;
+    if (k >= 0 && last.s - h[k].s >= 3 && last.s - h[h.length - 2].s > 0.02) {
+      let dTheta = last.heading - h[k].heading;
+      dTheta = Math.atan2(Math.sin(dTheta), Math.cos(dTheta));
+      const radius = (last.s - h[k].s) / Math.max(1e-9, Math.abs(dTheta));
+      if (radius < m.minRadius) {
+        m.minRadius = radius;
+        m.minRadiusAt = time;
+      }
+    }
+    if (h.length > 400) h.splice(0, 200);
+  }
+}
+for (const [id, m] of motion)
+  assert(
+    m.minRadius >= 5,
+    `${id} turns with a ${m.minRadius.toFixed(2)} m radius at ${m.minRadiusAt}s (hairpin)`,
+  );
+// Deterministic and loop-continuous.
+for (const v of communityVehicles) {
+  for (const t of [0, 90.5, 255.2, 480.1, 719.98])
+    for (const shift of [-720, 720])
+      assert(
+        sampleCommunityVehicle(v.id, t).position.distanceTo(
+          sampleCommunityVehicle(v.id, t + shift).position,
+        ) < 1e-9,
+        `${v.id} is not periodic at ${t}`,
+      );
+  const end = sampleCommunityVehicle(v.id, 719.98),
+    start = sampleCommunityVehicle(v.id, 0.02);
+  if (end.visible && start.visible)
+    assert(
+      end.position.distanceTo(start.position) < 0.05,
+      `${v.id} jumps across the loop seam`,
+    );
+}
+
+// --- People -----------------------------------------------------------------
+const source = communitySource(model);
+const composed = composeSources(activityData, source);
+assert(
+  composed.actors.length === activityData.actors.length + source.actors.length,
+);
+const settingZones = new Set(careSettings.map((s) => settingZone(s.id)));
+const categories = new Set(COMMUNITY_CATEGORIES.map(([id]) => id));
+const vehicleIds = new Set(communityVehicles.map((v) => v.id));
+const positionAt = (actor, t) => {
+  const s = sampleActor(actor, t);
+  if (s.vehicleId && s.seat) {
+    const pose = sampleCommunityVehicle(s.vehicleId, t),
+      placed = seatInVehicle(pose, s.seat, s.seatHeading);
+    return {
+      ...s,
+      x: placed.x,
+      z: placed.z,
+      visible: s.visible !== false && pose.visible,
+      inVehicle: s.vehicleId,
+    };
+  }
+  return { ...s, visible: s.visible !== false };
+};
+const problems = [];
+const check = (ok, message) => {
+  if (!ok) problems.push(message);
+};
+let walks = 0,
+  maxGait = 0;
+for (const a of source.actors) {
+  assert(
+    settingZones.has(a.segments[0].zoneId) ||
+      a.segments[0].zoneId === 'upper-office',
+    `${a.id}: zone`,
+  );
+  assert.equal(a.segments[0].start, 0);
+  assert.equal(a.segments.at(-1).end, 720);
+  for (let i = 0; i < a.segments.length; i++) {
+    const s = a.segments[i];
+    if (i) assert.equal(a.segments[i - 1].end, s.start, `${a.id}: contiguous`);
+    if (s.vehicleId) {
+      assert(
+        vehicleIds.has(s.vehicleId),
+        `${a.id} rides unknown vehicle ${s.vehicleId}`,
+      );
+      assert(s.seat, `${a.id} rides ${s.vehicleId} without a seat`);
+    }
+    if (['walk', 'roll', 'escort'].includes(s.action)) {
+      let length = 0;
+      for (let k = 1; k < s.path.length; k++)
+        length += Math.hypot(
+          s.path[k][0] - s.path[k - 1][0],
+          s.path[k][1] - s.path[k - 1][1],
+        );
+      const gait = length / (s.end - s.start);
+      check(
+        gait <= 1.65,
+        `${a.id} walks at ${gait.toFixed(2)} m/s during "${s.title}" (${s.start}–${s.end})`,
+      );
+      maxGait = Math.max(maxGait, gait);
+      walks++;
+    }
+    // Consecutive segments join: exactly on foot, within a step when leaving
+    // or entering a seat, freely while out of sight (indoors, in a car).
+    if (i) {
+      const p = a.segments[i - 1],
+        q = s,
+        seatAt = (seg, t) => {
+          const placed = seatInVehicle(
+            sampleCommunityVehicle(seg.vehicleId, t),
+            seg.seat,
+            seg.seatHeading,
+          );
+          return [placed.x, placed.z];
+        };
+      let limit = 0.05,
+        from = p.path.at(-1),
+        to = q.path[0];
+      if (p.seat && q.seat) limit = Infinity;
+      else if (p.seat) [from, limit] = [seatAt(p, q.start), 2.0];
+      else if (q.seat) [to, limit] = [seatAt(q, q.start), 2.0];
+      else if (p.visible === false || q.visible === false) limit = Infinity;
+      const d = Math.hypot(from[0] - to[0], from[1] - to[1]);
+      check(
+        d <= limit,
+        `${a.id} teleports ${d.toFixed(2)} m between "${p.title}" and "${q.title}" at ${q.start}s`,
+      );
+    }
+  }
+}
+for (const i of source.interactions) {
+  assert(categories.has(i.category), `${i.id}: category ${i.category}`);
+  assert(i.start >= 0 && i.end <= 720 && i.end > i.start, `${i.id}: window`);
+  assert(
+    settingZones.has(i.zoneId) || ['site', 'upper-office'].includes(i.zoneId),
+    `${i.id}: zone ${i.zoneId}`,
+  );
+  for (const id of i.actorIds)
+    assert(
+      source.actors.some((a) => a.id === id),
+      `${i.id} names ${id}`,
+    );
+}
+// Nobody stands in anyone else (community cast against itself and the center's cast).
+const groundOrSite = activityData.actors.filter(
+  (a) => a.levelId === 'ground' || a.levelId === 'site',
+);
+let samples = 0,
+  nearest = Infinity;
+for (let t = 0; t < 720; t += 0.5) {
+  const us = source.actors.map((a) => ({ a, p: positionAt(a, t) }));
+  for (let i = 0; i < us.length; i++) {
+    const { a, p } = us[i];
+    if (!p.visible) continue;
+    for (let j = i + 1; j < us.length; j++) {
+      const { a: b, p: q } = us[j];
+      if (!q.visible || a.levelId !== b.levelId) continue;
+      // Seated riders are inside a body; only people on foot can collide with each other.
+      if (p.inVehicle || q.inVehicle) continue;
+      const d = Math.hypot(p.x - q.x, p.z - q.z);
+      nearest = Math.min(nearest, d);
+      check(
+        d >= 0.55,
+        `${a.id} and ${b.id} are ${d.toFixed(2)} m apart at ${t}s ("${p.title}" / "${q.title}")`,
+      );
+    }
+    if (a.levelId === 'site' && !p.inVehicle)
+      for (const b of groundOrSite) {
+        const q = sampleActor(b, t);
+        if (q.visible === false) continue;
+        const d = Math.hypot(p.x - q.x, p.z - q.z);
+        check(
+          d >= 0.55,
+          `${a.id} and ${b.id} (center cast) are ${d.toFixed(2)} m apart at ${t}s`,
+        );
+      }
+    samples++;
+  }
+}
+if (problems.length) {
+  const unique = [...new Set(problems)];
+  console.error(unique.slice(0, 40).join('\n'));
+  assert.fail(`${unique.length} cast problem(s); first: ${unique[0]}`);
+}
+const radii = [...motion.entries()]
+  .map(
+    ([id, m]) =>
+      `${id} ≥ ${m.minRadius.toFixed(1)} m, ≤ ${m.maxSpeed.toFixed(1)} m/s`,
+  )
+  .join('; ');
+console.log(
+  `Community traffic: ${pairs.toLocaleString()} vehicle-pair checks over 12 minutes at 50 Hz; minimum gap ${closest.toFixed(2)} m (street traffic ${streetClosest.toFixed(2)} m). Turn radii and top speeds: ${radii}. ` +
+    `Cast: ${source.actors.length} people, ${source.interactions.length} touchpoints, ${walks} walks (max ${maxGait.toFixed(2)} m/s), ${samples.toLocaleString()} placement samples, nearest ${nearest.toFixed(2)} m.`,
+);

@@ -55,6 +55,7 @@ export type ParticipantActivity =
   | 'activities'
   | 'meals'
   | 'coordination'
+  | 'community'
   | 'moving'
   | 'waiting';
 export const PARTICIPANT_ACTIVITIES: ParticipantActivity[] = [
@@ -64,6 +65,7 @@ export const PARTICIPANT_ACTIVITIES: ParticipantActivity[] = [
   'activities',
   'meals',
   'coordination',
+  'community',
   'moving',
   'waiting',
   'offSite',
@@ -76,6 +78,7 @@ export const participantActivityLabels: Record<ParticipantActivity, string> = {
   activities: 'Activities',
   meals: 'Meals',
   coordination: 'Social work & coordination',
+  community: 'Care at home & in the community',
   moving: 'Walking between',
   waiting: 'Waiting & free time',
 };
@@ -105,7 +108,16 @@ const CATEGORY_PRIORITY: ParticipantActivity[] = [
   'coordination',
   'activities',
   'arrivals',
+  'community',
 ];
+/** Interaction categories of the distributed-care layer, measured as one bucket. */
+const COMMUNITY_CATEGORIES = new Set(['home', 'pharmacy', 'specialist', 'hospital', 'partner', 'after-hours']);
+const categoryBucket = (category: string): ParticipantActivity | null =>
+  COMMUNITY_CATEGORIES.has(category)
+    ? 'community'
+    : (CATEGORY_PRIORITY as string[]).includes(category)
+      ? (category as ParticipantActivity)
+      : null;
 /** Character role → IDT discipline id (care-team.json), when there is one. */
 export const disciplineOfRole: Partial<Record<CharacterRole, string>> =
   Object.fromEntries(
@@ -366,7 +378,7 @@ export function computeMetrics(
         else {
           const mine = active.filter((i) => i.actorIds.includes(a.id));
           const found = CATEGORY_PRIORITY.find((c) =>
-            mine.some((i) => i.category === c),
+            mine.some((i) => categoryBucket(i.category) === c),
           );
           if (found && !(f.sample.action === 'walk' && found !== 'arrivals'))
             cat = found;
@@ -573,7 +585,7 @@ export function computeMetrics(
     participantTimes.reduce((s, p) => {
       const onSiteSeconds = n * step - p.seconds.offSite;
       const active =
-        p.seconds.clinical + p.seconds.rehab + p.seconds.activities + p.seconds.meals + p.seconds.coordination;
+        p.seconds.clinical + p.seconds.rehab + p.seconds.activities + p.seconds.meals + p.seconds.coordination + p.seconds.community;
       return s + (onSiteSeconds > 0 ? active / onSiteSeconds : 0);
     }, 0) / Math.max(1, participantTimes.length);
   return {

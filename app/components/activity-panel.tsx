@@ -32,6 +32,7 @@ import {
   subscribeProgramRotation,
   type RotationDay,
 } from '../model/day-room';
+import { COMMUNITY_CATEGORIES } from '../model/community-people';
 import type { createViewer } from '../model/renderer';
 
 export const activityViews = [
@@ -51,6 +52,7 @@ const categories = [
   ['activities', 'Activities'],
   ['meals', 'Meals'],
   ['coordination', 'Coordination'],
+  ...COMMUNITY_CATEGORIES,
 ];
 const dayLabels: Record<RotationDay, string> = {
   mon: 'Mon',
