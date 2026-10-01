@@ -2584,6 +2584,33 @@ td a {
   line-height: 1.4;
   color: #637872;
 }
+.day-program-week {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.day-program-week > span {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #4f6f69;
+}
+.activity-panel .day-program-week button {
+  padding: 4px 9px;
+  font-size: 12px;
+}
+.day-program-chips {
+  margin: 6px 0 8px;
+}
+.day-program-chips .chip-language {
+  background: #e3eee7;
+}
+.day-program-chips .chip-format {
+  background: transparent;
+  border: 1px solid #cfdfd5;
+}
 @media (max-width: 600px) {
   .day-program-topline label {
     flex-basis: 100%;

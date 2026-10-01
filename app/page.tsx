@@ -43,6 +43,7 @@ import { roomLabelCode } from './model/room-labels';
 import { JourneyPanel } from './components/journey-panel';
 import type { JourneyStep } from './model/journeys';
 import { ActivityPanel } from './components/activity-panel';
+import { isRotationDay, setProgramRotation } from './model/day-room';
 import { ShowcaseControls } from './components/showcase-controls';
 import { SiteMap } from './components/site-map';
 import { sites, type SiteId } from './data/sites';
@@ -196,6 +197,8 @@ export default function Home() {
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
     const id = sites.find((s) => s.id === p.get('site'))?.id || 'alhambra';
+    const program = p.get('program');
+    if (isRotationDay(program)) setProgramRotation(program);
     queueMicrotask(() => {
       selectSite(id);
       setClinicOption(id === 'olympic' && p.get('option') === 'clinic');
