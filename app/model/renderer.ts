@@ -20,11 +20,15 @@ import {
   PoissonDenoiseShader,
   generatePdSamplePointInitializer,
 } from 'three/addons/shaders/PoissonDenoiseShader.js';
-import {
-  mergeGeometries,
-  mergeVertices,
-} from 'three/addons/utils/BufferGeometryUtils.js';
 import { buildAsset } from './assets';
+import { mergeByMaterial } from './batch';
+import {
+  roomFinish,
+  wallMeshes,
+  zoneFloor,
+  zoneSlab,
+} from './facility-geometry';
+import { CUTAWAY_HEIGHT, PRESENTATION } from './presentation';
 import { buildEnvelopeWall, buildRoofGeometry } from './envelope';
 import { buildNeighborhood } from './neighborhood';
 import { createSiteActivity } from './site-activity';
@@ -47,72 +51,6 @@ import {
 
 /** Warm drawing-paper backdrop shared with the page behind the canvas. */
 export const PAPER = '#f3f0e9';
-/**
- * Presentation finishes for the architectural-model look: warm whites, light
- * oak, pale stone and muted accents. Hues follow the photographed interior;
- * the facility JSON keeps its source colors, so this is a rendering layer only.
- */
-const PRESENTATION: Record<string, Partial<MaterialSpec>> = {
-  wall: { color: '#f5f3ee', roughness: 0.92 },
-  tile: { color: '#ebe6dc', roughness: 0.55, pattern: 'stone' },
-  vinyl: { color: '#ece8e0', roughness: 0.6 },
-  wood: { color: '#e4d1b0', roughness: 0.6 },
-  sports: { color: '#decdaf', roughness: 0.6 },
-  carpet: { color: '#cdc6b8', roughness: 1 },
-  pattern: { color: '#e2ded5', roughness: 0.8 },
-  concrete: { color: '#dedad2', roughness: 0.95 },
-  oak: { color: '#dcc49c', roughness: 0.6 },
-  chair: { color: '#eee7d9', roughness: 0.8 },
-  table: { color: '#f5f3ee', roughness: 0.4 },
-  'clinical-blue': { color: '#a9b9ba' },
-  blue: { color: '#8ea9b3' },
-  metal: { color: '#c2c2bc', roughness: 0.35, metalness: 0.5 },
-  porcelain: { color: '#f4f3ee', roughness: 0.3 },
-  leaf: { color: '#8e9f7e', roughness: 0.95 },
-  cabinet: { color: '#ece8df' },
-  screen: { color: '#262c2e', roughness: 0.28 },
-  car: { color: '#d9d6cf' },
-  glass: { color: '#d3dfde', roughness: 0.08, metalness: 0.1, opacity: 0.42 },
-  frame: { color: '#5f6461' },
-  canopy: { color: '#5c7690' },
-  light: { color: '#f6efe0' },
-  'wet-tile': { color: '#d5dcd6', roughness: 0.5 },
-  'dining-chair': { color: '#936f53' },
-  'office-blue': { color: '#91a3a7' },
-  'lounge-blue': { color: '#8f9fb0' },
-  'grey-seat': { color: '#d4d1c9' },
-  'clinical-seat': { color: '#d5dbce' },
-  'photo-carpet': { color: '#d9d2c3' },
-  'photo-teal': { color: '#88aba9' },
-  'photo-tan-mesh': { color: '#bb9f7e' },
-  'photo-blue-grey': { color: '#b4c0bc' },
-  'photo-blue-seat': { color: '#b5ccc9' },
-  'photo-chair-wood': { color: '#a47d57' },
-  'photo-brown-counter': { color: '#aa9587' },
-  'photo-mustard': { color: '#c6ad73' },
-  'photo-yellow': { color: '#e8ddbd' },
-  'photo-lattice-blue': { color: '#6f9fb1' },
-  'photo-landscape-red': { color: '#ab6a53' },
-  'photo-landscape-ochre': { color: '#c9a579' },
-  'photo-moss': { color: '#5e7752' },
-  'photo-teal-tile': { color: '#bccdc8' },
-  'photo-facade': { color: '#e4dbcc' },
-  'photo-black': { color: '#2e3130' },
-  'photo-red-cart': { color: '#b4675c' },
-  'upperfit-floor': { color: '#d8cebe' },
-  'upperfit-wall': { color: '#ece5d8' },
-  'upperfit-blue': { color: '#b3c5c5' },
-  'upperfit-divider': { color: '#b6b7b1' },
-  'upperfit-wood': { color: '#cfb086' },
-  'upperfit-mesh': { color: '#c2b79e' },
-  'fleet-teal': { color: '#174a49' },
-  'fleet-glass': { color: '#2b3335', roughness: 0.25 },
-  'rehab-blue': { color: '#8199a9' },
-  '#e4e5df': { color: '#f0eee9', roughness: 0.9 },
-  '#dfdfd8': { color: '#ebe8e2', roughness: 0.9 },
-};
-/** Thin, slightly darker coping on cut interior walls: a drawn section line. */
-const WALL_CAP = '#b9b1a4';
 /** 'high' adds ambient occlusion and larger soft shadows; 'balanced' renders directly. */
 export type ViewerQuality = 'high' | 'balanced';
 const prefersBalanced = () =>
@@ -808,29 +746,17 @@ export function createViewer(
       (z.elevationOffset || 0);
     scene.add(g);
     groups.set(z.id, g);
-    const sh = floorShapes(
-        z.polygon,
-        (model.floorOpenings || []).filter(
-          (o) => o.zoneId === z.id && o.levelId === z.levelId,
-        ),
-      ),
-      slab = new T.ExtrudeGeometry(sh, {
-        depth: z.slabDepth || 0.19,
-        bevelEnabled: false,
-      });
-    slab.rotateX(-Math.PI / 2);
-    mesh(g, slab, mat('concrete'), 0, -(z.slabDepth || 0.19) - 0.01, 0);
-    const geo = new T.ShapeGeometry(sh);
-    geo.rotateX(-Math.PI / 2);
-    const uv = geo.attributes.uv;
-    const p = geo.attributes.position;
-    for (let i = 0; i < p.count; i++) uv.setXY(i, p.getX(i) / 2, p.getZ(i) / 2);
-    const f = mesh(g, geo, mat(z.floorMaterial).clone());
+    const openings = (model.floorOpenings || []).filter(
+      (o) => o.zoneId === z.id && o.levelId === z.levelId,
+    );
+    g.add(zoneSlab(z, openings, mat('concrete')));
+    const f = zoneFloor(z, openings, mat(z.floorMaterial).clone());
+    g.add(f);
     f.name = `zone-floor-${z.id}`;
     f.userData = { zone: z.id };
     floorMap.set(z.id, f);
     pickables.push(f);
-    const ov = geo.clone();
+    const ov = f.geometry.clone();
     mapUV(ov, z.levelId);
     const overlay = mesh(
       g,
@@ -860,29 +786,14 @@ export function createViewer(
     labels.set(z.id, label);
   });
   model.rooms.forEach((r) => {
-    const geo = new T.ShapeGeometry(
-      floorShapes(
-        r.polygon,
-        (model.floorOpenings || []).filter(
-          (o) => o.zoneId === r.zoneId && o.levelId === r.levelId,
-        ),
-      ),
+    const openings = (model.floorOpenings || []).filter(
+      (o) => o.zoneId === r.zoneId && o.levelId === r.levelId,
     );
+    const geo = new T.ShapeGeometry(floorShapes(r.polygon, openings));
     geo.rotateX(-Math.PI / 2);
     if (r.floorMaterial) {
-      const floorGeo = geo.clone(),
-        uv = floorGeo.attributes.uv,
-        p = floorGeo.attributes.position;
-      for (let i = 0; i < p.count; i++)
-        uv.setXY(i, p.getX(i) / 2, p.getZ(i) / 2);
-      const finish = mesh(
-        groups.get(r.zoneId)!,
-        floorGeo,
-        mat(r.floorMaterial),
-        0,
-        0.004,
-        0,
-      );
+      const finish = roomFinish(r, openings, mat(r.floorMaterial));
+      groups.get(r.zoneId)!.add(finish);
       finish.name = `room-finish-${r.id}`;
       finish.userData = { zone: r.zoneId, room: r.id };
       roomFinishes.push(finish);
@@ -906,8 +817,6 @@ export function createViewer(
     pickables.unshift(m);
   });
   model.walls.forEach((w) => {
-    const dx = w.b[0] - w.a[0],
-      dz = w.b[1] - w.a[1];
     // The traced Alhambra plan also contains solid perimeter strokes. Let
     // the opening-aware envelope replace those strokes in assembled views.
     const perimeter =
@@ -931,40 +840,10 @@ export function createViewer(
             );
           });
         }));
-    const g = wallGroups.get(w.zoneId)!;
-    const m = box(
-      g,
-      (w.a[0] + w.b[0]) / 2,
-      0,
-      (w.a[1] + w.b[1]) / 2,
-      Math.hypot(dx, dz),
-      w.height,
-      w.thickness,
-      w.material,
-    );
-    m.rotation.y = -Math.atan2(dz, dx);
-    m.userData = {
-      id: w.id,
-      height: w.height,
-      perimeter,
-    };
-    const cap = box(
-      g,
-      (w.a[0] + w.b[0]) / 2,
-      w.height,
-      (w.a[1] + w.b[1]) / 2,
-      Math.hypot(dx, dz) + 0.004,
-      0.02,
-      w.thickness + 0.006,
-      WALL_CAP,
-    );
-    cap.castShadow = false;
-    cap.rotation.y = m.rotation.y;
-    cap.userData = {
-      cap: true,
-      height: w.height,
-      perimeter,
-    };
+    const [m, cap] = wallMeshes(w, mat);
+    m.userData.perimeter = perimeter;
+    cap.userData.perimeter = perimeter;
+    wallGroups.get(w.zoneId)!.add(m, cap);
   });
   const context = new T.Group();
   context.name = 'site-context';
@@ -1248,7 +1127,7 @@ export function createViewer(
     // Full shell is a global assembled layer; these independent copies follow
     // zone explosion and level visibility in interior inspection modes.
     const wall = buildEnvelopeWall({ ...w, detailIds: undefined }, mat);
-    const cut = buildEnvelopeWall(w, mat, 1.2);
+    const cut = buildEnvelopeWall(w, mat, CUTAWAY_HEIGHT);
     interior.add(wall, cut);
     interiorShells.push({ full: wall, cut, zoneId: w.zoneId });
   }
@@ -1297,35 +1176,6 @@ export function createViewer(
   );
   scene.add(roomOutline);
   roomOutline.visible = false;
-  // Group geometry by material inside each instance: keeps IDs and future swaps independent.
-  function batch(group: T.Group) {
-    const meshes: T.Mesh[] = [];
-    group.traverse((o) => {
-      if (o instanceof T.Mesh && !Array.isArray(o.material)) meshes.push(o);
-    });
-    group.updateWorldMatrix(true, true);
-    const inverse = group.matrixWorld.clone().invert(),
-      buckets = new Map<T.Material, T.BufferGeometry[]>();
-    for (const m of meshes) {
-      const geo = m.geometry
-        .clone()
-        .applyMatrix4(inverse.clone().multiply(m.matrixWorld));
-      const key = m.material as T.Material;
-      (buckets.get(key) || buckets.set(key, []).get(key)!).push(
-        geo.index ? geo.toNonIndexed() : geo,
-      );
-    }
-    group.clear();
-    buckets.forEach((gs, ma) => {
-      const geo = mergeGeometries(gs);
-      if (geo) {
-        mesh(group, mergeVertices(geo, 0.000001), ma);
-        geo.dispose();
-      }
-      gs.forEach((g) => g.dispose());
-    });
-    meshes.forEach((m) => m.geometry.dispose());
-  }
   const sharedFurniture = new Map<string, T.Object3D[]>();
   furnitureRoots.forEach((g) => {
     const spec = model.assets[g.userData.assetId];
@@ -1359,7 +1209,8 @@ export function createViewer(
       g.clear();
       g.add(...cached.map((o) => o.clone()));
     } else {
-      batch(g);
+      // Group geometry by material inside each instance: keeps IDs and future swaps independent.
+      mergeByMaterial(g);
       if (reusable)
         sharedFurniture.set(
           g.userData.assetId,
@@ -1568,7 +1419,7 @@ export function createViewer(
             state.walls === 'hidden' || sourceOverlay
               ? 0
               : state.walls === 'cutaway'
-                ? Math.min(1.2, h)
+                ? Math.min(CUTAWAY_HEIGHT, h)
                 : h;
         if (o.userData.cap) o.position.y = cut - 0.004;
         else {

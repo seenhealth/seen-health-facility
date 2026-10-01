@@ -1,4 +1,5 @@
 import type { Vec2 } from './schema';
+import { toLocal, toWorld, worldDir } from './frame';
 
 /**
  * Distributed-care settings around the Seen center: the registry that the
@@ -58,33 +59,9 @@ export const PORCH_Y = 0.3;
 export const SETTING_ZONE_PREFIX = 'community:';
 export const settingZone = (id: string) => `${SETTING_ZONE_PREFIX}${id}`;
 
-export function toWorld(
-  s: Pick<CareSetting, 'position' | 'heading'>,
-  p: Vec2,
-): Vec2 {
-  const c = Math.cos(s.heading),
-    sn = Math.sin(s.heading);
-  return [
-    s.position[0] + p[0] * c + p[1] * sn,
-    s.position[1] - p[0] * sn + p[1] * c,
-  ];
-}
-export function toLocal(
-  s: Pick<CareSetting, 'position' | 'heading'>,
-  p: Vec2,
-): Vec2 {
-  const c = Math.cos(s.heading),
-    sn = Math.sin(s.heading),
-    dx = p[0] - s.position[0],
-    dz = p[1] - s.position[1];
-  return [dx * c - dz * sn, dx * sn + dz * c];
-}
-/** Local direction vector rotated into the world (no translation). */
-export function worldDir(s: Pick<CareSetting, 'heading'>, d: Vec2): Vec2 {
-  const c = Math.cos(s.heading),
-    sn = Math.sin(s.heading);
-  return [d[0] * c + d[1] * sn, -d[0] * sn + d[1] * c];
-}
+// A setting's frame follows the one documented convention (frame.ts):
+// local → world like `Object3D.rotation.y`.
+export { toLocal, toWorld, worldDir };
 /** Local z of the pad's front edge and of the stub's street end. */
 export function frontZ(s: CareSetting) {
   return s.pad.d / 2;

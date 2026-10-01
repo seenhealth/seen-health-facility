@@ -1,0 +1,46 @@
+import type { Vec2 } from './schema';
+
+/**
+ * A local frame on the ground plane: an origin and a heading. One convention
+ * everywhere (community pads, facility instances, vehicles): `heading` turns
+ * the frame like three.js `Object3D.rotation.y`, so local +z maps to the world
+ * direction (sin h, cos h) and local +x to (cos h, −sin h). Metres, +x east,
+ * +z north. Pure math, no three.js.
+ */
+export type Frame = { position: Vec2; heading: number };
+type Placed = Pick<Frame, 'position' | 'heading'>;
+
+/** A local point in the world. */
+export function toWorld(f: Placed, p: Vec2): Vec2 {
+  const c = Math.cos(f.heading),
+    s = Math.sin(f.heading);
+  return [
+    f.position[0] + p[0] * c + p[1] * s,
+    f.position[1] - p[0] * s + p[1] * c,
+  ];
+}
+/** A world point in the frame. */
+export function toLocal(f: Placed, p: Vec2): Vec2 {
+  const c = Math.cos(f.heading),
+    s = Math.sin(f.heading),
+    dx = p[0] - f.position[0],
+    dz = p[1] - f.position[1];
+  return [dx * c - dz * s, dx * s + dz * c];
+}
+/** A local direction in the world (no translation). */
+export function worldDir(f: Pick<Frame, 'heading'>, d: Vec2): Vec2 {
+  const c = Math.cos(f.heading),
+    s = Math.sin(f.heading);
+  return [d[0] * c + d[1] * s, -d[0] * s + d[1] * c];
+}
+/** `inner`, authored in `outer`'s local frame, as a world frame. */
+export function composeFrames(outer: Placed, inner: Placed): Frame {
+  return {
+    position: toWorld(outer, inner.position),
+    heading: outer.heading + inner.heading,
+  };
+}
+/** A local polygon in the world. */
+export function transformPolygon(f: Placed, poly: readonly Vec2[]): Vec2[] {
+  return poly.map((p) => toWorld(f, p));
+}
