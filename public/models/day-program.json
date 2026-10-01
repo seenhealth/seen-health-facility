@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "source": "Owner-requested day-center activity repertoire and flexible front-of-room layout, September 2026. Illustrative rotation, not a verified daily timetable.",
+  "source": "Owner-requested day-center activity repertoire and flexible front-of-room layout, September 2026. Illustrative rotation, not a verified daily timetable. Monday’s ten sessions are the base loop; Tuesday to Friday rotate a culturally specific repertoire into the same ten 72-second slots.",
   "removedObjectIds": [
     "day-diamond-table-01",
     "day-diamond-table-01-chair-1",
@@ -76,7 +76,16 @@
       "action": "clap",
       "title": "Familiar songs & community performances",
       "culture": "Songs and stories chosen with participants; a bilingual host invites requests.",
-      "access": "Watch, clap or join in from a chair, wheelchair or standing position."
+      "access": "Watch, clap or join in from a chair, wheelchair or standing position.",
+      "cultures": [
+        "Multicultural"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "English"
+      ],
+      "format": "group"
     },
     {
       "id": "language",
@@ -87,7 +96,16 @@
       "action": "conversation",
       "title": "Language & conversation",
       "culture": "Picture prompts, familiar sayings and conversation in preferred languages; Mandarin, Cantonese and English are example options.",
-      "access": "Listen, point to a picture or speak at your own pace."
+      "access": "Listen, point to a picture or speak at your own pace.",
+      "cultures": [
+        "Multicultural"
+      ],
+      "languages": [
+        "Mandarin",
+        "Cantonese",
+        "English"
+      ],
+      "format": "small-group"
     },
     {
       "id": "devices",
@@ -98,7 +116,16 @@
       "action": "device",
       "title": "Everyday device skills",
       "culture": "Practice video calls, photos and larger text using step-by-step visual prompts.",
-      "access": "One-to-one help, a supported tablet and repeatable small steps."
+      "access": "One-to-one help, a supported tablet and repeatable small steps.",
+      "cultures": [
+        "Multicultural"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "English"
+      ],
+      "format": "one-to-one"
     },
     {
       "id": "exercise",
@@ -109,7 +136,16 @@
       "action": "exercise",
       "title": "Everyday movement",
       "culture": "A staff-led group with familiar music and easy-to-follow demonstrations.",
-      "access": "Standing, chair-based or wheelchair upper-body movement; rest whenever needed."
+      "access": "Standing, chair-based or wheelchair upper-body movement; rest whenever needed.",
+      "cultures": [
+        "Multicultural"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "English"
+      ],
+      "format": "group"
     },
     {
       "id": "dance",
@@ -120,7 +156,16 @@
       "action": "dance",
       "title": "Music & dance",
       "culture": "Participant-selected music, familiar rhythms and a simple shared sequence.",
-      "access": "Standing steps or seated rhythm and arm movements."
+      "access": "Standing steps or seated rhythm and arm movements.",
+      "cultures": [
+        "Multicultural"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "English"
+      ],
+      "format": "group"
     },
     {
       "id": "tai-chi",
@@ -131,7 +176,15 @@
       "action": "tai-chi",
       "title": "Tai chi together",
       "culture": "Slow, flowing gestures with a visible leader and time to follow.",
-      "access": "A seated version mirrors the upper-body sequence; a care aide stays nearby."
+      "access": "A seated version mirrors the upper-body sequence; a care aide stays nearby.",
+      "cultures": [
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin"
+      ],
+      "format": "group"
     },
     {
       "id": "calligraphy",
@@ -142,7 +195,16 @@
       "action": "write",
       "title": "Calligraphy & brushwork",
       "culture": "Explore personally meaningful characters and brush strokes, with large sample cards.",
-      "access": "Thick-handled brushes, supported paper and hand-over-hand help when requested."
+      "access": "Thick-handled brushes, supported paper and hand-over-hand help when requested.",
+      "cultures": [
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "English"
+      ],
+      "format": "small-group"
     },
     {
       "id": "crafts",
@@ -153,7 +215,16 @@
       "action": "craft",
       "title": "Seasonal arts & crafts",
       "culture": "Paper, color and collage inspired by the group’s interests and celebrations.",
-      "access": "Choose, arrange or create with large pieces and individual assistance."
+      "access": "Choose, arrange or create with large pieces and individual assistance.",
+      "cultures": [
+        "Multicultural"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "English"
+      ],
+      "format": "small-group"
     },
     {
       "id": "instruments",
@@ -164,7 +235,16 @@
       "action": "music",
       "title": "Rhythm & instruments",
       "culture": "Simple percussion, listening and shared rhythms around favorite songs.",
-      "access": "Lightweight shakers and a supported hand drum; listening is welcome."
+      "access": "Lightweight shakers and a supported hand drum; listening is welcome.",
+      "cultures": [
+        "Multicultural"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "English"
+      ],
+      "format": "group"
     },
     {
       "id": "tcm",
@@ -175,7 +255,486 @@
       "action": "listen",
       "title": "TCM & cultural wellness talks",
       "culture": "A hosted educational conversation about traditional Chinese medicine, with bilingual discussion and questions.",
-      "access": "Seated listening, visual prompts and time for questions; a quiet table option stays available."
+      "access": "Seated listening, visual prompts and time for questions; a quiet table option stays available.",
+      "cultures": [
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "English"
+      ],
+      "format": "group"
     }
-  ]
+  ],
+  "repertoire": [
+    {
+      "id": "cantonese-opera",
+      "label": "Cantonese opera",
+      "leaderAction": "perform",
+      "action": "clap",
+      "title": "Cantonese opera appreciation",
+      "culture": "Recorded and live excerpts from well-loved Cantonese opera; the story of each scene is introduced in Cantonese and English before it plays.",
+      "access": "Listen from any seat with large-print lyric sheets; clapping or humming along is welcome.",
+      "cultures": [
+        "Cantonese"
+      ],
+      "languages": [
+        "Cantonese",
+        "English"
+      ],
+      "format": "group",
+      "propsLike": "performance"
+    },
+    {
+      "id": "tea-social",
+      "label": "Tea & dim sum social",
+      "leaderAction": "serve",
+      "action": "conversation",
+      "title": "Morning tea & dim sum social",
+      "culture": "A relaxed morning table with hot tea and a small dim sum selection planned with the dietitian; conversation is led by whoever has news to share.",
+      "access": "Cups with handles, cut portions and a staff member who serves each table; wheelchairs pull straight up to the table.",
+      "cultures": [
+        "Cantonese",
+        "Chinese American"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "English"
+      ],
+      "format": "small-group",
+      "propsLike": "language"
+    },
+    {
+      "id": "xiangqi-go",
+      "label": "Xiangqi & go",
+      "leaderAction": "tabletop",
+      "action": "tabletop",
+      "title": "Xiangqi & go tables",
+      "culture": "Chinese chess and go on large boards, with experienced players paired with newcomers and a game clock nobody enforces.",
+      "access": "Oversized pieces, boards raised to wheelchair height and a staff partner for anyone who prefers to watch a game unfold.",
+      "cultures": [
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "English"
+      ],
+      "format": "small-group",
+      "propsLike": "crafts"
+    },
+    {
+      "id": "qigong",
+      "label": "Qigong",
+      "leaderAction": "tai-chi",
+      "action": "tai-chi",
+      "title": "Qigong · Ba Duan Jin",
+      "culture": "The eight brocades sequence, cued in Cantonese and Mandarin by an instructor who faces the group so each movement can be mirrored.",
+      "access": "Every form has a seated version; a care aide stays within reach of anyone standing.",
+      "cultures": [
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin"
+      ],
+      "format": "group",
+      "propsLike": "tai-chi"
+    },
+    {
+      "id": "brush-painting",
+      "label": "Brush painting",
+      "leaderAction": "write",
+      "action": "write",
+      "title": "Brush painting · bamboo, plum & birds",
+      "culture": "Ink and wash on rice paper, beginning with bamboo and plum-blossom strokes and moving on to subjects participants suggest.",
+      "access": "Weighted brush handles, taped-down paper and hand-over-hand help when asked for.",
+      "cultures": [
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "English"
+      ],
+      "format": "small-group",
+      "propsLike": "calligraphy"
+    },
+    {
+      "id": "paper-cutting",
+      "label": "Paper cutting & lanterns",
+      "leaderAction": "craft",
+      "action": "craft",
+      "title": "Paper cutting & lantern making",
+      "culture": "Window flowers, double-happiness cuts and lanterns for Mid-Autumn and Lunar New Year, following patterns participants remember from home.",
+      "access": "Spring-loaded scissors, pre-scored folds and large templates; finished pieces decorate the day room.",
+      "cultures": [
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "English"
+      ],
+      "format": "small-group",
+      "propsLike": "crafts",
+      "season": "Mid-Autumn · Lunar New Year"
+    },
+    {
+      "id": "dumpling-demo",
+      "label": "Dumpling & bao demo",
+      "leaderAction": "serve",
+      "action": "tabletop",
+      "title": "Dumpling & bao making with the dietitian",
+      "culture": "The dietitian and kitchen team fold dumplings and bao with the group, talking through fillings that suit diabetes, low-salt and soft-food plans.",
+      "access": "Seated folding at table height, pre-portioned dough and a tasting for everyone who wants one.",
+      "cultures": [
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "English"
+      ],
+      "format": "small-group",
+      "propsLike": "crafts"
+    },
+    {
+      "id": "chinese-knotting",
+      "label": "Chinese knotting",
+      "leaderAction": "craft",
+      "action": "craft",
+      "title": "Chinese knotting",
+      "culture": "Red cord knots for good wishes, from the simple button knot to a shared wall hanging built one section at a time.",
+      "access": "Thick cord, a pegboard to hold tension and small steps demonstrated one at a time.",
+      "cultures": [
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "English"
+      ],
+      "format": "small-group",
+      "propsLike": "crafts"
+    },
+    {
+      "id": "sing-along",
+      "label": "Cantopop & Mandopop",
+      "leaderAction": "music",
+      "action": "clap",
+      "title": "Cantopop & Mandopop sing-along",
+      "culture": "Songs from the Teresa Teng and Sam Hui era through to Beyond, with lyrics on the screen in characters plus jyutping or pinyin, and requests taken all hour.",
+      "access": "Sing, clap or keep time with a shaker; the volume stays comfortable for hearing aids.",
+      "cultures": [
+        "Cantonese",
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin"
+      ],
+      "format": "group",
+      "propsLike": "instruments"
+    },
+    {
+      "id": "fan-dance",
+      "label": "Fan dance",
+      "leaderAction": "dance",
+      "action": "dance",
+      "title": "Fan dance",
+      "culture": "Folk fan-dance steps set to familiar melodies, led slowly enough to learn the opening and closing of the fan together.",
+      "access": "Seated arm and fan movements mirror the standing steps; lightweight fans are provided.",
+      "cultures": [
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin"
+      ],
+      "format": "group",
+      "propsLike": "dance"
+    },
+    {
+      "id": "story-circle",
+      "label": "Story circle",
+      "leaderAction": "conversation",
+      "action": "conversation",
+      "title": "Reminiscence & story circle",
+      "culture": "Memories of home villages, first jobs and family recipes, shared in Toisanese, Cantonese and Mandarin with staff who speak each.",
+      "access": "Photo prompts and objects to hold; listening counts as taking part.",
+      "cultures": [
+        "Toisanese",
+        "Cantonese",
+        "Chinese"
+      ],
+      "languages": [
+        "Toisanese",
+        "Cantonese",
+        "Mandarin"
+      ],
+      "format": "small-group",
+      "propsLike": "language"
+    },
+    {
+      "id": "bilingual-news",
+      "label": "Bilingual news",
+      "leaderAction": "present",
+      "action": "listen",
+      "title": "Bilingual news & current events",
+      "culture": "Headlines from local Chinese-language and English papers, read aloud and discussed side by side, with room for differing views.",
+      "access": "Large-print summaries, one topic at a time and a microphone passed to anyone who wants to comment.",
+      "cultures": [
+        "Chinese American"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "English"
+      ],
+      "format": "group",
+      "propsLike": "tcm"
+    },
+    {
+      "id": "planter-gardening",
+      "label": "Planter gardening",
+      "leaderAction": "craft",
+      "action": "craft",
+      "title": "Planter gardening · bok choy, chives & herbs",
+      "culture": "Raised planters of bok choy, garlic chives, Thai basil and mint, tended by the group and harvested for the kitchen.",
+      "access": "Waist-high planters reachable from a wheelchair, long-handled tools and a shaded seat nearby.",
+      "cultures": [
+        "Chinese",
+        "Vietnamese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "Vietnamese",
+        "English"
+      ],
+      "format": "small-group",
+      "propsLike": "crafts",
+      "season": "Spring through autumn"
+    },
+    {
+      "id": "mindfulness",
+      "label": "Mindfulness",
+      "leaderAction": "present",
+      "action": "listen",
+      "title": "Mindfulness & meditation",
+      "culture": "Guided breathing and a quiet body scan, with an optional Buddhist chant or a secular count for those who prefer it.",
+      "access": "Eyes open or closed, seated or in a wheelchair; the room stays dim and no one is asked to speak.",
+      "cultures": [
+        "Chinese",
+        "Vietnamese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "English"
+      ],
+      "format": "group",
+      "propsLike": "tcm"
+    },
+    {
+      "id": "birthday",
+      "label": "Birthday of the month",
+      "leaderAction": "perform",
+      "action": "clap",
+      "title": "Birthday of the month",
+      "culture": "Longevity noodles or a shared cake, a birthday song in each guest’s language and a photo for the family board.",
+      "access": "Everyone joins from their own seat; sugar-free and soft options are on the table.",
+      "cultures": [
+        "Multicultural"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "English"
+      ],
+      "format": "group",
+      "propsLike": "performance"
+    },
+    {
+      "id": "school-visit",
+      "label": "School visit",
+      "leaderAction": "conversation",
+      "action": "conversation",
+      "title": "Intergenerational visit from a local school",
+      "culture": "Students from a nearby school bring a prepared song or game, then sit with participants to swap stories about school days then and now.",
+      "access": "Small tables of two or three, an interpreter at each and a quiet corner for anyone who would rather watch.",
+      "cultures": [
+        "Multicultural"
+      ],
+      "languages": [
+        "English",
+        "Cantonese",
+        "Mandarin",
+        "Spanish"
+      ],
+      "format": "small-group",
+      "propsLike": "language"
+    },
+    {
+      "id": "vietnamese-songs",
+      "label": "Vietnamese folk songs",
+      "leaderAction": "music",
+      "action": "music",
+      "title": "Vietnamese folk songs",
+      "culture": "Dân ca and lullabies from the north, centre and south, with a Vietnamese-speaking host and lyrics on the screen.",
+      "access": "Percussion for those who want it and listening for those who do not; the host checks in in Vietnamese.",
+      "cultures": [
+        "Vietnamese"
+      ],
+      "languages": [
+        "Vietnamese"
+      ],
+      "format": "group",
+      "propsLike": "instruments"
+    },
+    {
+      "id": "language-circles",
+      "label": "Korean, Spanish & Tagalog circles",
+      "leaderAction": "conversation",
+      "action": "conversation",
+      "title": "Korean, Spanish and Tagalog language circles",
+      "culture": "Three small circles, each hosted by a staff member or volunteer who speaks the language, with news from home and everyday phrases for neighbours.",
+      "access": "Join any circle; picture cards and unhurried speech make it welcoming for beginners.",
+      "cultures": [
+        "Korean",
+        "Latino",
+        "Filipino"
+      ],
+      "languages": [
+        "Korean",
+        "Spanish",
+        "Tagalog"
+      ],
+      "format": "small-group",
+      "propsLike": "language"
+    },
+    {
+      "id": "fall-prevention",
+      "label": "Fall-prevention talk",
+      "leaderAction": "present",
+      "action": "listen",
+      "title": "Fall-prevention health talk in Chinese",
+      "culture": "A nurse or physical therapist explains home hazards, footwear and safe transfers in Cantonese and Mandarin, with a short balance check offered afterwards.",
+      "access": "Seated throughout, printed take-home sheets in Chinese and time to ask about individual situations.",
+      "cultures": [
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin"
+      ],
+      "format": "group",
+      "propsLike": "tcm"
+    },
+    {
+      "id": "tea-appreciation",
+      "label": "Tea appreciation",
+      "leaderAction": "serve",
+      "action": "conversation",
+      "title": "Tea appreciation · gongfu cha",
+      "culture": "Oolong, pu-erh and jasmine brewed gongfu style at the table, with the origin of each tea and the pour explained in Cantonese and Mandarin.",
+      "access": "Small cups, a warm-not-hot pour and a table height that suits wheelchairs.",
+      "cultures": [
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "English"
+      ],
+      "format": "small-group",
+      "propsLike": "tcm"
+    },
+    {
+      "id": "mahjong",
+      "label": "Mahjong strategy",
+      "leaderAction": "tabletop",
+      "action": "tabletop",
+      "title": "Mahjong strategy hour",
+      "culture": "Hands, discards and defence talked through at a demonstration table, then open play with Cantonese or Taiwanese rules chosen by each table.",
+      "access": "Large-character tiles, a tile rack for one-handed play and a seat for anyone who prefers to watch.",
+      "cultures": [
+        "Cantonese",
+        "Taiwanese",
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "English"
+      ],
+      "format": "small-group",
+      "propsLike": "crafts"
+    }
+  ],
+  "rotations": {
+    "mon": [
+      "performance",
+      "language",
+      "devices",
+      "exercise",
+      "dance",
+      "tai-chi",
+      "calligraphy",
+      "crafts",
+      "instruments",
+      "tcm"
+    ],
+    "tue": [
+      "tea-social",
+      "story-circle",
+      "xiangqi-go",
+      "exercise",
+      "fan-dance",
+      "qigong",
+      "brush-painting",
+      "paper-cutting",
+      "sing-along",
+      "fall-prevention"
+    ],
+    "wed": [
+      "cantonese-opera",
+      "language-circles",
+      "devices",
+      "exercise",
+      "dance",
+      "mindfulness",
+      "calligraphy",
+      "chinese-knotting",
+      "vietnamese-songs",
+      "bilingual-news"
+    ],
+    "thu": [
+      "birthday",
+      "school-visit",
+      "mahjong",
+      "exercise",
+      "fan-dance",
+      "tai-chi",
+      "brush-painting",
+      "planter-gardening",
+      "instruments",
+      "tea-appreciation"
+    ],
+    "fri": [
+      "performance",
+      "language",
+      "dumpling-demo",
+      "qigong",
+      "dance",
+      "mindfulness",
+      "calligraphy",
+      "crafts",
+      "sing-along",
+      "tcm"
+    ]
+  }
 }

@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import {
   Download,
   Eye,
@@ -23,7 +23,15 @@ import {
   vanWindows as siteVanWindows,
   alhambraVanWindows,
 } from '../model/arrival';
-import { dayProgram, programAt } from '../model/day-room';
+import {
+  dayProgram,
+  programAt,
+  programRotation,
+  rotationDays,
+  setProgramRotation,
+  subscribeProgramRotation,
+  type RotationDay,
+} from '../model/day-room';
 import type { createViewer } from '../model/renderer';
 
 export const activityViews = [
@@ -44,6 +52,18 @@ const categories = [
   ['meals', 'Meals'],
   ['coordination', 'Coordination'],
 ];
+const dayLabels: Record<RotationDay, string> = {
+  mon: 'Mon',
+  tue: 'Tue',
+  wed: 'Wed',
+  thu: 'Thu',
+  fri: 'Fri',
+};
+const formatLabels = {
+  group: 'Whole group',
+  'small-group': 'Small groups',
+  'one-to-one': 'One-to-one',
+};
 const palette: Record<string, string> = {
   walk: '#aec9bc',
   roll: '#aec9bc',
@@ -102,13 +122,26 @@ export function ActivityPanel({
   useEffect(() => viewer?.activity.subscribe(setState), [viewer]);
   const time = state?.time || 0,
     change = (p: Partial<ActivitySnapshot>) => viewer?.activity.setOptions(p);
+  const rotation = useSyncExternalStore(
+    subscribeProgramRotation,
+    programRotation,
+    () => 'mon' as RotationDay,
+  );
   const session = programAt(time);
   const chooseSession = (id: string) => {
     const p = dayProgram.programs.find((p) => p.id === id)!;
     change({ time: p.start + 3, enabled: true, filter: 'all' });
     setCategory('activities');
     setActivityView(true);
-    onScene(dayRoomId, 'interaction:day-' + p.id);
+    onScene(dayRoomId, 'interaction:day-' + p.baseId);
+  };
+  const chooseRotation = (day: RotationDay) => {
+    setProgramRotation(day);
+    const u = new URL(window.location.href);
+    if (day === 'mon') u.searchParams.delete('program');
+    else u.searchParams.set('program', day);
+    window.history.replaceState(null, '', u);
+    change({ enabled: true });
   };
   const interactions = activityData.interactions.filter(
       (i) => category === 'all' || i.category === category,
@@ -288,6 +321,22 @@ export function ActivityPanel({
       </div>
       {activityView && (
         <div className="day-program-panel">
+          {!siteSpecific && (
+            <div className="day-program-week">
+              <span>Weekly repertoire</span>
+              <div className="track-tabs">
+                {rotationDays.map((d) => (
+                  <button
+                    key={d}
+                    aria-pressed={rotation === d}
+                    onClick={() => chooseRotation(d)}
+                  >
+                    {dayLabels[d]}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="day-program-topline">
             <label htmlFor="day-session">Day room program</label>
             <select
@@ -315,6 +364,26 @@ export function ActivityPanel({
             </button>
           </div>
           <strong>{session.title}</strong>
+          <div className="day-program-tags day-program-chips">
+            {session.cultures.map((c) => (
+              <span key={'culture:' + c} title="Culture">
+                {c}
+              </span>
+            ))}
+            {session.languages.map((l) => (
+              <span
+                key={'language:' + l}
+                className="chip-language"
+                title="Language"
+              >
+                {l}
+              </span>
+            ))}
+            <span className="chip-format">{formatLabels[session.format]}</span>
+            {session.season && (
+              <span className="chip-format">{session.season}</span>
+            )}
+          </div>
           <p>{session.culture}</p>
           <p className="day-program-access">{session.access}</p>
           <div className="day-program-tags">
@@ -326,7 +395,7 @@ export function ActivityPanel({
           <small>
             {siteSpecific
               ? 'Activities use the existing room furniture. Choose a session, then play or follow its interaction track.'
-              : 'Three front tables cleared · Illustrative rotation · Choose a session, then play or follow its interaction track.'}
+              : 'Three front tables cleared · Illustrative weekly repertoire · Choose a day and session, then play or follow its interaction track.'}
           </small>
         </div>
       )}
@@ -406,8 +475,12 @@ export function ActivityPanel({
         <div className="activity-follow">
           <Eye size={15} />
           <span>
-            <b>{selected.label}</b> ·{' '}
-            {currentStage?.title || 'Between activities'}
+            <b>
+              {selected.id === 'interaction:day-' + session.baseId
+                ? session.title
+                : selected.label}
+            </b>{' '}
+            · {currentStage?.title || 'Between activities'}
           </span>
           <button onClick={() => viewer?.followActor(null)}>
             Release camera
