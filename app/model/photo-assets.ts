@@ -24,6 +24,26 @@ export const FLEET_VAN_SEATS = {
   /** Sill of the sliding-door opening, where the ramp hinges (`pivot` in arrival.ts). */
   door: [1.035, 0.58, -0.19] as VanSeat,
 };
+/**
+ * Folding wheelchair ramp, hinged at the sliding-door sill: deployed, it runs
+ * `run` m out along local +x and drops `rise` m to the ground. `sill` and
+ * `foot` are the van-local (x, z) ends that riders and escorts walk between.
+ */
+export const FLEET_VAN_RAMP = (() => {
+  const [x, rise, z] = FLEET_VAN_SEATS.door,
+    run = 2.9;
+  return {
+    hinge: FLEET_VAN_SEATS.door,
+    run,
+    rise,
+    length: Math.hypot(run, rise),
+    width: 1.02,
+    sill: [x, z] as [number, number],
+    foot: [x + run, z] as [number, number],
+  };
+})();
+/** Driver's door on the −x side: hinged at its front edge, it swings out by up to `openAngle` rad. */
+export const FLEET_VAN_CAB_DOOR = { hinge: -2.38, rear: -1.23, openAngle: 1.2 };
 
 /** Photo-informed, dimensioned components. Placement and palettes belong to the facility specification. */
 export function buildPhotoAsset(
@@ -295,8 +315,18 @@ export function buildPhotoAsset(
     box(0, 0.52, 0.5, 1.98, 0.06, 5.1, dark);
     for (const side of [-1, 1])
       box(side * sideX, 0.4, 0.3, 0.07, 0.36, 5.7, black);
-    // Teal body below the beltline; the +x panel leaves the door opening free.
-    box(-sideX, 0.74, 0.35, 0.07, belt - 0.74, 5.5, body);
+    // Teal body below the beltline; the +x panel leaves the door opening free
+    // and the −x panel starts behind the driver's door.
+    const cab = FLEET_VAN_CAB_DOOR;
+    box(
+      -sideX,
+      0.74,
+      (cab.rear + 3.1) / 2,
+      0.07,
+      belt - 0.74,
+      3.1 - cab.rear,
+      body,
+    );
     box(sideX, 0.74, -1.6, 0.07, belt - 0.74, 1.6, body);
     box(sideX, 0.74, 1.76, 0.07, belt - 0.74, 2.68, body);
     // Window band: roof rail, pillars and see-through glazing on both sides.
@@ -305,8 +335,32 @@ export function buildPhotoAsset(
       box(side * sideX, belt, -1.15, 0.08, windowTop - belt, 0.14, body);
       box(side * sideX, belt, 0.55, 0.08, windowTop - belt, 0.26, body);
       box(side * sideX, belt, 3.0, 0.08, windowTop - belt, 0.2, body);
-      pane(side * sideX, belt, -1.72, 0.03, windowTop - belt, 1.0);
+      if (side > 0) pane(sideX, belt, -1.72, 0.03, windowTop - belt, 1.0);
       pane(side * sideX, belt, 1.79, 0.03, windowTop - belt, 2.22);
+    }
+    // Driver's door: lower panel, cab window and handle on one front-hinged
+    // leaf (`driver-door`; fleet vans swing it open as the driver gets out).
+    const leafLength = cab.rear - cab.hinge,
+      leafMid = (cab.hinge + cab.rear) / 2;
+    const leafParts: T.Object3D[] = [
+      box(-sideX, 0.74, leafMid, 0.07, belt - 0.74, leafLength, body),
+      pane(
+        -sideX,
+        belt,
+        leafMid + 0.01,
+        0.03,
+        windowTop - belt,
+        leafLength - 0.14,
+      ),
+      box(-sideX, windowTop - 0.035, leafMid, 0.05, 0.035, leafLength, black),
+      box(-sideX - 0.05, 1.2, cab.rear - 0.2, 0.02, 0.03, 0.14, black),
+    ];
+    if (operable) {
+      const leaf = new T.Group();
+      leaf.name = 'driver-door';
+      leaf.position.set(-sideX, 0, cab.hinge);
+      g.add(leaf);
+      for (const part of leafParts) leaf.attach(part);
     }
     pane(-sideX, belt, -0.33, 0.03, windowTop - belt, 1.5);
     // Tall rounded roof cap, header and the short sloped cab roof.
@@ -315,16 +369,20 @@ export function buildPhotoAsset(
     pitched(0, 2.29, -1.81, 1.96, 0.1, 0.55, -0.67, body);
     // Raked windshield between A-pillars, cowl, sloped hood and front fenders.
     pitched(0, 1.675, -2.235, 1.86, 0.865, 0.04, 0.52, glazing);
-    for (const x of [-0.96, 0.96]) pitched(x, 1.675, -2.235, 0.1, 0.9, 0.12, 0.52, body);
+    for (const x of [-0.96, 0.96])
+      pitched(x, 1.675, -2.235, 0.1, 0.9, 0.12, 0.52, body);
     box(0, 1.22, -2.5, 1.96, 0.08, 0.2, black);
     pitched(0, 1.17, -2.79, 1.96, 0.06, 0.62, -0.362, body);
-    for (const side of [-1, 1]) box(side * (half - 0.06), 0.74, -2.8, 0.09, 0.4, 0.7, body);
+    for (const side of [-1, 1])
+      box(side * (half - 0.06), 0.74, -2.8, 0.09, 0.4, 0.7, body);
     // Nose: teal face with headlamps over a black bumper and grille.
     box(0, 0.74, nose + 0.06, 2.0, 0.34, 0.1, body);
     box(0, 0.3, nose + 0.05, 2.16, 0.44, 0.13, black);
     box(0, 0.42, nose - 0.01, 1.2, 0.26, 0.04, black);
-    for (let i = 0; i < 4; i++) box(0, 0.44 + i * 0.065, nose - 0.02, 1.1, 0.012, 0.012, metal);
-    for (const y of [0.4, 0.68]) box(0, y, nose - 0.015, 1.26, 0.025, 0.02, metal);
+    for (let i = 0; i < 4; i++)
+      box(0, 0.44 + i * 0.065, nose - 0.02, 1.1, 0.012, 0.012, metal);
+    for (const y of [0.4, 0.68])
+      box(0, y, nose - 0.015, 1.26, 0.025, 0.02, metal);
     for (const side of [-1, 1]) {
       box(side * 0.78, 0.8, nose + 0.02, 0.44, 0.22, 0.06, lamp);
       box(side * 0.99, 0.8, nose + 0.05, 0.06, 0.22, 0.06, '#e0a24a');
@@ -369,7 +427,15 @@ export function buildPhotoAsset(
         box(sideX + 0.03, windowTop - 0.035, zc, 0.05, 0.035, 0.6, black),
         box(sideX + 0.03, belt, zc - 0.29, 0.05, windowTop - belt, 0.03, black),
         box(sideX + 0.03, belt, zc + 0.29, 0.05, windowTop - belt, 0.03, black),
-        box(sideX + 0.07, 1.2, zc + (i ? -0.22 : 0.22), 0.02, 0.03, 0.14, black),
+        box(
+          sideX + 0.07,
+          1.2,
+          zc + (i ? -0.22 : 0.22),
+          0.02,
+          0.03,
+          0.14,
+          black,
+        ),
       ];
       if (!operable) continue;
       const door = new T.Group();
@@ -385,7 +451,13 @@ export function buildPhotoAsset(
       box(x, 1.67, -1.77, 0.26, 0.16, 0.08, seat);
     }
     box(0, 0.95, -2.55, 1.96, 0.28, 0.32, dark);
-    const wheel = add(new T.TorusGeometry(0.18, 0.022, 8, 24), black, -0.55, 1.2, -2.32);
+    const wheel = add(
+      new T.TorusGeometry(0.18, 0.022, 8, 24),
+      black,
+      -0.55,
+      1.2,
+      -2.32,
+    );
     wheel.rotation.x = -Math.PI / 2 + 0.55;
     for (const zRow of [0.65, 1.55, 2.45]) {
       box(-0.5, 0.97, zRow, 0.9, 0.12, 0.48, seat);
@@ -394,7 +466,12 @@ export function buildPhotoAsset(
     box(0.72, 0.97, 2.25, 0.5, 0.12, 0.48, seat);
     box(0.72, 1.09, 2.52, 0.5, 0.5, 0.09, seat);
     box(0.7, 0.58, 1.45, 0.6, 0.012, 1.2, '#4a5153');
-    rod(new T.Vector3(0.95, 0.9, -0.88), new T.Vector3(0.95, 1.95, -0.88), 0.015, metal);
+    rod(
+      new T.Vector3(0.95, 0.9, -0.88),
+      new T.Vector3(0.95, 1.95, -0.88),
+      0.015,
+      metal,
+    );
     // Wrap decals: same sheet rectangles as before (variant B offsets the sheet
     // column), sized to the lower body so the window band stays clear.
     const decal = (
@@ -430,7 +507,15 @@ export function buildPhotoAsset(
       0.202 + variant,
       0.691,
     ]);
-    decal(0, 0.91, nose - 0.005, 1.04, 0.265, Math.PI, [0.407, 0.14, 0.592, 0.169]);
+    decal(
+      0,
+      0.91,
+      nose - 0.005,
+      1.04,
+      0.265,
+      Math.PI,
+      [0.407, 0.14, 0.592, 0.169],
+    );
     decal(0, 1.27, rear + 0.025, 1.13, 1.03, 0, [
       0.14 + variant,
       0.812,
