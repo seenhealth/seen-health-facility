@@ -3,37 +3,53 @@ import type { CSSProperties } from 'react';
 import {
   groups,
   hero,
+  isCutaway,
   isTeamMeeting,
   kickerTime,
   laneMembers,
   palette,
+  placeLabel,
   shortLabel,
   steps,
+  type Step,
 } from './data';
 
 type Orientation = 'across' | 'down';
 
-/** Geometry for the role x step grid. `across`: steps are columns (desktop). */
+/**
+ * Geometry for the role x step grid. `across`: steps are columns (desktop).
+ * Cutaway columns (moments across the network) are narrower than Mrs. Lin's;
+ * a "Partners" lane for external roles sits below the eleven disciplines.
+ */
 function grid(o: Orientation) {
   const across = o === 'across';
   const lane = across ? 34 : 25,
-    stepSize = across ? 76 : 40,
     gap = across ? 14 : 9;
+  const sizeOf = (s: Step) => (isCutaway(s) ? (across ? 56 : 30) : across ? 76 : 40);
   const labelW = across ? 292 : 112,
     head = across ? 74 : 86;
   const laneOffset = laneMembers.map((m, i) => {
     const g = groups.findIndex((g) => g.id === m.group);
     return i * lane + g * gap + lane / 2;
   });
-  const lanesLen = laneOffset.at(-1)! + lane / 2 + 6;
-  const stepsLen = steps.length * stepSize;
+  const partnersOffset = laneOffset.at(-1)! + lane + gap;
+  const lanesLen = partnersOffset + lane / 2 + 6;
+  const starts: number[] = [];
+  let stepsLen = 0;
+  for (const s of steps) {
+    starts.push(stepsLen);
+    stepsLen += sizeOf(s);
+  }
+  const size = (i: number) => sizeOf(steps[i]);
+  const mid = (i: number) => starts[i] + size(i) / 2;
   const width = across ? labelW + stepsLen + 16 : labelW + lanesLen + 4;
   const height = across ? head + lanesLen + 8 : head + stepsLen + 8;
-  const at = (s: number, l: number): [number, number] =>
-    across
-      ? [labelW + s * stepSize + stepSize / 2, head + laneOffset[l]]
-      : [labelW + laneOffset[l], head + s * stepSize + stepSize / 2];
-  return { across, lane, stepSize, labelW, head, laneOffset, lanesLen, width, height, at };
+  /** Lane l of step s; l = laneMembers.length is the partners lane. */
+  const at = (s: number, l: number): [number, number] => {
+    const lo = l < laneOffset.length ? laneOffset[l] : partnersOffset;
+    return across ? [labelW + mid(s), head + lo] : [labelW + lo, head + mid(s)];
+  };
+  return { across, lane, size, labelW, head, laneOffset, partnersOffset, lanesLen, width, height, at };
 }
 
 function arrowPath(
@@ -65,13 +81,42 @@ function arrowPath(
   return { d, head };
 }
 
+/** Setting badge: the network colour behind the moment's short label. */
+function Badge({ x, y, text, anchor }: { x: number; y: number; text: string; anchor: 'middle' | 'start' }) {
+  // Width from the label length (10 px semibold ≈ 5.9 px a character).
+  const w = text.length * 5.9 + 12,
+    left = anchor === 'middle' ? x - w / 2 : x;
+  return (
+    <g className="story-swim-badge">
+      <rect x={left} y={y - 11} width={w} height={15} rx={7.5} />
+      <text x={left + w / 2} y={y} textAnchor="middle">
+        {text}
+      </text>
+    </g>
+  );
+}
+
 function Grid({ o, revealed }: { o: Orientation; revealed: number }) {
   const g = grid(o);
   const laneIndex = new Map(laneMembers.map((m, i) => [m.id, i]));
-  const heroAt = (s: number): [number, number] =>
-    g.across
-      ? [g.labelW + s * g.stepSize + g.stepSize / 2, g.head - 20]
-      : [g.labelW - 20, g.head + s * g.stepSize + g.stepSize / 2];
+  const partnersLane = laneMembers.length;
+  const heroAt = (s: number): [number, number] => {
+    const [x, y] = g.at(s, 0);
+    return g.across ? [x, g.head - 20] : [g.labelW - 20, y];
+  };
+  const last = steps.length - 1;
+  const lineSpan = (l: number) => {
+    const [x, y] = g.at(0, l),
+      [x2, y2] = g.at(last, l);
+    return g.across
+      ? { x1: x - g.size(0) / 2 + 4, x2: x2 + g.size(last) / 2 - 4, y1: y, y2 }
+      : { x1: x, x2, y1: y - g.size(0) / 2 + 4, y2: y2 + g.size(last) / 2 - 4 };
+  };
+  /** Index of the previous step with Mrs. Lin's dot (cutaways have none). */
+  const prevHero = (i: number) => {
+    for (let j = i - 1; j >= 0; j--) if (!isCutaway(steps[j])) return j;
+    return -1;
+  };
   return (
     <svg
       className={`story-swim-svg story-swim-${o}`}
@@ -83,12 +128,11 @@ function Grid({ o, revealed }: { o: Orientation; revealed: number }) {
       {laneMembers.map((m, i) => {
         const first = laneMembers.findIndex((x) => x.group === m.group) === i;
         const [x, y] = g.at(0, i);
-        const [x2, y2] = g.at(steps.length - 1, i);
         return (
           <g key={m.id} className="story-swim-lane">
+            <line {...lineSpan(i)} />
             {g.across ? (
               <>
-                <line x1={x - g.stepSize / 2 + 4} x2={x2 + g.stepSize / 2 - 4} y1={y} y2={y2} />
                 {first && (
                   <text className="group" x={0} y={y + 4}>
                     {groups.find((gr) => gr.id === m.group)?.label}
@@ -101,7 +145,6 @@ function Grid({ o, revealed }: { o: Orientation; revealed: number }) {
               </>
             ) : (
               <>
-                <line x1={x} x2={x2} y1={y - g.stepSize / 2 + 4} y2={y2 + g.stepSize / 2 - 4} />
                 <text className="role short" transform={`translate(${x + 3} ${g.head - 12}) rotate(-60)`}>
                   {m.short}
                 </text>
@@ -111,61 +154,102 @@ function Grid({ o, revealed }: { o: Orientation; revealed: number }) {
           </g>
         );
       })}
+      {(() => {
+        const [x, y] = g.at(0, partnersLane);
+        return (
+          <g className="story-swim-lane partners">
+            <line {...lineSpan(partnersLane)} />
+            {g.across ? (
+              <>
+                <text className="group" x={0} y={y + 4}>
+                  Partners
+                </text>
+                <circle className="partner" cx={100} cy={y} r={4.5} />
+                <text className="role" x={112} y={y + 4.5}>
+                  Outside the team
+                </text>
+              </>
+            ) : (
+              <>
+                <text className="role short" transform={`translate(${x + 3} ${g.head - 12}) rotate(-60)`}>
+                  Partners
+                </text>
+                <circle className="partner" cx={x} cy={g.head - 4} r={3.5} />
+              </>
+            )}
+          </g>
+        );
+      })()}
       <text className="story-swim-hero-label" x={0} y={g.across ? g.head - 16 : 12}>
         {g.across ? `${hero.name}’s day` : ''}
       </text>
       {steps.map((s, i) => {
+        const away = isCutaway(s);
+        const j = away ? -1 : prevHero(i);
         const [hx, hy] = heroAt(i);
-        const prev = i > 0 ? heroAt(i - 1) : null;
+        const prev = j >= 0 ? heroAt(j) : null;
         const team = isTeamMeeting(s);
         const on = i < revealed;
         const [cx, cy] = g.at(i, 0);
+        const size = g.size(i);
+        const time = kickerTime(s).replace(/ (AM|PM)$/, '');
+        const partners = s.partners || [];
         return (
           <g
             key={s.id}
             className="story-swim-col"
             data-on={on || undefined}
+            data-network={away || undefined}
             style={{ '--j': i } as CSSProperties}
           >
-            {team &&
+            {(team || away) &&
               (g.across ? (
                 <rect
-                  className="band"
-                  x={cx - g.stepSize / 2 + 5}
+                  className={away ? 'band network' : 'band'}
+                  x={cx - size / 2 + (away ? 4 : 5)}
                   y={g.head - 6}
-                  width={g.stepSize - 10}
+                  width={size - (away ? 8 : 10)}
                   height={g.lanesLen + 10}
-                  rx={14}
+                  rx={away ? 12 : 14}
                 />
               ) : (
                 <rect
-                  className="band"
+                  className={away ? 'band network' : 'band'}
                   x={g.labelW - 6}
-                  y={cy - g.stepSize / 2 + 4}
+                  y={cy - size / 2 + (away ? 3 : 4)}
                   width={g.lanesLen + 8}
-                  height={g.stepSize - 8}
-                  rx={10}
+                  height={size - (away ? 6 : 8)}
+                  rx={away ? 8 : 10}
                 />
               ))}
             {g.across ? (
               <>
                 <text className="time" x={cx} y={14} textAnchor="middle">
-                  {kickerTime(s).replace(/ (AM|PM)$/, '')}
+                  {time}
                 </text>
-                <text className="step" x={cx} y={30} textAnchor="middle">
-                  {shortLabel(s)}
-                </text>
+                {away ? (
+                  <Badge x={cx} y={31} text={shortLabel(s)} anchor="middle" />
+                ) : (
+                  <text className="step" x={cx} y={30} textAnchor="middle">
+                    {shortLabel(s)}
+                  </text>
+                )}
               </>
             ) : (
               <>
                 <text className="time" x={0} y={cy - 2}>
-                  {kickerTime(s).replace(/ (AM|PM)$/, '')}
+                  {time}
                 </text>
-                <text className="step" x={0} y={cy + 11}>
-                  {shortLabel(s)}
-                </text>
+                {away ? (
+                  <Badge x={0} y={cy + 12} text={shortLabel(s)} anchor="start" />
+                ) : (
+                  <text className="step" x={0} y={cy + 11}>
+                    {shortLabel(s)}
+                  </text>
+                )}
               </>
             )}
+            {/* Mrs. Lin's path joins her own moments and passes behind the cutaways. */}
             {prev && (
               <line
                 className="story-swim-path"
@@ -176,13 +260,15 @@ function Grid({ o, revealed }: { o: Orientation; revealed: number }) {
                 pathLength={1}
               />
             )}
-            <circle
-              className="story-swim-hero"
-              data-away={!s.heroPresent || undefined}
-              cx={hx}
-              cy={hy}
-              r={5.5}
-            />
+            {!away && (
+              <circle
+                className="story-swim-hero"
+                data-away={!s.heroPresent || undefined}
+                cx={hx}
+                cy={hy}
+                r={5.5}
+              />
+            )}
             {s.handoffs.map((h, k) => {
               const a = laneIndex.get(h.from),
                 b = laneIndex.get(h.to);
@@ -206,10 +292,11 @@ function Grid({ o, revealed }: { o: Orientation; revealed: number }) {
               const inStep = s.roles.includes(m.id);
               const receives = !inStep && s.handoffs.some((h) => h.to === m.id);
               if (!inStep && !receives) return null;
+              const kind = !inStep ? ' receives' : away ? ' network' : '';
               return (
                 <circle
                   key={m.id}
-                  className={inStep ? 'story-swim-dot' : 'story-swim-dot receives'}
+                  className={`story-swim-dot${kind}`}
                   cx={x}
                   cy={y}
                   r={inStep ? (g.across ? 6.5 : 5.2) : 4}
@@ -217,6 +304,21 @@ function Grid({ o, revealed }: { o: Orientation; revealed: number }) {
                 />
               );
             })}
+            {partners.length > 0 &&
+              (() => {
+                const [x, y] = g.at(i, partnersLane);
+                return (
+                  <circle
+                    className="story-swim-dot partner"
+                    cx={x}
+                    cy={y}
+                    r={g.across ? 5.5 : 4.4}
+                    style={{ '--l': partnersLane } as CSSProperties}
+                  >
+                    <title>{partners.join(', ')}</title>
+                  </circle>
+                );
+              })()}
           </g>
         );
       })}
@@ -224,14 +326,25 @@ function Grid({ o, revealed }: { o: Orientation; revealed: number }) {
   );
 }
 
+/** Where a moment happens, for the table: with Mrs. Lin, at the center, or a setting. */
+function whereOf(s: Step) {
+  if (isCutaway(s)) return placeLabel(s);
+  return s.heroPresent ? `With ${hero.name}` : 'At the center, team meeting';
+}
+
 /** Screen-reader alternative: the same grid as a table. */
 function SwimTable() {
+  const title = (id: string) => laneMembers.find((m) => m.id === id)?.title;
+  const short = (id: string) => laneMembers.find((m) => m.id === id)?.short;
   return (
     <table className="sr-only">
-      <caption>Who was involved in each moment of {hero.name}’s day</caption>
+      <caption>
+        Who was involved in each moment of {hero.name}’s day, and across the care network
+      </caption>
       <thead>
         <tr>
           <th scope="col">Moment</th>
+          <th scope="col">Where</th>
           <th scope="col">Disciplines involved</th>
           <th scope="col">Handoffs</th>
         </tr>
@@ -242,19 +355,14 @@ function SwimTable() {
             <th scope="row">
               {kickerTime(s)} {s.title}
             </th>
+            <td>{whereOf(s)}</td>
             <td>
-              {s.roles
-                .map((r) => laneMembers.find((m) => m.id === r)?.title)
-                .filter(Boolean)
-                .join(', ')}
+              {s.roles.map(title).filter(Boolean).join(', ')}
+              {s.partners?.length ? `; with partners: ${s.partners.join(', ')}` : ''}
             </td>
             <td>
-              {s.handoffs
-                .map(
-                  (h) =>
-                    `${laneMembers.find((m) => m.id === h.from)?.short} to ${laneMembers.find((m) => m.id === h.to)?.short}: ${h.note}`,
-                )
-                .join('; ') || 'None'}
+              {s.handoffs.map((h) => `${short(h.from)} to ${short(h.to)}: ${h.note}`).join('; ') ||
+                'None'}
             </td>
           </tr>
         ))}

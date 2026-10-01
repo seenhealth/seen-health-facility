@@ -1,5 +1,6 @@
 import scenario from '../data/scenarios/day-in-the-life.json';
 import careTeam from '../data/care-team.json';
+import { isCutawayStep, scrubWindows } from '../sim/story-timeline';
 
 /** Typed views of the shared story contracts (scenario script + IDT roster). */
 export type Handoff = { from: string; to: string; note: string };
@@ -16,6 +17,12 @@ export type Step = {
   handoffs: Handoff[];
   heroPresent: boolean;
   stops?: Stop[];
+  /** Cutaways only: the care setting shown (a `careSettings` id). */
+  settingId?: string;
+  /** Cutaways only: the community interactions shown; the camera follows the first. */
+  interactionIds?: string[];
+  /** External roles named on the card and in the swimlane (not IDT disciplines). */
+  partners?: string[];
 };
 export type Member = {
   id: string;
@@ -71,7 +78,14 @@ export const laneMembers: Member[] = groups.flatMap((g) =>
   members.filter((m) => m.group === g.id),
 );
 
-/** Compact UI labels for the day-flow strip, rail and swimlane headers. */
+/**
+ * A cutaway: a moment across the care network (a partner site or a home)
+ * without Mrs. Lin. Cutaways have their own counters; touchpoints and
+ * handoffs stay hers.
+ */
+export const isCutaway = (s: Step) => isCutawayStep(s);
+
+/** Compact UI labels for the day-flow strip, rail, ring hub and swimlane headers. */
 const SHORT: Record<string, string> = {
   huddle: 'Huddle',
   pickup: 'Pickup',
@@ -86,9 +100,18 @@ const SHORT: Record<string, string> = {
   farewell: 'Farewell',
   'ride-home': 'Ride home',
   'care-plan': 'Care plan',
+  'network-pharmacy': 'Pharmacy',
+  'network-home-am': 'At home',
+  'network-specialist': 'Cardiology',
+  'network-partner': 'Partner ADC',
+  'network-hospital': 'Hospital',
+  'network-home-pm': 'Home health',
 };
 export const shortLabel = (s: Step) =>
   SHORT[s.id] || s.kicker.split('·').pop()!.trim();
+/** Where a step happens, from its kicker ("8:20 AM · Partner pharmacy" → "Partner pharmacy"). */
+export const placeLabel = (s: Step) =>
+  s.kicker.split('·').slice(1).join('·').trim() || shortLabel(s);
 /** "9:25 AM" from the kicker when present, else from the window start. */
 export const kickerTime = (s: Step) => {
   const [head] = s.kicker.split('·');
@@ -105,22 +128,39 @@ export function clockLabel(t: number, withPeriod = true) {
   return `${h % 12 || 12}:${m}${withPeriod ? (h >= 12 ? ' PM' : ' AM') : ''}`;
 }
 
-export const totals = {
-  disciplines: members.length,
-  touchpoints: steps.reduce((n, s) => n + s.roles.length, 0),
-  handoffs: steps.reduce((n, s) => n + s.handoffs.length, 0),
-};
-/** Cumulative counts before each step (index i = everything in steps < i). */
-export const before = steps.reduce<{ touchpoints: number; handoffs: number }[]>(
-  (acc, s, i) => {
-    const prev = acc[i];
-    acc.push({
-      touchpoints: prev.touchpoints + s.roles.length,
-      handoffs: prev.handoffs + s.handoffs.length,
-    });
-    return acc;
-  },
-  [{ touchpoints: 0, handoffs: 0 }],
-);
+type Counts = { touchpoints: number; handoffs: number };
+const count = (list: Step[]): Counts => ({
+  touchpoints: list.reduce((n, s) => n + s.roles.length, 0),
+  handoffs: list.reduce((n, s) => n + s.handoffs.length, 0),
+});
+/** Cumulative counts of the steps before each step index that pass `keep`. */
+const cumulative = (keep: (s: Step) => boolean) =>
+  steps.reduce<Counts[]>(
+    (acc, s, i) => {
+      const prev = acc[i],
+        add = keep(s) ? count([s]) : { touchpoints: 0, handoffs: 0 };
+      acc.push({
+        touchpoints: prev.touchpoints + add.touchpoints,
+        handoffs: prev.handoffs + add.handoffs,
+      });
+      return acc;
+    },
+    [{ touchpoints: 0, handoffs: 0 }],
+  );
+export const heroSteps = steps.filter((s) => !isCutaway(s));
+export const networkSteps = steps.filter(isCutaway);
+/** Mrs. Lin's day: disciplines, and touchpoints and handoffs across her steps. */
+export const totals = { disciplines: members.length, ...count(heroSteps) };
+/** The moments across the care network (cutaways), kept apart from Mrs. Lin's. */
+export const networkTotals = { moments: networkSteps.length, ...count(networkSteps) };
+/** Mrs. Lin's counts before each step index (index i = her steps among steps < i). */
+export const before = cumulative((s) => !isCutaway(s));
+/** The network's counts before each step index (cutaways among steps < i). */
+export const beforeNetwork = cumulative(isCutaway);
 export const isTeamMeeting = (s: Step) =>
-  !s.heroPresent && s.roles.length >= members.length;
+  !s.heroPresent && !isCutaway(s) && s.roles.length >= members.length;
+/**
+ * Scroll-scrubbed clock range per step: hero chapters are clipped on screen
+ * around the cutaways next to them (`app/sim/story-timeline.ts`).
+ */
+export const scrub = scrubWindows(steps);

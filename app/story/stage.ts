@@ -1,3 +1,4 @@
+import type { ViewerOptions } from '../model/renderer';
 import type { Facility } from '../model/schema';
 import type { Viewer } from './director';
 
@@ -37,6 +38,26 @@ function rebase(model: Facility, base: string) {
     if (a.modelUrl) a.modelUrl = assetUrl(base, a.modelUrl);
 }
 
+/**
+ * Loads a community setting's facility instance (the Wongs' home plan) from
+ * the story's asset base, validated and rebased like the main model
+ * (SPEC-facility-instance §7). The partner day center reuses the loaded model
+ * and needs no fetch.
+ */
+function facilityLoader(
+  base: string,
+  signal: AbortSignal,
+  validate: (raw: unknown) => Facility,
+) {
+  return async (url: string): Promise<Facility> => {
+    const response = await fetch(assetUrl(base, url), { signal });
+    if (!response.ok) throw new Error(`${url}: ${response.status}`);
+    const facility = validate(await response.json());
+    rebase(facility, base);
+    return facility;
+  };
+}
+
 export async function bootStage(
   host: HTMLElement,
   base: string,
@@ -54,13 +75,17 @@ export async function bootStage(
   rebase(model, base);
   if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
   const { source, heroId } = heroSource.storyActivitySource();
-  const viewer = renderer.createViewer(host, model, () => {}, {
+  // `loadFacility` takes effect once the renderer accepts community facility
+  // instances (ViewerOptions.loadFacility); until then it is simply unused.
+  const options: ViewerOptions & { loadFacility?: (url: string) => Promise<Facility> } = {
     activity: source,
     interactive: false,
     maxPixelRatio: MAX_PIXEL_RATIO,
     labels: false,
     keepSiteWhenStacked: true,
-  });
+    loadFacility: facilityLoader(base, signal, schema.validateFacility),
+  };
+  const viewer = renderer.createViewer(host, model, () => {}, options);
   viewer.setInteractive(false);
   viewer.activity.setOptions({
     enabled: true,

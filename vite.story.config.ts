@@ -6,42 +6,69 @@
  *   npm run dev:story / npm run preview:story
  *
  * Only runtime assets the story needs are copied: the facility specification,
- * the textures and models it references, the logo and the favicon. See
- * docs/STORY.md.
+ * the facility instances the community layer stamps on its pads (the Wongs'
+ * home), the textures and models they reference, the logo and the favicon.
+ * See docs/STORY.md.
  */
 import react from '@vitejs/plugin-react';
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, type Plugin } from 'vite';
+import * as communitySettings from './app/model/community-settings';
 
 const here = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 const FACILITY = 'models/seen-alhambra-planning.json';
 const STATIC = ['brand/seen-health-horizontal.png', 'favicon.svg'];
+
+/**
+ * Root-relative facility URLs of the community instances
+ * (`instanceFacilityUrls()` in community-settings.ts, SPEC-facility-instance
+ * §7). Read by name so this build works before that export lands: without it
+ * only the main facility ships.
+ */
+function instanceFacilities(): string[] {
+  const exported: unknown = Object.entries(communitySettings).find(
+    ([name]) => name === 'instanceFacilityUrls',
+  )?.[1];
+  if (typeof exported !== 'function') return [];
+  const urls: unknown = exported();
+  return Array.isArray(urls) ? urls.filter((u): u is string => typeof u === 'string') : [];
+}
+/** Every facility the story loads at runtime, relative to the asset base, deduplicated. */
+const FACILITIES = [...new Set([FACILITY, ...instanceFacilities().map((u) => u.replace(/^\/+/, ''))])];
 
 type Facility = {
   materials?: Record<string, { textureUrl?: string }>;
   assets?: Record<string, { modelUrl?: string }>;
 };
 
-/** Emits the facility JSON (minified) and every file it loads at runtime. */
+/** Emits the facility JSONs (minified) and every file they load at runtime. */
 function storyAssets(): Plugin {
   return {
     name: 'seen-story-assets',
     apply: 'build',
     generateBundle() {
-      const facility = JSON.parse(readFileSync(here(`public/${FACILITY}`), 'utf8')) as Facility;
       const runtime = new Set<string>(STATIC);
-      // site.image (the source plan) is only shown in plan mode; the story
-      // replaces it at runtime, so it is intentionally not copied.
-      for (const m of Object.values(facility.materials || {}))
-        if (m.textureUrl?.startsWith('/')) runtime.add(m.textureUrl.slice(1));
-      for (const a of Object.values(facility.assets || {}))
-        if (a.modelUrl?.startsWith('/')) runtime.add(a.modelUrl.slice(1));
-      this.emitFile({
-        type: 'asset',
-        fileName: FACILITY,
-        source: JSON.stringify(facility),
-      });
+      for (const file of FACILITIES) {
+        const source = here(`public/${file}`);
+        if (!existsSync(source)) {
+          if (file === FACILITY) this.error(`Story facility missing: public/${file}`);
+          this.warn(`Instance facility missing, the pad keeps its massing: public/${file}`);
+          continue;
+        }
+        const facility = JSON.parse(readFileSync(source, 'utf8')) as Facility;
+        // site.image (the source plan) is only shown in plan mode; the story
+        // replaces it at runtime, so it is intentionally not copied.
+        for (const m of Object.values(facility.materials || {}))
+          if (m.textureUrl?.startsWith('/')) runtime.add(m.textureUrl.slice(1));
+        for (const a of Object.values(facility.assets || {}))
+          if (a.modelUrl?.startsWith('/')) runtime.add(a.modelUrl.slice(1));
+        this.emitFile({
+          type: 'asset',
+          fileName: file,
+          source: JSON.stringify(facility),
+        });
+      }
       for (const file of runtime) {
         const source = here(`public/${file}`);
         if (!existsSync(source)) {

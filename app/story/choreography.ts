@@ -3,20 +3,35 @@ import type { Step } from './data';
 /**
  * Declarative camera direction for every beat of the story.
  *
- * Angles are radians. Azimuth is measured around +y from +z (0 = looking
- * north from the street side, the renderer default iso is ~0.576); elevation
- * is the angle above the ground plane. Zoom is the orthographic zoom
- * (0.9 frames the whole site, ~2-3 a zone, ~5-9 a person).
+ * World axes: +x east, +z north, y up (metres). Angles are radians. Azimuth
+ * is measured around +y from +z: the camera sits at target + (sin a, ·, cos a),
+ * so 0 puts it north of the subject looking south, π/2 east of it looking
+ * west, and the renderer's default iso (~0.576) sees the north and east
+ * faces. Elevation is the angle above the ground plane. Zoom is the
+ * orthographic zoom (1 shows 80 m of stage height; 0.9 frames the whole site,
+ * ~2-3 a zone, ~5-9 a person).
  */
 export type ShotSpec = {
   zoom: number;
   azimuth: number;
   elevation: number;
-  /** Weight (0-1) toward the hero when she is within `radius` of the anchor. */
+  /**
+   * Weight (0-1) toward the subject when it is within `radius` of the anchor:
+   * the hero in her chapters, the first featured interaction in a cutaway.
+   */
   follow?: number;
   radius?: number;
-  /** Explicit world anchor; otherwise the step's room (or zone) centre. */
+  /** Explicit world anchor; otherwise `place`, else the step's room (or zone) centre. */
   anchor?: [number, number, number];
+  /**
+   * Anchor read from the community layer: the whole care network (its zoom is
+   * then `frame().zoom × zoom`), or a care setting by id. For a setting the
+   * anchor is the first that exists of: the centre of `room` in the setting's
+   * facility instance (once one is stamped), the registry anchor named
+   * `anchor` (a place the cast uses, e.g. 'porchSeat'), the pad centre
+   * (`frame(setting)`). Cutaways default to their own setting's pad.
+   */
+  place?: 'network' | { setting: string; room?: string; anchor?: string };
   /** Zoom multiplier reached at the end of the beat (slow push-in). */
   push?: number;
   /** Azimuth drift across the beat. */
@@ -59,6 +74,19 @@ export const FINALE_SHOT: ShotSpec = {
   elevation: 0.5,
   drift: 0.35,
 };
+/**
+ * The whole care network around the center. Seen from the east, the network
+ * is about 115 m across the screen (from the north-east it is about 210 m), so
+ * every pad fits between the card and the team panel.
+ */
+export const NETWORK_SHOT: ShotSpec = {
+  place: 'network',
+  zoom: 0.92,
+  azimuth: 1.57,
+  elevation: 0.86,
+  push: 1.06,
+  drift: 0.12,
+};
 
 /**
  * Per-chapter shots, keyed by scenario step id. Unknown ids fall back to
@@ -96,6 +124,67 @@ export const CHAPTER_SHOTS: Record<string, ShotSpec> = {
     drift: -0.2,
   },
   'care-plan': { zoom: 3.3, azimuth: 1.05, elevation: 0.74, push: 1.12, drift: 0.16 },
+  // Cutaways: anchored where the featured people are (registry anchors, so a
+  // pad that moves or turns keeps its framing) and leaning toward the first
+  // featured interaction. Fronts face east (home, pharmacy: seen from
+  // azimuth ≈ 1.1-1.3) or north (clinic, partner, hospital: ≈ 0-0.5).
+  // Elevations stay low enough to see under the clinic's upper storey, the
+  // pharmacy's roof and the hospital bay's roof.
+  'network-pharmacy': {
+    place: { setting: 'pharmacy', anchor: 'counterBack' },
+    zoom: 2.9,
+    azimuth: 1.3,
+    elevation: 0.5,
+    follow: 0.3,
+    radius: 8,
+    push: 1.05,
+  },
+  'network-home-am': {
+    place: { setting: 'home-lin', anchor: 'porchSeat' },
+    zoom: 3.3,
+    azimuth: 1.12,
+    elevation: 0.72,
+    follow: 0.4,
+    radius: 10,
+    push: 1.05,
+  },
+  'network-specialist': {
+    place: { setting: 'specialist', anchor: 'examSeat' },
+    zoom: 3.0,
+    azimuth: 0.22,
+    elevation: 0.42,
+    follow: 0.3,
+    radius: 8,
+    push: 1.05,
+  },
+  'network-partner': {
+    place: { setting: 'partner-adc', room: 'rehab-open', anchor: 'ptStand' },
+    zoom: 2.8,
+    azimuth: 0.5,
+    elevation: 0.64,
+    follow: 0.4,
+    radius: 10,
+    push: 1.05,
+    drift: 0.08,
+  },
+  'network-hospital': {
+    place: { setting: 'hospital', anchor: 'huddleA' },
+    zoom: 2.6,
+    azimuth: 0.08,
+    elevation: 0.5,
+    follow: 0.3,
+    radius: 8,
+    push: 1.05,
+  },
+  'network-home-pm': {
+    place: { setting: 'home-lin', anchor: 'wheelchairSpot' },
+    zoom: 3.3,
+    azimuth: 1.12,
+    elevation: 0.72,
+    follow: 0.4,
+    radius: 10,
+    push: 1.04,
+  },
 };
 export const DEFAULT_CHAPTER_SHOT: ShotSpec = {
   zoom: 3.6,
@@ -104,6 +193,15 @@ export const DEFAULT_CHAPTER_SHOT: ShotSpec = {
   follow: 0.5,
   radius: 8,
   push: 1.06,
+};
+/** Cutaways without an entry in CHAPTER_SHOTS: their own setting's pad. */
+export const DEFAULT_CUTAWAY_SHOT: ShotSpec = {
+  zoom: 2.4,
+  azimuth: 0.55,
+  elevation: 0.66,
+  follow: 0.35,
+  radius: 14,
+  push: 1.05,
 };
 
 export type Shot = {
@@ -143,9 +241,9 @@ export function mixShots(a: Shot, b: Shot, t: number): Shot {
   };
 }
 
-/** Sim-clock position of a chapter at progress p, honouring recreation stops. */
-export const stepTime = (s: Step, p: number) =>
-  s.window[0] + (s.window[1] - s.window[0]) * clamp01(p);
+/** Sim-clock position at progress p through a chapter's scrub window (`data.scrub`). */
+export const scrubTime = (w: readonly [number, number], p: number) =>
+  w[0] + (w[1] - w[0]) * clamp01(p);
 
 /** Room shown for a step at a given sim time (follows `stops` when present). */
 export function stepRoom(s: Step, time: number): string | null {

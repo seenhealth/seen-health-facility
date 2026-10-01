@@ -29,8 +29,12 @@ export function scrubWindows(steps: readonly TimedStep[]): ScrubWindow[] {
     const prev = steps[i - 1],
       next = steps[i + 1];
     return [
-      prev && isCutawayStep(prev) ? Math.max(s.window[0], prev.window[1]) : s.window[0],
-      next && isCutawayStep(next) ? Math.min(s.window[1], next.window[0]) : s.window[1],
+      prev && isCutawayStep(prev)
+        ? Math.max(s.window[0], prev.window[1])
+        : s.window[0],
+      next && isCutawayStep(next)
+        ? Math.min(s.window[1], next.window[0])
+        : s.window[1],
     ];
   });
 }
