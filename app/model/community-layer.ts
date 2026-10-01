@@ -12,6 +12,7 @@ import { buildCareSetting } from './community-pads';
 import {
   buildCommunityVehicleBody,
   communityVehicles,
+  registerCommunityVehicles,
   sampleCommunityVehicle,
   variantIndex,
   VEHICLE_DECOR,
@@ -77,10 +78,8 @@ export function buildCommunityLayer(
       'Illustrative distributed-care settings on the paper ground beyond the ring streets; positions, massing and timings are not surveyed.',
   };
   for (const setting of careSettings) root.add(buildCareSetting(setting, mat));
+  registerCommunityVehicles(vehicles);
   const bodies = communityVehicles.map((v) => {
-    vehicles.register(v.id, (t) => sampleCommunityVehicle(v.id, t), {
-      label: v.name,
-    });
     if (v.kind === 'van') {
       // The shared fleet body in the registry's livery letter.
       const van = buildArrivalVan(model, variantIndex(v.variant ?? 'A'), mat);

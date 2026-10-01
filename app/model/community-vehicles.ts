@@ -1,7 +1,7 @@
 import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import type { Vec2 } from './schema';
-import type { VehiclePose } from './activity';
+import type { VehiclePose, VehicleRegistry } from './activity';
 import { deliveryStops } from './deliveries';
 import { FLEET_VAN_SEATS } from './photo-assets';
 import {
@@ -792,6 +792,18 @@ export function sampleCommunityVehicle(id: string, time: number): VehiclePose {
     door: 0,
     ramp: 0,
   };
+}
+/**
+ * Register every community vehicle's sampler under its id and display name
+ * (the viewer's engine registry, or `alhambraVehicles()` for Node).
+ */
+export function registerCommunityVehicles(
+  registry: Pick<VehicleRegistry, 'register'>,
+) {
+  for (const v of communityVehicles)
+    registry.register(v.id, (t) => sampleCommunityVehicle(v.id, t), {
+      label: v.name,
+    });
 }
 /** World position of a seat at a moment (for authoring boarding walks). */
 export function seatWorld(id: string, seat: string, time: number) {

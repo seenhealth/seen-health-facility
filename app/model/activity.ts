@@ -149,6 +149,31 @@ export function createVehicleRegistry() {
   };
 }
 export type VehicleRegistry = ReturnType<typeof createVehicleRegistry>;
+/**
+ * Register the center's own vehicles under the ids and names every consumer
+ * shares: fleet vans `van-a`… ('Van A'…) and the delivery trucks. The engine
+ * and `alhambraVehicles()` both call this, so a seated rider, a followed van
+ * and a traced boarding all name the same vehicle.
+ */
+export function registerCenterVehicles(
+  registry: VehicleRegistry,
+  vans: number,
+  sampleVan: (index: number, time: number) => VehiclePose,
+  deliveries: boolean,
+) {
+  for (let i = 0; i < vans; i++) {
+    const letter = String.fromCharCode(65 + i);
+    registry.register(`van-${letter.toLowerCase()}`, (t) => sampleVan(i, t), {
+      label: `Van ${letter}`,
+    });
+  }
+  if (deliveries)
+    deliveryStops.forEach((stop, i) =>
+      registry.register(stop.id, (t) => sampleDelivery(i, t), {
+        label: `Delivery truck · ${stop.kind}`,
+      }),
+    );
+}
 /** What metrics and the trace need to seat riders: a pose per vehicle id. */
 export type VehicleLookup = Pick<VehicleRegistry, 'sample'>;
 /** World placement of a seat offset in a vehicle frame (rotation.y = heading). */
@@ -436,18 +461,12 @@ export function createActivity(
   const deliveries = data.siteSpecific ? null : buildDeliveries();
   if (deliveries) scene.add(deliveries.root);
   const vehicles = createVehicleRegistry();
-  arrival.vans.forEach((_, i) => {
-    const letter = String.fromCharCode(65 + i);
-    vehicles.register(`van-${letter.toLowerCase()}`, (t) => arrival.sampleVan(i, t), {
-      label: `Van ${letter}`,
-    });
-  });
-  if (deliveries)
-    deliveryStops.forEach((stop, i) =>
-      vehicles.register(stop.id, (t) => sampleDelivery(i, t), {
-        label: `Delivery truck · ${stop.kind}`,
-      }),
-    );
+  registerCenterVehicles(
+    vehicles,
+    arrival.vans.length,
+    arrival.sampleVan,
+    !!deliveries,
+  );
   const root = new T.Group();
   root.name = 'care-day-actors';
   scene.add(root);
