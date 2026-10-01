@@ -638,7 +638,7 @@ function buildPartnerHall(s: CareSetting, h: Ctx) {
 }
 /**
  * Grounds around the stamped building: the tai chi patio in the arrival
- * court's west half under a slatted pergola (people stay visible from above),
+ * court's west half under a slatted awning (people stay visible from above),
  * a bench, a planting strip along the west edge and four trees.
  */
 function buildPartnerGrounds(s: CareSetting, h: Ctx) {

@@ -678,15 +678,29 @@ export const careSettings: CareSetting[] = [
       courtA: [8.85, 21.5],
       courtB: [8.6, 8.4],
       doorOutside: [0, 7.15], // facility (−15.3, −0.99)
-      // The tai chi patio in the arrival court's west half, under a pergola.
+      // The tai chi patio in the arrival court's west half, under a slatted
+      // awning: out of the front door (the plan's west entrance), along the
+      // clinic front, in at the patio's south-east corner; the lead faces
+      // two rows of four.
       patioMin: [-20, 9],
       patioMax: [-11, 19],
+      courtWest: [-8.6, 7.9],
+      patioGate: [-11.8, 9.9],
+      tcLead: [-15.6, 17.3],
+      tc1: [-18.15, 14.7],
+      tc2: [-16.45, 14.7],
+      tc3: [-14.75, 14.7],
+      tc4: [-13.05, 14.7],
+      tc5: [-18.15, 12.5],
+      tc6: [-16.45, 12.5],
+      tc7: [-14.75, 12.5],
+      tc8: [-13.05, 12.5],
       // Grounds (outside the footprint and the drive; validated).
       treeA: [-26.5, 19.5],
       treeB: [-26.5, 1.5],
       treeC: [-26.5, -17.5],
       treeD: [-16.5, 21.0],
-      bench: [-19.3, 14.0],
+      bench: [-21.4, 14.0],
     },
   }),
 ];

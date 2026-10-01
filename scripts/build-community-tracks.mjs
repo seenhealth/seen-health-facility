@@ -5,12 +5,21 @@
 //   node scripts/build-community-tracks.mjs --check  # npm run validate:community-tracks:
 //                                                    # regenerate in memory, validate,
 //                                                    # fail if the committed JSON drifted
+//   … --notes                                        # also list every walk the
+//                                                    # generator moved or slowed
 //
 // For every registry setting with a `facility` (app/model/community-settings.ts)
-// it reads the specification from public/ and writes
+// it reads the specification from public/ and, when the setting has one, its
+// cast file app/data/community/<setting>.cast.json (scene people and/or
+// scheduled people; see docs/COMMUNITY.md, "Facility instances"), and writes
 //   app/data/community-instances.json  footprint + rooms per setting (sizes the
 //                                      pad, gives people the floor height)
-// The TypeScript is bundled with Rolldown (`loadSim`, as build-scenario.mjs).
+//   app/data/community-casts.json      the generated people: setting-local
+//                                      tracks, interactions, holes and notes
+// Both are validated (SPEC-facility-instance §10): the building against its
+// pad and drive, then every track (continuity, gait, walls, furniture,
+// contacts). The TypeScript is bundled with Rolldown (`loadSim`, as
+// build-scenario.mjs).
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
@@ -21,12 +30,18 @@ import { jsonDifference, loadSim } from './build-scenario.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const paths = {
   instances: 'app/data/community-instances.json',
+  casts: 'app/data/community-casts.json',
   castFile: (settingId) => `app/data/community/${settingId}.cast.json`,
 };
 const read = (path) => readFileSync(resolve(root, path), 'utf8');
 
 /** Generate and validate; `write` stores the JSON, `check` fails on drift. */
-export async function build({ write = true, check = false, quiet = false } = {}) {
+export async function build({
+  write = true,
+  check = false,
+  quiet = false,
+  notes = false,
+} = {}) {
   const started = Date.now();
   const { community, settings, schema } = await loadSim(
     {
@@ -36,7 +51,8 @@ export async function build({ write = true, check = false, quiet = false } = {})
     },
     { dir: 'work/community' },
   );
-  const instances = {};
+  const instances = {},
+    casts = {};
   const log = (line) => quiet || console.log(line);
   for (const s of settings.careSettings.filter((s) => s.facility)) {
     const facility = schema.validateFacility(
@@ -60,11 +76,39 @@ export async function build({ write = true, check = false, quiet = false } = {})
         `paving ≥ ${site.pavingClearance} m from the building; pad slack side ${site.padSlack.side} / front ${site.padSlack.front} / back ${site.padSlack.back} m; ` +
         `grounds ${Object.entries(site.grounds).map(([k, d]) => `${k} ${d} m`).join(', ') || 'none'}.`,
     );
+    if (!castText) continue;
+    const castFile = JSON.parse(castText);
+    assert.equal(castFile.setting, s.id, `${castPath}: setting ${castFile.setting}`);
+    const nav = community.instanceNavOptions(s.facility, summary.inputs.levelIds[0]);
+    const t0 = Date.now();
+    const cast = community.communityCastFromScenes(facility, s.facility.frame, castFile, {
+      setting: s,
+      nav,
+    });
+    const report = community.checkInstanceCast(facility, s, cast, { nav });
+    casts[s.id] = cast;
+    log(
+      `${s.id}: ${report.people} people, ${cast.interactions.length} interactions, ${report.segments} segments, ${report.walks} walks (max ${report.maxGait} m/s) in ${Date.now() - t0} ms; ` +
+        `walks ≥ ${report.minWalkWall} m and poses ≥ ${report.minPoseWall} m from walls; ${report.furniturePoses} poses clear of furniture; ` +
+        `closest ${report.closest.d} m (${report.closest.a} / ${report.closest.b} at ${report.closest.t} s); ${Object.keys(cast.holes).length} people with holes.`,
+    );
+    if (notes) for (const note of cast.notes) log(`  note: ${note}`);
+    else if (cast.notes.length)
+      log(
+        `  ${cast.notes.length} walks moved, slowed or routed beside others to keep people apart (--notes lists them).`,
+      );
   }
-  const output = { [paths.instances]: { version: 1, instances } };
+  const output = {
+    [paths.instances]: { version: 1, instances },
+    [paths.casts]: { version: 1, casts },
+  };
   for (const [file, data] of Object.entries(output)) {
     const text = JSON.stringify(data, null, 1) + '\n';
     if (check) {
+      assert.ok(
+        existsSync(resolve(root, file)),
+        `${file} is missing. Run \`npm run build:community\` and commit it.`,
+      );
       const drift = jsonDifference(
         JSON.parse(text),
         JSON.parse(read(file)),
@@ -87,5 +131,5 @@ export async function build({ write = true, check = false, quiet = false } = {})
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const check = process.argv.includes('--check');
-  await build({ write: !check, check });
+  await build({ write: !check, check, notes: process.argv.includes('--notes') });
 }

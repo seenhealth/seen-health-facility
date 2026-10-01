@@ -301,13 +301,15 @@ export function freeStandingPoint(g: NavGrid, p: Vec2): { point: Vec2; moved: bo
 type Place = { anchor: Vec2; approach: Vec2[] };
 /**
  * Walk from one placed point to another: leave along the reversed approach,
- * follow the navigation grid, then enter along the next approach.
+ * follow the navigation grid, then enter along the next approach. `avoid`
+ * blocks further grid cells (see `route`).
  */
 export function walkBetween(
   g: NavGrid,
   from: Place,
   to: Place,
   clearance: number,
+  avoid?: (p: Vec2) => boolean,
 ): Vec2[] {
   const head = dedupe([from.anchor, ...[...from.approach].reverse()]),
     tail = dedupe([...to.approach, to.anchor]);
@@ -316,8 +318,8 @@ export function walkBetween(
   let middle: Vec2[];
   if (same(a, b)) middle = [a];
   else {
-    const sa = snap(g, a, { clearance }),
-      sb = snap(g, b, { clearance });
+    const sa = snap(g, a, { clearance, avoid }),
+      sb = snap(g, b, { clearance, avoid });
     for (const [p, s] of [
       [a, sa],
       [b, sb],
@@ -326,7 +328,11 @@ export function walkBetween(
         throw new NavError(
           `Point ${p.join(',')} is ${distance(p, s).toFixed(2)} m from free floor; add approach waypoints`,
         );
-    middle = [a, ...(same(sa, sb) ? [sa] : route(g, sa, sb, clearance)), b];
+    middle = [
+      a,
+      ...(same(sa, sb) ? [sa] : route(g, sa, sb, clearance, avoid)),
+      b,
+    ];
   }
   const path = dedupe([...head, ...middle, ...tail]);
   const clear = pathWallClearanceAt(g, path);
