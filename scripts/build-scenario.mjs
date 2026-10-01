@@ -328,6 +328,155 @@ export function validateTracks(sim, model, scenario, result) {
   return report;
 }
 
+/** Total length of the union of [start, end] spans. */
+function unionLength(spans) {
+  let total = 0,
+    end = -Infinity;
+  for (const [a, b] of [...spans].sort((x, y) => x[0] - y[0])) {
+    if (b <= end) continue;
+    total += b - Math.max(a, end);
+    end = b;
+  }
+  return total;
+}
+const overlapOf = (a, b) => Math.max(0, Math.min(a[1], b[1]) - Math.max(a[0], b[0]));
+/**
+ * The story's timeline and cutaways (docs/STORY.md, "Cutaways"). Every
+ * cutaway features community interactions that exist in the composed story
+ * source, at its setting, inside its window; the scrub windows
+ * (`scrubWindows`) tile the day from 0; and the on-screen trimming never hides
+ * a hero focus time, cuts into a stop or leaves a kicker time outside its
+ * chapter. Throws one error listing every failure; returns the timeline
+ * rows.
+ */
+export function validateStory(sim, model, scenario, result) {
+  const duration = result.source.duration,
+    steps = scenario.steps;
+  const compiled = new Map(result.steps.map((s) => [s.id, s]));
+  const composed = sim.alhambraSource(model, result.source);
+  const interactions = new Map(composed.interactions.map((i) => [i.id, i]));
+  const settings = new Set(sim.careSettings.map((s) => s.id));
+  const team = new Set(sim.careTeam.members.map((m) => m.id));
+  const failures = [];
+  const fail = (message) => failures.push(message);
+  const isCutaway = (s) => s.placement?.mode === 'cutaway' || !!s.settingId;
+  const kickerAt = (s) => {
+    const [head] = (s.kicker || '').split('·');
+    return /\d:\d\d/.test(head) ? sim.clockToLoop(head.trim()) : null;
+  };
+  const span = (w) => `${round(w[0], 2)}–${round(w[1], 2)}`;
+
+  // 1. Cutaways: setting, window, featured interactions, roles, kicker.
+  for (const s of steps.filter(isCutaway)) {
+    const at = `cutaway ${s.id}`,
+      [w0, w1] = s.window,
+      zone = sim.settingZone(s.settingId);
+    if (s.placement?.mode !== 'cutaway') fail(`${at}: placement.mode must be 'cutaway'`);
+    if (s.heroPresent !== false) fail(`${at}: heroPresent must be false`);
+    if (s.roomId !== null) fail(`${at}: roomId must be null`);
+    if (!settings.has(s.settingId)) fail(`${at}: settingId ${s.settingId} is not in careSettings`);
+    if (s.zoneId !== zone) fail(`${at}: zoneId ${s.zoneId} must be ${zone}`);
+    if (!(w0 >= 0 && w1 <= duration && w1 - w0 >= 6))
+      fail(`${at}: window ${span(s.window)} must lie inside 0–${duration} and last at least 6 s`);
+    const ids = s.interactionIds || [];
+    if (!ids.length) fail(`${at}: interactionIds is empty`);
+    const spans = [];
+    for (const id of ids) {
+      const i = interactions.get(id);
+      if (!i) {
+        fail(`${at}: interaction ${id} is not in the composed story source`);
+        continue;
+      }
+      const o = overlapOf([i.start, i.end], s.window);
+      if (o < 4)
+        fail(`${at}: ${id} (${span([i.start, i.end])}) overlaps the window by ${round(o, 2)} s (need at least 4)`);
+      if (![zone, 'site', 'upper-office'].includes(i.zoneId))
+        fail(`${at}: ${id} happens in ${i.zoneId}, not at ${s.settingId}`);
+      if (o > 0) spans.push([Math.max(i.start, w0), Math.min(i.end, w1)]);
+    }
+    const covered = unionLength(spans);
+    if (ids.length && covered < 0.6 * (w1 - w0) - 1e-9)
+      fail(`${at}: featured interactions cover ${round(covered, 2)} s of the ${w1 - w0} s window (need 60 %)`);
+    for (const r of s.roles) if (!team.has(r)) fail(`${at}: role ${r} is not a care-team id`);
+    for (const h of s.handoffs)
+      for (const end of [h.from, h.to]) if (!team.has(end)) fail(`${at}: handoff end ${end} is not a care-team id`);
+    const k = kickerAt(s);
+    if (k === null || k < w0 - 1e-6 || k > w1 + 1e-6)
+      fail(`${at}: kicker "${s.kicker}" (${k === null ? 'no time' : round(k, 2) + ' s'}) lies outside its window ${span(s.window)}`);
+    // 3. The compiled summary points the camera at the first featured interaction.
+    const c = compiled.get(s.id);
+    if (!c) fail(`${at}: missing from the compiled steps`);
+    else {
+      if (c.heroPresent !== false || c.settingId !== s.settingId || c.roomId !== null)
+        fail(`${at}: compiled step must have heroPresent false, roomId null and settingId ${s.settingId}`);
+      if (c.focusActorId !== `interaction:${ids[0]}`)
+        fail(`${at}: compiled focusActorId ${c.focusActorId} must be interaction:${ids[0]}`);
+      if (!(c.focusTime >= w0 && c.focusTime <= w1)) fail(`${at}: focus time ${c.focusTime} lies outside its window`);
+      const live = ids.some((id) => {
+        const i = interactions.get(id);
+        return i && c.focusTime >= i.start && c.focusTime <= i.end;
+      });
+      if (!live) fail(`${at}: focus time ${c.focusTime} falls outside every featured interaction`);
+    }
+  }
+
+  // 2. Timeline: scrub windows tile the day; trimming hides nothing of the hero's.
+  const scrub = sim.scrubWindows(steps);
+  if (Math.abs(scrub[0][0]) > 1e-6) fail(`timeline starts at ${scrub[0][0]} s, not 0`);
+  for (let i = 1; i < scrub.length; i++)
+    if (Math.abs(scrub[i][0] - scrub[i - 1][1]) > 1e-6)
+      fail(
+        `timeline is not contiguous: ${steps[i - 1].id} ends at ${scrub[i - 1][1]} s, ${steps[i].id} starts at ${scrub[i][0]} s`,
+      );
+  if (scrub.at(-1)[1] > duration + 1e-6) fail(`timeline ends at ${scrub.at(-1)[1]} s, after ${duration}`);
+  const cutaways = steps.filter(isCutaway);
+  for (let a = 0; a < cutaways.length; a++)
+    for (let b = a + 1; b < cutaways.length; b++)
+      if (overlapOf(cutaways[a].window, cutaways[b].window) > 1e-6)
+        fail(`cutaways ${cutaways[a].id} and ${cutaways[b].id} overlap`);
+  steps.forEach((s, i) => {
+    if (isCutaway(s)) return;
+    const at = `hero step ${s.id}`,
+      [a, b] = scrub[i],
+      c = compiled.get(s.id);
+    if (b - a < 20) fail(`${at}: scrub window ${span(scrub[i])} lasts under 20 s`);
+    if (!c) return fail(`${at}: missing from the compiled steps`);
+    if (!(c.focusTime >= a + 1 && c.focusTime <= b - 1))
+      fail(`${at}: focus time ${c.focusTime} is not inside its scrub window ${span(scrub[i])} with a 1 s margin`);
+    const k = kickerAt(s);
+    if (k !== null && (k < a - 1e-6 || k > b + 1e-6))
+      fail(`${at}: kicker "${s.kicker}" (${round(k, 2)} s) lies outside its scrub window ${span(scrub[i])}`);
+    // Every stop begins on screen; where a cutaway follows, it also ends before the cut.
+    const clippedEnd = b < s.window[1] - 1e-9;
+    for (const stop of c.stops) {
+      if (stop.arrive < a - 1e-6 || stop.arrive > b + 1e-6)
+        fail(`${at}: stop ${stop.id} begins at ${round(stop.arrive, 2)} s, outside its scrub window ${span(scrub[i])}`);
+      if (clippedEnd && stop.depart > b + 1e-6)
+        fail(`${at}: stop ${stop.id} lasts until ${round(stop.depart, 2)} s, after the cut to ${steps[i + 1].id} at ${b} s`);
+    }
+  });
+
+  assert.equal(failures.length, 0, `Story timeline (${failures.length} problem(s)):\n  ${failures.join('\n  ')}`);
+  const rows = steps.map((s, i) => {
+    const c = compiled.get(s.id);
+    const featured = isCutaway(s)
+      ? (s.interactionIds || []).map((id) => {
+          const x = interactions.get(id);
+          return `${id} ${span([x.start, x.end])}`;
+        })
+      : (c?.stops || []).map((st) => `${st.id} ${span([st.arrive, st.depart])}`);
+    return {
+      id: s.id,
+      kind: isCutaway(s) ? 'cutaway' : s.placement?.mode || 'hero',
+      scrub: scrub[i],
+      clock: `${sim.clockLabel(scrub[i][0])}–${sim.clockLabel(scrub[i][1])}`,
+      focus: c?.focusTime,
+      featured: featured.join(', ') || '—',
+    };
+  });
+  return { rows };
+}
+
 /**
  * Compile and validate the scenario. `write` stores the tracks JSON; `check`
  * fails when the committed tracks differ from the fresh compile (drift), so a
@@ -344,9 +493,13 @@ export async function compile({
   const model = sim.validateFacility(JSON.parse(readFileSync(modelPath, 'utf8')));
   const scenario = JSON.parse(readFileSync(paths.scenario, 'utf8'));
   const t0 = Date.now();
-  const result = sim.compileScenario(model, scenario, sim.activityData);
+  // Cutaway focus times come from the community interactions of the composed source.
+  const result = sim.compileScenario(model, scenario, sim.activityData, {
+    context: sim.alhambraSource(model, sim.activityData),
+  });
   const compileMs = Date.now() - t0;
   const report = validateTracks(sim, model, scenario, result);
+  const story = validateStory(sim, model, scenario, result);
   const grid = sim.navGrid(model);
   if (write) writeFileSync(paths.tracks, JSON.stringify(result.tracks, null, 1) + '\n');
   if (!quiet) {
@@ -390,6 +543,21 @@ export async function compile({
           report.furnitureCrossings.map((c) => `${c.actor} × ${c.object} (${c.samples})`).join('; '),
       );
     for (const n of t.notes) console.log('Note: ' + n);
+    console.log('Story timeline (scrub windows: hero chapters clipped around cutaways):');
+    console.log(row(['#', 3], ['Beat', 19], ['Kind', 9], ['Scrub', 9], ['Clock', 18], ['Focus', 7], ['Featured interactions / hero stops', 0]));
+    story.rows.forEach((r, i) =>
+      console.log(
+        row(
+          [i + 1, 3],
+          [r.id, 19],
+          [r.kind, 9],
+          [`${r.scrub[0]}–${r.scrub[1]}`, 9],
+          [r.clock, 18],
+          [r.focus === undefined ? '—' : r.focus.toFixed(1), 7],
+          [r.featured, 0],
+        ),
+      ),
+    );
     if (write) console.log(`Wrote ${paths.tracks.replace(root + '/', '')}`);
   }
   if (check) {

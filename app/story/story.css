@@ -5,6 +5,8 @@
  * properties written by app/story/director.ts:
  *   on .story-root: --ui (team panel), --rail, --veil (finale), --open, --day
  *   on each section: --vis (0-1), --enter (-1..1 offset from pinned), --p
+ * Moments across the care network (cutaways) share one accent: --net (the
+ * brand leaf) for fills, --net-ink for its text and outlines.
  */
 
 .story-root {
@@ -12,6 +14,9 @@
   --ink: #1e2a26;
   --brand: #1f4d3a;
   --leaf: #8cbf5e;
+  --net: var(--leaf);
+  --net-ink: #3e6324;
+  --net-wash: rgba(140, 191, 94, 0.18);
   --ink-2: rgba(30, 42, 38, 0.74);
   --ink-3: rgba(30, 42, 38, 0.52);
   --line: rgba(30, 42, 38, 0.1);
@@ -362,8 +367,15 @@
 .story-team {
   height: 210vh;
 }
+.story-network {
+  height: 210vh;
+}
 .story-chapter {
   height: 190vh;
+}
+/* Cutaways are short looks across the network. */
+.story-chapter[data-network] {
+  height: 150vh;
 }
 .story-finale {
   height: 330vh;
@@ -569,6 +581,51 @@
 .story-chip .swatches i:first-child {
   margin-left: 0;
 }
+/* External roles (pharmacist, hospitalist ...): grey, no team colour. */
+.story-chip.partner {
+  color: var(--ink-2);
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(30, 42, 38, 0.16);
+}
+.story-chip.partner > i {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px rgba(30, 42, 38, 0.42);
+}
+/* "Meanwhile" line above a cutaway's kicker. */
+.story-meanwhile {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 24px;
+  margin-bottom: 12px !important;
+  padding: 0 11px 0 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--net-ink);
+  background: var(--net-wash);
+  box-shadow: inset 0 0 0 1px rgba(62, 99, 36, 0.2);
+}
+.story-meanwhile i,
+.story-places i {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 1.5px;
+  background: var(--net);
+  box-shadow: inset 0 0 0 1px var(--net-ink);
+  transform: rotate(45deg);
+}
+.story-net-badge {
+  display: inline-block;
+  padding: 1px 8px 2px;
+  border-radius: 999px;
+  font-weight: 650;
+  color: var(--ink);
+  background: var(--net);
+}
 /* Handoffs are narrated in the ring on desktop; the list serves small screens. */
 .story-handoffs {
   display: none;
@@ -594,6 +651,22 @@
   height: 8px;
   border-radius: 50%;
   background: var(--c);
+}
+/* The network beat's list of places. */
+.story-places {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 18px;
+  margin-top: 20px !important;
+  font-size: 13.5px;
+  font-weight: 520;
+  color: var(--ink);
+}
+.story-places li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  line-height: 1.25;
 }
 
 /* ---- IDT panel ---------------------------------------------------------------- */
@@ -653,6 +726,19 @@
   display: flex;
   gap: 16px;
   text-align: right;
+}
+.story-idt-stats[data-network] {
+  gap: 10px;
+}
+.story-stat.network .story-stat-value {
+  color: var(--net-ink);
+}
+.story-stat.network .story-stat-label {
+  width: 58px;
+  margin-left: auto;
+  font-size: 9.5px;
+  letter-spacing: 0;
+  line-height: 1.2;
 }
 .story-stat .story-stat-value {
   display: block;
@@ -728,6 +814,14 @@
 }
 .story-ring-spokes path.on[data-away] {
   opacity: 0.32;
+}
+/* A cutaway: dashed spokes to the setting, faded in rather than drawn. */
+.story-ring[data-mode='away'] .story-ring-spokes path.on {
+  stroke-dasharray: 0.04 0.032;
+  stroke-dashoffset: 0;
+  opacity: 0.75;
+  animation: story-fade-in 0.6s var(--ease) both;
+  animation-delay: calc(0.1s + var(--k) * 40ms);
 }
 .story-node {
   cursor: pointer;
@@ -832,6 +926,35 @@
 }
 .story-ring[data-mode='idle'] .story-hub {
   opacity: 0.9;
+}
+.story-hub .name.long {
+  font-size: 11px;
+}
+.story-hub[data-net='away'] .disc {
+  fill: #fbfaf6;
+  stroke: var(--net-ink);
+  stroke-width: 1.4;
+  stroke-dasharray: 3 3.5;
+}
+.story-hub[data-net='away'] .halo,
+.story-hub[data-net='network'] .halo {
+  fill: var(--net);
+  opacity: 0.22;
+}
+.story-hub[data-net='away'] .name {
+  fill: var(--net-ink);
+}
+.story-hub[data-net='away'] .meta {
+  fill: var(--ink-3);
+}
+.story-hub[data-net='network'] .disc {
+  fill: var(--net);
+}
+.story-hub[data-net='network'] .name {
+  fill: var(--ink);
+}
+.story-hub[data-net='network'] .meta {
+  fill: rgba(30, 42, 38, 0.72);
 }
 .story-flow-arrow {
   opacity: 0;
@@ -985,14 +1108,14 @@
 .story-dayflow-list {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(13, 1fr);
+  grid-template-columns: repeat(var(--n, 13), 1fr);
 }
 .story-dayflow-list::before {
   content: '';
   position: absolute;
   top: 10px;
-  left: calc(100% / 26);
-  right: calc(100% / 26);
+  left: calc(100% / (2 * var(--n, 13)));
+  right: calc(100% / (2 * var(--n, 13)));
   height: 1.5px;
   border-radius: 2px;
   background: linear-gradient(90deg, var(--brand) calc(var(--done, 0) * 100%),
@@ -1033,6 +1156,29 @@
   margin-top: 0;
   background: var(--brand);
   box-shadow: 0 0 0 4px rgba(31, 77, 58, 0.16);
+}
+/* Moments across the network: small diamonds in the network colour. */
+.story-dayflow-list [data-kind='network'] .node {
+  width: 7px;
+  height: 7px;
+  margin-top: 3px;
+  border-radius: 1.5px;
+  background: #fbfaf6;
+  box-shadow: inset 0 0 0 1.5px var(--net-ink);
+  transform: rotate(45deg);
+}
+.story-dayflow-list [data-kind='network'][data-state='past'] .node {
+  background: var(--net);
+  box-shadow: inset 0 0 0 1px var(--net-ink);
+}
+.story-dayflow-list [data-kind='network'][data-state='now'] .node {
+  width: 11px;
+  height: 11px;
+  margin-top: 1px;
+  background: var(--net);
+  box-shadow:
+    0 0 0 3px rgba(140, 191, 94, 0.3),
+    inset 0 0 0 1px var(--net-ink);
 }
 .story-dayflow-list .roles {
   display: grid;
@@ -1163,6 +1309,29 @@
   background: var(--brand);
   box-shadow: 0 0 0 4px rgba(31, 77, 58, 0.16);
 }
+.story-rail-tick[data-kind='network'] > button {
+  width: 10px;
+}
+.story-rail-tick[data-kind='network'] > button::before {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  background: #fbfaf6;
+  box-shadow: inset 0 0 0 1.5px var(--net-ink);
+  transform: rotate(45deg);
+}
+.story-rail-tick[data-kind='network'][data-state='past'] > button::before {
+  background: var(--net);
+  box-shadow: inset 0 0 0 1px var(--net-ink);
+}
+.story-rail-tick[data-kind='network'][data-state='now'] > button::before {
+  width: 9px;
+  height: 9px;
+  background: var(--net);
+  box-shadow:
+    0 0 0 3px rgba(140, 191, 94, 0.3),
+    inset 0 0 0 1px var(--net-ink);
+}
 .story-rail-tick > button::after {
   content: attr(data-label);
   position: absolute;
@@ -1195,7 +1364,7 @@
   padding-bottom: 16px;
 }
 .story-finale-inner {
-  width: min(1240px, 100%);
+  width: min(1420px, 100%);
   opacity: var(--vis);
   transform: translate3d(0, calc(var(--enter) * 48px), 0);
 }
@@ -1271,6 +1440,27 @@
 .story-swim-col .band {
   fill: rgba(31, 77, 58, 0.065);
 }
+.story-swim-col .band.network {
+  fill: rgba(140, 191, 94, 0.08);
+  stroke: rgba(62, 99, 36, 0.4);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+.story-swim-badge rect {
+  fill: var(--net);
+}
+.story-swim-svg .story-swim-badge text {
+  font-size: 10px;
+  font-weight: 650;
+  fill: var(--ink);
+}
+.story-swim-lane .partner,
+.story-swim-dot.partner {
+  fill: #a9aca5;
+}
+.story-swim-lane.partners line {
+  stroke-dasharray: 3 4;
+}
 .story-swim-col .time {
   font-size: 12.5px;
   font-weight: 700;
@@ -1320,6 +1510,12 @@
   stroke: var(--c);
   stroke-width: 1.8;
 }
+/* Disciplines in a moment across the network: hollow, in the role colour. */
+.story-swim-dot.network {
+  fill: #fbfaf6;
+  stroke: var(--c);
+  stroke-width: 2.6;
+}
 .story-swim-arrow .stroke {
   fill: none;
   stroke: var(--c);
@@ -1342,7 +1538,7 @@
 }
 .story-totals {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 12px;
   margin-top: 16px;
   opacity: 0;
@@ -1373,6 +1569,9 @@
   font-size: 14px;
   font-weight: 550;
   color: var(--ink-2);
+}
+.story-total.network .story-stat-value {
+  color: var(--net-ink);
 }
 
 /* ---- call to action ------------------------------------------------------------ */
@@ -1466,6 +1665,11 @@
 @keyframes story-fade {
   to {
     opacity: 1;
+  }
+}
+@keyframes story-fade-in {
+  from {
+    opacity: 0;
   }
 }
 @keyframes story-pulse {
@@ -1611,8 +1815,15 @@
     font-size: 11.5px;
     padding: 0 9px 0 8px;
   }
-  .story-legend {
+  .story-legend,
+  .story-places,
+  .story-chip.partner {
     display: none;
+  }
+  .story-meanwhile {
+    height: 20px;
+    margin-bottom: 8px !important;
+    font-size: 10px;
   }
   .story-handoffs {
     display: grid;

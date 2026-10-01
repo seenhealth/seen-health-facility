@@ -7,6 +7,7 @@ export * from './scenario';
 export * from './clock';
 export * from './metrics';
 export * from './trace';
+export * from './story-timeline';
 export { validateFacility } from '../model/schema';
 export {
   activityData,
@@ -17,5 +18,6 @@ export {
 } from '../model/activity';
 export { sampleVan, vanWindows, ARRIVAL } from '../model/arrival';
 export { alhambraSource, alhambraVehicles } from '../model/alhambra-source';
+export { careSettings, settingZone } from '../model/community-settings';
 export { default as careTeam } from '../data/care-team.json';
 export { default as dayProgram } from '../data/day-program.json';

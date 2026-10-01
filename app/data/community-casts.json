@@ -1479,7 +1479,7 @@
       },
       {
        "start": 52,
-       "end": 53.5,
+       "end": 53,
        "action": "conversation",
        "path": [
         [
@@ -1495,8 +1495,8 @@
        "title": "Morning check-in: sleep, pain, dizziness, ankles"
       },
       {
-       "start": 53.5,
-       "end": 54.7,
+       "start": 53,
+       "end": 54.2,
        "action": "serve",
        "path": [
         [
@@ -1512,8 +1512,8 @@
        "title": "Reheats congee on the front-control range"
       },
       {
-       "start": 54.7,
-       "end": 56.279,
+       "start": 54.2,
+       "end": 54.979,
        "action": "idle",
        "path": [
         [
@@ -1529,8 +1529,8 @@
        "title": "Reheats congee on the front-control range"
       },
       {
-       "start": 56.279,
-       "end": 57.5,
+       "start": 54.979,
+       "end": 56.2,
        "action": "walk",
        "path": [
         [
@@ -1558,8 +1558,8 @@
        "title": "To Kitchen"
       },
       {
-       "start": 57.5,
-       "end": 59.2,
+       "start": 56.2,
+       "end": 58.2,
        "action": "serve",
        "path": [
         [
@@ -1575,8 +1575,8 @@
        "title": "Sets up breakfast and opens the morning blister"
       },
       {
-       "start": 59.2,
-       "end": 60.844,
+       "start": 58.2,
+       "end": 59.344,
        "action": "idle",
        "path": [
         [
@@ -1592,8 +1592,8 @@
        "title": "Sets up breakfast and opens the morning blister"
       },
       {
-       "start": 60.844,
-       "end": 61.5,
+       "start": 59.344,
+       "end": 60,
        "action": "walk",
        "path": [
         [
@@ -1613,7 +1613,7 @@
        "title": "To Kitchen"
       },
       {
-       "start": 61.5,
+       "start": 60,
        "end": 64,
        "action": "serve",
        "path": [

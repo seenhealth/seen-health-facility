@@ -42,7 +42,8 @@ if (!traceOnly) {
   const lin = sim.computeMetrics(source, model, {
     step: 1,
     heroId,
-    steps: scenario.steps,
+    // Mrs. Lin's steps; the cutaways look in on other people across the network.
+    steps: scenario.steps.filter((s) => !s.settingId),
     vehicles,
   });
   const ms = Date.now() - started;
@@ -194,7 +195,7 @@ line(`  ${'Participants with…'.padEnd(20)}${col(`of ${participants(sources.bas
 for (const k of sim.TRACE_BUCKETS)
   line(`  ${k.padEnd(20)}${col(sources.base.summary.participantsWith[k])}${col(sources.story.summary.participantsWith[k])}`);
 const hero = sim.personJourney(sources.story.events, heroId);
-const claimed = [...new Set(scenario.steps.flatMap((s) => s.roles))];
+const claimed = [...new Set(scenario.steps.filter((s) => !s.settingId).flatMap((s) => s.roles))];
 const missing = claimed.filter((d) => !hero.disciplines.includes(d));
 line();
 line(

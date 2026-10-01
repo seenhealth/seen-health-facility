@@ -659,6 +659,30 @@ pushed to the door by 672 (drive crossing and porch ramp shortened to fit),
 the driver handing over the folder at the door and back at the van by 700.
 Re-time `home-van-boarding` to 80.5–113.
 
+## In the story
+
+The scroll story (docs/STORY.md) pulls out to the whole network in its network
+beat (`frame()`) and has six cutaway chapters that feature these interactions,
+a public contract that `node scripts/build-scenario.mjs --check` checks (each
+must exist in the composed story source, at its setting, overlapping its
+chapter's window):
+
+| Cutaway | Setting | Featured interactions | Camera anchor |
+| --- | --- | --- | --- |
+| `network-pharmacy` | `pharmacy` | `pharmacy-packing` | `counterBack` |
+| `network-home-am` | `home-lin` | `home-personal-care` | `porchSeat` |
+| `network-specialist` | `specialist` | `specialist-visit` | `examSeat` |
+| `network-partner` | `partner-adc` | `partner-pt` | `ptStand` (instance room `rehab-open` once stamped) |
+| `network-hospital` | `hospital` | `hospital-discharge-huddle` | `huddleA` |
+| `network-home-pm` | `home-lin` | `home-health-visit`, `after-hours-call` | `wheelchairSpot` |
+
+Keep those interaction ids and anchor names stable when re-timing the cast or
+rebuilding a pad; the story reads anchors through the layer (`settings`,
+`frame(id)`, an instance's `roomCenter`), never through world coordinates, and
+falls back to the pad centre when an anchor disappears. Re-timing
+`home-personal-care` indoors to about 30–72 s lets the home's morning cutaway
+move to its intended slot (`HOME_AM_RETIME` in `app/sim/story-timeline.ts`).
+
 ## Adding things
 
 **A setting.** Add a `define({...})` entry to `careSettings` with local

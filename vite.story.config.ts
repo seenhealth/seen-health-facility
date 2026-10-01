@@ -6,8 +6,9 @@
  *   npm run dev:story / npm run preview:story
  *
  * Only runtime assets the story needs are copied: the facility specification,
- * the textures and models it references, the logo and the favicon. See
- * docs/STORY.md.
+ * the facility instances the community layer stamps on its pads (the Wongs'
+ * home), the textures and models they reference, the logo and the favicon.
+ * See docs/STORY.md.
  */
 import react from '@vitejs/plugin-react';
 import { existsSync, readFileSync } from 'node:fs';

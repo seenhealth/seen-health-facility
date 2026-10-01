@@ -249,9 +249,10 @@ for (const [name, source] of [
   );
 }
 
-// The hero's trace covers every discipline the scenario steps claim.
+// The hero's trace covers every discipline her scenario steps claim (cutaways,
+// steps with a settingId, show other people across the care network).
 const hero = sim.personJourney(results.story.events, heroId);
-const claimed = [...new Set(scenario.steps.flatMap((s) => s.roles))];
+const claimed = [...new Set(scenario.steps.filter((s) => !s.settingId).flatMap((s) => s.roles))];
 const missing = claimed.filter((d) => !hero.disciplines.includes(d));
 assert.equal(
   missing.length,

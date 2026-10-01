@@ -9851,7 +9851,7 @@
    "start": 409.5767,
    "end": 423.9767,
    "zoneId": "ot",
-   "description": "12:20 PM · Personal care"
+   "description": "12:25 PM · Personal care"
   },
   {
    "id": "hero-lin-table-tennis",
@@ -10010,6 +10010,64 @@
     "pca",
     "driver"
    ]
+  },
+  {
+   "id": "network-pharmacy",
+   "window": [
+    26,
+    50
+   ],
+   "heroPresent": false,
+   "zoneId": "community:pharmacy",
+   "roomId": null,
+   "focusTime": 38,
+   "focusActorId": "interaction:pharmacy-packing",
+   "stops": [],
+   "companionIds": [],
+   "interactionIds": [
+    "pharmacy-packing"
+   ],
+   "handoffs": [
+    {
+     "from": "rn",
+     "to": "home-care",
+     "note": "This week’s packs go out at nine"
+    }
+   ],
+   "roles": [
+    "rn",
+    "home-care"
+   ],
+   "settingId": "pharmacy"
+  },
+  {
+   "id": "network-home-am",
+   "window": [
+    50,
+    58
+   ],
+   "heroPresent": false,
+   "zoneId": "community:home-lin",
+   "roomId": null,
+   "focusTime": 55,
+   "focusActorId": "interaction:home-meal-meds",
+   "stops": [],
+   "companionIds": [],
+   "interactionIds": [
+    "home-meal-meds"
+   ],
+   "handoffs": [
+    {
+     "from": "pca",
+     "to": "home-care",
+     "note": "Slept well; ankles a little swollen"
+    }
+   ],
+   "roles": [
+    "pca",
+    "home-care"
+   ],
+   "settingId": "home-lin"
   },
   {
    "id": "pickup",
@@ -10230,6 +10288,36 @@
    ]
   },
   {
+   "id": "network-specialist",
+   "window": [
+    232,
+    240
+   ],
+   "heroPresent": false,
+   "zoneId": "community:specialist",
+   "roomId": null,
+   "focusTime": 236,
+   "focusActorId": "interaction:specialist-visit",
+   "stops": [],
+   "companionIds": [],
+   "interactionIds": [
+    "specialist-visit"
+   ],
+   "handoffs": [
+    {
+     "from": "pca",
+     "to": "pcp",
+     "note": "Ankle swelling is mild; recheck in three months"
+    }
+   ],
+   "roles": [
+    "driver",
+    "pca",
+    "pcp"
+   ],
+   "settingId": "specialist"
+  },
+  {
    "id": "program",
    "window": [
     240,
@@ -10283,6 +10371,41 @@
     "rec",
     "pca"
    ]
+  },
+  {
+   "id": "network-partner",
+   "window": [
+    289,
+    300
+   ],
+   "heroPresent": false,
+   "zoneId": "community:partner-adc",
+   "roomId": null,
+   "focusTime": 294.5,
+   "focusActorId": "interaction:partner-pt",
+   "stops": [],
+   "companionIds": [],
+   "interactionIds": [
+    "partner-pt",
+    "partner-rn-review"
+   ],
+   "handoffs": [
+    {
+     "from": "pt",
+     "to": "rn",
+     "note": "Both steadier on turns; keep the walker"
+    },
+    {
+     "from": "rn",
+     "to": "pcp",
+     "note": "Two medicine lists checked with the partner nurse"
+    }
+   ],
+   "roles": [
+    "pt",
+    "rn"
+   ],
+   "settingId": "partner-adc"
   },
   {
    "id": "lunch",
@@ -10553,6 +10676,41 @@
    ]
   },
   {
+   "id": "network-hospital",
+   "window": [
+    500,
+    525
+   ],
+   "heroPresent": false,
+   "zoneId": "community:hospital",
+   "roomId": null,
+   "focusTime": 512.5,
+   "focusActorId": "interaction:hospital-discharge-huddle",
+   "stops": [],
+   "companionIds": [],
+   "interactionIds": [
+    "hospital-discharge-huddle"
+   ],
+   "handoffs": [
+    {
+     "from": "rn",
+     "to": "home-care",
+     "note": "Home health visit as soon as he is home"
+    },
+    {
+     "from": "home-care",
+     "to": "driver",
+     "note": "Hospital canopy pickup at 2:10"
+    }
+   ],
+   "roles": [
+    "rn",
+    "home-care",
+    "driver"
+   ],
+   "settingId": "hospital"
+  },
+  {
    "id": "farewell",
    "window": [
     525,
@@ -10690,6 +10848,36 @@
     "pca",
     "driver"
    ]
+  },
+  {
+   "id": "network-home-pm",
+   "window": [
+    690,
+    712
+   ],
+   "heroPresent": false,
+   "zoneId": "community:home-lin",
+   "roomId": null,
+   "focusTime": 699,
+   "focusActorId": "interaction:home-health-visit",
+   "stops": [],
+   "companionIds": [],
+   "interactionIds": [
+    "home-health-visit",
+    "after-hours-call"
+   ],
+   "handoffs": [
+    {
+     "from": "rn",
+     "to": "pcp",
+     "note": "Vitals stable; new medicines reconciled"
+    }
+   ],
+   "roles": [
+    "rn",
+    "home-care"
+   ],
+   "settingId": "home-lin"
   }
  ],
  "heroSpeed": 1.36,
