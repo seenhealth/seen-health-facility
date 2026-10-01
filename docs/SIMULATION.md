@@ -23,8 +23,9 @@ flowchart LR
   E[Activity engine<br/>app/model/activity.ts]
   R[Renderer<br/>app/model/renderer.ts]
   X[Metrics<br/>app/sim/metrics.ts]
+  W[Touchpoint trace<br/>app/sim/trace.ts]
   U[Measure panel<br/>app/components/metrics-panel.tsx]
-  J[Report<br/>scripts/sim-report.mjs → public/models/sim-report.json]
+  J[Report<br/>scripts/sim-report.mjs → public/models/sim-report.json<br/>+ touchpoint-trace.json]
 
   F --> N
   P --> N
@@ -40,6 +41,10 @@ flowchart LR
   B --> X
   X --> U
   X --> J
+  M --> W
+  B --> W
+  W --> U
+  W --> J
 ```
 
 - **Build time** (Node): `scripts/build-scenario.mjs` bundles the TypeScript
@@ -198,7 +203,9 @@ disappears (`visible: false` off duty); `exit` optionally differs.
 npm run build:scenario                  # compile, validate, write tracks JSON
 node scripts/build-scenario.mjs --check # compile and validate only
 node scripts/build-scenario.mjs --check --model path/to/facility.json
-node scripts/sim-report.mjs             # report + public/models/sim-report.json
+node scripts/sim-report.mjs             # report + public/models/sim-report.json + touchpoint-trace.json
+npm run trace:report                    # touchpoint trace only (summary table + JSON)
+npm run validate:trace                  # trace structure, hero coverage, file freshness and size
 ```
 
 Re-run `npm run build:scenario` after changing the facility (e.g. new
@@ -254,7 +261,132 @@ attendee and the same person downstairs) are one person.
 The **Measure** panel (header → Measure) shows occupancy small multiples by zone
 (click to jump the playback), staff time by role and, for the story scenario,
 Mrs. Lin's care team, with a marker synced to the viewer clock. Compare the base
-loop and "With Mrs. Lin's day" with the scenario toggle.
+loop and "With Mrs. Lin's day" with the scenario toggle. Its **Trace** tab lists
+one person's touchpoints end to end (next section).
+
+## Touchpoint trace (digital-twin seed)
+
+`app/sim/trace.ts` turns the same tracks into an **event stream**: an ordered log
+of what happened to whom, where and with whom, for every person on the clock.
+Metrics answer "how much"; the trace answers "what happened to this person, in
+order", which is the shape a digital twin of operations ingests and compares.
+
+```ts
+import { traceTouchpoints, personJourney, traceSummary } from '@/app/sim/trace';
+
+const events = traceTouchpoints(source, model, { step: 1 }); // sorted by t, then actorId
+const lin = personJourney(events, 'hero-lin');               // one person's day
+const totals = traceSummary(events, source);                 // events by kind, coverage
+```
+
+### Event schema
+
+Every event is a `TouchpointEvent`:
+
+| Field | Meaning |
+| --- | --- |
+| `t`, `clock` | loop seconds and the clock label (`clockLabel`), e.g. `144.93`, `9:36 AM` |
+| `actorId`, `actorLabel`, `role` | the person (one event per person involved) |
+| `kind` | one of the kinds below |
+| `zoneId`, `roomId`, `levelId`, `x`, `z` | where: ground zones by point-in-polygon like the engine, rooms by `model.rooms` polygons (`null` in open areas), `site` outdoors |
+| `with` | other actor ids involved (interaction members, the encounter partner, the two staff of a handoff) |
+| `interactionId`, `category`, `title` | the interaction; `title` is also the place name on `enter` and `"RN → PT"` on a handoff |
+| `vehicleId` | the van on `board` / `alight` |
+| `durationSeconds` | coalesced encounters and `interaction-end` |
+
+Events are sorted by `t`, then `actorId`, then a fixed kind order
+(`day-start, alight, on-site, leave, enter, board, off-site, interaction-end,
+handoff, interaction-start, encounter, day-end`), so the output is
+reproducible byte for byte.
+
+### How each kind is derived
+
+The tracer samples every actor every `step` seconds (2 s in the panel, 1 s in
+the report) with the same `sampleFrame` helper metrics uses, so what is traced
+is exactly what is animated.
+
+| Kind | Rule |
+| --- | --- |
+| `day-start` / `day-end` | every person, at 0 s and 720 s |
+| `on-site` / `off-site` | the track becomes visible / hidden (hidden = at home or inside a van) |
+| `enter` / `leave` | the (zone, room) pair changes while visible; a room change inside a zone is a `leave` + `enter` of the same zone |
+| `board` / `alight` | a segment with `vehicleId` and action `ride` begins / ends |
+| `interaction-start` / `-end` | `source.interactions`, one pair per member, at the authored times |
+| `encounter` | two visible people on the same level (or one outdoors) within `encounterRadius` (1.6 m) for at least `minEncounterSeconds` (4 s); breaks shorter than `encounterGapSeconds` (3 s) are bridged; one event per person at the start of the run, with the partner in `with` and the length in `durationSeconds` |
+| `handoff` | a participant's attending staff change role: staff attend through a shared interaction, an `escortFor` link or a `pairedWith` link; when someone of a different role than the most recent attender starts attending at a later sample, the participant gets a `handoff` from that person to the newcomer |
+
+`personJourney` adds per-person zone dwell (from `enter`/`leave`), the IDT
+disciplines met (roles of everyone in `with`, through `care-team.json`),
+encounter and interaction counts and the first/last time on site.
+`traceSummary` counts events by kind, participants with at least one clinical,
+therapy, activities, meals or coordination interaction, and the median events
+per participant.
+
+### Report, export and validation
+
+`npm run sim:report` (or `npm run trace:report` for the trace alone) traces the
+base loop and the story source at 1 s and writes
+`public/models/touchpoint-trace.json`: `{ sources: { base, story } }`, each with a
+`summary` and one event per line, about 1.3 MB for ~4,800 events, under the 3 MB
+bound. Compactness comes from coalescing encounters, not from short keys. The
+console prints events by kind, participants covered per category and the hero's
+discipline coverage. `npm run validate:trace` recomputes the trace and asserts
+ordering, one `day-start`/`day-end` per person, alternating presence, stays and
+rides, start/end pairing per interaction and per person, mutual encounters,
+finite coordinates, determinism, that Mrs. Lin's trace includes every discipline
+the scenario steps' `roles` claim, and that the published file is current and
+within the size bound.
+
+In the viewer, the Measure panel's **Trace** tab has a person picker
+(participants first, then staff, with search), counters (events, encounters,
+disciplines), a zone-dwell strip, the ordered timeline (clock · place · event ·
+who with) and **Download trace (JSON)** for the scenario shown. Clicking an entry
+sets the clock there and follows the person when they are in the scene (the
+story-only cast is traced, but the scene animates the base loop).
+
+### Limits
+
+- The events are derived from composite, scripted tracks, not from records:
+  they show what the model animates, on its compressed clock, not what
+  happened at a center.
+- An encounter is proximity, not conversation: neighbours at a dining table
+  count, passers-by do not (below 4 s), and a 1.6 m radius misses care given
+  from behind a chair or across a treatment bed.
+- Handoffs are inferred from who starts attending next, so they include
+  joint starts (RN and PCP in the same minute both appear as handoffs from the
+  front desk) and they do not know why a handoff happened; the scenario's
+  authored `handoffs` carry that meaning.
+- Rooms are only as good as the room polygons: open areas trace at zone level,
+  and a person walking a corridor along a room boundary may enter and leave it
+  briefly.
+- The in-browser trace samples every 2 s, the report every 1 s, so counts
+  differ slightly between the panel and the file.
+
+### From simulation to operations data
+
+The same event kinds are the join points to real signals. Each row names the
+operational record that would produce the event; none of these integrations
+exist in this repository.
+
+| Trace kind | Real signal |
+| --- | --- |
+| `board` / `alight` | van manifest and boarding log: driver app pickup / drop-off confirmations, vehicle GPS geofence at the home and the center |
+| `on-site` / `off-site` | day-center check-in and check-out: front-desk or kiosk check-in, attendance roster |
+| `enter` / `leave` | room-level location where it exists: scheduled room use, clinic room assignment, badge or indoor positioning if deployed |
+| `interaction` · `clinical` | clinic visit records: encounter open/close times, vitals feed timestamps, medication administration |
+| `interaction` · `rehab` | therapy session notes with start and end times |
+| `interaction` · `meals` | meal service: tray tickets, dietary orders, dining attendance |
+| `interaction` · `activities` | program attendance and engagement notes |
+| `interaction` · `coordination` / `arrivals` | social-work notes, care-coordination tasks, family phone calls and texts, front-desk registration |
+| `encounter` | no direct record; approximated by staff assignment and task logs, or by proximity devices where consented |
+| `handoff` | care-team handoffs: IDT huddle notes, task reassignments, secure messages between disciplines |
+| `day-start` / `day-end` | the day's scheduled attendance and transport manifest |
+
+With such feeds, `TouchpointEvent` becomes the common schema: real events and
+simulated events can be compared per person (did the day go as planned?), per
+zone (where does time go?) and per discipline (who did each participant see?),
+which is the starting point for calibrating the simulation (see the roadmap
+below).
 
 ## Limitations
 

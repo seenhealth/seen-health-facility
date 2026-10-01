@@ -3307,6 +3307,172 @@ td a {
   line-height: 1.5;
   color: #7b928d;
 }
+/* Trace tab: one person's touchpoints end to end (metrics-panel.tsx, TraceTab). */
+.mp-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 10px;
+}
+.metrics-panel .mp-tabs .mp-segment button {
+  min-width: 82px;
+  font-weight: 600;
+}
+.mp-picker {
+  display: grid;
+  gap: 6px;
+  margin-top: 6px;
+}
+.mp-picker input,
+.mp-picker select {
+  font: inherit;
+  font-size: 12px;
+  color: #234c4f;
+  background: #fff;
+  border: 1px solid #cadbd5;
+  border-radius: 7px;
+  padding: 5px 9px;
+}
+.mp-picker select {
+  padding: 3px;
+  scrollbar-width: thin;
+}
+.mp-picker option {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #234c4f;
+}
+.mp-picker option:checked {
+  background: #176e6c;
+  color: #fff;
+}
+.mp-picker optgroup {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #54817e;
+}
+.mp-picker input:focus-visible,
+.mp-picker select:focus-visible {
+  outline: 3px solid #a77f27;
+  outline-offset: 1px;
+}
+.mp-strip {
+  position: relative;
+  height: 16px;
+  margin-top: 8px;
+  background: #e9f0ec;
+  border-radius: 4px;
+}
+.metrics-panel .mp-strip button {
+  position: absolute;
+  top: 0;
+  height: 16px;
+  min-height: 0;
+  min-width: 2px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+}
+.metrics-panel .mp-strip button:hover,
+.metrics-panel .mp-strip button:focus-visible {
+  filter: brightness(1.1);
+  box-shadow:
+    0 0 0 2px #fbfcfa,
+    0 0 0 3px #1d4548;
+  outline: 0;
+  z-index: 1;
+}
+.mp-strip .mp-now {
+  bottom: -4px;
+}
+.mp-trace-axis {
+  margin-top: 4px;
+}
+.mp-timeline {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  max-height: 280px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #dde8e3;
+  border-radius: 10px;
+  scrollbar-width: thin;
+}
+.mp-timeline li + li {
+  border-top: 1px solid #edf2ef;
+}
+.metrics-panel .mp-timeline button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr);
+  column-gap: 8px;
+  row-gap: 1px;
+  align-items: start;
+  text-align: left;
+  min-height: 0;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 12px;
+  color: #234c4f;
+}
+.metrics-panel .mp-timeline button:hover {
+  background: #e9f2ee;
+}
+.mp-timeline time {
+  grid-row: span 2;
+  padding-top: 1px;
+  font-size: 11px;
+  color: #5f7d79;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.mp-timeline .what {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-weight: 600;
+  color: #183f42;
+}
+.mp-timeline .what i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.mp-timeline .where {
+  font-size: 11px;
+  color: #5f7d79;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mp-timeline li.muted .what {
+  font-weight: 500;
+  color: #6f8a86;
+}
+.mp-timeline li.muted .what i {
+  opacity: 0.55;
+}
+.mp-timeline li[aria-current] button {
+  background: #e3efeb;
+  box-shadow: inset 3px 0 0 #176e6c;
+}
+.metrics-panel .mp-download {
+  width: 100%;
+  margin-top: 10px;
+  font-weight: 600;
+}
 @media (max-width: 800px) {
   .metrics-panel {
     top: auto;
