@@ -90,6 +90,8 @@ const ownTitle = (title = '', actorLabel: string) => {
 function describe(
   e: TouchpointEvent,
   vehicleLabel: (id: string) => string,
+  /** At a home or partner site rather than the center. */
+  away = false,
 ): string {
   switch (e.kind) {
     case 'day-start':
@@ -97,9 +99,9 @@ function describe(
     case 'day-end':
       return 'Day ends';
     case 'on-site':
-      return 'Arrives on site';
+      return away ? 'Comes into view' : 'Arrives on site';
     case 'off-site':
-      return 'Leaves the site';
+      return away ? 'Goes out of view' : 'Leaves the site';
     case 'enter':
       return 'Enters';
     case 'leave':
@@ -366,7 +368,11 @@ function TraceTab({
               <time>{e.clock}</time>
               <span className="what">
                 <i style={{ background: KIND_COLOR[e.kind] }} />
-                {describe(e, vehicleLabel)}
+                {describe(
+                  e,
+                  vehicleLabel,
+                  !!source.zones?.some((z) => z.id === e.zoneId),
+                )}
               </span>
               <span className="where">
                 {place(e)}
