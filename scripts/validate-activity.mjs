@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import * as T from 'three';
 import {
   activityData,
@@ -459,8 +459,14 @@ const n = buffer.readUInt32LE(12),
 assert.equal(gltf.skins.length, 15);
 assert.equal(gltf.animations.length, 270);
 assert.ok(gltf.animations.some((a) => a.name === 'cast-doctor:walk'));
-writeFileSync('public/models/seen-health-animated-cast.glb', buffer);
+// The checked cast is written to work/ so validation leaves the tree clean;
+// `--out public/models` publishes it.
+const out = process.argv.includes('--out')
+  ? process.argv[process.argv.indexOf('--out') + 1]
+  : 'work/validation';
+mkdirSync(out, { recursive: true });
+writeFileSync(`${out}/seen-health-animated-cast.glb`, buffer);
 console.log(
-  `Validated ${activity.actors.length} actors, ${activityData.roles.length} roles, ${samples} path samples, ${minWall.toFixed(3)}m minimum wall clearance; pause, repeat, seek, speed, synchronized pairs, levels and 3D context. Exported 15 rigs and 270 clips (${(buffer.length / 1024 / 1024).toFixed(2)} MB).`,
+  `Validated ${activity.actors.length} actors, ${activityData.roles.length} roles, ${samples} path samples, ${minWall.toFixed(3)}m minimum wall clearance; pause, repeat, seek, speed, synchronized pairs, levels and 3D context. Exported 15 rigs and 270 clips (${(buffer.length / 1024 / 1024).toFixed(2)} MB) to ${out}/.`,
 );
 activity.dispose();

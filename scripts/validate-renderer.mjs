@@ -521,7 +521,12 @@ const headlessThree = {
 };
 const isThree = (id) => /^three(\/.*)?$/.test(id);
 
-function installGlobals(canvas) {
+/**
+ * Install the DOM stand-ins as globals (document, canvas, animation frames,
+ * ResizeObserver, FileReader). Validators that build canvas-textured meshes
+ * without a viewer call this directly.
+ */
+export function installHeadlessGlobals({ canvas } = {}) {
   harness.canvasModule = canvas || null;
   const globals = {
     document: new HeadlessDocument(canvas),
@@ -574,7 +579,7 @@ function installGlobals(canvas) {
  * omitted, canvases accept drawing calls and keep no pixels.
  */
 export async function loadHeadlessViewer({ canvas } = {}) {
-  installGlobals(canvas);
+  installHeadlessGlobals({ canvas });
   const { renderer, schema } = await loadSim(
     { renderer: 'app/model/renderer.ts', schema: 'app/model/schema.ts' },
     {
