@@ -88,11 +88,11 @@ Camera angles: world axes are +x east, +z north, y up. The camera sits at target
 
 **Network beat.** After the team introduction the camera pulls out to the whole care network (`NETWORK_SHOT`, `place: 'network'`): the target and zoom come from the community layer’s `frame()` (its zoom times the shot’s `zoom` factor, so the framing follows as settings are added). It is seen from the east (azimuth ≈ π/2), where the network is about 115 m across the screen against about 210 m from the default iso, so all five pads and the center fit between the card and the team panel. The card (“Beyond the building · One team, many places.”) lists the places the cutaways visit.
 
-**Cutaways.** Scenario steps with `placement.mode: 'cutaway'` (`docs/SIMULATION.md`) add no tracks: they name a care setting (`settingId`), the community interactions they feature (`interactionIds`) and external `partners`. On screen they are shorter chapters (150vh against 190vh) with a “Meanwhile, across the network” line, discipline chips plus grey partner chips, and their handoffs. Their shots anchor through the layer, never through world coordinates: `place: { setting, room?, anchor? }` resolves to the centre of `room` in the setting’s facility instance once one is stamped (`instance(id).roomCenter`), else to the registry anchor named `anchor` (the places the cast uses, e.g. `porchSeat`, already in world coordinates), else to the pad centre (`frame(setting)`). Without the community layer the camera falls back to the building. Mrs. Lin’s name tag only shows in her own chapters.
+**Cutaways.** Scenario steps with `placement.mode: 'cutaway'` (`docs/SIMULATION.md`) add no tracks: they name a care setting (`settingId`), the community interactions they feature (`interactionIds`) and external `partners`. On screen they are shorter chapters (150vh against 190vh) with a “Meanwhile, across the network” line, discipline chips plus grey partner chips, and their handoffs. Their shots anchor through the layer, never through world coordinates: `place: { setting, room?, anchor? }` resolves to the centre of `room` in the setting’s facility instance once one is stamped (`instance(id).roomCenter`), else to the registry anchor named `anchor` (the places the cast uses, e.g. `counterBack`, already in world coordinates), else to the pad centre (`frame(setting)`). Without the community layer the camera falls back to the building. Mrs. Lin’s name tag only shows in her own chapters.
 
-**Counters.** Mrs. Lin’s touchpoints (43) and handoffs (15) neither jump nor reset during a cutaway. The “Across the network” counter adds each cutaway’s roles (13 by the end), and the finale adds a fifth total, “moments across the network” (6), between handoffs and the shared care plan; the finale copy mentions them too. The swimlane gives cutaways narrower columns with a setting badge, hollow discipline dots, a dashed band and a dot in a “Partners” lane naming the external roles; Mrs. Lin’s path joins her own moments and passes behind them. Its screen-reader table has a “Where” column (“With Mrs. Lin”, “At the center, team meeting” or the setting).
+**Counters.** Mrs. Lin’s touchpoints (43) and handoffs (15) neither jump nor reset during a cutaway. The “Across the network” counter adds each cutaway’s roles (14 by the end), and the finale adds the same count as a fourth total, “14 touchpoints across the network · 6 moments”, between handoffs and the shared care plan (both read `networkTotals` in `app/story/data.ts`); the finale copy mentions the moments too. The swimlane gives cutaways narrower columns with a setting badge, hollow discipline dots, a dashed band and a dot in a “Partners” lane naming the external roles; Mrs. Lin’s path joins her own moments and passes behind them. Its screen-reader table has a “Where” column (“With Mrs. Lin”, “At the center, team meeting” or the setting).
 
-**The Wongs’ morning (integration point).** At this commit the featured interaction `home-personal-care` runs 52–71 s on the porch, so `network-home-am` plays 50–58 s, the pharmacy 26–50 s, and the pickup chapter opens at 58 s with Van A already docked and its ramp down. When the home instance re-times personal care indoors to ≈ 30–72 s, move the two steps to `HOME_AM_RETIME.target` in `app/sim/story-timeline.ts` (home 34–42 s with kicker “8:25 AM”, pharmacy 26–34 s) and run `npm run build:scenario`; the pickup chapter then opens on the docking at 42 s. `node scripts/build-scenario.mjs --check` prints a READY notice as soon as the composed source covers the target window, and another when `partner-rn-review` exists (feature it in `network-partner` with the `rn` role).
+**The stamped buildings.** The Wongs’ home and the partner day center are facility instances cut away at 1.2 m, so their cutaways frame an instance room (`home-kitchen`, `home-living`, `rehab-open`) from above (elevation 0.86–1.0 for the home) rather than a porch or pad anchor. The home’s morning plays 50–58 s on breakfast and the morning pills at the seated worktop (`home-meal-meds`, 52–64 s in the home cast: the aide sets up and opens the blister at 56.2–58.2 s); the pharmacy keeps 26–50 s and the pickup chapter opens at 58 s with Van A already docked and its ramp down. The partner cutaway features the visiting PT and, at the nurse station across the plan, the visiting RN’s medication review (`partner-rn-review`); the camera follows the PT.
 
 ## Chapters and scenario steps
 
@@ -102,14 +102,14 @@ Chapters come straight from `app/data/scenarios/day-in-the-life.json`, in order.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | `huddle` | 0–40 | 0–26 | 8:00 AM–8:17 AM | `upperfit-conference` | 4.10 · 0.62 · 0.72 | no (team meeting) |
 | 2 | `network-pharmacy` (cutaway) | 26–50 | 26–50 | 8:17 AM–8:33 AM | `pharmacy` · `counterBack` | 2.90 · 1.30 · 0.50 | `pharmacy-packing` |
-| 3 | `network-home-am` (cutaway) | 50–58 | 50–58 | 8:33 AM–8:38 AM | `home-lin` · `porchSeat` | 3.30 · 1.12 · 0.72 | `home-personal-care` |
+| 3 | `network-home-am` (cutaway) | 50–58 | 50–58 | 8:33 AM–8:38 AM | `home-lin` · instance room `home-kitchen` (`door`) | 4.60 · 1.12 · 0.86 | `home-meal-meds` |
 | 4 | `pickup` | 40–120 | 58–120 | 8:38 AM–9:20 AM | arrival kerb & ramp | 2.70 · −0.72 · 0.50 | yes, 40 m |
 | 5 | `checkin` | 120–140 | 120–140 | 9:20 AM–9:33 AM | `lobby-arrival` | 4.60 · −0.35 · 0.62 | yes |
 | 6 | `clinic` | 140–178 | 140–178 | 9:33 AM–9:58 AM | `clinic-nurse` | 4.40 · 0.28 · 0.68 | yes |
 | 7 | `therapy` | 178–240 | 178–232 | 9:58 AM–10:34 AM | `rehab-open` | 2.90 · −0.50 · 0.62 | yes |
 | 8 | `network-specialist` (cutaway) | 232–240 | 232–240 | 10:34 AM–10:40 AM | `specialist` · `examSeat` | 3.00 · 0.22 · 0.42 | `specialist-visit` |
 | 9 | `program` | 240–290 | 240–289 | 10:40 AM–11:12 AM | `day-open` | 2.60 · 0.30 · 0.66 | yes |
-| 10 | `network-partner` (cutaway) | 289–300 | 289–300 | 11:12 AM–11:20 AM | `partner-adc` · `ptStand` (instance room `rehab-open`) | 2.80 · 0.50 · 0.64 | `partner-pt` |
+| 10 | `network-partner` (cutaway) | 289–300 | 289–300 | 11:12 AM–11:20 AM | `partner-adc` · instance room `rehab-open` (`ptStand`) | 2.80 · 0.50 · 0.64 | `partner-pt`, `partner-rn-review` |
 | 11 | `lunch` | 290–350 | 300–350 | 11:20 AM–11:53 AM | `dining-1421` | 4.20 · 0.62 · 0.66 | yes |
 | 12 | `social-work` | 350–392 | 350–392 | 11:53 AM–12:21 PM | `admin-side-office` | 5.20 · 0.85 · 0.72 | yes |
 | 13 | `personal-care` | 392–440 | 392–440 | 12:21 PM–12:53 PM | `rear-wc-east` | 5.20 · 0.50 · 0.92 | yes |
@@ -118,7 +118,7 @@ Chapters come straight from `app/data/scenarios/day-in-the-life.json`, in order.
 | 16 | `farewell` | 525–552 | 525–552 | 1:50 PM–2:08 PM | `lobby-arrival` | 4.60 · −0.45 · 0.60 | yes |
 | 17 | `ride-home` | 552–624 | 552–624 | 2:08 PM–2:56 PM | arrival kerb & ramp | 2.60 · −0.95 · 0.48 | yes, 40 m |
 | 18 | `care-plan` | 624–720 | 624–690 | 2:56 PM–3:40 PM | `upperfit-conference` | 3.30 · 1.05 · 0.74 | no (team meeting) |
-| 19 | `network-home-pm` (cutaway) | 690–712 | 690–712 | 3:40 PM–3:54 PM | `home-lin` · `wheelchairSpot` | 3.30 · 1.12 · 0.72 | `home-health-visit`, `after-hours-call` |
+| 19 | `network-home-pm` (cutaway) | 690–712 | 690–712 | 3:40 PM–3:54 PM | `home-lin` · instance room `home-living` (`door`) | 5.00 · 0.85 · 1.00 | `home-health-visit`, `after-hours-call` |
 
 Small screens multiply chapter zoom by 1.45 (the stage there is about 56 % of the viewport height); the opening, team and network beats use 1.3.
 
@@ -145,7 +145,7 @@ To tune a shot, open the story with `?debug=1` and run `__story.director.debug()
 | `app/story/idt-panel.tsx`, `idt-geometry.ts` | Team ring (intro, step, mesh, network and away modes), arrows, captions, counters, day-flow strip |
 | `app/story/swimlane.tsx` | Finale flowchart (roles × moments), with a table for screen readers |
 | `app/story/data.ts` | Typed access to the scenario and team JSON, derived totals (Mrs. Lin’s and the network’s), scrub windows |
-| `app/sim/story-timeline.ts` | `scrubWindows` (hero chapters clipped around cutaways) and `HOME_AM_RETIME`; shared by the story, `build-scenario` and `test/story-timeline.test.ts` |
+| `app/sim/story-timeline.ts` | `scrubWindows` (hero chapters clipped around cutaways); shared by the story, `build-scenario` and `test/story-timeline.test.ts` |
 | `app/story/hero-source.ts` | Activity tracks and hero id adapter |
 | `app/story/story.css` | All story styles, scoped to `.story-root` / `.story-*` |
 | `story/site/index.html`, `story/site/main.tsx`, `vite.story.config.ts` | Standalone build. The entry sits in `story/site/` because a root-level `story/index.html` would be served by the vinext dev server in place of the `/story` route. |

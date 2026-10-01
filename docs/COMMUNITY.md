@@ -44,7 +44,8 @@ loop. The renderer, the Measure panel (metrics and trace), the story scenario
 (`composedStorySource`), `scripts/sim-report.mjs` and `scripts/validate-trace.mjs`
 all read it, so every count, trace and report describes the people the scene
 animates (220 in the base loop: the center's 167, the fleet crew's 10 and the
-community's 43, of whom 25 are generated inside the partner day center). When
+community's 43, of whom 31 are generated inside facility instances: 25 in the
+partner day center and 6 in the Wongs' home). When
 the played source carries the `community` view, `renderer.ts` passes
 `registerCommunityVehicles` to `createActivity` (which rejects a seat in an
 unregistered vehicle), builds the layer, ticks it, sizes the sun's shadow
@@ -129,9 +130,9 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 | Clock | Where | What |
 | --- | --- | --- |
 | 8:00–8:55 | Pharmacy | Pharmacist and technician pack and check blister packs; courier loads at 8:52, leaves 9:01. |
-| 8:18 | Home | Personal care aide arrives by car (in along the north street's western reach), personal care on the porch 8:35–8:47. |
+| 8:00–8:49 | Home | Mrs. Wong wakes, toilets, washes and dresses her top half on her own; the personal care aide parks at 8:19 (in along the north street's western reach) and is at the front door at 8:29: breakfast and the morning pills at the seated kitchen worktop 8:35–8:43, stockings and shoes on the entry bench. |
 | 8:38–9:14 | Hospital | Ambulance in along the north street's eastern reach to the ED; hospitalist takes the handoff (8:41–9:05). |
-| 9:15 | Home | Mrs. Wong (walker) down the new ramp and up the van ramp; the Seen van leaves at 9:15 with the escort aide and driver. |
+| 8:54–9:15 | Home | Mrs. Wong (walker) out of the front door behind her aide, down the new ramp and up the van ramp; the Seen van leaves at 9:15 with the escort aide and driver. |
 | 9:27 | Home | Courier hands the pill packs to the aide; then to the center's rear receiving (10:04–11:28) and back to the pharmacy by 12:40. |
 | 9:55–10:45 | Specialist clinic | Drop-off under the canopy, check-in, vitals by the MA, cardiology follow-up 10:17–10:42; van leaves 11:02 and returns by the south and west streets. |
 | 8:00–12:00 | Partner ADC | Twenty participants settle at the day-room tables (two wheelchair places at table ends); the activities lead welcomes them, the aide serves coffee, the partner nurse charts at the nurse station all day. |
@@ -142,11 +143,11 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 | 12:01–13:03 | Partner ADC | Lunch in the dining room: participants come in staggered from 12:00 to 12:20, the aide sets up and serves, two chairs are left out for the wheelchairs; she clears up until 14:30. |
 | 13:20–16:00 | Partner ADC | Seated music led from the front of the day room (the lead sets up from 12:13; walkers and wheelchairs join a little later), then afternoon conversation at the same tables. |
 | 10:30–10:55 | Hospital | Rounds with the Seen liaison nurse, hospitalist and case manager. |
-| 11:40 | Home | Van home; aide meets her, follows her up the ramp and stays for the indoor care (toileting, shower, dressing, lunch); she walks back to her car at 12:57 and drives off at 13:12. |
-| 12:05 | Home | Home-delivered lunch and wellness check (meals car on the outer lane; it leaves by the inner lane's exit, round the aide's parked car; back at the center by 13:00). |
-| 13:00–14:30 | Home | OT and installer fit grab bars and finish the ramp rails with Mrs. Wong. |
+| 11:45–13:12 | Home | Van home; the aide meets her and follows her up the ramp and in (12:07); after the clinic: toileting, the assisted shower and dressing, lunch at the dining table; the aide hands over to the OT on the porch at 13:00 and drives off at 13:12. |
+| 12:14 | Home | Home-delivered lunch handed to the aide at the front door, a wellness check with Mrs. Wong on the entry bench (meals car on the outer lane; it leaves by the inner lane's exit, round the aide's parked car; back at the center by 13:00). |
+| 13:02–14:28 | Home | OT and installer: dry-run toilet and shower transfers with Mrs. Wong, Mr. Wong's side of the bed, the swing-up grab bar fitted (13:48–14:00) while the OT checks the porch ramp, then the sign-off. |
 | 13:30–13:50 | Hospital | Discharge huddle; 14:10–14:16 Mr. Wong wheeled to the Seen van; van leaves 14:23. |
-| 15:07 | Home | Mr. Wong home: driver wheels him up the porch ramp; home health nurse (walked in from the road end at 14:40) does vitals and medication reconciliation. |
+| 15:08–15:52 | Home | Mr. Wong home: the driver wheels him up the porch ramp to the front door (15:28) and he rolls in beside his armchair; the home health nurse (in at 15:08 from the road end) checks his transfer, vitals and medicines and leaves at 15:52. |
 | 15:40–15:52 | Home ↔ center | 24/7 nurse line call between the upstairs RN and Mrs. Wong. |
 
 ## Facility instances
@@ -355,54 +356,55 @@ walks or times.
 }
 ```
 
-Two **scheduled people** on the Wongs' home plan (`seen-home-wong`; this
-file generates and validates as written): a home health nurse visits through
-the front door (`door` anchor) from 642.5 to 709.5 s, with a 15 s trip to her
-car (`away`), and Mrs. Wong, a resident, starts the day in bed and ends it on
-the sofa (points with `seat`), with her clinic trip as an `away` window.
-Their time outside is filled by hand-authored legs (below); `nurse-line-rn`
-is a hand-authored actor outside the cast. A resident who comes home during
-the day (Mr. Wong from hospital) writes `arrive: { t: 672, anchor: 'door' }`
-and `leave: { t: 720, anchor: 'door' }`; his hospital day fills the
-`before` hole.
+Three **scheduled people** from the Wongs' home (`app/data/community/
+home-lin.cast.json`, abridged to a few stops each): the home health nurse
+visits through the front door (`door` anchor) from 642.5 to 708 s; Mrs. Wong,
+a resident, starts the day in bed and ends it on the sofa (points with `seat`)
+with her clinic trip as an `away` window; Mr. Wong comes home from hospital at
+672 s, so his hospital day fills the `before` hole. Their time outside is
+filled by hand-authored legs (below); `nurse-line-rn` and `community-driver`
+are hand-authored actors outside the cast.
 
 ```json
 {
   "setting": "home-lin", "facility": "seen-home-wong",
   "people": [
     { "id": "home-rn", "role": "nurse", "label": "Home health nurse", "variant": 5, "gait": 1.35,
-      "arrive": { "t": 642.5, "anchor": "door" }, "leave": { "t": 709.5, "anchor": "door" },
-      "away": [[678, 693]],
+      "arrive": { "t": 642.5, "anchor": "door" }, "leave": { "t": 708, "anchor": "door" },
       "stops": [
-        { "window": [650, 652.5], "roomId": "home-kitchen", "at": [-3.89, -5.3], "heading": 3.142,
+        { "window": [651, 653], "roomId": "home-kitchen", "at": [-3.89, -5.3], "heading": 3.142,
           "action": "serve", "title": "Washes her hands" },
-        { "window": [657, 666], "roomId": "home-dining", "at": [0.8, -3.95], "heading": -2.507,
-          "action": "document", "title": "Reads the discharge summary" },
-        { "window": [671, 675], "roomId": "home-living", "at": [2.12, -0.4], "heading": 0.562,
-          "action": "consult", "title": "Checks her blood pressure", "with": ["home-participant"],
-          "interaction": { "id": "home-health-visit", "category": "home", "label": "Home health visit",
-                           "description": "Vitals on the sofa." } },
-        { "window": [698, 702], "roomId": "home-living", "at": [2.12, -0.4], "heading": 0.562,
-          "action": "conversation", "title": "Warning signs and the nurse-line number" }
+        { "window": [683.5, 692], "roomId": "home-living", "at": [2.12, 0.05], "heading": 0.562,
+          "action": "treat", "title": "Vitals: blood pressure, pulse, oxygen, temperature; skin check",
+          "with": ["hospital-participant", "home-participant"],
+          "interaction": { "id": "home-health-visit", "category": "home",
+                           "label": "Post-discharge home health visit", "description": "…",
+                           "window": [683.5, 700] } }
       ] },
     { "id": "home-participant", "role": "participant", "label": "Mrs. Wong · at home", "variant": 3,
       "mobility": "walker", "gait": 1.1,
       "arrive": { "t": 0.5, "anchor": [-4.6, 3.3] }, "leave": { "t": 720, "anchor": "door" },
       "away": [[80.5, 370]],
       "stops": [
-        { "window": [0.5, 20], "roomId": "home-primary", "at": [-4.6, 3.3], "heading": 3.142,
-          "seat": "home-primary-bed", "seated": true, "action": "seated", "title": "Awake on her side of the bed" },
-        { "window": [45, 65], "roomId": "home-kitchen", "at": "home-kitchen-chair", "action": "tabletop",
-          "title": "Breakfast at the seated worktop" },
-        { "window": [72.5, 77.5], "roomId": "home-living", "at": "home-living-entry-bench", "action": "seated",
-          "title": "Shoes on at the entry bench" },
-        { "window": [374, 386], "roomId": "home-living", "at": "home-living-entry-bench", "action": "seated",
-          "title": "Resting after the clinic" },
-        { "window": [521, 720], "roomId": "home-living", "at": [0.6, 0.78], "heading": 0,
-          "seat": "home-living-sofa", "seated": true, "action": "listen", "title": "On the sofa, the news on",
-          "with": ["nurse-line-rn"],
-          "interaction": { "id": "after-hours-call", "category": "after-hours", "label": "Nurse line call",
-                           "description": "The evening plan by phone.", "window": [690, 708] } }
+        { "window": [0.5, 4], "roomId": "home-primary", "at": [-4.6, 3.3], "heading": 3.142,
+          "seat": "home-primary-bed", "seated": true, "action": "seated",
+          "title": "Awake on her side of the bed, walker at hand" },
+        { "window": [56, 64], "roomId": "home-kitchen", "at": "home-kitchen-chair", "action": "tabletop",
+          "title": "Breakfast and morning pills at the 0.76 m worktop" },
+        { "window": [71.7, 74], "roomId": "home-living", "at": "home-living-entry-bench", "action": "seated",
+          "title": "Stockings and shoes on the entry bench" },
+        { "window": [708, 720], "roomId": "home-living", "at": [1.7, 0.78], "heading": 0,
+          "seat": "home-living-sofa", "seated": true, "action": "seated", "title": "Home together, the TV on" }
+      ] },
+    { "id": "hospital-participant", "role": "participant", "label": "Mr. Wong · inpatient, discharged home",
+      "variant": 8, "mobility": "wheelchair", "gait": 1,
+      "arrive": { "t": 672, "anchor": "door" }, "leave": { "t": 720, "anchor": "door" },
+      "stops": [
+        { "window": [690, 708], "roomId": "home-living", "at": [2.58, 0.78], "heading": -0.35,
+          "action": "conversation", "title": "Nurse-line call on speakerphone",
+          "with": ["nurse-line-rn", "home-participant"],
+          "interaction": { "id": "after-hours-call", "category": "after-hours",
+                           "label": "Nurse line call · evening plan", "description": "…" } }
       ] }
   ]
 }
@@ -458,40 +460,42 @@ one hidden placeholder segment in the generated track and an entry in
 the arrive anchor for a `before` hole and the leave anchor otherwise, so both
 are the door for a visit through it).
 
-Legs are registered per actor id in `HOLE_LEGS` in `community-people.ts`:
+Legs are registered per actor id in `HOLE_LEGS` in `community-people.ts`,
+each person's legs listed by the exact hole they fill:
 
 ```ts
-const HOLE_LEGS: Record<string, (hole: InstanceHole, setting: CareSetting) => Segment[] | undefined> = {
-  'home-participant': (hole, s) =>
-    hole.kind === 'away' && hole.start === 73 && hole.end === 374.5
-      ? wongClinicLeg(hole, settingZone(s.id))  // a Track from hole.from at hole.start … segmentsTo(hole.end)
-      : undefined,                              // no legs: the placeholder stays, hidden
+const HOLE_LEGS: Record<string, Leg> = {
+  'home-participant': byWindow('home-participant', {
+    'before 0–0.5': () => undefined,  // listed, no leg: the placeholder stays, hidden
+    'away 80.5–370': (hole, s) => wongClinicLeg(hole, settingZone(s.id)),
+  }),
+  'home-pca': byWindow('home-pca', aideLegs),  // 'before 0–44', 'away 77–152.5', …
+  // home-ot, home-installer, home-rn, hospital-participant
 };
 ```
 
-The function receives every hole of that person and returns the segments
-that replace it, or nothing to leave it hidden; match on `kind` and the
-window so a re-timed cast cannot silently pick up the wrong leg.
-`fillHoles` (`instance-cast.ts`) then requires, per filled hole, that the
-first segment starts at `hole.start` and the last ends at `hole.end` (it
-covers the hole exactly), that the first point is `hole.from` unless the hole
-is `before` (the day may start anywhere) and the last point is `hole.to`
-unless it is `after` (the day may end anywhere), within 5 cm; segments may be
-hidden or ride a vehicle inside. A hand-authored leg is typically a `Track`
-(`community-track.ts`) built with `start: hole.start` at `hole.from` and
-closed with `segmentsTo(hole.end)`, ending with a walk onto `hole.to`; a
-`before` leg is the visitor's arrival (hidden off the map, then a walk up to
-the door by `hole.end`), an `after` leg the departure from the door. An actor
-id is either generated or hand-authored, never both (`communitySource`
-throws), and an interaction id is defined once in the composed source
-(`composeSources` throws on duplicates). Mrs. Wong's clinic trip is written
-this way (`wongClinicTrip(track, back)`, `wongClinicLeg(hole, zoneId)`), ready
-for the day her home is an instance: `test/community-cast.test.ts` generates
-her on a stand-in house with `away: [[73, 374.5]]`, fills the hole from the
-front door and back, and checks the composed day against the hand-authored
-one; its trip times are fixed by the Seen van (on board 108.5–181 and
-257.5–337 s), so a cast with another away window re-times the walks at either
-end of the trip.
+`byWindow` keys a person's legs by `<kind> <start>–<end>` and throws on a hole
+it does not list, so a re-timed cast fails the build instead of silently
+picking up the wrong leg or leaving someone hidden; a listed leg may return
+nothing to keep the placeholder. `fillHoles` (`instance-cast.ts`) then
+requires, per filled hole, that the first segment starts at `hole.start` and
+the last ends at `hole.end` (it covers the hole exactly), that the first point
+is `hole.from` unless the hole is `before` (the day may start anywhere) and
+the last point is `hole.to` unless it is `after` (the day may end anywhere),
+within 5 cm; segments may be hidden or ride a vehicle inside. A leg is
+typically a `Track` (`community-track.ts`; `legTrack(id, role, hole, s,
+start?)` starts one at `hole.start`) closed with `segmentsTo(hole.end)`,
+ending with a walk onto `hole.to`; a `before` leg is the visitor's arrival
+(hidden off the map, then a walk up to the door by `hole.end`), an `after` leg
+the departure from the door. An actor id is either generated or hand-authored,
+never both (`communitySource` throws), and an interaction id is defined once
+in the composed source (`composeSources` throws on duplicates).
+`test/community-cast.test.ts` generates Mrs. Wong on a stand-in house with
+`away: [[80.5, 370]]`, fills the hole from the front door and back with
+`wongClinicLeg`, and checks that the composed source carries the same trip in
+the real home's away window; the trip's times between the door passes are
+fixed by the Seen van (on board 108.5–181 and 257.5–337 s), so a cast with
+another away window re-times the walks at either end of it.
 
 ### The partner adult day center
 
@@ -527,17 +531,18 @@ Seen layout" and its rooms "Partner ADC · Day room" and so on; Measure counts
 one occupancy series for the pad (25 people). Nobody arrives by van yet (see
 Roadmap hooks).
 
-## The Wongs' home
+### The Wongs' home
 
-The `home-lin` pad gets a real floor plan: `public/models/seen-home-wong.json`,
-a schema 2.0 facility specification of an illustrative senior-friendly
-bungalow, informed by typical Alhambra and San Gabriel Valley two-bedroom
-listings and by 2010 ADA Standards / ICC A117.1 guidance. It is not a real
-home or address and uses no participant records. Until the facility-instance
-chassis (SPEC-facility-instance) stamps it on the pad, the scene keeps the
-bungalow massing and the porch choreography.
+The `home-lin` pad stamps `public/models/seen-home-wong.json`, a schema 2.0
+facility specification of an illustrative senior-friendly bungalow, informed
+by typical Alhambra and San Gabriel Valley two-bedroom listings and by 2010
+ADA Standards / ICC A117.1 guidance. It is not a real home or address and uses
+no participant records. Its six people (Mrs. Wong, her personal care aide, the
+OT, the home-mods installer, the home health nurse and Mr. Wong) are generated
+inside it from `app/data/community/home-lin.cast.json`; everything they do
+outside is a hole leg.
 
-### Plan
+#### Plan
 
 13.0 × 9.0 m (117 m², 1,259 sq ft), two bedrooms and one bath on one floor,
 behind the existing 8.0 × 2.6 m porch and ramp. Plan frame P: metres, origin at
@@ -570,60 +575,74 @@ centred on the 0.2 m navigation grid so each 0.9 m door passes a wheelchair
 `app/model/home-assets.ts`; their fronts are in each asset's
 `parameters.front`.
 
-### On the pad
+#### On the pad
 
-`careSettings` `home-lin` carries `facility` (the `CareFacility` type of
-SPEC-facility-instance §5.1, read by the chassis):
-`{ id: 'seen-home-wong', url: '/models/seen-home-wong.json', frame: { position:
-[0, −10.8], heading: −π/2 }, levelIds: ['ground'], excludeZoneIds:
-['home-zone-porch'], cutaway: true, floorY: PORCH_Y, labels: {…}, margin: 1.6 }`
-and `pad.back: 8` (the pad may grow 8 m west; front edge, drive and anchors stay
-put). The frame puts the front door's opening 0.10 m from the `door` anchor and
-the front wall's face on the porch slab's back edge (local z −7.6, `HOME_PORCH`
-in `community-pads.ts`); the drawn footprint stays 0.10 m clear of the porch
-slab, which the pad keeps drawing (hence the excluded porch zone), and more
-than 3 m from the drive. The derived pad would need `back` 5.8 m and a 16.2 m
-width. Name plates (Living room, Kitchen, Bath) go only where the name reads
-at the room's label anchor: the instance's 3.6 m floor plate would put a
-bedroom's or the dining nook's name under the bed or the table, and the bath's
-name stays short to clear the shower.
+`careSettings` `home-lin`: `facility: { id: 'seen-home-wong', url:
+'/models/seen-home-wong.json', frame: { position: [0, −10.8], heading: −π/2 },
+levelIds: ['ground'], excludeZoneIds: ['home-zone-porch'], cutaway: true,
+floorY: PORCH_Y, labels: {…}, margin: 1.6 }` and `pad.back: 8` (the pad grows
+8 m west; front edge, drive and anchors stay put). The frame puts the front
+door's opening 0.10 m from the `door` anchor and the front wall's face on the
+porch slab's back edge (local z −7.6, `HOME_PORCH` in `community-pads.ts`); the
+drawn footprint stays 0.10 m clear of the porch slab, which the pad's site
+builder keeps drawing with its ramp, rail gap and half step at `porchStep`,
+bench and the home-mods crate (hence the excluded porch zone), and more than
+3 m from the drive. The derived pad needs `back` 5.8 m and a 16.2 m width.
+Name plates (Living room, Kitchen, Bath) go only where the name reads at the
+room's label anchor: the instance's 3.6 m floor plate would put a bedroom's or
+the dining nook's name under the bed or the table, and the bath's name stays
+short to clear the shower. The bungalow massing draws only while the instance
+loads or if it fails.
 
-### The ADL day
+#### The ADL day
 
-`app/data/community/home-lin.cast.json` is the day inside the house for the
-build-time cast pipeline (`scripts/build-community-tracks.mjs`). People keep
-their community ids; positions are facility-local; each stop is a stationary
-hold over its `window` and the gap to the next stop is the walk, sized for the
-person's `gait`; `arrive`/`leave` are front-door passes of visitors and `away`
-windows the residents' times out (outdoor legs stay in `community-people.ts`).
-Seats on chairs and benches are object ids (`seatPose`); seats on a bed, sofa,
-toilet or shower are a point, a heading and `seat`. Each interaction is defined
-once, on one stop, with the other actors in `with`.
+The cast follows the schema above. Every walk has 1.5–2 s of slack over its
+plain route at the person's gait (a few one-metre steps in the kitchen and
+bath about 1 s) and door passes are at least 2 s apart, so the generator can
+stagger people in a small house; the build reports a closest pair of 0.65 m.
 
 | Clock | Who | Where | What |
 | --- | --- | --- | --- |
-| 8:00–8:21 | Mrs. Wong | bedroom, bath | Wakes, toilets on her own (raised seat, bars), washes at the roll-under basin, dresses her top half in the dressing chair |
+| 8:00–8:20 | Mrs. Wong | bedroom, bath | Wakes, toilets on her own (raised seat, bars), washes at the roll-under basin, dresses her top half in the dressing chair |
 | 8:29–8:43 | Aide, Mrs. Wong | kitchen | Aide in at 8:29: check-in, congee on the front-control range, breakfast and the morning blister at the seated worktop |
-| 8:48–8:53 | Aide, Mrs. Wong | entry bench | Stockings, Velcro shoes and jacket; out to the van at 8:53 |
-| 9:41–11:30 | Aide | whole house | Files the new pill packs, remakes the bed for two, laundry, cleans bath and kitchen, clears the route to the armchair |
-| 12:06–12:17 | Mrs. Wong, aide, meals driver | entry bench, front door | Rest after the clinic; meal hand-off at the door at 12:14 |
-| 12:23–12:44 | Mrs. Wong, aide | bath, bedroom | Toileting help, transfer, assisted shower on the fold-down seat, dressing |
-| 12:47–12:59 | Aide, Mrs. Wong | kitchen, dining | Lunch heated and set up, visit logged; aide out at 12:59, car away at 1:12 |
-| 1:02–2:28 | OT, installer, Mrs. Wong | dining, bath, bedroom, ramp | Bar heights, dry-run toilet and shower transfers, bed handle, swing-up bar, ramp check, sign-off |
-| 1:47–3:30 | Mrs. Wong | sofa | Rests; welcomes Mr. Wong home |
-| 3:08–3:46 | Home health nurse | kitchen, dining, living | Washes, sets up, meets Mr. Wong, checks his transfer technique, vitals, medication reconciliation, warning signs |
+| 8:48–8:54 | Aide, Mrs. Wong | entry bench, front door | Stockings, Velcro shoes and jacket; the aide out ahead with the clinic bag at 8:51, Mrs. Wong at 8:54 |
+| 9:42–11:30 | Aide | whole house | Files the new pill packs, remakes the bed for two, laundry, cleans bath and kitchen, clears the route to the armchair |
+| 12:07–12:17 | Mrs. Wong, aide, meals driver | entry bench, front door | In at 12:07 (the aide at 12:08); rest after the clinic; meal hand-off at the door at 12:14 |
+| 12:25–12:44 | Mrs. Wong, aide | bath, bedroom | Toileting help, transfer, assisted shower on the fold-down seat, dressing |
+| 12:47–1:00 | Aide, Mrs. Wong | kitchen, dining | Lunch heated and set up, visit logged; aide out at 1:00, car away at 1:12 |
+| 1:02–2:28 | OT, installer, Mrs. Wong | dining, bath, bedroom, porch ramp | The visit explained, bar layout and dry-run toilet and shower transfers, Mr. Wong's side of the bed and its handle; the swing-up bar fitted while the OT checks the ramp; sign-off |
+| 1:47–4:00 | Mrs. Wong | sofa | At the armchair end of the sofa; welcomes Mr. Wong home |
+| 3:08–3:52 | Home health nurse | kitchen, dining, living | Washes, sets up, meets Mr. Wong, checks his transfer technique, vitals, medication reconciliation, warning signs |
 | 3:28 | Mr. Wong | front door → beside the armchair | Rolls himself in over the flush threshold |
 | 3:40–3:52 | Mr. and Mrs. Wong, nurse line | living room | Nurse-line call on speakerphone |
 
 Interactions (id · window in loop s): `home-personal-care` 30–72,
-`home-meal-meds` 51–65, `home-dressing-am` 72.5–77.5, `home-housekeeping`
+`home-meal-meds` 52–64, `home-dressing-am` 71.7–74.2, `home-housekeeping`
 152.5–316, `home-return` 330–373, `home-meals` 381–386, `home-toileting`
-395.5–401.5, `home-bathing` 401.5–411, `home-dressing-pm` 418–426.5,
+397–404, `home-bathing` 404–411, `home-dressing-pm` 419.5–425.5,
 `home-lunch` 430.5–446, `home-mods` 453–583, `home-grab-bar` 522–540,
 `home-ramp-check` 523–548 (on the porch ramp), `home-discharge-arrival`
 642–683.5, `home-transfer` 674.5–683.5, `home-health-visit` 683.5–700,
-`after-hours-call` 690–708. `home-van-boarding` and `home-pill-drop` stay
-outdoors in `community-people.ts`.
+`after-hours-call` 690–708. The cast keeps `home-personal-care`,
+`home-health-visit` and `after-hours-call` at those windows (the story and
+the trace read them; `npm run validate:home` checks them).
+`home-van-boarding` (80.5–113) and `home-pill-drop` (130–141) stay outdoors in
+`community-people.ts`.
+
+Door passes and the legs that fill the holes (`HOLE_LEGS`):
+
+| Who | In / out at the front door (s) | Outside (hole legs) |
+| --- | --- | --- |
+| Mrs. Wong | out 80.5, in 370 | `wongClinicLeg`: across the porch and down the ramp to the van (sill 108.5), the cardiology clinic, home on the van (off 337), up the ramp |
+| Aide | in 44, out 77, in 152.5, out 318.5, in 372.5, out 450.5 | from her car in the stall (parked 28 s); ahead of Mrs. Wong to the ramp, waving the van off, the pill packs from the courier on the drive; out to meet the van and up the ramp behind her; the hand-over to the OT on the porch and back to her car (469 s) |
+| OT | in 453, out 520, in 551, out 582.5 | in from the road end and up the ramp; the ramp check (landing, rails, slope); away to the road end |
+| Installer | in 456, out 572.5 | in from the road end, unpacks the kit at the crate on the pad; packs it and leaves |
+| Home health nurse | in 642.5, out 708 | in from the road end and up the ramp; down the ramp to her car |
+| Mr. Wong | in 672 | the hospital ward, discharge, the van ride home; the driver wheels him across the pad and up the ramp to the door (the driver hands over the discharge folder there and is back at the van by 700 s) |
+
+The meals driver and the van driver are hand-authored and stay outside: the
+meals driver hands the bag to the aide at the front door (`doorStep`), the
+van driver waits at the drive.
 
 Assumptions: an illustrative composite, not a care plan. Mrs. Wong toilets,
 washes and starts dressing on her own before the aide arrives (in another plan
@@ -633,31 +652,13 @@ The couple share the queen bed with a transfer handle on his side (no hospital
 bed yet; `home-hospital-bed` is a catalog entry). Mr. Wong keeps his wheelchair
 all day until a per-segment mobility override exists, so the nurse checks his
 transfer beside the armchair. The swing-up bar and the bed handle are fitted
-during the day but drawn installed. Until the chassis lands, the aide's
-community track goes indoors (hidden) after the clinic return and walks back
-to her car for 1:12 PM.
+during the day but drawn installed.
 
 Sources (the specification's `referencePages`): Redfin, Homes.com and Zillow
 Alhambra 2-bedroom listings; typical room-size guides; 2010 ADA Standards and
 U.S. Access Board guides; ICC A117.1 Type A dwelling units; HUD aging in place
 and visitability; wheelchair, walker and hospital-bed clearance guides; CDC
 STEADI *Check for Safety*; PACE (42 CFR 460) and CAPABLE.
-
-**Integration once the chassis lands.** Keep `home-lin.facility` and
-`pad.back` (drop the local `CareFacility` copy for the chassis's), keep the
-porch as `community-pads.ts` draws it here (with `HOME_PORCH`) in the pad's
-site part, which stays when the house massing is replaced, run `npm run
-build:community`, then stitch each home actor's outdoor legs to the cast's door
-times in `community-people.ts` and remove the porch and hidden segments and
-the duplicated interactions there: Mrs. Wong out at 80.5 (van sill at 108.5 as
-today), back at the door at 370; the aide in at 44 (a direct path from the
-stall, ≤ 25 m), out 79–152.5 (van, courier hand-over) and 318.5–372 (meeting
-the van), out at 449.5, hand-over to the OT on the porch 450–453, car at 469;
-the OT in at 453, out 520–551 for the ramp check, gone at 582.5; the installer
-in at 454, gone at 572.5; the nurse in at 642.5, gone at 709.5; Mr. Wong
-pushed to the door by 672 (drive crossing and porch ramp shortened to fit),
-the driver handing over the folder at the door and back at the van by 700.
-Re-time `home-van-boarding` to 80.5–113.
 
 ## In the story
 
@@ -670,18 +671,16 @@ chapter's window):
 | Cutaway | Setting | Featured interactions | Camera anchor |
 | --- | --- | --- | --- |
 | `network-pharmacy` | `pharmacy` | `pharmacy-packing` | `counterBack` |
-| `network-home-am` | `home-lin` | `home-personal-care` | `porchSeat` |
+| `network-home-am` | `home-lin` | `home-meal-meds` | instance room `home-kitchen` (`door` until stamped) |
 | `network-specialist` | `specialist` | `specialist-visit` | `examSeat` |
-| `network-partner` | `partner-adc` | `partner-pt` | `ptStand` (instance room `rehab-open` once stamped) |
+| `network-partner` | `partner-adc` | `partner-pt`, `partner-rn-review` | instance room `rehab-open` (`ptStand` until stamped) |
 | `network-hospital` | `hospital` | `hospital-discharge-huddle` | `huddleA` |
-| `network-home-pm` | `home-lin` | `home-health-visit`, `after-hours-call` | `wheelchairSpot` |
+| `network-home-pm` | `home-lin` | `home-health-visit`, `after-hours-call` | instance room `home-living` (`door` until stamped) |
 
-Keep those interaction ids and anchor names stable when re-timing the cast or
-rebuilding a pad; the story reads anchors through the layer (`settings`,
-`frame(id)`, an instance's `roomCenter`), never through world coordinates, and
-falls back to the pad centre when an anchor disappears. Re-timing
-`home-personal-care` indoors to about 30–72 s lets the home's morning cutaway
-move to its intended slot (`HOME_AM_RETIME` in `app/sim/story-timeline.ts`).
+Keep those interaction ids, room ids and anchor names stable when re-timing a
+cast or rebuilding a pad; the story reads anchors through the layer
+(`settings`, `frame(id)`, `instance(id).roomCenter(room)`), never through world
+coordinates, and falls back to the pad centre when an anchor disappears.
 
 ## Adding things
 
@@ -778,9 +777,11 @@ builds and the home kinds come out at their declared size from boxes and
 cylinders in defined materials; the registry frame meets the door anchor and
 the porch slab, keeps the building ≥ 1 m from the drive and each room name
 readable on its plate (≥ 90 % in the room and clear of floor items); and the
-cast keeps today's ids and the contract windows, clears
-furniture and walls at every stop, routes every walk on the instance grid in
-the time its gap allows and keeps people ≥ 0.6 m apart on foot (0.55 m seated).
+cast names community actors and keeps the contract windows, clears furniture
+and walls at every stop, routes every walk on the instance grid in the time its
+gap allows (door passes at the door, a resident's arrival at a point at her
+first stop), and its generated tracks (`community-casts.json`) keep people
+≥ 0.6 m apart on foot (0.55 m seated).
 
 ## Roadmap hooks
 
@@ -788,15 +789,9 @@ the time its gap allows and keeps people ≥ 0.6 m apart on foot (0.55 m seated)
   RN are in place; a Seen van drop at its drive (8:30, pickup 3:30) is one
   more `van-…` itinerary plus riders arriving through the `front` entrance.
 - **Replicate a building.** Any facility specification can be stamped on a
-  pad (`facility`); the Wongs' home is next (its plan and cast are being drawn:
-  a `facility` with `floorY: PORCH_Y` whose front door sits on the `door`
-  anchor, and the six people who go indoors there as scheduled people). Each
-  of them then leaves `community-people.ts` as a `Track` and comes back as
-  `HOLE_LEGS` for the outdoor parts of the day (the aide's car and porch,
-  Mrs. Wong's clinic trip, Mr. Wong's hospital day and ride home, the
-  visitors' walks from the road), and the interactions the cast defines leave
-  the hand-authored list. A second Seen center is another entry with a
-  `seen-center` kind.
+  pad (`facility`): the partner day center and the Wongs' home are, with their
+  people generated inside (`HOLE_LEGS` for the home's outdoor parts). A second
+  Seen center is another entry with a `seen-center` kind.
 - **Network of centers.** The camera framing (`frame()`), the zone naming
   (`community:<id>`) and the view (`community`) already treat settings as a
   set; a hub-and-spoke network is more settings plus vehicles whose legs join

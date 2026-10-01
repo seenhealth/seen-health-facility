@@ -314,8 +314,8 @@ furniture), the base loop or the scenario. Validation checks:
   are IDT ids. The scrub windows start at 0, meet end to start and end by
   720 s; every hero chapter keeps at least 20 s, its focus time with a 1 s
   margin, its kicker and the start of every stop, and no stop runs past a cut
-  to a cutaway. The build prints the timeline and integration notices
-  (`HOME_AM_RETIME`, interactions due to be featured);
+  to a cutaway. The build prints the timeline with focus times and the
+  featured interactions;
 - with `--check` (`npm run validate:scenario`, part of `npm run validate`), the
   committed `day-in-the-life.tracks.json` equals the fresh compile.
 

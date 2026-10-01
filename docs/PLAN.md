@@ -42,7 +42,7 @@ modules, per-frame placement is implemented four times, and 3D primitives are de
 | Duplication | Placement logic ×4, point-in-polygon ×4, vehicle frame transform ×6, clock labels ×3, box helper ×16, five ways of compiling TypeScript for Node. | Started in this PR for vehicles: ring lanes, corner radius, easing, the van ramp, the fade, the fleet van ids and straight-and-arc routes (`vehicle-path.ts`) are each defined once. The other kits follow the migration order below. |
 | Validation | 19 validators, no runner, no CI, lint not enforced, several vacuous or orphaned checks. | Runner and CI added in this PR: `npm run validate` runs every validator (orphans included), `npm test` adds a `node:test` suite and CI runs both; the fleet-crew vehicle-id check now asserts against the engine's registered ids; lint enforcement and the remaining vacuous checks are follow-up. |
 | Dependencies | The shadcn kit and about a dozen packages are unused. | Prune during the split of the renderer and the page. |
-| Facility instances | A care setting could only be schematic massing; nothing could put a real building, or its people, on a pad. | Built after this PR: any schema 2.0 facility is stamped on a pad (`facility-instance.ts`, registry `facility`) with people generated inside it at build time from a cast file (`npm run build:community`): scene people placed by room scenes, and scheduled people with explicit stops whose time off the instance is a hole that hand-authored legs fill (`fillHoles`, `HOLE_LEGS`). The partner adult day center is Seen's Alhambra ground floor. Renderer geometry, batching and frame helpers it needed are extracted (`facility-geometry.ts`, `batch.ts`, `frame.ts`, `presentation.ts`). The Wongs' home is the next consumer. |
+| Facility instances | A care setting could only be schematic massing; nothing could put a real building, or its people, on a pad. | Built after this PR: any schema 2.0 facility is stamped on a pad (`facility-instance.ts`, registry `facility`) with people generated inside it at build time from a cast file (`npm run build:community`): scene people placed by room scenes, and scheduled people with explicit stops whose time off the instance is a hole that hand-authored legs fill (`fillHoles`, `HOLE_LEGS`). The partner adult day center is Seen's Alhambra ground floor; the Wongs' home is its own bungalow plan (`seen-home-wong.json`, `npm run validate:home`) with the six people of its ADL day generated inside and their time outdoors (the clinic trip, the aide's car and porch, the visitors' arrivals, Mr. Wong's hospital day) as hole legs. The story's home and partner cutaways frame the stamped rooms. Renderer geometry, batching and frame helpers it needed are extracted (`facility-geometry.ts`, `batch.ts`, `frame.ts`, `presentation.ts`). |
 
 ## 3. The chassis
 
@@ -188,7 +188,9 @@ feeds). Keep simulation and platform speaking one schema:
   before turning away; they still appear and vanish on the south street east of the yard.
 - **Community timings** were shifted to clear fleet, truck and street-car movements (the van leaves the
   home 9:15, specialist visit 10:05, discharge pickup 2:23 PM, home-health visit 3:07 PM, nurse line
-  3:40 PM). The discharged participant goes to the home on the pad.
+  3:40 PM). The discharged participant goes home and rolls in at the front door at 3:28 PM; the home's
+  indoor day (breakfast and pills, the assisted shower after the clinic, the grab bar, the nurse's visit)
+  fits around those times.
 - **Day program.** Rotations default to the existing Monday so the story and validators are unchanged;
   repertoire programs borrow equipment from a base program and reuse existing poses.
 - **Trace.** Encounters are emitted for both people; handoffs are attributed to the participant; the
