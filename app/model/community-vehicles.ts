@@ -2,6 +2,7 @@ import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import type { Vec2 } from './schema';
 import type { VehiclePose } from './activity';
+import { deliveryStops } from './deliveries';
 import {
   arcPoint,
   careSettingById,
@@ -279,10 +280,21 @@ const W = RING.west,
 /** Entry/exit leg z (or x) of a setting's lane plus the clearance a turn needs. */
 const legAt = (s: CareSetting, lane: 0 | 1, side: 'entry' | 'exit') =>
   legPoint(s, lane, side, 'street');
+/** Rear receiving: the door the package truck delivers to. */
+const receiving = deliveryStops.find((d) => d.kind === 'package')!.door;
 /** The Seen center's rear lot: meals car home and the courier's stop by receiving. */
 export const CENTER_LOT = {
   meals: { at: [-4, -26.8] as Vec2, dir: [1, 0] as Vec2 },
   courier: { at: [-16, -26.8] as Vec2, dir: [1, 0] as Vec2 },
+  /** On foot from the lot edge across the yard to rear receiving. */
+  receivingWalk: [
+    [-14, -24.5],
+    [-2, -24.0],
+    [2.4, -16],
+  ] as Vec2[],
+  /** Where a courier stands to hand packs in, and the door it faces. */
+  receivingDoor: [receiving[0], receiving[1] - 0.83] as Vec2,
+  receivingFace: [receiving[0], receiving[1]] as Vec2,
 };
 /** west.in → north.in → east.in, from a z on the west street to a z on the east street. */
 const viaNorthEastbound = (fromZ: number, toZ: number): Vec2[] => [
@@ -731,6 +743,13 @@ export function seatWorld(id: string, seat: string, time: number) {
     y: pose.position.y + sy,
     z: pose.position.z - sx * sn + sz * c,
   };
+}
+/** Where a car's driver steps out: beside the driver door (local x −1.05). */
+export function carDoorWorld(pose: VehiclePose): Vec2 {
+  const c = Math.cos(pose.heading),
+    sn = Math.sin(pose.heading),
+    [x, z] = [-1.05, 0.2];
+  return [pose.position.x + x * c + z * sn, pose.position.z - x * sn + z * c];
 }
 /** Door sill and ramp foot of a fleet van in a pose (ramp on the right side). */
 export function vanRampWorld(pose: VehiclePose) {

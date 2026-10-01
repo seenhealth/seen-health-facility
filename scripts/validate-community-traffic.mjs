@@ -2,8 +2,9 @@
 // the whole 720 s day: community vehicles keep clear of the fleet, the delivery
 // trucks, the street cars and each other at 50 Hz; drive nose-first with no
 // hairpins or reversing; keep doors and ramps shut while moving; and the
-// community cast's tracks are contiguous, walk at human speeds, ride only in
-// registered seats and never stand in each other.
+// community cast's tracks are contiguous, walk at human speeds on the drawn
+// pads, stubs or the center's site, ride only in registered seats and never
+// stand in each other.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { Vector3 } from 'three';
@@ -21,7 +22,12 @@ import {
 } from '../work/validation/community-people.mjs';
 import {
   careSettings,
+  frontZ,
+  LANE,
+  laneRadius,
   settingZone,
+  streetZ,
+  toLocal,
 } from '../work/validation/community-settings.mjs';
 import {
   activityData,
@@ -220,6 +226,23 @@ const problems = [];
 const check = (ok, message) => {
   if (!ok) problems.push(message);
 };
+// Walks stay on the ground the registry draws: a setting's pad, its access
+// stub and sidewalk, or the center's own site. Points authored in world
+// coordinates instead of a setting's local anchors fail here once the
+// setting moves or turns.
+const [[siteX0, siteZ0], [siteX1, siteZ1]] = model.site.bounds;
+const onDrawnGround = (p) =>
+  (p[0] >= siteX0 && p[0] <= siteX1 && p[1] >= siteZ0 && p[1] <= siteZ1) ||
+  careSettings.some((s) => {
+    const [x, z] = toLocal(s, p),
+      corridor = laneRadius(s, s.drive.lanes - 1) + LANE / 2 + 2;
+    return (
+      (Math.abs(x) <= s.pad.w / 2 + 0.5 && Math.abs(z) <= s.pad.d / 2 + 0.5) ||
+      (Math.abs(x) <= corridor &&
+        z >= frontZ(s) - 0.5 &&
+        z <= streetZ(s) + 0.5)
+    );
+  });
 let walks = 0,
   maxGait = 0;
 for (const a of source.actors) {
@@ -247,6 +270,12 @@ for (const a of source.actors) {
           s.path[k][0] - s.path[k - 1][0],
           s.path[k][1] - s.path[k - 1][1],
         );
+      if (s.visible !== false)
+        for (const p of s.path)
+          check(
+            onDrawnGround(p),
+            `${a.id} walks off the drawn ground at (${p[0].toFixed(1)}, ${p[1].toFixed(1)}) during "${s.title}"`,
+          );
       const gait = length / (s.end - s.start);
       check(
         gait <= 1.65,

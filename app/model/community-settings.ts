@@ -293,6 +293,28 @@ export const careSettings: CareSetting[] = [
       padCorner: [12.4, -2],
       padCornerFar: [-12.4, -2],
       padCornerNear: [-12.4, 9],
+      // Van ramp foot → porch ramp: down the drive edge, a loop in from the side.
+      crossA: [6.0, -4.0],
+      crossB: [11.4, -4.8],
+      crossC: [13.4, -6.2],
+      crossD: [11.6, -7.2],
+      // The aide's kerb-side places and walks.
+      pcaWait: [2.4, -4.6],
+      handover: [-0.6, -3.6],
+      porchApproach: [-3.0, -4.4],
+      pcaMeetA: [8.0, -4.4],
+      pcaMeetB: [2.0, -2.6],
+      pcaWalkA: [6.0, -3.0],
+      pcaWalkB: [10.5, -3.2],
+      pcaBack: [4.0, -3.2],
+      // Meals driver and pharmacy courier from the drive to the porch.
+      mealsWalkA: [-3.6, -2.0],
+      mealsWalkB: [-4.6, -4.2],
+      courierWalkA: [-2.4, 0.8],
+      courierWalkB: [-2.2, -1.5],
+      // The van driver's way back from the porch ramp.
+      driverBackA: [8.0, -4.6],
+      driverBackB: [5.0, -3.6],
     },
   }),
   define({

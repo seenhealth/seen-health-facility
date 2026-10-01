@@ -6817,7 +6817,7 @@
       "offDuty": 0.12669753086419752
      },
      "onFloorSeconds": 5659,
-     "meanWalkMeters": 118.99543385550942
+     "meanWalkMeters": 119.00788132823943
     }
    ],
    "participants": [
@@ -8944,7 +8944,7 @@
       "waiting": 81,
       "offSite": 276
      },
-     "walkMeters": 191.44403527988848
+     "walkMeters": 191.44403527988854
     },
     {
      "id": "hospital-participant",
@@ -8961,7 +8961,7 @@
       "waiting": 47,
       "offSite": 556
      },
-     "walkMeters": 79.54048383294983
+     "walkMeters": 79.54048383294985
     },
     {
      "id": "adc-participant-1",
@@ -16388,7 +16388,7 @@
       "offDuty": 0.12669753086419752
      },
      "onFloorSeconds": 5659,
-     "meanWalkMeters": 123.03671020461563
+     "meanWalkMeters": 123.04915767734565
     }
    ],
    "participants": [
@@ -18447,7 +18447,7 @@
       "waiting": 81,
       "offSite": 276
      },
-     "walkMeters": 191.44403527988848
+     "walkMeters": 191.44403527988854
     },
     {
      "id": "hospital-participant",
@@ -18464,7 +18464,7 @@
       "waiting": 47,
       "offSite": 556
      },
-     "walkMeters": 79.54048383294983
+     "walkMeters": 79.54048383294985
     },
     {
      "id": "adc-participant-1",
