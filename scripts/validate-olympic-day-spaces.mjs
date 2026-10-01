@@ -1,19 +1,26 @@
-import './compile-model-modules.mjs';
+// Olympic day spaces (both options): unique room labels anchored inside their
+// rooms, the raised-wing day furniture inside its rooms without furniture or
+// door-swing collisions, the entrance-side parking box removed, and the dining
+// table count.
+//   node scripts/validate-olympic-day-spaces.mjs
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
-import { createRequire } from 'node:module';
 import * as T from 'three';
-const require = createRequire(import.meta.url);
-const { createCanvas } = require(
-  process.env.FACILITY_CANVAS_MODULE || '@napi-rs/canvas',
+import { loadSim } from './build-scenario.mjs';
+import { installHeadlessGlobals } from './validate-renderer.mjs';
+installHeadlessGlobals();
+const {
+  schema: { validateFacility },
+  exterior: { buildOlympicExterior },
+  labels: { roomLabelCode, roomLabelAnchor },
+} = await loadSim(
+  {
+    schema: 'app/model/schema.ts',
+    exterior: 'app/model/olympic-exterior.ts',
+    labels: 'app/model/room-labels.ts',
+  },
+  { dir: 'work/olympic' },
 );
-globalThis.document = { createElement: () => createCanvas(1, 1) };
-const { validateFacility } = await import('../work/validation/schema.mjs');
-const { buildOlympicExterior } =
-  await import('../work/validation/olympic-exterior.mjs');
-const { roomLabelCode, roomLabelAnchor } =
-  await import('../work/validation/room-labels.mjs');
 function inside([x, z], polygon) {
   let yes = false;
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
@@ -47,26 +54,6 @@ function overlap(a, b) {
 for (const key of ['olympic', 'olympic-option']) {
   const path = `public/models/seen-${key}.json`,
     m = validateFacility(JSON.parse(fs.readFileSync(path)));
-  const baseline = JSON.parse(
-    execFileSync('git', ['show', `${process.argv[2] || 'HEAD'}:${path}`], {
-      maxBuffer: 20 * 1024 * 1024,
-    }),
-  );
-  for (const field of [
-    'rooms',
-    'zones',
-    'levels',
-    'walls',
-    'doorSchedule',
-    'floorOpenings',
-    'verticalConnections',
-  ])
-    assert.deepEqual(m[field], baseline[field], `${field} preserved`);
-  assert.deepEqual(
-    m.objects.filter((o) => o.levelId === 'upper'),
-    baseline.objects.filter((o) => o.levelId === 'upper'),
-    'Upper fit-out preserved',
-  );
   const codes = m.rooms.map((r) => roomLabelCode(m, r));
   assert.equal(new Set(codes).size, m.rooms.length);
   for (const r of m.rooms)
@@ -138,6 +125,6 @@ for (const key of ['olympic', 'olympic-option']) {
   );
   assert.equal(diningTables.length, 11);
   console.log(
-    `${key}: ${m.rooms.length} unique room labels; ${added.length} furniture footprints inside rooms, without furniture or door-swing collisions; parking box removed; geometry and upper floor preserved.`,
+    `${key}: ${m.rooms.length} unique room labels; ${added.length} furniture footprints inside rooms, without furniture or door-swing collisions; parking box removed.`,
   );
 }

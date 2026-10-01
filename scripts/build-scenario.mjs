@@ -1,11 +1,14 @@
 // Compile the day-in-the-life scenario into precomputed tracks and validate them.
 //
 //   npm run build:scenario            # compile + validate + write tracks JSON
-//   node scripts/build-scenario.mjs --check   # compile + validate only
+//   node scripts/build-scenario.mjs --check   # compile + validate, and fail if
+//                                             # the committed tracks JSON is stale
 //
 // The TypeScript simulation modules (app/sim/*) are bundled for Node with
 // Rolldown (already installed with Vite) into work/sim/, which resolves the
-// app's extensionless and JSON imports. Three.js stays external.
+// app's extensionless and JSON imports. Three.js stays external. `loadSim` is
+// shared by every Node script that runs app TypeScript (renderer smoke test,
+// GLB exporters, unit tests).
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -18,31 +21,80 @@ export const paths = {
   tracks: resolve(root, 'app/data/scenarios/day-in-the-life.tracks.json'),
 };
 
-/** Bundle TypeScript entries for Node and import them. */
-export async function loadSim(entries = { sim: 'app/sim/index.ts' }) {
+/**
+ * Bundle TypeScript entries for Node and import them.
+ * `dir` is the output folder (relative to the repository root); `plugins` and
+ * `external` customise Rolldown (e.g. headless stand-ins for browser-only
+ * modules; three.js is external by default); `load: false` only writes the
+ * bundle and returns the output paths.
+ */
+export async function loadSim(
+  entries = { sim: 'app/sim/index.ts' },
+  {
+    dir = 'work/sim',
+    plugins = [],
+    external = [/^three(\/.*)?$/],
+    load = true,
+  } = {},
+) {
   const { rolldown } = await import('rolldown');
   const bundle = await rolldown({
     input: Object.fromEntries(
       Object.entries(entries).map(([k, v]) => [k, resolve(root, v)]),
     ),
     platform: 'node',
-    external: [/^three(\/.*)?$/],
+    external,
+    plugins,
     logLevel: 'warn',
   });
-  const dir = resolve(root, 'work/sim');
+  const out = resolve(root, dir);
   await bundle.write({
-    dir,
+    dir: out,
     format: 'esm',
     entryFileNames: '[name].mjs',
     chunkFileNames: '[name]-[hash].mjs',
   });
   await bundle.close();
-  const out = {};
-  for (const k of Object.keys(entries))
-    out[k] = await import(
-      pathToFileURL(resolve(dir, `${k}.mjs`)).href + `?v=${Date.now()}`
-    );
-  return out;
+  const files = Object.fromEntries(
+    Object.keys(entries).map((k) => [k, resolve(out, `${k}.mjs`)]),
+  );
+  if (!load) return files;
+  const modules = {};
+  for (const [k, file] of Object.entries(files))
+    modules[k] = await import(pathToFileURL(file).href + `?v=${Date.now()}`);
+  return modules;
+}
+
+/**
+ * First difference between an actual and an expected JSON value (numbers
+ * compare within `tolerance`), as "path: expected …, got …"; null when equal.
+ */
+export function jsonDifference(a, b, tolerance = 1e-6, at = '$') {
+  if (typeof a === 'number' && typeof b === 'number')
+    return Math.abs(a - b) <= tolerance ? null : `${at}: expected ${b}, got ${a}`;
+  if (Array.isArray(a) !== Array.isArray(b) || typeof a !== typeof b)
+    return `${at}: type changed`;
+  if (a === null || b === null || typeof a !== 'object')
+    return a === b
+      ? null
+      : `${at}: expected ${JSON.stringify(b)}, got ${JSON.stringify(a)}`;
+  if (Array.isArray(a)) {
+    if (a.length !== b.length)
+      return `${at}: expected length ${b.length}, got ${a.length}`;
+    for (let i = 0; i < a.length; i++) {
+      const d = jsonDifference(a[i], b[i], tolerance, `${at}[${i}]`);
+      if (d) return d;
+    }
+    return null;
+  }
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+  for (const k of keys) {
+    if (!(k in a) || !(k in b))
+      return `${at}.${k}: ${k in a ? 'unexpected' : 'missing'}`;
+    const d = jsonDifference(a[k], b[k], tolerance, `${at}.${k}`);
+    if (d) return d;
+  }
+  return null;
 }
 
 const round = (v, d = 3) => Math.round(v * 10 ** d) / 10 ** d;
@@ -276,7 +328,17 @@ export function validateTracks(sim, model, scenario, result) {
   return report;
 }
 
-export async function compile({ write = true, quiet = false, modelPath = paths.model } = {}) {
+/**
+ * Compile and validate the scenario. `write` stores the tracks JSON; `check`
+ * fails when the committed tracks differ from the fresh compile (drift), so a
+ * change to rooms, seats, base tracks or the compiler cannot ship stale tracks.
+ */
+export async function compile({
+  write = true,
+  check = false,
+  quiet = false,
+  modelPath = paths.model,
+} = {}) {
   const started = Date.now();
   const { sim } = await loadSim();
   const model = sim.validateFacility(JSON.parse(readFileSync(modelPath, 'utf8')));
@@ -330,13 +392,33 @@ export async function compile({ write = true, quiet = false, modelPath = paths.m
     for (const n of t.notes) console.log('Note: ' + n);
     if (write) console.log(`Wrote ${paths.tracks.replace(root + '/', '')}`);
   }
+  if (check) {
+    const file = paths.tracks.replace(root + '/', '');
+    // The committed tracks belong to the published Alhambra model only.
+    if (modelPath !== paths.model) {
+      if (!quiet) console.log(`Drift check skipped: ${file} is compiled from the default model.`);
+    } else {
+      const drift = jsonDifference(
+        JSON.parse(JSON.stringify(result.tracks)),
+        JSON.parse(readFileSync(paths.tracks, 'utf8')),
+      );
+      assert.equal(
+        drift,
+        null,
+        `${file} differs from a fresh compile (${drift}; expected = committed). Run \`npm run build:scenario\` and commit the tracks.`,
+      );
+      if (!quiet) console.log(`${file} matches the fresh compile.`);
+    }
+  }
   return { sim, model, scenario, result, report };
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const at = process.argv.indexOf('--model');
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const at = process.argv.indexOf('--model'),
+    check = process.argv.includes('--check');
   await compile({
-    write: !process.argv.includes('--check'),
+    write: !check,
+    check,
     modelPath: at > 0 ? resolve(process.argv[at + 1]) : paths.model,
   });
 }
