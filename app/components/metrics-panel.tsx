@@ -1,22 +1,33 @@
 'use client';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Area, ComposedChart, Line, Tooltip, XAxis, YAxis } from 'recharts';
-import { Pause, Play, X } from 'lucide-react';
+import { Download, Pause, Play, X } from 'lucide-react';
 import {
   activityData,
   type ActivitySnapshot,
   type ActivitySource,
+  type ActorSpec,
 } from '../model/activity';
+import { roleNames } from '../model/characters';
 import type { Facility } from '../model/schema';
 import type { createViewer } from '../model/renderer';
 import {
   computeMetrics,
+  disciplines,
   staffActivityLabels,
   type SimMetrics,
   type StaffActivity,
 } from '../sim/metrics';
 import { clockLabel, hourTicks } from '../sim/clock';
 import type { CompiledStep } from '../sim/tracks';
+import {
+  dwellIntervals,
+  personJourney,
+  traceSummary,
+  traceTouchpoints,
+  type TouchpointEvent,
+  type TouchpointKind,
+} from '../sim/trace';
 
 type Viewer = ReturnType<typeof createViewer>;
 /** Occupancy series (validated pair on the panel surface). */
@@ -35,9 +46,346 @@ const SMALL_MULTIPLES = 8,
   CHART_H = 54;
 type Story = { source: ActivitySource; heroId: string; steps: CompiledStep[] };
 type Scenario = 'base' | 'story';
+type Tab = 'measure' | 'trace';
 const pct = (v: number) => `${Math.round(v * 100)}%`;
 const minutes = (seconds: number) =>
   Math.round((seconds * activityData.dayDurationMinutes) / activityData.duration);
+
+// ---------------------------------------------------------------------------
+// Trace tab
+// ---------------------------------------------------------------------------
+/** Sampling interval for the in-browser trace (the report uses 1 s). */
+const TRACE_STEP = 2;
+type TraceFilter = 'all' | 'care' | 'moves';
+const CARE_KINDS = new Set<TouchpointKind>([
+  'interaction-start',
+  'interaction-end',
+  'handoff',
+  'encounter',
+]);
+/** Quiet rows: the list reads by its care events; movement is context. */
+const MUTED_KINDS = new Set<TouchpointKind>(['leave', 'off-site', 'day-end']);
+/** Event-kind markers reuse the panel's validated hues; labels carry the meaning. */
+const KIND_COLOR: Record<TouchpointKind, string> = {
+  'interaction-start': '#008a7c',
+  'interaction-end': '#008a7c',
+  handoff: '#c0507e',
+  encounter: '#6a55c2',
+  enter: '#c8741c',
+  leave: '#c8741c',
+  board: '#4f8fd1',
+  alight: '#4f8fd1',
+  'on-site': '#4f8fd1',
+  'off-site': '#4f8fd1',
+  'day-start': '#7b928d',
+  'day-end': '#7b928d',
+};
+const SITE_COLOR = '#8e9d9a';
+const vehicleLabel = (id = '') =>
+  id.startsWith('van-') ? `Van ${id.slice(4).toUpperCase()}` : id;
+/** "Mrs. Lin · check-in" → "check-in" when the person is the title's subject. */
+const ownTitle = (title = '', actorLabel: string) => {
+  for (const prefix of [actorLabel, actorLabel.split(' · ')[0]])
+    if (title.startsWith(`${prefix} · `)) return title.slice(prefix.length + 3);
+  return title;
+};
+function describe(e: TouchpointEvent): string {
+  switch (e.kind) {
+    case 'day-start':
+      return 'Day begins';
+    case 'day-end':
+      return 'Day ends';
+    case 'on-site':
+      return 'Arrives on site';
+    case 'off-site':
+      return 'Leaves the site';
+    case 'enter':
+      return 'Enters';
+    case 'leave':
+      return 'Leaves';
+    case 'board':
+      return `Boards ${vehicleLabel(e.vehicleId)}`;
+    case 'alight':
+      return `Steps off ${vehicleLabel(e.vehicleId)}`;
+    case 'interaction-start':
+      return `${ownTitle(e.title, e.actorLabel)} begins`;
+    case 'interaction-end':
+      return `${ownTitle(e.title, e.actorLabel)} ends · ${minutes(e.durationSeconds ?? 0)} min`;
+    case 'encounter':
+      return `Together ${minutes(e.durationSeconds ?? 0)} min`;
+    case 'handoff':
+      return `Handoff ${e.title ?? ''}`;
+  }
+}
+
+/** One person's touchpoints: picker, counters, zone strip, timeline, export. */
+function TraceTab({
+  model,
+  source,
+  events,
+  scenario,
+  heroId,
+  time,
+  seek,
+  getViewer,
+}: {
+  model: Facility;
+  source: ActivitySource;
+  events: TouchpointEvent[];
+  scenario: Scenario;
+  heroId?: string;
+  time: number;
+  seek: (t: number) => void;
+  getViewer: () => Viewer | null;
+}) {
+  const [query, setQuery] = useState(''),
+    [picked, setPicked] = useState<string | null>(null),
+    [filter, setFilter] = useState<TraceFilter>('all');
+  const people = useMemo(() => {
+    const byLabel = (a: ActorSpec, b: ActorSpec) => a.label.localeCompare(b.label);
+    return {
+      participants: source.actors.filter((a) => a.role === 'participant').sort(byLabel),
+      staff: source.actors.filter((a) => a.role !== 'participant').sort(byLabel),
+    };
+  }, [source]);
+  const counts = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const e of events) m.set(e.actorId, (m.get(e.actorId) || 0) + 1);
+    return m;
+  }, [events]);
+  const defaultId = useMemo(() => {
+    if (heroId && counts.has(heroId)) return heroId;
+    let best = people.participants[0]?.id ?? source.actors[0].id;
+    for (const p of people.participants)
+      if ((counts.get(p.id) || 0) > (counts.get(best) || 0)) best = p.id;
+    return best;
+  }, [heroId, counts, people, source]);
+  const actorId = picked && counts.has(picked) ? picked : defaultId;
+  const journey = useMemo(() => personJourney(events, actorId), [events, actorId]);
+  const names = useMemo(
+    () => new Map(source.actors.map((a) => [a.id, a.label] as const)),
+    [source],
+  );
+  const zoneName = useCallback(
+    (id: string) =>
+      id === 'site' ? 'Street & vans' : (model.zones.find((z) => z.id === id)?.name ?? id),
+    [model],
+  );
+  const zoneColor = (id: string) =>
+    id === 'site' ? SITE_COLOR : (model.zones.find((z) => z.id === id)?.color ?? SITE_COLOR);
+  const roomName = (id: string | null | undefined) =>
+    id ? model.rooms.find((r) => r.id === id)?.name : undefined;
+  const place = (e: TouchpointEvent) => roomName(e.roomId) || zoneName(e.zoneId);
+  const q = query.trim().toLowerCase();
+  const matches = (a: ActorSpec) =>
+    !q || `${a.label} ${a.id} ${roleNames[a.role]}`.toLowerCase().includes(q);
+  // Zone stays, merged across rooms of the same zone for the strip.
+  const stays = useMemo(() => {
+    const out: { zoneId: string; start: number; end: number }[] = [];
+    for (const d of dwellIntervals(journey.events)) {
+      const last = out[out.length - 1];
+      if (last && last.zoneId === d.zoneId && Math.abs(last.end - d.start) < 1e-6)
+        last.end = d.end;
+      else out.push({ zoneId: d.zoneId, start: d.start, end: d.end });
+    }
+    return out.filter((s) => s.end > s.start);
+  }, [journey]);
+  const shown = journey.events.filter((e) =>
+    filter === 'all' ? true : filter === 'care' ? CARE_KINDS.has(e.kind) : !CARE_KINDS.has(e.kind),
+  );
+  let current = -1;
+  for (let i = 0; i < shown.length; i++) if (shown[i].t <= time) current = i;
+  // Keep the current entry in view inside the list (never scrolling the page).
+  const listRef = useRef<HTMLOListElement>(null);
+  useEffect(() => {
+    const list = listRef.current,
+      li = list?.children[current] as HTMLElement | undefined;
+    if (!list || !li) return;
+    const r = li.getBoundingClientRect(),
+      b = list.getBoundingClientRect();
+    if (r.top < b.top || r.bottom > b.bottom)
+      list.scrollTop += r.top - b.top - (b.height - r.height) / 2;
+  }, [current, actorId, filter]);
+  const duration = source.duration;
+  const ticks = hourTicks().filter((_, i, a) => i === 0 || i === a.length - 1 || i === 4);
+  const inScene = !!getViewer()?.activity.actorSample(actorId);
+  const go = (t: number) => {
+    seek(t);
+    if (inScene) getViewer()?.followActor(actorId);
+  };
+  const download = () => {
+    const payload = {
+      version: 1,
+      title: 'Touchpoint trace',
+      scenario: scenario === 'story' ? 'With Mrs. Lin’s day' : 'Care-day loop',
+      basis:
+        'Derived from the animated care-day tracks (app/sim/trace.ts). Composite, illustrative data; not participant records.',
+      clock: {
+        duration: source.duration,
+        dayStartMinutes: source.dayStartMinutes,
+        dayDurationMinutes: source.dayDurationMinutes,
+      },
+      step: TRACE_STEP,
+      summary: traceSummary(events, source),
+      events,
+    };
+    const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob),
+      a = document.createElement('a');
+    a.href = url;
+    a.download = `touchpoint-trace-${scenario}.json`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  };
+  const who = (e: TouchpointEvent) => {
+    const list = (e.with || []).map((id) => names.get(id) ?? id);
+    return list.length > 2 ? `${list.slice(0, 2).join(', ')} +${list.length - 2}` : list.join(', ');
+  };
+  const option = (a: ActorSpec) => (
+    <option key={a.id} value={a.id}>
+      {a.label} · {counts.get(a.id) || 0}
+    </option>
+  );
+  return (
+    <>
+      <div className="mp-section-head">
+        <h3>Who</h3>
+        <span className="mp-scale">
+          {people.participants.length} participants, {people.staff.length} staff · n = events
+        </span>
+      </div>
+      <div className="mp-picker">
+        <input
+          type="search"
+          placeholder="Search people by name or role"
+          aria-label="Search people"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <select
+          size={4}
+          aria-label="Person to trace"
+          value={actorId}
+          onChange={(e) => setPicked(e.target.value)}
+        >
+          <optgroup label="Participants">{people.participants.filter(matches).map(option)}</optgroup>
+          <optgroup label="Staff">{people.staff.filter(matches).map(option)}</optgroup>
+        </select>
+      </div>
+
+      <div className="mp-kpis">
+        <div>
+          <span>Events</span>
+          <b>{journey.events.length}</b>
+          <small>{journey.interactions} interactions</small>
+        </div>
+        <div>
+          <span>Encounters</span>
+          <b>{journey.encounters}</b>
+          <small>within 1.6 m, 4 s+</small>
+        </div>
+        <div>
+          <span>Disciplines</span>
+          <b>{journey.disciplines.length}</b>
+          <small>of {disciplines.length} on the IDT</small>
+        </div>
+      </div>
+
+      <div className="mp-section-head">
+        <h3>{journey.label}</h3>
+        <span className="mp-scale">
+          {roleNames[journey.role]}
+          {journey.firstOnSite !== undefined && journey.lastOnSite !== undefined
+            ? ` · on site ${clockLabel(journey.firstOnSite)}–${clockLabel(journey.lastOnSite)}`
+            : ' · not on site'}
+        </span>
+      </div>
+      <div className="mp-strip">
+        {stays.map((s) => (
+          <button
+            key={`${s.zoneId}-${s.start}`}
+            style={{
+              left: `${(s.start / duration) * 100}%`,
+              width: `calc(${((s.end - s.start) / duration) * 100}% - 2px)`,
+              background: zoneColor(s.zoneId),
+            }}
+            title={`${zoneName(s.zoneId)} · ${clockLabel(s.start)}–${clockLabel(s.end)}`}
+            aria-label={`${zoneName(s.zoneId)} from ${clockLabel(s.start)} to ${clockLabel(s.end)}; jump there`}
+            onClick={() => go(s.start)}
+          />
+        ))}
+        <div className="mp-now" style={{ left: `${(time / duration) * 100}%` }} />
+      </div>
+      <div className="mp-axis mp-trace-axis" aria-hidden>
+        {ticks.map((t) => (
+          <span key={t.t} style={{ left: `${(t.t / duration) * 100}%` }}>
+            {t.label}
+          </span>
+        ))}
+      </div>
+      <p className="mp-legend wrap">
+        {journey.zones.slice(0, 6).map((z) => (
+          <span key={z.zoneId}>
+            <i className="bar" style={{ background: zoneColor(z.zoneId) }} />
+            {zoneName(z.zoneId)} {minutes(z.seconds)} min
+          </span>
+        ))}
+        {journey.zones.length > 6 && <span>+{journey.zones.length - 6} more</span>}
+      </p>
+
+      <div className="mp-section-head">
+        <h3>Timeline</h3>
+        <fieldset className="mp-segment small">
+          <legend>Events shown</legend>
+          {(
+            [
+              ['all', 'All'],
+              ['care', 'Care & encounters'],
+              ['moves', 'Movement'],
+            ] as [TraceFilter, string][]
+          ).map(([k, label]) => (
+            <button key={k} aria-pressed={filter === k} onClick={() => setFilter(k)}>
+              {label}
+            </button>
+          ))}
+        </fieldset>
+      </div>
+      <ol className="mp-timeline" aria-label={`${journey.label}’s timeline`} ref={listRef}>
+        {shown.map((e, i) => (
+          <li
+            key={`${i}-${e.t}-${e.kind}`}
+            className={MUTED_KINDS.has(e.kind) ? 'muted' : ''}
+            aria-current={i === current ? 'step' : undefined}
+          >
+            <button onClick={() => go(e.t)}>
+              <time>{e.clock}</time>
+              <span className="what">
+                <i style={{ background: KIND_COLOR[e.kind] }} />
+                {describe(e)}
+              </span>
+              <span className="where">
+                {place(e)}
+                {e.with?.length ? ` · with ${who(e)}` : ''}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ol>
+      <p className="mp-readout">
+        Click an entry to set the clock there
+        {inScene ? ' and follow this person.' : '. This person is only in the story scene; the viewer keeps playing the base loop.'}
+      </p>
+      <button className="mp-download" onClick={download}>
+        <Download size={14} /> Download trace (JSON)
+      </button>
+      <p className="mp-note">
+        Every person sampled every {TRACE_STEP} s: zone and room entries, van boarding,
+        interactions, encounters within 1.6 m for 4 s or more, and staff handoffs.
+        Derived from the animated tracks; composite, illustrative data.
+      </p>
+    </>
+  );
+}
 
 /** One zone's occupancy over the day; memoised so playback only moves the marker. */
 const ZoneSpark = memo(function ZoneSpark({
@@ -109,6 +457,7 @@ const ZoneSpark = memo(function ZoneSpark({
 /**
  * Measure: occupancy by zone, staff time by role and (for the story scenario)
  * the hero's touchpoints, with a current-time marker synced to the viewer.
+ * The Trace tab lists one person's touchpoint events end to end.
  */
 export default function MetricsPanel({
   model,
@@ -123,6 +472,7 @@ export default function MetricsPanel({
 }) {
   const [snap, setSnap] = useState<ActivitySnapshot | null>(null),
     [scenario, setScenario] = useState<Scenario>('base'),
+    [tab, setTab] = useState<Tab>('measure'),
     [story, setStory] = useState<Story | null>(null),
     [table, setTable] = useState(false),
     [hover, setHover] = useState<{ role: string; key: StaffActivity } | null>(
@@ -143,6 +493,7 @@ export default function MetricsPanel({
     };
   }, [scenario, story]);
   const active = scenario === 'story' ? story : null;
+  const source = active?.source || activityData;
   const metrics: SimMetrics | null = useMemo(() => {
     if (scenario === 'story' && !active) return null;
     return computeMetrics(active?.source || activityData, model, {
@@ -151,6 +502,10 @@ export default function MetricsPanel({
       steps: active?.steps,
     });
   }, [scenario, active, model]);
+  const trace: TouchpointEvent[] | null = useMemo(() => {
+    if (tab !== 'trace' || (scenario === 'story' && !active)) return null;
+    return traceTouchpoints(active?.source || activityData, model, { step: TRACE_STEP });
+  }, [tab, scenario, active, model]);
   const time = snap?.time ?? 0,
     playing = !!snap?.playing;
   const seek = useCallback(
@@ -182,12 +537,26 @@ export default function MetricsPanel({
       <header className="mp-head">
         <div>
           <span className="overline">MEASURE</span>
-          <strong>Care-day metrics</strong>
+          <strong>{tab === 'trace' ? 'Touchpoint trace' : 'Care-day metrics'}</strong>
         </div>
         <button aria-label="Close measurements" onClick={onClose}>
           <X size={17} />
         </button>
       </header>
+      <div className="mp-tabs">
+        <fieldset className="mp-segment">
+          <legend>Panel</legend>
+          <button aria-pressed={tab === 'measure'} onClick={() => setTab('measure')}>
+            Metrics
+          </button>
+          <button aria-pressed={tab === 'trace'} onClick={() => setTab('trace')}>
+            Trace
+          </button>
+        </fieldset>
+        <span className="mp-scale">
+          {tab === 'trace' ? 'one person, end to end' : 'occupancy · staff time · care team'}
+        </span>
+      </div>
       <div className="mp-controls">
         <fieldset className="mp-segment">
           <legend>Scenario measured</legend>
@@ -216,7 +585,22 @@ export default function MetricsPanel({
           <output aria-live="off">{clockLabel(time)}</output>
         </div>
       </div>
-      {!metrics ? (
+      {tab === 'trace' ? (
+        !trace ? (
+          <p className="mp-note">Tracing the scenario…</p>
+        ) : (
+          <TraceTab
+            model={model}
+            source={source}
+            events={trace}
+            scenario={scenario}
+            heroId={active?.heroId}
+            time={time}
+            seek={seek}
+            getViewer={getViewer}
+          />
+        )
+      ) : !metrics ? (
         <p className="mp-note">Loading the scenario…</p>
       ) : (
         <>

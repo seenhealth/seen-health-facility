@@ -11,7 +11,7 @@ Interactive planning models of **Alhambra (1839 W Valley), 1630 Olympic and Alve
 - Eight Alhambra vans run staggered trips, park in marked bays, yield at shared driveways and deploy ramps. Package and food deliveries use the rear employee entrance and receiving area. Olympic and Alveare have site-specific van arrivals, escorts and activity; Alveare drop-off is on the east side beside reception.
 - Video mode holds the camera still, speeds up the activities and can record a one-minute 1080p clip. Tilt shift is optional. Hide all controls for a clean view; **H** or **Esc** restores them and **R** starts recording.
 - The viewer includes the pull request's architectural presentation palette, clay figures, soft lighting and optional ambient occlusion. `?quality=balanced` selects lighter rendering; `?quality=high` enables the full pipeline.
-- **Measure** shows occupancy and staff-time metrics for Alhambra's base loop or the participant story.
+- **Measure** shows occupancy and staff-time metrics for Alhambra's base loop or the participant story. Its **Trace** tab lists one person's touchpoints end to end (zones, van boarding, interactions, encounters, handoffs) and downloads them as JSON.
 
 ## A day at Seen Health
 
@@ -19,7 +19,8 @@ Interactive planning models of **Alhambra (1839 W Valley), 1630 Olympic and Alve
 
 ```bash
 npm run build:scenario   # compile and validate the story tracks
-npm run sim:report       # refresh the downloadable simulation report
+npm run sim:report       # refresh the downloadable simulation report and touchpoint trace
+npm run trace:report     # touchpoint trace only (public/models/touchpoint-trace.json)
 npm run dev:story        # standalone story preview
 npm run build:story      # static output in dist/story-site/
 ```
@@ -59,6 +60,7 @@ node scripts/validate-site-arrivals.mjs
 node scripts/validate-additional-sites.mjs
 npm run validate:traffic
 npm run build:scenario -- --check
+npm run validate:trace
 npm run build
 npm run build:story
 ```
