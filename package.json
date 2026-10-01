@@ -22,6 +22,7 @@
     "sim:report": "node scripts/sim-report.mjs",
     "trace:report": "node scripts/sim-report.mjs --trace-only",
     "validate:trace": "node scripts/validate-trace.mjs",
+    "validate:renderer": "node scripts/validate-renderer.mjs",
     "dev:story": "vite --config vite.story.config.ts",
     "build:story": "vite build --config vite.story.config.ts",
     "preview:story": "vite preview --config vite.story.config.ts"
