@@ -13,8 +13,18 @@
  * van's docked pose, so the same choreography works wherever the dock is.
  */
 import { ARRIVAL, alhambraVanWindows, sampleVan } from './arrival';
-import { fleetParking, fleetReservations } from './alhambra-fleet';
-import { FLEET_VAN_SEATS, type VanSeat } from './photo-assets';
+import {
+  FLEET_CAB_DOOR,
+  fleetParking,
+  fleetTimeline,
+  type FleetSpell,
+} from './alhambra-fleet';
+import {
+  FLEET_VAN_CAB_DOOR,
+  FLEET_VAN_RAMP,
+  FLEET_VAN_SEATS,
+  type VanSeat,
+} from './photo-assets';
 import type { ActivityData, ActorSpec, Interaction, Segment } from './activity';
 import type { Action } from './characters';
 import type { Vec2 } from './schema';
@@ -24,6 +34,12 @@ const LOOP = 720;
 const STAFF_WALK = 1.35,
   CABIN_WALK = 0.7,
   CABIN_ROLL = 0.55;
+/**
+ * Nominal speed along a ride segment's placeholder path (m per loop second;
+ * see `Track.ride`): fast enough that an escort following its partner is
+ * handed to its own seat within a millisecond of the partner sitting down.
+ */
+const RIDE_PATH_SPEED = 1000;
 /** The driver follows the last member of a rider's party this far behind on the ramp. */
 const FOLLOW_GAP = 0.8;
 /** Gap an escort keeps behind its partner (mirrors `sampleEscort`). */
@@ -31,15 +47,20 @@ const escortGap = (rider: ActorSpec) =>
   rider.mobility === 'wheelchair' ? 0.74 : 0.95;
 /** Van-local standing spots used by the choreography (metres; see module comment). */
 const SPOT = {
-  sill: [FLEET_VAN_SEATS.door[0], FLEET_VAN_SEATS.door[2]] as Vec2,
-  foot: [FLEET_VAN_SEATS.door[0] + 2.9, FLEET_VAN_SEATS.door[2]] as Vec2,
+  sill: FLEET_VAN_RAMP.sill,
+  foot: FLEET_VAN_RAMP.foot,
   /** Beside the ramp hinge, clear of the door leaves and of riders arriving along the sidewalk. */
   standby: [2.8, -1.2] as Vec2,
   /** Upper ramp, off the centre line toward the nose: out of the way of a rider stepping onto the sill. */
   topside: [1.6, -0.62] as Vec2,
   /** Standing room between the cab seats and the door opening. */
   inside: [0.55, -1.15] as Vec2,
-  driverDoor: [-1.65, -1.95] as Vec2,
+  /** Just outside the driver's door opening, and a step further out, behind the open door's swing. */
+  cabDoorway: [
+    -1.3,
+    (FLEET_VAN_CAB_DOOR.hinge + FLEET_VAN_CAB_DOOR.rear) / 2,
+  ] as Vec2,
+  cabOutside: [-2.55, FLEET_VAN_CAB_DOOR.rear - 0.12] as Vec2,
   noseDriverSide: [-1.65, -3.75] as Vec2,
   noseDoorSide: [1.65, -3.75] as Vec2,
   aisleX: 0.18,
@@ -49,7 +70,12 @@ const GROUND = ARRIVAL.streetY,
   FLOOR = ARRIVAL.vanFloorY;
 const DRIVER_NAMES = ['Casey', 'Taylor', 'Robin', 'Dana', 'Jamie', 'Kai', 'Priya', 'Wen'];
 type Mobility = ActorSpec['mobility'];
-/** Two riders for each van that arrives mid-day without any actors of its own. */
+/**
+ * Two riders for each van that arrives mid-day without any actors of its own,
+ * and where each waits in the lobby for the afternoon van. Their ramp,
+ * entrance and lobby routes are the base loop's walking arrival's (see
+ * `entranceRoute`).
+ */
 const MIDDAY_RIDERS: {
   van: string;
   home: string;
@@ -63,23 +89,8 @@ const MIDDAY_RIDERS: {
   { van: 'van-d', home: 'van-b', name: 'Dolores', variant: 16, mobility: 'walker', waitAt: [-11.5, -1.5] },
   { van: 'van-d', home: 'van-b', name: 'Minh', variant: 17, waitAt: [-13.6, -1.6] },
 ];
-/** Sidewalk and entrance route shared with the base loop's walking arrivals (metres, world). */
-const SIDEWALK: Vec2 = [-17, 5.435],
-  ENTRANCE_RAMP_FOOT: Vec2 = [-15.518, 5.5],
-  ENTRANCE_RAMP_TOP: Vec2 = [-15.518, -0.992],
-  DOOR_OUTSIDE: Vec2 = [-14.653121, -0.992],
-  DOOR_INSIDE: Vec2 = [-14, -1],
-  LOBBY_ROUTE: Vec2[] = [
-    [-13.4, -1],
-    [-12.8, -0.4],
-    [-12, 0.2],
-  ],
-  QUEUE: Vec2 = [-11.3, 0.9],
-  LOBBY_DEPARTURE: Vec2[] = [
-    [-13.4, -0.8],
-    [-13.6, -0.8],
-    [-13.8, -1],
-  ];
+/** Mid-day riders check in a step behind and beside the front-desk spot, leaving it to the morning arrival waiting there. */
+const QUEUE_OFFSET: Vec2 = [-0.9, 0.7];
 
 const vanIds = fleetParking.map((_, i) => `van-${String.fromCharCode(97 + i)}`);
 const vanIndex = (id: string) => vanIds.indexOf(id);
@@ -203,9 +214,12 @@ class Track {
    * Seated in a vehicle until `until`. The nominal path (what the engine uses
    * when it is not placing the person in the vehicle) starts and ends at the
    * seat's docked world point via a far detour: `sampleEscort` measures its
-   * gap back along the partner's nominal path, and a long ride path keeps that
-   * measurement inside the ride segment, where the `seat` lets the engine hand
-   * an escort over to its own seat instead of leaving it behind at the dock.
+   * gap back along the partner's nominal path, and a fast ride path keeps that
+   * measurement inside the ride segment from its first frame, where the
+   * `seat` lets the engine hand an escort over to its own seat instead of
+   * leaving it behind at the dock (until then the engine slides the escort
+   * along the partner's last steps). The detour grows with the ride's length
+   * so that the nominal speed stays at RIDE_PATH_SPEED or more.
    */
   ride(
     until: number,
@@ -216,8 +230,9 @@ class Track {
     visible: boolean,
     from: Vec2 = seatWorld,
   ) {
+    const detour = Math.max(300, (RIDE_PATH_SPEED * (until - this.t)) / 2);
     this.push(
-      segment(this.t, until, 'ride', [from, [seatWorld[0], seatWorld[1] + 300], seatWorld], {
+      segment(this.t, until, 'ride', [from, [seatWorld[0], seatWorld[1] + detour], seatWorld], {
         heights: [FLOOR, FLOOR, FLOOR],
         heading: 0,
         title,
@@ -251,28 +266,9 @@ function hiddenAfter(index: number, t: number) {
   for (let s = t; s < LOOP; s += 0.25) if (!sampleVan(index, s).visible) return round(s);
   return LOOP;
 }
-/** Intervals during which a van is away from its bay, and how it is engaged. */
-type VanSpell = { start: number; end: number; kind: 'moving' | 'docked' | 'yielding' };
-function vanSpells(index: number): VanSpell[] {
-  const w = alhambraVanWindows[index];
-  if (w)
-    return [
-      [w.inbound, w.outbound],
-      [w.returning, w.leaving],
-    ]
-      .filter(([go]) => go[0] >= 0)
-      .flatMap(([go, leave]): VanSpell[] => [
-        { start: go[0], end: go[1], kind: 'moving' },
-        { start: go[1], end: leave[0], kind: 'docked' },
-        { start: leave[0], end: leave[1], kind: 'moving' },
-      ]);
-  return fleetReservations(alhambraVanWindows)
-    .filter((r) => r.van === index)
-    .flatMap((r): VanSpell[] => [
-      { start: r.requested, end: r.start, kind: 'yielding' },
-      { start: r.start, end: r.end, kind: 'moving' },
-    ]);
-}
+/** The van's day as the fleet plans it: trips, docked spells and waits (off site, in its bay or for the driveway). */
+const vanSpells = (index: number): FleetSpell[] =>
+  fleetTimeline(index, alhambraVanWindows);
 
 // ---------------------------------------------------------------------------
 // Riders
@@ -525,7 +521,12 @@ const rampHeight = (p: Vec2, sill: Vec2, foot: Vec2) => {
   return round(FLOOR + (GROUND - FLOOR) * Math.min(1, f));
 };
 
-/** One driver's day from the van timetable and the riders who use its ramp. */
+/**
+ * One driver's day from the van's timeline and the riders who use its ramp:
+ * seated and visible whenever the van is under way or waiting to go, seated
+ * and hidden with it while it is off site, in the fleet office while it is
+ * parked, and on foot at the drop-off.
+ */
 function driverDay(index: number, actors: ActorSpec[], escorts: Map<string, ActorSpec>): Segment[] {
   const vehicle = vanIds[index],
     seat = FLEET_VAN_SEATS.driver,
@@ -535,24 +536,24 @@ function driverDay(index: number, actors: ActorSpec[], escorts: Map<string, Acto
     ? dockFrame(index).world(seatPoint(seat))
     : [bay.x, bay.z];
   const track = new Track(parkedSeat, FLOOR, 0);
-  const hidden = (until: number, title: string) =>
-    track.ride(until, vehicle, seat, parkedSeat, title, false);
-  const driving = (until: number, title = 'Driving the van') =>
-    track.ride(until, vehicle, seat, parkedSeat, title, true);
-  if (!spells.length) return hidden(LOOP, 'Spare van · no runs scheduled').segments;
+  const ride = (until: number, title: string, visible: boolean) =>
+    track.ride(until, vehicle, seat, parkedSeat, title, visible);
+  if (spells.every((s) => s.kind === 'parked'))
+    return ride(LOOP, 'Spare van · no runs scheduled', false).segments;
   const ramp = alhambraVanWindows[index] ? rampUses(index, actors, escorts) : { down: [], up: [] };
   for (const spell of spells) {
-    if (track.t < spell.start) hidden(spell.start, 'Off the road · fleet office');
-    if (spell.kind === 'yielding') driving(spell.end, 'Waiting for the driveway');
-    else if (spell.kind === 'moving') driving(spell.end);
-    else dockedDuty(track, index, spell, ramp);
+    if (spell.kind === 'docked') dockedDuty(track, index, spell, ramp);
+    // Rounded down to the millisecond (segment times are), so the driver is never seen in the van once it is parked.
+    else if (spell.kind === 'trip') ride(Math.floor(spell.end * 1000) / 1000, 'Driving the van', true);
+    else if (spell.kind === 'yielding') ride(spell.end, 'Waiting for the driveway', true);
+    else if (spell.kind === 'away') ride(spell.end, 'Off site · driving the route', false);
+    else ride(spell.end, 'Off the road · fleet office', false);
   }
-  if (track.t < LOOP) hidden(LOOP, 'Off the road · fleet office');
   return track.segments;
 }
 
 /** The docked choreography: out of the cab, ramp duty for each rider, back in before departure. */
-function dockedDuty(track: Track, index: number, spell: VanSpell, ramp: RampUses) {
+function dockedDuty(track: Track, index: number, spell: FleetSpell, ramp: RampUses) {
   const frame = dockFrame(index),
     { window } = frame,
     vehicle = vanIds[index],
@@ -560,7 +561,8 @@ function dockedDuty(track: Track, index: number, spell: VanSpell, ramp: RampUses
     at = (p: Vec2) => frame.world(p);
   const P = {
     seat: at(seatPoint(seat)),
-    door: at(SPOT.driverDoor),
+    doorway: at(SPOT.cabDoorway),
+    outside: at(SPOT.cabOutside),
     noseA: at(SPOT.noseDriverSide),
     noseB: at(SPOT.noseDoorSide),
     standby: at(SPOT.standby),
@@ -576,8 +578,13 @@ function dockedDuty(track: Track, index: number, spell: VanSpell, ramp: RampUses
     faceSill = facing(P.foot, P.sill),
     faceOut = facing(P.foot, at([SPOT.foot[0], SPOT.foot[1] - 3]));
   const inside: Extra = { vehicleId: vehicle };
-  // Out of the cab (through the unmodelled driver door) and around the nose.
-  track.walk([P.door], track.t + 1.2, 'Out of the cab', GROUND, 'walk', inside);
+  // The driver's door (FLEET_CAB_DOOR) swings open as the van docks: out
+  // through it and a step clear of its swing before it shuts, then around the
+  // nose. Before departure it opens again for the way back in.
+  const { swing, exit, entry } = FLEET_CAB_DOOR,
+    departs = spell.end;
+  track.ride(spell.start + exit.open + 0.2, vehicle, seat, P.seat, 'Opening the cab door', true);
+  track.walk([P.doorway, P.outside], spell.start + exit.close - 0.7, 'Out of the cab', GROUND, 'walk', inside);
   track.walkAt([P.noseA, P.noseB, P.standby], STAFF_WALK, 'Around the nose to the ramp', GROUND);
   const rampReady = service[0] + 2;
   if (morning) {
@@ -605,7 +612,8 @@ function dockedDuty(track: Track, index: number, spell: VanSpell, ramp: RampUses
     }
     if (uses.length) track.stay(track.t + 1.5, 'greet', 'Handoff at the ramp foot', faceOut);
     track.walkAt([P.standby], STAFF_WALK, 'Back to the ramp hinge', GROUND);
-    track.stay(service[1] + 1, 'idle', 'Stowing the ramp', faceRamp);
+    // The ramp folds up over [end − 2, end + 1]; once it is mostly stowed, head for the cab.
+    track.stay(service[1], 'idle', 'Stowing the ramp', faceRamp);
   } else {
     let lastAboard = track.t;
     const cycle = FOLLOW_GAP / 0.6 + 1 + length([P.sill, P.foot, P.standby]) / STAFF_WALK;
@@ -631,25 +639,73 @@ function dockedDuty(track: Track, index: number, spell: VanSpell, ramp: RampUses
       track.stay(track.t + 1, 'idle', 'Rider aboard', facing(stop, P.sill), inside);
       track.walkAt([P.foot, P.standby], STAFF_WALK, 'Back beside the ramp', GROUND);
     }
-    const latest = spell.end - length([P.standby, P.noseB, P.noseA, P.door]) / STAFF_WALK - 1.2 - 0.2;
+    const latest = departs + entry.open + swing - length([P.standby, P.noseB, P.noseA, P.outside]) / STAFF_WALK - 0.2;
     track.stay(Math.min(lastAboard + 0.4, latest), 'idle', 'Doors clear', faceRamp);
   }
-  // Around the nose and back into the cab before the van leaves.
-  track.walkAt([P.noseB, P.noseA, P.door], STAFF_WALK, 'Around the nose to the cab', GROUND);
-  track.walk([P.seat], track.t + 1.2, 'Into the cab', FLOOR, 'walk', inside);
-  if (track.t > spell.end)
-    throw new Error(`${vehicle}: the driver is back in the cab ${round(track.t - spell.end)} s after departure`);
-  track.ride(spell.end, vehicle, seat, P.seat, 'In the cab, ready to leave', true);
+  // Around the nose to the driver's door, in once it is open, seated before it shuts.
+  track.walkAt([P.noseB, P.noseA, P.outside], STAFF_WALK, 'Around the nose to the cab', GROUND);
+  const doorOpen = departs + entry.open + swing;
+  if (track.t > doorOpen)
+    throw new Error(`${vehicle}: the driver reaches the cab door ${round(track.t - doorOpen)} s after it opens`);
+  track.stay(doorOpen, 'idle', 'At the cab door', facing(P.outside, P.doorway));
+  track.walk([P.doorway, P.seat], departs + entry.close, 'Into the cab', FLOOR, 'walk', inside);
+  track.ride(departs, vehicle, seat, P.seat, 'In the cab, ready to leave', true);
 }
 
 // ---------------------------------------------------------------------------
 // Mid-day riders for vans that arrive without actors of their own
 // ---------------------------------------------------------------------------
+type Leg = { path: Vec2[]; heights: number[] };
+/**
+ * The base loop's walking arrival (`arrival-walker`): its approach along the
+ * sidewalk, the wheelchair ramp, the sliding entrance, the walk to reception
+ * and its afternoon walk back to the van are the routes the mid-day riders
+ * share, so that a change to the entrance or lobby reaches them too.
+ */
+function entranceRoute(data: ActivityData) {
+  const walker = data.actors.find((a) => a.id === 'arrival-walker');
+  const leg = (title: string): Leg & { vehicleId?: string } => {
+    const s = walker?.segments.find((x) => x.title === title);
+    if (!s) throw new Error(`withFleetCrew: arrival-walker has no "${title}" segment to share`);
+    return { path: s.path, heights: s.heights ?? s.path.map(() => 0), vehicleId: s.vehicleId };
+  };
+  const tail = (l: Leg, from = 1): Leg => ({ path: l.path.slice(from), heights: l.heights.slice(from) });
+  const approach = leg('Meet escort · approach ramp'),
+    reception = leg('Walk to reception'),
+    departure = leg('Escorted departure · board van');
+  const desk = reception.path.at(-1)!,
+    queue: Vec2 = [round(desk[0] + QUEUE_OFFSET[0]), round(desk[1] + QUEUE_OFFSET[1])];
+  // The reception walk as far as its point nearest the queue spot, then the step to it.
+  const turn = nearestIndex(reception.path, queue);
+  // The walker's own van: its departure ends at that van's ramp foot and sill.
+  const walkerVan = vanIndex(departure.vehicleId ?? '');
+  if (walkerVan < 0) throw new Error('withFleetCrew: arrival-walker does not board a fleet van');
+  const footAt = departure.path.findIndex((p) => near(p, dockFrame(walkerVan).foot));
+  return {
+    /** From the ramp foot along the sidewalk to the foot of the entrance ramp. */
+    approach: tail(approach),
+    ramp: tail(leg('Up the wheelchair ramp')),
+    entrance: tail(leg('Turn right · sliding entrance')),
+    lobby: { path: [...reception.path.slice(1, turn + 1), queue], heights: [...reception.heights.slice(1, turn + 1), 0] },
+    queue,
+    rejoin: reception.path[turn],
+    desk,
+    /** The walk out, joined at its point nearest `from`, up to (not including) the ramp foot. */
+    exit(from: Vec2): Leg {
+      const join = nearestIndex(departure.path.slice(0, footAt), from);
+      return { path: departure.path.slice(join, footAt), heights: departure.heights.slice(join, footAt) };
+    },
+  };
+}
+type EntranceRoute = ReturnType<typeof entranceRoute>;
+const nearestIndex = (path: Vec2[], p: Vec2) =>
+  path.reduce((best, q, i) => (Math.hypot(q[0] - p[0], q[1] - p[1]) < Math.hypot(path[best][0] - p[0], path[best][1] - p[1]) ? i : best), 0);
 function middayRider(
   spec: (typeof MIDDAY_RIDERS)[number],
   order: number,
   onVan: number,
   onHome: number,
+  route: EntranceRoute,
 ): ActorSpec {
   const frame = dockFrame(vanIndex(spec.van)),
     homeFrame = dockFrame(vanIndex(spec.home));
@@ -660,32 +716,25 @@ function middayRider(
   const boardingEnd = homeFrame.window.boarding[0] + 28 + onHome * 3;
   const speed = spec.mobility ? 0.64 : 0.7;
   const track = new Track(frame.sill, FLOOR, 0);
+  const withHeights = (l: Leg) => ({ heights: [track.y, ...l.heights] });
+  const onVanRoute = { vehicleId: spec.van };
   // Placeholder rides at the sill; seatRider assigns the seat, cabin walks and visibility.
   track.ride(r0, spec.van, FLEET_VAN_SEATS.benches[0], frame.sill, 'Riding to Seen Health', true);
-  track.walk([frame.foot], r0 + 12, 'Unload on van ramp', GROUND, 'walk', { vehicleId: spec.van });
-  track.walk([SIDEWALK, ENTRANCE_RAMP_FOOT], r0 + 24, 'Meet escort · approach ramp', GROUND, 'walk', { vehicleId: spec.van });
-  track.walk([ENTRANCE_RAMP_TOP], r0 + 42, 'Up the wheelchair ramp', 0, 'walk', { vehicleId: spec.van });
-  track.walk([DOOR_OUTSIDE, DOOR_INSIDE], r0 + 47, 'Turn right · sliding entrance', 0, 'walk', { vehicleId: spec.van, zoneId: 'lobby' });
-  track.walkAt([...LOBBY_ROUTE, QUEUE], 0.77, 'Walk to reception', 0, 'walk', { zoneId: 'lobby' });
-  track.stay(track.t + 12, 'greet', 'Check in behind the front desk queue', Math.PI / 2, { zoneId: 'lobby' });
-  track.walkAt([[-11.8, -0.3], spec.waitAt], 0.77, 'Find a place to wait', 0, 'walk', { zoneId: 'lobby' });
-  const departure: Vec2[] = [
-    ...LOBBY_DEPARTURE,
-    DOOR_INSIDE,
-    DOOR_OUTSIDE,
-    ENTRANCE_RAMP_TOP,
-    ENTRANCE_RAMP_FOOT,
-    SIDEWALK,
-    homeFrame.foot,
-    homeFrame.sill,
-  ];
-  const heights = [0, 0, 0, 0, 0, 0, 0, GROUND, GROUND, GROUND, FLOOR];
+  track.walk([frame.foot], r0 + 12, 'Unload on van ramp', GROUND, 'walk', onVanRoute);
+  track.walk(route.approach.path, r0 + 24, 'Meet escort · approach ramp', GROUND, 'walk', { ...onVanRoute, ...withHeights(route.approach) });
+  track.walk(route.ramp.path, r0 + 42, 'Up the wheelchair ramp', 0, 'walk', { ...onVanRoute, ...withHeights(route.ramp) });
+  track.walk(route.entrance.path, r0 + 47, 'Turn right · sliding entrance', 0, 'walk', { ...onVanRoute, zoneId: 'lobby', ...withHeights(route.entrance) });
+  track.walkAt(route.lobby.path, 0.77, 'Walk to reception', 0, 'walk', { zoneId: 'lobby', ...withHeights(route.lobby) });
+  track.stay(track.t + 12, 'greet', 'Check in behind the front desk queue', facing(route.queue, route.desk), { zoneId: 'lobby' });
+  track.walkAt([route.rejoin, spec.waitAt], 0.77, 'Find a place to wait', 0, 'walk', { zoneId: 'lobby' });
+  const exit = route.exit(spec.waitAt);
+  const departure: Vec2[] = [...exit.path, homeFrame.foot, homeFrame.sill];
   const departAt = boardingEnd - length([spec.waitAt, ...departure]) / speed;
-  track.stay(departAt, 'idle', 'Await confirmed pickup', facing(spec.waitAt, QUEUE), { zoneId: 'lobby' });
+  track.stay(departAt, 'idle', 'Await confirmed pickup', facing(spec.waitAt, route.queue), { zoneId: 'lobby' });
   track.walk(departure, boardingEnd, 'Escorted departure · board van', FLOOR, 'walk', {
     vehicleId: spec.home,
     zoneId: 'lobby',
-    heights,
+    heights: [track.y, ...exit.heights, GROUND, FLOOR],
   });
   track.ride(LOOP, spec.home, FLEET_VAN_SEATS.benches[0], homeFrame.sill, 'Riding home', true);
   return {
@@ -712,13 +761,15 @@ export function withFleetCrew(data: ActivityData): ActivityData {
   const midday: ActorSpec[] = [],
     perVan = new Map<string, number>(),
     perHome = new Map<string, number>();
+  let route: EntranceRoute | undefined;
   MIDDAY_RIDERS.forEach((spec, order) => {
     if (data.actors.some((a) => rideEvents(a).some((e) => e.vehicle === spec.van))) return;
     const onVan = perVan.get(spec.van) ?? 0,
       onHome = perHome.get(spec.home) ?? 0;
     perVan.set(spec.van, onVan + 1);
     perHome.set(spec.home, onHome + 1);
-    midday.push(middayRider(spec, order, onVan, onHome));
+    route ??= entranceRoute(data);
+    midday.push(middayRider(spec, order, onVan, onHome, route));
   });
   const actors = [...data.actors.filter((a) => !isFleetDriverId(a.id)), ...midday];
   const byId = new Map(actors.map((a) => [a.id, a]));

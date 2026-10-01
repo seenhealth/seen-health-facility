@@ -8,14 +8,16 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { loadSim } from './build-scenario.mjs';
 
-const { sim, activity, crew, story, deliveries, fleet } = await loadSim({
+const { sim, activity, crew, story, deliveries, fleet, body } = await loadSim({
   sim: 'app/sim/index.ts',
   activity: 'app/model/activity.ts',
   crew: 'app/model/fleet-crew.ts',
   story: 'app/sim/story-source.ts',
   deliveries: 'app/model/deliveries.ts',
   fleet: 'app/model/alhambra-fleet.ts',
+  body: 'app/model/photo-assets.ts',
 });
+const { FLEET_VAN_RAMP: RAMP, FLEET_VAN_CAB_DOOR: CAB } = body;
 const model = sim.validateFacility(
   JSON.parse(readFileSync('public/models/seen-alhambra-planning.json', 'utf8')),
 );
@@ -62,6 +64,7 @@ const sources = [
   ['story', crew.withFleetCrew(story.storyActivitySource().source)],
 ];
 const totals = { actors: 0, drivers: 0, riders: 0, rampEscorts: 0, samples: 0 };
+let driverDoorCrossings = 0;
 for (const [name, source] of sources) {
   const byId = new Map(source.actors.map((a) => [a.id, a]));
   assert.equal(new Set(source.actors.map((a) => a.id)).size, source.actors.length, `${name}: unique ids`);
@@ -80,14 +83,19 @@ for (const [name, source] of sources) {
       if (i < a.segments.length - 1) assert.ok(Math.abs(s.end - next.start) < 1e-6, `${a.id} contiguous at ${s.end} ("${s.title}" → "${next.title}")`);
       assert.deepEqual(s.path.at(-1), next.path[0], `${a.id}: no teleport after "${s.title}" (${s.end}s)`);
       if (s.heights) assert.equal(s.heights.length, s.path.length, `${a.id} "${s.title}" heights match path`);
-      if (s.seat) assert.ok(vanIds.includes(s.vehicleId) || s.vehicleId, `${a.id} seat names a vehicle`);
+      if (s.seat)
+        assert.ok(
+          vanIds.includes(s.vehicleId) || deliveries.deliveryStops.some((d) => d.id === s.vehicleId),
+          `${a.id} "${s.title}" sits in an unregistered vehicle "${s.vehicleId}"`,
+        );
     });
   }
   // Sampled motion.
   const dt = 0.05,
     prev = new Map();
   const drivers = source.actors.filter((a) => a.role === 'driver' && a.segments.some((s) => vanIds.includes(s.vehicleId)));
-  const seatedInParked = [];
+  const seatedInParked = [],
+    cabSide = new Map();
   for (let t = 0; t <= DURATION + 1e-9; t += dt) {
     const tt = t % DURATION;
     for (const id of crewIds) {
@@ -129,14 +137,37 @@ for (const [name, source] of sources) {
       }
       prev.set(id, f);
     }
-    // Drivers are in their seat whenever their van moves.
+    // Drivers are in their seat, and seen there, whenever their van moves in
+    // view; on foot at the drop-off they pass the van's driver-side panel
+    // only through the open driver's door.
     for (const d of drivers) {
       const vid = d.segments.find((s) => vanIds.includes(s.vehicleId)).vehicleId,
-        v = vanIds.indexOf(vid);
+        v = vanIds.indexOf(vid),
+        van = sim.sampleVan(v, tt),
+        f = place(source, byId, d, tt);
       if (vanSpeed(v, tt) > 0.05) {
-        const f = place(source, byId, d, tt);
         assert.equal(f.seatedIn, vid, `${name}: ${d.id} is out of the cab while ${vid} moves at ${tt} ("${f.title}")`);
+        if (van.visible) assert.ok(f.visible !== false, `${name}: ${vid} drives in view without its driver at ${tt} ("${f.title}")`);
       }
+      const c = Math.cos(van.heading),
+        sn = Math.sin(van.heading),
+        dx = f.x - van.position.x,
+        dz = f.z - van.position.z,
+        local = { x: dx * c - dz * sn, z: dx * sn + dz * c, door: van.cabDoor, onFoot: !f.seatedIn && f.visible !== false };
+      const before = cabSide.get(d.id);
+      if (before && before.onFoot && local.onFoot && van.visible && Math.abs(local.z) < 3.2) {
+        const wall = -1.095;
+        if ((before.x - wall) * (local.x - wall) < 0) {
+          const k = (wall - before.x) / (local.x - before.x),
+            z = before.z + (local.z - before.z) * k;
+          driverDoorCrossings++;
+          assert.ok(
+            z >= CAB.hinge && z <= CAB.rear && Math.min(before.door, local.door) > 0.9,
+            `${name}: ${d.id} passes through ${vid}'s driver-side panel at ${tt.toFixed(2)} (z ${z.toFixed(2)}, door ${local.door.toFixed(2)}, "${f.title}")`,
+          );
+        }
+      }
+      cabSide.set(d.id, local);
     }
   }
   assert.deepEqual(seatedInParked.slice(0, 3), [], `${name}: nobody sits in a van parked in its bay`);
@@ -149,8 +180,8 @@ for (const [name, source] of sources) {
       const v = vanIds.indexOf(s.vehicleId),
         dock = sim.sampleVan(v, s.start);
       if (!dock.visible || dock.ramp < 0.999) continue;
-      const sill = activity.seatInVehicle(dock, [1.035, 0, -0.19]),
-        foot = activity.seatInVehicle(dock, [3.935, 0, -0.19]);
+      const sill = activity.seatInVehicle(dock, [RAMP.sill[0], 0, RAMP.sill[1]]),
+        foot = activity.seatInVehicle(dock, [RAMP.foot[0], 0, RAMP.foot[1]]);
       const onRamp = (p) => Math.abs((p.x - sill.x) * (foot.z - sill.z) - (p.z - sill.z) * (foot.x - sill.x)) < 0.25 &&
         Math.min(sill.x, foot.x) - 0.05 <= p.x && p.x <= Math.max(sill.x, foot.x) + 0.05 &&
         Math.min(sill.z, foot.z) - 0.05 <= p.z && p.z <= Math.max(sill.z, foot.z) + 0.05;
@@ -190,5 +221,5 @@ for (const [name, source] of sources) {
   console.log(`${name}: ${source.actors.length} actors, ${drivers.length} drivers, ${crewIds.length - drivers.length} riders seated.`);
 }
 console.log(
-  `Fleet crew: ${totals.rampEscorts} ramp descents escorted by the driver, ${totals.samples.toLocaleString()} placement samples; cabin walks, seat visibility, driver-in-cab and wall clearance passed.`,
+  `Fleet crew: ${totals.rampEscorts} ramp descents escorted by the driver, ${driverDoorCrossings} cab-door passages through the open driver's door, ${totals.samples.toLocaleString()} placement samples; cabin walks, seat visibility, driver-in-cab and wall clearance passed.`,
 );

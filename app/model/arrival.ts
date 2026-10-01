@@ -5,6 +5,7 @@ import {
   extraVanWindows,
   sampleFleetVan,
 } from './alhambra-fleet';
+import { FLEET_VAN_CAB_DOOR, FLEET_VAN_RAMP } from './photo-assets';
 import type { Facility, Vec2 } from './schema';
 export const ARRIVAL = {
   dock: [-20.5, 1.5] as Vec2,
@@ -219,8 +220,22 @@ export function buildArrivalVan(
     material,
   );
   root.name = `animated-van-${String.fromCharCode(97 + index)}`;
+  // Own copies of the body materials, so one van can fade out at the map edge
+  // without touching the others (the renderer's section clones key on these).
+  const copies = new Map<T.Material, T.Material>();
+  const own = (m: T.Material) => {
+    if (!copies.has(m)) copies.set(m, m.clone());
+    return copies.get(m)!;
+  };
+  root.traverse((o) => {
+    if (o instanceof T.Mesh)
+      o.material = Array.isArray(o.material)
+        ? o.material.map(own)
+        : own(o.material);
+  });
+  const ramp = FLEET_VAN_RAMP;
   const pivot = new T.Group();
-  pivot.position.set(1.035, 0.58, -0.19);
+  pivot.position.set(...ramp.hinge);
   pivot.name = 'vehicle-ramp-hinge';
   root.add(pivot);
   const box = (
@@ -241,11 +256,14 @@ export function buildArrivalVan(
     pivot.add(mesh);
     return mesh;
   };
-  box(1.48, -0.04, 0, 2.96, 0.055, 1.02, '#a8bab8').name =
+  const half = ramp.length / 2,
+    edge = ramp.width / 2 + 0.01;
+  box(half, -0.04, 0, ramp.length, 0.055, ramp.width, '#a8bab8').name =
     'deployable-wheelchair-ramp';
-  for (const z of [-0.52, 0.52]) box(1.48, 0, z, 2.96, 0.055, 0.035, '#25777c');
-  for (let x = 0.15; x < 2.94; x += 0.17)
-    box(x, 0.016, 0, 0.026, 0.006, 0.91, '#243f49');
+  for (const z of [-edge, edge])
+    box(half, 0, z, ramp.length, 0.055, 0.035, '#25777c');
+  for (let x = 0.15; x < ramp.length - 0.02; x += 0.17)
+    box(x, 0.016, 0, 0.026, 0.006, ramp.width - 0.11, '#243f49');
   return {
     root,
     pivot,
@@ -253,20 +271,62 @@ export function buildArrivalVan(
       root.getObjectByName('passenger-door-0')!,
       root.getObjectByName('passenger-door-1')!,
     ],
+    cabDoor: root.getObjectByName('driver-door') ?? null,
+    opacity: 1,
   };
+}
+/** What a van body needs from a vehicle sampler; fleet vans also fade and open the driver's door. */
+export type VanPose = {
+  position: T.Vector3;
+  heading: number;
+  visible: boolean;
+  door: number;
+  ramp: number;
+  phase?: string;
+  opacity?: number;
+  cabDoor?: number;
+};
+/** Fade a van body (its own material copies) toward `opacity`; shadows drop while it is see-through. */
+function fadeVan(van: ReturnType<typeof buildArrivalVan>, opacity: number) {
+  if (van.opacity === opacity) return;
+  van.opacity = opacity;
+  const fading = opacity < 1;
+  van.root.traverse((o) => {
+    if (!(o instanceof T.Mesh)) return;
+    o.userData.castShadow ??= o.castShadow;
+    o.castShadow = !fading && o.userData.castShadow;
+    for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
+      const base = (m.userData.fade ??= {
+        opacity: m.opacity,
+        transparent: m.transparent,
+        depthWrite: m.depthWrite,
+      });
+      m.opacity = base.opacity * opacity;
+      m.depthWrite = fading ? false : base.depthWrite;
+      const transparent = base.transparent || fading;
+      if (m.transparent !== transparent) {
+        m.transparent = transparent;
+        m.needsUpdate = true;
+      }
+    }
+  });
 }
 export function updateArrivalVan(
   van: ReturnType<typeof buildArrivalVan>,
-  sample: Omit<ReturnType<typeof sampleVan>, 'reverse'>,
+  sample: VanPose,
   enabled: boolean,
-  rampAngle = -Math.atan2(0.58, 2.9),
+  rampAngle = -Math.atan2(FLEET_VAN_RAMP.rise, FLEET_VAN_RAMP.run),
 ) {
   van.root.position.copy(sample.position);
   van.root.rotation.y = sample.heading;
   van.root.visible = enabled && sample.visible;
+  fadeVan(van, sample.opacity ?? 1);
   van.pivot.visible = sample.ramp > 0.001;
   van.pivot.rotation.z = T.MathUtils.lerp(Math.PI / 2, rampAngle, sample.ramp);
   van.doors.forEach(
     (door, i) => (door.position.z = (i ? 1 : -1) * 0.6 * sample.door),
   );
+  if (van.cabDoor)
+    van.cabDoor.rotation.y =
+      -FLEET_VAN_CAB_DOOR.openAngle * (sample.cabDoor ?? 0);
 }
