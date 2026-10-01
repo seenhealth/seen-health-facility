@@ -41,7 +41,8 @@ visible, and exposes `focusSetting(id?)` and `view('community')`.
 Layers) shows or hides the layer. The pads live in the site context, so they
 also hide with **Street & parking context** and stay out of Plan. The engine
 hides the layer's people through its view (`hiddenSources`, matched against
-`ActorSpec.sourceId`), so the people count, walking-path lines and follow
+`ActorSpec.sourceId`), so the activity panel's people count (the snapshot's
+`people`: 203 with the layer, 177 without), walking-path lines and follow
 targets follow the toggle; site-level people (the community cast and the fleet
 drivers) show only with the site context, at every level.
 

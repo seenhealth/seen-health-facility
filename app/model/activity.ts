@@ -207,7 +207,10 @@ export function seatInVehicle(
   };
 }
 export type ActivitySnapshot = ActivityOptions & {
+  /** People drawn right now. */
   count: number;
+  /** People in the loop, less those of hidden sources (the community layer toggled off). */
+  people: number;
   elapsedLabel: string;
 };
 const inside = (p: Vec2, poly: Vec2[]) => {
@@ -626,6 +629,10 @@ export function createActivity(
     return {
       ...options,
       count: actors.filter((a) => a.root.visible).length,
+      people: actors.filter(
+        (a) =>
+          !(a.spec.sourceId && view.hiddenSources.includes(a.spec.sourceId)),
+      ).length,
       elapsedLabel: `${Math.floor(options.time / 60)}:${String(Math.floor(options.time % 60)).padStart(2, '0')}`,
     };
   }
@@ -675,7 +682,11 @@ export function createActivity(
           : null;
       if (ride) {
         const placed = seatInVehicle(ride, s.seat!, s.seatHeading);
-        s = { ...s, ...placed, visible: s.visible !== false && seatsShown(ride) };
+        s = {
+          ...s,
+          ...placed,
+          visible: s.visible !== false && seatsShown(ride),
+        };
       }
       if (
         (!data.siteSpecific || a.spec.arrivalVehicleId) &&

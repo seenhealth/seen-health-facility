@@ -11,6 +11,7 @@ import {
 } from '../work/validation/activity.mjs';
 import { alhambraSource } from '../work/validation/alhambra-source.mjs';
 import { registerCommunityVehicles } from '../work/validation/community-vehicles.mjs';
+import { COMMUNITY_SOURCE_ID } from '../work/validation/community-people.mjs';
 import { buildNeighborhood } from '../work/validation/neighborhood.mjs';
 import { sampleVan, vanWindows, ARRIVAL } from '../work/validation/arrival.mjs';
 import { dayProgram, programAt } from '../work/validation/day-room.mjs';
@@ -197,6 +198,35 @@ activity.updateView({
   site: true,
 });
 assert.equal(activity.root.visible, false);
+// The community toggle hides that source's people, and the panel's people
+// count (the snapshot's `people`) drops with it.
+const allView = {
+  level: 'all',
+  plan: false,
+  explode: 0,
+  stack: 0,
+  isolate: false,
+  selected: null,
+  site: true,
+};
+const communityIds = new Set(
+  activity.actors
+    .filter((a) => a.spec.sourceId === COMMUNITY_SOURCE_ID)
+    .map((a) => a.spec.id),
+);
+assert.equal(communityIds.size, 26, 'the community layer brings its cast');
+activity.updateView(allView);
+assert.equal(activity.getState().people, 203);
+activity.updateView({ ...allView, hiddenSources: [COMMUNITY_SOURCE_ID] });
+assert.equal(
+  activity.getState().people,
+  177,
+  'people count without the community layer',
+);
+assert.ok(
+  activity.actors.every((a) => !communityIds.has(a.spec.id) || !a.root.visible),
+  'community people hidden with their source',
+);
 activity.setOptions({ filter: 'doctor' });
 activity.updateView({
   level: 'ground',
