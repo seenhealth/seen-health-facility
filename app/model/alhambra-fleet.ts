@@ -140,8 +140,10 @@ export const FLEET_LOT = {
 const SPEED = { lot: 3, street: 9, corner: 5, reverse: 1.8 },
   ACCEL = 1.5;
 /** Fleet van footprint (half width, half length) and the clearance kept to parked vans. */
-const VAN = { halfWidth: 1.125, halfLength: 3.175 },
-  VAN_MARGIN = 0.5;
+export const FLEET_VAN = { halfWidth: 1.125, halfLength: 3.175 },
+  FLEET_VAN_MARGIN = 0.5;
+const VAN = FLEET_VAN,
+  VAN_MARGIN = FLEET_VAN_MARGIN;
 
 // ---------------------------------------------------------------------------
 // Route pieces: straight runs and arcs of the van centre
@@ -708,7 +710,6 @@ function tripLot(trip: Trip): [number, number] | null {
   }
   return lot;
 }
-
 
 // ---------------------------------------------------------------------------
 // Parked neighbours: which spots a trip sweeps close to, and when

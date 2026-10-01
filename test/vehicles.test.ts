@@ -2,8 +2,16 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import * as T from 'three';
 import { seatInVehicle, type VehiclePose } from '../app/model/activity';
-import { fleetReservations } from '../app/model/alhambra-fleet';
+import {
+  FLEET_LOT,
+  FLEET_VAN,
+  FLEET_VAN_MARGIN,
+  fleetParking,
+  fleetReservations,
+  sampleFleetVan,
+} from '../app/model/alhambra-fleet';
 import { alhambraVanWindows } from '../app/model/arrival';
+import { vehicleGap } from '../app/model/vehicle-clearance';
 
 const close = (a: number, b: number, what: string) =>
   assert.ok(Math.abs(a - b) < 1e-9, `${what}: ${a} vs ${b}`);
@@ -44,45 +52,74 @@ void test('seatInVehicle matches the three.js vehicle frame and round-trips', ()
     }
 });
 
-const runs = (booked: ReturnType<typeof fleetReservations>) =>
-  booked.filter((b) => b.van === 4 || b.van === 5);
-
 void test('fleetReservations keeps the shared driveway to one maneuver with 4 s gaps', () => {
   const booked = fleetReservations(alhambraVanWindows);
-  const scheduled = runs(booked);
-  assert.equal(scheduled.length, 4, 'two runs each for vans E and F');
-  for (const run of scheduled)
-    assert.ok(run.start >= run.requested, 'a run is never moved earlier');
-  // Sorted by start with every gap >= 4 s means no two bookings overlap.
+  assert.ok(booked.length > alhambraVanWindows.length, 'the day has bookings');
+  for (const b of booked) {
+    assert.ok(b.end > b.start, `van ${b.van} books a real span`);
+    assert.ok(b.start >= b.requested, `van ${b.van} is never moved earlier`);
+  }
+  // Sorted by start with every gap >= 4 s: no two maneuvers share the lot.
   for (let i = 1; i < booked.length; i++) {
     const [a, b] = [booked[i - 1], booked[i]];
+    assert.ok(a.start <= b.start, 'reservations are sorted by start');
     assert.ok(
       b.start - a.end >= 4 - 1e-9,
       `van ${b.van} at ${b.start} follows van ${a.van} (until ${a.end}) by ${b.start - a.end} s`,
     );
   }
+  // Across the loop seam the last booking still ends before the first starts.
+  const [first, last] = [booked[0], booked.at(-1)!];
+  assert.ok(
+    last.end - 720 <= first.start + 1e-9,
+    `van ${last.van} (until ${last.end}) overlaps van ${first.van} at ${first.start} across the seam`,
+  );
 });
 
-void test('fleetReservations pushes a run past a conflicting booking by 4 s', () => {
-  const idle = [-2, -2];
-  const windows = [
+void test('fleet vans maneuver past a parking spot or the drop-off only while it is empty', () => {
+  const spots = [
+    ...fleetParking,
     {
-      inbound: [20, 40],
-      unload: idle,
-      outbound: [150, 170],
-      returning: idle,
-      boarding: idle,
-      leaving: idle,
+      x: FLEET_LOT.dock[0],
+      z: FLEET_LOT.dock[1],
+      heading: FLEET_LOT.dockHeading,
     },
   ];
-  const scheduled = runs(fleetReservations(windows));
-  const morningE = scheduled.find((r) => r.van === 4 && r.requested === 30)!;
-  assert.equal(morningE.start, 44, 'van E waits for the inbound van plus 4 s');
-  assert.equal(morningE.end - morningE.start, 64, 'the run keeps its length');
-  const morningF = scheduled.find((r) => r.van === 5 && r.requested === 155)!;
-  assert.equal(
-    morningF.start,
-    174,
-    'van F waits for the outbound van plus 4 s',
+  const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
+  const standingAt = (v: { position: T.Vector3; heading: number }) =>
+    spots.findIndex(
+      (s) =>
+        Math.hypot(v.position.x - s.x, v.position.z - s.z) < 1e-6 &&
+        Math.abs(wrap(v.heading - s.heading)) < 1e-6,
+    );
+  // The planner checks each sweep every 10 cm; 5 cm of slack covers the
+  // samples that fall between its stations.
+  const margin = FLEET_VAN_MARGIN - 0.05;
+  let checked = 0,
+    closest = Infinity;
+  for (let frame = 0; frame < 720 * 20; frame++) {
+    const time = frame / 20;
+    const vans = fleetParking.map((_, i) => {
+      const v = sampleFleetVan(i, time, alhambraVanWindows);
+      return { ...v, ...FLEET_VAN, spot: standingAt(v) };
+    });
+    for (const [i, a] of vans.entries()) {
+      if (!a.visible || a.spot >= 0) continue;
+      for (const [j, b] of vans.entries()) {
+        if (j === i || b.spot < 0) continue;
+        const gap = vehicleGap(a, b);
+        closest = Math.min(closest, gap);
+        checked++;
+        assert.ok(
+          gap >= margin,
+          `van ${i} ("${a.phase}") passes ${gap.toFixed(2)} m from van ${j} standing at spot ${b.spot} at ${time} s`,
+        );
+      }
+    }
+  }
+  assert.ok(
+    checked > 1000,
+    `moving vans were checked against parked ones (${checked})`,
   );
+  assert.ok(closest >= margin, `closest pass ${closest.toFixed(2)} m`);
 });
