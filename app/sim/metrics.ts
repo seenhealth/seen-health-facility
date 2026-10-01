@@ -225,10 +225,15 @@ export type MetricsOptions = {
   step?: number;
   /** Hero whose touchpoints are measured. */
   heroId?: string;
-  /** Scenario steps whose handoffs are counted. */
+  /**
+   * Scenario steps whose handoffs are counted. Cutaways (steps with a
+   * `settingId`: moments across the care network, without the hero) are left
+   * out, so the handoffs are the hero's.
+   */
   steps?: {
     id: string;
     handoffs: { from: string; to: string; note: string }[];
+    settingId?: string;
   }[];
   /** Distance (m) that counts as being with the hero. */
   touchRadius?: number;
@@ -596,19 +601,20 @@ export function computeMetrics(
 
   // Handoffs.
   let handoffs: HandoffMetrics | null = null;
-  if (options.steps) {
+  const heroSteps = options.steps?.filter((s) => !s.settingId);
+  if (heroSteps) {
     const pairs = new Map<string, number>(),
       sent = new Map<string, number>(),
       received = new Map<string, number>();
-    for (const s of options.steps)
+    for (const s of heroSteps)
       for (const h of s.handoffs) {
         pairs.set(`${h.from}→${h.to}`, (pairs.get(`${h.from}→${h.to}`) || 0) + 1);
         sent.set(h.from, (sent.get(h.from) || 0) + 1);
         received.set(h.to, (received.get(h.to) || 0) + 1);
       }
     handoffs = {
-      total: options.steps.reduce((s, x) => s + x.handoffs.length, 0),
-      byStep: options.steps.map((s) => ({ stepId: s.id, count: s.handoffs.length })),
+      total: heroSteps.reduce((s, x) => s + x.handoffs.length, 0),
+      byStep: heroSteps.map((s) => ({ stepId: s.id, count: s.handoffs.length })),
       byDiscipline: disciplines
         .map((d) => ({
           discipline: d.id,

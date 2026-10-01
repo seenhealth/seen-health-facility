@@ -62,6 +62,73 @@
       }
     },
     {
+      "id": "network-pharmacy",
+      "window": [
+        26,
+        50
+      ],
+      "zoneId": "community:pharmacy",
+      "roomId": null,
+      "settingId": "pharmacy",
+      "interactionIds": [
+        "pharmacy-packing"
+      ],
+      "title": "Medicines, packed and checked",
+      "kicker": "8:20 AM \u00b7 Partner pharmacy",
+      "body": "Across town, a partner pharmacist checks every participant\u2019s weekly blister packs against the medication list Seen\u2019s nurses keep current. The home care coordinator has the drop-offs lined up, and by nine the courier is on the road.",
+      "roles": [
+        "rn",
+        "home-care"
+      ],
+      "partners": [
+        "Pharmacist",
+        "Pharmacy technician"
+      ],
+      "handoffs": [
+        {
+          "from": "rn",
+          "to": "home-care",
+          "note": "This week\u2019s packs go out at nine"
+        }
+      ],
+      "heroPresent": false,
+      "placement": {
+        "mode": "cutaway"
+      }
+    },
+    {
+      "id": "network-home-am",
+      "window": [
+        50,
+        58
+      ],
+      "zoneId": "community:home-lin",
+      "roomId": null,
+      "settingId": "home-lin",
+      "interactionIds": [
+        "home-personal-care"
+      ],
+      "title": "Morning care at home",
+      "kicker": "8:35 AM \u00b7 The Wongs\u2019 home",
+      "body": "A personal care attendant helps Mrs. Wong with her hair, breakfast and morning medicines, the routine her home care coordinator set up. Then a Seen van takes her to a cardiology visit, with an aide riding along.",
+      "roles": [
+        "pca",
+        "home-care"
+      ],
+      "partners": [],
+      "handoffs": [
+        {
+          "from": "pca",
+          "to": "home-care",
+          "note": "Slept well; ankles a little swollen"
+        }
+      ],
+      "heroPresent": false,
+      "placement": {
+        "mode": "cutaway"
+      }
+    },
+    {
       "id": "pickup",
       "window": [
         40,
@@ -343,6 +410,42 @@
       }
     },
     {
+      "id": "network-specialist",
+      "window": [
+        232,
+        240
+      ],
+      "zoneId": "community:specialist",
+      "roomId": null,
+      "settingId": "specialist",
+      "interactionIds": [
+        "specialist-visit"
+      ],
+      "title": "A specialist, with an escort",
+      "kicker": "10:35 AM \u00b7 Cardiology clinic",
+      "body": "Mrs. Wong sees her cardiologist across town. A Seen driver brought her and a personal care attendant checked her in; the consult note goes straight back to her primary care provider.",
+      "roles": [
+        "driver",
+        "pca",
+        "pcp"
+      ],
+      "partners": [
+        "Cardiologist",
+        "Medical assistant"
+      ],
+      "handoffs": [
+        {
+          "from": "pca",
+          "to": "pcp",
+          "note": "Ankle swelling is mild; recheck in three months"
+        }
+      ],
+      "heroPresent": false,
+      "placement": {
+        "mode": "cutaway"
+      }
+    },
+    {
       "id": "program",
       "window": [
         240,
@@ -394,6 +497,39 @@
             ]
           }
         ]
+      }
+    },
+    {
+      "id": "network-partner",
+      "window": [
+        289,
+        300
+      ],
+      "zoneId": "community:partner-adc",
+      "roomId": null,
+      "settingId": "partner-adc",
+      "interactionIds": [
+        "partner-pt"
+      ],
+      "title": "Therapy that travels",
+      "kicker": "11:15 AM \u00b7 Partner day center",
+      "body": "At a partner adult day center, a visiting Seen physical therapist works on strength and balance with two participants enrolled in both programs, while the partner\u2019s activities lead runs games on the patio.",
+      "roles": [
+        "pt"
+      ],
+      "partners": [
+        "Activities lead"
+      ],
+      "handoffs": [
+        {
+          "from": "pt",
+          "to": "rn",
+          "note": "Both steadier on turns; keep the walker"
+        }
+      ],
+      "heroPresent": false,
+      "placement": {
+        "mode": "cutaway"
       }
     },
     {
@@ -558,7 +694,7 @@
       "zoneId": "ot",
       "roomId": "rear-wc-east",
       "title": "Dignity, privately",
-      "kicker": "12:20 PM \u00b7 Personal care",
+      "kicker": "12:25 PM \u00b7 Personal care",
       "body": "A supported shower and hair care, with the grab bars and shower chair her OT recommended for home.",
       "roles": [
         "pca",
@@ -739,6 +875,47 @@
       }
     },
     {
+      "id": "network-hospital",
+      "window": [
+        500,
+        525
+      ],
+      "zoneId": "community:hospital",
+      "roomId": null,
+      "settingId": "hospital",
+      "interactionIds": [
+        "hospital-discharge-huddle"
+      ],
+      "title": "Planning the trip home",
+      "kicker": "1:35 PM \u00b7 Community hospital",
+      "body": "Seen\u2019s liaison nurse joins the hospitalist and the case manager to plan Mr. Wong\u2019s discharge. His home care coordinator lines up a home health visit and meals, and a Seen van will be at the canopy at 2:10.",
+      "roles": [
+        "rn",
+        "home-care",
+        "driver"
+      ],
+      "partners": [
+        "Hospitalist",
+        "Case manager"
+      ],
+      "handoffs": [
+        {
+          "from": "rn",
+          "to": "home-care",
+          "note": "Home health visit as soon as he is home"
+        },
+        {
+          "from": "home-care",
+          "to": "driver",
+          "note": "Hospital canopy pickup at 2:10"
+        }
+      ],
+      "heroPresent": false,
+      "placement": {
+        "mode": "cutaway"
+      }
+    },
+    {
       "id": "farewell",
       "window": [
         525,
@@ -874,6 +1051,39 @@
       "placement": {
         "mode": "meeting",
         "category": "coordination"
+      }
+    },
+    {
+      "id": "network-home-pm",
+      "window": [
+        690,
+        712
+      ],
+      "zoneId": "community:home-lin",
+      "roomId": null,
+      "settingId": "home-lin",
+      "interactionIds": [
+        "home-health-visit",
+        "after-hours-call"
+      ],
+      "title": "Home, and not alone",
+      "kicker": "3:45 PM \u00b7 The Wongs\u2019 home",
+      "body": "Mr. Wong is home. The home health nurse his care coordinator booked checks his vitals and matches his new medicines to the pill packs, and the Seen nurse line calls Mrs. Wong to confirm the evening plan.",
+      "roles": [
+        "rn",
+        "home-care"
+      ],
+      "partners": [],
+      "handoffs": [
+        {
+          "from": "rn",
+          "to": "pcp",
+          "note": "Vitals stable; new medicines reconciled"
+        }
+      ],
+      "heroPresent": false,
+      "placement": {
+        "mode": "cutaway"
       }
     }
   ],
