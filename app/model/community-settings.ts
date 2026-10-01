@@ -11,6 +11,11 @@ import type { Vec2 } from './schema';
  * points at the access road (the "front"), local +x is to the right when
  * looking from the road at the building. `heading` rotates the frame into the
  * world exactly like `Object3D.rotation.y`.
+ *
+ * Fronts face +x or +z, the sides the default and Community cameras look at
+ * (azimuth ≈ 0.58), so drop-offs, canopies and lobbies are in view: pads sit
+ * west of the west street, south of the south street, or south of the north
+ * street east of the center, each with its stub on its front.
  */
 export type SettingKind =
   | 'home'
@@ -189,14 +194,24 @@ export function groundYAt(p: Vec2) {
   }
   return STREET_Y;
 }
+/** The pad rectangle's world corners (the setting's zone polygon). */
+export function padPolygon(
+  s: Pick<CareSetting, 'position' | 'heading' | 'pad'>,
+): Vec2[] {
+  return (
+    [
+      [-s.pad.w / 2, -s.pad.d / 2],
+      [s.pad.w / 2, -s.pad.d / 2],
+      [s.pad.w / 2, s.pad.d / 2],
+      [-s.pad.w / 2, s.pad.d / 2],
+    ] as Vec2[]
+  ).map((p) => toWorld(s, p));
+}
 /** World-space x/z of the pad rectangle (for framing and validation). */
-export function padBounds(s: CareSetting): [Vec2, Vec2] {
-  const corners = [
-    [-s.pad.w / 2, -s.pad.d / 2],
-    [s.pad.w / 2, -s.pad.d / 2],
-    [s.pad.w / 2, s.pad.d / 2],
-    [-s.pad.w / 2, s.pad.d / 2],
-  ].map((p) => toWorld(s, p as Vec2));
+export function padBounds(
+  s: Pick<CareSetting, 'position' | 'heading' | 'pad'>,
+): [Vec2, Vec2] {
+  const corners = padPolygon(s);
   const xs = corners.map((p) => p[0]),
     zs = corners.map((p) => p[1]);
   return [
@@ -206,14 +221,31 @@ export function padBounds(s: CareSetting): [Vec2, Vec2] {
 }
 
 type Draft = Omit<CareSetting, 'anchors'> & { local: Record<string, Vec2> };
+/** Label plate size (world x × z), drawn by community-pads.ts. */
+export const LABEL_PLATE = { w: 14.2, d: 2.6 };
+/**
+ * The label plate sits just past the pad's viewer-facing (max z) edge. When
+ * the access stub leaves through that edge, the plate moves beside the stub
+ * on its exit-leg side (the sidewalk runs along the entry leg).
+ */
+function labelAnchor(s: Omit<CareSetting, 'anchors'>): Vec2 {
+  const [[minX], [maxX, maxZ]] = padBounds(s),
+    z = maxZ + LABEL_PLATE.d,
+    { from, to } = s.road,
+    alongZ = Math.abs(to[1] - from[1]) > Math.abs(to[0] - from[0]),
+    crosses = alongZ && Math.max(from[1], to[1]) > maxZ;
+  if (!crosses) return [(minX + maxX) / 2, z];
+  const half = laneRadius(s as CareSetting, (s.drive.lanes - 1) as 0 | 1) + LANE / 2,
+    side = Math.sign(worldDir(s, [-1, 0])[0]) || -1;
+  return [to[0] + side * (half + 0.6 + LABEL_PLATE.w / 2), z];
+}
 const define = (d: Draft): CareSetting => {
   const { local, ...rest } = d;
   const anchors = Object.fromEntries(
     Object.entries(local).map(([k, p]) => [k, toWorld(rest, p)]),
   );
-  // The label plate sits just past the pad's viewer-facing edge.
-  const [[minX, minZ], [maxX, maxZ]] = padBounds({ ...rest, anchors });
-  anchors.label ??= [(minX + maxX) / 2, maxZ + 2.6];
+  const [[minX, minZ], [maxX, maxZ]] = padBounds(rest);
+  anchors.label ??= labelAnchor(rest);
   anchors.padMin = [minX, minZ];
   anchors.padMax = [maxX, maxZ];
   return { ...rest, anchors };
@@ -236,6 +268,9 @@ export const careSettings: CareSetting[] = [
     road: { from: [-48.4, 12], to: [-70, 12] },
     drive: { depth: 7, radius: 6.2, lanes: 2 },
     apron: { w: 0, d: 0 },
+    // The north street continued west past the home: the aide's car comes
+    // and goes along it, off the map beyond the Community framing.
+    streetExtension: { from: [-128, 41.3], to: [-48.5, 41.3], width: 10 },
     services: [
       'home-care',
       'home-health',
@@ -283,6 +318,28 @@ export const careSettings: CareSetting[] = [
       padCorner: [12.4, -2],
       padCornerFar: [-12.4, -2],
       padCornerNear: [-12.4, 9],
+      // Van ramp foot → porch ramp: down the drive edge, a loop in from the side.
+      crossA: [6.0, -4.0],
+      crossB: [11.4, -4.8],
+      crossC: [13.4, -6.2],
+      crossD: [11.6, -7.2],
+      // The aide's kerb-side places and walks.
+      pcaWait: [2.4, -4.6],
+      handover: [-0.6, -3.6],
+      porchApproach: [-3.0, -4.4],
+      pcaMeetA: [8.0, -4.4],
+      pcaMeetB: [2.0, -2.6],
+      pcaWalkA: [6.0, -3.0],
+      pcaWalkB: [10.5, -3.2],
+      pcaBack: [4.0, -3.2],
+      // Meals driver and pharmacy courier from the drive to the porch.
+      mealsWalkA: [-3.6, -2.0],
+      mealsWalkB: [-4.6, -4.2],
+      courierWalkA: [-2.4, 0.8],
+      courierWalkB: [-2.2, -1.5],
+      // The van driver's way back from the porch ramp.
+      driverBackA: [8.0, -4.6],
+      driverBackB: [5.0, -3.6],
     },
   }),
   define({
@@ -314,12 +371,13 @@ export const careSettings: CareSetting[] = [
     kind: 'hospital',
     name: 'Community hospital · ED & inpatient',
     subtitle: 'Admission, rounds and discharge coordination',
-    position: [94, -6],
-    heading: -Math.PI / 2,
+    position: [94, 14],
+    heading: 0,
     pad: { w: 36, d: 30 },
-    road: { from: [58, -6], to: [79, -6] },
+    road: { from: [94, 36.3], to: [94, 29] },
     drive: { depth: 8, radius: 7, lanes: 1 },
     apron: { w: 10, d: 4.6 },
+    streetExtension: { from: [56.5, 41.3], to: [128, 41.3], width: 10 },
     services: ['ed', 'discharge'],
     accent: '#b9645c',
     local: {
@@ -344,7 +402,7 @@ export const careSettings: CareSetting[] = [
       walkway: [2.4, -5.4],
       edBay: [14, -5.4],
       edBayVan: [5, 2],
-      sidewalkEnd: [9.5, 35],
+      sidewalkEnd: [9.5, 21.6],
       sidewalkPad: [9.5, 13.5],
       sidewalkIn: [9.5, -5.4],
     },
@@ -354,13 +412,13 @@ export const careSettings: CareSetting[] = [
     kind: 'specialist',
     name: 'Cardiology & specialty clinic',
     subtitle: 'Contracted specialist visits with a Seen escort',
-    position: [72, 64],
-    heading: Math.PI,
+    position: [84, -56],
+    heading: 0,
     pad: { w: 28, d: 26 },
-    road: { from: [72, 46.3], to: [72, 51] },
+    road: { from: [84, -35.8], to: [84, -43] },
     drive: { depth: 6, radius: 6.2, lanes: 1 },
     apron: { w: 10, d: 4.6 },
-    streetExtension: { from: [56.5, 41.3], to: [92, 41.3], width: 10 },
+    streetExtension: { from: [55.5, -32.3], to: [104, -32.3], width: 7 },
     services: ['specialist'],
     accent: '#6d8fb3',
     local: {

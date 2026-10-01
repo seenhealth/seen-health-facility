@@ -2,19 +2,27 @@ import type { ActivityData } from './activity';
 import type { CharacterRole } from './characters';
 
 /**
- * An add-on to a care-day source: more people, interactions, filter views and
- * roles on the same 720 s clock. Distributed-care settings, partner sites and
- * scripted scenarios are all expressed this way, so the engine, the Measure
- * panel and the story consume one composed `ActivityData`.
+ * An add-on to a care-day source: more people, interactions, filter views,
+ * roles and zones beyond the facility model on the same 720 s clock.
+ * Distributed-care settings, partner sites and scripted scenarios are all
+ * expressed this way; `alhambraSource()` composes them once so the engine,
+ * the Measure panel, the trace and the reports consume one `ActivityData`.
  */
 export type SourceExtension = Partial<
-  Pick<ActivityData, 'actors' | 'interactions' | 'roles' | 'views' | 'evidence'>
+  Pick<
+    ActivityData,
+    'actors' | 'interactions' | 'roles' | 'views' | 'evidence' | 'zones'
+  >
 > & {
   id: string;
   description?: string;
 };
 
-/** Base loop plus extensions; actor and interaction ids must stay unique. */
+/**
+ * Base loop plus extensions; actor, interaction and zone ids must stay
+ * unique. Each extension's actors are tagged with its id (`sourceId`) so a
+ * viewer can show or hide one source's people as a layer.
+ */
 export function composeSources(
   base: ActivityData,
   ...parts: SourceExtension[]
@@ -23,6 +31,7 @@ export function composeSources(
     interactions = [...base.interactions],
     views = [...(base.views || [])],
     evidence = [...base.evidence],
+    zones = [...(base.zones || [])],
     roles = new Set<CharacterRole>(base.roles),
     actorIds = new Set(actors.map((a) => a.id)),
     interactionIds = new Set(interactions.map((i) => i.id)),
@@ -37,7 +46,7 @@ export function composeSources(
           `${part.id}: ${a.id} must cover 0–${base.duration} s of the care-day clock`,
         );
       actorIds.add(a.id);
-      actors.push(a);
+      actors.push({ ...a, sourceId: part.id });
       roles.add(a.role);
     }
     for (const i of part.interactions || []) {
@@ -54,6 +63,11 @@ export function composeSources(
         viewIds.add(v.id);
         views.push(v);
       }
+    for (const z of part.zones || []) {
+      if (zones.some((y) => y.id === z.id))
+        throw new Error(`${part.id}: duplicate zone id ${z.id}`);
+      zones.push(z);
+    }
     for (const r of part.roles || []) roles.add(r);
     evidence.push(...(part.evidence || []));
     if (part.description) descriptions.push(part.description);
@@ -64,6 +78,7 @@ export function composeSources(
     interactions,
     views: views.length ? views : base.views,
     evidence,
+    zones: zones.length ? zones : base.zones,
     roles: [...roles].sort() as CharacterRole[],
     description: descriptions.join(' '),
   };

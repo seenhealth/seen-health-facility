@@ -1,7 +1,9 @@
 import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import type { Vec2 } from './schema';
-import type { VehiclePose } from './activity';
+import type { VehiclePose, VehicleRegistry } from './activity';
+import { deliveryStops } from './deliveries';
+import { FLEET_VAN_SEATS } from './photo-assets';
 import {
   arcPoint,
   careSettingById,
@@ -51,13 +53,25 @@ type Drive = {
    */
   pre?: Vec2;
   post?: Vec2;
+  /**
+   * Entering or leaving the map: opacity ramps in over the leg's first
+   * `FADE_METRES` or out over its last, beyond the Community framing.
+   */
+  fade?: 'in' | 'out';
 };
 export type VehicleLeg = Dwell | Drive;
+/** Roof dressing that says what a car is for (built by `VEHICLE_DECOR`). */
+export type VehicleDecor = 'pharmacy-cross' | 'meal-cooler';
 export type CommunityVehicle = {
   id: string;
   kind: CommunityVehicleKind;
+  /** Display name: the trace, the follow bar and the registry label. */
   name: string;
   accent: string;
+  /** Roof dressing for cars. */
+  decor?: VehicleDecor;
+  /** Livery letter of a Seen fleet-body van (after the center's own fleet). */
+  variant?: string;
   /** Pose outside the legs (hidden when `visible` is false). */
   rest: { at: Vec2; dir: Vec2; visible: boolean; phase: string };
   legs: VehicleLeg[];
@@ -222,7 +236,9 @@ const drive = (
   to: number,
   path: Vec2[],
   phase: string,
-  extra: Partial<Pick<Drive, 'easeIn' | 'easeOut' | 'pre' | 'post'>> = {},
+  extra: Partial<
+    Pick<Drive, 'easeIn' | 'easeOut' | 'pre' | 'post' | 'fade'>
+  > = {},
 ): Drive => ({ kind: 'drive', from, to, path: dedupe(path), phase, ...extra });
 /** A point `delta` degrees further along a lane's arc from a stop: the phantom beyond it. */
 const beyond = (
@@ -276,13 +292,39 @@ const W = RING.west,
   N = RING.north,
   S = RING.south,
   R = TURN_RADIUS;
+/**
+ * Where vehicles enter and leave the map: near the ends of the drawn streets
+ * (which run to about x ±130, z ±95), beyond every pad and the Community
+ * framing. Vehicles fade in or out over the last `FADE_METRES` before them.
+ */
+export const OFF_MAP = { east: 124, west: -124, north: 90, south: -90 };
+export const FADE_METRES = 8;
 /** Entry/exit leg z (or x) of a setting's lane plus the clearance a turn needs. */
 const legAt = (s: CareSetting, lane: 0 | 1, side: 'entry' | 'exit') =>
   legPoint(s, lane, side, 'street');
-/** The Seen center's rear lot: meals car home and the courier's stop by receiving. */
+/** Rear receiving: the door the package truck delivers to. */
+const receiving = deliveryStops.find((d) => d.kind === 'package')!.door;
+/**
+ * The Seen center's rear kerb: the meals car's home and the courier's stop by
+ * receiving, in the 2.4 m strip between the south street slab (z ≤ -28.8)
+ * and the raised sidewalk (z ≥ -26.4), so a 1.76 m car clears both.
+ */
 export const CENTER_LOT = {
-  meals: { at: [-4, -26.8] as Vec2, dir: [1, 0] as Vec2 },
-  courier: { at: [-16, -26.8] as Vec2, dir: [1, 0] as Vec2 },
+  meals: { at: [-4, -27.7] as Vec2, dir: [1, 0] as Vec2 },
+  courier: { at: [-16, -27.7] as Vec2, dir: [1, 0] as Vec2 },
+  /**
+   * On foot from the courier's door (street side) round the car's nose,
+   * across the sidewalk and the yard to rear receiving.
+   */
+  receivingWalk: [
+    [-13.2, -29.0],
+    [-13.0, -25.6],
+    [-2, -24.0],
+    [2.4, -16],
+  ] as Vec2[],
+  /** Where a courier stands to hand packs in, and the door it faces. */
+  receivingDoor: [receiving[0], receiving[1] - 0.83] as Vec2,
+  receivingFace: [receiving[0], receiving[1]] as Vec2,
 };
 /** west.in → north.in → east.in, from a z on the west street to a z on the east street. */
 const viaNorthEastbound = (fromZ: number, toZ: number): Vec2[] => [
@@ -318,12 +360,16 @@ export const communityVehicles: CommunityVehicle[] = [
     kind: 'van',
     name: 'Seen van · community runs',
     accent: '#174a49',
+    variant: 'I',
     rest: { ...stop(home, 0), visible: true, phase: 'Waiting at the home' },
+    // The fleet body's own furniture: Mrs. Lin on the aisle seat of the first
+    // bench (the shortest step from the ramp with her walker), her escort
+    // beside her at the window, Mr. Lin's chair on the wheelchair plate.
     seats: {
-      driver: [-0.55, 0.58, -1.9],
-      participant: [0.5, 0.58, 1.0],
-      escort: [-0.35, 0.58, 0.8],
-      wheelchair: [0.2, 0.58, 1.3],
+      driver: FLEET_VAN_SEATS.driver,
+      participant: FLEET_VAN_SEATS.benches[1],
+      escort: FLEET_VAN_SEATS.benches[0],
+      wheelchair: FLEET_VAN_SEATS.wheelchair,
     },
     legs: [
       dwell(0, 113, stop(home, 0), 'Boarding at the porch', {
@@ -334,16 +380,18 @@ export const communityVehicles: CommunityVehicle[] = [
         113,
         172.5,
         [
+          // Round by the north and east streets: the south street's
+          // eastbound lane carries the street traffic at this hour.
           ...depart(home, 0, 0, W.in),
-          ...zRun(W.in, legAt(home, 0, 'exit')[1] + R + 2, N.in.z! - R),
-          ...corner(W.in, N.in),
-          ...xRun(N.in, W.in.x! + R, legAt(specialist, 0, 'entry')[0] - R - 2),
-          ...arrive(specialist, 0, N.in, 0),
+          ...viaNorthEastbound(legAt(home, 0, 'exit')[1] + R + 2, S.out.z! + R),
+          ...corner(E.in, S.out),
+          ...xRun(S.out, E.in.x! + R, legAt(specialist, 0, 'entry')[0] - R - 2),
+          ...arrive(specialist, 0, S.out, 0),
         ],
         'Driving to the specialist',
         { pre: beyond(home, 0, 0, 10), post: beyond(specialist, 0, 0, -10) },
       ),
-      dwell(172.5, 268, stop(specialist, 0), 'Waiting at the clinic', {
+      dwell(172.5, 274, stop(specialist, 0), 'Waiting at the clinic', {
         door: [
           [175, 190],
           [248, 261.5],
@@ -354,14 +402,16 @@ export const communityVehicles: CommunityVehicle[] = [
         ],
       }),
       drive(
-        268,
+        274,
         330,
         [
-          ...depart(specialist, 0, 0, N.out),
-          ...xRun(N.out, legAt(specialist, 0, 'exit')[0] - R - 2, W.out.x! + R),
-          ...corner(N.out, W.out),
-          ...zRun(W.out, N.out.z! - R, legAt(home, 0, 'entry')[1] + R + 2),
-          ...arrive(home, 0, W.out, 0),
+          // Leaves at 274 so it passes the rear lot after the package truck
+          // has turned in and before the courier pulls out (312).
+          ...depart(specialist, 0, 0, S.in),
+          ...xRun(S.in, legAt(specialist, 0, 'exit')[0] - R - 2, W.in.x! + R),
+          ...corner(S.in, W.in),
+          ...zRun(W.in, S.in.z! + R, legAt(home, 0, 'entry')[1] - R - 2),
+          ...arrive(home, 0, W.in, 0),
         ],
         'Bringing Mrs. Lin home',
         { pre: beyond(specialist, 0, 0, 10), post: beyond(home, 0, 0, -10) },
@@ -375,11 +425,10 @@ export const communityVehicles: CommunityVehicle[] = [
         540,
         [
           ...depart(home, 0, 0, W.in),
-          ...viaNorthEastbound(
-            legAt(home, 0, 'exit')[1] + R + 2,
-            legAt(hospital, 0, 'entry')[1] + R + 2,
-          ),
-          ...arrive(hospital, 0, E.in, 0),
+          ...zRun(W.in, legAt(home, 0, 'exit')[1] + R + 2, N.in.z! - R),
+          ...corner(W.in, N.in),
+          ...xRun(N.in, W.in.x! + R, legAt(hospital, 0, 'entry')[0] - R - 2),
+          ...arrive(hospital, 0, N.in, 0),
         ],
         'Driving to the hospital for a discharge',
         { pre: beyond(home, 0, 0, 10), post: beyond(hospital, 0, 0, -10) },
@@ -392,11 +441,10 @@ export const communityVehicles: CommunityVehicle[] = [
         575,
         642,
         [
-          ...depart(hospital, 0, 0, E.out),
-          ...viaNorthWestbound(
-            legAt(hospital, 0, 'exit')[1] + R + 2,
-            legAt(home, 0, 'entry')[1] + R + 2,
-          ),
+          ...depart(hospital, 0, 0, N.out),
+          ...xRun(N.out, legAt(hospital, 0, 'exit')[0] - R - 2, W.out.x! + R),
+          ...corner(N.out, W.out),
+          ...zRun(W.out, N.out.z! - R, legAt(home, 0, 'entry')[1] + R + 2),
           ...arrive(home, 0, W.out, 0),
         ],
         'Bringing Mr. Lin home from hospital',
@@ -413,6 +461,7 @@ export const communityVehicles: CommunityVehicle[] = [
     kind: 'car',
     name: 'Pharmacy courier',
     accent: '#e4e7df',
+    decor: 'pharmacy-cross',
     rest: { ...stop(pharmacy, 0), visible: true, phase: 'At the pharmacy' },
     seats: { driver: [-0.42, 0.3, -0.2] },
     legs: [
@@ -442,24 +491,25 @@ export const communityVehicles: CommunityVehicle[] = [
           ...corner(W.out, S.out),
           ...xRun(S.out, W.out.x! + R, -36),
           [-32, -33.2],
-          [-26, -30.6],
-          [-21, -27.8],
-          [-18.5, -26.9],
+          [-26, -31.0],
+          [-21, -28.5],
+          [-18.5, -27.8],
           CENTER_LOT.courier.at,
         ],
         'Driving to the center',
         { pre: beyond(home, 0, 0, 10), post: past(CENTER_LOT.courier, 2) },
       ),
-      dwell(186, 300, CENTER_LOT.courier, 'Pill packs to rear receiving'),
+      // Pulls out at 312, once the Seen van has passed on its way home.
+      dwell(186, 312, CENTER_LOT.courier, 'Pill packs to rear receiving'),
       drive(
-        300,
+        312,
         420,
         [
           CENTER_LOT.courier.at,
-          [-13, -26.8],
-          [-9, -28.0],
-          [-4, -30.8],
-          [1, -32.8],
+          [-13, -27.7],
+          [-9, -28.7],
+          [-4, -31.2],
+          [1, -32.9],
           [6, -33.9],
           ...viaEastNorthWestbound(10, legAt(pharmacy, 0, 'entry')[1] + R + 2),
           ...arrive(pharmacy, 0, W.out, 0),
@@ -479,18 +529,22 @@ export const communityVehicles: CommunityVehicle[] = [
     name: 'Personal care aide · car',
     accent: '#b9c4b0',
     rest: {
-      at: [W.out.x!, 40],
-      dir: [0, -1],
+      at: [OFF_MAP.west, N.in.z!],
+      dir: [1, 0],
       visible: false,
       phase: 'Off duty',
     },
     seats: { driver: [-0.42, 0.3, -0.2] },
+    // In and out by the north street's western reach, clear of the fleet's
+    // west-street runs and beyond the Community framing.
     legs: [
       drive(
-        1,
-        18,
+        0,
+        28,
         [
-          ...zRun(W.out, 40, legAt(home, 1, 'entry')[1] + R + 2),
+          ...xRun(N.in, OFF_MAP.west, W.out.x! - R),
+          ...corner(N.in, W.out),
+          ...zRun(W.out, N.in.z! - R, legAt(home, 1, 'entry')[1] + R + 2),
           ...arrive(home, 1, W.out, -90),
           ...straight(
             toWorld(home, [
@@ -501,19 +555,21 @@ export const communityVehicles: CommunityVehicle[] = [
           ).slice(1),
         ],
         'Arriving for the morning visit',
-        { easeIn: false, post: past(homeStall, 2) },
+        { easeIn: false, fade: 'in', post: past(homeStall, 2) },
       ),
-      dwell(18, 394, homeStall, 'Parked in the stall'),
+      dwell(28, 394, homeStall, 'Parked in the stall'),
       drive(
         394,
-        476,
+        416,
         [
           ...straight(homeStall.at, homeExitTurn[0]).slice(0, -1),
           ...homeExitTurn,
-          ...viaNorthEastbound(legAt(home, 1, 'exit')[1] + R + 2, -36),
+          ...zRun(W.in, legAt(home, 1, 'exit')[1] + R + 2, N.out.z! - R),
+          ...corner(W.in, N.out),
+          ...xRun(N.out, W.in.x! - R, OFF_MAP.west),
         ],
         'Leaving for the next client',
-        { easeOut: false, pre: past(homeStall, -2) },
+        { easeOut: false, fade: 'out', pre: past(homeStall, -2) },
       ),
     ],
   },
@@ -522,6 +578,7 @@ export const communityVehicles: CommunityVehicle[] = [
     kind: 'car',
     name: 'Home-delivered meals',
     accent: '#eef0ea',
+    decor: 'meal-cooler',
     rest: {
       ...CENTER_LOT.meals,
       visible: true,
@@ -535,10 +592,10 @@ export const communityVehicles: CommunityVehicle[] = [
         367.5,
         [
           CENTER_LOT.meals.at,
-          [-1, -26.8],
-          [3, -27.7],
-          [8, -30.2],
-          [13, -32.6],
+          [-1, -27.7],
+          [3, -28.4],
+          [8, -30.6],
+          [13, -32.7],
           [18, -33.9],
           ...viaEastNorthWestbound(22, legAt(home, 1, 'entry')[1] + R + 2),
           ...arrive(home, 1, W.out, 0),
@@ -546,28 +603,29 @@ export const communityVehicles: CommunityVehicle[] = [
         'Delivering meals to the home',
         { pre: past(CENTER_LOT.meals, -2), post: beyond(home, 1, 0, -10) },
       ),
-      // Held four seconds longer than the drop needs so the car crosses the
-      // westbound lane into the lot behind van F's afternoon pull-out.
-      dwell(367.5, 412, stop(home, 1), 'Meal bag drop'),
+      // Held after the drop so the car turns onto the south street behind
+      // the fleet's afternoon runs at the west corner and crosses into the lot
+      // after van F's pull-out.
+      dwell(367.5, 421, stop(home, 1), 'Meal bag drop'),
       drive(
-        412,
-        442,
+        421,
+        451,
         [
           ...depart(home, 1, 0, W.out),
           ...zRun(W.out, legAt(home, 1, 'exit')[1] - R - 2, S.out.z! + R),
           ...corner(W.out, S.out),
           ...xRun(S.out, W.out.x! + R, -30),
           [-25, -33.2],
-          [-19, -30.6],
-          [-13, -27.9],
-          [-9, -26.95],
-          [-6, -26.8],
+          [-19, -31.0],
+          [-13, -28.6],
+          [-9, -27.8],
+          [-6, -27.7],
           CENTER_LOT.meals.at,
         ],
         'Back to the center',
         { pre: beyond(home, 1, 0, 10), post: past(CENTER_LOT.meals, 2) },
       ),
-      dwell(442, 720, CENTER_LOT.meals, 'At the center kitchen'),
+      dwell(451, 720, CENTER_LOT.meals, 'At the center kitchen'),
     ],
   },
   {
@@ -576,8 +634,8 @@ export const communityVehicles: CommunityVehicle[] = [
     name: 'Ambulance',
     accent: '#c25b52',
     rest: {
-      at: [E.out.x!, -36],
-      dir: [0, 1],
+      at: [OFF_MAP.east, N.out.z!],
+      dir: [-1, 0],
       visible: false,
       phase: 'Off site',
     },
@@ -587,22 +645,22 @@ export const communityVehicles: CommunityVehicle[] = [
         58,
         75,
         [
-          ...zRun(E.out, -36, legAt(hospital, 0, 'entry')[1] - R - 2),
-          ...arrive(hospital, 0, E.out, 45),
+          ...xRun(N.out, OFF_MAP.east, legAt(hospital, 0, 'entry')[0] + R + 2),
+          ...arrive(hospital, 0, N.out, 45),
         ],
         'Arriving at the emergency department',
-        { easeIn: false, post: beyond(hospital, 0, 45, -10) },
+        { easeIn: false, fade: 'in', post: beyond(hospital, 0, 45, -10) },
       ),
       dwell(75, 98, stop(hospital, 0, 45), 'At the ED bay'),
       drive(
         98,
         111,
         [
-          ...depart(hospital, 0, 45, E.in, 9.7),
-          ...zRun(E.in, legAt(hospital, 0, 'exit')[1] - 9.7 - 2, -36),
+          ...depart(hospital, 0, 45, N.in, 9.7),
+          ...xRun(N.in, legAt(hospital, 0, 'exit')[0] + 9.7 + 2, OFF_MAP.east),
         ],
         'Leaving the hospital',
-        { easeOut: false, pre: beyond(hospital, 0, 45, 10) },
+        { easeOut: false, fade: 'out', pre: beyond(hospital, 0, 45, 10) },
       ),
     ],
   },
@@ -611,7 +669,13 @@ export const communityVehicleById = (id: string) =>
   communityVehicles.find((v) => v.id === id);
 
 // --- Sampling ---------------------------------------------------------------
-type Spline = { curve: T.CatmullRomCurve3; u0: number; u1: number };
+type Spline = {
+  curve: T.CatmullRomCurve3;
+  u0: number;
+  u1: number;
+  /** Arc length of the whole spline (phantom spans included). */
+  length: number;
+};
 const curves = new WeakMap<Drive, Spline>();
 function curveOf(leg: Drive): Spline {
   let c = curves.get(leg);
@@ -637,6 +701,7 @@ function curveOf(leg: Drive): Spline {
       curve,
       u0: leg.pre ? at(1) : 0,
       u1: leg.post ? at(pts.length - 2) : 1,
+      length: total,
     };
     curves.set(leg, c);
   }
@@ -699,7 +764,7 @@ export function sampleCommunityVehicle(id: string, time: number): VehiclePose {
       ramp: 0,
     };
   if (leg.kind === 'dwell') return dwellPose(leg, t);
-  const { curve, u0, u1 } = curveOf(leg),
+  const { curve, u0, u1, length } = curveOf(leg),
     u =
       u0 +
       (u1 - u0) *
@@ -709,15 +774,36 @@ export function sampleCommunityVehicle(id: string, time: number): VehiclePose {
           leg.easeOut,
         ),
     position = curve.getPointAt(u),
-    d = curve.getTangentAt(u);
+    d = curve.getTangentAt(u),
+    // Metres from the map edge for a leg that enters or leaves the map.
+    edge =
+      leg.fade === 'in'
+        ? (u - u0) * length
+        : leg.fade === 'out'
+          ? (u1 - u) * length
+          : Infinity,
+    opacity = T.MathUtils.clamp(edge / FADE_METRES, 0, 1);
   return {
     position,
     heading: Math.atan2(d.x, d.z) + Math.PI,
-    visible: true,
+    visible: opacity > 0,
+    opacity,
     phase: leg.phase,
     door: 0,
     ramp: 0,
   };
+}
+/**
+ * Register every community vehicle's sampler under its id and display name
+ * (the viewer's engine registry, or `alhambraVehicles()` for Node).
+ */
+export function registerCommunityVehicles(
+  registry: Pick<VehicleRegistry, 'register'>,
+) {
+  for (const v of communityVehicles)
+    registry.register(v.id, (t) => sampleCommunityVehicle(v.id, t), {
+      label: v.name,
+    });
 }
 /** World position of a seat at a moment (for authoring boarding walks). */
 export function seatWorld(id: string, seat: string, time: number) {
@@ -731,6 +817,13 @@ export function seatWorld(id: string, seat: string, time: number) {
     y: pose.position.y + sy,
     z: pose.position.z - sx * sn + sz * c,
   };
+}
+/** Where a car's driver steps out: beside the driver door (local x −1.05). */
+export function carDoorWorld(pose: VehiclePose): Vec2 {
+  const c = Math.cos(pose.heading),
+    sn = Math.sin(pose.heading),
+    [x, z] = [-1.05, 0.2];
+  return [pose.position.x + x * c + z * sn, pose.position.z - x * sn + z * c];
 }
 /** Door sill and ramp foot of a fleet van in a pose (ramp on the right side). */
 export function vanRampWorld(pose: VehiclePose) {
@@ -829,7 +922,7 @@ export function buildCommunityVehicleBody(
   return g;
 }
 /** A rooftop green cross for the pharmacy courier. */
-export function decorateCourier(car: T.Group) {
+function decorateCourier(car: T.Group) {
   const green = new T.MeshStandardMaterial({
       color: BODY.cross,
       roughness: 0.7,
@@ -849,7 +942,7 @@ export function decorateCourier(car: T.Group) {
   }
 }
 /** A cool box on the meals car roof in Seen teal. */
-export function decorateMeals(car: T.Group) {
+function decorateMeals(car: T.Group) {
   const cooler = new T.Mesh(
     new RoundedBoxGeometry(0.9, 0.36, 0.7, 2, 0.05),
     new T.MeshStandardMaterial({ color: '#25777c', roughness: 0.6 }),
@@ -858,3 +951,11 @@ export function decorateMeals(car: T.Group) {
   cooler.castShadow = true;
   car.add(cooler);
 }
+/** Roof dressings by registry `decor` value. */
+export const VEHICLE_DECOR: Record<VehicleDecor, (car: T.Group) => void> = {
+  'pharmacy-cross': decorateCourier,
+  'meal-cooler': decorateMeals,
+};
+/** Index of a livery letter ('A' = 0) for the shared fleet-van body. */
+export const variantIndex = (letter: string) =>
+  letter.toUpperCase().charCodeAt(0) - 65;

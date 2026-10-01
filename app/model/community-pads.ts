@@ -2,6 +2,7 @@ import * as T from 'three';
 import type { Vec2 } from './schema';
 import {
   frontZ,
+  LABEL_PLATE,
   LANE,
   lanePose,
   laneRadius,
@@ -172,13 +173,19 @@ function helpers(setting: CareSetting, root: T.Group, mat: Mat) {
     c.width = 1024;
     c.height = 176;
     const g = c.getContext('2d')!;
-    g.fillStyle = PALETTE.text;
     g.textAlign = 'center';
-    g.font = '600 62px Arial';
-    g.fillText(setting.name, 512, 74);
-    g.font = '400 38px Arial';
+    // Step the type down until the longest registry name fits the plate.
+    const fit = (text: string, weight: number, size: number, y: number) => {
+      let px = size;
+      g.font = `${weight} ${px}px Arial`;
+      while (px > 20 && g.measureText(text).width > 960)
+        g.font = `${weight} ${(px -= 2)}px Arial`;
+      g.fillText(text, 512, y);
+    };
+    g.fillStyle = PALETTE.text;
+    fit(setting.name, 600, 62, 74);
     g.fillStyle = '#5b6663';
-    g.fillText(setting.subtitle, 512, 134);
+    fit(setting.subtitle, 400, 38, 134);
     const tex = new T.CanvasTexture(c);
     tex.colorSpace = T.SRGBColorSpace;
     tex.anisotropy = 4;
@@ -186,8 +193,9 @@ function helpers(setting: CareSetting, root: T.Group, mat: Mat) {
     plate.position.set(x, 0, z);
     plate.rotation.y = angle;
     root.add(plate);
-    box(0, STREET_Y - 0.06, 0, 14.2, 0.09, 2.6, PALETTE.plate, plate);
-    box(-6.6, STREET_Y + 0.03, 0, 0.5, 0.05, 2.6, setting.accent, plate);
+    const { w, d } = LABEL_PLATE;
+    box(0, STREET_Y - 0.06, 0, w, 0.09, d, PALETTE.plate, plate);
+    box(-w / 2 + 0.5, STREET_Y + 0.03, 0, 0.5, 0.05, d, setting.accent, plate);
     const text = new T.Mesh(
       new T.PlaneGeometry(13, 2.23),
       new T.MeshBasicMaterial({

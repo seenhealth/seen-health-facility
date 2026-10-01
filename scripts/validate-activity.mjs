@@ -9,6 +9,7 @@ import {
   sampleEscort,
   timelineFor,
 } from '../work/validation/activity.mjs';
+import { alhambraSource } from '../work/validation/alhambra-source.mjs';
 import { buildNeighborhood } from '../work/validation/neighborhood.mjs';
 import { sampleVan, vanWindows, ARRIVAL } from '../work/validation/arrival.mjs';
 import { dayProgram, programAt } from '../work/validation/day-room.mjs';
@@ -16,11 +17,14 @@ import { createCharacter } from '../work/validation/characters.mjs';
 const m = JSON.parse(
   readFileSync('public/models/seen-alhambra-planning.json', 'utf8'),
 );
+// The engine plays its source as given; the viewer gives it the composed
+// Alhambra source: the 167-person loop, the fleet crew (177) and the
+// community cast (203).
 const scene = new T.Scene(),
-  activity = createActivity(m, scene),
+  activity = createActivity(m, scene, undefined, alhambraSource(m)),
   neighborhood = buildNeighborhood(m);
 scene.add(neighborhood.root);
-assert.equal(activity.actors.length, 177);
+assert.equal(activity.actors.length, 203);
 assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 167);
 for (const role of [
   'doctor',

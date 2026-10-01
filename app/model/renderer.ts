@@ -33,9 +33,9 @@ import { buildOlympicExterior } from './olympic-exterior';
 import { buildAlhambraExterior } from './alhambra-exterior';
 import { buildAlveareExterior } from './alveare-exterior';
 import { buildRoomLabels } from './room-labels';
-import { activityData, createActivity, type ActivitySource } from './activity';
-import { composeSources } from './sources';
-import { communitySource } from './community-people';
+import { createActivity, type ActivitySource } from './activity';
+import { alhambraSource } from './alhambra-source';
+import { COMMUNITY_SOURCE_ID, COMMUNITY_VIEW } from './community-people';
 import { buildCommunityLayer } from './community-layer';
 import {
   center,
@@ -1003,24 +1003,18 @@ export function createViewer(
   if (olympicExterior) context.add(olympicExterior.site);
   if (alhambraExterior) context.add(alhambraExterior.site);
   if (alveareExterior) context.add(alveareExterior.site);
-  // Models without a bespoke context style (Alhambra) get the distributed-care
-  // layer: its people are composed into the care-day source, its vehicles
-  // register with the activity engine so riders sit in them.
-  const communityData = model.contextStyle ? null : communitySource(model);
+  // Models without a bespoke context style (Alhambra) play the composed
+  // Alhambra source (alhambra-source.ts): the care-day loop, the fleet crew
+  // and the distributed-care layer. When that source carries the community
+  // view, the layer's pads and vehicles are built and its vehicles register
+  // with the engine so riders sit in them.
   const activity = model.contextStyle
     ? createSiteActivity(model, scene, mat)
-    : createActivity(
-        model,
-        scene,
-        mat,
-        composeSources(options.activity || activityData, communityData!),
-      );
-  const community = communityData
+    : createActivity(model, scene, mat, alhambraSource(model, options.activity));
+  const community = activity.data.views?.some((v) => v.id === COMMUNITY_VIEW.id)
     ? buildCommunityLayer(model, mat, activity.vehicles)
     : null;
   if (community) context.add(community.root);
-  const communityIds = new Set((communityData?.actors || []).map((a) => a.id));
-  const communityActors = activity.actors.filter((a) => communityIds.has(a.spec.id));
   const furnitureRoots: T.Group[] = [];
   const exteriorAssets: T.Group[] = [],
     roofAssets: T.Group[] = [];
@@ -1413,7 +1407,10 @@ export function createViewer(
   };
   function update(next: ViewerState) {
     state = next;
-    activity.updateView(next);
+    activity.updateView({
+      ...next,
+      hiddenSources: next.community === false ? [COMMUNITY_SOURCE_ID] : [],
+    });
     ground.visible = state.plan;
     neighborhood.root.visible = !state.plan;
     if (siteMassing)
@@ -1609,10 +1606,12 @@ export function createViewer(
         !options.keepSiteWhenStacked
       );
     if (community) {
-      community.root.visible = state.community !== false;
-      // Pads out to ±130 m receive shadows only while the layer is on screen;
+      // Like the ring streets, the 3D pads stay out of the flat plan view.
+      community.root.visible = state.community !== false && !state.plan;
+      // The network's pads receive shadows only while the layer is on screen;
       // otherwise the map keeps its finer building shadows.
-      const extent = context.visible && community.root.visible ? 130 : 65;
+      const extent =
+        context.visible && community.root.visible ? community.shadowExtent : 65;
       if (sun.shadow.camera.right !== extent) {
         Object.assign(sun.shadow.camera, {
           left: -extent,
@@ -1694,12 +1693,31 @@ export function createViewer(
     zoomTarget = T.MathUtils.clamp(30 / Math.max(size.x, size.y), 1.35, 8);
     finishFocus(instant);
   }
-  /** Frame the whole distributed-care network, or one setting's pad. */
+  /**
+   * Frame the whole distributed-care network, or one setting's pad. When the
+   * camera looks at a pad's back, it first orbits round (keeping elevation
+   * and distance) so the pad's front, where the drop-off happens, faces it.
+   */
   function focusSetting(id?: string) {
     const framing = community?.frame(id);
     if (!framing) {
       focus(null);
       return;
+    }
+    if (framing.azimuth !== undefined) {
+      const offset = camera.position.clone().sub(controls.target),
+        current = Math.atan2(offset.x, offset.z),
+        off = Math.atan2(
+          Math.sin(current - framing.azimuth),
+          Math.cos(current - framing.azimuth),
+        );
+      if (Math.abs(off) > 1.2)
+        offset.applyAxisAngle(
+          new T.Vector3(0, 1, 0),
+          framing.azimuth + Math.sign(off) * 0.6 - current,
+        );
+      camera.position.copy(controls.target).add(offset);
+      controls.update();
     }
     focusTarget = new T.Vector3(...framing.target);
     zoomTarget = framing.zoom;
@@ -2023,8 +2041,6 @@ export function createViewer(
     activity.tick(typeof document !== 'undefined' && document.hidden ? 0 : dt);
     neighborhood.tick(activity.getState().time);
     community?.tick(activity.getState().time);
-    if (community && state.community === false)
-      for (const a of communityActors) a.root.visible = false;
     // Entry leaves open for approaching transport parties, even with the design door toggle shut.
     if (model.contextStyle) {
       const travelers = activity.root.visible

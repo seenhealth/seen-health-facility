@@ -5,24 +5,18 @@
 //   node scripts/sim-report.mjs --no-write
 //   node scripts/sim-report.mjs --trace-only  # only the touchpoint trace (npm run trace:report)
 //
-// Measures two activity sources on the shared 720 s clock: the base care-day
-// loop and the day-in-the-life story source (base + Mrs. Lin's itinerary).
+// Measures two activity sources on the shared 720 s clock, both exactly as
+// the Alhambra viewer plays them (app/model/alhambra-source.ts: the loop plus
+// the fleet crew and the distributed-care layer around the center): the base
+// care-day loop and the day-in-the-life story source (+ Mrs. Lin's itinerary).
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { loadSim, paths } from './build-scenario.mjs';
+import { TRACE_FILE, TRACE_OPTIONS, TRACE_SIZE_LIMIT } from './trace-config.mjs';
 
 const root = resolve(paths.model, '../../..');
 const out = resolve(root, 'public/models/sim-report.json');
-export const tracePath = resolve(root, 'public/models/touchpoint-trace.json');
-/** Trace options shared by the report and scripts/validate-trace.mjs. */
-export const TRACE_OPTIONS = {
-  step: 1,
-  encounterRadius: 1.6,
-  minEncounterSeconds: 4,
-  encounterGapSeconds: 3,
-};
-/** Size bound for the published trace JSON (bytes). */
-export const TRACE_SIZE_LIMIT = 3_000_000;
+const tracePath = resolve(root, TRACE_FILE);
 const write = !process.argv.includes('--no-write');
 const traceOnly = process.argv.includes('--trace-only');
 
@@ -32,7 +26,10 @@ const { sim, story } = await loadSim({
 });
 const model = sim.validateFacility(JSON.parse(readFileSync(paths.model, 'utf8')));
 const scenario = JSON.parse(readFileSync(paths.scenario, 'utf8'));
-const { source, heroId } = story.storyActivitySource();
+const baseSource = sim.alhambraSource(model);
+const { source, heroId } = story.composedStorySource(model);
+// Riders are measured in their seats, where the scene draws them.
+const vehicles = sim.alhambraVehicles();
 const line = (s = '') => console.log(s);
 const pct = (v) => `${Math.round(v * 100)}%`;
 const min = (seconds) => (seconds * sim.CARE_DAY.dayDurationMinutes) / sim.CARE_DAY.duration;
@@ -41,11 +38,12 @@ const at = (series, value) => sim.clockLabel(series.indexOf(value));
 
 if (!traceOnly) {
   const started = Date.now();
-  const base = sim.computeMetrics(sim.activityData, model, { step: 1 });
+  const base = sim.computeMetrics(baseSource, model, { step: 1, vehicles });
   const lin = sim.computeMetrics(source, model, {
     step: 1,
     heroId,
     steps: scenario.steps,
+    vehicles,
   });
   const ms = Date.now() - started;
 
@@ -142,21 +140,21 @@ if (!traceOnly) {
 // ---------------------------------------------------------------------------
 // Touchpoint trace: every person's events, end to end (digital-twin seed).
 // ---------------------------------------------------------------------------
-/** Trace both sources with the report options; shared with the validator. */
-export function traceSources() {
+/** Trace both sources with the published options. */
+function traceSources() {
   const started = Date.now();
   const sources = {};
   for (const [key, src] of [
-    ['base', sim.activityData],
+    ['base', baseSource],
     ['story', source],
   ]) {
-    const events = sim.traceTouchpoints(src, model, TRACE_OPTIONS);
+    const events = sim.traceTouchpoints(src, model, { ...TRACE_OPTIONS, vehicles });
     sources[key] = { source: src, events, summary: sim.traceSummary(events, src) };
   }
   return { sources, ms: Date.now() - started };
 }
 /** The published document: one event per line keeps diffs readable and the file compact. */
-export function traceDocument(sources) {
+function traceDocument(sources) {
   const block = (events) =>
     '[\n' + events.map((e) => '   ' + JSON.stringify(e)).join(',\n') + '\n  ]';
   const head = {
@@ -193,7 +191,7 @@ line(`  ${'median / participant'.padEnd(20)}${col(sources.base.summary.medianEve
 line();
 const participants = (s) => s.source.actors.filter((a) => a.role === 'participant').length;
 line(`  ${'Participants with…'.padEnd(20)}${col(`of ${participants(sources.base)}`)}${col(`of ${participants(sources.story)}`)}`);
-for (const k of ['clinical', 'therapy', 'activities', 'meals', 'coordination'])
+for (const k of sim.TRACE_BUCKETS)
   line(`  ${k.padEnd(20)}${col(sources.base.summary.participantsWith[k])}${col(sources.story.summary.participantsWith[k])}`);
 const hero = sim.personJourney(sources.story.events, heroId);
 const claimed = [...new Set(scenario.steps.flatMap((s) => s.roles))];

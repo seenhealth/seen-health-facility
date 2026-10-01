@@ -16,5 +16,6 @@ export {
   timelineFor,
 } from '../model/activity';
 export { sampleVan, vanWindows, ARRIVAL } from '../model/arrival';
+export { alhambraSource, alhambraVehicles } from '../model/alhambra-source';
 export { default as careTeam } from '../data/care-team.json';
 export { default as dayProgram } from '../data/day-program.json';

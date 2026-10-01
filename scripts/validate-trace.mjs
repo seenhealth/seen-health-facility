@@ -4,21 +4,19 @@
 //
 // Recomputes the trace for both sources with the report options, checks its
 // structure, and checks public/models/touchpoint-trace.json is fresh and small.
+// Both sources are the composed Alhambra sources the viewer plays
+// (app/model/alhambra-source.ts), so the published trace covers every person
+// in the scene: the center's loop, the fleet crew and the community cast.
 import assert from 'node:assert/strict';
 import { readFileSync, statSync } from 'node:fs';
 import { loadSim, paths } from './build-scenario.mjs';
+import {
+  TRACE_FILE,
+  TRACE_OPTIONS,
+  TRACE_SIZE_LIMIT as SIZE_LIMIT,
+} from './trace-config.mjs';
 
-const TRACE_PATH = new URL(
-  '../public/models/touchpoint-trace.json',
-  import.meta.url,
-);
-const TRACE_OPTIONS = {
-  step: 1,
-  encounterRadius: 1.6,
-  minEncounterSeconds: 4,
-  encounterGapSeconds: 3,
-};
-const SIZE_LIMIT = 3_000_000;
+const TRACE_PATH = new URL(`../${TRACE_FILE}`, import.meta.url);
 
 const { sim, story } = await loadSim({
   sim: 'app/sim/index.ts',
@@ -28,7 +26,10 @@ const model = sim.validateFacility(
   JSON.parse(readFileSync(paths.model, 'utf8')),
 );
 const scenario = JSON.parse(readFileSync(paths.scenario, 'utf8'));
-const { source: storySource, heroId } = story.storyActivitySource();
+const baseSource = sim.alhambraSource(model);
+const { source: storySource, heroId } = story.composedStorySource(model);
+const vehicles = sim.alhambraVehicles();
+const traceOptions = { ...TRACE_OPTIONS, vehicles };
 const kindRank = new Map(sim.TOUCHPOINT_KINDS.map((k, i) => [k, i]));
 const rank = (e) => kindRank.get(e.kind);
 
@@ -211,16 +212,40 @@ function validateEvents(name, source, events) {
 
 const results = {};
 for (const [name, source] of [
-  ['base', sim.activityData],
+  ['base', baseSource],
   ['story', storySource],
 ]) {
-  const events = sim.traceTouchpoints(source, model, TRACE_OPTIONS);
+  const events = sim.traceTouchpoints(source, model, traceOptions);
   results[name] = { events, summary: validateEvents(name, source, events) };
   // Deterministic: a second run is identical.
   assert.deepEqual(
-    sim.traceTouchpoints(source, model, TRACE_OPTIONS),
+    sim.traceTouchpoints(source, model, traceOptions),
     events,
     `${name}: deterministic`,
+  );
+}
+
+// The trace describes the people the viewer plays: the center's loop, the
+// fleet crew and the community cast, with riders in their seats (no event
+// lies off the drawn world) and community touchpoints counted.
+for (const [name, source] of [
+  ['base', baseSource],
+  ['story', storySource],
+]) {
+  assert.ok(
+    source.actors.some((a) => a.sourceId === 'community'),
+    `${name}: the community layer is traced`,
+  );
+  assert.ok(
+    results[name].summary.participantsWith.community > 0,
+    `${name}: community touchpoints are counted`,
+  );
+  const stray = results[name].events.find(
+    (e) => Math.abs(e.x) > 200 || Math.abs(e.z) > 200,
+  );
+  assert.ok(
+    !stray,
+    `${name}: ${stray?.actorId} ${stray?.kind} at (${stray?.x}, ${stray?.z}) lies off the drawn world`,
   );
 }
 

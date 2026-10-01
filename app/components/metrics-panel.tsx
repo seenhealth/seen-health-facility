@@ -81,32 +81,35 @@ const KIND_COLOR: Record<TouchpointKind, string> = {
   'day-end': '#7b928d',
 };
 const SITE_COLOR = '#8e9d9a';
-const vehicleLabel = (id = '') =>
-  id.startsWith('van-') ? `Van ${id.slice(4).toUpperCase()}` : id;
 /** "Mrs. Lin · check-in" → "check-in" when the person is the title's subject. */
 const ownTitle = (title = '', actorLabel: string) => {
   for (const prefix of [actorLabel, actorLabel.split(' · ')[0]])
     if (title.startsWith(`${prefix} · `)) return title.slice(prefix.length + 3);
   return title;
 };
-function describe(e: TouchpointEvent): string {
+function describe(
+  e: TouchpointEvent,
+  vehicleLabel: (id: string) => string,
+  /** At a home or partner site rather than the center. */
+  away = false,
+): string {
   switch (e.kind) {
     case 'day-start':
       return 'Day begins';
     case 'day-end':
       return 'Day ends';
     case 'on-site':
-      return 'Arrives on site';
+      return away ? 'Comes into view' : 'Arrives on site';
     case 'off-site':
-      return 'Leaves the site';
+      return away ? 'Goes out of view' : 'Leaves the site';
     case 'enter':
       return 'Enters';
     case 'leave':
       return 'Leaves';
     case 'board':
-      return `Boards ${vehicleLabel(e.vehicleId)}`;
+      return `Boards ${vehicleLabel(e.vehicleId ?? '')}`;
     case 'alight':
-      return `Steps off ${vehicleLabel(e.vehicleId)}`;
+      return `Steps off ${vehicleLabel(e.vehicleId ?? '')}`;
     case 'interaction-start':
       return `${ownTitle(e.title, e.actorLabel)} begins`;
     case 'interaction-end':
@@ -166,13 +169,17 @@ function TraceTab({
     () => new Map(source.actors.map((a) => [a.id, a.label] as const)),
     [source],
   );
-  const zoneName = useCallback(
+  // Facility zones, plus the places a composed source adds (homes, partner sites).
+  const zoneOf = useCallback(
     (id: string) =>
-      id === 'site' ? 'Street & vans' : (model.zones.find((z) => z.id === id)?.name ?? id),
-    [model],
+      model.zones.find((z) => z.id === id) ?? source.zones?.find((z) => z.id === id),
+    [model, source],
   );
+  const zoneName = (id: string) =>
+    id === 'site' ? 'Street & vans' : (zoneOf(id)?.name ?? id);
   const zoneColor = (id: string) =>
-    id === 'site' ? SITE_COLOR : (model.zones.find((z) => z.id === id)?.color ?? SITE_COLOR);
+    (id !== 'site' && zoneOf(id)?.color) || SITE_COLOR;
+  const vehicleLabel = (id: string) => getViewer()?.activity.vehicles.label(id) ?? id;
   const roomName = (id: string | null | undefined) =>
     id ? model.rooms.find((r) => r.id === id)?.name : undefined;
   const place = (e: TouchpointEvent) => roomName(e.roomId) || zoneName(e.zoneId);
@@ -361,7 +368,11 @@ function TraceTab({
               <time>{e.clock}</time>
               <span className="what">
                 <i style={{ background: KIND_COLOR[e.kind] }} />
-                {describe(e)}
+                {describe(
+                  e,
+                  vehicleLabel,
+                  !!source.zones?.some((z) => z.id === e.zoneId),
+                )}
               </span>
               <span className="where">
                 {place(e)}
@@ -379,9 +390,11 @@ function TraceTab({
         <Download size={14} /> Download trace (JSON)
       </button>
       <p className="mp-note">
-        Every person sampled every {TRACE_STEP} s: zone and room entries, van boarding,
-        interactions, encounters within 1.6 m for 4 s or more, and staff handoffs.
-        Derived from the animated tracks; composite, illustrative data.
+        Every person in the scene ({source.actors.length} tracks: the center, the fleet
+        crew and the community settings) sampled every {TRACE_STEP} s: zone and room
+        entries, van boarding, interactions, encounters within 1.6 m for 4 s or more,
+        and staff handoffs. Derived from the animated tracks; composite, illustrative
+        data.
       </p>
     </>
   );
@@ -486,26 +499,31 @@ export default function MetricsPanel({
     if (scenario !== 'story' || story) return;
     let live = true;
     void import('../sim/story-source').then((m) => {
-      if (live) setStory({ ...m.storyActivitySource(), steps: m.storySteps() });
+      if (live) setStory({ ...m.composedStorySource(model), steps: m.storySteps() });
     });
     return () => {
       live = false;
     };
-  }, [scenario, story]);
+  }, [scenario, story, model]);
   const active = scenario === 'story' ? story : null;
-  const source = active?.source || activityData;
+  // Measure what the viewer plays: its composed source (center loop, fleet
+  // crew, community settings) and its vehicles, so riders sit in their seats.
+  const scene = ready ? getViewer()?.activity : undefined;
+  const source = active?.source || scene?.data || activityData;
+  const vehicles = scene?.vehicles;
   const metrics: SimMetrics | null = useMemo(() => {
     if (scenario === 'story' && !active) return null;
-    return computeMetrics(active?.source || activityData, model, {
+    return computeMetrics(source, model, {
       step: 2,
       heroId: active?.heroId,
       steps: active?.steps,
+      vehicles,
     });
-  }, [scenario, active, model]);
+  }, [scenario, active, source, vehicles, model]);
   const trace: TouchpointEvent[] | null = useMemo(() => {
     if (tab !== 'trace' || (scenario === 'story' && !active)) return null;
-    return traceTouchpoints(active?.source || activityData, model, { step: TRACE_STEP });
-  }, [tab, scenario, active, model]);
+    return traceTouchpoints(source, model, { step: TRACE_STEP, vehicles });
+  }, [tab, scenario, active, source, vehicles, model]);
   const time = snap?.time ?? 0,
     playing = !!snap?.playing;
   const seek = useCallback(
@@ -799,8 +817,10 @@ export default function MetricsPanel({
             </>
           )}
           <p className="mp-note">
-            Measured by sampling the animated tracks every {metrics.step} s of the
-            12-minute loop (8 AM–4 PM). Composite, illustrative data.
+            Measured by sampling the animated tracks of all {metrics.headline.people}{' '}
+            people every {metrics.step} s of the 12-minute loop (8 AM–4 PM). Occupancy
+            includes the homes and partner sites; on-site counts and staff time cover the
+            center. Composite, illustrative data.
           </p>
         </>
       )}

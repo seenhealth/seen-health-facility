@@ -4,14 +4,18 @@ import type { Facility, Vec2 } from './schema';
 import type { SourceExtension } from './sources';
 import {
   careSettingById,
+  careSettings,
   groundYAt,
+  padPolygon,
   PAD_Y,
   PORCH_Y,
   settingZone,
+  toLocal,
   type CareSetting,
 } from './community-settings';
 import {
   CENTER_LOT,
+  carDoorWorld,
   communityVehicleById,
   sampleCommunityVehicle,
   vanRampWorld,
@@ -25,6 +29,13 @@ import {
  * static poses otherwise, and seats in the community vehicles while riding.
  * Loop seconds throughout: 1 s = 40 clock seconds, 8 AM = 0, 4 PM = 720.
  */
+/** Source id of the community layer (`ActorSpec.sourceId` after composition). */
+export const COMMUNITY_SOURCE_ID = 'community';
+/** The filter view the layer adds to the activity panel. */
+export const COMMUNITY_VIEW = {
+  id: 'community',
+  label: 'Homes, pharmacy, hospital & partners',
+};
 const VAN = 'van-community';
 const CLOCK_END = 720;
 const VAN_FLOOR = 0.35;
@@ -59,6 +70,20 @@ export function offsetBehind(path: Vec2[], m: number): Vec2[] {
 }
 const facing = (from: Vec2, to: Vec2) =>
   Math.atan2(to[0] - from[0], to[1] - from[1]);
+/**
+ * A heading in a setting's local frame (0 = facing the front, toward the
+ * access road; π = facing the back) turned into the world, so poses follow
+ * the setting when its registry entry moves or turns.
+ */
+const rel = (s: Pick<CareSetting, 'heading'>, local = 0) => s.heading + local;
+/** Where the driver steps out of a community car at a moment of its route. */
+const carDoor = (vehicleId: string, time: number) =>
+  carDoorWorld(sampleCommunityVehicle(vehicleId, time));
+/**
+ * The 24/7 nurse line works from the corner desk of the upstairs open office:
+ * the office chair furthest along the perimeter (largest z, then x).
+ */
+const NURSE_LINE_DESK = { zoneId: 'upper-office', assetId: 'upperfit-chair' };
 
 type TrackOptions = {
   label: string;
@@ -275,10 +300,10 @@ export function communitySource(model: Facility): SourceExtension {
   /** Van ramp foot → porch ramp foot: down the drive edge, then a gentle loop in from the south. */
   const crossing = (foot: Vec2): Vec2[] => [
     foot,
-    [-88.0, 6.0],
-    [-88.8, 0.6],
-    [-90.2, -1.4],
-    [-91.2, 0.4],
+    h.crossA,
+    h.crossB,
+    h.crossC,
+    h.crossD,
     h.rampFoot,
   ];
   const crossingBack = (foot: Vec2): Vec2[] => [...crossing(foot)].reverse();
@@ -295,12 +320,12 @@ export function communitySource(model: Facility): SourceExtension {
     )
       .hold(48, 'seated', {
         title: 'Morning on the porch',
-        heading: Math.PI / 2,
+        heading: rel(home),
       })
       .hold(52, 'greet', { title: 'Her aide arrives', face: h.pcaCare })
       .hold(73, 'seated', {
         title: 'Personal care & morning medicines',
-        heading: Math.PI / 2,
+        heading: rel(home),
       })
       .walk(79, [h.porch, h.rampTop], {
         title: 'Out to the van',
@@ -322,7 +347,10 @@ export function communitySource(model: Facility): SourceExtension {
       .walk(206, [c.doorway, c.examIn, c.examSeat], {
         title: 'To the exam room',
       })
-      .hold(243, 'seated', { title: 'Cardiology follow-up', heading: Math.PI })
+      .hold(243, 'seated', {
+        title: 'Cardiology follow-up',
+        heading: rel(specialist),
+      })
       .walk(254, [c.examIn, c.doorway, c.entrance, c.kerb, clinic.foot], {
         title: 'Back to the van',
       })
@@ -341,7 +369,7 @@ export function communitySource(model: Facility): SourceExtension {
       })
       .hold(420, 'seated', {
         title: 'Lunch on the porch',
-        heading: Math.PI / 2,
+        heading: rel(home),
       })
       .walk(425, [h.porch, h.door], {
         title: 'Inside to rest',
@@ -364,7 +392,7 @@ export function communitySource(model: Facility): SourceExtension {
       })
       .hold(560, 'seated', {
         title: 'Afternoon on the porch',
-        heading: Math.PI / 2,
+        heading: rel(home),
       })
       .walk(566, [h.porch, h.door], { title: 'Inside', ys: [PORCH_Y, PORCH_Y] })
       .hidden(644, 'Waiting for Mr. Lin')
@@ -384,11 +412,11 @@ export function communitySource(model: Facility): SourceExtension {
       })
       .hold(708, 'conversation', {
         title: 'On the phone with the nurse line',
-        heading: Math.PI / 2,
+        heading: rel(home),
       })
       .hold(CLOCK_END, 'seated', {
         title: 'Evening on the porch',
-        heading: Math.PI / 2,
+        heading: rel(home),
       });
     add(lin);
     const pca = new Track(
@@ -397,9 +425,9 @@ export function communitySource(model: Facility): SourceExtension {
       { ...opts, label: 'Personal care aide', variant: 2 },
       h.stallStand,
     )
-      .hidden(18, 'Driving to the visit')
+      .hidden(28, 'Driving to the visit')
       .walk(
-        48,
+        50,
         [
           h.padCornerNear,
           h.padCornerFar,
@@ -424,21 +452,18 @@ export function communitySource(model: Facility): SourceExtension {
       .hold(110, 'greet', { title: 'Waving her off', face: homeAm.foot })
       .walk(
         114,
-        [
-          [-88.6, 9.6],
-          [-88.4, 11.8],
-        ],
+        [h.pcaWait, h.kerb],
         { title: 'Waiting for the pharmacy courier' },
       )
       .hold(130, 'idle', {
         title: 'Waiting for the pharmacy courier',
-        heading: Math.PI / 2,
+        heading: rel(home),
       })
       .hold(141, 'greet', {
         title: 'Taking the pill packs from the courier',
-        face: [-87.6, 12.6],
+        face: h.handover,
       })
-      .walk(152, [[-88.4, 15.0], h.porchStepFoot, h.porchStep, h.porchAside], {
+      .walk(152, [h.porchApproach, h.porchStepFoot, h.porchStep, h.porchAside], {
         title: 'Back to the porch',
         ys: [undefined, undefined, PORCH_Y, PORCH_Y],
       })
@@ -453,7 +478,7 @@ export function communitySource(model: Facility): SourceExtension {
       .hidden(310, 'Housekeeping & laundry')
       .walk(
         330,
-        [h.porch, h.rampTop, h.rampFoot, [-88.4, 4.0], [-86.6, 10.0]],
+        [h.porch, h.rampTop, h.rampFoot, h.pcaMeetA, h.pcaMeetB],
         {
           title: 'Out to meet the van',
           from: h.door,
@@ -464,18 +489,15 @@ export function communitySource(model: Facility): SourceExtension {
       .hold(340.5, 'greet', { title: 'Meeting the van', face: homeNoon.foot })
       .walk(
         358.5,
-        [
-          [-87.0, 6.0],
-          [-87.2, 1.5],
-        ],
+        [h.pcaWalkA, h.pcaWalkB],
         { title: 'Walking her home' },
       )
       .hold(364, 'greet', { title: 'Up you go', face: h.rampFoot })
       .walk(
         393,
         [
-          [-87.2, 8.0],
-          [-88.4, 15.0],
+          h.pcaBack,
+          h.porchApproach,
           h.padCornerFar,
           h.padCornerNear,
           h.stallStand,
@@ -496,7 +518,7 @@ export function communitySource(model: Facility): SourceExtension {
         [
           h.sidewalkPad,
           h.padCorner,
-          [-88.4, 15.0],
+          h.porchApproach,
           h.porchStepFoot,
           h.porchStep,
           h.porchNurse,
@@ -515,7 +537,7 @@ export function communitySource(model: Facility): SourceExtension {
         title: 'Charting the visit',
         face: h.wheelchairSpot,
       })
-      .walk(718, [h.porchStep, h.porchStepFoot, [-88.4, 15.0], h.padCorner], {
+      .walk(718, [h.porchStep, h.porchStepFoot, h.porchApproach, h.padCorner], {
         title: 'Heading to the car',
         ys: [PORCH_Y],
       })
@@ -569,11 +591,7 @@ export function communitySource(model: Facility): SourceExtension {
       .walk(622, [h.padCorner, h.sidewalkPadOut], { title: 'Leaving' })
       .hidden(CLOCK_END, 'Back at the depot');
     add(installer);
-    const mealsCar = sampleCommunityVehicle('meals-car', 380);
-    const mealsDoor: Vec2 = [
-      mealsCar.position.x + 1.05,
-      mealsCar.position.z - 0.2,
-    ];
+    const mealsDoor = carDoor('meals-car', 380);
     const meals = new Track(
       'meals-driver',
       'driver',
@@ -581,7 +599,7 @@ export function communitySource(model: Facility): SourceExtension {
       CENTER_LOT.meals.at,
     )
       .hidden(371, 'Loading & driving meals', mealsDoor)
-      .walk(380, [[-86.0, 15.6], [-88.2, 16.6], h.porchStepFoot, h.porchStep], {
+      .walk(380, [h.mealsWalkA, h.mealsWalkB, h.porchStepFoot, h.porchStep], {
         title: 'Meal bag to the door',
         ys: [undefined, undefined, undefined, PORCH_Y],
       })
@@ -590,7 +608,7 @@ export function communitySource(model: Facility): SourceExtension {
         title: 'Wellness check-in',
         face: h.porchSeat,
       })
-      .walk(403, [h.porchStepFoot, [-88.2, 16.6], [-86.0, 15.6], mealsDoor], {
+      .walk(403, [h.porchStepFoot, h.mealsWalkB, h.mealsWalkA, mealsDoor], {
         title: 'Back to the car',
       })
       .hidden(CLOCK_END, 'Delivering the rest of the route');
@@ -681,8 +699,9 @@ export function communitySource(model: Facility): SourceExtension {
   {
     const zone = settingZone(pharmacy.id),
       opts = { zoneId: zone };
-    const car = sampleCommunityVehicle('courier-car', 10),
-      carDoor: Vec2 = [car.position.x + 1.05, car.position.z - 0.2];
+    const pharmacyDoor = carDoor('courier-car', 10),
+      homeDoor = carDoor('courier-car', 140),
+      lotDoor = carDoor('courier-car', 250);
     const courier = new Track(
       'courier',
       'driver',
@@ -695,60 +714,31 @@ export function communitySource(model: Facility): SourceExtension {
       })
       .walk(80, [p.doorway, p.loading], { title: 'Carrying totes to the car' })
       .hold(86, 'serve', { title: 'Loading pill packs', face: p.loadingCar })
-      .walk(92, [carDoor], { title: 'Setting off' })
-      .hidden(130, 'Driving to Mrs. Lin’s home', [-82.2, 11.8])
-      .walk(
-        138,
-        [
-          [-83.2, 14.4],
-          [-85.5, 14.2],
-          [-87.6, 12.6],
-        ],
-        { title: 'Pill packs to the aide' },
-      )
-      .hold(141, 'greet', {
-        title: 'Handing over the packs',
-        face: [-88.4, 11.8],
+      .walk(92, [pharmacyDoor], { title: 'Setting off' })
+      .hidden(130, 'Driving to Mrs. Lin’s home', homeDoor)
+      .walk(138, [h.courierWalkA, h.courierWalkB, h.handover], {
+        title: 'Pill packs to the aide',
       })
-      .walk(
-        149,
-        [
-          [-85.5, 14.2],
-          [-83.2, 14.4],
-          [-82.2, 11.8],
-        ],
-        { title: 'Back to the car' },
-      )
-      .hidden(186, 'Driving to the center', [-16.2, -27.8])
-      .walk(
-        216,
-        [
-          [-14, -24.5],
-          [-2, -24.0],
-          [2.4, -16],
-          [3.56, -13.3],
-        ],
-        { title: 'Pill packs for the day center' },
-      )
+      .hold(141, 'greet', { title: 'Handing over the packs', face: h.kerb })
+      .walk(149, [h.courierWalkB, h.courierWalkA, homeDoor], {
+        title: 'Back to the car',
+      })
+      .hidden(186, 'Driving to the center', lotDoor)
+      .walk(216, [...CENTER_LOT.receivingWalk, CENTER_LOT.receivingDoor], {
+        title: 'Pill packs for the day center',
+      })
       .hold(226, 'serve', {
         title: 'Handing packs to rear receiving',
-        heading: 0,
+        face: CENTER_LOT.receivingFace,
       })
-      .walk(
-        256,
-        [
-          [2.4, -16],
-          [-2, -24.0],
-          [-14, -24.5],
-          [-16.2, -27.8],
-        ],
-        { title: 'Back to the car' },
-      )
+      .walk(256, [...[...CENTER_LOT.receivingWalk].reverse(), lotDoor], {
+        title: 'Back to the car',
+      })
       .hold(300, 'conversation', {
         title: 'Catching up with the receiving team',
-        heading: 0,
+        face: CENTER_LOT.receivingFace,
       })
-      .hidden(422, 'Returning to the pharmacy', carDoor)
+      .hidden(422, 'Returning to the pharmacy', pharmacyDoor)
       .walk(430, [p.doorway, p.counterFront], { title: 'Back in the pharmacy' })
       .hold(CLOCK_END, 'document', {
         title: 'Next-day manifest',
@@ -856,23 +846,23 @@ export function communitySource(model: Facility): SourceExtension {
     )
       .hold(225, 'seated', {
         title: 'On the ward, awaiting rounds',
-        heading: -Math.PI / 2,
+        heading: rel(hospital),
       })
       .hold(262, 'conversation', {
         title: 'Rounds with the team',
-        heading: -Math.PI / 2,
+        heading: rel(hospital),
       })
       .hold(495, 'seated', {
         title: 'Ready for discharge',
-        heading: -Math.PI / 2,
+        heading: rel(hospital),
       })
       .hold(525, 'listen', {
         title: 'Discharge huddle at the bedside',
-        heading: -Math.PI / 2,
+        heading: rel(hospital),
       })
       .hold(556, 'conversation', {
         title: 'Discharge instructions',
-        heading: -Math.PI / 2,
+        heading: rel(hospital),
       })
       .walk(566, rollPath.slice(1), {
         action: 'roll',
@@ -906,7 +896,7 @@ export function communitySource(model: Facility): SourceExtension {
       })
       .hold(712, 'seated', {
         title: 'Home health visit on the porch',
-        heading: Math.PI / 2,
+        heading: rel(home),
       })
       .walk(715, [h.door], {
         action: 'roll',
@@ -1083,7 +1073,7 @@ export function communitySource(model: Facility): SourceExtension {
       .walk(195, [c.waitB], { title: 'To the waiting area' })
       .hold(245, 'seated', {
         title: 'Waiting; confirming the ride home',
-        heading: Math.PI,
+        heading: rel(specialist),
       })
       .walk(248, [c.waitFront], { title: 'Meeting her' })
       .hold(250, 'greet', { title: 'All done?', face: c.doorway })
@@ -1099,13 +1089,16 @@ export function communitySource(model: Facility): SourceExtension {
       { ...opts, label: 'Cardiologist', variant: 6 },
       c.mdDesk,
     )
-      .hold(202, 'document', { title: 'Reviewing the referral', heading: 0 })
+      .hold(202, 'document', {
+        title: 'Reviewing the referral',
+        heading: rel(specialist, Math.PI),
+      })
       .walk(206, [c.examMd], { title: 'Into the exam room' })
       .hold(243, 'consult', { title: 'Cardiology follow-up', face: c.examSeat })
       .walk(247, [c.mdDesk], { title: 'Back to the desk' })
       .hold(CLOCK_END, 'document', {
         title: 'Consult note to the Seen PCP',
-        heading: 0,
+        heading: rel(specialist, Math.PI),
       });
     add(md);
     const ma = new Track(
@@ -1114,7 +1107,7 @@ export function communitySource(model: Facility): SourceExtension {
       { ...opts, label: 'Clinic medical assistant', variant: 7 },
       c.receptionMa,
     )
-      .hold(189, 'document', { title: 'Front desk', heading: Math.PI })
+      .hold(189, 'document', { title: 'Front desk', heading: rel(specialist) })
       .hold(197, 'greet', { title: 'Checking in Mrs. Lin', face: c.checkIn })
       .walk(212, [c.deskEnd, c.lobbyMid, c.doorway, c.examIn, c.examMa], {
         title: 'To the exam room',
@@ -1128,7 +1121,7 @@ export function communitySource(model: Facility): SourceExtension {
       })
       .hold(CLOCK_END, 'document', {
         title: 'Scheduling the next visit',
-        heading: Math.PI,
+        heading: rel(specialist),
       });
     add(ma);
     interact(
@@ -1174,7 +1167,11 @@ export function communitySource(model: Facility): SourceExtension {
       ['adc-participant-4', d.seatD, d.tcF, 13],
     ] as const;
     tables.forEach(([id, seat, tc, variant], i) => {
-      const faceTable = seat[1] > d.tableFace[1] ? Math.PI : 0;
+      // Face the table: toward the building when seated on its road side.
+      const faceTable = rel(
+        adc,
+        toLocal(adc, seat)[1] > toLocal(adc, d.tableFace)[1] ? Math.PI : 0,
+      );
       add(
         new Track(
           id,
@@ -1194,7 +1191,7 @@ export function communitySource(model: Facility): SourceExtension {
           .walk(180, [tc], { title: 'Out for tai chi' })
           .hold(247.5, 'tai-chi', {
             title: 'Morning tai chi',
-            heading: Math.PI,
+            heading: rel(adc, Math.PI),
           })
           .walk(262 - i * 2, [seat], { title: 'Back to the tables' })
           .hold(420, 'tabletop', {
@@ -1226,25 +1223,25 @@ export function communitySource(model: Facility): SourceExtension {
         )
           .hold(172 + i * 3, 'seated', {
             title: 'Morning coffee on the patio',
-            heading: Math.PI / 2,
+            heading: rel(adc, Math.PI / 2),
           })
           .walk(180, [tc], { title: 'Out for tai chi' })
           .hold(247.5, 'tai-chi', {
             title: 'Morning tai chi',
-            heading: Math.PI,
+            heading: rel(adc, Math.PI),
           })
           .hold(270, 'conversation', {
             title: 'Meeting the visiting PT',
-            heading: Math.PI / 2,
+            heading: rel(adc, Math.PI / 2),
           })
           .hold(360, 'exercise', {
             title: 'Strength & balance with the Seen PT',
-            heading: Math.PI / 2,
+            heading: rel(adc, Math.PI / 2),
           })
           .walk(368 + i * 2, [chair], { title: 'Back to a chair' })
           .hold(CLOCK_END, 'seated', {
             title: 'Afternoon on the patio',
-            heading: Math.PI / 2,
+            heading: rel(adc, Math.PI / 2),
           }),
       );
     });
@@ -1256,15 +1253,18 @@ export function communitySource(model: Facility): SourceExtension {
     )
       .hold(180, 'conversation', {
         title: 'Welcoming the group',
-        heading: Math.PI,
+        heading: rel(adc, Math.PI),
       })
-      .hold(247.5, 'tai-chi', { title: 'Leading tai chi', heading: Math.PI })
+      .hold(247.5, 'tai-chi', {
+        title: 'Leading tai chi',
+        heading: rel(adc, Math.PI),
+      })
       .walk(262, [d.leadTables], { title: 'Setting up the tables' })
-      .hold(420, 'present', { title: 'Tabletop games', heading: 0 })
+      .hold(420, 'present', { title: 'Tabletop games', heading: rel(adc) })
       .walk(426, [d.lead], { title: 'Back to the patio front' })
       .hold(CLOCK_END, 'conversation', {
         title: 'Afternoon conversation',
-        heading: Math.PI,
+        heading: rel(adc, Math.PI),
       });
     add(lead);
     const pt = new Track(
@@ -1284,7 +1284,7 @@ export function communitySource(model: Facility): SourceExtension {
       .walk(272, [d.ptStand], { title: 'Setting up' })
       .hold(360, 'exercise', {
         title: 'Seated strength & balance',
-        heading: -Math.PI / 2,
+        heading: rel(adc, -Math.PI / 2),
       })
       .walk(420, [d.patioEdge, d.patioCorner, d.sidewalkPad, d.sidewalkEnd], {
         title: 'Back to the center',
@@ -1424,8 +1424,8 @@ export function communitySource(model: Facility): SourceExtension {
         [
           h.rampTop,
           h.rampFoot,
-          [-88.6, 4.0],
-          [-87.6, 7.0],
+          h.driverBackA,
+          h.driverBackB,
           homePm.aside,
           homePm.noseRight,
           homePm.nose,
@@ -1435,12 +1435,20 @@ export function communitySource(model: Facility): SourceExtension {
       )
       .ride(CLOCK_END, VAN, 'driver', 'At the wheel');
     add(driver);
-    const desk = model.objects.find(
-      (o) => o.id === 'upperfit-chair-perimeter-3',
-    );
-    const deskAt: Vec2 = desk
-      ? [desk.position[0], desk.position[2]]
-      : [13.6, 22.77];
+    const desk = model.objects
+      .filter(
+        (o) =>
+          o.zoneId === NURSE_LINE_DESK.zoneId &&
+          o.assetId === NURSE_LINE_DESK.assetId,
+      )
+      .sort(
+        (a, b) => b.position[2] - a.position[2] || b.position[0] - a.position[0],
+      )[0];
+    if (!desk)
+      throw new Error(
+        `No ${NURSE_LINE_DESK.assetId} in ${NURSE_LINE_DESK.zoneId} for the nurse line`,
+      );
+    const deskAt: Vec2 = [desk.position[0], desk.position[2]];
     const nurseLine = new Track(
       'nurse-line-rn',
       'nurse',
@@ -1451,7 +1459,7 @@ export function communitySource(model: Facility): SourceExtension {
         label: '24/7 nurse line RN',
         variant: 12,
         seated: true,
-        seatId: desk?.id,
+        seatId: desk.id,
       },
       deskAt,
     )
@@ -1475,12 +1483,19 @@ export function communitySource(model: Facility): SourceExtension {
   }
 
   return {
-    id: 'community',
+    id: COMMUNITY_SOURCE_ID,
     description:
       'Around the center, the same care team runs home care, home health, pill-pack delivery, meals, home modifications, specialist escorts, hospital discharge coordination and a 24/7 nurse line, joined by door-to-door transport.',
     actors,
     interactions,
-    views: [{ id: 'community', label: 'Homes, pharmacy, hospital & partners' }],
+    views: [COMMUNITY_VIEW],
+    zones: careSettings.map((s) => ({
+      id: settingZone(s.id),
+      name: s.name,
+      levelId: 'site',
+      polygon: padPolygon(s),
+      color: s.accent,
+    })),
     evidence: [
       'Distributed-care settings are illustrative pads on the paper ground beyond the ring streets; timings are compressed onto the 720 s care-day clock.',
     ],

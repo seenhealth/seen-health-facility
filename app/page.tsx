@@ -39,6 +39,8 @@ import {
 } from './model/schema';
 import { defaultState, type ViewerState } from './model/renderer';
 import type { createViewer } from './model/renderer';
+import { SETTING_ZONE_PREFIX } from './model/community-settings';
+import { COMMUNITY_VIEW } from './model/community-people';
 import { roomLabelCode } from './model/room-labels';
 import { JourneyPanel } from './components/journey-panel';
 import type { JourneyStep } from './model/journeys';
@@ -57,6 +59,27 @@ const download = (data: Blob, name: string) => {
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 5000);
 };
+/**
+ * The distributed-care network view: the whole shell with the site context
+ * and the community layer on. One recipe for the view-bar button (from the
+ * current state) and for activity-panel touchpoints (from the default state).
+ */
+const communityState = (base: ViewerState): ViewerState => ({
+  ...base,
+  level: 'all',
+  selected: null,
+  room: null,
+  isolate: false,
+  plan: false,
+  exterior: true,
+  roof: true,
+  walls: 'full',
+  explode: 0,
+  stack: 0,
+  sectionAxis: 'none',
+  site: true,
+  community: true,
+});
 const jsonDownload = (data: unknown, name: string) =>
   download(
     new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }),
@@ -94,26 +117,27 @@ export default function Home() {
     [measureOpen, setMeasureOpen] = useState(false),
     [exporting, setExporting] = useState(false),
     [notice, setNotice] = useState(''),
+    // The viewer builds the community layer when its source carries one.
+    [hasCommunity, setHasCommunity] = useState(false),
     [dataTab, setDataTab] = useState<'overview' | 'assets'>('overview');
   const patch = (s: Partial<ViewerState>) => setState((p) => ({ ...p, ...s }));
   const getViewer = useCallback(() => viewer.current, []);
   const focusActivity = useCallback(
     (zoneId: string, actor?: string | null) => {
       if (!model || !viewer.current) return;
-      if (zoneId === 'community' || zoneId.startsWith('community:')) {
+      if (
+        viewer.current.community &&
+        (zoneId === COMMUNITY_VIEW.id || zoneId.startsWith(SETTING_ZONE_PREFIX))
+      ) {
         // A distributed-care setting: whole shell, site context and the layer on.
-        const next: ViewerState = {
-          ...defaultState,
-          level: 'all',
-          walls: 'full',
-          labels: false,
-        };
+        const next = communityState(defaultState);
         setState(next);
         setView('community');
         viewer.current.update(next);
         viewer.current.view('community');
         viewer.current.activity.setOptions({ enabled: true, follow: null });
-        viewer.current.focusSetting(zoneId.split(':')[1]);
+        if (zoneId.startsWith(SETTING_ZONE_PREFIX))
+          viewer.current.focusSetting(zoneId.slice(SETTING_ZONE_PREFIX.length));
         if (actor) viewer.current.followActor(actor);
         return;
       }
@@ -310,6 +334,7 @@ export default function Home() {
         if (model.contextStyle) viewer.current.focus(null, null, true);
         else viewer.current.focus('day');
         if (state.exterior) viewer.current.view('exterior');
+        setHasCommunity(!!viewer.current.community);
         setReady(true);
       } catch (e) {
         console.error(e);
@@ -323,6 +348,17 @@ export default function Home() {
     };
   }, [model]);
   useEffect(() => viewer.current?.update(state), [state, ready]);
+  useEffect(() => {
+    // The weekly repertoire belongs to the Alhambra day room; site-specific
+    // models play their own baked Monday program, so ?program= does not
+    // follow the visitor there (and Alhambra starts from Monday again).
+    if (!model?.contextStyle) return;
+    setProgramRotation('mon');
+    const u = new URL(window.location.href);
+    if (!u.searchParams.has('program')) return;
+    u.searchParams.delete('program');
+    window.history.replaceState(null, '', u);
+  }, [model]);
   useEffect(() => {
     if (!ready || !viewer.current) return;
     if (showcase) {
@@ -456,22 +492,7 @@ export default function Home() {
   };
   const showCommunity = () => {
     setView('community');
-    const next: ViewerState = {
-      ...state,
-      level: 'all',
-      selected: null,
-      room: null,
-      isolate: false,
-      plan: false,
-      exterior: true,
-      roof: true,
-      walls: 'full',
-      explode: 0,
-      stack: 0,
-      sectionAxis: 'none',
-      site: true,
-      community: true,
-    };
+    const next = communityState(state);
     setState(next);
     viewer.current?.update(next);
     viewer.current?.view('community');
@@ -977,7 +998,7 @@ export default function Home() {
           >
             Rear
           </button>
-          {!model?.contextStyle && (
+          {ready && hasCommunity && (
             <button
               className={view === 'community' ? 'chosen' : ''}
               onClick={showCommunity}
@@ -1269,7 +1290,7 @@ export default function Home() {
                 'community',
               ] as const
             )
-              .filter((k) => k !== 'community' || !model?.contextStyle)
+              .filter((k) => k !== 'community' || (ready && hasCommunity))
               .map((k) => (
               <label key={k}>
                 <input
@@ -1286,7 +1307,7 @@ export default function Home() {
                       roof: 'Roof surfaces',
                       exterior: 'Exterior envelope',
                       ceilings: 'Ceilings & structure',
-                      community: 'Homes, pharmacy & partner sites',
+                      community: 'Community sites (homes, pharmacy, hospital & partners)',
                     } as const
                   )[k]
                 }

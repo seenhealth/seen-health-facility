@@ -11,7 +11,6 @@ import { buildArrival } from './arrival';
 import { buildSiteArrival } from './site-arrival';
 import { buildDayRoom } from './day-room';
 import { buildDeliveries, deliveryStops, sampleDelivery } from './deliveries';
-import { withFleetCrew } from './fleet-crew';
 
 export type Segment = {
   start: number;
@@ -46,6 +45,20 @@ export type ActorSpec = CharacterSpec & {
   programMode?: string;
   roomId?: string;
   arrivalVehicleId?: string;
+  /** Id of the `SourceExtension` that contributed this actor (set by `composeSources`). */
+  sourceId?: string;
+};
+/**
+ * A place outside the facility model that a composed source adds (a home, a
+ * pharmacy, a partner site). Metrics and the trace locate site-level people
+ * in these polygons; people there are away from the center.
+ */
+export type SourceZone = {
+  id: string;
+  name: string;
+  levelId: string;
+  polygon: Vec2[];
+  color?: string;
 };
 export type Interaction = {
   id: string;
@@ -70,6 +83,8 @@ export type ActivityData = {
   actors: ActorSpec[];
   roles: CharacterRole[];
   evidence: string[];
+  /** Zones beyond the facility model contributed by composed sources. */
+  zones?: SourceZone[];
 };
 export type ActivitySource = ActivityData;
 export const activityData = source as unknown as ActivityData;
@@ -105,6 +120,8 @@ export type VehiclePose = {
   position: T.Vector3;
   heading: number;
   visible: boolean;
+  /** Below 1 while the vehicle fades in or out at the map edge. */
+  opacity?: number;
   phase?: string;
   door?: number;
   ramp?: number;
@@ -116,18 +133,49 @@ export type VehicleSampler = (time: number) => VehiclePose;
  * follow it and metrics can locate it, whichever module built its body.
  */
 export function createVehicleRegistry() {
-  const samplers = new Map<string, VehicleSampler>();
+  const samplers = new Map<string, VehicleSampler>(),
+    labels = new Map<string, string>();
   return {
-    register(id: string, sample: VehicleSampler) {
+    register(id: string, sample: VehicleSampler, meta: { label?: string } = {}) {
       if (samplers.has(id)) throw new Error(`Vehicle ${id} is already registered`);
       samplers.set(id, sample);
+      if (meta.label) labels.set(id, meta.label);
     },
     has: (id: string) => samplers.has(id),
     sample: (id: string, time: number) => samplers.get(id)?.(time) ?? null,
+    /** Display name given at registration (falls back to the id). */
+    label: (id: string) => labels.get(id) ?? id,
     ids: () => [...samplers.keys()],
   };
 }
 export type VehicleRegistry = ReturnType<typeof createVehicleRegistry>;
+/**
+ * Register the center's own vehicles under the ids and names every consumer
+ * shares: fleet vans `van-a`… ('Van A'…) and the delivery trucks. The engine
+ * and `alhambraVehicles()` both call this, so a seated rider, a followed van
+ * and a traced boarding all name the same vehicle.
+ */
+export function registerCenterVehicles(
+  registry: VehicleRegistry,
+  vans: number,
+  sampleVan: (index: number, time: number) => VehiclePose,
+  deliveries: boolean,
+) {
+  for (let i = 0; i < vans; i++) {
+    const letter = String.fromCharCode(65 + i);
+    registry.register(`van-${letter.toLowerCase()}`, (t) => sampleVan(i, t), {
+      label: `Van ${letter}`,
+    });
+  }
+  if (deliveries)
+    deliveryStops.forEach((stop, i) =>
+      registry.register(stop.id, (t) => sampleDelivery(i, t), {
+        label: `Delivery truck · ${stop.kind}`,
+      }),
+    );
+}
+/** What metrics and the trace need to seat riders: a pose per vehicle id. */
+export type VehicleLookup = Pick<VehicleRegistry, 'sample'>;
 /** World placement of a seat offset in a vehicle frame (rotation.y = heading). */
 export function seatInVehicle(
   pose: VehiclePose,
@@ -403,7 +451,9 @@ export function createActivity(
 ) {
   if (data.duration !== activityData.duration)
     throw new Error(`Activity source must use the ${activityData.duration}s care-day clock`);
-  if (!data.siteSpecific) data = withFleetCrew(data);
+  // The engine plays its source as given; composition (community layer,
+  // fleet crew) happens upstream in alhambra-source.ts so Measure, the trace
+  // and the reports read the very same ActivityData.
   const arrival = data.siteSpecific
     ? buildSiteArrival(model, material)
     : buildArrival(model, material);
@@ -411,13 +461,12 @@ export function createActivity(
   const deliveries = data.siteSpecific ? null : buildDeliveries();
   if (deliveries) scene.add(deliveries.root);
   const vehicles = createVehicleRegistry();
-  arrival.vans.forEach((_, i) =>
-    vehicles.register(`van-${String.fromCharCode(97 + i)}`, (t) => arrival.sampleVan(i, t)),
+  registerCenterVehicles(
+    vehicles,
+    arrival.vans.length,
+    arrival.sampleVan,
+    !!deliveries,
   );
-  if (deliveries)
-    deliveryStops.forEach((stop, i) =>
-      vehicles.register(stop.id, (t) => sampleDelivery(i, t)),
-    );
   const root = new T.Group();
   root.name = 'care-day-actors';
   scene.add(root);
@@ -448,6 +497,8 @@ export function createActivity(
       isolate: false,
       selected: null as string | null,
       site: true,
+      /** Composed sources (`ActorSpec.sourceId`) whose people are hidden. */
+      hiddenSources: [] as readonly string[],
     },
     noticeTime = 0;
   const listeners = new Set<(s: ActivitySnapshot) => void>();
@@ -605,17 +656,19 @@ export function createActivity(
       a.root.position.set(s.x, s.y ?? levelY(a.spec.levelId) + zoneOffset, s.z);
       a.root.rotation.y = s.heading;
       a.root.scale.setScalar(a.profile.height * options.scale);
+      // Site-level people (drivers, the community cast) live in the site
+      // context, so they show only with it, whatever the level.
       a.root.visible =
         s.visible !== false &&
         visibleRole(a.spec.role) &&
+        !(a.spec.sourceId && view.hiddenSources.includes(a.spec.sourceId)) &&
+        (a.spec.levelId !== 'site' || view.site) &&
         (!a.spec.arrivalVehicleId ||
           s.zoneId !== 'site' ||
           (view.site && !view.isolate)) &&
         (view.level === 'all' ||
           view.level === a.spec.levelId ||
-          (a.spec.levelId === 'site' &&
-            view.site &&
-            view.level === 'ground')) &&
+          (a.spec.levelId === 'site' && view.level === 'ground')) &&
         (!view.isolate || !view.selected || view.selected === s.zoneId);
       const cargo = a.spec.id.startsWith('delivery-')
         ? a.root.getObjectByName('delivery-cargo')
@@ -687,8 +740,12 @@ export function createActivity(
     getState,
     setOptions,
     tick,
-    updateView(next: typeof view) {
-      view = next;
+    updateView(
+      next: Omit<typeof view, 'hiddenSources'> & {
+        hiddenSources?: readonly string[];
+      },
+    ) {
+      view = { ...next, hiddenSources: next.hiddenSources ?? [] };
       tick(0, true);
     },
     subscribe(fn: (s: ActivitySnapshot) => void) {
