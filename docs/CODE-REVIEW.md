@@ -23,7 +23,7 @@ The architecture review below was written for the September 2026 distributed-car
 | Composed sources rebuilt per viewer | §2.2 item 14 | Follow-up |
 | Per-frame linear scans | §2.3 item 15 | Follow-up |
 | Double `update()` per UI action | §2.3 item 16 | Follow-up |
-| Disposal gaps | §2.3 item 17 | Follow-up |
+| Disposal gaps | §2.3 item 17 | Partly fixed in this PR: `validate:renderer` found two leaks outside the review's list, the PMREM `RoomEnvironment` and the tilt-shift `OutputPass`; both are disposed now and the smoke test fails on any geometry or material the renderer used that `dispose()` leaves allocated, on all four sites (no known leaks remain). The review's own items (the GLTF placeholder dropped by `g.clear()`, per-box van materials, shared character materials re-uploaded per viewer, a recording that resolves after dispose) are follow-up |
 | `preserveDrawingBuffer: true` on the main renderer | §2.3 item 18 | Follow-up |
 | Viewer effects read stale state by design | §2.3 item 19 | Follow-up |
 | Heading conventions undocumented; vehicle-local transform written six times | §2.4 | Follow-up |

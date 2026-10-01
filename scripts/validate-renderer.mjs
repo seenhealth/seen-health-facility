@@ -650,25 +650,13 @@ export async function loadCanvasModule() {
 // Smoke test.
 // ---------------------------------------------------------------------------
 /**
- * Leaks this test found in app/model/renderer.ts, reported for a fix there.
- * They are printed on every run; anything else that leaks fails, and an entry
- * that stops matching fails too, so the list only shrinks.
+ * Leaks this test found in app/model/renderer.ts, reported for a fix there:
+ * `{ id, where, match: (resource, use) => boolean }`. They are printed on
+ * every run; anything else that leaks fails, and an entry that stops matching
+ * fails too, so the list only shrinks. Empty since the RoomEnvironment and the
+ * tilt-shift OutputPass are disposed.
  */
-const KNOWN_LEAKS = [
-  {
-    id: 'room-environment',
-    where:
-      'renderer.ts:509 pmrem.fromScene(new RoomEnvironment(), 0.04) never calls RoomEnvironment.dispose()',
-    match: (resource, use) => use.context === 'environment (RoomEnvironment)',
-  },
-  {
-    id: 'tilt-shift-output-pass',
-    where:
-      'renderer.ts:1766 the OutputPass added to tiltComposer is never disposed (EffectComposer.dispose() leaves passes alone)',
-    match: (resource) =>
-      resource.isMaterial && resource.name === 'OutputShader',
-  },
-];
+const KNOWN_LEAKS = [];
 const describe = (resource, { object, context }) => {
   const names = [];
   for (let o = object; o; o = o.parent) if (o.name) names.unshift(o.name);
@@ -793,7 +781,7 @@ async function smokeTest() {
       `${model.id}: no frame scheduled after dispose`,
     );
     console.log(
-      `${model.id}: 10 frames; ${usedGeometries} geometries and ${used.length - usedGeometries} materials reached the renderer (of ${s.created.geometries} and ${s.created.materials} constructed), all disposed but ${knownLeaks} known leaks; ${harness.textureRequests.length} textures loaded; no listeners, elements or frames left.`,
+      `${model.id}: 10 frames; ${usedGeometries} geometries and ${used.length - usedGeometries} materials reached the renderer (of ${s.created.geometries} and ${s.created.materials} constructed), ${knownLeaks ? `all disposed but ${knownLeaks} known leaks` : 'all disposed'}; ${harness.textureRequests.length} textures loaded; no listeners, elements or frames left.`,
     );
   }
   for (const k of KNOWN_LEAKS) {

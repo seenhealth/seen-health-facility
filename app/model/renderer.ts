@@ -506,7 +506,9 @@ export function createViewer(
   // environment for material response and a warm, low-contrast key.
   scene.add(new T.HemisphereLight('#fbfaf6', '#d8d4cc', 1.1));
   const pmrem = new T.PMREMGenerator(renderer);
-  const environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  const roomEnvironment = new RoomEnvironment();
+  const environment = pmrem.fromScene(roomEnvironment, 0.04).texture;
+  roomEnvironment.dispose();
   pmrem.dispose();
   scene.environment = environment;
   scene.environmentIntensity = 0.45;
@@ -2343,9 +2345,9 @@ export function createViewer(
         m.dispose();
       });
       textures.forEach((t) => t.dispose());
+      // EffectComposer.dispose() frees its render targets, not its passes.
+      tiltComposer?.passes.forEach((pass) => pass.dispose());
       tiltComposer?.dispose();
-      tiltHorizontal?.dispose();
-      tiltVertical?.dispose();
       post?.dispose();
       environment.dispose();
       renderer.dispose();
