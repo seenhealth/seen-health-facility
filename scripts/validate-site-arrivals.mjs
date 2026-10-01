@@ -1,12 +1,54 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import * as T from 'three';
-import { createSiteActivity } from '../work/validation/site-activity.mjs';
-import { sampleActor } from '../work/validation/activity.mjs';
-import { vanWindows } from '../work/validation/arrival.mjs';
-import { buildEnvelopeWall } from '../work/validation/envelope.mjs';
-import { validateFacility } from '../work/validation/schema.mjs';
-import { insideRoom } from '../work/validation/site-activity-data.mjs';
+
+// Compile, then load: static imports would be read before the compile runs.
+await import('./compile-model-modules.mjs');
+const { createSiteActivity } =
+  await import('../work/validation/site-activity.mjs');
+const { sampleActor } = await import('../work/validation/activity.mjs');
+const { alhambraVanWindows } = await import('../work/validation/arrival.mjs');
+const { buildSiteArrival, siteVanWindows } =
+  await import('../work/validation/site-arrival.mjs');
+const { buildEnvelopeWall } = await import('../work/validation/envelope.mjs');
+const { validateFacility } = await import('../work/validation/schema.mjs');
+const { buildSiteActivityData, insideRoom } =
+  await import('../work/validation/site-activity-data.mjs');
+const siteArrivals = JSON.parse(
+  fs.readFileSync('app/data/site-arrivals.json', 'utf8'),
+);
+const phases = [
+  'inbound',
+  'unload',
+  'outbound',
+  'returning',
+  'boarding',
+  'leaving',
+];
+const alhambraRefs = new Set(
+  alhambraVanWindows.flatMap((w) => [w, ...phases.map((k) => w[k])]),
+);
+// Everything a site's arrivals produce: the cast, its interactions and both vans.
+function arrivalFingerprint(data, arrival) {
+  const vans = [];
+  for (let time = 0; time < 720; time += 0.5)
+    for (const index of arrival.windows.keys()) {
+      const v = arrival.sampleVan(index, time);
+      vans.push(
+        v.position.x,
+        v.position.z,
+        v.heading,
+        v.door,
+        v.ramp,
+        v.visible,
+      );
+    }
+  return JSON.stringify({
+    actors: data.actors,
+    interactions: data.interactions,
+    vans,
+  });
+}
 
 const edgeDistance = (p, a, b) => {
   const dx = b[0] - a[0],
@@ -137,9 +179,39 @@ for (const id of ['olympic', 'olympic-option', 'alveare']) {
       }
     }
   }
+  // The site runs its own timetable from data, sharing nothing with Alhambra's
+  // fleet schedule: retiming Alhambra's vans leaves this site's day untouched.
+  const windows = siteVanWindows(model);
+  assert.deepEqual(
+    windows,
+    siteArrivals.timetables[model.contextStyle],
+    `${id} van timetable comes from app/data/site-arrivals.json`,
+  );
+  assert.deepEqual(api.arrival.windows, windows, `${id} vans run it`);
+  for (const w of windows)
+    for (const ref of [w, ...phases.map((k) => w[k])])
+      assert(!alhambraRefs.has(ref), `${id} ${w.id} shares Alhambra's windows`);
+  const before = arrivalFingerprint(api.data, api.arrival);
+  const shift = (by) =>
+    alhambraVanWindows.forEach((w) =>
+      phases.forEach((k) => {
+        w[k][0] += by;
+        w[k][1] += by;
+      }),
+    );
+  shift(9);
+  try {
+    assert.equal(
+      arrivalFingerprint(buildSiteActivityData(model), buildSiteArrival(model)),
+      before,
+      `${id} arrivals follow alhambraVanWindows`,
+    );
+  } finally {
+    shift(-9);
+  }
   for (const a of travelers.filter((a) => a.role === 'participant')) {
     const index = a.arrivalVehicleId === 'van-a' ? 0 : 1;
-    const van = vanWindows[index];
+    const van = windows[index];
     const inside = sampleActor(a, van.unload[0] + 34);
     assert(
       insideRoom(
@@ -193,6 +265,6 @@ for (const id of ['olympic', 'olympic-option', 'alveare']) {
   );
   api.dispose();
   console.log(
-    `${id}: ${samples} person samples; van timing, ramp heights, entrance walls, furniture, separation, reception handoff and pickup verified.`,
+    `${id}: ${samples} person samples; own van timetable (independent of Alhambra's), van timing, ramp heights, entrance walls, furniture, separation, reception handoff and pickup verified.`,
   );
 }

@@ -1,6 +1,21 @@
 import * as T from 'three';
-import { buildArrivalVan, updateArrivalVan, vanWindows } from './arrival';
+import siteArrivals from '../data/site-arrivals.json';
+import { buildArrivalVan, updateArrivalVan } from './arrival';
 import type { Facility, Vec2 } from './schema';
+
+export type SiteVanWindow =
+  (typeof siteArrivals.timetables)[keyof typeof siteArrivals.timetables][number];
+
+/** The site's own Van A/B timetable (app/data/site-arrivals.json), never Alhambra's fleet schedule. */
+export function siteVanWindows(model: Facility): SiteVanWindow[] {
+  const windows =
+    model.contextStyle && siteArrivals.timetables[model.contextStyle];
+  if (!windows)
+    throw new Error(
+      `No site van timetable for ${model.contextStyle ?? model.id}`,
+    );
+  return windows;
+}
 
 // Alveare's east lobby entry is centered at (15.80685, 10.22132).
 // Olympic's proposed reception vestibule opens to the rear at (-8.614, 11.69278).
@@ -154,8 +169,9 @@ export function buildSiteArrival(
     );
   const inbound = curve(layout.approach),
     outbound = curve(layout.departure);
+  const windows = siteVanWindows(model);
   function sampleVan(index: number, time: number) {
-    const v = vanWindows[index],
+    const v = windows[index],
       t = ((time % 720) + 720) % 720;
     let position = new T.Vector3(
       layout.dock[0],
@@ -204,7 +220,7 @@ export function buildSiteArrival(
     }
     return { position, heading, visible, phase, door, ramp };
   }
-  const vans = vanWindows.map((_, i) => {
+  const vans = windows.map((_, i) => {
     const van = buildArrivalVan(model, i, materialFor);
     root.add(van.root);
     return van;
@@ -225,6 +241,7 @@ export function buildSiteArrival(
     vans,
     tick,
     sampleVan,
+    windows,
     description: layout.description,
     focus: new T.Vector3(layout.focus[0], 0, layout.focus[1]),
   };

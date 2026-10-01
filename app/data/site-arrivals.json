@@ -1,0 +1,50 @@
+{
+  "version": "1.0",
+  "source": "Illustrative design-phase van timetables for the additional sites, in care-day loop seconds (0 = 8 AM, 720 = 4 PM). Keyed by the facility contextStyle. Independent of the Alhambra fleet schedule in app/model/arrival.ts and app/model/alhambra-fleet.ts, so retiming the Alhambra drivers does not move these vans or their riders.",
+  "timetables": {
+    "olympic": [
+      {
+        "id": "van-a",
+        "name": "Van A",
+        "inbound": [0, 36],
+        "unload": [42, 108],
+        "outbound": [112, 142],
+        "returning": [510, 546],
+        "boarding": [552, 590],
+        "leaving": [594, 624]
+      },
+      {
+        "id": "van-b",
+        "name": "Van B",
+        "inbound": [146, 166],
+        "unload": [172, 238],
+        "outbound": [242, 272],
+        "returning": [628, 656],
+        "boarding": [662, 702],
+        "leaving": [708, 720]
+      }
+    ],
+    "alveare": [
+      {
+        "id": "van-a",
+        "name": "Van A",
+        "inbound": [0, 36],
+        "unload": [42, 108],
+        "outbound": [112, 142],
+        "returning": [510, 546],
+        "boarding": [552, 590],
+        "leaving": [594, 624]
+      },
+      {
+        "id": "van-b",
+        "name": "Van B",
+        "inbound": [146, 166],
+        "unload": [172, 238],
+        "outbound": [242, 272],
+        "returning": [628, 656],
+        "boarding": [662, 702],
+        "leaving": [708, 720]
+      }
+    ]
+  }
+}
