@@ -290,13 +290,21 @@ const legAt = (s: CareSetting, lane: 0 | 1, side: 'entry' | 'exit') =>
   legPoint(s, lane, side, 'street');
 /** Rear receiving: the door the package truck delivers to. */
 const receiving = deliveryStops.find((d) => d.kind === 'package')!.door;
-/** The Seen center's rear lot: meals car home and the courier's stop by receiving. */
+/**
+ * The Seen center's rear kerb: the meals car's home and the courier's stop by
+ * receiving, in the 2.4 m strip between the south street slab (z ≤ -28.8)
+ * and the raised sidewalk (z ≥ -26.4), so a 1.76 m car clears both.
+ */
 export const CENTER_LOT = {
-  meals: { at: [-4, -26.8] as Vec2, dir: [1, 0] as Vec2 },
-  courier: { at: [-16, -26.8] as Vec2, dir: [1, 0] as Vec2 },
-  /** On foot from the lot edge across the yard to rear receiving. */
+  meals: { at: [-4, -27.7] as Vec2, dir: [1, 0] as Vec2 },
+  courier: { at: [-16, -27.7] as Vec2, dir: [1, 0] as Vec2 },
+  /**
+   * On foot from the courier's door (street side) round the car's nose,
+   * across the sidewalk and the yard to rear receiving.
+   */
   receivingWalk: [
-    [-14, -24.5],
+    [-13.2, -29.0],
+    [-13.0, -25.6],
     [-2, -24.0],
     [2.4, -16],
   ] as Vec2[],
@@ -467,9 +475,9 @@ export const communityVehicles: CommunityVehicle[] = [
           ...corner(W.out, S.out),
           ...xRun(S.out, W.out.x! + R, -36),
           [-32, -33.2],
-          [-26, -30.6],
-          [-21, -27.8],
-          [-18.5, -26.9],
+          [-26, -31.0],
+          [-21, -28.5],
+          [-18.5, -27.8],
           CENTER_LOT.courier.at,
         ],
         'Driving to the center',
@@ -481,10 +489,10 @@ export const communityVehicles: CommunityVehicle[] = [
         420,
         [
           CENTER_LOT.courier.at,
-          [-13, -26.8],
-          [-9, -28.0],
-          [-4, -30.8],
-          [1, -32.8],
+          [-13, -27.7],
+          [-9, -28.7],
+          [-4, -31.2],
+          [1, -32.9],
           [6, -33.9],
           ...viaEastNorthWestbound(10, legAt(pharmacy, 0, 'entry')[1] + R + 2),
           ...arrive(pharmacy, 0, W.out, 0),
@@ -561,10 +569,10 @@ export const communityVehicles: CommunityVehicle[] = [
         367.5,
         [
           CENTER_LOT.meals.at,
-          [-1, -26.8],
-          [3, -27.7],
-          [8, -30.2],
-          [13, -32.6],
+          [-1, -27.7],
+          [3, -28.4],
+          [8, -30.6],
+          [13, -32.7],
           [18, -33.9],
           ...viaEastNorthWestbound(22, legAt(home, 1, 'entry')[1] + R + 2),
           ...arrive(home, 1, W.out, 0),
@@ -584,10 +592,10 @@ export const communityVehicles: CommunityVehicle[] = [
           ...corner(W.out, S.out),
           ...xRun(S.out, W.out.x! + R, -30),
           [-25, -33.2],
-          [-19, -30.6],
-          [-13, -27.9],
-          [-9, -26.95],
-          [-6, -26.8],
+          [-19, -31.0],
+          [-13, -28.6],
+          [-9, -27.8],
+          [-6, -27.7],
           CENTER_LOT.meals.at,
         ],
         'Back to the center',
