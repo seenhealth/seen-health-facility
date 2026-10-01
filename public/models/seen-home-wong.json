@@ -3036,14 +3036,6 @@
       "metalness": 0.15,
       "opacity": 0.62
     },
-    "light": {
-      "color": "#ead8ad",
-      "roughness": 0.5
-    },
-    "leaf": {
-      "color": "#477c47",
-      "roughness": 1
-    },
     "photo-white": {
       "color": "#f5f3ea",
       "roughness": 0.55
@@ -3101,21 +3093,11 @@
       "color": "#a1b8b6",
       "roughness": 0.65
     },
-    "photo-light": {
-      "color": "#fff8e8",
-      "roughness": 0.3,
-      "emissive": "#fff2d3",
-      "emissiveIntensity": 0.45
-    },
     "home-lamp": {
       "color": "#fbf1e0",
       "roughness": 0.75,
       "emissive": "#ffd8a3",
       "emissiveIntensity": 0.75
-    },
-    "home-linen": {
-      "color": "#f3efe6",
-      "roughness": 0.9
     }
   },
   "programs": [],

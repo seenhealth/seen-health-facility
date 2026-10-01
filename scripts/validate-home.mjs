@@ -8,14 +8,23 @@
 // grid; and every room is reachable from just inside the front door at
 // wheelchair (0.37 m) and walker (0.33 m) clearance. The grid is built with
 // explicit options (no day-program removals or reservations, no excluded
-// zones), never navGrid's Alhambra defaults.
+// zones), never navGrid's Alhambra defaults. Every asset builds; the home
+// kinds (app/model/home-assets.ts) come from buildHomeAsset at their declared
+// size, from boxes, cylinders and rounded boxes that cast and receive
+// shadows, in materials the specification defines.
 import assert from 'node:assert/strict';
 import { readFileSync, statSync } from 'node:fs';
+import * as T from 'three';
 import { loadSim } from './build-scenario.mjs';
 
 const FILE = process.argv[2] || 'public/models/seen-home-wong.json';
-const { schema, nav } = await loadSim(
-  { schema: 'app/model/schema.ts', nav: 'app/sim/nav.ts' },
+const { schema, nav, assets, home } = await loadSim(
+  {
+    schema: 'app/model/schema.ts',
+    nav: 'app/sim/nav.ts',
+    assets: 'app/model/assets.ts',
+    home: 'app/model/home-assets.ts',
+  },
   { dir: 'work/home' },
 );
 const text = readFileSync(FILE, 'utf8');
@@ -333,6 +342,86 @@ for (const [name, clearance] of [
   reach[name] = cells;
 }
 
+// --- Asset kinds -------------------------------------------------------------
+const used = new Set();
+const resolver = () => {
+  const cache = new Map();
+  return (id) => {
+    used.add(id);
+    if (!cache.has(id))
+      cache.set(
+        id,
+        new T.MeshStandardMaterial({
+          color: model.materials[id]?.color ?? '#dce1d8',
+        }),
+      );
+    return cache.get(id);
+  };
+};
+const homeKinds = new Set(home.HOME_ASSET_KINDS);
+const builtKinds = new Set();
+const sizeOf = (o) => new T.Box3().setFromObject(o).getSize(new T.Vector3());
+for (const [id, spec] of Object.entries(model.assets)) {
+  const group = assets.buildAsset(spec, resolver());
+  let meshes = 0;
+  group.traverse((o) => {
+    if (!o.isMesh) return;
+    meshes++;
+    if (!homeKinds.has(spec.kind)) return;
+    check(
+      o.castShadow && o.receiveShadow,
+      `${id}: a mesh does not cast and receive shadows`,
+    );
+    check(
+      o.geometry instanceof T.BoxGeometry ||
+        o.geometry instanceof T.CylinderGeometry,
+      `${id}: ${o.geometry.type} is not a box, cylinder or rounded box`,
+    );
+  });
+  check(meshes > 0, `${id}: built no meshes`);
+  if (!homeKinds.has(spec.kind)) continue;
+  builtKinds.add(spec.kind);
+  check(
+    home.buildHomeAsset(spec, resolver()),
+    `${id}: buildHomeAsset does not draw ${spec.kind}`,
+  );
+  check(meshes >= 4, `${id}: only ${meshes} meshes (fallback box?)`);
+  check(
+    typeof spec.parameters?.front === 'string',
+    `${id}: document the kind's front in parameters.front`,
+  );
+  const size = sizeOf(group);
+  check(
+    [size.x, size.y, size.z].every(
+      (v, i) => Math.abs(v - spec.dimensions[i]) < 0.002,
+    ),
+    `${id}: built ${[size.x, size.y, size.z].map((v) => v.toFixed(3)).join(' × ')}, declared ${spec.dimensions.join(' × ')}`,
+  );
+}
+for (const kind of homeKinds)
+  check(builtKinds.has(kind), `No asset in the home uses the ${kind} kind`);
+// Transfer-handle variants keep the bed inside its declared size.
+for (const transferHandle of ['none', 'left', 'right', 'both']) {
+  const spec = {
+    ...model.assets['home-bed-queen'],
+    parameters: {
+      ...model.assets['home-bed-queen'].parameters,
+      transferHandle,
+    },
+  };
+  const size = sizeOf(assets.buildAsset(spec, resolver()));
+  check(
+    Math.abs(size.x - spec.dimensions[0]) < 0.002 &&
+      Math.abs(size.z - spec.dimensions[2]) < 0.002,
+    `bed with transferHandle ${transferHandle} is ${size.x.toFixed(3)} × ${size.z.toFixed(3)} m`,
+  );
+}
+for (const id of used)
+  check(
+    model.materials[id] || /^#[0-9a-f]{6}$/i.test(id),
+    `Material ${id} is used by an asset but not defined`,
+  );
+
 if (problems.length) {
   console.error(problems.slice(0, 40).join('\n'));
   assert.fail(`${problems.length} home problem(s); first: ${problems[0]}`);
@@ -346,5 +435,6 @@ console.log(
       )} m, each passed straight through at wheelchair clearance), ${floorItems.length} floor items without overlaps, ${stacked.length} stacked. ` +
     `Turning circles clear (margin to the nearest wall or fixture): ${circleReport.join(', ')}. ` +
     `Every room reachable from the front door: ${reach.wheelchair} cells at wheelchair and ${reach.walker} at walker clearance ` +
-    `(grid ${grid.nx}×${grid.nz}, ${grid.buildMs} ms).`,
+    `(grid ${grid.nx}×${grid.nz}, ${grid.buildMs} ms). ` +
+    `${Object.keys(model.assets).length} assets build; home kinds ${[...builtKinds].join(', ')} at their declared size; ${used.size} materials, all defined.`,
 );
