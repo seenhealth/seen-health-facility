@@ -12,12 +12,15 @@ import {
   fleetReservations,
   fleetTimeline,
 } from '../work/validation/alhambra-fleet.mjs';
-import { sampleDelivery } from '../work/validation/deliveries.mjs';
+import {
+  deliveryStops,
+  sampleDelivery,
+} from '../work/validation/deliveries.mjs';
 import { sampleStreetCar } from '../work/validation/traffic-routes.mjs';
 import { vehicleGap } from '../work/validation/vehicle-clearance.mjs';
-import { siteArrivalLayout } from '../work/validation/site-arrival.mjs';
+import { buildSiteArrival } from '../work/validation/site-arrival.mjs';
 import { siteCurbs, STREET_EXTENT } from '../work/validation/neighborhood.mjs';
-import { CatmullRomCurve3 } from 'three';
+import { validateFacility } from '../work/validation/schema.mjs';
 
 const body = (p, kind) => ({
   ...p,
@@ -55,15 +58,18 @@ const parkedCars = [
   ),
 );
 const VANS = fleetParking.length;
-const samples = (time) => [
-  ...Array.from({ length: VANS }, (_, i) => body(sampleVan(i, time), 'van')),
-  ...Array.from({ length: 2 }, (_, i) =>
-    body(sampleDelivery(i, time), 'truck'),
-  ),
-  ...Array.from({ length: 2 }, (_, i) => body(sampleStreetCar(i, time), 'car')),
-  ...parkedCars,
+/**
+ * Every moving vehicle: fleet vans, delivery trucks and street cars. `nose` is
+ * the local z of the bonnet: vans and trucks drive toward local −z, the
+ * street-car bodies toward +z.
+ */
+const movers = [
+  ...fleetParking.map((_, i) => ({ name: `Van ${i}`, kind: 'van', nose: -1, sample: (t) => sampleVan(i, t) })),
+  ...deliveryStops.map((stop, i) => ({ name: `Truck ${stop.id}`, kind: 'truck', nose: -1, sample: (t) => sampleDelivery(i, t) })),
+  ...[0, 1].map((i) => ({ name: `Street car ${i}`, kind: 'car', nose: 1, sample: (t) => sampleStreetCar(i, t) })),
 ];
-const streetCar = (i) => i === VANS + 2 || i === VANS + 3;
+const samples = (time) => [...movers.map((v) => body(v.sample(time), v.kind)), ...parkedCars];
+const streetCar = (i) => movers[i]?.kind === 'car';
 
 // Driveway: one maneuver on the lot at a time, four seconds apart.
 const reservations = fleetReservations(alhambraVanWindows);
@@ -164,13 +170,41 @@ const turnBetween = (a, b) => Math.abs(Math.atan2(Math.sin(b - a), Math.cos(b - 
  * swings its tail out faster than it moves forward and reads as pivoting.
  */
 const MIN_TURN_RADIUS = 4;
-const SITE_MAX_TURN_PER_SAMPLE = 25;
+const tightest = new Map();
+/**
+ * Nose-first everywhere except in a phase that says it is reversing (a step
+ * that ends or starts one may go either way), no jump between frames, and no
+ * turn tighter than MIN_TURN_RADIUS while visible: a vehicle that turns
+ * without moving (a pivot or a heading snap) fails too. `a` and `later` are
+ * samples 0.02 s apart.
+ */
+function checkMotion(name, kind, nose, a, later, time) {
+  if (a.visible === false || later.visible === false) return;
+  const front = new Vector3(nose * Math.sin(a.heading), 0, nose * Math.cos(a.heading));
+  const step = later.position.clone().sub(a.position);
+  const distance = step.length();
+  assert(distance < 0.3, `${name} jumps ${distance.toFixed(2)} m at ${time}s ("${a.phase}" → "${later.phase}")`);
+  if (distance > 0.001) {
+    const forward = step.dot(front) > 0,
+      reversing = [a.phase, later.phase].map((p) => p.startsWith('Reversing'));
+    assert(
+      forward ? !(reversing[0] && reversing[1]) : reversing[0] || reversing[1],
+      `${name} moves ${forward ? 'forward' : 'backward'} during "${a.phase}" at ${time}s`,
+    );
+  }
+  const turn = turnBetween(a.heading, later.heading);
+  const best = tightest.get(kind) ?? { radius: Infinity, at: '' };
+  if (turn > 1e-9 && distance / turn < best.radius)
+    tightest.set(kind, { radius: distance / turn, at: `${name} at ${time}s ("${a.phase}")` });
+  assert(
+    turn <= (distance / MIN_TURN_RADIUS) * 1.01 + 1e-9,
+    `${name} turns ${((turn * 180) / Math.PI).toFixed(1)}° over ${distance.toFixed(3)} m (radius ${(distance / turn).toFixed(2)} m < ${MIN_TURN_RADIUS} m) at ${time}s ("${a.phase}")`,
+  );
+}
 let closest = Infinity,
   streetClosest = Infinity,
   lotClosest = Infinity,
-  pairs = 0,
-  tightest = Infinity,
-  tightestAt = '';
+  pairs = 0;
 for (let frame = 0; frame < 36000; frame++) {
   const time = frame / 50,
     vehicles = samples(time);
@@ -191,6 +225,10 @@ for (let frame = 0; frame < 36000; frame++) {
       if (margin === 0.85) streetClosest = Math.min(streetClosest, gap);
       pairs++;
     }
+    if (i >= movers.length) continue;
+    const mover = movers[i],
+      later = mover.sample(time + 0.02);
+    checkMotion(mover.name, mover.kind, mover.nose, a, later, time);
     if (i >= VANS) continue;
     const next = sampleVan(i, time + 0.002);
     const movement = next.position.clone().sub(a.position);
@@ -212,7 +250,6 @@ for (let frame = 0; frame < 36000; frame++) {
         Math.abs(a.position.z) > STREET_EXTENT.z - 5 || Math.abs(a.position.x) > STREET_EXTENT.x - 5,
         `Van ${i} fades inside the map at ${time}s (${a.position.x.toFixed(1)}, ${a.position.z.toFixed(1)})`,
       );
-    const later = sampleVan(i, time + 0.02);
     if (later.visible !== a.visible)
       assert(
         (later.visible ? later.opacity : a.opacity) < 0.05,
@@ -227,32 +264,6 @@ for (let frame = 0; frame < 36000; frame++) {
         assert(gap >= LOT_CLEARANCE, `Van ${i} is ${gap.toFixed(2)} m from the ${name} at ${time}s ("${a.phase}")`);
       }
     }
-    // Nose-first everywhere except in a phase that says it is reversing (a
-    // step that ends or starts one may go either way), no jump between frames,
-    // and no turn tighter than MIN_TURN_RADIUS while visible: a van that turns
-    // without moving (a pivot or a heading snap) fails too.
-    if (later.visible) {
-      const step = later.position.clone().sub(a.position);
-      const distance = step.length();
-      assert(distance < 0.3, `Van ${i} jumps ${distance.toFixed(2)} m at ${time}s ("${a.phase}" → "${later.phase}")`);
-      if (distance > 0.001) {
-        const forward = step.dot(front) > 0,
-          reversing = [a.phase, later.phase].map((p) => p.startsWith('Reversing'));
-        assert(
-          forward ? !(reversing[0] && reversing[1]) : reversing[0] || reversing[1],
-          `Van ${i} moves ${forward ? 'forward' : 'backward'} during "${a.phase}" at ${time}s`,
-        );
-      }
-      const turn = turnBetween(a.heading, later.heading);
-      if (turn > 1e-9 && distance / turn < tightest) {
-        tightest = distance / turn;
-        tightestAt = `van ${i} at ${time}s ("${a.phase}")`;
-      }
-      assert(
-        turn <= (distance / MIN_TURN_RADIUS) * 1.01 + 1e-9,
-        `Van ${i} turns ${((turn * 180) / Math.PI).toFixed(1)}° over ${distance.toFixed(3)} m (radius ${(distance / turn).toFixed(2)} m < ${MIN_TURN_RADIUS} m) at ${time}s ("${a.phase}")`,
-      );
-    }
   }
 }
 // Deterministic sampling preserves the same collision-free schedule at any speed,
@@ -262,32 +273,22 @@ for (const t of [0, 130.8, 280.76, 460.74, 489.56, 719.98])
     samples(t).forEach((v, i) =>
       assert(v.position.distanceTo(samples(t + shift)[i].position) < 1e-9),
     );
-// The other sites' approach and departure curves must be free of hairpins too.
-let siteMaxTurn = 0;
-for (const contextStyle of ['alveare', 'olympic']) {
-  const layout = siteArrivalLayout({ contextStyle });
-  for (const [points, seconds] of [
-    [layout.approach, alhambraVanWindows[0].inbound[1] - alhambraVanWindows[0].inbound[0]],
-    [layout.departure, alhambraVanWindows[0].outbound[1] - alhambraVanWindows[0].outbound[0]],
-  ]) {
-    const curve = new CatmullRomCurve3(
-      points.map(([x, z]) => new Vector3(x, 0, z)),
-      false,
-      'centripetal',
-    );
-    let previous = null;
-    for (let t = 0; t <= seconds; t += 0.02) {
-      const d = curve.getTangentAt(Math.min(1, t / seconds)),
-        heading = Math.atan2(d.x, d.z) + Math.PI;
-      if (previous !== null) {
-        const turn = (turnBetween(previous, heading) * 180) / Math.PI;
-        siteMaxTurn = Math.max(siteMaxTurn, turn);
-        assert(turn <= SITE_MAX_TURN_PER_SAMPLE, `${contextStyle} van route turns ${turn.toFixed(1)}° in 0.02 s`);
-      }
-      previous = heading;
+// The other sites' vans, sampled as their viewer drives them (site-arrival's
+// sampler on each facility's own timetable), obey the same motion rules.
+let siteSamples = 0;
+for (const site of ['seen-olympic', 'seen-alveare']) {
+  const model = validateFacility(JSON.parse(fs.readFileSync(`public/models/${site}.json`, 'utf8')));
+  const arrival = buildSiteArrival(model);
+  for (const index of arrival.windows.keys())
+    for (let frame = 0; frame < 36000; frame++) {
+      const time = frame / 50;
+      checkMotion(`${site} van ${index}`, 'site van', -1, arrival.sampleVan(index, time), arrival.sampleVan(index, time + 0.02), time);
+      siteSamples++;
     }
-  }
 }
+const radii = [...tightest]
+  .map(([kind, { radius, at }]) => `${kind} ${radius.toFixed(2)} m (${at})`)
+  .join('; ');
 console.log(
-  `${pairs.toLocaleString()} vehicle-pair checks passed over 12 minutes at 50 Hz; minimum gap ${closest.toFixed(2)} m, street-traffic gap ${streetClosest.toFixed(2)} m, lot obstacles ${lotClosest.toFixed(2)} m. Driveway yielding, parking, orientation, doors, reverse, fades and loop continuity passed; tightest turn radius ${tightest.toFixed(2)} m (${tightestAt}; floor ${MIN_TURN_RADIUS} m), Olympic/Alveare ${siteMaxTurn.toFixed(1)}° per 0.02 s, no backward motion outside reversing phases.`,
+  `${pairs.toLocaleString()} vehicle-pair checks passed over 12 minutes at 50 Hz; minimum gap ${closest.toFixed(2)} m, street-traffic gap ${streetClosest.toFixed(2)} m, lot obstacles ${lotClosest.toFixed(2)} m. Driveway yielding, parking, orientation, doors, reverse, fades and loop continuity passed. Every fleet van, delivery truck, street car and the Olympic/Alveare vans (${siteSamples.toLocaleString()} site samples) drive nose-first outside reversing phases, never jump and turn no tighter than ${MIN_TURN_RADIUS} m; tightest: ${radii}.`,
 );

@@ -70,6 +70,16 @@ minute. Vans (`vanWindows` in `app/model/arrival.ts`, routes in
 `app/model/alhambra-fleet.ts`), the day-room program and every activity source
 run on this clock.
 
+Every vehicle route is a chain of straight runs and circular arcs of the
+vehicle's centre (`app/model/vehicle-path.ts`: the `Pen` turtle, `roundedPath`
+for corner-point data, `pathAt`), so turning radii are exact: 4 m in the fleet
+lot and at the Olympic and Alveare bays, 4.5 m for the delivery trucks (which
+back straight out of receiving before pulling away) and 6.4 m
+(`STREET_CORNER_RADIUS`) at the ring-street corners for street cars, fleet and
+community vehicles. Speeds blend with the shared `easeDistance`
+(`app/model/traffic-routes.ts`). `npm run validate:traffic` checks nose-first
+motion, jumps and the 4 m minimum radius for every one of them at 50 Hz.
+
 `app/sim/clock.ts` converts between loop
 seconds, clock minutes and labels:
 

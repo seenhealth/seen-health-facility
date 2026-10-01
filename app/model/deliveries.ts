@@ -1,4 +1,12 @@
 import * as T from 'three';
+import { easeDistance, laneLine } from './traffic-routes';
+import {
+  Pen,
+  pathAt,
+  pathLength,
+  roundedPath,
+  type Piece,
+} from './vehicle-path';
 export const deliveryStops = [
   {
     id: 'delivery-food',
@@ -19,65 +27,128 @@ export const deliveryStops = [
     dwell: 52,
   },
 ] as const;
-const curves = new Map<string, T.CatmullRomCurve3>();
+/**
+ * Truck routes: straight runs and arcs of radius `radius` (see vehicle-path).
+ * A truck arrives nose-first from the south street and stops facing its door.
+ * It leaves by backing straight out `backOut` m, stopping, then pulling
+ * forward from a `lead` m straight into a right turn east across the yard,
+ * south at `exitX` to the street and east along its eastbound lane to `offX`.
+ * Loop seconds: `approach` to arrive, the stop's dwell, then `reverse`,
+ * `pause` and the rest of `departure` to leave.
+ */
+const TRUCK = {
+  radius: 4.5,
+  backOut: 4,
+  lead: 0.6,
+  exitX: 21,
+  offX: 32,
+  approach: 24,
+  departure: 24,
+  reverse: 4.5,
+  pause: 0.6,
+  /** Tailgate opening after the stop and closing before the truck moves. */
+  tailgate: 2,
+};
+type Stop = (typeof deliveryStops)[number];
+const STREET_Y = -0.23;
+function truckRoutes(s: Stop) {
+  const eastbound = laneLine('south', 1),
+    backTo = s.z - TRUCK.backOut,
+    turnZ = backTo + TRUCK.lead + TRUCK.radius;
+  return {
+    inbound: roundedPath(
+      [
+        [27, -33],
+        [20, -28],
+        [s.x, -27],
+        [s.x, s.z],
+      ],
+      TRUCK.radius,
+    ),
+    reverse: new Pen(s.x, s.z, Math.PI).line(TRUCK.backOut).take(),
+    outbound: roundedPath(
+      [
+        [s.x, backTo],
+        [s.x, turnZ],
+        [TRUCK.exitX, turnZ],
+        [TRUCK.exitX, eastbound],
+        [TRUCK.offX, eastbound],
+      ],
+      TRUCK.radius,
+    ),
+  };
+}
+const routes = new Map<Stop, ReturnType<typeof truckRoutes>>();
+const routesOf = (s: Stop) => {
+  let r = routes.get(s);
+  if (!r) routes.set(s, (r = truckRoutes(s)));
+  return r;
+};
+/** Pose `fraction` of the way along a route (nose-first, or backing up along it). */
+function along(pieces: Piece[], fraction: number, reverse = false) {
+  const p = pathAt(pieces, fraction * pathLength(pieces));
+  return {
+    position: new T.Vector3(p.x, STREET_Y, p.z),
+    heading: p.dir + (reverse ? 0 : Math.PI),
+  };
+}
 export function sampleDelivery(index: number, time: number) {
   const s = deliveryStops[index],
-    t = ((time % 720) + 720) % 720;
+    t = ((time % 720) + 720) % 720,
+    r = routesOf(s);
   for (const start of s.starts) {
-    const arrive = start + 24,
+    const arrive = start + TRUCK.approach,
       leave = arrive + s.dwell,
-      end = leave + 24;
+      end = leave + TRUCK.departure;
     if (t < start || t >= end) continue;
-    if (t >= arrive && t < leave)
+    const moving = { visible: true, door: 0, reverse: false };
+    if (t < arrive)
       return {
-        position: new T.Vector3(s.x, -0.23, s.z),
-        heading: Math.PI,
-        visible: true,
-        phase: 'Unloading',
-        door: 1,
+        ...moving,
+        ...along(r.inbound, easeDistance(t - start, TRUCK.approach, 0, 6)),
+        phase: 'Arriving',
       };
-    const inbound = t < arrive,
-      u = inbound ? (t - start) / 24 : (t - leave) / 24,
-      key = `${index}-${inbound}`;
-    let curve = curves.get(key);
-    if (!curve) {
-      const points = inbound
-        ? [
-            [27, -33],
-            [20, -28],
-            [s.x, -27],
-            [s.x, s.z],
-          ]
-        : [
-            [s.x, s.z],
-            [s.x + 0.8, s.z + 0.8],
-            [s.x + 5, s.z],
-            [21, -26],
-            [32, -33],
-          ];
-      curve = new T.CatmullRomCurve3(
-        points.map((p) => new T.Vector3(p[0], -0.23, p[1])),
-        false,
-        'centripetal',
-      );
-      curves.set(key, curve);
-    }
-    const position = curve.getPointAt(u),
-      direction = curve.getTangentAt(u);
+    if (t < leave)
+      return {
+        ...moving,
+        position: new T.Vector3(s.x, STREET_Y, s.z),
+        heading: Math.PI,
+        phase: 'Unloading',
+        door:
+          T.MathUtils.smoothstep(t, arrive, arrive + TRUCK.tailgate) *
+          (1 - T.MathUtils.smoothstep(t, leave - TRUCK.tailgate, leave)),
+      };
+    const out = t - leave,
+      pulls = TRUCK.reverse + TRUCK.pause;
+    if (out < TRUCK.reverse)
+      return {
+        ...moving,
+        ...along(r.reverse, easeDistance(out, TRUCK.reverse, 1.5, 1.5), true),
+        phase: 'Reversing out of receiving',
+        reverse: true,
+      };
+    if (out < pulls)
+      return {
+        ...moving,
+        ...along(r.reverse, 1, true),
+        phase: 'Stopped to pull away',
+      };
     return {
-      position,
-      heading: Math.atan2(direction.x, direction.z) + Math.PI,
-      visible: true,
-      phase: inbound ? 'Arriving' : 'Leaving',
-      door: 0,
+      ...moving,
+      ...along(
+        r.outbound,
+        easeDistance(out - pulls, TRUCK.departure - pulls, 5, 0),
+      ),
+      phase: 'Leaving',
     };
   }
   return {
-    position: new T.Vector3(27, -0.23, -33),
+    position: new T.Vector3(27, STREET_Y, -33),
     heading: 0,
     visible: false,
     phase: 'On delivery route',
     door: 0,
+    reverse: false,
   };
 }
 export function buildDeliveries() {
@@ -192,7 +263,7 @@ export function buildDeliveries() {
       v.root.position.copy(p.position);
       v.root.rotation.y = p.heading;
       v.tail.position.y = 1.4 + p.door * 0.65;
-      doors[i].rotation.y = p.door ? -Math.PI * 0.47 : 0;
+      doors[i].rotation.y = -Math.PI * 0.47 * p.door;
     });
   }
   return { root, tick, vehicles, doors };

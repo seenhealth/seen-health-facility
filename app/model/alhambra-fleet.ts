@@ -1,6 +1,7 @@
 import * as T from 'three';
 import type { Vec2 } from './schema';
-import { laneLine } from './traffic-routes';
+import { laneLine, STREET_CORNER_RADIUS } from './traffic-routes';
+import { jogLength, Pen, pieceAt, type Piece } from './vehicle-path';
 import { vehicleGap } from './vehicle-clearance';
 
 /**
@@ -132,7 +133,7 @@ export const FLEET_LOT = {
   laneChangeRadius: 8,
   driftRadius: 20,
   curbRadius: 6,
-  streetRadius: 6.4,
+  streetRadius: STREET_CORNER_RADIUS,
   /** A departing van backs straight out of the drop-off to here before pulling away. */
   dockBackTo: -23.5,
   /** Straight run before a forward arc that starts from standstill. */
@@ -155,77 +156,6 @@ export const FLEET_VAN = { halfWidth: 1.125, halfLength: 3.175 },
   FLEET_VAN_MARGIN = 0.5;
 const VAN = FLEET_VAN,
   VAN_MARGIN = FLEET_VAN_MARGIN;
-
-// ---------------------------------------------------------------------------
-// Route pieces: straight runs and arcs of the van centre
-// ---------------------------------------------------------------------------
-/** A straight (curvature 0) or circular piece starting at (x, z) travelling along `dir` (atan2(dx, dz)). */
-type Piece = {
-  x: number;
-  z: number;
-  dir: number;
-  length: number;
-  curvature: number;
-};
-function pieceAt(p: Piece, s: number) {
-  if (!p.curvature)
-    return {
-      x: p.x + s * Math.sin(p.dir),
-      z: p.z + s * Math.cos(p.dir),
-      dir: p.dir,
-    };
-  const d = p.dir + p.curvature * s;
-  return {
-    x: p.x + (Math.cos(p.dir) - Math.cos(d)) / p.curvature,
-    z: p.z + (Math.sin(d) - Math.sin(p.dir)) / p.curvature,
-    dir: d,
-  };
-}
-/** Turtle that lays pieces end to end. Positive arc angles turn right (north → east). */
-class Pen {
-  pieces: Piece[] = [];
-  constructor(
-    public x: number,
-    public z: number,
-    public dir: number,
-  ) {}
-  private add(length: number, curvature: number) {
-    if (length < 1e-9) return this;
-    const piece = { x: this.x, z: this.z, dir: this.dir, length, curvature };
-    this.pieces.push(piece);
-    ({ x: this.x, z: this.z, dir: this.dir } = pieceAt(piece, length));
-    return this;
-  }
-  line(length: number) {
-    if (length < -1e-6)
-      throw new Error(`Fleet route runs backwards (${length} m)`);
-    return this.add(length, 0);
-  }
-  /** Straight on until reaching `x` (or `z`) along the current direction. */
-  lineToX(x: number) {
-    return this.line((x - this.x) / Math.sin(this.dir));
-  }
-  lineToZ(z: number) {
-    return this.line((z - this.z) / Math.cos(this.dir));
-  }
-  arc(radius: number, angle: number) {
-    return this.add(Math.abs(angle) * radius, Math.sign(angle) / radius);
-  }
-  /** Lane change: two opposite arcs; `lateral` is positive to the right of travel. */
-  jog(lateral: number, radius = FLEET_LOT.turnRadius) {
-    const a = Math.acos(1 - Math.abs(lateral) / (2 * radius)),
-      s = Math.sign(lateral);
-    return this.arc(radius, s * a).arc(radius, -s * a);
-  }
-  /** Take the pieces laid since the last take. */
-  take() {
-    const out = this.pieces;
-    this.pieces = [];
-    return out;
-  }
-}
-const jogLength = (lateral: number, radius = FLEET_LOT.turnRadius) =>
-  2 * radius * Math.sin(Math.acos(1 - Math.abs(lateral) / (2 * radius)));
 
 export type FleetLeg = {
   id: string;

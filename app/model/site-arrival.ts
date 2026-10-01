@@ -3,6 +3,8 @@ import siteArrivals from '../data/site-arrivals.json';
 import { fleetVanLetter } from './alhambra-fleet';
 import { buildArrivalVan, updateArrivalVan } from './arrival';
 import type { Facility, Vec2 } from './schema';
+import { easeDistance } from './traffic-routes';
+import { pathAt, pathLength, roundedPath } from './vehicle-path';
 
 export type SiteVanWindow =
   (typeof siteArrivals.timetables)[keyof typeof siteArrivals.timetables][number];
@@ -21,6 +23,9 @@ export function siteVanWindows(model: Facility): SiteVanWindow[] {
 // Alveare's east lobby entry is centered at (15.80685, 10.22132).
 // Olympic's proposed reception vestibule opens to the rear at (-8.614, 11.69278).
 // Bay dimensions and fleet movements are illustrative design-phase placements.
+// Approach and departure are corner points; every corner is rounded to a
+// SITE_VAN_RADIUS arc (vehicle-path.ts), the fleet's 4 m lot radius.
+const SITE_VAN_RADIUS = 4;
 export function siteArrivalLayout(model: Facility) {
   const alveare = model.contextStyle === 'alveare';
   return alveare
@@ -55,23 +60,18 @@ export function siteArrivalLayout(model: Facility) {
         streetY: -0.18,
         landingY: -0.115,
         focus: [-6, 15] as Vec2,
+        // In along the rear lane, a half turn and straight into the bay;
+        // out west and a jog back onto the lane.
         approach: [
           [-38, 27],
-          [-26, 27],
-          [-12, 27],
-          [7, 27],
-          [12, 24],
-          [10, 20],
-          [5, 19],
+          [12, 27],
+          [12, 19],
           [0, 19],
         ] as Vec2[],
         departure: [
           [0, 19],
-          [-8, 19],
-          [-17, 19],
-          [-20, 22],
-          [-21, 27],
-          [-27, 27],
+          [-19, 19],
+          [-19, 27],
           [-38, 27],
         ] as Vec2[],
         walk: [
@@ -162,14 +162,8 @@ export function buildSiteArrival(
       );
     }
   }
-  const curve = (points: Vec2[]) =>
-    new T.CatmullRomCurve3(
-      points.map(([x, z]) => new T.Vector3(x, layout.streetY, z)),
-      false,
-      'centripetal',
-    );
-  const inbound = curve(layout.approach),
-    outbound = curve(layout.departure);
+  const inbound = roundedPath(layout.approach, SITE_VAN_RADIUS),
+    outbound = roundedPath(layout.departure, SITE_VAN_RADIUS);
   const windows = siteVanWindows(model);
   function sampleVan(index: number, time: number) {
     const v = windows[index],
@@ -182,17 +176,26 @@ export function buildSiteArrival(
     let heading = layout.heading,
       visible = false,
       phase = 'Off-site';
-    for (const [range, label, path] of [
-      [v.inbound, 'Arriving', inbound],
-      [v.returning, 'Returning for pickup', inbound],
-      [v.outbound, 'Leaving after drop-off', outbound],
-      [v.leaving, 'Taking participants home', outbound],
+    // Arrivals come in at speed and slow into the bay; departures pull
+    // away from it and leave at speed.
+    for (const [range, label, path, arriving] of [
+      [v.inbound, 'Arriving', inbound, true],
+      [v.returning, 'Returning for pickup', inbound, true],
+      [v.outbound, 'Leaving after drop-off', outbound, false],
+      [v.leaving, 'Taking participants home', outbound, false],
     ] as const) {
       if (t >= range[0] && t < range[1]) {
-        const u = (t - range[0]) / (range[1] - range[0]);
-        position = path.getPointAt(u);
-        const direction = path.getTangentAt(u);
-        heading = Math.atan2(direction.x, direction.z) + Math.PI;
+        const seconds = range[1] - range[0],
+          ramp = Math.min(4, seconds / 3),
+          u = easeDistance(
+            t - range[0],
+            seconds,
+            arriving ? 0 : ramp,
+            arriving ? ramp : 0,
+          ),
+          p = pathAt(path, u * pathLength(path));
+        position = new T.Vector3(p.x, layout.streetY, p.z);
+        heading = p.dir + Math.PI;
         visible = true;
         phase = label;
       }
