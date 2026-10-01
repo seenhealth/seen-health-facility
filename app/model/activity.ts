@@ -394,7 +394,7 @@ export function createActivity(
         tick: (_time: number) => {},
         highlights: (): DayHighlight[] => [],
       }
-    : buildDayRoom(actors);
+    : buildDayRoom(actors, model);
   scene.add(dayRoom.root);
   const actorMap = new Map(actors.map((a) => [a.spec.id, a]));
   const groundZones = model.zones.filter((z) => z.levelId === 'ground');

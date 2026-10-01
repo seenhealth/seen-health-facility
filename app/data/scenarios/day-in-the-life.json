@@ -371,15 +371,15 @@
             ],
             "roomId": "day-open",
             "anchor": [
-              -7.9,
-              12.25
+              -8.4,
+              11.7
             ],
             "heading": 3.1416,
             "action": "exercise",
             "approach": [
               [
-                -8.8,
-                11.35
+                -10.45,
+                11.7
               ]
             ],
             "followProgram": true,

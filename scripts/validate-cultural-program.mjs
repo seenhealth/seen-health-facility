@@ -25,6 +25,10 @@ const D = activityData.duration,
   actors = new Map(activityData.actors.map((a) => [a.id, a])),
   sessionOf = new Map(dayProgram.programs.map((s) => [s.id, s]));
 const near = (p, q) => Math.hypot(p[0] - q[0], p[1] - q[1]) < 1e-6;
+const FORMATIONS = dayProgram.floor.formations,
+  SHIFT = dayProgram.floor.transition,
+  [[AX0, AZ0], [AX1, AZ1]] = dayProgram.floor.area,
+  cohort = dayProgram.stations.map((s) => actors.get(s.actorId));
 
 // 1. Every zone is a gap-free rotation over the care day.
 for (const zone of dayProgram.zones) {
@@ -46,12 +50,16 @@ for (const person of dayProgram.instructors) {
   assert.ok(costume?.style, `${person.id} wears activity attire`);
   attire.add(`${costume.style}/${costume.color}`);
   const led = dayProgram.programs.filter((s) => s.instructorId === person.id),
-    spot = dayProgram.zones.find((z) => z.id === led[0].zone).instructorSpot;
+    onFloor = led[0].zone === 'floor',
+    spot = onFloor
+      ? FORMATIONS[led[0].formation].lead
+      : dayProgram.zones.find((z) => z.id === led[0].zone).instructorSpot.position;
   for (let t = 0; t < D; t += 0.5) {
     const p = sampleActor(a, t),
-      session = led.find((s) => t >= s.start && t < s.end);
+      // Floor guests step in once the class has rearranged.
+      session = led.find((s) => t >= s.start + (onFloor ? SHIFT : 0) && t < s.end);
     assert.equal(p.visible !== false, !!session, `${person.id} on site at ${t}`);
-    assert.ok(near([p.x, p.z], spot.position), `${person.id} stays at the zone's spot`);
+    assert.ok(near([p.x, p.z], spot), `${person.id} stays at the zone's spot`);
     if (session) assert.equal(p.action, session.instructorAction);
   }
 }
@@ -69,13 +77,14 @@ for (let t = 0; t < D; t += 2) {
   assert.ok(led.length >= 2, `Two guest-led cultural activities at ${t}`);
   let engaged = 0;
   for (const { zone, session } of now) {
-    const cast =
-      zone.id === 'floor'
-        ? dayProgram.stations
-            .filter((s) => !['leader', 'support'].includes(s.mode))
-            .map((s) => s.actorId)
-        : zone.participants;
-    for (const id of cast) {
+    if (zone.id === 'floor') {
+      for (const s of dayProgram.stations.filter((s) => !['leader', 'support'].includes(s.mode))) {
+        const p = sampleActor(actors.get(s.actorId), t);
+        if (p.visible !== false && !['walk', 'roll', 'idle'].includes(p.action)) engaged++;
+      }
+      continue;
+    }
+    for (const id of zone.participants) {
       const p = sampleActor(actors.get(id), t);
       if (p.visible !== false && p.action === session.action) engaged++;
     }
@@ -112,6 +121,57 @@ for (const person of dayProgram.instructors) {
         `${person.id} and ${other.id} need space at ${t}`,
       );
     }
+  }
+}
+
+// 5b. The open-floor class: a different layout for different activities, everyone inside the area
+// and apart from one another even while rearranging.
+const layouts = new Set(dayProgram.programs.filter((s) => s.zone === 'floor').map((s) => s.formation));
+assert.ok(layouts.size >= 5, `Floor layouts vary by activity (${layouts.size})`);
+let closestPair = Infinity;
+for (let t = 0; t < D; t += 0.1) {
+  const at = cohort.map((a) => sampleActor(a, t));
+  for (const p of at)
+    assert.ok(p.x >= AX0 - 0.6 && p.x <= AX1 + 0.6 && p.z >= AZ0 - 0.6 && p.z <= AZ1 + 0.6, `Class stays on the floor at ${t}`);
+  for (let i = 0; i < at.length; i++)
+    for (let j = i + 1; j < at.length; j++)
+      closestPair = Math.min(closestPair, Math.hypot(at[i].x - at[j].x, at[i].z - at[j].z));
+}
+assert.ok(closestPair >= 0.5, `Class members keep 0.5 m apart (${closestPair.toFixed(2)})`);
+const groupSizes = dayProgram.programs
+  .filter((s) => s.zone === 'floor')
+  .map((s) => {
+    const t = (s.start + s.end) / 2;
+    return dayProgram.stations
+      .filter((st) => !['leader', 'support'].includes(st.mode))
+      .filter((st) => sampleActor(actors.get(st.actorId), t).action === s.action).length;
+  });
+assert.ok(Math.max(...groupSizes) >= 10 && Math.min(...groupSizes) <= 6, `Big and small groups (${groupSizes})`);
+
+// 5c. Side tables: games and crafts change through the day; players play, others look on.
+const activities = dayProgram.tableActivities;
+let fewestKinds = Infinity;
+for (let t = 0; t < D; t += 10) {
+  const kinds = new Set(dayProgram.tables.map((tb) => tb.schedule.find((e) => t >= e.start && t < e.end).activity));
+  fewestKinds = Math.min(fewestKinds, kinds.size);
+}
+assert.ok(fewestKinds >= 8, `Many table activities at once (${fewestKinds})`);
+for (const game of ['xiangqi', 'go', 'checkers', 'mahjong', 'cards'])
+  assert.ok(dayProgram.tables.some((tb) => tb.schedule.some((e) => e.activity === game)), `${game} is played`);
+const seatPrefix = (id) =>
+  id.startsWith('day-tree-table-')
+    ? `day-tree-chair-${id.split('-').at(-1)}-`
+    : id === 'day-photo-lounge-table'
+      ? 'day-photo-lounge-chair-'
+      : `${id}-chair-`;
+for (const tb of dayProgram.tables) {
+  const seated = activityData.actors.filter((a) => a.seatId?.startsWith(seatPrefix(tb.id)));
+  assert.ok(seated.length, `${tb.id} has people`);
+  for (const e of tb.schedule) {
+    const act = activities[e.activity],
+      t = (e.start + e.end) / 2,
+      playing = seated.filter((a) => sampleActor(a, t).action === act.play).length;
+    assert.ok(playing >= Math.min(act.players || 1, seated.length), `${tb.id}: ${e.activity} is being played (${playing})`);
   }
 }
 
@@ -168,14 +228,22 @@ for (const id of decorIds)
 for (const session of dayProgram.programs) {
   const at = (session.start + session.end) / 2;
   activity.setOptions({ time: at, playing: false, enabled: true });
-  const labels = room.highlights(),
+  const all = room.highlights(),
+    labels = all.filter((h) => h.kind !== 'table'),
     label = labels.find((h) => h.zoneId === session.zone);
   assert.equal(labels.length, dayProgram.zones.length, 'One label per zone');
+  assert.equal(all.filter((h) => h.kind === 'table').length, dayProgram.tables.length, 'One label per activity table');
   assert.equal(label?.sessionId, session.id, `${session.id} is labeled`);
   if (session.labelZh) assert.ok(label.title.includes(session.labelZh));
   const guest = dayProgram.instructors.find((i) => i.id === session.instructorId);
   if (guest) assert.ok(label.subtitle.includes(guest.name), `${session.id} names its instructor`);
   assert.ok([label.position.x, label.position.y, label.position.z].every(Number.isFinite));
+  if (session.zone === 'floor')
+    assert.equal(
+      room.root.getObjectByName('day-program-display').visible,
+      !!FORMATIONS[session.formation].board,
+      `Board only where ${session.id} needs it`,
+    );
   const running = new Set(
     sessionsAt(at).flatMap(({ session: s }) => sessionOf.get(s.id).decor),
   );
@@ -184,5 +252,5 @@ for (const session of dayProgram.programs) {
 }
 activity.dispose();
 console.log(
-  `Cultural program: ${dayProgram.programs.length} sessions in ${dayProgram.zones.length} concurrent zones; ${dayProgram.instructors.length} guest instructors in distinct attire; ≥2 guest-led activities and ≥${minEngaged} engaged participants at all times; movements differ by ≥${closest.toFixed(2)} rad; ${decorIds.size} décor sets and per-zone labels verified.`,
+  `Cultural program: ${dayProgram.programs.length} sessions in ${dayProgram.zones.length} concurrent zones; ${dayProgram.instructors.length} guest instructors in distinct attire; ≥2 guest-led activities and ≥${minEngaged} engaged participants at all times; movements differ by ≥${closest.toFixed(2)} rad; ${layouts.size} floor layouts with groups of ${Math.min(...groupSizes)}–${Math.max(...groupSizes)}, class ≥${closestPair.toFixed(2)} m apart; ≥${fewestKinds} table activities at once; ${decorIds.size} décor sets, zone and table labels, board only when needed.`,
 );

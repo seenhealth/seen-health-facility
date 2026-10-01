@@ -18,11 +18,11 @@ const normalized = {
 };
 const data = JSON.parse(fs.readFileSync('app/data/activity-loop.json'));
 const cast = data.actors.filter((a) => a.id.startsWith('community-'));
-assert.equal(data.actors.length, 176);
+assert.equal(data.actors.length, 184);
 const profiles = JSON.parse(
   fs.readFileSync('app/data/character-templates.json'),
 ).people;
-assert.equal(new Set(data.actors.map((a) => a.profileId)).size, 176);
+assert.equal(new Set(data.actors.map((a) => a.profileId)).size, 184);
 assert(data.actors.every((a) => profiles.some((p) => p.id === a.profileId)));
 let samples = 0;
 for (const actor of cast) {

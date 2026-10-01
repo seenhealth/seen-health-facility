@@ -57,7 +57,12 @@ export type Action =
   | 'fan-dance'
   | 'opera'
   | 'erhu'
-  | 'tea';
+  | 'tea'
+  | 'board-game'
+  | 'watch'
+  | 'knit'
+  | 'cards'
+  | 'read';
 /** Guest-instructor attire: one silhouette and colour signature per style. */
 export type CostumeStyle = 'taichi' | 'tang' | 'qipao' | 'opera' | 'tcm-coat';
 export type Costume = {
@@ -79,7 +84,20 @@ export const actionPeriods: Partial<Record<Action, number>> = {
   opera: 8,
   erhu: 3,
   tea: 8,
+  'board-game': 8,
+  watch: 10,
+  knit: 3,
+  cards: 6,
+  read: 12,
 };
+/** Seated table activities: they always sit (a chair or wheelchair). */
+const TABLE_ACTIONS = new Set<Action>([
+  'board-game',
+  'watch',
+  'knit',
+  'cards',
+  'read',
+]);
 export type CharacterSpec = {
   id: string;
   role: CharacterRole;
@@ -2548,6 +2566,94 @@ export function createCharacter(spec: CharacterSpec) {
     return a[5].map((x, j) => x + (b[5][j] - x) * t);
   }
   /**
+   * Cycle phase (0–1) of an action for this person at loop time `time`, as
+   * pose() uses it. Table activities and guests' tea are staggered per
+   * person, so props tied to a moment (a placed piece, a turned page, a
+   * played card) can follow the same phase.
+   */
+  function phase(action: Action, time: number) {
+    const period = actionPeriods[action] ?? 2,
+      stagger =
+        TABLE_ACTIONS.has(action) ||
+        (action === 'tea' && spec.role !== 'instructor');
+    return (
+      (((time / period + (stagger ? (h % 997) / 997 : 0)) % 1) + 1) % 1
+    );
+  }
+  // Table layout shared by the seated table activities: top 0.74 m above the
+  // floor, near edge ~0.30 m and centre ~0.60 m in front of the hip joint.
+  const TABLE_TOP = 0.74,
+    TABLE_EDGE = 0.3,
+    TABLE_MID = 0.6;
+  type HandPose = {
+    f: number;
+    c: T.Vector3;
+    q: T.Quaternion;
+    p: T.Vector3;
+  };
+  const keyPool: HandPose[] = Array.from({ length: 8 }, () => ({
+    f: 0,
+    c: new T.Vector3(),
+    q: new T.Quaternion(),
+    p: new T.Vector3(),
+  }));
+  /**
+   * Hand key `k` at phase `f`: centre, fingers, palm and elbow direction,
+   * given in the hip frame (table work) or the torso frame (near the body).
+   */
+  function handKey(
+    k: number,
+    f: number,
+    side: 'L' | 'R',
+    hipFrame: boolean,
+    c: V3,
+    fingers: V3,
+    palm: V3,
+    pole: V3,
+  ) {
+    const o = keyPool[k];
+    o.f = f;
+    o.c.set(...c);
+    o.p.set(...pole);
+    orient(side, fv.set(...fingers), pv.set(...palm), o.q);
+    if (hipFrame) {
+      torsoPoint(o.c);
+      torsoTurn(o.q);
+    }
+  }
+  /** Eased cyclic blend of the first `n` hand keys at phase `f` into cv/hq/ov. */
+  function handPath(n: number, f: number) {
+    let i = n - 1;
+    while (i > 0 && keyPool[i].f > f) i--;
+    const a = keyPool[i],
+      b = keyPool[(i + 1) % n],
+      span = (b.f <= a.f ? b.f + 1 : b.f) - a.f,
+      t = smooth(0, 1, (f - a.f) / span);
+    cv.lerpVectors(a.c, b.c, t);
+    ov.lerpVectors(a.p, b.p, t);
+    hq.slerpQuaternions(a.q, b.q, t);
+  }
+  /** A hand resting palm-down at the near table edge (hip frame). */
+  function restAtTable(
+    k: number,
+    f: number,
+    side: 'L' | 'R',
+    s: number,
+    y: number,
+    z = 0,
+  ) {
+    handKey(
+      k,
+      f,
+      side,
+      true,
+      [s * 0.15, y + 0.035, TABLE_EDGE + 0.05 + z],
+      [-s * 0.25, -0.3, 1],
+      [0, -1, -0.3],
+      [s * 0.7, -0.7, -0.2],
+    );
+  }
+  /**
    * Cultural activities: whole-body choreography standing, upper body only
    * when seated or using a mobility aid. `motion` scales the range.
    */
@@ -2772,6 +2878,209 @@ export function createCharacter(spec: CharacterSpec) {
         head.rotation.set(0.12 - 0.2 * sip, 0, 0);
       }
     }
+    if (TABLE_ACTIONS.has(action)) tableWork(action, phase(action, time), m);
+  }
+  /**
+   * Seated table activities (always sitting): board games, watching a game,
+   * knitting, cards and reading. Table work is placed in the hip frame,
+   * hand-held work in the torso frame; `m` < 1 shortens reaches.
+   */
+  function tableWork(action: Action, g: number, m: number) {
+    const { torso, head } = joints,
+      top = TABLE_TOP / profile.height - joints.hip.position.y,
+      mid = TABLE_EDGE + (TABLE_MID - TABLE_EDGE) * (0.7 + 0.3 * m);
+    if (action === 'board-game') {
+      // Lean in, place a piece at the board centre, withdraw, then think
+      // with the right hand at the chin; eyes stay on the board.
+      const reachOut = bump(g, 0.26, 0.4, 0.53, 0.66),
+        think = bump(g, 0.58, 0.68, 0.86, 0.97);
+      torso.rotation.x += 0.1 + 0.16 * reachOut + 0.05 * think;
+      restAtTable(0, 0, 'R', 1, top);
+      restAtTable(1, 0.26, 'R', 1, top);
+      // Palm down so the pinched piece stays level.
+      const over: [V3, V3, V3] = [
+        [-0.1, -0.15, 1],
+        [0, -1, -0.12],
+        [0.6, -0.6, -0.5],
+      ];
+      handKey(2, 0.4, 'R', true, [0.05, top + 0.08, mid - 0.04], ...over);
+      handKey(3, 0.47, 'R', true, [0.05, top + 0.039, mid - 0.035], ...over);
+      handKey(4, 0.54, 'R', true, [0.06, top + 0.11, mid - 0.07], ...over);
+      handKey(
+        5,
+        0.68,
+        'R',
+        false,
+        [0.035, 0.405, 0.16],
+        [-0.3, 0.9, 0.3],
+        [0.1, 0.3, -1],
+        [0.3, -1, 0.3],
+      );
+      handKey(
+        6,
+        0.86,
+        'R',
+        false,
+        [0.035, 0.405, 0.16],
+        [-0.3, 0.9, 0.3],
+        [0.1, 0.3, -1],
+        [0.3, -1, 0.3],
+      );
+      restAtTable(7, 0.97, 'R', 1, top);
+      handPath(8, g);
+      reach('R', cv, hq, ov);
+      restAtTable(0, 0, 'L', -1, top);
+      handPath(1, 0);
+      reach('L', cv, hq, ov);
+      head.rotation.set(
+        0.42 + 0.06 * reachOut - 0.12 * think,
+        -0.06 * reachOut,
+        0.07 * think,
+      );
+    }
+    if (action === 'watch') {
+      // A spectator leaning on the table edge, glancing from player to
+      // player with small nods, now and then pointing at the board.
+      const sw = Math.sin(TAU * g),
+        turn = Math.sign(sw) * Math.pow(Math.abs(sw), 0.45) * m,
+        point = bump(g, 0.55, 0.63, 0.7, 0.78);
+      torso.rotation.x += 0.2;
+      torso.rotation.y = 0.1 * turn * (1 - point);
+      for (const [side, s] of SIDES) {
+        handKey(
+          0,
+          0,
+          side,
+          true,
+          [s * 0.13, top + 0.04, TABLE_EDGE + 0.08],
+          [-s * 0.35, -0.2, 1],
+          [0, -1, -0.2],
+          [s * 0.3, -0.6, -1],
+        );
+        handPath(1, 0);
+        if (side === 'R') {
+          hq.slerp(
+            orient('R', fv.set(-0.15, -0.15, 1), pv.set(-0.7, -0.7, 0), kq),
+            point * m,
+          );
+          cv.lerp(torsoPoint(v4.set(0.08, top + 0.2, mid - 0.08)), point * m);
+          ov.lerp(v3.set(0.6, -0.8, -0.2), point);
+        }
+        reach(side, cv, hq, ov);
+      }
+      head.rotation.set(
+        0.24 + 0.05 * Math.max(0, Math.sin(TAU * 3 * g)) * m,
+        0.42 * turn * (1 - point),
+        0,
+      );
+    }
+    if (action === 'knit') {
+      // Hands together in front of the lower chest, the needles stroking in
+      // turn; eyes on the work.
+      const a = TAU * g;
+      torso.rotation.x += 0.12;
+      for (const [side, s] of SIDES) {
+        const stroke = Math.max(0, s * Math.sin(a)) * (0.6 + 0.4 * m);
+        cv.set(s * 0.072, 0.22, 0.25).add(
+          v1.set(-s * 0.018 * stroke, 0.012 * stroke, 0.022 * stroke),
+        );
+        orient(
+          side,
+          fv.set(-s * 0.6, 0.3, 0.75),
+          pv.set(-s * 0.25, -0.95, 0.15),
+          hq,
+        );
+        hq.premultiply(q1.setFromAxisAngle(fv.normalize(), s * 0.3 * stroke));
+        reach(side, cv, hq, ov.set(s * 0.6, -0.9, -0.1));
+      }
+      head.rotation.set(0.42, 0.03 * Math.sin(a), 0);
+    }
+    if (action === 'cards') {
+      // The left hand holds a fan of cards at chest height facing the
+      // player; the right hand draws one, plays it to the table centre and
+      // returns to the table edge.
+      const play = bump(g, 0.28, 0.4, 0.46, 0.56);
+      torso.rotation.x += 0.06 + 0.12 * play;
+      cv.set(-0.075, 0.3 + 0.008 * Math.sin(TAU * g), 0.25);
+      orient('L', fv.set(0.3, 0.9, 0.15), pv.set(0.05, 0.25, -1), hq);
+      reach('L', cv, hq, ov.set(-0.7, -0.8, -0.1));
+      restAtTable(0, 0, 'R', 1, top);
+      restAtTable(1, 0.1, 'R', 1, top);
+      const pick: [V3, V3, V3] = [
+          [-0.4, 0.55, 0.7],
+          [-0.8, -0.3, 0.4],
+          [0.7, -0.8, -0.2],
+        ],
+        lay: [V3, V3, V3] = [
+          [-0.1, -0.2, 1],
+          [0, -1, -0.1],
+          [0.6, -0.6, -0.5],
+        ];
+      handKey(2, 0.2, 'R', false, [0.0, 0.39, 0.245], ...pick);
+      handKey(3, 0.26, 'R', false, [0.01, 0.42, 0.245], ...pick);
+      handKey(4, 0.4, 'R', true, [0.03, top + 0.07, mid - 0.06], ...lay);
+      handKey(5, 0.46, 'R', true, [0.03, top + 0.032, mid - 0.05], ...lay);
+      restAtTable(6, 0.56, 'R', 1, top);
+      handPath(7, g);
+      reach('R', cv, hq, ov);
+      head.rotation.set(0.22 + 0.2 * play, -0.12 * (1 - play), 0);
+    }
+    if (action === 'read') {
+      // An open book or folded paper held up in both hands, eyes scanning;
+      // the right hand turns a page once a cycle.
+      torso.rotation.x += 0.06;
+      for (const [side, s] of SIDES) {
+        handKey(
+          0,
+          0,
+          side,
+          false,
+          [s * 0.155, 0.24, 0.285],
+          [-s * 0.25, 0.65, 0.7],
+          [-s * 0.9, -0.1, -0.4],
+          [s * 0.6, -0.8, -0.3],
+        );
+        if (side === 'L') {
+          handPath(1, 0);
+          reach('L', cv, hq, ov);
+          continue;
+        }
+        handKey(
+          1,
+          0.68,
+          side,
+          false,
+          [0.155, 0.24, 0.285],
+          [-0.25, 0.65, 0.7],
+          [-0.9, -0.1, -0.4],
+          [0.6, -0.8, -0.3],
+        );
+        const turnPage: [V3, V3, V3] = [
+          [-0.6, 0.45, 0.65],
+          [0, -0.8, 0.55],
+          [0.6, -0.8, -0.3],
+        ];
+        handKey(
+          2,
+          0.76,
+          side,
+          false,
+          [0.12, 0.32 * m + 0.24 * (1 - m), 0.265],
+          ...turnPage,
+        );
+        handKey(
+          3,
+          0.83,
+          side,
+          false,
+          [0.155 - 0.195 * m, 0.33 * m + 0.24 * (1 - m), 0.285],
+          ...turnPage,
+        );
+        handPath(4, g);
+        reach('R', cv, hq, ov);
+      }
+      head.rotation.set(0.36, 0.07 * Math.sin(TAU * 3 * g) * m, 0);
+    }
   }
   /** Water sleeves hang from the hand bones; let them fall (or fly) freely. */
   function drapeSleeves(thrown: boolean) {
@@ -2831,6 +3140,7 @@ export function createCharacter(spec: CharacterSpec) {
         action === 'seated' ||
         action === 'ride' ||
         action === 'erhu' ||
+        TABLE_ACTIONS.has(action) ||
         !!spec.seated ||
         seatedOverride ||
         inWheelchair;
@@ -3036,6 +3346,11 @@ export function createCharacter(spec: CharacterSpec) {
       'opera',
       'erhu',
       'tea',
+      'board-game',
+      'watch',
+      'knit',
+      'cards',
+      'read',
     ] as Action[]) {
       // Cultural actions bake one full period; the rest keep 2 s clips.
       const period = actionPeriods[action] ?? 2,
@@ -3074,5 +3389,5 @@ export function createCharacter(spec: CharacterSpec) {
     pose('idle', 0, 0);
     return list;
   }
-  return { root, mesh, bones, joints, pose, clips, profile };
+  return { root, mesh, bones, joints, pose, clips, profile, phase };
 }

@@ -9,26 +9,37 @@ import {
   type DayZone,
 } from './day-program';
 import type { ActorSpec, ActorSample } from './activity';
-import { ERHU, type createCharacter } from './characters';
+import { ERHU, type Action, type createCharacter } from './characters';
+import type { Facility } from './schema';
 
 export { dayProgram, programAt } from './day-program';
 type Person = ReturnType<typeof createCharacter> & {
   spec: ActorSpec;
   sample: ActorSample;
 };
-/** The floating highlight for the session running now in one day-room zone. */
+/**
+ * A floating highlight: the session running now in one day-room zone
+ * (`kind: 'zone'`) or the pastime at one game table (`kind: 'table'`).
+ */
 export type DayHighlight = {
+  kind: 'zone' | 'table';
   id: string;
-  zoneId: string;
-  sessionId: string;
+  /** Zone entries: the zone and its session. */
+  zoneId?: string;
+  sessionId?: string;
+  /** Table entries: the table object id and its activity. */
+  tableId?: string;
+  activity?: string;
   /** `${labelZh} ${label}`, or the English label alone. */
   title: string;
   label: string;
   labelZh?: string;
-  /** `with ${instructor.name}`, or the activities team for staff-led sessions. */
+  /** `with ${instructor.name}`, the activities team, or '' for tables. */
   subtitle: string;
-  /** Label anchor: the zone anchor at its label height (world metres). */
+  /** Label anchor in world metres. */
   position: T.Vector3;
+  /** The activity follow id (interaction track) for this entry. */
+  follow: string;
 };
 /** An activity tool shown for `actions`, and only in `sessions` when listed. */
 export type DayProp = {
@@ -115,7 +126,7 @@ const place = (
   );
 const templates = {
   box: new T.BoxGeometry(1, 1, 1),
-  ball: new T.SphereGeometry(1, 14, 9),
+  ball: new T.SphereGeometry(1, 12, 8),
   pebble: new T.SphereGeometry(1, 8, 5),
   ring: new T.TorusGeometry(1, 0.022, 4, 28),
 };
@@ -141,7 +152,12 @@ class Kit {
   }
   /** Adds a primitive in `color`; `null` keeps a kit-built geometry's own colors. */
   add(geometry: T.BufferGeometry, color: string | null, m = new T.Matrix4()) {
-    const g = geometry.index ? geometry.toNonIndexed() : geometry.clone();
+    // Indexed throughout: shared vertices keep smooth parts light.
+    const g = geometry.clone();
+    if (!g.index)
+      g.setIndex(
+        Array.from({ length: g.attributes.position.count }, (_, i) => i),
+      );
     for (const name of Object.keys(g.attributes))
       if (!['position', 'normal', ...(color ? [] : ['color'])].includes(name))
         g.deleteAttribute(name);
@@ -393,9 +409,9 @@ const standingLantern = (
 /** Paper-cut window flower: a scalloped disc with petal and star cut-outs. */
 function windowFlower(r: number, petals = 8) {
   const s = new T.Shape();
-  for (let i = 0; i <= 120; i++) {
-    const a = (i / 120) * Math.PI * 2,
-      rr = r * (0.96 + 0.04 * Math.cos(a * 20));
+  for (let i = 0; i <= 80; i++) {
+    const a = (i / 80) * Math.PI * 2,
+      rr = r * (0.96 + 0.04 * Math.cos(a * 16));
     if (i) s.lineTo(Math.cos(a) * rr, Math.sin(a) * rr);
     else s.moveTo(Math.cos(a) * rr, Math.sin(a) * rr);
   }
@@ -1085,15 +1101,734 @@ const sheetBuilders: Record<string, (k: Kit, rand: () => number) => void> = {
   },
 };
 // ---------------------------------------------------------------------------
+// Table games and pastimes. Centre sets are drawn in a table frame (origin on
+// the top at its centre, +z toward the first player); place settings in a
+// seat frame (origin on the top in front of the sitter, +z away from them).
+const G = {
+  board: '#dcb97c',
+  boardDark: '#8b5b37',
+  line: '#5e4128',
+  ivory: '#f2e9d3',
+  jade: '#3f7b5e',
+  black: '#262524',
+  white: '#f3f0e8',
+  river: '#c6dde0',
+  card: '#fbf8f1',
+  cardBack: '#b8463a',
+  wicker: '#b38b57',
+  colors: ['#d9534a', '#efb23c', '#4c9a6a', '#4a7fc1', '#e889a8', '#8f6bb8'],
+};
+const pick = <T>(list: T[], rand: () => number) =>
+  list[Math.floor(rand() * list.length) % list.length];
+function teacup(k: Kit, x: number, z: number) {
+  k.cyl(C.porcelain, x, 0.003, z, 0.034, 0.005, 0, 0, 0, 1, 14);
+  k.cyl(C.porcelain, x, 0.021, z, 0.024, 0.032, 0, 0, 0, 1.35, 14);
+  k.cyl(C.cobalt, x, 0.031, z, 0.0305, 0.006, 0, 0, 0, 1.03, 14);
+  k.cyl(C.tea, x, 0.0365, z, 0.0285, 0.001, 0, 0, 0, 1, 14);
+}
+function xiangqiDisc(k: Kit, x: number, y: number, z: number, color: string) {
+  k.cyl(G.ivory, x, y + 0.006, z, 0.0165, 0.012, 0, 0, 0, 1, 14);
+  k.cyl(color, x, y + 0.0124, z, 0.0125, 0.0012, 0, 0, 0, 1, 14);
+  k.cyl(G.ivory, x, y + 0.0129, z, 0.0082, 0.001, 0, 0, 0, 1, 12);
+}
+function xiangqi(k: Kit) {
+  const W = 0.34,
+    H = 0.38,
+    cx = W / 8,
+    cz = H / 9,
+    y = 0.0195;
+  k.rbox(G.boardDark, 0, 0.009, 0, W + 0.07, 0.018, H + 0.07);
+  k.box(G.board, 0, 0.0185, 0, W + 0.05, 0.001, H + 0.05);
+  k.box(G.river, 0, y - 0.0002, 0, W, 0.0008, cz * 0.92);
+  for (let j = 0; j <= 9; j++)
+    k.box(G.line, 0, y, -H / 2 + j * cz, W + 0.002, 0.0008, 0.0022);
+  for (let i = 0; i <= 8; i++) {
+    const x = -W / 2 + i * cx;
+    if (i === 0 || i === 8) k.box(G.line, x, y, 0, 0.0022, 0.0008, H);
+    else
+      for (const s of [-1, 1])
+        k.box(
+          G.line,
+          x,
+          y,
+          s * (H / 4 + cz / 4),
+          0.0022,
+          0.0008,
+          H / 2 - cz / 2,
+        );
+  }
+  const d = Math.hypot(2 * cx, 2 * cz),
+    a = Math.atan2(2 * cz, 2 * cx);
+  for (const s of [-1, 1])
+    for (const r of [-a, a])
+      k.box(G.line, 0, y, s * (H / 2 - cz), d, 0.0008, 0.0018, 0, r, 0);
+  const at = (i: number, j: number, color: string) =>
+    xiangqiDisc(k, -W / 2 + i * cx, y, -H / 2 + j * cz, color);
+  // Red sits with the first player (+z), black across; a game well under way.
+  for (const i of [0, 1, 2, 4, 6, 8]) at(i, 9, C.red);
+  for (const [i, j] of [
+    [1, 7],
+    [6, 6],
+    [0, 6],
+    [4, 6],
+    [8, 6],
+    [2, 4],
+  ])
+    at(i, j, C.red);
+  for (const i of [0, 2, 3, 4, 5, 8]) at(i, 0, G.black);
+  for (const [i, j] of [
+    [7, 2],
+    [2, 3],
+    [4, 3],
+    [6, 3],
+    [5, 5],
+  ])
+    at(i, j, G.black);
+  xiangqiDisc(k, W / 2 + 0.07, 0, -0.04, G.black);
+  xiangqiDisc(k, W / 2 + 0.075, 0, 0.0, G.black);
+  xiangqiDisc(k, -W / 2 - 0.07, 0, 0.05, C.red);
+}
+function goBoard(k: Kit, rand: () => number) {
+  const S = 0.4,
+    n = 13,
+    span = S - 0.04,
+    step = span / (n - 1),
+    y = 0.0505,
+    o = (i: number) => -span / 2 + i * step;
+  k.rbox('#dcb97c', 0, 0.025, 0, S, 0.05, S);
+  for (let i = 0; i < n; i++) {
+    k.box(G.line, o(i), y, 0, 0.0016, 0.0008, span);
+    k.box(G.line, 0, y, o(i), span, 0.0008, 0.0016);
+  }
+  const taken = new Set<string>();
+  let i = 6,
+    j = 6;
+  for (let m = 0; m < 46; m++) {
+    i = Math.min(n - 1, Math.max(0, i + Math.round((rand() - 0.5) * 3)));
+    j = Math.min(n - 1, Math.max(0, j + Math.round((rand() - 0.5) * 3)));
+    if (taken.has(i + ',' + j)) continue;
+    taken.add(i + ',' + j);
+    k.ball(
+      m % 2 ? G.white : G.black,
+      o(i),
+      y + 0.005,
+      o(j),
+      0.0125,
+      0.0055,
+      0.0125,
+      0,
+      0,
+      0,
+      false,
+    );
+  }
+  for (const [x, z, c] of [
+    [S / 2 + 0.07, 0.11, G.black],
+    [-S / 2 - 0.07, -0.11, G.white],
+  ] as const) {
+    k.cyl('#7b4f31', x, 0.022, z, 0.048, 0.044, 0, 0, 0, 0.85, 16);
+    k.ball(c, x, 0.044, z, 0.038, 0.012, 0.038);
+  }
+}
+function chineseCheckers(k: Kit, rand: () => number) {
+  const R = 0.2,
+    s = R / (4 * Math.sqrt(3)),
+    star = new T.Shape();
+  for (let i = 0; i <= 12; i++) {
+    const a = Math.PI / 6 + (i * Math.PI) / 6,
+      r = (i % 2 ? R / Math.sqrt(3) : R) * 1.08;
+    if (i) star.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+    else star.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+  }
+  const g = new T.ExtrudeGeometry(star, { depth: 0.014, bevelEnabled: false });
+  k.add(g, G.board, place(0, 0, 0, -Math.PI / 2));
+  g.dispose();
+  const tri = (a0: number) =>
+    [0, 1, 2].map((i) => {
+      const a = a0 + (i * 2 * Math.PI) / 3;
+      return [Math.cos(a) * R, Math.sin(a) * R];
+    });
+  const inside = (p: number[], t: number[][]) => {
+    const [a, b, c] = t,
+      d = (u: number[], v: number[], w: number[]) =>
+        (u[0] - w[0]) * (v[1] - w[1]) - (v[0] - w[0]) * (u[1] - w[1]),
+      d1 = d(p, a, b),
+      d2 = d(p, b, c),
+      d3 = d(p, c, a),
+      e = 1e-6;
+    return !((d1 < -e || d2 < -e || d3 < -e) && (d1 > e || d2 > e || d3 > e));
+  };
+  const up = tri(Math.PI / 2),
+    down = tri(-Math.PI / 2),
+    homes: [number, string][] = [
+      [Math.PI / 2, C.red],
+      [Math.PI / 2 + (2 * Math.PI) / 3, '#3f7fc0'],
+      [Math.PI / 2 + (4 * Math.PI) / 3, '#4c9a6a'],
+    ];
+  for (let j = -8; j <= 8; j++)
+    for (let i = -12; i <= 12; i++) {
+      const x = (i + j / 2) * s,
+        y = (j * s * Math.sqrt(3)) / 2;
+      if (!inside([x, y], up) && !inside([x, y], down)) continue;
+      k.cyl('#6d4a2c', x, 0.0144, -y, 0.0052, 0.0008, 0, 0, 0, 1, 8);
+      const home = homes.find(
+        ([a]) =>
+          Math.hypot(x - Math.cos(a) * R, y - Math.sin(a) * R) < R * 0.52,
+      );
+      const stray = !home && rand() < 0.06;
+      if (home || stray)
+        k.ball(
+          home ? home[1] : pick(homes, rand)[1],
+          x,
+          0.0235,
+          -y,
+          0.0092,
+          0.0092,
+          0.0092,
+          0,
+          0,
+          0,
+          false,
+        );
+    }
+}
+function mahjongTile(
+  k: Kit,
+  x: number,
+  y: number,
+  z: number,
+  ry: number,
+  faceUp: boolean,
+  rand: () => number,
+) {
+  k.push(place(x, y, z, 0, ry, 0));
+  k.box(faceUp ? G.jade : G.ivory, 0, 0.004, 0, 0.028, 0.008, 0.038);
+  k.box(faceUp ? G.ivory : G.jade, 0, 0.0125, 0, 0.028, 0.009, 0.038);
+  if (faceUp)
+    k.box(
+      pick([C.red, G.jade, '#2f5f9a', G.black], rand),
+      0,
+      0.0172,
+      0,
+      0.012,
+      0.0008,
+      0.02,
+    );
+  k.pop();
+}
+function mahjongCentre(k: Kit, rand: () => number) {
+  for (let side = 0; side < 4; side++) {
+    k.push(place(0, 0, 0, 0, (side * Math.PI) / 2, 0));
+    for (let i = 0; i < 9; i++)
+      for (const layer of [0, 1])
+        mahjongTile(k, -0.124 + i * 0.031, layer * 0.017, 0.17, 0, false, rand);
+    k.pop();
+  }
+  for (let i = 0; i < 12; i++)
+    mahjongTile(
+      k,
+      (rand() - 0.5) * 0.17,
+      0,
+      (rand() - 0.5) * 0.17,
+      rand() * Math.PI,
+      true,
+      rand,
+    );
+  for (const x of [-0.02, 0.012])
+    k.rbox(C.porcelain, x, 0.007, 0.02, 0.014, 0.014, 0.014, x * 20);
+}
+function mahjongRack(k: Kit, rand: () => number) {
+  for (let i = 0; i < 13; i++) {
+    const x = -0.18 + i * 0.03;
+    k.box(G.ivory, x, 0.02, 0.04, 0.027, 0.039, 0.011);
+    k.box(G.jade, x, 0.02, 0.0505, 0.027, 0.039, 0.01);
+    k.box(
+      pick([C.red, G.jade, '#2f5f9a'], rand),
+      x,
+      0.022,
+      0.0342,
+      0.011,
+      0.016,
+      0.0008,
+    );
+  }
+}
+function cardsCentre(k: Kit, rand: () => number) {
+  for (let i = 0; i < 9; i++) {
+    k.push(
+      place(
+        (rand() - 0.5) * 0.12,
+        0.0008 + i * 0.0005,
+        (rand() - 0.5) * 0.12,
+        0,
+        rand() * Math.PI,
+        0,
+      ),
+    );
+    k.box(G.card, 0, 0, 0, 0.064, 0.0008, 0.09);
+    k.box(
+      rand() < 0.5 ? C.red : G.black,
+      -0.02,
+      0.0005,
+      -0.033,
+      0.008,
+      0.0004,
+      0.012,
+    );
+    k.box(
+      rand() < 0.5 ? C.red : G.black,
+      0.0,
+      0.0005,
+      0.0,
+      0.016,
+      0.0004,
+      0.02,
+    );
+    k.pop();
+  }
+  for (let i = 0; i < 6; i++)
+    k.box(
+      G.cardBack,
+      0.2,
+      0.0006 + i * 0.0008,
+      -0.1,
+      0.064,
+      0.0008,
+      0.09,
+      0,
+      0.3,
+      0,
+    );
+}
+function domino(
+  k: Kit,
+  x: number,
+  y: number,
+  z: number,
+  ry: number,
+  rand: () => number,
+  standing = false,
+) {
+  k.push(place(x, y, z, standing ? Math.PI / 2 : 0, ry, 0));
+  k.box(G.ivory, 0, 0.004, 0, 0.024, 0.008, 0.048);
+  k.box(G.black, 0, 0.0083, 0, 0.02, 0.0006, 0.0012);
+  for (const s of [-1, 1]) {
+    const n = 1 + Math.floor(rand() * 5);
+    for (let p = 0; p < n; p++)
+      k.cyl(
+        p % 3 === 1 ? C.red : G.black,
+        ((p % 2) - 0.5) * 0.01,
+        0.0083,
+        s * (0.012 + Math.floor(p / 2) * 0.006 - 0.003),
+        0.0024,
+        0.0006,
+        0,
+        0,
+        0,
+        1,
+        6,
+      );
+  }
+  k.pop();
+}
+function dominoLine(k: Kit, rand: () => number) {
+  for (let i = 0; i < 7; i++)
+    domino(k, -0.15 + i * 0.05, 0, 0, Math.PI / 2, rand);
+  for (let i = 0; i < 3; i++) domino(k, 0.2, 0, 0.05 + i * 0.05, 0, rand);
+  for (let i = 0; i < 2; i++) domino(k, -0.2, 0, -0.05 - i * 0.05, 0, rand);
+}
+function puzzle(k: Kit, rand: () => number) {
+  k.rbox('#cdb38a', 0, 0.003, 0, 0.4, 0.006, 0.3);
+  const nx = 10,
+    nz = 7,
+    w = 0.034;
+  for (let i = 0; i < nx; i++)
+    for (let j = 0; j < nz; j++) {
+      if (rand() < 0.16) continue;
+      const u = i / (nx - 1),
+        v = j / (nz - 1),
+        color =
+          v > 0.72
+            ? u > 0.7 && v > 0.8
+              ? '#f2c46a'
+              : '#a9cde6'
+            : v > 0.42
+              ? Math.abs(u - 0.5) < 0.12
+                ? C.red
+                : '#6fa37a'
+              : v > 0.2
+                ? '#4d8a66'
+                : '#5b8fc6';
+      k.box(
+        color,
+        (i - (nx - 1) / 2) * w,
+        0.007,
+        ((nz - 1) / 2 - j) * w,
+        w - 0.002,
+        0.002,
+        w - 0.002,
+      );
+    }
+  for (let i = 0; i < 9; i++)
+    k.box(
+      pick(['#a9cde6', '#6fa37a', '#5b8fc6', C.red], rand),
+      (rand() - 0.5) * 0.5,
+      0.001,
+      0.19 + rand() * 0.06 * (rand() < 0.5 ? -1 : 1) - 0.03,
+      w - 0.002,
+      0.002,
+      w - 0.002,
+      0,
+      rand() * 3,
+      0,
+    );
+  k.rbox('#efe6d3', -0.27, 0.01, -0.08, 0.13, 0.02, 0.1, 0.3);
+  k.box('#a9cde6', -0.27, 0.0205, -0.08, 0.11, 0.001, 0.05, 0, 0.3, 0);
+}
+function crane(k: Kit, x: number, z: number, ry: number, color: string, s = 1) {
+  k.push(place(x, 0, z, 0, ry, 0, s, s, s));
+  k.box(color, 0, 0.012, 0, 0.017, 0.018, 0.017, 0, Math.PI / 4, 0);
+  for (const side of [-1, 1])
+    k.box(
+      color,
+      side * 0.024,
+      0.021,
+      0,
+      0.042,
+      0.002,
+      0.024,
+      0,
+      0,
+      side * 0.35,
+    );
+  k.box(color, 0, 0.026, 0.021, 0.004, 0.004, 0.036, -0.9, 0, 0);
+  k.box(color, 0, 0.044, 0.035, 0.004, 0.004, 0.012, 0.4, 0, 0);
+  k.box(color, 0, 0.026, -0.021, 0.004, 0.004, 0.034, 0.9, 0, 0);
+  k.pop();
+}
+function origamiCentre(k: Kit, rand: () => number) {
+  G.colors.forEach((c, i) =>
+    k.box(
+      c,
+      -0.05,
+      0.0008 + i * 0.0007,
+      0.02,
+      0.1,
+      0.0007,
+      0.1,
+      0,
+      i * 0.18,
+      0,
+    ),
+  );
+  crane(k, 0.09, -0.04, 0.6, C.red, 1.2);
+  crane(k, 0.1, 0.08, -0.8, '#4a7fc1', 1.1);
+  crane(k, -0.1, -0.11, 2.2, pick(G.colors, rand), 1);
+}
+function watercolorPlace(k: Kit, rand: () => number) {
+  k.rbox('#e9e3d6', 0, 0.004, 0.02, 0.26, 0.008, 0.2);
+  k.box('#fbf8f0', 0, 0.0085, 0.02, 0.23, 0.001, 0.17);
+  k.box('#bcd6e8', 0, 0.0092, 0.075, 0.21, 0.0006, 0.05);
+  k.ball('#9cc39a', -0.04, 0.0093, 0.0, 0.08, 0.0006, 0.035);
+  k.ball('#7fae86', 0.05, 0.0095, -0.02, 0.07, 0.0006, 0.03);
+  k.cyl('#f2c46a', 0.07, 0.0097, 0.08, 0.012, 0.0006);
+  for (let i = 0; i < 6; i++)
+    k.ball(
+      '#e79ab0',
+      -0.08 + rand() * 0.06,
+      0.0099,
+      0.03 + rand() * 0.04,
+      0.007,
+      0.0006,
+      0.007,
+      0,
+      0,
+      0,
+      false,
+    );
+  k.rbox('#f6f4ef', 0.19, 0.005, -0.04, 0.07, 0.01, 0.11);
+  G.colors.forEach((c, i) =>
+    k.cyl(
+      c,
+      0.175 + (i % 2) * 0.03,
+      0.0102,
+      -0.075 + Math.floor(i / 2) * 0.035,
+      0.009,
+      0.0008,
+      0,
+      0,
+      0,
+      1,
+      10,
+    ),
+  );
+  k.cyl('#dfe9ec', 0.19, 0.03, 0.08, 0.026, 0.06, 0, 0, 0, 1.1);
+  k.cyl('#9fc0d4', 0.19, 0.0595, 0.08, 0.0265, 0.002);
+}
+function brushJar(k: Kit) {
+  k.cyl(C.celadon, 0, 0.05, 0, 0.035, 0.1, 0, 0, 0, 0.9);
+  for (let i = 0; i < 4; i++) {
+    const a = (i * Math.PI) / 2 + 0.4;
+    k.rod(
+      '#9c7048',
+      [Math.cos(a) * 0.012, 0.06, Math.sin(a) * 0.012],
+      [Math.cos(a) * 0.035, 0.2, Math.sin(a) * 0.035],
+      0.004,
+      6,
+    );
+  }
+}
+function coloringPlace(k: Kit, rand: () => number) {
+  for (const s of [-1, 1]) {
+    k.box(
+      '#fbf9f3',
+      s * 0.058,
+      0.004,
+      0.03,
+      0.112,
+      0.004,
+      0.16,
+      0,
+      0,
+      -s * 0.04,
+    );
+    for (let i = 0; i < 5; i++) {
+      const a = (i / 5) * Math.PI * 2;
+      k.ball(
+        s > 0 ? pick(G.colors, rand) : '#e9e4d8',
+        s * 0.058 + Math.cos(a) * 0.022,
+        0.0068,
+        0.04 + Math.sin(a) * 0.022,
+        0.014,
+        0.0008,
+        0.009,
+        0,
+        -a,
+        0,
+        false,
+      );
+    }
+    k.cyl(s > 0 ? '#efb23c' : '#d8d2c4', s * 0.058, 0.0072, 0.04, 0.01, 0.0008);
+  }
+  k.box('#7c6450', 0, 0.005, 0.03, 0.006, 0.006, 0.16);
+  for (let i = 0; i < 3; i++)
+    k.rod(
+      G.colors[(i * 2) % 6],
+      [0.15, 0.004, -0.04 + i * 0.02],
+      [0.15 + 0.03, 0.004, 0.08 + i * 0.02],
+      0.0035,
+      6,
+    );
+}
+function pencilCup(k: Kit) {
+  k.cyl('#c9b28a', 0, 0.04, 0, 0.03, 0.08, 0, 0, 0, 1, 14);
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2;
+    k.rod(
+      G.colors[i % 6],
+      [Math.cos(a) * 0.01, 0.05, Math.sin(a) * 0.01],
+      [Math.cos(a) * 0.03, 0.16, Math.sin(a) * 0.03],
+      0.0035,
+      6,
+      0.5,
+    );
+  }
+}
+function yarn(
+  k: Kit,
+  x: number,
+  y: number,
+  z: number,
+  r: number,
+  color: string,
+) {
+  k.ball(color, x, y, z, r);
+  k.ring(shade(color, 0.82), x, y, z, r * 1.01, r * 1.01, 0.5, 0.3, 0);
+  k.ring(shade(color, 0.82), x, y, z, r * 1.01, r * 1.01, -0.6, 1.2, 0);
+}
+function knittingCentre(k: Kit) {
+  k.cyl(G.wicker, 0, 0.035, 0, 0.1, 0.07, 0, 0, 0, 1.12, 16);
+  k.ring('#8f6a3e', 0, 0.07, 0, 0.11, 0.11, Math.PI / 2);
+  yarn(k, -0.035, 0.08, 0.02, 0.04, '#c94f4f');
+  yarn(k, 0.04, 0.08, -0.01, 0.038, '#e2b04a');
+  yarn(k, 0.0, 0.085, -0.05, 0.036, '#5a86b8');
+}
+function knittingPlace(k: Kit, rand: () => number) {
+  const c = pick(['#c94f4f', '#5a86b8', '#7aa66b', '#b77bb0'], rand);
+  k.rbox(c, 0, 0.005, 0.03, 0.13, 0.01, 0.1);
+  for (let i = 0; i < 3; i++)
+    k.box(shade(c, 0.8), 0, 0.0105, i * 0.03, 0.13, 0.001, 0.008);
+  yarn(k, 0.15, 0.04, 0.0, 0.04, c);
+}
+function flowersCentre(k: Kit, rand: () => number) {
+  k.cyl(C.celadon, 0, 0.08, 0, 0.055, 0.16, 0, 0, 0, 0.65, 16);
+  k.cyl(C.celadon, 0, 0.165, 0, 0.026, 0.012, 0, 0, 0, 1.2, 12);
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2 + rand() * 0.4,
+      r = 0.06 + rand() * 0.07,
+      h = 0.3 + rand() * 0.12,
+      tip: V3 = [Math.cos(a) * r, h, Math.sin(a) * r];
+    k.rod('#5f8a4a', [0, 0.16, 0], tip, 0.0035, 5);
+    if (i % 2) k.ball('#e6b83a', tip[0], tip[1], tip[2], 0.03, 0.016, 0.03);
+    else k.ball('#e48aa2', tip[0], tip[1], tip[2], 0.032, 0.026, 0.032);
+    k.ball(
+      '#6f9a55',
+      tip[0] * 0.7,
+      h * 0.75 + 0.05,
+      tip[2] * 0.7,
+      0.025,
+      0.006,
+      0.012,
+      0,
+      a,
+      0.3,
+      false,
+    );
+  }
+}
+function flowersPlace(k: Kit, rand: () => number) {
+  for (let i = 0; i < 3; i++) {
+    const z = -0.03 + i * 0.035;
+    k.rod('#5f8a4a', [-0.1, 0.005, z], [0.09, 0.005, z + 0.02], 0.003, 5);
+    k.ball(
+      i % 2 ? '#e6b83a' : '#e48aa2',
+      0.1,
+      0.014,
+      z + 0.02,
+      0.022,
+      0.012,
+      0.022,
+    );
+  }
+  k.ball(
+    '#6f9a55',
+    -0.02,
+    0.004,
+    0.08,
+    0.03,
+    0.003,
+    0.012,
+    0,
+    rand(),
+    0,
+    false,
+  );
+}
+function album(k: Kit, rand: () => number, open = true) {
+  const cover = pick(['#7a2f2f', '#2f4a6b', '#4d5f3a'], rand);
+  if (!open) {
+    k.rbox(cover, 0, 0.01, 0, 0.22, 0.02, 0.16);
+    k.box(C.gold, 0, 0.0205, -0.04, 0.08, 0.001, 0.02);
+    return;
+  }
+  for (const s of [-1, 1]) {
+    k.box(cover, s * 0.105, 0.003, 0, 0.21, 0.006, 0.16, 0, 0, -s * 0.03);
+    k.box('#2b2a28', s * 0.103, 0.0068, 0, 0.19, 0.002, 0.145, 0, 0, -s * 0.03);
+    for (let i = 0; i < 4; i++)
+      k.box(
+        pick(['#e8dfcc', '#d9c7a4', '#c7d6dd', '#e3cfc4'], rand),
+        s * (0.055 + (i % 2) * 0.09),
+        0.0085,
+        -0.035 + Math.floor(i / 2) * 0.07,
+        0.07,
+        0.0012,
+        0.055,
+        0,
+        rand() * 0.1 - 0.05,
+        -s * 0.03,
+      );
+  }
+}
+function newspaperStack(k: Kit, rand: () => number) {
+  for (let i = 0; i < 3; i++) {
+    k.push(place(0, 0.003 + i * 0.006, 0, 0, (rand() - 0.5) * 0.4));
+    k.box(C.newsprint, 0, 0, 0, 0.22, 0.005, 0.3);
+    k.box(i === 2 ? C.red : '#3c3e3d', 0.05, 0.003, -0.11, 0.09, 0.0012, 0.04);
+    for (let j = 0; j < 5; j++)
+      k.box(C.print, -0.02, 0.003, -0.06 + j * 0.035, 0.16, 0.0012, 0.008);
+    k.pop();
+  }
+}
+function snacksCentre(k: Kit) {
+  k.cyl(C.porcelain, -0.07, 0.004, 0, 0.09, 0.008, 0, 0, 0, 1, 20);
+  for (let i = 0; i < 4; i++) {
+    const a = (i * Math.PI) / 2 + 0.3,
+      x = -0.07 + Math.cos(a) * 0.045,
+      z = Math.sin(a) * 0.045;
+    k.cyl('#c98b3f', x, 0.017, z, 0.024, 0.018, 0, 0, 0, 1, 16);
+    k.ring('#a8682c', x, 0.026, z, 0.016, 0.016, Math.PI / 2);
+  }
+  k.cyl(C.porcelain, 0.09, 0.004, 0.04, 0.075, 0.008, 0, 0, 0, 1, 20);
+  for (const [x, z] of [
+    [0.07, 0.03],
+    [0.11, 0.05],
+    [0.09, 0.0],
+    [0.1, 0.075],
+  ])
+    k.ball('#e98a2a', x, 0.032, z, 0.024);
+  k.ball(C.porcelain, 0.03, 0.05, -0.12, 0.055, 0.045, 0.055);
+  k.ring(C.cobalt, 0.03, 0.05, -0.12, 0.056, 0.056, Math.PI / 2);
+  k.ball(C.porcelain, 0.03, 0.098, -0.12, 0.012);
+}
+function snacksPlace(k: Kit) {
+  k.cyl(C.porcelain, -0.06, 0.003, 0.0, 0.05, 0.006, 0, 0, 0, 1, 16);
+  k.cyl('#c98b3f', -0.06, 0.014, 0.0, 0.022, 0.016, 0, 0, 0, 1, 16);
+}
+/** Light/dark variant of a hex colour (factor < 1 darkens). */
+function shade(color: string, f: number) {
+  return '#' + new T.Color(color).multiplyScalar(f).getHexString();
+}
+type Setter = (k: Kit, rand: () => number) => void;
+/** Centre set and place settings (players / others) for each pastime. */
+type TableSet = { centre: Setter; player?: Setter; other?: Setter | 'cup' };
+const tableSets: Record<string, TableSet> = {
+  xiangqi: { centre: xiangqi, other: 'cup' },
+  go: { centre: goBoard, other: 'cup' },
+  checkers: { centre: chineseCheckers, other: 'cup' },
+  mahjong: { centre: mahjongCentre, player: mahjongRack, other: 'cup' },
+  cards: { centre: cardsCentre, other: 'cup' },
+  dominoes: {
+    centre: dominoLine,
+    player: (k, rand) => {
+      for (let i = 0; i < 4; i++)
+        domino(k, -0.06 + i * 0.03, 0.024, 0.02, 0, rand, true);
+    },
+    other: 'cup',
+  },
+  puzzle: { centre: puzzle, other: 'cup' },
+  origami: {
+    centre: origamiCentre,
+    player: (k, rand) => crane(k, 0.1, 0.0, rand() * 6, pick(G.colors, rand)),
+    other: 'cup',
+  },
+  watercolor: {
+    centre: brushJar,
+    player: watercolorPlace,
+    other: watercolorPlace,
+  },
+  coloring: { centre: pencilCup, player: coloringPlace, other: 'cup' },
+  knitting: { centre: knittingCentre, other: knittingPlace },
+  flowers: { centre: flowersCentre, player: flowersPlace, other: 'cup' },
+  albums: {
+    centre: (k, rand) => {
+      album(k, rand, false);
+      k.push(place(0.02, 0.02, 0.01, 0, 0.3, 0));
+      album(k, rand, false);
+      k.pop();
+    },
+    other: album,
+  },
+  newspapers: { centre: newspaperStack },
+  snacks: { centre: snacksCentre, player: snacksPlace, other: 'cup' },
+};
+// ---------------------------------------------------------------------------
 /** Décor ids of a session (sessions without décor type as `never[]`). */
 const decorOf = (s: DaySession): string[] => s.decor;
-type ZoneState = {
-  zone: DayZone;
-  sessions: DaySession[];
-  current: DaySession | null;
-  position: T.Vector3;
-};
-type PropEntry = DayProp & { zone: ZoneState; world: boolean };
+/** A schedule (zone sessions or table entries) and the entry running now. */
+type Slot = { id: string; start: number; end: number };
+type Track<S extends Slot = Slot> = { sessions: S[]; current: S | null };
+type ZoneState = Track<DaySession> & { zone: DayZone; position: T.Vector3 };
+type PropEntry = DayProp & { zone: Track; world: boolean };
 type Aligned = {
   root: T.Object3D;
   actor: Person;
@@ -1103,7 +1838,7 @@ type Aligned = {
   sway?: number;
 };
 /** Movable activity equipment. The original furniture/source plan remains a separate reference. */
-export function buildDayRoom(actors: Person[]) {
+export function buildDayRoom(actors: Person[], model?: Facility) {
   const root = new T.Group();
   root.name = 'day-room-flexible-program';
   const materials = new Map<string, T.MeshStandardMaterial>();
@@ -1134,37 +1869,12 @@ export function buildDayRoom(actors: Person[]) {
     parent.add(mesh);
     return mesh;
   };
-  const ball = (
-    parent: T.Object3D,
-    color: string,
-    x: number,
-    y: number,
-    z: number,
-    r: number,
-  ) => {
-    const mesh = new T.Mesh(new T.SphereGeometry(r, 12, 10), mat(color));
-    mesh.position.set(x, y, z);
-    parent.add(mesh);
-    return mesh;
-  };
-  const rod = (
-    parent: T.Object3D,
-    color: string,
-    x: number,
-    y: number,
-    z: number,
-    r: number,
-    h: number,
-  ) => {
-    const mesh = new T.Mesh(new T.CylinderGeometry(r, r, h, 12), mat(color));
-    mesh.position.set(x, y, z);
-    parent.add(mesh);
-    return mesh;
-  };
-  // A mobile screen stays outside the open exercise floor and circulation paths.
+  // A mobile screen comes out on the north edge of the open floor only for
+  // layouts that face it (talks, device class); other layouts clear it away.
   const screen = new T.Group();
   screen.name = 'day-program-display';
-  screen.position.set(-7, 0, 9.72);
+  screen.position.set(program.floor.board[0], 0, program.floor.board[1]);
+  screen.visible = false;
   root.add(screen);
   box(screen, '#3b403f', 0, 1.44, 0, 1.95, 1.12, 0.09);
   box(screen, '#eef0ea', 0, 1.44, 0.054, 1.8, 0.97, 0.025);
@@ -1214,99 +1924,6 @@ export function buildDayRoom(actors: Person[]) {
   const floor = zoneOf('floor');
   const chairs: { actor: Person; root: T.Group }[] = [];
   const props: PropEntry[] = [];
-  for (const actor of actors.filter(
-    (a) => a.spec.programMode || ['seated-0', 'seated-1'].includes(a.spec.id),
-  )) {
-    const mode = actor.spec.programMode;
-    if (mode && !['wheelchair', 'support'].includes(mode)) {
-      const chair = new T.Group();
-      chair.name = actor.spec.id + '-activity-chair';
-      const station = program.stations.find(
-        (s) => s.actorId === actor.spec.id,
-      )!;
-      chair.position.set(station.position[0], 0, station.position[1]);
-      chair.rotation.y = station.heading;
-      chair.scale.setScalar(actor.profile.height);
-      // Stackable activity chairs: oatmeal seat on light oak legs.
-      box(chair, '#dcd3c3', 0, 0.455, 0, 0.49, 0.05, 0.49);
-      box(chair, '#dcd3c3', 0, 0.68, -0.23, 0.49, 0.42, 0.055);
-      for (const x of [-0.19, 0.19])
-        for (const z of [-0.18, 0.18])
-          box(chair, '#b8996f', x, 0.22, z, 0.035, 0.44, 0.035);
-      root.add(chair);
-      chairs.push({ actor, root: chair });
-    }
-    const prop = (name: string, actions: string[], parent: T.Object3D) => {
-      const group = new T.Group();
-      group.name = actor.spec.id + '-' + name;
-      parent.add(group);
-      props.push({ actor, root: group, actions, zone: floor, world: false });
-      return group;
-    };
-    // Shared lap surfaces permit wheelchair access without an extra fixed table.
-    if (mode && mode !== 'support') {
-      const lap = prop('lap-work-surface', ['write', 'craft'], actor.root);
-      box(lap, '#cfb48c', 0, 0.78, 0.36, 0.59, 0.035, 0.38);
-      box(lap, '#faf1de', 0, 0.804, 0.37, 0.44, 0.006, 0.28);
-      const ink = prop('calligraphy-paper', ['write'], actor.root);
-      for (let i = 0; i < 3; i++)
-        box(
-          ink,
-          '#394c48',
-          -0.12 + i * 0.1,
-          0.812,
-          0.39,
-          0.024,
-          0.006,
-          0.14 - i * 0.025,
-        );
-      const collage = prop('paper-collage', ['craft'], actor.root);
-      for (let i = 0; i < 6; i++) {
-        const q = box(
-          collage,
-          ['#bb7c64', '#80a49e', '#d8c18c'][i % 3],
-          -0.17 + (i % 3) * 0.14,
-          0.815,
-          0.29 + Math.floor(i / 3) * 0.15,
-          0.085,
-          0.009,
-          0.08,
-        );
-        q.rotation.y = i * 0.3;
-      }
-    }
-    const brush = prop('brush', ['write'], actor.joints.handR);
-    brush.rotation.x = 2.05;
-    rod(brush, '#9c7048', 0, 0.06, 0.035, 0.011, 0.17);
-    rod(brush, '#233d3a', 0, -0.035, 0.035, 0.009, 0.02);
-    const tablet = prop('tablet', ['device'], actor.joints.handL);
-    box(tablet, '#34393b', 0.14, -0.03, 0.08, 0.3, 0.22, 0.025);
-    box(tablet, '#bcd0cc', 0.14, -0.027, 0.096, 0.26, 0.18, 0.008);
-    for (let i = 0; i < 4; i++)
-      box(
-        tablet,
-        '#f4e6c7',
-        0.075 + (i % 2) * 0.105,
-        -0.073 + Math.floor(i / 2) * 0.09,
-        0.103,
-        0.062,
-        0.048,
-        0.005,
-      );
-    const shaker = prop('shaker', ['music'], actor.joints.handR);
-    rod(shaker, '#b7804d', 0, -0.025, 0.03, 0.019, 0.15);
-    ball(shaker, '#c79451', 0, 0.085, 0.03, 0.073);
-    if (mode === 'leader') {
-      const microphone = prop('microphone', ['perform'], actor.joints.handR);
-      rod(microphone, '#3b403f', 0, -0.015, 0.045, 0.022, 0.18);
-      ball(microphone, '#a4aba7', 0, -0.125, 0.045, 0.041);
-    }
-    const drum = prop('hand-drum', ['music'], actor.root);
-    const drumY = mode === 'leader' ? 0.98 : 0.77;
-    rod(drum, '#b57750', 0, drumY, 0.35, 0.16, 0.1);
-    rod(drum, '#efe0ba', 0, drumY + 0.055, 0.35, 0.161, 0.018);
-  }
-
   // -------------------------------------------------------------------------
   // Cultural program: session-bound tools, tabletop work and décor. Every
   // piece is a single merged, vertex-colored clay mesh built once here.
@@ -1335,7 +1952,7 @@ export function buildDayRoom(actors: Person[]) {
     geometry: T.BufferGeometry,
     parent: T.Object3D,
     actions: string[],
-    zone: ZoneState,
+    zone: Track,
     sessions?: string[],
     world = false,
   ) => {
@@ -1358,10 +1975,94 @@ export function buildDayRoom(actors: Person[]) {
       anchor: new T.Vector3(...anchor),
       sway,
     });
+  /**
+   * Book or paper held up to read: mounted on the torso (centre 0, 0.27,
+   * 0.33), a +z-facing plane turned toward the reader (the rig's read frame).
+   */
+  const holdToRead = (mesh: T.Mesh, scale = 1) => {
+    mesh.position.set(0, 0.27, 0.33);
+    mesh.rotation.set(1.0, Math.PI, 0);
+    mesh.scale.setScalar(scale);
+    return mesh;
+  };
   const instructorActor = (session: DaySession) =>
     session.instructorId ? byId.get(session.instructorId) : undefined;
   const sessionIds = (zone: ZoneState, test: (s: DaySession) => boolean) =>
     zone.sessions.filter(test).map((s) => s.id);
+
+  // Floor class: each member's activity chair follows them to every layout;
+  // the class carries the session tools (tablet, shakers, drum, microphone).
+  const chairGeo = (() => {
+    const k = new Kit();
+    // Stackable activity chairs: oatmeal seat on light oak legs.
+    k.rbox('#dcd3c3', 0, 0.455, 0, 0.49, 0.05, 0.49);
+    k.rbox('#dcd3c3', 0, 0.68, -0.23, 0.49, 0.42, 0.055);
+    for (const x of [-0.19, 0.19])
+      for (const z of [-0.18, 0.18])
+        k.rbox('#b8996f', x, 0.22, z, 0.035, 0.44, 0.035);
+    return k.geometry();
+  })();
+  const tabletGeo = (() => {
+    const k = new Kit();
+    k.rbox('#34393b', 0.14, -0.03, 0.08, 0.3, 0.22, 0.025);
+    k.box('#bcd0cc', 0.14, -0.027, 0.096, 0.26, 0.18, 0.008);
+    for (let i = 0; i < 4; i++)
+      k.box(
+        '#f4e6c7',
+        0.075 + (i % 2) * 0.105,
+        -0.073 + Math.floor(i / 2) * 0.09,
+        0.103,
+        0.062,
+        0.048,
+        0.005,
+      );
+    return k.geometry();
+  })();
+  const shakerGeo = (() => {
+    const k = new Kit();
+    k.cyl('#b7804d', 0, -0.025, 0.03, 0.019, 0.15);
+    k.ball('#c79451', 0, 0.085, 0.03, 0.073);
+    return k.geometry();
+  })();
+  const micGeo = (() => {
+    const k = new Kit();
+    k.cyl('#3b403f', 0, -0.015, 0.045, 0.022, 0.18);
+    k.ball('#a4aba7', 0, -0.125, 0.045, 0.041);
+    return k.geometry();
+  })();
+  const drumGeo = (y: number) => {
+    const k = new Kit();
+    k.cyl('#b57750', 0, y, 0.35, 0.16, 0.1, 0, 0, 0, 1, 20);
+    k.cyl('#efe0ba', 0, y + 0.055, 0.35, 0.161, 0.018, 0, 0, 0, 1, 20);
+    return k.geometry();
+  };
+  const drums = { lead: drumGeo(0.98), lap: drumGeo(0.77) };
+  for (const station of program.stations) {
+    const actor = byId.get(station.actorId);
+    if (!actor) continue;
+    const mode = station.mode;
+    if (!['wheelchair', 'support'].includes(mode)) {
+      const chair = new T.Group();
+      chair.name = actor.spec.id + '-activity-chair';
+      chair.visible = false;
+      piece(chair.name + '-frame', chairGeo, chair, true);
+      root.add(chair);
+      chairs.push({ actor, root: chair });
+    }
+    if (mode === 'support') continue;
+    bind(actor, 'tablet', tabletGeo, actor.joints.handL, ['device'], floor);
+    bind(actor, 'shaker', shakerGeo, actor.joints.handR, ['music'], floor);
+    bind(
+      actor,
+      'hand-drum',
+      mode === 'leader' ? drums.lead : drums.lap,
+      actor.root,
+      ['music'],
+      floor,
+    );
+    if (mode === 'leader')
+      bind(actor, 'microphone', micGeo, actor.joints.handR, ['perform'], floor);
+  }
 
   // Open floor: fans, ribbon wands, the erhu and a riddle card. Hand props
   // use the rig's hand frame: wrist at the origin, fingers -y, thumb +z,
@@ -1608,9 +2309,9 @@ export function buildDayRoom(actors: Person[]) {
     return s
       ? { x: s.path[0][0], z: s.path[0][1], heading: s.heading }
       : {
-          x: arts.zone.instructorSpot.position[0],
-          z: arts.zone.instructorSpot.position[1],
-          heading: arts.zone.instructorSpot.heading,
+          x: arts.zone.instructorSpot!.position[0],
+          z: arts.zone.instructorSpot!.position[1],
+          heading: arts.zone.instructorSpot!.heading,
         };
   };
   /** Distance from a seat along its heading to the edge of a table rectangle. */
@@ -1775,7 +2476,7 @@ export function buildDayRoom(actors: Person[]) {
   const coasters: [number, number][] = [];
   for (const actor of teaPeople) {
     const s = actor.spec.segments.find(
-      (s) => s.seated && ['tea', 'listen'].includes(s.action),
+      (s) => s.seated && ['tea', 'read', 'listen'].includes(s.action),
     );
     if (!s) continue;
     const seat = { x: s.path[0][0], z: s.path[0][1], heading: s.heading },
@@ -1789,23 +2490,24 @@ export function buildDayRoom(actors: Person[]) {
         'tea-cup-table',
         cupGeo,
         root,
-        ['listen'],
+        ['read'],
         tea,
         paperSessions,
         true,
       );
       cup.position.set(x, TABLE_TOP + 0.006, z);
-      const paper = bind(
-        actor,
-        'newspaper',
-        newspaperGeo,
-        actor.joints.hip,
-        ['listen'],
-        tea,
-        paperSessions,
+      holdToRead(
+        bind(
+          actor,
+          'newspaper',
+          newspaperGeo,
+          actor.joints.torso,
+          ['read'],
+          tea,
+          paperSessions,
+        ),
+        0.82,
       );
-      paper.position.set(0, 0.075, 0.33);
-      paper.rotation.x = 0.95;
     }
     if (teaSessions.length) {
       // Cup centre 0.04 m along -x of the hand centre, its axis on +z.
@@ -1842,15 +2544,32 @@ export function buildDayRoom(actors: Person[]) {
     return group;
   };
   const decorIds = new Set(program.programs.flatMap(decorOf));
-  // Festival lanterns hang from the timber truss over the class rows.
+  // Festival lanterns: a stage row on the front truss, above the performer
+  // and the first rows; for the riddle circle, a ring over the circle.
+  const circleSlots = program.floor.formations.circle.slots,
+    circleCentre = circleSlots
+      .reduce(
+        (v, s) => v.add(new T.Vector3(s.at[0], 0, s.at[1])),
+        new T.Vector3(),
+      )
+      .multiplyScalar(1 / circleSlots.length);
+  const stageRow: V3[] = [-9.4, -8.15, -6.9, -5.65, -4.4].map((x, i) => [
+      x,
+      9.92,
+      2.92 + (i % 2) * 0.08,
+    ]),
+    riddleRing: V3[] = [0, 1, 2, 3, 4, 5].map((i) => {
+      const a = (i / 6) * Math.PI * 2 + 0.3;
+      return [
+        circleCentre.x + Math.cos(a) * 1.2,
+        circleCentre.z + Math.sin(a) * 1.2,
+        2.92 + (i % 2) * 0.08,
+      ];
+    });
   const lanternRow = (tags: boolean) => {
     const k = new Kit(),
       rand = seeded(tags ? 31 : 17);
-    // The bay over the teachers' spot stays open so that, from the iso view,
-    // no lantern hangs in front of the guest teacher or the host.
-    [-10.5, -9.2, -7.9, -4.0, -2.9].forEach((x, i) => {
-      const z = 12.36,
-        top = 2.78 + (i % 2) * 0.08;
+    (tags ? riddleRing : stageRow).forEach(([x, z, top]) => {
       k.cyl(C.cord, x, (top + 3.98) / 2, z, 0.0045, 3.98 - top, 0, 0, 0, 1, 5);
       const cap = lantern(k, x, top, z) + 0.2;
       if (!tags) return;
@@ -1886,7 +2605,7 @@ export function buildDayRoom(actors: Person[]) {
       true,
     );
   if (decorIds.has('herb-chart')) {
-    // Teaching easel beside the screen, on the presenter's side of the class.
+    // Teaching easel with an acupoint figure and herb plates.
     const k = new Kit();
     for (const s of [-1, 1])
       k.rod(C.wood, [s * 0.36, 0, 0.16], [s * 0.3, 1.98, 0.0], 0.017, 6);
@@ -2027,8 +2746,9 @@ export function buildDayRoom(actors: Person[]) {
       decorGroup('herb-chart'),
       true,
     );
-    easel.position.set(-8.4, 0, 10.0);
-    easel.rotation.y = 0.35;
+    // Beside the board on the presenter's side, angled toward the rows.
+    easel.position.set(-4.6, 0, 9.3);
+    easel.rotation.y = -0.83;
   }
   // Library bays flanking the long table face east into the arts zone.
   const onBay = (k: Kit, z: number) =>
@@ -2233,16 +2953,572 @@ export function buildDayRoom(actors: Person[]) {
   for (const id of decorIds)
     if (!decor.some((d) => d.id === id)) decorGroup(id);
 
+  // Layout pieces that come with a floor formation once the class has
+  // settled: subtle practice mats under the tai chi / qigong grid and a low
+  // tea table inside the device class's chat circle.
+  const transition = program.floor.transition;
+  const formations = program.floor.formations;
+  type FormationId = keyof typeof formations;
+  const formationOf = (s: DaySession) =>
+    s.formation ? formations[s.formation as FormationId] : undefined;
+  const layout: { root: T.Object3D; sessions: string[] }[] = [];
+  {
+    const k = new Kit();
+    for (const slot of formations.grid.slots) {
+      k.cyl(
+        '#d2ddcd',
+        slot.at[0],
+        0.004,
+        slot.at[1],
+        0.34,
+        0.008,
+        0,
+        0,
+        0,
+        1,
+        28,
+      );
+      k.ring(
+        '#aebfaa',
+        slot.at[0],
+        0.0085,
+        slot.at[1],
+        0.31,
+        0.31,
+        Math.PI / 2,
+      );
+    }
+    layout.push({
+      root: piece('layout-practice-mats', k.geometry(), root),
+      sessions: sessionIds(
+        floor,
+        (s) => s.formation === 'grid' && ['tai-chi', 'qigong'].includes(s.id),
+      ),
+    });
+  }
+  {
+    const chat = formations['small-groups'].slots.filter(
+      (s) => s.group === 'chat',
+    );
+    if (chat.length) {
+      const cx = chat.reduce((v, s) => v + s.at[0], 0) / chat.length,
+        cz = chat.reduce((v, s) => v + s.at[1], 0) / chat.length,
+        k = new Kit();
+      k.cyl('#9a6a45', 0, 0.43, 0, 0.32, 0.03, 0, 0, 0, 1, 28);
+      k.cyl('#7d5437', 0, 0.21, 0, 0.035, 0.42, 0, 0, 0, 1, 10);
+      k.cyl('#7d5437', 0, 0.012, 0, 0.17, 0.024, 0, 0, 0, 1, 20);
+      k.push(place(0, 0.445, 0));
+      snacksCentre(k);
+      for (let i = 0; i < 4; i++) {
+        const a = (i / 4) * Math.PI * 2 + 0.6;
+        teacup(k, Math.cos(a) * 0.22, Math.sin(a) * 0.22);
+      }
+      k.pop();
+      const table = piece('layout-chat-tea-table', k.geometry(), root, true);
+      table.position.set(cx, 0, cz);
+      layout.push({
+        root: table,
+        sessions: sessionIds(floor, (s) => s.formation === 'small-groups'),
+      });
+    }
+  }
+  layout.forEach((l) => (l.root.visible = false));
+
+  // Game and pastime tables: each schedule entry brings its set (centre
+  // pieces plus a place setting for every sitter) and the sitters' tools.
+  type Pastime = {
+    label: string;
+    labelZh: string;
+    players?: number;
+    play: string;
+    others: string;
+  };
+  const catalog = program.tableActivities as Record<string, Pastime>;
+  type TableEntry = Slot & { activity: string; index: number };
+  type TableState = Track<TableEntry> & {
+    tableId: string;
+    position: T.Vector3;
+  };
+  const tables: TableState[] = [];
+  const tableSetMeshes: {
+    track: TableState;
+    entry: TableEntry;
+    root: T.Object3D;
+  }[] = [];
+  const timed: {
+    root: T.Object3D;
+    actor: Person;
+    action: string;
+    from: number;
+    to: number;
+  }[] = [];
+  const pages: { root: T.Object3D; actor: Person }[] = [];
+  const actionAt = (actor: Person, time: number) => {
+    const segments = actor.spec.segments,
+      t = (((time + actor.spec.offset) % 720) + 720) % 720;
+    return (
+      segments.find((s) => t >= s.start && t < s.end) ||
+      segments[segments.length - 1]
+    ).action as string;
+  };
+  const hipY = (actor: Person, y: number) => y / actor.profile.height - 0.575;
+  // Shared hand-tool geometries (rig hand frame; see handCentre above).
+  const pieceGeos = new Map<string, T.BufferGeometry>();
+  const gamePiece = (kind: string, color: string) => {
+    const key = kind + color;
+    if (!pieceGeos.has(key)) {
+      const k = new Kit(),
+        rand = seeded(color.length * 7 + kind.length);
+      if (kind === 'xiangqi') xiangqiDisc(k, 0, -0.006, 0, color);
+      else if (kind === 'go')
+        k.ball(color, 0, 0, 0, 0.0125, 0.0055, 0.0125, 0, 0, 0, false);
+      else if (kind === 'checkers')
+        k.ball(color, 0, 0, 0, 0.0092, 0.0092, 0.0092, 0, 0, 0, false);
+      else if (kind === 'dominoes') domino(k, 0, -0.004, 0, 0, rand);
+      else k.box(color, 0, 0, 0, 0.032, 0.002, 0.032);
+      pieceGeos.set(key, k.geometry());
+    }
+    return pieceGeos.get(key)!;
+  };
+  const fannedCardsGeo = (() => {
+    const k = new Kit(),
+      rand = seeded(77);
+    for (let i = 0; i < 7; i++) {
+      const a = ((-25 + (i * 50) / 6) * Math.PI) / 180;
+      k.push(place(-0.0072 + 0.012 + i * 0.0011, -0.06, 0, a, 0, 0));
+      k.box(G.card, 0, -0.045, 0, 0.0008, 0.09, 0.064);
+      k.box(
+        rand() < 0.5 ? C.red : G.black,
+        0.0006,
+        -0.077,
+        -0.022,
+        0.0004,
+        0.014,
+        0.01,
+      );
+      k.box(G.cardBack, -0.0006, -0.045, 0, 0.0004, 0.084, 0.058);
+      k.pop();
+    }
+    return k.geometry();
+  })();
+  const playedCardGeo = (() => {
+    const k = new Kit();
+    k.box(G.card, 0, 0, 0, 0.0008, 0.09, 0.064);
+    k.box(C.red, 0.0006, -0.03, -0.02, 0.0004, 0.014, 0.01);
+    k.box(G.cardBack, -0.0006, 0, 0, 0.0004, 0.084, 0.058);
+    return k.geometry();
+  })();
+  const needleGeo = (s: number) => {
+    const k = new Kit(),
+      [x, y] = handCentre(s);
+    k.rod('#c9a66c', [x, y + 0.05, 0], [x, y - 0.18, 0], 0.0028, 6, 0.4);
+    k.ball(C.woodDark, x, y + 0.052, 0, 0.007);
+    return k.geometry();
+  };
+  const needles = { R: needleGeo(1), L: needleGeo(-1) };
+  const knittedGeo = (color: string) => {
+    // Hangs from the left needle: local +x points down in the knit pose.
+    const k = new Kit(),
+      [x, y] = handCentre(-1);
+    k.rbox(color, x + 0.055, y - 0.1, 0, 0.1, 0.09, 0.012);
+    for (let i = 0; i < 3; i++)
+      k.box(
+        shade(color, 0.8),
+        x + 0.025 + i * 0.03,
+        y - 0.1,
+        0.0062,
+        0.006,
+        0.09,
+        0.001,
+      );
+    return k.geometry();
+  };
+  const yarnGeos = new Map<string, T.BufferGeometry>();
+  const yarnBall = (color: string) => {
+    if (!yarnGeos.has(color)) {
+      const k = new Kit();
+      yarn(k, 0, 0, 0, 0.045, color);
+      yarnGeos.set(color, k.geometry());
+    }
+    return yarnGeos.get(color)!;
+  };
+  const albumGeo = (() => {
+    // Open photo album, a +z-facing plane 0.30 × 0.22 with the spine on y.
+    const k = new Kit(),
+      rand = seeded(91);
+    k.rbox('#6e2f2c', 0, 0, -0.003, 0.3, 0.22, 0.006);
+    k.box('#2d2b29', 0, 0, 0.001, 0.286, 0.206, 0.002);
+    for (const s of [-1, 1])
+      for (let i = 0; i < 4; i++)
+        k.box(
+          pick(['#efe6d2', '#d9c7a4', '#c7d6dd', '#e3cfc4'], rand),
+          s * (0.04 + (i % 2) * 0.062),
+          -0.045 + Math.floor(i / 2) * 0.09,
+          0.0028,
+          0.05,
+          0.07,
+          0.0012,
+        );
+    return k.geometry();
+  })();
+  const pageGeo = (() => {
+    const k = new Kit();
+    k.box('#2d2b29', 0.071, 0, 0, 0.14, 0.2, 0.0016);
+    k.box('#e6dccb', 0.075, 0.03, 0.0012, 0.05, 0.07, 0.001);
+    k.box('#e6dccb', 0.075, 0.03, -0.0012, 0.05, 0.07, 0.001);
+    return k.geometry();
+  })();
+  const pencilGeo = (() => {
+    const k = new Kit(),
+      c = new T.Vector3(...handCentre(1)),
+      d = new T.Vector3(0.1, 0.39, -0.91).normalize(),
+      at = (t: number) => c.clone().addScaledVector(d, t).toArray() as V3;
+    k.rod('#3d6fa8', at(-0.07), at(0.1), 0.0045, 6);
+    k.rod('#e6cfa5', at(0.1), at(0.125), 0.0045, 6, 0.3);
+    return k.geometry();
+  })();
+  const origamiPaperGeo = (() => {
+    const k = new Kit(),
+      [x] = handCentre(-1);
+    k.box('#e889a8', x + 0.02, -0.12, 0.015, 0.0016, 0.11, 0.11, 0.08);
+    k.box('#4a7fc1', x + 0.024, -0.1, 0.03, 0.0016, 0.06, 0.06, 0.6);
+    return k.geometry();
+  })();
+  const stemGeo = (() => {
+    const k = new Kit(),
+      [x, y] = handCentre(1);
+    k.rod('#5f8a4a', [x, y + 0.03, 0.01], [x, y - 0.2, 0.01], 0.003, 5);
+    k.ball('#e48aa2', x, y - 0.21, 0.01, 0.028, 0.022, 0.028);
+    return k.geometry();
+  })();
+  const hashOf = (id: string) => {
+    let h = 7;
+    for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+    return h;
+  };
+  for (const table of program.tables) {
+    const object = model?.objects.find((o) => o.id === table.id);
+    const spec = object && model?.assets[object.assetId];
+    if (!object || !spec) continue;
+    const [w, h, d] = spec.dimensions.map(
+        (v, i) => v * (object.scale?.[i] ?? 1),
+      ),
+      round = spec.kind === 'round-table',
+      c = { x: object.position[0], z: object.position[2] },
+      top = object.position[1] + h,
+      rot = object.rotation;
+    const entries: TableEntry[] = table.schedule.map((e, index) => ({
+      id: table.id + '#' + index,
+      start: e.start,
+      end: e.end,
+      activity: e.activity,
+      index,
+    }));
+    const track: TableState = {
+      sessions: entries,
+      current: null,
+      tableId: table.id,
+      position: new T.Vector3(c.x, top + 0.85, c.z),
+    };
+    tables.push(track);
+    // Sitters: anyone seated within reach whose activity names this table.
+    const labels = entries
+      .map((e) => catalog[e.activity]?.label)
+      .filter(Boolean);
+    const sitters = actors.flatMap((actor) => {
+      const s = actor.spec.segments.find(
+        (s) =>
+          s.seated &&
+          Math.hypot(s.path[0][0] - c.x, s.path[0][1] - c.z) < 1.3 &&
+          labels.some((l) => s.title?.startsWith(l)),
+      );
+      if (!s) return [];
+      const x = s.path[0][0],
+        z = s.path[0][1],
+        toward = Math.atan2(c.x - x, c.z - z),
+        facing = Math.cos(s.heading - toward) > 0.6;
+      // Place settings sit in front of the sitter, or toward the table when
+      // their chair is turned away.
+      const heading = facing ? s.heading : toward,
+        fx = Math.sin(heading),
+        fz = Math.cos(heading);
+      let edge: number;
+      if (round) {
+        const px = c.x - x,
+          pz = c.z - z,
+          proj = px * fx + pz * fz,
+          perp = px * px + pz * pz - proj * proj;
+        edge = proj - Math.sqrt(Math.max(0, (w / 2) ** 2 - perp));
+      } else {
+        const cr = Math.cos(-rot),
+          sr = Math.sin(-rot),
+          lx = (x - c.x) * cr + (z - c.z) * sr,
+          lz = -(x - c.x) * sr + (z - c.z) * cr;
+        edge = edgeDistance(
+          { x: lx, z: lz, heading: heading - rot },
+          { x: 0, z: 0, hx: w / 2, hz: d / 2 },
+        );
+      }
+      return [{ actor, x, z, heading, edge }];
+    });
+    const byActivity = new Map<string, TableEntry[]>();
+    for (const e of entries)
+      byActivity.set(e.activity, [...(byActivity.get(e.activity) || []), e]);
+    for (const [activity, list] of byActivity) {
+      const info = catalog[activity],
+        set = tableSets[activity];
+      if (!info || !set) continue;
+      const mid = (list[0].start + list[0].end) / 2,
+        roles = sitters.map((s) => ({
+          ...s,
+          play: actionAt(s.actor, mid) === info.play,
+        })),
+        players = roles.filter((r) => r.play),
+        first = players[0] || roles[0],
+        angle = first ? Math.atan2(first.x - c.x, first.z - c.z) : rot,
+        ids = list.map((e) => e.id);
+      const k = new Kit(),
+        rand = seeded(hashOf(table.id + activity));
+      k.push(place(c.x, top, c.z, 0, angle, 0));
+      set.centre(k, rand);
+      k.pop();
+      for (const r of roles) {
+        const setting = r.play ? set.player : set.other;
+        if (!setting) continue;
+        const dist = r.edge + 0.1;
+        k.push(
+          place(
+            r.x + Math.sin(r.heading) * dist,
+            top,
+            r.z + Math.cos(r.heading) * dist,
+            0,
+            r.heading,
+            0,
+          ),
+        );
+        if (setting === 'cup') teacup(k, 0.12, 0.0);
+        else setting(k, rand);
+        k.pop();
+      }
+      const mesh = piece(
+        `table-set-${table.id}-${activity}`,
+        k.geometry(),
+        root,
+      );
+      mesh.visible = false;
+      for (const e of list)
+        tableSetMeshes.push({ track, entry: e, root: mesh });
+      // Tools in hand, timed to the motion's phase where a piece changes hands.
+      players.forEach((r, i) => {
+        const a = r.actor,
+          tableTop = hipY(a, top);
+        if (info.play === 'board-game') {
+          const color =
+            activity === 'xiangqi'
+              ? [C.red, G.black][i % 2]
+              : activity === 'go'
+                ? [G.black, G.white][i % 2]
+                : activity === 'checkers'
+                  ? [C.red, '#3f7fc0', '#4c9a6a'][i % 3]
+                  : pick(['#a9cde6', '#6fa37a', C.red], rand);
+          const geo = gamePiece(activity, color);
+          const held = bind(
+            a,
+            'game-piece',
+            geo,
+            a.joints.handR,
+            ['board-game'],
+            track,
+            ids,
+          );
+          held.position.set(-0.012, -0.13, 0.012);
+          held.rotation.z = Math.PI / 2;
+          timed.push({
+            root: held,
+            actor: a,
+            action: 'board-game',
+            from: 0.26,
+            to: 0.47,
+          });
+          const placed = bind(
+            a,
+            'placed-piece',
+            geo,
+            a.joints.hip,
+            ['board-game'],
+            track,
+            ids,
+          );
+          placed.position.set(0.033, tableTop + 0.006, 0.615);
+          timed.push({
+            root: placed,
+            actor: a,
+            action: 'board-game',
+            from: 0.47,
+            to: 1,
+          });
+        }
+        if (info.play === 'cards') {
+          bind(
+            a,
+            'fanned-cards',
+            fannedCardsGeo,
+            a.joints.handL,
+            ['cards'],
+            track,
+            ids,
+          );
+          const held = bind(
+            a,
+            'played-card',
+            playedCardGeo,
+            a.joints.handR,
+            ['cards'],
+            track,
+            ids,
+          );
+          held.position.set(-0.012, -0.11, 0.01);
+          timed.push({
+            root: held,
+            actor: a,
+            action: 'cards',
+            from: 0.2,
+            to: 0.46,
+          });
+          const laid = bind(
+            a,
+            'laid-card',
+            playedCardGeo,
+            a.joints.hip,
+            ['cards'],
+            track,
+            ids,
+          );
+          laid.position.set(0.017, tableTop + 0.002, 0.58);
+          laid.rotation.z = Math.PI / 2;
+          timed.push({
+            root: laid,
+            actor: a,
+            action: 'cards',
+            from: 0.46,
+            to: 1,
+          });
+        }
+        if (info.play === 'knit') {
+          const color = pick(
+            ['#c94f4f', '#5a86b8', '#7aa66b', '#b77bb0', '#e2b04a'],
+            rand,
+          );
+          bind(
+            a,
+            'needle-right',
+            needles.R,
+            a.joints.handR,
+            ['knit'],
+            track,
+            ids,
+          );
+          bind(
+            a,
+            'needle-left',
+            needles.L,
+            a.joints.handL,
+            ['knit'],
+            track,
+            ids,
+          );
+          bind(
+            a,
+            'knitting',
+            knittedGeo(color),
+            a.joints.handL,
+            ['knit'],
+            track,
+            ids,
+          );
+          bind(
+            a,
+            'yarn',
+            yarnBall(color),
+            a.joints.hip,
+            ['knit'],
+            track,
+            ids,
+          ).position.set(0, 0.06, 0.2);
+        }
+        if (info.play === 'read') {
+          if (activity === 'newspapers')
+            holdToRead(
+              bind(
+                a,
+                'newspaper',
+                newspaperGeo,
+                a.joints.torso,
+                ['read'],
+                track,
+                ids,
+              ),
+              0.82,
+            );
+          else {
+            const book = holdToRead(
+              bind(a, 'album', albumGeo, a.joints.torso, ['read'], track, ids),
+            );
+            const page = piece(a.spec.id + '-album-page', pageGeo, book);
+            page.position.z = 0.004;
+            pages.push({ root: page, actor: a });
+          }
+        }
+        if (info.play === 'write')
+          bind(
+            a,
+            activity === 'coloring' ? 'pencil' : 'paint-brush',
+            activity === 'coloring' ? pencilGeo : brushGeo,
+            a.joints.handR,
+            ['write'],
+            track,
+            ids,
+          );
+        if (info.play === 'craft')
+          bind(
+            a,
+            activity === 'flowers' ? 'flower-stem' : 'origami-paper',
+            activity === 'flowers' ? stemGeo : origamiPaperGeo,
+            activity === 'flowers' ? a.joints.handR : a.joints.handL,
+            ['craft'],
+            track,
+            ids,
+          );
+        if (info.play === 'tea') {
+          const cup = bind(
+            a,
+            'snack-tea-cup',
+            cupGeo,
+            a.joints.handR,
+            ['tea'],
+            track,
+            ids,
+          );
+          cup.position.set(0.0072 - 0.04, -0.0716, -0.016);
+          cup.rotation.x = Math.PI / 2;
+        }
+      });
+    }
+  }
+
   // -------------------------------------------------------------------------
   let highlightList: DayHighlight[] = [];
   const DAY = 720;
+  const tracks: Track[] = [...zones, ...tables];
   const qa = new T.Quaternion(),
     qb = new T.Quaternion(),
     sway = new T.Euler();
+  const titleOf = (label: string, labelZh?: string) =>
+    labelZh ? `${labelZh} ${label}` : label;
   function tick(time: number) {
     const t = ((time % DAY) + DAY) % DAY;
     let changed = false;
-    for (const z of zones) {
+    for (const z of tracks) {
       let next = z.sessions[z.sessions.length - 1];
       for (const s of z.sessions)
         if (t >= s.start && t < s.end) {
@@ -2257,35 +3533,78 @@ export function buildDayRoom(actors: Person[]) {
     const session = floor.current!;
     root.userData.programId = session.id;
     if (changed) {
+      screen.visible = !!formationOf(session)?.board;
       screenPanels.forEach(
         (g, i) => (g.visible = floorPrograms[i].id === session.id),
       );
       for (const d of decor)
         d.root.visible = zones.some((z) => decorOf(z.current!).includes(d.id));
-      highlightList = zones.map(({ zone, current, position }) => {
-        const s = current!,
-          guest = instructorOf(s);
-        return {
-          id: zone.id,
-          zoneId: zone.id,
-          sessionId: s.id,
-          title: s.labelZh ? `${s.labelZh} ${s.label}` : s.label,
-          label: s.label,
-          labelZh: s.labelZh,
-          subtitle: guest ? `with ${guest.name}` : 'with the activities team',
-          position,
-        };
-      });
+      for (const s of tableSetMeshes) s.root.visible = false;
+      for (const s of tableSetMeshes)
+        if (s.track.current === s.entry) s.root.visible = true;
+      highlightList = [
+        ...zones.map(({ zone, current, position }): DayHighlight => {
+          const s = current!,
+            guest = instructorOf(s);
+          return {
+            kind: 'zone',
+            id: zone.id,
+            zoneId: zone.id,
+            sessionId: s.id,
+            title: titleOf(s.label, s.labelZh),
+            label: s.label,
+            labelZh: s.labelZh,
+            subtitle: guest ? `with ${guest.name}` : 'with the activities team',
+            position,
+            follow: 'interaction:day-' + s.id,
+          };
+        }),
+        ...tables.map(({ tableId, current, position }): DayHighlight => {
+          const e = current!,
+            info = catalog[e.activity];
+          return {
+            kind: 'table',
+            id: tableId,
+            tableId,
+            activity: e.activity,
+            title: titleOf(info?.label || e.activity, info?.labelZh),
+            label: info?.label || e.activity,
+            labelZh: info?.labelZh,
+            subtitle: '',
+            position,
+            follow: `interaction:table-${tableId.replace(/^day-/, '')}-${e.index + 1}`,
+          };
+        }),
+      ];
     }
-    chairs.forEach(({ actor, root: chair }) => {
+    // Formation furniture arrives once the class has walked to its places.
+    const settled = t >= session.start + transition;
+    for (const l of layout)
+      l.root.visible = settled && l.sessions.includes(session.id);
+    // Each activity chair stands wherever its member sits down.
+    for (const { actor, root: chair } of chairs) {
       chair.visible = actor.root.visible && !!actor.sample.seated;
+      if (!chair.visible) continue;
+      chair.position.copy(actor.root.position);
+      chair.rotation.y = actor.root.rotation.y;
       chair.scale.copy(actor.root.scale);
-    });
+    }
     for (const p of props)
       p.root.visible =
         (!p.world || p.actor.root.visible) &&
         p.actions.includes(p.actor.sample.action) &&
         (!p.sessions || p.sessions.includes(p.zone.current!.id));
+    // Pieces and cards change hands on the motion's own phase.
+    for (const m of timed) {
+      if (!m.root.visible) continue;
+      const g = m.actor.phase(m.action as Action, time + m.actor.spec.offset);
+      m.root.visible = g >= m.from && g < m.to;
+    }
+    for (const p of pages) {
+      const g = p.actor.phase('read', time + p.actor.spec.offset);
+      p.root.visible = g >= 0.68 && g < 0.9;
+      p.root.rotation.y = -Math.PI * T.MathUtils.clamp((g - 0.68) / 0.22, 0, 1);
+    }
     // Ribbon silk trails from the wand tip in the dancer's upright frame,
     // swaying with the dance rhythm.
     for (const a of aligned) {
@@ -2312,7 +3631,10 @@ export function buildDayRoom(actors: Person[]) {
     chairs,
     props,
     decor,
-    /** Floating highlights for the sessions running at the last `tick`. */
+    /**
+     * Floating highlights at the last `tick`: one per zone (its session) and
+     * one per game table (its current pastime).
+     */
     highlights: (): DayHighlight[] => highlightList,
   };
 }

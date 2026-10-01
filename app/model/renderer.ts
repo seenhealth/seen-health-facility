@@ -1952,16 +1952,19 @@ export function createViewer(
     });
   }
   renderer.domElement.addEventListener('wheel', wheel, { passive: true });
-  // Floating highlights name the session running in each day-room zone.
+  // Floating highlights: the session in each day-room zone and, closer in,
+  // the pastime at each game table.
   type Highlight = {
     el: HTMLButtonElement;
     zh: HTMLSpanElement;
     en: HTMLSpanElement;
     sub: HTMLSpanElement;
-    session: string;
-    /** The activity follow id for this session's interaction track. */
+    kind: 'zone' | 'table';
+    /** The activity follow id for the entry shown; changes with it. */
     track: string;
     shown: boolean;
+    /** Table labels: placed this frame without covering another label. */
+    placed: boolean;
     following: boolean;
     compact: boolean;
     size: [number, number];
@@ -1972,23 +1975,29 @@ export function createViewer(
   };
   const highlightLabels = new Map<string, Highlight>();
   const highlightPoint = new T.Vector3();
-  const highlightSlots: Highlight[] = [];
+  const zoneSlots: Highlight[] = [],
+    tableSlots: Highlight[] = [];
   const lowestFirst = (a: Highlight, b: Highlight) => b.y - a.y;
   /**
-   * Day-room labels appear from the "Day activities" focus zoom (about 1.39)
-   * inward and stay hidden in the whole-building overviews (1.3 and below);
-   * hosts lend their names once the room is large enough to read (px/m).
+   * Zone labels appear from the "Day activities" zoom (about 1.39) inward and
+   * stay hidden in the whole-building overviews (1.3 and below); hosts are
+   * named once the room is large enough to read (px/m). Table labels join
+   * from the day-program framing (zoom 2.4) inward.
    */
   const HIGHLIGHT_MIN_ZOOM = 1.35,
+    HIGHLIGHT_TABLE_ZOOM = 2.3,
     HIGHLIGHT_MIN_SCALE = 8,
     HIGHLIGHT_DETAIL_SCALE = 22;
-  const followSession = (sessionId: string) => {
-    const id = 'interaction:day-' + sessionId;
-    activity.setOptions({ follow: id });
-    zoomTarget = Math.max(camera.zoom, 4.5);
-    const p = activity.actorPosition(id);
+  const followHighlight = (label: Highlight) => {
+    activity.setOptions({ follow: label.track });
+    zoomTarget = Math.max(camera.zoom, label.kind === 'table' ? 6 : 4.5);
+    const p = activity.actorPosition(label.track);
     if (p) focusTarget = p;
   };
+  const overlaps = (a: Highlight, b: Highlight, gap = 6) =>
+    Math.abs(a.x - b.x) < (a.size[0] + b.size[0]) / 2 + gap &&
+    a.y - a.stem > b.y - b.stem - b.size[1] - gap &&
+    a.y - a.stem - a.size[1] < b.y - b.stem + gap;
   function updateHighlights() {
     if (options.labels === false) return;
     const s = activity.getState();
@@ -2003,10 +2012,12 @@ export function createViewer(
       !ceiling.visible &&
       camera.zoom >= HIGHLIGHT_MIN_ZOOM &&
       scale >= HIGHLIGHT_MIN_SCALE;
+    const showTables = show && camera.zoom >= HIGHLIGHT_TABLE_ZOOM;
     const compact = scale < HIGHLIGHT_DETAIL_SCALE;
-    highlightSlots.length = 0;
+    zoneSlots.length = tableSlots.length = 0;
     for (const h of activity.dayRoom.highlights()) {
-      let label = highlightLabels.get(h.zoneId);
+      const key = h.kind + ':' + h.id;
+      let label = highlightLabels.get(key);
       if (!label) {
         const el = document.createElement('button'),
           title = document.createElement('span'),
@@ -2014,8 +2025,8 @@ export function createViewer(
           en = document.createElement('span'),
           sub = document.createElement('span');
         el.type = 'button';
-        el.className = 'day-highlight';
-        el.dataset.zone = h.zoneId;
+        el.className = 'day-highlight' + (h.kind === 'table' ? ' table' : '');
+        el.dataset.zone = h.zoneId || h.tableId || h.id;
         el.style.display = 'none';
         title.className = 'day-highlight-title';
         zh.className = 'day-highlight-zh';
@@ -2031,9 +2042,10 @@ export function createViewer(
           zh,
           en,
           sub,
-          session: '',
+          kind: h.kind,
           track: '',
           shown: false,
+          placed: false,
           following: false,
           compact: false,
           size: [0, 0],
@@ -2041,19 +2053,21 @@ export function createViewer(
           y: 0,
           stem: 0,
         };
-        el.onclick = () => followSession(entry.session);
+        el.onclick = () => followHighlight(entry);
         host.appendChild(el);
-        highlightLabels.set(h.zoneId, entry);
+        highlightLabels.set(key, entry);
         label = entry;
       }
-      if (label.session !== h.sessionId) {
-        label.session = h.sessionId;
-        label.track = 'interaction:day-' + h.sessionId;
+      if (label.track !== h.follow) {
+        label.track = h.follow;
         label.zh.textContent = h.labelZh || '';
         label.en.textContent = h.label;
         label.sub.textContent = h.subtitle;
-        label.el.title = `${h.title} · ${h.subtitle}`;
-        label.el.setAttribute('aria-label', `Follow ${h.title}, ${h.subtitle}`);
+        label.el.title = h.subtitle ? `${h.title} · ${h.subtitle}` : h.title;
+        label.el.setAttribute(
+          'aria-label',
+          `Follow ${h.title}${h.subtitle ? ', ' + h.subtitle : ''}`,
+        );
         label.size = [0, 0];
       }
       const following = s.follow === label.track;
@@ -2061,49 +2075,60 @@ export function createViewer(
         label.following = following;
         label.el.classList.toggle('following', following);
       }
-      if (show !== label.shown) {
-        label.shown = show;
-        label.el.style.display = show ? '' : 'none';
+      const visible = h.kind === 'table' ? showTables : show;
+      if (visible !== label.shown) {
+        label.shown = visible;
+        label.el.style.display = visible ? '' : 'none';
       }
-      if (compact !== label.compact) {
+      if (h.kind === 'zone' && compact !== label.compact) {
         label.compact = compact;
         label.el.classList.toggle('compact', compact);
         label.size = [0, 0];
       }
-      if (!show) continue;
+      if (!visible) continue;
       highlightPoint.copy(h.position).project(camera);
       if (highlightPoint.z > 1) {
         label.el.style.visibility = 'hidden';
         continue;
       }
-      label.el.style.visibility = 'visible';
       if (!label.size[0])
         label.size = [label.el.offsetWidth, label.el.offsetHeight];
       label.x = (highlightPoint.x * 0.5 + 0.5) * host.clientWidth;
       label.y = (-highlightPoint.y * 0.5 + 0.5) * host.clientHeight;
-      label.stem = 10;
-      highlightSlots.push(label);
+      label.stem = h.kind === 'table' ? 6 : 10;
+      (h.kind === 'table' ? tableSlots : zoneSlots).push(label);
     }
-    // Labels never cover one another: a higher one rises on a longer stem.
-    highlightSlots.sort(lowestFirst);
-    for (let i = 0; i < highlightSlots.length; i++) {
-      const a = highlightSlots[i];
+    // Zone labels never cover one another: a higher one rises on a longer
+    // stem. Table labels give way: one that would cover another is hidden.
+    zoneSlots.sort(lowestFirst);
+    tableSlots.sort(lowestFirst);
+    for (let i = 0; i < zoneSlots.length; i++) {
+      const a = zoneSlots[i];
       for (let pass = 0; pass < 2; pass++)
-        for (let j = 0; j < i; j++) {
-          const b = highlightSlots[j],
-            bottom = a.y - a.stem,
-            bTop = b.y - b.stem - b.size[1];
-          if (
-            Math.abs(a.x - b.x) < (a.size[0] + b.size[0]) / 2 + 6 &&
-            bottom > bTop - 6 &&
-            bottom - a.size[1] < b.y - b.stem + 6
-          )
-            a.stem = a.y - bTop + 6;
-        }
-      a.el.style.left = `${a.x}px`;
-      a.el.style.top = `${a.y}px`;
-      a.el.style.setProperty('--stem', `${a.stem}px`);
+        for (let j = 0; j < i; j++)
+          if (overlaps(a, zoneSlots[j]))
+            a.stem =
+              a.y - (zoneSlots[j].y - zoneSlots[j].stem - zoneSlots[j].size[1]) + 6;
     }
+    for (const a of zoneSlots) placeHighlight(a, true);
+    for (let i = 0; i < tableSlots.length; i++) {
+      const a = tableSlots[i];
+      let clear = true;
+      for (let j = 0; j < zoneSlots.length && clear; j++)
+        clear = !overlaps(a, zoneSlots[j], 4);
+      for (let j = 0; j < i && clear; j++)
+        clear = !tableSlots[j].placed || !overlaps(a, tableSlots[j], 4);
+      // A table label that gives way stays out of the later overlap checks.
+      a.placed = clear;
+      placeHighlight(a, clear);
+    }
+  }
+  function placeHighlight(a: Highlight, visible: boolean) {
+    a.el.style.visibility = visible ? 'visible' : 'hidden';
+    if (!visible) return;
+    a.el.style.left = `${a.x}px`;
+    a.el.style.top = `${a.y}px`;
+    a.el.style.setProperty('--stem', `${a.stem}px`);
   }
   let lastTime = performance.now(),
     paused = false;

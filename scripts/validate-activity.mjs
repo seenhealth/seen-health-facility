@@ -21,8 +21,8 @@ const scene = new T.Scene(),
   activity = createActivity(m, scene),
   neighborhood = buildNeighborhood(m);
 scene.add(neighborhood.root);
-assert.equal(activity.actors.length, 176);
-assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 176);
+assert.equal(activity.actors.length, 184);
+assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 184);
 for (const role of [
   'doctor',
   'nurse',
@@ -365,7 +365,7 @@ console.log(
 // The flexible layout and repertoire stay in sync with animation, accessibility and scrubbing.
 assert.equal(floorPrograms.length, 10);
 assert.equal(dayProgram.programs.length, 17);
-assert.equal(dayProgram.removedObjectIds.length, 19);
+assert.equal(dayProgram.removedObjectIds.length, 42);
 assert.ok(
   dayProgram.removedObjectIds.every((id) => m.objects.some((o) => o.id === id)),
 );
@@ -425,8 +425,9 @@ for (const session of dayProgram.programs)
     ),
     `${session.id} has an interaction track`,
   );
-// Passing traffic must stay outside the stationary activity group and its chairs.
-for (const a of activityData.actors.filter((a) => !groupIds.has(a.id)))
+// Passing traffic keeps outside the open floor, where the class rearranges between layouts.
+const [[ax0, az0], [ax1, az1]] = dayProgram.floor.area;
+for (const a of activityData.actors.filter((a) => !groupIds.has(a.id) && a.levelId === 'ground'))
   for (const s of a.segments.filter((s) =>
     ['walk', 'roll'].includes(s.action),
   )) {
@@ -436,12 +437,10 @@ for (const a of activityData.actors.filter((a) => !groupIds.has(a.id)))
           s.path[i - 1][0] + ((s.path[i][0] - s.path[i - 1][0]) * j) / 20;
         const z =
           s.path[i - 1][1] + ((s.path[i][1] - s.path[i - 1][1]) * j) / 20;
-        for (const station of dayProgram.stations)
-          assert.ok(
-            Math.hypot(x - station.position[0], z - station.position[1]) >=
-              0.63,
-            `${a.id} crosses activity seating`,
-          );
+        assert.ok(
+          x < ax0 - 0.25 || x > ax1 + 0.25 || z < az0 - 0.25 || z > az1 + 0.25,
+          `${a.id} crosses the open floor at ${x},${z}`,
+        );
       }
   }
 console.log(

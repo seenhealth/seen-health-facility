@@ -109,27 +109,30 @@ export function distanceToSegment(p: Vec2, a: Vec2, b: Vec2) {
 }
 
 /**
- * Day-program defaults: cleared front tables, group stations and the mobile
- * screen. `parity: true` reproduces build-activity.py exactly (stairs walkable).
+ * Day-program defaults: cleared furniture and the open-floor class area (its
+ * layouts and the mobile board move within it). `parity: true` keeps stairs
+ * walkable, as build-activity.py did.
  */
 export function dayProgramNavOptions(parity = false): NavOptions {
+  const [[x0, z0], [x1, z1]] = program.floor.area;
+  // A lane from the west aisle stays open to the class's reserved story slot.
+  const [hx, hz] = Object.values(program.floor.formations)
+    .flatMap((f) => f.slots)
+    .find((s) => 'reserved' in s && s.reserved === 'hero')!.at;
+  const box = (id: string, ax: number, az: number, bx: number, bz: number) => ({
+    id: 'day-program-floor-' + id,
+    position: [(ax + bx) / 2, (az + bz) / 2] as Vec2,
+    halfWidth: (bx - ax) / 2,
+    halfDepth: (bz - az) / 2,
+  });
   return {
     levelId: 'ground',
     blockVerticalCirculation: !parity,
     removedObjectIds: program.removedObjectIds,
     reservations: [
-      ...program.stations.map((s) => ({
-        id: 'station:' + s.actorId,
-        position: s.position as Vec2,
-        halfWidth: 0.64,
-        halfDepth: 0.65,
-      })),
-      {
-        id: 'day-program-display',
-        position: [-7, 9.72] as Vec2,
-        halfWidth: 1.15,
-        halfDepth: 0.3,
-      },
+      box('front', x0, z0, x1, hz - 0.5),
+      box('back', x0, hz + 0.5, x1, z1),
+      box('middle', hx + 0.4, hz - 0.5, x1, hz + 0.5),
     ],
     excludeZoneIds: ['adjacent'],
   };

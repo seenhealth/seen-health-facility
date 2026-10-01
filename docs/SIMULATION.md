@@ -70,7 +70,7 @@ seconds, clock minutes and labels:
 A TypeScript port of the grid in `scripts/build-activity.py`, with identical
 results: 0.2 m cells; 0.21 m wall clearance; furniture footprints (including
 `navigationFootprints`) inflated by 0.19 m; cleared day-program furniture; the
-reserved group stations and presentation screen; 8-connected A* without corner
+reserved open-floor class area (with a lane to the story slot); 8-connected A* without corner
 cutting; collinear simplification. `navGrid(model, dayProgramNavOptions(true))`
 reproduces the Python grid exactly (22,063 walkable cells; 20,099 at cane
 clearance) and builds in about 0.4 s in Node, cached per model and options.
