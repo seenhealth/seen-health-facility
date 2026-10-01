@@ -11,16 +11,13 @@ import {
   RotateCcw,
   Truck,
   Users,
-  X,
 } from 'lucide-react';
 import { journeyData, type JourneyStep } from '../model/journeys';
 
 export function JourneyPanel({
   onFocus,
-  onClose,
 }: {
   onFocus: (step: JourneyStep) => void;
-  onClose: () => void;
 }) {
   const [journeyId, setJourneyId] = useState(journeyData.journeys[0].id);
   const [index, setIndex] = useState(0);
@@ -75,12 +72,6 @@ export function JourneyPanel({
   }[step.evidence];
   return (
     <article className="journey-panel" aria-label="Participant journeys">
-      <div className="journey-top">
-        <span className="overline">PARTICIPANT JOURNEYS</span>
-        <button onClick={onClose} aria-label="Close journeys">
-          <X size={18} />
-        </button>
-      </div>
       <label className="journey-select">
         Choose a journey
         <select

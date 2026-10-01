@@ -4,10 +4,8 @@ import {
   ArrowDownToLine,
   ArrowUpRight,
   Box,
-  ChartArea,
   ChevronDown,
   ChevronRight,
-  Compass,
   Download,
   Expand,
   Eye,
@@ -20,13 +18,13 @@ import {
   Minus,
   PanelLeftClose,
   PanelLeftOpen,
+  PanelRightClose,
+  PanelRightOpen,
   Plus,
   RotateCcw,
-  Route,
   Search,
   Settings2,
   Upload,
-  Users,
   Video,
   X,
 } from 'lucide-react';
@@ -46,7 +44,7 @@ import {
 import { roomLabelCode } from './model/room-labels';
 import { JourneyPanel } from './components/journey-panel';
 import type { JourneyStep } from './model/journeys';
-import { ActivityPanel } from './components/activity-panel';
+import { ActivityPanel, MiniPlayer } from './components/activity-panel';
 import { isRotationDay, setProgramRotation } from './model/day-room';
 import { ShowcaseControls } from './components/showcase-controls';
 import { SiteMap } from './components/site-map';
@@ -82,6 +80,8 @@ const communityState = (base: ViewerState): ViewerState => ({
   site: true,
   community: true,
 });
+// Below this width the sidebar overlays the model and the side panel docks below it.
+const narrow = () => window.matchMedia('(max-width: 800px)').matches;
 const jsonDownload = (data: unknown, name: string) =>
   download(
     new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }),
@@ -114,9 +114,10 @@ export default function Home() {
     [roomSearch, setRoomSearch] = useState(''),
     [modal, setModal] = useState<'accuracy' | 'model' | null>(null),
     [showControls, setShowControls] = useState(false),
-    [journeyOpen, setJourneyOpen] = useState(false),
-    [activityOpen, setActivityOpen] = useState(true),
-    [measureOpen, setMeasureOpen] = useState(false),
+    [panelOpen, setPanelOpen] = useState(true),
+    [panelTab, setPanelTab] = useState<'activity' | 'journeys' | 'measure'>(
+      'activity',
+    ),
     [exporting, setExporting] = useState(false),
     [notice, setNotice] = useState(''),
     // The viewer builds the community layer when its source carries one.
@@ -213,7 +214,6 @@ export default function Home() {
       setError('');
     }
     setSiteId(id);
-    setMeasureOpen(false);
     setClinicOption(false);
     setNetworkOpen(false);
     setModal(null);
@@ -228,9 +228,9 @@ export default function Home() {
       labels: false,
     });
     setView('iso');
-    setActivityOpen(true);
-    setJourneyOpen(false);
-    setCollapsed(id === 'alhambra');
+    setPanelOpen(true);
+    setPanelTab('activity');
+    setCollapsed(id === 'alhambra' || narrow());
     const u = new URL(window.location.href);
     u.searchParams.set('site', id);
     u.searchParams.delete('option');
@@ -377,8 +377,7 @@ export default function Home() {
       setState(next);
       viewer.current.update(next);
       viewer.current.setShowcase(true);
-      setActivityOpen(false);
-      setJourneyOpen(false);
+      setPanelOpen(false);
       setShowControls(false);
       setCollapsed(true);
     } else viewer.current.setShowcase(false);
@@ -451,6 +450,7 @@ export default function Home() {
       });
     setView('iso');
     viewer.current?.view('iso');
+    if (narrow()) setCollapsed(true);
   };
   const selectRoom = (r: Room) => {
     patch({
@@ -469,6 +469,7 @@ export default function Home() {
     setView('iso');
     viewer.current?.view('iso');
     requestAnimationFrame(() => viewer.current?.focus(r.zoneId, r.id));
+    if (narrow()) setCollapsed(true);
   };
   const selectLevel = (id: string) => {
     setView(id === 'roof' ? 'building' : 'iso');
@@ -582,10 +583,32 @@ export default function Home() {
             height={160}
           />
         </a>
-        <div className="header-location">
-          {model?.address || sites.find((s) => s.id === siteId)?.address}
-          <span className="header-tag">Facility model</span>
-        </div>
+        <nav className="site-navigation" aria-label="Facility locations">
+          {sites.map((s) => (
+            <button
+              key={s.id}
+              aria-pressed={!networkOpen && s.id === siteId}
+              onClick={() => selectSite(s.id)}
+            >
+              <span className="site-dot" style={{ background: s.color }} />
+              {s.name}
+            </button>
+          ))}
+          <button
+            className="network-tab"
+            aria-pressed={networkOpen}
+            onClick={() => {
+              setNetworkOpen(!networkOpen);
+              const u = new URL(window.location.href);
+              if (!networkOpen) u.searchParams.set('view', 'map');
+              else u.searchParams.delete('view');
+              window.history.replaceState(null, '', u);
+            }}
+          >
+            <Map size={15} />
+            Site map
+          </button>
+        </nav>
         <div className="header-actions">
           {siteId === 'alhambra' && (
             <button disabled={!ready} onClick={enterShowcase}>
@@ -593,82 +616,27 @@ export default function Home() {
               <span>Video view</span>
             </button>
           )}
-          {
-            <button
-              aria-label="Animated care day"
-              aria-pressed={activityOpen}
-              onClick={() => {
-                setActivityOpen(!activityOpen);
-                setJourneyOpen(false);
-                setMeasureOpen(false);
-              }}
-            >
-              <Users size={16} />
-              <span>Animated care day</span>
-            </button>
-          }
-          {siteId === 'alhambra' && (
-            <button
-              aria-label="Participant journeys"
-              aria-pressed={journeyOpen}
-              onClick={() => {
-                setJourneyOpen(!journeyOpen);
-                setActivityOpen(false);
-                setMeasureOpen(false);
-                if (window.innerWidth < 800) setCollapsed(true);
-              }}
-            >
-              <Route size={16} />
-              <span>Participant journeys</span>
-            </button>
-          )}
-          {siteId === 'alhambra' && (
-          <button
-            aria-label="Measure"
-            aria-pressed={measureOpen}
-            onClick={() => {
-              setMeasureOpen(!measureOpen);
-              setActivityOpen(false);
-              setJourneyOpen(false);
-            }}
-          >
-            <ChartArea size={16} />
-            <span>Measure</span>
-          </button>
-          )}
           <button onClick={() => setModal('model')}>
             <FolderOpen size={16} />
             <span>Model files</span>
           </button>
+          <button
+            className="panel-toggle"
+            aria-label={panelOpen ? 'Hide side panel' : 'Show side panel'}
+            aria-pressed={panelOpen}
+            onClick={() => {
+              setPanelOpen(!panelOpen);
+              if (narrow()) setCollapsed(true);
+            }}
+          >
+            {panelOpen ? (
+              <PanelRightClose size={18} />
+            ) : (
+              <PanelRightOpen size={18} />
+            )}
+          </button>
         </div>
       </header>
-      <nav className="site-navigation" aria-label="Facility locations">
-        <span className="site-nav-label">EXPLORE OUR SPACES</span>
-        {sites.map((s) => (
-          <button
-            key={s.id}
-            aria-pressed={!networkOpen && s.id === siteId}
-            onClick={() => selectSite(s.id)}
-          >
-            <span className="site-dot" style={{ background: s.color }} />
-            {s.name}
-          </button>
-        ))}
-        <button
-          className="network-tab"
-          aria-pressed={networkOpen}
-          onClick={() => {
-            setNetworkOpen(!networkOpen);
-            const u = new URL(window.location.href);
-            if (!networkOpen) u.searchParams.set('view', 'map');
-            else u.searchParams.delete('view');
-            window.history.replaceState(null, '', u);
-          }}
-        >
-          <Map size={15} />
-          Site map
-        </button>
-      </nav>
       {networkOpen && (
         <SiteMap
           onSelect={selectSite}
@@ -682,12 +650,23 @@ export default function Home() {
       )}
       <aside className="facility-sidebar">
         <div className="sidebar-title">
+          <button
+            className="sidebar-close"
+            aria-label="Hide room navigation"
+            onClick={() => setCollapsed(true)}
+          >
+            <X size={18} />
+          </button>
           <span className="overline">BUILDING EXPLORER</span>
           <h1>
             {model?.name.replace('Seen Health · ', '') ||
               sites.find((s) => s.id === siteId)?.name}
           </h1>
-          <p>{model?.source.date || 'Loading source'} design baseline</p>
+          <p>
+            {model?.address || sites.find((s) => s.id === siteId)?.address}
+            <br />
+            {model?.source.date || 'Loading source'} design baseline
+          </p>
           <button
             className="accuracy-badge"
             onClick={() => setModal('accuracy')}
@@ -755,6 +734,7 @@ export default function Home() {
               onClick={() => {
                 patch({ selected: null, room: null, isolate: false });
                 viewer.current?.focus(null);
+                if (narrow()) setCollapsed(true);
               }}
             >
               <Box size={17} />
@@ -764,7 +744,7 @@ export default function Home() {
                     ? 'Entire building'
                     : level?.name || 'Building exterior'}
                 </strong>
-                <small>View all spaces on this level</small>
+                <small>{level?.notes || 'View all spaces on this level'}</small>
               </span>
             </button>
             {shownZones.map((z) => (
@@ -935,105 +915,10 @@ export default function Home() {
                   : level?.name || 'A connected center')}
           </h2>
           <div className="scene-subtitle">
-            {state.level === 'all'
-              ? state.exterior
-                ? 'Orbit the complete shell, or use Cutaway and Section to look inside'
-                : 'Separate levels to inspect how the building fits together'
-              : level?.notes || 'Select an area or room to inspect its layout.'}
+            Drag to orbit · Scroll to zoom · Right-drag to pan
           </div>
         </div>
-        <div className="view-switch">
-          <button
-            className={view === 'iso' ? 'chosen' : ''}
-            onClick={() => {
-              setView('iso');
-              patch({
-                plan: false,
-                level:
-                  state.level === 'roof' || state.level === 'all'
-                    ? 'ground'
-                    : state.level,
-                roof: false,
-                exterior: false,
-                ceilings: false,
-                walls: 'cutaway',
-                sectionAxis: 'none',
-                stack: 0,
-              });
-              viewer.current?.view('iso');
-            }}
-          >
-            <Box size={15} />
-            Cutaway
-          </button>
-          <button
-            className={view === 'plan' ? 'chosen' : ''}
-            onClick={() => {
-              setView('plan');
-              patch({
-                roof: false,
-                exterior: false,
-                ceilings: false,
-                walls: 'cutaway',
-                sectionAxis: 'none',
-                level:
-                  state.level === 'roof' || state.level === 'all'
-                    ? 'ground'
-                    : state.level,
-                stack: 0,
-              });
-              viewer.current?.view('plan');
-            }}
-          >
-            <Map size={15} />
-            Plan
-          </button>
-          <button
-            className={view === 'building' ? 'chosen' : ''}
-            onClick={() => showBuilding()}
-          >
-            Whole building
-          </button>
-          <button
-            className={view === 'rear' ? 'chosen' : ''}
-            onClick={() => showBuilding(true)}
-          >
-            Rear
-          </button>
-          {ready && hasCommunity && (
-            <button
-              className={view === 'community' ? 'chosen' : ''}
-              onClick={showCommunity}
-            >
-              Community
-            </button>
-          )}
-        </div>
-        {activityOpen && ready && (
-          <ActivityPanel
-            key={model?.id || siteId}
-            viewer={ready ? viewer.current : null}
-            onScene={focusActivity}
-            onClose={() => setActivityOpen(false)}
-          />
-        )}
-        {measureOpen && model && siteId === 'alhambra' && (
-          <Suspense fallback={null}>
-            <MetricsPanel
-              model={model}
-              ready={ready}
-              getViewer={getViewer}
-              onClose={() => setMeasureOpen(false)}
-            />
-          </Suspense>
-        )}
-        {journeyOpen && siteId === 'alhambra' && (
-          <JourneyPanel
-            onFocus={focusJourney}
-            onClose={() => setJourneyOpen(false)}
-          />
-        )}
-        {zone && !journeyOpen && !activityOpen && !measureOpen && (
+        {zone && !panelOpen && (
           <article
             className="space-card"
             style={{ '--zone': zone.color } as React.CSSProperties}
@@ -1142,11 +1027,114 @@ export default function Home() {
             <RotateCcw size={16} />
           </button>
         </div>
-        <div className="bottom-dock">
-          <div className="separation-controls">
-            <label>
-              <Layers size={16} />
-              Explode areas
+        {!panelOpen && ready && !showcase && (
+          <MiniPlayer
+            viewer={viewer.current}
+            onOpen={() => {
+              setPanelTab('activity');
+              setPanelOpen(true);
+            }}
+          />
+        )}
+        <div className="canvas-tools">
+          <div className="view-switch">
+            <button
+              className={view === 'iso' ? 'chosen' : ''}
+              onClick={() => {
+                setView('iso');
+                patch({
+                  plan: false,
+                  level:
+                    state.level === 'roof' || state.level === 'all'
+                      ? 'ground'
+                      : state.level,
+                  roof: false,
+                  exterior: false,
+                  ceilings: false,
+                  walls: 'cutaway',
+                  sectionAxis: 'none',
+                  stack: 0,
+                });
+                viewer.current?.view('iso');
+              }}
+            >
+              <Box size={15} />
+              Cutaway
+            </button>
+            <button
+              className={view === 'plan' ? 'chosen' : ''}
+              onClick={() => {
+                setView('plan');
+                patch({
+                  roof: false,
+                  exterior: false,
+                  ceilings: false,
+                  walls: 'cutaway',
+                  sectionAxis: 'none',
+                  level:
+                    state.level === 'roof' || state.level === 'all'
+                      ? 'ground'
+                      : state.level,
+                  stack: 0,
+                });
+                viewer.current?.view('plan');
+              }}
+            >
+              <Map size={15} />
+              Plan
+            </button>
+            <button
+              className={view === 'building' ? 'chosen' : ''}
+              onClick={() => showBuilding()}
+            >
+              Whole building
+            </button>
+            <button
+              className={view === 'rear' ? 'chosen' : ''}
+              onClick={() => showBuilding(true)}
+            >
+              Rear
+            </button>
+            {ready && hasCommunity && (
+              <button
+                className={view === 'community' ? 'chosen' : ''}
+                onClick={showCommunity}
+              >
+                Community
+              </button>
+            )}
+          </div>
+          <button
+            className={showControls ? 'dock-button chosen' : 'dock-button'}
+            aria-expanded={showControls}
+            onClick={() => setShowControls(!showControls)}
+          >
+            <Settings2 size={15} />
+            Layers
+            <ChevronDown size={13} />
+          </button>
+          <label className="dock-check">
+            <input
+              type="checkbox"
+              checked={state.labels}
+              onChange={(e) => patch({ labels: e.target.checked })}
+            />
+            {siteId === 'olympic' ? 'Room labels' : 'Labels'}
+          </label>
+        </div>
+        {showControls && (
+          <div className="layer-popover">
+            <div className="popover-heading">
+              Visible layers
+              <button
+                onClick={() => setShowControls(false)}
+                aria-label="Close layer settings"
+              >
+                <X size={15} />
+              </button>
+            </div>
+            <label className="section-range">
+              Explode areas <span>{Math.round(state.explode * 100)}%</span>
               <input
                 type="range"
                 aria-label="Explode area separation"
@@ -1167,12 +1155,10 @@ export default function Home() {
                   });
                 }}
               />
-              <span>{Math.round(state.explode * 100)}%</span>
             </label>
             {state.level === 'all' && (
-              <label>
-                <ArrowDownToLine size={16} />
-                Separate levels
+              <label className="section-range">
+                Separate levels <span>{Math.round(state.stack * 100)}%</span>
                 <input
                   type="range"
                   aria-label="Vertical level separation"
@@ -1191,55 +1177,8 @@ export default function Home() {
                     })
                   }
                 />
-                <span>{Math.round(state.stack * 100)}%</span>
               </label>
             )}
-          </div>
-          <span className="dock-rule" />
-          <label className="dock-check">
-            <input
-              type="checkbox"
-              checked={state.labels}
-              onChange={(e) => patch({ labels: e.target.checked })}
-            />
-            {siteId === 'olympic' ? 'Room labels' : 'Labels'}
-          </label>
-          <button
-            className={
-              state.sectionAxis !== 'none'
-                ? 'dock-button chosen'
-                : 'dock-button'
-            }
-            onClick={() => {
-              patch({
-                sectionAxis: state.sectionAxis === 'none' ? 'z' : 'none',
-                plan: false,
-              });
-              setShowControls(true);
-            }}
-          >
-            Section
-          </button>
-          <button
-            className={showControls ? 'dock-button chosen' : 'dock-button'}
-            onClick={() => setShowControls(!showControls)}
-          >
-            <Settings2 size={16} />
-            Layers
-            <ChevronDown size={13} />
-          </button>
-        </div>
-        {showControls && (
-          <div className="layer-popover">
-            <div className="popover-heading">
-              Visible layers
-              <button
-                onClick={() => setShowControls(false)}
-                aria-label="Close layer settings"
-              >
-                <X size={15} />
-              </button>
-            </div>
             {model?.contextStyle && (
               <label>
                 <input
@@ -1330,13 +1269,71 @@ export default function Home() {
             </label>
           </div>
         )}
-        <div className="workspace-footer">
-          <span>
-            <Compass size={14} />
-            Drag to orbit · Scroll to zoom · Right-drag to pan
-          </span>
-        </div>
       </section>
+      {panelOpen && (
+        <aside
+          className="side-panel"
+          data-tab={panelTab}
+          aria-label="Care day, journeys and measures"
+        >
+          <div className="side-panel-tabs">
+            {siteId === 'alhambra' ? (
+              (
+                [
+                  ['activity', 'Care day'],
+                  ['journeys', 'Journeys'],
+                  ['measure', 'Measure'],
+                ] as const
+              ).map(([id, label]) => (
+                <button
+                  key={id}
+                  aria-pressed={panelTab === id}
+                  onClick={() => setPanelTab(id)}
+                >
+                  {label}
+                </button>
+              ))
+            ) : (
+              <strong>Care day</strong>
+            )}
+            <button
+              className="side-panel-close"
+              aria-label="Close side panel"
+              onClick={() => setPanelOpen(false)}
+            >
+              <X size={16} />
+            </button>
+          </div>
+          <div className="side-panel-body">
+            {panelTab === 'activity' &&
+              (ready ? (
+                <ActivityPanel
+                  key={model?.id || siteId}
+                  viewer={viewer.current}
+                  onScene={focusActivity}
+                />
+              ) : (
+                <p className="side-panel-loading">Loading the care day…</p>
+              ))}
+            {panelTab === 'measure' && model && siteId === 'alhambra' && (
+              <Suspense
+                fallback={
+                  <p className="side-panel-loading">Loading measures…</p>
+                }
+              >
+                <MetricsPanel
+                  model={model}
+                  ready={ready}
+                  getViewer={getViewer}
+                />
+              </Suspense>
+            )}
+            {panelTab === 'journeys' && siteId === 'alhambra' && (
+              <JourneyPanel onFocus={focusJourney} />
+            )}
+          </div>
+        </aside>
+      )}
       {notice && (
         <div className="toast" role="status">
           {notice}
