@@ -7,6 +7,7 @@ import {
   type CharacterRole,
 } from './characters';
 import type { Facility, Vec2 } from './schema';
+import { fleetVanId, fleetVanLabel } from './alhambra-fleet';
 import { buildArrival } from './arrival';
 import { buildSiteArrival } from './site-arrival';
 import { buildDayRoom } from './day-room';
@@ -136,8 +137,13 @@ export function createVehicleRegistry() {
   const samplers = new Map<string, VehicleSampler>(),
     labels = new Map<string, string>();
   return {
-    register(id: string, sample: VehicleSampler, meta: { label?: string } = {}) {
-      if (samplers.has(id)) throw new Error(`Vehicle ${id} is already registered`);
+    register(
+      id: string,
+      sample: VehicleSampler,
+      meta: { label?: string } = {},
+    ) {
+      if (samplers.has(id))
+        throw new Error(`Vehicle ${id} is already registered`);
       samplers.set(id, sample);
       if (meta.label) labels.set(id, meta.label);
     },
@@ -151,9 +157,10 @@ export function createVehicleRegistry() {
 export type VehicleRegistry = ReturnType<typeof createVehicleRegistry>;
 /**
  * Register the center's own vehicles under the ids and names every consumer
- * shares: fleet vans `van-a`… ('Van A'…) and the delivery trucks. The engine
- * and `alhambraVehicles()` both call this, so a seated rider, a followed van
- * and a traced boarding all name the same vehicle.
+ * shares: fleet vans `van-a`… ('Van A'…, `fleetVanId` / `fleetVanLabel`) and
+ * the delivery trucks. The engine and `alhambraVehicles()` both call this, so
+ * a seated rider, a followed van and a traced boarding all name the same
+ * vehicle.
  */
 export function registerCenterVehicles(
   registry: VehicleRegistry,
@@ -161,12 +168,10 @@ export function registerCenterVehicles(
   sampleVan: (index: number, time: number) => VehiclePose,
   deliveries: boolean,
 ) {
-  for (let i = 0; i < vans; i++) {
-    const letter = String.fromCharCode(65 + i);
-    registry.register(`van-${letter.toLowerCase()}`, (t) => sampleVan(i, t), {
-      label: `Van ${letter}`,
+  for (let i = 0; i < vans; i++)
+    registry.register(fleetVanId(i), (t) => sampleVan(i, t), {
+      label: fleetVanLabel(i),
     });
-  }
   if (deliveries)
     deliveryStops.forEach((stop, i) =>
       registry.register(stop.id, (t) => sampleDelivery(i, t), {
@@ -458,7 +463,9 @@ export function createActivity(
   registerVehicles?: (vehicles: VehicleRegistry) => void,
 ) {
   if (data.duration !== activityData.duration)
-    throw new Error(`Activity source must use the ${activityData.duration}s care-day clock`);
+    throw new Error(
+      `Activity source must use the ${activityData.duration}s care-day clock`,
+    );
   // The engine plays its source as given; composition (community layer,
   // fleet crew) happens upstream in alhambra-source.ts so Measure, the trace
   // and the reports read the very same ActivityData.
@@ -654,7 +661,9 @@ export function createActivity(
       if (a.spec.escortFor && s.vehicleId && s.seat)
         s = sampleActor(a.spec, options.time);
       const ride =
-        s.vehicleId && s.seat ? vehicles.sample(s.vehicleId, options.time) : null;
+        s.vehicleId && s.seat
+          ? vehicles.sample(s.vehicleId, options.time)
+          : null;
       if (ride) {
         const placed = seatInVehicle(ride, s.seat!, s.seatHeading);
         s = { ...s, ...placed, visible: s.visible !== false && ride.visible };

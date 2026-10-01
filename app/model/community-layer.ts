@@ -12,7 +12,6 @@ import {
   buildCommunityVehicleBody,
   communityVehicles,
   sampleCommunityVehicle,
-  variantIndex,
   VEHICLE_DECOR,
 } from './community-vehicles';
 
@@ -51,7 +50,7 @@ export function buildCommunityLayer(
   const bodies = communityVehicles.map((v) => {
     if (v.kind === 'van') {
       // The shared fleet body in the registry's livery letter.
-      const van = buildArrivalVan(model, variantIndex(v.variant ?? 'A'), mat);
+      const van = buildArrivalVan(model, v.variant ?? 'A', mat);
       van.root.name = v.id;
       root.add(van.root);
       return { v, van, object: van.root };

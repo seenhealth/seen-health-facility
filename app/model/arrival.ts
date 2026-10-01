@@ -2,6 +2,7 @@ import * as T from 'three';
 import { buildAsset } from './assets';
 import {
   fleetParking,
+  fleetVanLetter,
   extraVanWindows,
   sampleFleetVan,
 } from './alhambra-fleet';
@@ -151,7 +152,7 @@ export function buildArrival(
         roughness: 0.75,
       }));
   const vans = fleetParking.map((_, i) => {
-    const van = buildArrivalVan(model, i, materialFor);
+    const van = buildArrivalVan(model, fleetVanLetter(i), materialFor);
     root.add(van.root);
     return van;
   });
@@ -199,27 +200,29 @@ export function buildArrival(
   };
 }
 
-// Shared fleet body, sliding passenger doors and folding ramp for every site.
+/**
+ * Shared fleet body, sliding passenger doors and folding ramp for every site,
+ * in the livery of `variant` (a letter: 'A' for the first fleet van; see
+ * `fleetVanLetter`). Van A uses the model's `fleet-van-a` spec, every other
+ * letter `fleet-van-b` when the model has one.
+ */
 export function buildArrivalVan(
   model: Facility,
-  index: number,
+  variant: string,
   material: (id: string) => T.MeshStandardMaterial,
 ) {
+  const letter = variant.toUpperCase();
   const spec =
-    model.assets[`fleet-van-${index ? 'b' : 'a'}`] ||
+    model.assets[`fleet-van-${letter === 'A' ? 'a' : 'b'}`] ||
     model.assets['fleet-van-a'];
   const root = buildAsset(
     {
       ...spec,
-      parameters: {
-        ...spec.parameters,
-        variant: String.fromCharCode(65 + index),
-        operable: true,
-      },
+      parameters: { ...spec.parameters, variant: letter, operable: true },
     },
     material,
   );
-  root.name = `animated-van-${String.fromCharCode(97 + index)}`;
+  root.name = `animated-van-${letter.toLowerCase()}`;
   // Own copies of the body materials, so one van can fade out at the map edge
   // without touching the others (the renderer's section clones key on these).
   const copies = new Map<T.Material, T.Material>();

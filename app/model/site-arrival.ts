@@ -1,5 +1,6 @@
 import * as T from 'three';
 import siteArrivals from '../data/site-arrivals.json';
+import { fleetVanLetter } from './alhambra-fleet';
 import { buildArrivalVan, updateArrivalVan } from './arrival';
 import type { Facility, Vec2 } from './schema';
 
@@ -221,7 +222,7 @@ export function buildSiteArrival(
     return { position, heading, visible, phase, door, ramp };
   }
   const vans = windows.map((_, i) => {
-    const van = buildArrivalVan(model, i, materialFor);
+    const van = buildArrivalVan(model, fleetVanLetter(i), materialFor);
     root.add(van.root);
     return van;
   });

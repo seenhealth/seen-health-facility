@@ -59,6 +59,17 @@ export const fleetParking: {
   ...[3.5, -11.5, -19].map((z) => ({ x: CURB_X, z, heading: Math.PI })),
 ];
 const atCurb = (index: number) => fleetParking[index].x === CURB_X;
+/** Livery letter of fleet van `index` ('A' for the first). */
+export const fleetVanLetter = (index: number) =>
+  String.fromCharCode(65 + index);
+/**
+ * Vehicle id of fleet van `index` ('van-a', 'van-b', …): the one scheme the
+ * engine registry, the crew, the trace and the validators share.
+ */
+export const fleetVanId = (index: number) =>
+  `van-${fleetVanLetter(index).toLowerCase()}`;
+/** Display name of fleet van `index` ('Van A', …). */
+export const fleetVanLabel = (index: number) => `Van ${fleetVanLetter(index)}`;
 
 // Vans C and D bring mid-day arrivals. Unload windows end once the last rider
 // has left the ramp and the driver has stowed it (see fleet-crew.ts), so the

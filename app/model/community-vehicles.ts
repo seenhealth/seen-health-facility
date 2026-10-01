@@ -960,6 +960,3 @@ export const VEHICLE_DECOR: Record<VehicleDecor, (car: T.Group) => void> = {
   'pharmacy-cross': decorateCourier,
   'meal-cooler': decorateMeals,
 };
-/** Index of a livery letter ('A' = 0) for the shared fleet-van body. */
-export const variantIndex = (letter: string) =>
-  letter.toUpperCase().charCodeAt(0) - 65;

@@ -17,6 +17,8 @@ import {
   FLEET_CAB_DOOR,
   fleetParking,
   fleetTimeline,
+  fleetVanId,
+  fleetVanLetter,
   type FleetSpell,
 } from './alhambra-fleet';
 import {
@@ -84,15 +86,16 @@ const MIDDAY_RIDERS: {
   mobility?: Mobility;
   waitAt: Vec2;
 }[] = [
-  { van: 'van-c', home: 'van-a', name: 'Mei', variant: 14, mobility: 'cane', waitAt: [-12.9, -1.55] },
-  { van: 'van-c', home: 'van-a', name: 'Rafael', variant: 15, waitAt: [-12.2, -1.55] },
-  { van: 'van-d', home: 'van-b', name: 'Dolores', variant: 16, mobility: 'walker', waitAt: [-11.5, -1.5] },
-  { van: 'van-d', home: 'van-b', name: 'Minh', variant: 17, waitAt: [-13.6, -1.6] },
+  // In on van C (index 2) or D (3), home on van A (0) or B (1).
+  { van: fleetVanId(2), home: fleetVanId(0), name: 'Mei', variant: 14, mobility: 'cane', waitAt: [-12.9, -1.55] },
+  { van: fleetVanId(2), home: fleetVanId(0), name: 'Rafael', variant: 15, waitAt: [-12.2, -1.55] },
+  { van: fleetVanId(3), home: fleetVanId(1), name: 'Dolores', variant: 16, mobility: 'walker', waitAt: [-11.5, -1.5] },
+  { van: fleetVanId(3), home: fleetVanId(1), name: 'Minh', variant: 17, waitAt: [-13.6, -1.6] },
 ];
 /** Mid-day riders check in a step behind and beside the front-desk spot, leaving it to the morning arrival waiting there. */
 const QUEUE_OFFSET: Vec2 = [-0.9, 0.7];
 
-const vanIds = fleetParking.map((_, i) => `van-${String.fromCharCode(97 + i)}`);
+const vanIds = fleetParking.map((_, i) => fleetVanId(i));
 const vanIndex = (id: string) => vanIds.indexOf(id);
 const near = (a: Vec2, b: Vec2, tolerance = 0.05) =>
   Math.hypot(a[0] - b[0], a[1] - b[1]) <= tolerance;
@@ -738,7 +741,7 @@ function middayRider(
   });
   track.ride(LOOP, spec.home, FLEET_VAN_SEATS.benches[0], homeFrame.sill, 'Riding home', true);
   return {
-    id: `arrival-midday-${spec.van.slice(-1)}-${order + 1}`,
+    id: `arrival-midday-${fleetVanLetter(vanIndex(spec.van)).toLowerCase()}-${order + 1}`,
     label: `${spec.name} · half-day`,
     role: 'participant',
     variant: spec.variant,

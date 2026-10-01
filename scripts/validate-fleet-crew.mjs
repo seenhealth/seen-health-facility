@@ -34,7 +34,15 @@ const inside = (p, poly) => {
   return odd;
 };
 const DURATION = 720,
-  vanIds = fleet.fleetParking.map((_, i) => `van-${String.fromCharCode(97 + i)}`);
+  vanIds = fleet.fleetParking.map((_, i) => fleet.fleetVanId(i));
+// The ids the engine registers (registerCenterVehicles, as the viewer and
+// alhambraVehicles() do): every van id above must be one of them, and every
+// seat must name one.
+const registry = activity.createVehicleRegistry();
+activity.registerCenterVehicles(registry, fleet.fleetParking.length, sim.sampleVan, true);
+const registered = new Set(registry.ids());
+for (const id of vanIds) assert.ok(registered.has(id), `${id} is registered with the engine (${[...registered].join(', ')})`);
+assert.equal(registered.size, vanIds.length + deliveries.deliveryStops.length, 'the engine registers the vans and the delivery trucks');
 const vehicle = (id, t) => {
   const v = vanIds.indexOf(id);
   if (v >= 0) return activity.sampleVan ? activity.sampleVan(v, t) : sim.sampleVan(v, t);
@@ -85,8 +93,8 @@ for (const [name, source] of sources) {
       if (s.heights) assert.equal(s.heights.length, s.path.length, `${a.id} "${s.title}" heights match path`);
       if (s.seat)
         assert.ok(
-          vanIds.includes(s.vehicleId) || deliveries.deliveryStops.some((d) => d.id === s.vehicleId),
-          `${a.id} "${s.title}" sits in an unregistered vehicle "${s.vehicleId}"`,
+          registered.has(s.vehicleId),
+          `${a.id} "${s.title}" sits in an unregistered vehicle "${s.vehicleId}" (registered: ${[...registered].join(', ')})`,
         );
     });
   }
