@@ -54,11 +54,18 @@ type Drive = {
   post?: Vec2;
 };
 export type VehicleLeg = Dwell | Drive;
+/** Roof dressing that says what a car is for (built by `VEHICLE_DECOR`). */
+export type VehicleDecor = 'pharmacy-cross' | 'meal-cooler';
 export type CommunityVehicle = {
   id: string;
   kind: CommunityVehicleKind;
+  /** Display name: the trace, the follow bar and the registry label. */
   name: string;
   accent: string;
+  /** Roof dressing for cars. */
+  decor?: VehicleDecor;
+  /** Livery letter of a Seen fleet-body van (after the center's own fleet). */
+  variant?: string;
   /** Pose outside the legs (hidden when `visible` is false). */
   rest: { at: Vec2; dir: Vec2; visible: boolean; phase: string };
   legs: VehicleLeg[];
@@ -330,6 +337,7 @@ export const communityVehicles: CommunityVehicle[] = [
     kind: 'van',
     name: 'Seen van · community runs',
     accent: '#174a49',
+    variant: 'I',
     rest: { ...stop(home, 0), visible: true, phase: 'Waiting at the home' },
     seats: {
       driver: [-0.55, 0.58, -1.9],
@@ -425,6 +433,7 @@ export const communityVehicles: CommunityVehicle[] = [
     kind: 'car',
     name: 'Pharmacy courier',
     accent: '#e4e7df',
+    decor: 'pharmacy-cross',
     rest: { ...stop(pharmacy, 0), visible: true, phase: 'At the pharmacy' },
     seats: { driver: [-0.42, 0.3, -0.2] },
     legs: [
@@ -534,6 +543,7 @@ export const communityVehicles: CommunityVehicle[] = [
     kind: 'car',
     name: 'Home-delivered meals',
     accent: '#eef0ea',
+    decor: 'meal-cooler',
     rest: {
       ...CENTER_LOT.meals,
       visible: true,
@@ -848,7 +858,7 @@ export function buildCommunityVehicleBody(
   return g;
 }
 /** A rooftop green cross for the pharmacy courier. */
-export function decorateCourier(car: T.Group) {
+function decorateCourier(car: T.Group) {
   const green = new T.MeshStandardMaterial({
       color: BODY.cross,
       roughness: 0.7,
@@ -868,7 +878,7 @@ export function decorateCourier(car: T.Group) {
   }
 }
 /** A cool box on the meals car roof in Seen teal. */
-export function decorateMeals(car: T.Group) {
+function decorateMeals(car: T.Group) {
   const cooler = new T.Mesh(
     new RoundedBoxGeometry(0.9, 0.36, 0.7, 2, 0.05),
     new T.MeshStandardMaterial({ color: '#25777c', roughness: 0.6 }),
@@ -877,3 +887,11 @@ export function decorateMeals(car: T.Group) {
   cooler.castShadow = true;
   car.add(cooler);
 }
+/** Roof dressings by registry `decor` value. */
+export const VEHICLE_DECOR: Record<VehicleDecor, (car: T.Group) => void> = {
+  'pharmacy-cross': decorateCourier,
+  'meal-cooler': decorateMeals,
+};
+/** Index of a livery letter ('A' = 0) for the shared fleet-van body. */
+export const variantIndex = (letter: string) =>
+  letter.toUpperCase().charCodeAt(0) - 65;

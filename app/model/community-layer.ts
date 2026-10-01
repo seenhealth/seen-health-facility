@@ -7,9 +7,9 @@ import { buildCareSetting } from './community-pads';
 import {
   buildCommunityVehicleBody,
   communityVehicles,
-  decorateCourier,
-  decorateMeals,
   sampleCommunityVehicle,
+  variantIndex,
+  VEHICLE_DECOR,
 } from './community-vehicles';
 
 /** Camera framing: orbit target and orthographic zoom. */
@@ -33,16 +33,18 @@ export function buildCommunityLayer(
   };
   for (const setting of careSettings) root.add(buildCareSetting(setting, mat));
   const bodies = communityVehicles.map((v) => {
-    vehicles.register(v.id, (t) => sampleCommunityVehicle(v.id, t));
+    vehicles.register(v.id, (t) => sampleCommunityVehicle(v.id, t), {
+      label: v.name,
+    });
     if (v.kind === 'van') {
-      const van = buildArrivalVan(model, 8, mat);
+      // The shared fleet body in the registry's livery letter.
+      const van = buildArrivalVan(model, variantIndex(v.variant ?? 'A'), mat);
       van.root.name = v.id;
       root.add(van.root);
       return { v, van, object: van.root };
     }
     const body = buildCommunityVehicleBody(v.kind, v.accent);
-    if (v.id === 'courier-car') decorateCourier(body);
-    if (v.id === 'meals-car') decorateMeals(body);
+    if (v.decor) VEHICLE_DECOR[v.decor](body);
     body.name = v.id;
     root.add(body);
     return { v, van: null, object: body };

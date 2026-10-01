@@ -9,12 +9,15 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { Vector3 } from 'three';
 import { sampleVan } from '../work/validation/arrival.mjs';
+import { fleetParking } from '../work/validation/alhambra-fleet.mjs';
 import { sampleDelivery } from '../work/validation/deliveries.mjs';
 import { sampleStreetCar } from '../work/validation/traffic-routes.mjs';
 import { vehicleGap } from '../work/validation/vehicle-clearance.mjs';
 import {
   communityVehicles,
   sampleCommunityVehicle,
+  variantIndex,
+  VEHICLE_DECOR,
 } from '../work/validation/community-vehicles.mjs';
 import {
   communitySource,
@@ -91,6 +94,21 @@ const mine = (time) =>
   }));
 
 // --- Vehicles ---------------------------------------------------------------
+// Presentation comes from the registry: every van wears its own livery letter
+// after the center's fleet, every decor has a builder, every vehicle a name.
+const letters = new Set(fleetParking.map((_, i) => i));
+for (const v of communityVehicles) {
+  assert(v.name, `${v.id}: name`);
+  if (v.decor) assert(VEHICLE_DECOR[v.decor], `${v.id}: unknown decor ${v.decor}`);
+  if (v.kind !== 'van') continue;
+  assert(v.variant, `${v.id}: a fleet-body van needs a livery letter`);
+  const index = variantIndex(v.variant);
+  assert(
+    !letters.has(index),
+    `${v.id}: livery letter ${v.variant} is already a fleet van's`,
+  );
+  letters.add(index);
+}
 let pairs = 0,
   closest = Infinity,
   streetClosest = Infinity;
