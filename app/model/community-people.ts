@@ -1486,12 +1486,4 @@ export function communitySource(model: Facility): SourceExtension {
     ],
   };
 }
-/** Interaction categories contributed by the community layer (id, panel label). */
-export const COMMUNITY_CATEGORIES: [string, string][] = [
-  ['home', 'Home care & home health'],
-  ['pharmacy', 'Pharmacy & pill packs'],
-  ['specialist', 'Specialist visits'],
-  ['hospital', 'Hospital & discharge'],
-  ['partner', 'Partner day center'],
-  ['after-hours', 'After-hours nurse line'],
-];
+export { COMMUNITY_CATEGORIES } from './community-settings';

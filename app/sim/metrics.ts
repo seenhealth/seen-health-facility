@@ -16,6 +16,7 @@ import {
 } from '../model/activity';
 import type { CharacterRole } from '../model/characters';
 import type { Facility, Vec2 } from '../model/schema';
+import { COMMUNITY_CATEGORIES } from '../model/community-settings';
 import careTeam from '../data/care-team.json';
 import { insidePolygon } from './nav';
 
@@ -111,9 +112,9 @@ const CATEGORY_PRIORITY: ParticipantActivity[] = [
   'community',
 ];
 /** Interaction categories of the distributed-care layer, measured as one bucket. */
-const COMMUNITY_CATEGORIES = new Set(['home', 'pharmacy', 'specialist', 'hospital', 'partner', 'after-hours']);
+const COMMUNITY_CATEGORY_IDS = new Set(COMMUNITY_CATEGORIES.map(([id]) => id));
 const categoryBucket = (category: string): ParticipantActivity | null =>
-  COMMUNITY_CATEGORIES.has(category)
+  COMMUNITY_CATEGORY_IDS.has(category)
     ? 'community'
     : (CATEGORY_PRIORITY as string[]).includes(category)
       ? (category as ParticipantActivity)

@@ -546,10 +546,12 @@ export const communityVehicles: CommunityVehicle[] = [
         'Delivering meals to the home',
         { pre: past(CENTER_LOT.meals, -2), post: beyond(home, 1, 0, -10) },
       ),
-      dwell(367.5, 408, stop(home, 1), 'Meal bag drop'),
+      // Held four seconds longer than the drop needs so the car crosses the
+      // westbound lane into the lot behind van F's afternoon pull-out.
+      dwell(367.5, 412, stop(home, 1), 'Meal bag drop'),
       drive(
-        408,
-        438,
+        412,
+        442,
         [
           ...depart(home, 1, 0, W.out),
           ...zRun(W.out, legAt(home, 1, 'exit')[1] - R - 2, S.out.z! + R),
@@ -565,7 +567,7 @@ export const communityVehicles: CommunityVehicle[] = [
         'Back to the center',
         { pre: beyond(home, 1, 0, 10), post: past(CENTER_LOT.meals, 2) },
       ),
-      dwell(438, 720, CENTER_LOT.meals, 'At the center kitchen'),
+      dwell(442, 720, CENTER_LOT.meals, 'At the center kitchen'),
     ],
   },
   {
