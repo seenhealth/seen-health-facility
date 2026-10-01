@@ -349,6 +349,17 @@ export default function Home() {
   }, [model]);
   useEffect(() => viewer.current?.update(state), [state, ready]);
   useEffect(() => {
+    // The weekly repertoire belongs to the Alhambra day room; site-specific
+    // models play their own baked Monday program, so ?program= does not
+    // follow the visitor there (and Alhambra starts from Monday again).
+    if (!model?.contextStyle) return;
+    setProgramRotation('mon');
+    const u = new URL(window.location.href);
+    if (!u.searchParams.has('program')) return;
+    u.searchParams.delete('program');
+    window.history.replaceState(null, '', u);
+  }, [model]);
+  useEffect(() => {
     if (!ready || !viewer.current) return;
     if (showcase) {
       previousView.current = state;
