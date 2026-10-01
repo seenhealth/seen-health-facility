@@ -120,6 +120,8 @@ export default function Home() {
       viewer.current.view('iso');
       viewer.current.activity.setOptions({ enabled: true, follow: null });
       if (zoneId === 'site') viewer.current.focusArrival();
+      else if (zoneId === 'day' && !model.contextStyle)
+        viewer.current.focusDayProgram();
       else viewer.current.focus(zone?.id || null, activityRoom?.id);
       if (actor) viewer.current.followActor(actor);
     },

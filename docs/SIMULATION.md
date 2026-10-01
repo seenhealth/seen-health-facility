@@ -160,8 +160,10 @@ disappears (`visible: false` off duty); `exit` optionally differs.
   0.2 m wall clearance.
 - `join` / `leave` time companions relative to the hero's arrival/departure
   (defaults −3 s and +1 s: they wait for her and see her off).
-- `followProgram: true` takes the day-room program's standing action for each
-  session the hero overlaps.
+- `followProgram: true` takes the open-floor program's standing action for each
+  session the hero overlaps (movement sessions are copied; others become
+  listening). The long arts table and tea corner run concurrently and are not
+  followed.
 - `minDwell` overrides the minimum seconds at a stop.
 - `duties` (with absolute `window`s) attach companions to steps where the hero
   follows copied tracks, e.g. the center manager at check-in.

@@ -3,7 +3,7 @@
   "duration": 720,
   "dayStartMinutes": 480,
   "dayDurationMinutes": 480,
-  "description": "167 individual people, with most day-center and dining seats occupied, group activities, care, meals and transport.",
+  "description": "176 individual people, with most day-center and dining seats occupied, concurrent cultural activities with guest instructors, care, meals and transport.",
   "timing": "Twelve-minute repeating overview of a representative 8 AM\u20134 PM care day. Playback time is compressed and all visit times are illustrative.",
   "navigation": {
     "cellSize": 0.2,
@@ -271,7 +271,7 @@
         {
           "start": 148.1975,
           "end": 198.1975,
-          "action": "exercise",
+          "action": "listen",
           "path": [
             [
               -13.4,
@@ -284,7 +284,7 @@
           ],
           "zoneId": "day",
           "heading": 1.5,
-          "title": "Movement & exercise"
+          "title": "Watching the arts table"
         },
         {
           "start": 198.1975,
@@ -637,7 +637,7 @@
         {
           "start": 508.1975,
           "end": 558.1975,
-          "action": "exercise",
+          "action": "listen",
           "path": [
             [
               -13.4,
@@ -650,7 +650,7 @@
           ],
           "zoneId": "day",
           "heading": 1.5,
-          "title": "Movement & exercise"
+          "title": "Watching the arts table"
         },
         {
           "start": 558.1975,
@@ -975,7 +975,7 @@
         {
           "start": 136.6112,
           "end": 186.6112,
-          "action": "exercise",
+          "action": "consult",
           "path": [
             [
               -13.4,
@@ -988,7 +988,7 @@
           ],
           "zoneId": "day",
           "heading": 1.5,
-          "title": "Movement & exercise"
+          "title": "Assisting at the arts table"
         },
         {
           "start": 186.6112,
@@ -1261,7 +1261,7 @@
         {
           "start": 496.6112,
           "end": 546.6112,
-          "action": "exercise",
+          "action": "consult",
           "path": [
             [
               -13.4,
@@ -1274,7 +1274,7 @@
           ],
           "zoneId": "day",
           "heading": 1.5,
-          "title": "Movement & exercise"
+          "title": "Assisting at the arts table"
         },
         {
           "start": 546.6112,
@@ -2900,12 +2900,12 @@
           "zoneId": "day",
           "heading": 0,
           "seated": false,
-          "title": "Performances \u00b7 facilitate"
+          "title": "Cantonese opera \u00b7 co-host with Ms. Leung"
         },
         {
           "start": 72,
           "end": 144,
-          "action": "present",
+          "action": "qigong",
           "path": [
             [
               -7,
@@ -2919,7 +2919,7 @@
           "zoneId": "day",
           "heading": 0,
           "seated": false,
-          "title": "Language circle \u00b7 facilitate"
+          "title": "Baduanjin qigong \u00b7 co-host with Mr. Zhou"
         },
         {
           "start": 144,
@@ -2962,7 +2962,7 @@
         {
           "start": 288,
           "end": 360,
-          "action": "dance",
+          "action": "fan-dance",
           "path": [
             [
               -7,
@@ -2976,7 +2976,7 @@
           "zoneId": "day",
           "heading": 0,
           "seated": false,
-          "title": "Dance \u00b7 facilitate"
+          "title": "Fan dance \u00b7 co-host with Ms. Tang"
         },
         {
           "start": 360,
@@ -2995,12 +2995,12 @@
           "zoneId": "day",
           "heading": 0,
           "seated": false,
-          "title": "Tai chi \u00b7 facilitate"
+          "title": "Tai chi \u00b7 co-host with Mr. Wong"
         },
         {
           "start": 432,
           "end": 504,
-          "action": "write",
+          "action": "present",
           "path": [
             [
               -7,
@@ -3013,13 +3013,13 @@
           ],
           "zoneId": "day",
           "heading": 0,
-          "seated": true,
-          "title": "Calligraphy \u00b7 facilitate"
+          "seated": false,
+          "title": "Language circle \u00b7 facilitate"
         },
         {
           "start": 504,
           "end": 576,
-          "action": "craft",
+          "action": "dance",
           "path": [
             [
               -7,
@@ -3032,8 +3032,8 @@
           ],
           "zoneId": "day",
           "heading": 0,
-          "seated": true,
-          "title": "Arts & crafts \u00b7 facilitate"
+          "seated": false,
+          "title": "Ribbon dance \u00b7 co-host with Ms. Tang"
         },
         {
           "start": 576,
@@ -3052,7 +3052,7 @@
           "zoneId": "day",
           "heading": 0,
           "seated": false,
-          "title": "Instruments \u00b7 facilitate"
+          "title": "Erhu & sing-along \u00b7 co-host with Mr. Lam"
         },
         {
           "start": 648,
@@ -3071,7 +3071,7 @@
           "zoneId": "day",
           "heading": 0,
           "seated": false,
-          "title": "TCM talk \u00b7 facilitate"
+          "title": "TCM talk \u00b7 co-host with Dr. Ho"
         }
       ],
       "profileId": "activities-lead",
@@ -3264,7 +3264,7 @@
         {
           "start": 140.4242,
           "end": 180.4242,
-          "action": "exercise",
+          "action": "listen",
           "path": [
             [
               -10.6,
@@ -3277,7 +3277,7 @@
           ],
           "zoneId": "day",
           "heading": 1.57,
-          "title": "Movement & exercise"
+          "title": "Watching the arts table"
         },
         {
           "start": 180.4242,
@@ -3526,7 +3526,7 @@
         {
           "start": 500.42420000000004,
           "end": 540.4242,
-          "action": "exercise",
+          "action": "listen",
           "path": [
             [
               -10.6,
@@ -3539,7 +3539,7 @@
           ],
           "zoneId": "day",
           "heading": 1.57,
-          "title": "Movement & exercise"
+          "title": "Watching the arts table"
         },
         {
           "start": 540.4242,
@@ -3691,7 +3691,7 @@
         {
           "start": 33.608,
           "end": 78.608,
-          "action": "exercise",
+          "action": "conversation",
           "path": [
             [
               -4,
@@ -3704,7 +3704,7 @@
           ],
           "zoneId": "day",
           "heading": 0,
-          "title": "Movement & exercise"
+          "title": "Chatting with friends"
         },
         {
           "start": 78.608,
@@ -3841,7 +3841,7 @@
         {
           "start": 393.608,
           "end": 438.608,
-          "action": "exercise",
+          "action": "conversation",
           "path": [
             [
               -4,
@@ -3854,7 +3854,7 @@
           ],
           "zoneId": "day",
           "heading": 0,
-          "title": "Movement & exercise"
+          "title": "Chatting with friends"
         },
         {
           "start": 438.608,
@@ -3948,12 +3948,12 @@
           "zoneId": "day",
           "heading": 3.141592653589793,
           "seated": true,
-          "title": "Performances \u00b7 standing / seated choice"
+          "title": "Cantonese opera \u00b7 standing / seated choice"
         },
         {
           "start": 72,
           "end": 144,
-          "action": "conversation",
+          "action": "qigong",
           "path": [
             [
               -9,
@@ -3966,8 +3966,8 @@
           ],
           "zoneId": "day",
           "heading": 3.141592653589793,
-          "seated": true,
-          "title": "Language circle \u00b7 standing / seated choice"
+          "seated": false,
+          "title": "Baduanjin qigong \u00b7 standing / seated choice"
         },
         {
           "start": 144,
@@ -4010,7 +4010,7 @@
         {
           "start": 288,
           "end": 360,
-          "action": "dance",
+          "action": "fan-dance",
           "path": [
             [
               -9,
@@ -4024,7 +4024,7 @@
           "zoneId": "day",
           "heading": 3.141592653589793,
           "seated": false,
-          "title": "Dance \u00b7 standing / seated choice"
+          "title": "Fan dance \u00b7 standing / seated choice"
         },
         {
           "start": 360,
@@ -4048,7 +4048,7 @@
         {
           "start": 432,
           "end": 504,
-          "action": "write",
+          "action": "conversation",
           "path": [
             [
               -9,
@@ -4062,12 +4062,12 @@
           "zoneId": "day",
           "heading": 3.141592653589793,
           "seated": true,
-          "title": "Calligraphy \u00b7 standing / seated choice"
+          "title": "Language circle \u00b7 standing / seated choice"
         },
         {
           "start": 504,
           "end": 576,
-          "action": "craft",
+          "action": "dance",
           "path": [
             [
               -9,
@@ -4080,8 +4080,8 @@
           ],
           "zoneId": "day",
           "heading": 3.141592653589793,
-          "seated": true,
-          "title": "Arts & crafts \u00b7 standing / seated choice"
+          "seated": false,
+          "title": "Ribbon dance \u00b7 standing / seated choice"
         },
         {
           "start": 576,
@@ -4100,7 +4100,7 @@
           "zoneId": "day",
           "heading": 3.141592653589793,
           "seated": true,
-          "title": "Instruments \u00b7 standing / seated choice"
+          "title": "Erhu & sing-along \u00b7 standing / seated choice"
         },
         {
           "start": 648,
@@ -4150,12 +4150,12 @@
           "zoneId": "day",
           "heading": 3.141592653589793,
           "seated": true,
-          "title": "Performances \u00b7 chair-based participation"
+          "title": "Cantonese opera \u00b7 chair-based participation"
         },
         {
           "start": 72,
           "end": 144,
-          "action": "conversation",
+          "action": "qigong",
           "path": [
             [
               -6.8,
@@ -4169,7 +4169,7 @@
           "zoneId": "day",
           "heading": 3.141592653589793,
           "seated": true,
-          "title": "Language circle \u00b7 chair-based participation"
+          "title": "Baduanjin qigong \u00b7 chair-based participation"
         },
         {
           "start": 144,
@@ -4212,7 +4212,7 @@
         {
           "start": 288,
           "end": 360,
-          "action": "dance",
+          "action": "fan-dance",
           "path": [
             [
               -6.8,
@@ -4226,7 +4226,7 @@
           "zoneId": "day",
           "heading": 3.141592653589793,
           "seated": true,
-          "title": "Dance \u00b7 chair-based participation"
+          "title": "Fan dance \u00b7 chair-based participation"
         },
         {
           "start": 360,
@@ -4250,7 +4250,7 @@
         {
           "start": 432,
           "end": 504,
-          "action": "write",
+          "action": "conversation",
           "path": [
             [
               -6.8,
@@ -4264,12 +4264,12 @@
           "zoneId": "day",
           "heading": 3.141592653589793,
           "seated": true,
-          "title": "Calligraphy \u00b7 chair-based participation"
+          "title": "Language circle \u00b7 chair-based participation"
         },
         {
           "start": 504,
           "end": 576,
-          "action": "craft",
+          "action": "dance",
           "path": [
             [
               -6.8,
@@ -4283,7 +4283,7 @@
           "zoneId": "day",
           "heading": 3.141592653589793,
           "seated": true,
-          "title": "Arts & crafts \u00b7 chair-based participation"
+          "title": "Ribbon dance \u00b7 chair-based participation"
         },
         {
           "start": 576,
@@ -4302,7 +4302,7 @@
           "zoneId": "day",
           "heading": 3.141592653589793,
           "seated": true,
-          "title": "Instruments \u00b7 chair-based participation"
+          "title": "Erhu & sing-along \u00b7 chair-based participation"
         },
         {
           "start": 648,
@@ -4352,12 +4352,12 @@
           "zoneId": "day",
           "heading": 3.141592653589793,
           "seated": true,
-          "title": "Performances \u00b7 wheelchair participation"
+          "title": "Cantonese opera \u00b7 wheelchair participation"
         },
         {
           "start": 72,
           "end": 144,
-          "action": "conversation",
+          "action": "qigong",
           "path": [
             [
               -4.5,
@@ -4371,7 +4371,7 @@
           "zoneId": "day",
           "heading": 3.141592653589793,
           "seated": true,
-          "title": "Language circle \u00b7 wheelchair participation"
+          "title": "Baduanjin qigong \u00b7 wheelchair participation"
         },
         {
           "start": 144,
@@ -4414,7 +4414,7 @@
         {
           "start": 288,
           "end": 360,
-          "action": "dance",
+          "action": "fan-dance",
           "path": [
             [
               -4.5,
@@ -4428,7 +4428,7 @@
           "zoneId": "day",
           "heading": 3.141592653589793,
           "seated": true,
-          "title": "Dance \u00b7 wheelchair participation"
+          "title": "Fan dance \u00b7 wheelchair participation"
         },
         {
           "start": 360,
@@ -4452,7 +4452,7 @@
         {
           "start": 432,
           "end": 504,
-          "action": "write",
+          "action": "conversation",
           "path": [
             [
               -4.5,
@@ -4466,12 +4466,12 @@
           "zoneId": "day",
           "heading": 3.141592653589793,
           "seated": true,
-          "title": "Calligraphy \u00b7 wheelchair participation"
+          "title": "Language circle \u00b7 wheelchair participation"
         },
         {
           "start": 504,
           "end": 576,
-          "action": "craft",
+          "action": "dance",
           "path": [
             [
               -4.5,
@@ -4485,7 +4485,7 @@
           "zoneId": "day",
           "heading": 3.141592653589793,
           "seated": true,
-          "title": "Arts & crafts \u00b7 wheelchair participation"
+          "title": "Ribbon dance \u00b7 wheelchair participation"
         },
         {
           "start": 576,
@@ -4504,7 +4504,7 @@
           "zoneId": "day",
           "heading": 3.141592653589793,
           "seated": true,
-          "title": "Instruments \u00b7 wheelchair participation"
+          "title": "Erhu & sing-along \u00b7 wheelchair participation"
         },
         {
           "start": 648,
@@ -4555,7 +4555,7 @@
           "zoneId": "day",
           "heading": -1.5707963267948966,
           "seated": false,
-          "title": "Performances \u00b7 individual assistance"
+          "title": "Cantonese opera \u00b7 individual assistance"
         },
         {
           "start": 72,
@@ -4574,7 +4574,7 @@
           "zoneId": "day",
           "heading": -1.5707963267948966,
           "seated": false,
-          "title": "Language circle \u00b7 individual assistance"
+          "title": "Baduanjin qigong \u00b7 individual assistance"
         },
         {
           "start": 144,
@@ -4631,7 +4631,7 @@
           "zoneId": "day",
           "heading": -1.5707963267948966,
           "seated": false,
-          "title": "Dance \u00b7 individual assistance"
+          "title": "Fan dance \u00b7 individual assistance"
         },
         {
           "start": 360,
@@ -4669,7 +4669,7 @@
           "zoneId": "day",
           "heading": -1.5707963267948966,
           "seated": false,
-          "title": "Calligraphy \u00b7 individual assistance"
+          "title": "Language circle \u00b7 individual assistance"
         },
         {
           "start": 504,
@@ -4688,7 +4688,7 @@
           "zoneId": "day",
           "heading": -1.5707963267948966,
           "seated": false,
-          "title": "Arts & crafts \u00b7 individual assistance"
+          "title": "Ribbon dance \u00b7 individual assistance"
         },
         {
           "start": 576,
@@ -4707,7 +4707,7 @@
           "zoneId": "day",
           "heading": -1.5707963267948966,
           "seated": false,
-          "title": "Instruments \u00b7 individual assistance"
+          "title": "Erhu & sing-along \u00b7 individual assistance"
         },
         {
           "start": 648,
@@ -6342,7 +6342,7 @@
         {
           "start": 250.3696,
           "end": 288.3696,
-          "action": "exercise",
+          "action": "listen",
           "path": [
             [
               -10.6,
@@ -6358,7 +6358,7 @@
             0
           ],
           "visible": true,
-          "title": "Group movement",
+          "title": "Watching the arts table",
           "zoneId": "day",
           "heading": 1.5,
           "vehicleId": "van-a"
@@ -6984,7 +6984,7 @@
         {
           "start": 240.8921,
           "end": 278.8921,
-          "action": "greet",
+          "action": "listen",
           "path": [
             [
               -13.4,
@@ -7000,7 +7000,7 @@
             0
           ],
           "visible": true,
-          "title": "Social activities",
+          "title": "Watching the arts table",
           "zoneId": "day",
           "heading": 1.5,
           "vehicleId": "van-a"
@@ -7691,7 +7691,7 @@
         {
           "start": 240.8921,
           "end": 278.8921,
-          "action": "greet",
+          "action": "listen",
           "path": [
             [
               -13.4,
@@ -7707,7 +7707,7 @@
             0
           ],
           "visible": true,
-          "title": "Social activities",
+          "title": "Watching the arts table",
           "zoneId": "day",
           "heading": 1.5,
           "vehicleId": "van-a"
@@ -8210,7 +8210,7 @@
         {
           "start": 273.7811,
           "end": 313.7811,
-          "action": "exercise",
+          "action": "listen",
           "path": [
             [
               -10.6,
@@ -8226,7 +8226,7 @@
             0
           ],
           "visible": true,
-          "title": "Group exercise",
+          "title": "Watching the arts table",
           "zoneId": "day",
           "heading": 1.5,
           "vehicleId": "van-b"
@@ -8954,7 +8954,7 @@
         {
           "start": 400.8116,
           "end": 432.8116,
-          "action": "greet",
+          "action": "listen",
           "path": [
             [
               -13.4,
@@ -8970,7 +8970,7 @@
             0
           ],
           "visible": true,
-          "title": "Supported activities",
+          "title": "Watching the arts table",
           "zoneId": "day",
           "heading": 1.5,
           "vehicleId": "van-b"
@@ -9647,7 +9647,7 @@
         {
           "start": 400.8116,
           "end": 432.8116,
-          "action": "greet",
+          "action": "listen",
           "path": [
             [
               -13.4,
@@ -9663,7 +9663,7 @@
             0
           ],
           "visible": true,
-          "title": "Supported activities",
+          "title": "Watching the arts table",
           "zoneId": "day",
           "heading": 1.5,
           "vehicleId": "van-b"
@@ -20367,37 +20367,18 @@
     {
       "id": "daily-member-01",
       "profileId": "daily-member-01",
-      "label": "Arts & crafts at the long table",
+      "label": "Long arts table \u00b7 participant",
       "role": "participant",
       "variant": 100,
-      "offset": 0,
+      "offset": 0.0,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-communal-east-0",
       "seated": true,
       "segments": [
         {
-          "start": 0,
-          "end": 90,
-          "action": "craft",
-          "path": [
-            [
-              -11.269675,
-              13.075875
-            ],
-            [
-              -11.269675,
-              13.075875
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 90,
-          "end": 180,
+          "start": 0.0,
+          "end": 144.0,
           "action": "write",
           "path": [
             [
@@ -20412,30 +20393,11 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Calligraphy \u00b7 long arts table"
         },
         {
-          "start": 180,
-          "end": 270,
-          "action": "conversation",
-          "path": [
-            [
-              -11.269675,
-              13.075875
-            ],
-            [
-              -11.269675,
-              13.075875
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 270,
-          "end": 360,
+          "start": 144.0,
+          "end": 288.0,
           "action": "craft",
           "path": [
             [
@@ -20450,30 +20412,11 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Paper-cutting \u00b7 long arts table"
         },
         {
-          "start": 360,
-          "end": 450,
-          "action": "craft",
-          "path": [
-            [
-              -11.269675,
-              13.075875
-            ],
-            [
-              -11.269675,
-              13.075875
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 450,
-          "end": 540,
+          "start": 288.0,
+          "end": 432.0,
           "action": "write",
           "path": [
             [
@@ -20488,30 +20431,11 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Ink painting \u00b7 long arts table"
         },
         {
-          "start": 540,
-          "end": 630,
-          "action": "conversation",
-          "path": [
-            [
-              -11.269675,
-              13.075875
-            ],
-            [
-              -11.269675,
-              13.075875
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 630,
-          "end": 720,
+          "start": 432.0,
+          "end": 576.0,
           "action": "craft",
           "path": [
             [
@@ -20526,17 +20450,36 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Lantern making \u00b7 long arts table"
+        },
+        {
+          "start": 576.0,
+          "end": 720.0,
+          "action": "write",
+          "path": [
+            [
+              -11.269675,
+              13.075875
+            ],
+            [
+              -11.269675,
+              13.075875
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 4.71238898038469,
+          "seated": true,
+          "title": "Spring couplets \u00b7 long arts table"
         }
       ]
     },
     {
       "id": "daily-member-02",
       "profileId": "daily-member-02",
-      "label": "Arts & crafts at the long table",
+      "label": "Long arts table \u00b7 participant",
       "role": "participant",
       "variant": 101,
-      "offset": 11,
+      "offset": 0.37,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-communal-east-1",
@@ -20544,26 +20487,7 @@
       "segments": [
         {
           "start": 0,
-          "end": 90,
-          "action": "craft",
-          "path": [
-            [
-              -11.269675,
-              13.889937
-            ],
-            [
-              -11.269675,
-              13.889937
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 90,
-          "end": 180,
+          "end": 0.37,
           "action": "write",
           "path": [
             [
@@ -20578,68 +20502,11 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Spring couplets \u00b7 long arts table"
         },
         {
-          "start": 180,
-          "end": 270,
-          "action": "conversation",
-          "path": [
-            [
-              -11.269675,
-              13.889937
-            ],
-            [
-              -11.269675,
-              13.889937
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 270,
-          "end": 360,
-          "action": "craft",
-          "path": [
-            [
-              -11.269675,
-              13.889937
-            ],
-            [
-              -11.269675,
-              13.889937
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 360,
-          "end": 450,
-          "action": "craft",
-          "path": [
-            [
-              -11.269675,
-              13.889937
-            ],
-            [
-              -11.269675,
-              13.889937
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 450,
-          "end": 540,
+          "start": 0.37,
+          "end": 144.37,
           "action": "write",
           "path": [
             [
@@ -20654,12 +20521,12 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Calligraphy \u00b7 long arts table"
         },
         {
-          "start": 540,
-          "end": 630,
-          "action": "conversation",
+          "start": 144.37,
+          "end": 288.37,
+          "action": "craft",
           "path": [
             [
               -11.269675,
@@ -20673,12 +20540,50 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Paper-cutting \u00b7 long arts table"
         },
         {
-          "start": 630,
+          "start": 288.37,
+          "end": 432.37,
+          "action": "write",
+          "path": [
+            [
+              -11.269675,
+              13.889937
+            ],
+            [
+              -11.269675,
+              13.889937
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 4.71238898038469,
+          "seated": true,
+          "title": "Ink painting \u00b7 long arts table"
+        },
+        {
+          "start": 432.37,
+          "end": 576.37,
+          "action": "craft",
+          "path": [
+            [
+              -11.269675,
+              13.889937
+            ],
+            [
+              -11.269675,
+              13.889937
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 4.71238898038469,
+          "seated": true,
+          "title": "Lantern making \u00b7 long arts table"
+        },
+        {
+          "start": 576.37,
           "end": 720,
-          "action": "craft",
+          "action": "write",
           "path": [
             [
               -11.269675,
@@ -20692,17 +20597,17 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Spring couplets \u00b7 long arts table"
         }
       ]
     },
     {
       "id": "daily-member-03",
       "profileId": "daily-member-03",
-      "label": "Arts & crafts at the long table",
+      "label": "Long arts table \u00b7 participant",
       "role": "participant",
       "variant": 102,
-      "offset": 22,
+      "offset": 0.74,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-communal-east-2",
@@ -20710,26 +20615,7 @@
       "segments": [
         {
           "start": 0,
-          "end": 90,
-          "action": "craft",
-          "path": [
-            [
-              -11.269675,
-              14.653121
-            ],
-            [
-              -11.269675,
-              14.653121
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 90,
-          "end": 180,
+          "end": 0.74,
           "action": "write",
           "path": [
             [
@@ -20744,68 +20630,11 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Spring couplets \u00b7 long arts table"
         },
         {
-          "start": 180,
-          "end": 270,
-          "action": "conversation",
-          "path": [
-            [
-              -11.269675,
-              14.653121
-            ],
-            [
-              -11.269675,
-              14.653121
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 270,
-          "end": 360,
-          "action": "craft",
-          "path": [
-            [
-              -11.269675,
-              14.653121
-            ],
-            [
-              -11.269675,
-              14.653121
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 360,
-          "end": 450,
-          "action": "craft",
-          "path": [
-            [
-              -11.269675,
-              14.653121
-            ],
-            [
-              -11.269675,
-              14.653121
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 450,
-          "end": 540,
+          "start": 0.74,
+          "end": 144.74,
           "action": "write",
           "path": [
             [
@@ -20820,12 +20649,12 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Calligraphy \u00b7 long arts table"
         },
         {
-          "start": 540,
-          "end": 630,
-          "action": "conversation",
+          "start": 144.74,
+          "end": 288.74,
+          "action": "craft",
           "path": [
             [
               -11.269675,
@@ -20839,12 +20668,50 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Paper-cutting \u00b7 long arts table"
         },
         {
-          "start": 630,
+          "start": 288.74,
+          "end": 432.74,
+          "action": "write",
+          "path": [
+            [
+              -11.269675,
+              14.653121
+            ],
+            [
+              -11.269675,
+              14.653121
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 4.71238898038469,
+          "seated": true,
+          "title": "Ink painting \u00b7 long arts table"
+        },
+        {
+          "start": 432.74,
+          "end": 576.74,
+          "action": "craft",
+          "path": [
+            [
+              -11.269675,
+              14.653121
+            ],
+            [
+              -11.269675,
+              14.653121
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 4.71238898038469,
+          "seated": true,
+          "title": "Lantern making \u00b7 long arts table"
+        },
+        {
+          "start": 576.74,
           "end": 720,
-          "action": "craft",
+          "action": "write",
           "path": [
             [
               -11.269675,
@@ -20858,17 +20725,17 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Spring couplets \u00b7 long arts table"
         }
       ]
     },
     {
       "id": "daily-member-04",
       "profileId": "daily-member-04",
-      "label": "Arts & crafts at the long table",
+      "label": "Long arts table \u00b7 participant",
       "role": "participant",
       "variant": 103,
-      "offset": 33,
+      "offset": 1.11,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-communal-east-3",
@@ -20876,26 +20743,7 @@
       "segments": [
         {
           "start": 0,
-          "end": 90,
-          "action": "craft",
-          "path": [
-            [
-              -11.269675,
-              15.416304
-            ],
-            [
-              -11.269675,
-              15.416304
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 90,
-          "end": 180,
+          "end": 1.11,
           "action": "write",
           "path": [
             [
@@ -20910,68 +20758,11 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Spring couplets \u00b7 long arts table"
         },
         {
-          "start": 180,
-          "end": 270,
-          "action": "conversation",
-          "path": [
-            [
-              -11.269675,
-              15.416304
-            ],
-            [
-              -11.269675,
-              15.416304
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 270,
-          "end": 360,
-          "action": "craft",
-          "path": [
-            [
-              -11.269675,
-              15.416304
-            ],
-            [
-              -11.269675,
-              15.416304
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 360,
-          "end": 450,
-          "action": "craft",
-          "path": [
-            [
-              -11.269675,
-              15.416304
-            ],
-            [
-              -11.269675,
-              15.416304
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 450,
-          "end": 540,
+          "start": 1.11,
+          "end": 145.11,
           "action": "write",
           "path": [
             [
@@ -20986,12 +20777,12 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Calligraphy \u00b7 long arts table"
         },
         {
-          "start": 540,
-          "end": 630,
-          "action": "conversation",
+          "start": 145.11,
+          "end": 289.11,
+          "action": "craft",
           "path": [
             [
               -11.269675,
@@ -21005,12 +20796,50 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Paper-cutting \u00b7 long arts table"
         },
         {
-          "start": 630,
+          "start": 289.11,
+          "end": 433.11,
+          "action": "write",
+          "path": [
+            [
+              -11.269675,
+              15.416304
+            ],
+            [
+              -11.269675,
+              15.416304
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 4.71238898038469,
+          "seated": true,
+          "title": "Ink painting \u00b7 long arts table"
+        },
+        {
+          "start": 433.11,
+          "end": 577.11,
+          "action": "craft",
+          "path": [
+            [
+              -11.269675,
+              15.416304
+            ],
+            [
+              -11.269675,
+              15.416304
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 4.71238898038469,
+          "seated": true,
+          "title": "Lantern making \u00b7 long arts table"
+        },
+        {
+          "start": 577.11,
           "end": 720,
-          "action": "craft",
+          "action": "write",
           "path": [
             [
               -11.269675,
@@ -21024,17 +20853,17 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Spring couplets \u00b7 long arts table"
         }
       ]
     },
     {
       "id": "daily-member-05",
       "profileId": "daily-member-05",
-      "label": "Arts & crafts at the long table",
+      "label": "Long arts table \u00b7 participant",
       "role": "participant",
       "variant": 104,
-      "offset": 44,
+      "offset": 1.48,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-communal-east-4",
@@ -21042,26 +20871,7 @@
       "segments": [
         {
           "start": 0,
-          "end": 90,
-          "action": "craft",
-          "path": [
-            [
-              -11.269675,
-              16.230366
-            ],
-            [
-              -11.269675,
-              16.230366
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 90,
-          "end": 180,
+          "end": 1.48,
           "action": "write",
           "path": [
             [
@@ -21076,68 +20886,11 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Spring couplets \u00b7 long arts table"
         },
         {
-          "start": 180,
-          "end": 270,
-          "action": "conversation",
-          "path": [
-            [
-              -11.269675,
-              16.230366
-            ],
-            [
-              -11.269675,
-              16.230366
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 270,
-          "end": 360,
-          "action": "craft",
-          "path": [
-            [
-              -11.269675,
-              16.230366
-            ],
-            [
-              -11.269675,
-              16.230366
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 360,
-          "end": 450,
-          "action": "craft",
-          "path": [
-            [
-              -11.269675,
-              16.230366
-            ],
-            [
-              -11.269675,
-              16.230366
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 450,
-          "end": 540,
+          "start": 1.48,
+          "end": 145.48,
           "action": "write",
           "path": [
             [
@@ -21152,12 +20905,12 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Calligraphy \u00b7 long arts table"
         },
         {
-          "start": 540,
-          "end": 630,
-          "action": "conversation",
+          "start": 145.48,
+          "end": 289.48,
+          "action": "craft",
           "path": [
             [
               -11.269675,
@@ -21171,12 +20924,50 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Paper-cutting \u00b7 long arts table"
         },
         {
-          "start": 630,
+          "start": 289.48,
+          "end": 433.48,
+          "action": "write",
+          "path": [
+            [
+              -11.269675,
+              16.230366
+            ],
+            [
+              -11.269675,
+              16.230366
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 4.71238898038469,
+          "seated": true,
+          "title": "Ink painting \u00b7 long arts table"
+        },
+        {
+          "start": 433.48,
+          "end": 577.48,
+          "action": "craft",
+          "path": [
+            [
+              -11.269675,
+              16.230366
+            ],
+            [
+              -11.269675,
+              16.230366
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 4.71238898038469,
+          "seated": true,
+          "title": "Lantern making \u00b7 long arts table"
+        },
+        {
+          "start": 577.48,
           "end": 720,
-          "action": "craft",
+          "action": "write",
           "path": [
             [
               -11.269675,
@@ -21190,44 +20981,25 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Spring couplets \u00b7 long arts table"
         }
       ]
     },
     {
       "id": "daily-member-06",
       "profileId": "daily-member-06",
-      "label": "Arts & crafts at the long table",
+      "label": "Long arts table \u00b7 participant",
       "role": "participant",
       "variant": 105,
-      "offset": 55,
+      "offset": 0.0,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-communal-east-5",
       "seated": true,
       "segments": [
         {
-          "start": 0,
-          "end": 90,
-          "action": "craft",
-          "path": [
-            [
-              -11.269675,
-              16.99355
-            ],
-            [
-              -11.269675,
-              16.99355
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 90,
-          "end": 180,
+          "start": 0.0,
+          "end": 144.0,
           "action": "write",
           "path": [
             [
@@ -21242,30 +21014,11 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Calligraphy \u00b7 long arts table"
         },
         {
-          "start": 180,
-          "end": 270,
-          "action": "conversation",
-          "path": [
-            [
-              -11.269675,
-              16.99355
-            ],
-            [
-              -11.269675,
-              16.99355
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 270,
-          "end": 360,
+          "start": 144.0,
+          "end": 288.0,
           "action": "craft",
           "path": [
             [
@@ -21280,30 +21033,11 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Paper-cutting \u00b7 long arts table"
         },
         {
-          "start": 360,
-          "end": 450,
-          "action": "craft",
-          "path": [
-            [
-              -11.269675,
-              16.99355
-            ],
-            [
-              -11.269675,
-              16.99355
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 450,
-          "end": 540,
+          "start": 288.0,
+          "end": 432.0,
           "action": "write",
           "path": [
             [
@@ -21318,30 +21052,11 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Ink painting \u00b7 long arts table"
         },
         {
-          "start": 540,
-          "end": 630,
-          "action": "conversation",
-          "path": [
-            [
-              -11.269675,
-              16.99355
-            ],
-            [
-              -11.269675,
-              16.99355
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 4.71238898038469,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 630,
-          "end": 720,
+          "start": 432.0,
+          "end": 576.0,
           "action": "craft",
           "path": [
             [
@@ -21356,183 +21071,202 @@
           "zoneId": "day",
           "heading": 4.71238898038469,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Lantern making \u00b7 long arts table"
+        },
+        {
+          "start": 576.0,
+          "end": 720.0,
+          "action": "write",
+          "path": [
+            [
+              -11.269675,
+              16.99355
+            ],
+            [
+              -11.269675,
+              16.99355
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 4.71238898038469,
+          "seated": true,
+          "title": "Spring couplets \u00b7 long arts table"
         }
       ]
     },
     {
       "id": "daily-member-07",
       "profileId": "daily-member-07",
-      "label": "Arts & crafts at the long table",
+      "label": "Small-group conversation",
       "role": "participant",
       "variant": 106,
       "offset": 66,
       "levelId": "ground",
       "roomId": "day-open",
-      "seatId": "day-communal-north",
+      "seatId": "day-tree-chair-2-1",
       "seated": true,
       "segments": [
         {
           "start": 0,
           "end": 90,
-          "action": "craft",
+          "action": "conversation",
           "path": [
             [
-              -12.007418,
-              12.261813
+              -5.80911482835009,
+              13.51529053996323
             ],
             [
-              -12.007418,
-              12.261813
+              -5.80911482835009,
+              13.51529053996323
             ]
           ],
           "zoneId": "day",
-          "heading": 6.283185307179586,
+          "heading": 0.7853981633974483,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Small-group conversation"
         },
         {
           "start": 90,
           "end": 180,
-          "action": "write",
+          "action": "listen",
           "path": [
             [
-              -12.007418,
-              12.261813
+              -5.80911482835009,
+              13.51529053996323
             ],
             [
-              -12.007418,
-              12.261813
+              -5.80911482835009,
+              13.51529053996323
             ]
           ],
           "zoneId": "day",
-          "heading": 6.283185307179586,
+          "heading": 0.7853981633974483,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Small-group conversation"
         },
         {
           "start": 180,
           "end": 270,
-          "action": "conversation",
+          "action": "greet",
           "path": [
             [
-              -12.007418,
-              12.261813
+              -5.80911482835009,
+              13.51529053996323
             ],
             [
-              -12.007418,
-              12.261813
+              -5.80911482835009,
+              13.51529053996323
             ]
           ],
           "zoneId": "day",
-          "heading": 6.283185307179586,
+          "heading": 0.7853981633974483,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Small-group conversation"
         },
         {
           "start": 270,
           "end": 360,
-          "action": "craft",
+          "action": "conversation",
           "path": [
             [
-              -12.007418,
-              12.261813
+              -5.80911482835009,
+              13.51529053996323
             ],
             [
-              -12.007418,
-              12.261813
+              -5.80911482835009,
+              13.51529053996323
             ]
           ],
           "zoneId": "day",
-          "heading": 6.283185307179586,
+          "heading": 0.7853981633974483,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Small-group conversation"
         },
         {
           "start": 360,
           "end": 450,
-          "action": "craft",
+          "action": "conversation",
           "path": [
             [
-              -12.007418,
-              12.261813
+              -5.80911482835009,
+              13.51529053996323
             ],
             [
-              -12.007418,
-              12.261813
+              -5.80911482835009,
+              13.51529053996323
             ]
           ],
           "zoneId": "day",
-          "heading": 6.283185307179586,
+          "heading": 0.7853981633974483,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Small-group conversation"
         },
         {
           "start": 450,
           "end": 540,
-          "action": "write",
+          "action": "listen",
           "path": [
             [
-              -12.007418,
-              12.261813
+              -5.80911482835009,
+              13.51529053996323
             ],
             [
-              -12.007418,
-              12.261813
+              -5.80911482835009,
+              13.51529053996323
             ]
           ],
           "zoneId": "day",
-          "heading": 6.283185307179586,
+          "heading": 0.7853981633974483,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Small-group conversation"
         },
         {
           "start": 540,
           "end": 630,
-          "action": "conversation",
+          "action": "greet",
           "path": [
             [
-              -12.007418,
-              12.261813
+              -5.80911482835009,
+              13.51529053996323
             ],
             [
-              -12.007418,
-              12.261813
+              -5.80911482835009,
+              13.51529053996323
             ]
           ],
           "zoneId": "day",
-          "heading": 6.283185307179586,
+          "heading": 0.7853981633974483,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Small-group conversation"
         },
         {
           "start": 630,
           "end": 720,
-          "action": "craft",
+          "action": "conversation",
           "path": [
             [
-              -12.007418,
-              12.261813
+              -5.80911482835009,
+              13.51529053996323
             ],
             [
-              -12.007418,
-              12.261813
+              -5.80911482835009,
+              13.51529053996323
             ]
           ],
           "zoneId": "day",
-          "heading": 6.283185307179586,
+          "heading": 0.7853981633974483,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Small-group conversation"
         }
       ]
     },
     {
       "id": "daily-member-08",
       "profileId": "daily-member-08",
-      "label": "Arts & crafts at the long table",
+      "label": "Long arts table \u00b7 participant",
       "role": "participant",
       "variant": 107,
-      "offset": 77,
+      "offset": 0.37,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-communal-south",
@@ -21540,26 +21274,7 @@
       "segments": [
         {
           "start": 0,
-          "end": 90,
-          "action": "craft",
-          "path": [
-            [
-              -12.007418,
-              17.705854
-            ],
-            [
-              -12.007418,
-              17.705854
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 3.141592653589793,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 90,
-          "end": 180,
+          "end": 0.37,
           "action": "write",
           "path": [
             [
@@ -21574,68 +21289,11 @@
           "zoneId": "day",
           "heading": 3.141592653589793,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Spring couplets \u00b7 long arts table"
         },
         {
-          "start": 180,
-          "end": 270,
-          "action": "conversation",
-          "path": [
-            [
-              -12.007418,
-              17.705854
-            ],
-            [
-              -12.007418,
-              17.705854
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 3.141592653589793,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 270,
-          "end": 360,
-          "action": "craft",
-          "path": [
-            [
-              -12.007418,
-              17.705854
-            ],
-            [
-              -12.007418,
-              17.705854
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 3.141592653589793,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 360,
-          "end": 450,
-          "action": "craft",
-          "path": [
-            [
-              -12.007418,
-              17.705854
-            ],
-            [
-              -12.007418,
-              17.705854
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 3.141592653589793,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 450,
-          "end": 540,
+          "start": 0.37,
+          "end": 144.37,
           "action": "write",
           "path": [
             [
@@ -21650,12 +21308,12 @@
           "zoneId": "day",
           "heading": 3.141592653589793,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Calligraphy \u00b7 long arts table"
         },
         {
-          "start": 540,
-          "end": 630,
-          "action": "conversation",
+          "start": 144.37,
+          "end": 288.37,
+          "action": "craft",
           "path": [
             [
               -12.007418,
@@ -21669,12 +21327,50 @@
           "zoneId": "day",
           "heading": 3.141592653589793,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Paper-cutting \u00b7 long arts table"
         },
         {
-          "start": 630,
+          "start": 288.37,
+          "end": 432.37,
+          "action": "write",
+          "path": [
+            [
+              -12.007418,
+              17.705854
+            ],
+            [
+              -12.007418,
+              17.705854
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 3.141592653589793,
+          "seated": true,
+          "title": "Ink painting \u00b7 long arts table"
+        },
+        {
+          "start": 432.37,
+          "end": 576.37,
+          "action": "craft",
+          "path": [
+            [
+              -12.007418,
+              17.705854
+            ],
+            [
+              -12.007418,
+              17.705854
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 3.141592653589793,
+          "seated": true,
+          "title": "Lantern making \u00b7 long arts table"
+        },
+        {
+          "start": 576.37,
           "end": 720,
-          "action": "craft",
+          "action": "write",
           "path": [
             [
               -12.007418,
@@ -21688,17 +21384,17 @@
           "zoneId": "day",
           "heading": 3.141592653589793,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Spring couplets \u00b7 long arts table"
         }
       ]
     },
     {
       "id": "daily-member-09",
       "profileId": "daily-member-09",
-      "label": "Arts & crafts at the long table",
+      "label": "Long arts table \u00b7 participant",
       "role": "participant",
       "variant": 108,
-      "offset": 88,
+      "offset": 0.74,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-communal-west-0",
@@ -21706,26 +21402,7 @@
       "segments": [
         {
           "start": 0,
-          "end": 90,
-          "action": "craft",
-          "path": [
-            [
-              -12.745162,
-              13.075875
-            ],
-            [
-              -12.745162,
-              13.075875
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 90,
-          "end": 180,
+          "end": 0.74,
           "action": "write",
           "path": [
             [
@@ -21740,68 +21417,11 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Spring couplets \u00b7 long arts table"
         },
         {
-          "start": 180,
-          "end": 270,
-          "action": "conversation",
-          "path": [
-            [
-              -12.745162,
-              13.075875
-            ],
-            [
-              -12.745162,
-              13.075875
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 270,
-          "end": 360,
-          "action": "craft",
-          "path": [
-            [
-              -12.745162,
-              13.075875
-            ],
-            [
-              -12.745162,
-              13.075875
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 360,
-          "end": 450,
-          "action": "craft",
-          "path": [
-            [
-              -12.745162,
-              13.075875
-            ],
-            [
-              -12.745162,
-              13.075875
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 450,
-          "end": 540,
+          "start": 0.74,
+          "end": 144.74,
           "action": "write",
           "path": [
             [
@@ -21816,12 +21436,12 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Calligraphy \u00b7 long arts table"
         },
         {
-          "start": 540,
-          "end": 630,
-          "action": "conversation",
+          "start": 144.74,
+          "end": 288.74,
+          "action": "craft",
           "path": [
             [
               -12.745162,
@@ -21835,12 +21455,50 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Paper-cutting \u00b7 long arts table"
         },
         {
-          "start": 630,
+          "start": 288.74,
+          "end": 432.74,
+          "action": "write",
+          "path": [
+            [
+              -12.745162,
+              13.075875
+            ],
+            [
+              -12.745162,
+              13.075875
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 1.5707963267948966,
+          "seated": true,
+          "title": "Ink painting \u00b7 long arts table"
+        },
+        {
+          "start": 432.74,
+          "end": 576.74,
+          "action": "craft",
+          "path": [
+            [
+              -12.745162,
+              13.075875
+            ],
+            [
+              -12.745162,
+              13.075875
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 1.5707963267948966,
+          "seated": true,
+          "title": "Lantern making \u00b7 long arts table"
+        },
+        {
+          "start": 576.74,
           "end": 720,
-          "action": "craft",
+          "action": "write",
           "path": [
             [
               -12.745162,
@@ -21854,17 +21512,17 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Spring couplets \u00b7 long arts table"
         }
       ]
     },
     {
       "id": "daily-member-10",
       "profileId": "daily-member-10",
-      "label": "Arts & crafts at the long table",
+      "label": "Long arts table \u00b7 participant",
       "role": "participant",
       "variant": 109,
-      "offset": 9,
+      "offset": 1.11,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-communal-west-1",
@@ -21872,26 +21530,7 @@
       "segments": [
         {
           "start": 0,
-          "end": 90,
-          "action": "craft",
-          "path": [
-            [
-              -12.745162,
-              13.889937
-            ],
-            [
-              -12.745162,
-              13.889937
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 90,
-          "end": 180,
+          "end": 1.11,
           "action": "write",
           "path": [
             [
@@ -21906,68 +21545,11 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Spring couplets \u00b7 long arts table"
         },
         {
-          "start": 180,
-          "end": 270,
-          "action": "conversation",
-          "path": [
-            [
-              -12.745162,
-              13.889937
-            ],
-            [
-              -12.745162,
-              13.889937
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 270,
-          "end": 360,
-          "action": "craft",
-          "path": [
-            [
-              -12.745162,
-              13.889937
-            ],
-            [
-              -12.745162,
-              13.889937
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 360,
-          "end": 450,
-          "action": "craft",
-          "path": [
-            [
-              -12.745162,
-              13.889937
-            ],
-            [
-              -12.745162,
-              13.889937
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 450,
-          "end": 540,
+          "start": 1.11,
+          "end": 145.11,
           "action": "write",
           "path": [
             [
@@ -21982,12 +21564,12 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Calligraphy \u00b7 long arts table"
         },
         {
-          "start": 540,
-          "end": 630,
-          "action": "conversation",
+          "start": 145.11,
+          "end": 289.11,
+          "action": "craft",
           "path": [
             [
               -12.745162,
@@ -22001,12 +21583,50 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Paper-cutting \u00b7 long arts table"
         },
         {
-          "start": 630,
+          "start": 289.11,
+          "end": 433.11,
+          "action": "write",
+          "path": [
+            [
+              -12.745162,
+              13.889937
+            ],
+            [
+              -12.745162,
+              13.889937
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 1.5707963267948966,
+          "seated": true,
+          "title": "Ink painting \u00b7 long arts table"
+        },
+        {
+          "start": 433.11,
+          "end": 577.11,
+          "action": "craft",
+          "path": [
+            [
+              -12.745162,
+              13.889937
+            ],
+            [
+              -12.745162,
+              13.889937
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 1.5707963267948966,
+          "seated": true,
+          "title": "Lantern making \u00b7 long arts table"
+        },
+        {
+          "start": 577.11,
           "end": 720,
-          "action": "craft",
+          "action": "write",
           "path": [
             [
               -12.745162,
@@ -22020,17 +21640,17 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Spring couplets \u00b7 long arts table"
         }
       ]
     },
     {
       "id": "daily-member-11",
       "profileId": "daily-member-11",
-      "label": "Arts & crafts at the long table",
+      "label": "Long arts table \u00b7 participant",
       "role": "participant",
       "variant": 110,
-      "offset": 20,
+      "offset": 1.48,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-communal-west-2",
@@ -22038,26 +21658,7 @@
       "segments": [
         {
           "start": 0,
-          "end": 90,
-          "action": "craft",
-          "path": [
-            [
-              -12.745162,
-              14.653121
-            ],
-            [
-              -12.745162,
-              14.653121
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 90,
-          "end": 180,
+          "end": 1.48,
           "action": "write",
           "path": [
             [
@@ -22072,68 +21673,11 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Spring couplets \u00b7 long arts table"
         },
         {
-          "start": 180,
-          "end": 270,
-          "action": "conversation",
-          "path": [
-            [
-              -12.745162,
-              14.653121
-            ],
-            [
-              -12.745162,
-              14.653121
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 270,
-          "end": 360,
-          "action": "craft",
-          "path": [
-            [
-              -12.745162,
-              14.653121
-            ],
-            [
-              -12.745162,
-              14.653121
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 360,
-          "end": 450,
-          "action": "craft",
-          "path": [
-            [
-              -12.745162,
-              14.653121
-            ],
-            [
-              -12.745162,
-              14.653121
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 450,
-          "end": 540,
+          "start": 1.48,
+          "end": 145.48,
           "action": "write",
           "path": [
             [
@@ -22148,12 +21692,12 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Calligraphy \u00b7 long arts table"
         },
         {
-          "start": 540,
-          "end": 630,
-          "action": "conversation",
+          "start": 145.48,
+          "end": 289.48,
+          "action": "craft",
           "path": [
             [
               -12.745162,
@@ -22167,12 +21711,50 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Paper-cutting \u00b7 long arts table"
         },
         {
-          "start": 630,
+          "start": 289.48,
+          "end": 433.48,
+          "action": "write",
+          "path": [
+            [
+              -12.745162,
+              14.653121
+            ],
+            [
+              -12.745162,
+              14.653121
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 1.5707963267948966,
+          "seated": true,
+          "title": "Ink painting \u00b7 long arts table"
+        },
+        {
+          "start": 433.48,
+          "end": 577.48,
+          "action": "craft",
+          "path": [
+            [
+              -12.745162,
+              14.653121
+            ],
+            [
+              -12.745162,
+              14.653121
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 1.5707963267948966,
+          "seated": true,
+          "title": "Lantern making \u00b7 long arts table"
+        },
+        {
+          "start": 577.48,
           "end": 720,
-          "action": "craft",
+          "action": "write",
           "path": [
             [
               -12.745162,
@@ -22186,44 +21768,25 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Spring couplets \u00b7 long arts table"
         }
       ]
     },
     {
       "id": "daily-member-12",
       "profileId": "daily-member-12",
-      "label": "Arts & crafts at the long table",
+      "label": "Long arts table \u00b7 participant",
       "role": "participant",
       "variant": 111,
-      "offset": 31,
+      "offset": 0.0,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-communal-west-3",
       "seated": true,
       "segments": [
         {
-          "start": 0,
-          "end": 90,
-          "action": "craft",
-          "path": [
-            [
-              -12.745162,
-              15.416304
-            ],
-            [
-              -12.745162,
-              15.416304
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 90,
-          "end": 180,
+          "start": 0.0,
+          "end": 144.0,
           "action": "write",
           "path": [
             [
@@ -22238,30 +21801,11 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Calligraphy \u00b7 long arts table"
         },
         {
-          "start": 180,
-          "end": 270,
-          "action": "conversation",
-          "path": [
-            [
-              -12.745162,
-              15.416304
-            ],
-            [
-              -12.745162,
-              15.416304
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 270,
-          "end": 360,
+          "start": 144.0,
+          "end": 288.0,
           "action": "craft",
           "path": [
             [
@@ -22276,30 +21820,11 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Paper-cutting \u00b7 long arts table"
         },
         {
-          "start": 360,
-          "end": 450,
-          "action": "craft",
-          "path": [
-            [
-              -12.745162,
-              15.416304
-            ],
-            [
-              -12.745162,
-              15.416304
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 450,
-          "end": 540,
+          "start": 288.0,
+          "end": 432.0,
           "action": "write",
           "path": [
             [
@@ -22314,30 +21839,11 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Ink painting \u00b7 long arts table"
         },
         {
-          "start": 540,
-          "end": 630,
-          "action": "conversation",
-          "path": [
-            [
-              -12.745162,
-              15.416304
-            ],
-            [
-              -12.745162,
-              15.416304
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 630,
-          "end": 720,
+          "start": 432.0,
+          "end": 576.0,
           "action": "craft",
           "path": [
             [
@@ -22352,17 +21858,36 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Lantern making \u00b7 long arts table"
+        },
+        {
+          "start": 576.0,
+          "end": 720.0,
+          "action": "write",
+          "path": [
+            [
+              -12.745162,
+              15.416304
+            ],
+            [
+              -12.745162,
+              15.416304
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 1.5707963267948966,
+          "seated": true,
+          "title": "Spring couplets \u00b7 long arts table"
         }
       ]
     },
     {
       "id": "daily-member-13",
       "profileId": "daily-member-13",
-      "label": "Arts & crafts at the long table",
+      "label": "Long arts table \u00b7 participant",
       "role": "participant",
       "variant": 112,
-      "offset": 42,
+      "offset": 0.37,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-communal-west-4",
@@ -22370,26 +21895,7 @@
       "segments": [
         {
           "start": 0,
-          "end": 90,
-          "action": "craft",
-          "path": [
-            [
-              -12.745162,
-              16.230366
-            ],
-            [
-              -12.745162,
-              16.230366
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 90,
-          "end": 180,
+          "end": 0.37,
           "action": "write",
           "path": [
             [
@@ -22404,68 +21910,11 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Spring couplets \u00b7 long arts table"
         },
         {
-          "start": 180,
-          "end": 270,
-          "action": "conversation",
-          "path": [
-            [
-              -12.745162,
-              16.230366
-            ],
-            [
-              -12.745162,
-              16.230366
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 270,
-          "end": 360,
-          "action": "craft",
-          "path": [
-            [
-              -12.745162,
-              16.230366
-            ],
-            [
-              -12.745162,
-              16.230366
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 360,
-          "end": 450,
-          "action": "craft",
-          "path": [
-            [
-              -12.745162,
-              16.230366
-            ],
-            [
-              -12.745162,
-              16.230366
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 450,
-          "end": 540,
+          "start": 0.37,
+          "end": 144.37,
           "action": "write",
           "path": [
             [
@@ -22480,12 +21929,12 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Calligraphy \u00b7 long arts table"
         },
         {
-          "start": 540,
-          "end": 630,
-          "action": "conversation",
+          "start": 144.37,
+          "end": 288.37,
+          "action": "craft",
           "path": [
             [
               -12.745162,
@@ -22499,12 +21948,50 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Paper-cutting \u00b7 long arts table"
         },
         {
-          "start": 630,
+          "start": 288.37,
+          "end": 432.37,
+          "action": "write",
+          "path": [
+            [
+              -12.745162,
+              16.230366
+            ],
+            [
+              -12.745162,
+              16.230366
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 1.5707963267948966,
+          "seated": true,
+          "title": "Ink painting \u00b7 long arts table"
+        },
+        {
+          "start": 432.37,
+          "end": 576.37,
+          "action": "craft",
+          "path": [
+            [
+              -12.745162,
+              16.230366
+            ],
+            [
+              -12.745162,
+              16.230366
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 1.5707963267948966,
+          "seated": true,
+          "title": "Lantern making \u00b7 long arts table"
+        },
+        {
+          "start": 576.37,
           "end": 720,
-          "action": "craft",
+          "action": "write",
           "path": [
             [
               -12.745162,
@@ -22518,17 +22005,17 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Spring couplets \u00b7 long arts table"
         }
       ]
     },
     {
       "id": "daily-member-14",
       "profileId": "daily-member-14",
-      "label": "Arts & crafts at the long table",
+      "label": "Long arts table \u00b7 participant",
       "role": "participant",
       "variant": 113,
-      "offset": 53,
+      "offset": 0.74,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-communal-west-5",
@@ -22536,26 +22023,7 @@
       "segments": [
         {
           "start": 0,
-          "end": 90,
-          "action": "craft",
-          "path": [
-            [
-              -12.745162,
-              16.99355
-            ],
-            [
-              -12.745162,
-              16.99355
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 90,
-          "end": 180,
+          "end": 0.74,
           "action": "write",
           "path": [
             [
@@ -22570,68 +22038,11 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Spring couplets \u00b7 long arts table"
         },
         {
-          "start": 180,
-          "end": 270,
-          "action": "conversation",
-          "path": [
-            [
-              -12.745162,
-              16.99355
-            ],
-            [
-              -12.745162,
-              16.99355
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 270,
-          "end": 360,
-          "action": "craft",
-          "path": [
-            [
-              -12.745162,
-              16.99355
-            ],
-            [
-              -12.745162,
-              16.99355
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 360,
-          "end": 450,
-          "action": "craft",
-          "path": [
-            [
-              -12.745162,
-              16.99355
-            ],
-            [
-              -12.745162,
-              16.99355
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Arts & crafts at the long table"
-        },
-        {
-          "start": 450,
-          "end": 540,
+          "start": 0.74,
+          "end": 144.74,
           "action": "write",
           "path": [
             [
@@ -22646,12 +22057,12 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Calligraphy \u00b7 long arts table"
         },
         {
-          "start": 540,
-          "end": 630,
-          "action": "conversation",
+          "start": 144.74,
+          "end": 288.74,
+          "action": "craft",
           "path": [
             [
               -12.745162,
@@ -22665,12 +22076,50 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Paper-cutting \u00b7 long arts table"
         },
         {
-          "start": 630,
+          "start": 288.74,
+          "end": 432.74,
+          "action": "write",
+          "path": [
+            [
+              -12.745162,
+              16.99355
+            ],
+            [
+              -12.745162,
+              16.99355
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 1.5707963267948966,
+          "seated": true,
+          "title": "Ink painting \u00b7 long arts table"
+        },
+        {
+          "start": 432.74,
+          "end": 576.74,
+          "action": "craft",
+          "path": [
+            [
+              -12.745162,
+              16.99355
+            ],
+            [
+              -12.745162,
+              16.99355
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 1.5707963267948966,
+          "seated": true,
+          "title": "Lantern making \u00b7 long arts table"
+        },
+        {
+          "start": 576.74,
           "end": 720,
-          "action": "craft",
+          "action": "write",
           "path": [
             [
               -12.745162,
@@ -22684,63 +22133,25 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Arts & crafts at the long table"
+          "title": "Spring couplets \u00b7 long arts table"
         }
       ]
     },
     {
       "id": "daily-member-15",
       "profileId": "daily-member-15",
-      "label": "Tea & conversation",
+      "label": "Tea corner \u00b7 participant",
       "role": "participant",
       "variant": 114,
-      "offset": 64,
+      "offset": 0.0,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-banquette-table-01-chair-1",
       "seated": true,
       "segments": [
         {
-          "start": 0,
-          "end": 90,
-          "action": "conversation",
-          "path": [
-            [
-              -2.416747,
-              10.684567
-            ],
-            [
-              -2.416747,
-              10.684567
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 90,
-          "end": 180,
-          "action": "tabletop",
-          "path": [
-            [
-              -2.416747,
-              10.684567
-            ],
-            [
-              -2.416747,
-              10.684567
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 180,
-          "end": 270,
+          "start": 0.0,
+          "end": 360.0,
           "action": "listen",
           "path": [
             [
@@ -22755,12 +22166,12 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Tea & conversation"
+          "title": "Morning tea & papers \u00b7 tea corner"
         },
         {
-          "start": 270,
-          "end": 360,
-          "action": "conversation",
+          "start": 360.0,
+          "end": 720.0,
+          "action": "tea",
           "path": [
             [
               -2.416747,
@@ -22774,93 +22185,17 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 360,
-          "end": 450,
-          "action": "conversation",
-          "path": [
-            [
-              -2.416747,
-              10.684567
-            ],
-            [
-              -2.416747,
-              10.684567
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 450,
-          "end": 540,
-          "action": "tabletop",
-          "path": [
-            [
-              -2.416747,
-              10.684567
-            ],
-            [
-              -2.416747,
-              10.684567
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 540,
-          "end": 630,
-          "action": "listen",
-          "path": [
-            [
-              -2.416747,
-              10.684567
-            ],
-            [
-              -2.416747,
-              10.684567
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 630,
-          "end": 720,
-          "action": "conversation",
-          "path": [
-            [
-              -2.416747,
-              10.684567
-            ],
-            [
-              -2.416747,
-              10.684567
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
+          "title": "Gongfu tea \u00b7 tea corner"
         }
       ]
     },
     {
       "id": "daily-member-16",
       "profileId": "daily-member-16",
-      "label": "Tea & conversation",
+      "label": "Tea corner \u00b7 participant",
       "role": "participant",
       "variant": 115,
-      "offset": 75,
+      "offset": 0.37,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-banquette-table-01-chair-2",
@@ -22868,8 +22203,8 @@
       "segments": [
         {
           "start": 0,
-          "end": 90,
-          "action": "conversation",
+          "end": 0.37,
+          "action": "tea",
           "path": [
             [
               -2.416747,
@@ -22883,30 +22218,11 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Tea & conversation"
+          "title": "Gongfu tea \u00b7 tea corner"
         },
         {
-          "start": 90,
-          "end": 180,
-          "action": "tabletop",
-          "path": [
-            [
-              -2.416747,
-              11.345993
-            ],
-            [
-              -2.416747,
-              11.345993
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 180,
-          "end": 270,
+          "start": 0.37,
+          "end": 360.37,
           "action": "listen",
           "path": [
             [
@@ -22921,88 +22237,12 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Tea & conversation"
+          "title": "Morning tea & papers \u00b7 tea corner"
         },
         {
-          "start": 270,
-          "end": 360,
-          "action": "conversation",
-          "path": [
-            [
-              -2.416747,
-              11.345993
-            ],
-            [
-              -2.416747,
-              11.345993
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 360,
-          "end": 450,
-          "action": "conversation",
-          "path": [
-            [
-              -2.416747,
-              11.345993
-            ],
-            [
-              -2.416747,
-              11.345993
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 450,
-          "end": 540,
-          "action": "tabletop",
-          "path": [
-            [
-              -2.416747,
-              11.345993
-            ],
-            [
-              -2.416747,
-              11.345993
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 540,
-          "end": 630,
-          "action": "listen",
-          "path": [
-            [
-              -2.416747,
-              11.345993
-            ],
-            [
-              -2.416747,
-              11.345993
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 630,
+          "start": 360.37,
           "end": 720,
-          "action": "conversation",
+          "action": "tea",
           "path": [
             [
               -2.416747,
@@ -23016,17 +22256,17 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Tea & conversation"
+          "title": "Gongfu tea \u00b7 tea corner"
         }
       ]
     },
     {
       "id": "daily-member-17",
       "profileId": "daily-member-17",
-      "label": "Tea & conversation",
+      "label": "Tea corner \u00b7 participant",
       "role": "participant",
       "variant": 116,
-      "offset": 86,
+      "offset": 0.74,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-banquette-table-02-chair-1",
@@ -23034,8 +22274,8 @@
       "segments": [
         {
           "start": 0,
-          "end": 90,
-          "action": "conversation",
+          "end": 0.74,
+          "action": "tea",
           "path": [
             [
               -2.416747,
@@ -23049,30 +22289,11 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Tea & conversation"
+          "title": "Gongfu tea \u00b7 tea corner"
         },
         {
-          "start": 90,
-          "end": 180,
-          "action": "tabletop",
-          "path": [
-            [
-              -2.416747,
-              12.770602
-            ],
-            [
-              -2.416747,
-              12.770602
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 180,
-          "end": 270,
+          "start": 0.74,
+          "end": 360.74,
           "action": "listen",
           "path": [
             [
@@ -23087,88 +22308,12 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Tea & conversation"
+          "title": "Morning tea & papers \u00b7 tea corner"
         },
         {
-          "start": 270,
-          "end": 360,
-          "action": "conversation",
-          "path": [
-            [
-              -2.416747,
-              12.770602
-            ],
-            [
-              -2.416747,
-              12.770602
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 360,
-          "end": 450,
-          "action": "conversation",
-          "path": [
-            [
-              -2.416747,
-              12.770602
-            ],
-            [
-              -2.416747,
-              12.770602
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 450,
-          "end": 540,
-          "action": "tabletop",
-          "path": [
-            [
-              -2.416747,
-              12.770602
-            ],
-            [
-              -2.416747,
-              12.770602
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 540,
-          "end": 630,
-          "action": "listen",
-          "path": [
-            [
-              -2.416747,
-              12.770602
-            ],
-            [
-              -2.416747,
-              12.770602
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 630,
+          "start": 360.74,
           "end": 720,
-          "action": "conversation",
+          "action": "tea",
           "path": [
             [
               -2.416747,
@@ -23182,17 +22327,17 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Tea & conversation"
+          "title": "Gongfu tea \u00b7 tea corner"
         }
       ]
     },
     {
       "id": "daily-member-18",
       "profileId": "daily-member-18",
-      "label": "Tea & conversation",
+      "label": "Tea corner \u00b7 participant",
       "role": "participant",
       "variant": 117,
-      "offset": 7,
+      "offset": 1.11,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-banquette-table-02-chair-2",
@@ -23200,8 +22345,8 @@
       "segments": [
         {
           "start": 0,
-          "end": 90,
-          "action": "conversation",
+          "end": 1.11,
+          "action": "tea",
           "path": [
             [
               -2.416747,
@@ -23215,30 +22360,11 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Tea & conversation"
+          "title": "Gongfu tea \u00b7 tea corner"
         },
         {
-          "start": 90,
-          "end": 180,
-          "action": "tabletop",
-          "path": [
-            [
-              -2.416747,
-              13.432027
-            ],
-            [
-              -2.416747,
-              13.432027
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 180,
-          "end": 270,
+          "start": 1.11,
+          "end": 361.11,
           "action": "listen",
           "path": [
             [
@@ -23253,88 +22379,12 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Tea & conversation"
+          "title": "Morning tea & papers \u00b7 tea corner"
         },
         {
-          "start": 270,
-          "end": 360,
-          "action": "conversation",
-          "path": [
-            [
-              -2.416747,
-              13.432027
-            ],
-            [
-              -2.416747,
-              13.432027
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 360,
-          "end": 450,
-          "action": "conversation",
-          "path": [
-            [
-              -2.416747,
-              13.432027
-            ],
-            [
-              -2.416747,
-              13.432027
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 450,
-          "end": 540,
-          "action": "tabletop",
-          "path": [
-            [
-              -2.416747,
-              13.432027
-            ],
-            [
-              -2.416747,
-              13.432027
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 540,
-          "end": 630,
-          "action": "listen",
-          "path": [
-            [
-              -2.416747,
-              13.432027
-            ],
-            [
-              -2.416747,
-              13.432027
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 630,
+          "start": 361.11,
           "end": 720,
-          "action": "conversation",
+          "action": "tea",
           "path": [
             [
               -2.416747,
@@ -23348,17 +22398,17 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Tea & conversation"
+          "title": "Gongfu tea \u00b7 tea corner"
         }
       ]
     },
     {
       "id": "daily-member-19",
       "profileId": "daily-member-19",
-      "label": "Tea & conversation",
+      "label": "Tea corner \u00b7 participant",
       "role": "participant",
       "variant": 118,
-      "offset": 18,
+      "offset": 1.48,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-banquette-table-03-chair-1",
@@ -23366,8 +22416,8 @@
       "segments": [
         {
           "start": 0,
-          "end": 90,
-          "action": "conversation",
+          "end": 1.48,
+          "action": "tea",
           "path": [
             [
               -2.416747,
@@ -23381,30 +22431,11 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Tea & conversation"
+          "title": "Gongfu tea \u00b7 tea corner"
         },
         {
-          "start": 90,
-          "end": 180,
-          "action": "tabletop",
-          "path": [
-            [
-              -2.416747,
-              14.856636
-            ],
-            [
-              -2.416747,
-              14.856636
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 180,
-          "end": 270,
+          "start": 1.48,
+          "end": 361.48,
           "action": "listen",
           "path": [
             [
@@ -23419,88 +22450,12 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Tea & conversation"
+          "title": "Morning tea & papers \u00b7 tea corner"
         },
         {
-          "start": 270,
-          "end": 360,
-          "action": "conversation",
-          "path": [
-            [
-              -2.416747,
-              14.856636
-            ],
-            [
-              -2.416747,
-              14.856636
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 360,
-          "end": 450,
-          "action": "conversation",
-          "path": [
-            [
-              -2.416747,
-              14.856636
-            ],
-            [
-              -2.416747,
-              14.856636
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 450,
-          "end": 540,
-          "action": "tabletop",
-          "path": [
-            [
-              -2.416747,
-              14.856636
-            ],
-            [
-              -2.416747,
-              14.856636
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 540,
-          "end": 630,
-          "action": "listen",
-          "path": [
-            [
-              -2.416747,
-              14.856636
-            ],
-            [
-              -2.416747,
-              14.856636
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 630,
+          "start": 361.48,
           "end": 720,
-          "action": "conversation",
+          "action": "tea",
           "path": [
             [
               -2.416747,
@@ -23514,63 +22469,25 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Tea & conversation"
+          "title": "Gongfu tea \u00b7 tea corner"
         }
       ]
     },
     {
       "id": "daily-member-20",
       "profileId": "daily-member-20",
-      "label": "Tea & conversation",
+      "label": "Tea corner \u00b7 participant",
       "role": "participant",
       "variant": 119,
-      "offset": 29,
+      "offset": 0.0,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-banquette-table-03-chair-2",
       "seated": true,
       "segments": [
         {
-          "start": 0,
-          "end": 90,
-          "action": "conversation",
-          "path": [
-            [
-              -2.416747,
-              15.518062
-            ],
-            [
-              -2.416747,
-              15.518062
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 90,
-          "end": 180,
-          "action": "tabletop",
-          "path": [
-            [
-              -2.416747,
-              15.518062
-            ],
-            [
-              -2.416747,
-              15.518062
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 180,
-          "end": 270,
+          "start": 0.0,
+          "end": 360.0,
           "action": "listen",
           "path": [
             [
@@ -23585,12 +22502,12 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Tea & conversation"
+          "title": "Morning tea & papers \u00b7 tea corner"
         },
         {
-          "start": 270,
-          "end": 360,
-          "action": "conversation",
+          "start": 360.0,
+          "end": 720.0,
+          "action": "tea",
           "path": [
             [
               -2.416747,
@@ -23604,83 +22521,7 @@
           "zoneId": "day",
           "heading": 1.5707963267948966,
           "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 360,
-          "end": 450,
-          "action": "conversation",
-          "path": [
-            [
-              -2.416747,
-              15.518062
-            ],
-            [
-              -2.416747,
-              15.518062
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 450,
-          "end": 540,
-          "action": "tabletop",
-          "path": [
-            [
-              -2.416747,
-              15.518062
-            ],
-            [
-              -2.416747,
-              15.518062
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 540,
-          "end": 630,
-          "action": "listen",
-          "path": [
-            [
-              -2.416747,
-              15.518062
-            ],
-            [
-              -2.416747,
-              15.518062
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
-        },
-        {
-          "start": 630,
-          "end": 720,
-          "action": "conversation",
-          "path": [
-            [
-              -2.416747,
-              15.518062
-            ],
-            [
-              -2.416747,
-              15.518062
-            ]
-          ],
-          "zoneId": "day",
-          "heading": 1.5707963267948966,
-          "seated": true,
-          "title": "Tea & conversation"
+          "title": "Gongfu tea \u00b7 tea corner"
         }
       ]
     },
@@ -31805,6 +30646,688 @@
           "title": "Delivery route"
         }
       ]
+    },
+    {
+      "id": "instructor-opera",
+      "role": "instructor",
+      "variant": 200,
+      "label": "Ms. Leung \u00b7 Cantonese opera performer",
+      "offset": 0,
+      "levelId": "ground",
+      "roomId": "day-open",
+      "segments": [
+        {
+          "start": 0,
+          "end": 72,
+          "action": "opera",
+          "path": [
+            [
+              -5.6,
+              10.7
+            ],
+            [
+              -5.6,
+              10.7
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "seated": false,
+          "title": "Cantonese opera \u7cb5\u5287 \u00b7 Ms. Leung leads"
+        },
+        {
+          "start": 72,
+          "end": 720,
+          "action": "idle",
+          "path": [
+            [
+              -5.6,
+              10.7
+            ],
+            [
+              -5.6,
+              10.7
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "visible": false,
+          "title": "Guest instructor \u00b7 not on site"
+        }
+      ],
+      "profileId": "instructor-opera"
+    },
+    {
+      "id": "instructor-qigong",
+      "role": "instructor",
+      "variant": 201,
+      "label": "Mr. Zhou \u00b7 Qigong teacher",
+      "offset": 0,
+      "levelId": "ground",
+      "roomId": "day-open",
+      "segments": [
+        {
+          "start": 0,
+          "end": 72,
+          "action": "idle",
+          "path": [
+            [
+              -5.6,
+              10.7
+            ],
+            [
+              -5.6,
+              10.7
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "visible": false,
+          "title": "Guest instructor \u00b7 not on site"
+        },
+        {
+          "start": 72,
+          "end": 144,
+          "action": "qigong",
+          "path": [
+            [
+              -5.6,
+              10.7
+            ],
+            [
+              -5.6,
+              10.7
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "seated": false,
+          "title": "Baduanjin qigong \u516b\u6bb5\u9326 \u00b7 Mr. Zhou leads"
+        },
+        {
+          "start": 144,
+          "end": 720,
+          "action": "idle",
+          "path": [
+            [
+              -5.6,
+              10.7
+            ],
+            [
+              -5.6,
+              10.7
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "visible": false,
+          "title": "Guest instructor \u00b7 not on site"
+        }
+      ],
+      "profileId": "instructor-qigong"
+    },
+    {
+      "id": "instructor-dance",
+      "role": "instructor",
+      "variant": 202,
+      "label": "Ms. Tang \u00b7 Folk dance teacher",
+      "offset": 0,
+      "levelId": "ground",
+      "roomId": "day-open",
+      "segments": [
+        {
+          "start": 0,
+          "end": 288,
+          "action": "idle",
+          "path": [
+            [
+              -5.6,
+              10.7
+            ],
+            [
+              -5.6,
+              10.7
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "visible": false,
+          "title": "Guest instructor \u00b7 not on site"
+        },
+        {
+          "start": 288,
+          "end": 360,
+          "action": "fan-dance",
+          "path": [
+            [
+              -5.6,
+              10.7
+            ],
+            [
+              -5.6,
+              10.7
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "seated": false,
+          "title": "Fan dance \u6247\u5b50\u821e \u00b7 Ms. Tang leads"
+        },
+        {
+          "start": 360,
+          "end": 504,
+          "action": "idle",
+          "path": [
+            [
+              -5.6,
+              10.7
+            ],
+            [
+              -5.6,
+              10.7
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "visible": false,
+          "title": "Guest instructor \u00b7 not on site"
+        },
+        {
+          "start": 504,
+          "end": 576,
+          "action": "dance",
+          "path": [
+            [
+              -5.6,
+              10.7
+            ],
+            [
+              -5.6,
+              10.7
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "seated": false,
+          "title": "Ribbon dance \u5f69\u5e36\u821e \u00b7 Ms. Tang leads"
+        },
+        {
+          "start": 576,
+          "end": 720,
+          "action": "idle",
+          "path": [
+            [
+              -5.6,
+              10.7
+            ],
+            [
+              -5.6,
+              10.7
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "visible": false,
+          "title": "Guest instructor \u00b7 not on site"
+        }
+      ],
+      "profileId": "instructor-dance"
+    },
+    {
+      "id": "instructor-taichi",
+      "role": "instructor",
+      "variant": 203,
+      "label": "Mr. Wong \u00b7 Tai chi teacher",
+      "offset": 0,
+      "levelId": "ground",
+      "roomId": "day-open",
+      "segments": [
+        {
+          "start": 0,
+          "end": 360,
+          "action": "idle",
+          "path": [
+            [
+              -5.6,
+              10.7
+            ],
+            [
+              -5.6,
+              10.7
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "visible": false,
+          "title": "Guest instructor \u00b7 not on site"
+        },
+        {
+          "start": 360,
+          "end": 432,
+          "action": "tai-chi",
+          "path": [
+            [
+              -5.6,
+              10.7
+            ],
+            [
+              -5.6,
+              10.7
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "seated": false,
+          "title": "Tai chi \u592a\u6975\u62f3 \u00b7 Mr. Wong leads"
+        },
+        {
+          "start": 432,
+          "end": 720,
+          "action": "idle",
+          "path": [
+            [
+              -5.6,
+              10.7
+            ],
+            [
+              -5.6,
+              10.7
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "visible": false,
+          "title": "Guest instructor \u00b7 not on site"
+        }
+      ],
+      "profileId": "instructor-taichi"
+    },
+    {
+      "id": "instructor-erhu",
+      "role": "instructor",
+      "variant": 204,
+      "label": "Mr. Lam \u00b7 Erhu musician",
+      "offset": 0,
+      "levelId": "ground",
+      "roomId": "day-open",
+      "segments": [
+        {
+          "start": 0,
+          "end": 576,
+          "action": "idle",
+          "path": [
+            [
+              -5.6,
+              10.7
+            ],
+            [
+              -5.6,
+              10.7
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "visible": false,
+          "title": "Guest instructor \u00b7 not on site"
+        },
+        {
+          "start": 576,
+          "end": 648,
+          "action": "erhu",
+          "path": [
+            [
+              -5.6,
+              10.7
+            ],
+            [
+              -5.6,
+              10.7
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "seated": true,
+          "title": "Erhu & sing-along \u4e8c\u80e1 \u00b7 Mr. Lam leads"
+        },
+        {
+          "start": 648,
+          "end": 720,
+          "action": "idle",
+          "path": [
+            [
+              -5.6,
+              10.7
+            ],
+            [
+              -5.6,
+              10.7
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "visible": false,
+          "title": "Guest instructor \u00b7 not on site"
+        }
+      ],
+      "profileId": "instructor-erhu"
+    },
+    {
+      "id": "instructor-tcm",
+      "role": "instructor",
+      "variant": 205,
+      "label": "Dr. Ho \u00b7 Traditional Chinese medicine practitioner",
+      "offset": 0,
+      "levelId": "ground",
+      "roomId": "day-open",
+      "segments": [
+        {
+          "start": 0,
+          "end": 648,
+          "action": "idle",
+          "path": [
+            [
+              -5.6,
+              10.7
+            ],
+            [
+              -5.6,
+              10.7
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "visible": false,
+          "title": "Guest instructor \u00b7 not on site"
+        },
+        {
+          "start": 648,
+          "end": 720,
+          "action": "present",
+          "path": [
+            [
+              -5.6,
+              10.7
+            ],
+            [
+              -5.6,
+              10.7
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "seated": false,
+          "title": "TCM talk \u4e2d\u91ab\u990a\u751f \u00b7 Dr. Ho leads"
+        }
+      ],
+      "profileId": "instructor-tcm"
+    },
+    {
+      "id": "instructor-calligraphy",
+      "role": "instructor",
+      "variant": 206,
+      "label": "Mr. Chan \u00b7 Calligraphy and ink-painting teacher",
+      "offset": 0,
+      "levelId": "ground",
+      "roomId": "day-open",
+      "segments": [
+        {
+          "start": 0,
+          "end": 144,
+          "action": "write",
+          "path": [
+            [
+              -12.007418,
+              12.261813
+            ],
+            [
+              -12.007418,
+              12.261813
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "seated": true,
+          "title": "Calligraphy \u66f8\u6cd5 \u00b7 Mr. Chan leads"
+        },
+        {
+          "start": 144,
+          "end": 288,
+          "action": "idle",
+          "path": [
+            [
+              -12.007418,
+              12.261813
+            ],
+            [
+              -12.007418,
+              12.261813
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "visible": false,
+          "title": "Guest instructor \u00b7 not on site"
+        },
+        {
+          "start": 288,
+          "end": 432,
+          "action": "write",
+          "path": [
+            [
+              -12.007418,
+              12.261813
+            ],
+            [
+              -12.007418,
+              12.261813
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "seated": true,
+          "title": "Ink painting \u570b\u756b \u00b7 Mr. Chan leads"
+        },
+        {
+          "start": 432,
+          "end": 576,
+          "action": "idle",
+          "path": [
+            [
+              -12.007418,
+              12.261813
+            ],
+            [
+              -12.007418,
+              12.261813
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "visible": false,
+          "title": "Guest instructor \u00b7 not on site"
+        },
+        {
+          "start": 576,
+          "end": 720,
+          "action": "write",
+          "path": [
+            [
+              -12.007418,
+              12.261813
+            ],
+            [
+              -12.007418,
+              12.261813
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "seated": true,
+          "title": "Spring couplets \u6625\u806f \u00b7 Mr. Chan leads"
+        }
+      ],
+      "profileId": "instructor-calligraphy",
+      "seatId": "day-communal-north",
+      "seated": true
+    },
+    {
+      "id": "instructor-papercut",
+      "role": "instructor",
+      "variant": 207,
+      "label": "Mrs. Yip \u00b7 Paper-cutting artist",
+      "offset": 0,
+      "levelId": "ground",
+      "roomId": "day-open",
+      "segments": [
+        {
+          "start": 0,
+          "end": 144,
+          "action": "idle",
+          "path": [
+            [
+              -12.007418,
+              12.261813
+            ],
+            [
+              -12.007418,
+              12.261813
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "visible": false,
+          "title": "Guest instructor \u00b7 not on site"
+        },
+        {
+          "start": 144,
+          "end": 288,
+          "action": "craft",
+          "path": [
+            [
+              -12.007418,
+              12.261813
+            ],
+            [
+              -12.007418,
+              12.261813
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "seated": true,
+          "title": "Paper-cutting \u526a\u7d19 \u00b7 Mrs. Yip leads"
+        },
+        {
+          "start": 288,
+          "end": 432,
+          "action": "idle",
+          "path": [
+            [
+              -12.007418,
+              12.261813
+            ],
+            [
+              -12.007418,
+              12.261813
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "visible": false,
+          "title": "Guest instructor \u00b7 not on site"
+        },
+        {
+          "start": 432,
+          "end": 576,
+          "action": "craft",
+          "path": [
+            [
+              -12.007418,
+              12.261813
+            ],
+            [
+              -12.007418,
+              12.261813
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "seated": true,
+          "title": "Lantern making \u7d2e\u71c8\u7c60 \u00b7 Mrs. Yip leads"
+        },
+        {
+          "start": 576,
+          "end": 720,
+          "action": "idle",
+          "path": [
+            [
+              -12.007418,
+              12.261813
+            ],
+            [
+              -12.007418,
+              12.261813
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "visible": false,
+          "title": "Guest instructor \u00b7 not on site"
+        }
+      ],
+      "profileId": "instructor-papercut",
+      "seatId": "day-communal-north",
+      "seated": true
+    },
+    {
+      "id": "instructor-tea",
+      "role": "instructor",
+      "variant": 208,
+      "label": "Mrs. Liu \u00b7 Tea host",
+      "offset": 0,
+      "levelId": "ground",
+      "roomId": "day-open",
+      "segments": [
+        {
+          "start": 0,
+          "end": 360,
+          "action": "tea",
+          "path": [
+            [
+              -0.6,
+              13.1
+            ],
+            [
+              -0.6,
+              13.1
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.5707963267948966,
+          "seated": true,
+          "title": "Morning tea & papers \u65e9\u8336\u00b7\u8b80\u5831 \u00b7 Mrs. Liu leads"
+        },
+        {
+          "start": 360,
+          "end": 720,
+          "action": "tea",
+          "path": [
+            [
+              -0.6,
+              13.1
+            ],
+            [
+              -0.6,
+              13.1
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.5707963267948966,
+          "seated": true,
+          "title": "Gongfu tea \u529f\u592b\u8336 \u00b7 Mrs. Liu leads"
+        }
+      ],
+      "profileId": "instructor-tea"
     }
   ],
   "interactions": [
@@ -31849,11 +31372,11 @@
     },
     {
       "id": "arrival-walker-visit-1",
-      "label": "Morgan \u00b7 walker \u00b7 Group movement",
+      "label": "Morgan \u00b7 walker \u00b7 Arts table visit",
       "category": "activities",
       "actorIds": [
         "arrival-walker",
-        "activities-lead"
+        "instructor-papercut"
       ],
       "start": 250.3696112679053,
       "end": 288.36961126790527,
@@ -31916,12 +31439,12 @@
     },
     {
       "id": "arrival-cane-visit-1",
-      "label": "Lin \u00b7 cane + escort \u00b7 Social activities",
+      "label": "Lin \u00b7 cane + escort \u00b7 Arts table visit",
       "category": "activities",
       "actorIds": [
         "arrival-cane",
         "arrival-aide-a",
-        "activities-lead"
+        "instructor-papercut"
       ],
       "start": 240.89213562373095,
       "end": 278.89213562373095,
@@ -31969,11 +31492,12 @@
     },
     {
       "id": "arrival-independent-visit-0",
-      "label": "Jordan \u00b7 independent \u00b7 Group exercise",
+      "label": "Jordan \u00b7 independent \u00b7 Arts table visit",
       "category": "activities",
       "actorIds": [
         "arrival-independent",
-        "activities-lead"
+        "instructor-papercut",
+        "instructor-calligraphy"
       ],
       "start": 273.78109216769116,
       "end": 313.78109216769116,
@@ -32048,12 +31572,12 @@
     },
     {
       "id": "arrival-wheelchair-visit-1",
-      "label": "Avery \u00b7 wheelchair + escort \u00b7 Supported activities",
+      "label": "Avery \u00b7 wheelchair + escort \u00b7 Arts table visit",
       "category": "activities",
       "actorIds": [
         "arrival-wheelchair",
         "arrival-aide-b",
-        "activities-lead"
+        "instructor-calligraphy"
       ],
       "start": 400.8115530061469,
       "end": 432.8115530061469,
@@ -32167,166 +31691,6 @@
       "description": "Continuous composite interaction track; select a person to inspect their individual activity stages."
     },
     {
-      "id": "day-performance",
-      "label": "Familiar songs & community performances",
-      "category": "activities",
-      "actorIds": [
-        "activities-lead",
-        "member-group-01",
-        "member-group-02",
-        "member-wheelchair",
-        "care-aide-03"
-      ],
-      "start": 0,
-      "end": 72,
-      "zoneId": "day",
-      "description": "Songs and stories chosen with participants; a bilingual host invites requests. Watch, clap or join in from a chair, wheelchair or standing position."
-    },
-    {
-      "id": "day-language",
-      "label": "Language & conversation",
-      "category": "activities",
-      "actorIds": [
-        "activities-lead",
-        "member-group-01",
-        "member-group-02",
-        "member-wheelchair",
-        "care-aide-03"
-      ],
-      "start": 72,
-      "end": 144,
-      "zoneId": "day",
-      "description": "Picture prompts, familiar sayings and conversation in preferred languages; Mandarin, Cantonese and English are example options. Listen, point to a picture or speak at your own pace."
-    },
-    {
-      "id": "day-devices",
-      "label": "Everyday device skills",
-      "category": "activities",
-      "actorIds": [
-        "activities-lead",
-        "member-group-01",
-        "member-group-02",
-        "member-wheelchair",
-        "care-aide-03"
-      ],
-      "start": 144,
-      "end": 216,
-      "zoneId": "day",
-      "description": "Practice video calls, photos and larger text using step-by-step visual prompts. One-to-one help, a supported tablet and repeatable small steps."
-    },
-    {
-      "id": "day-exercise",
-      "label": "Everyday movement",
-      "category": "activities",
-      "actorIds": [
-        "activities-lead",
-        "member-group-01",
-        "member-group-02",
-        "member-wheelchair",
-        "care-aide-03"
-      ],
-      "start": 216,
-      "end": 288,
-      "zoneId": "day",
-      "description": "A staff-led group with familiar music and easy-to-follow demonstrations. Standing, chair-based or wheelchair upper-body movement; rest whenever needed."
-    },
-    {
-      "id": "day-dance",
-      "label": "Music & dance",
-      "category": "activities",
-      "actorIds": [
-        "activities-lead",
-        "member-group-01",
-        "member-group-02",
-        "member-wheelchair",
-        "care-aide-03"
-      ],
-      "start": 288,
-      "end": 360,
-      "zoneId": "day",
-      "description": "Participant-selected music, familiar rhythms and a simple shared sequence. Standing steps or seated rhythm and arm movements."
-    },
-    {
-      "id": "day-tai-chi",
-      "label": "Tai chi together",
-      "category": "activities",
-      "actorIds": [
-        "activities-lead",
-        "member-group-01",
-        "member-group-02",
-        "member-wheelchair",
-        "care-aide-03"
-      ],
-      "start": 360,
-      "end": 432,
-      "zoneId": "day",
-      "description": "Slow, flowing gestures with a visible leader and time to follow. A seated version mirrors the upper-body sequence; a care aide stays nearby."
-    },
-    {
-      "id": "day-calligraphy",
-      "label": "Calligraphy & brushwork",
-      "category": "activities",
-      "actorIds": [
-        "activities-lead",
-        "member-group-01",
-        "member-group-02",
-        "member-wheelchair",
-        "care-aide-03"
-      ],
-      "start": 432,
-      "end": 504,
-      "zoneId": "day",
-      "description": "Explore personally meaningful characters and brush strokes, with large sample cards. Thick-handled brushes, supported paper and hand-over-hand help when requested."
-    },
-    {
-      "id": "day-crafts",
-      "label": "Seasonal arts & crafts",
-      "category": "activities",
-      "actorIds": [
-        "activities-lead",
-        "member-group-01",
-        "member-group-02",
-        "member-wheelchair",
-        "care-aide-03"
-      ],
-      "start": 504,
-      "end": 576,
-      "zoneId": "day",
-      "description": "Paper, color and collage inspired by the group\u2019s interests and celebrations. Choose, arrange or create with large pieces and individual assistance."
-    },
-    {
-      "id": "day-instruments",
-      "label": "Rhythm & instruments",
-      "category": "activities",
-      "actorIds": [
-        "activities-lead",
-        "member-group-01",
-        "member-group-02",
-        "member-wheelchair",
-        "care-aide-03"
-      ],
-      "start": 576,
-      "end": 648,
-      "zoneId": "day",
-      "description": "Simple percussion, listening and shared rhythms around favorite songs. Lightweight shakers and a supported hand drum; listening is welcome."
-    },
-    {
-      "id": "day-tcm",
-      "label": "TCM & cultural wellness talks",
-      "category": "activities",
-      "actorIds": [
-        "activities-lead",
-        "member-group-01",
-        "member-group-02",
-        "member-wheelchair",
-        "care-aide-03"
-      ],
-      "start": 648,
-      "end": 720,
-      "zoneId": "day",
-      "description": "A hosted educational conversation about traditional Chinese medicine, with bilingual discussion and questions. Seated listening, visual prompts and time for questions; a quiet table option stays available."
-    },
-    {
       "id": "quiet-creative-table",
       "label": "Quiet creative table \u00b7 choose your pace",
       "category": "activities",
@@ -32412,31 +31776,6 @@
       "description": "A shared table activity throughout the representative care day."
     },
     {
-      "id": "daily-43",
-      "label": "Arts & crafts at the long table",
-      "category": "activities",
-      "actorIds": [
-        "daily-member-01",
-        "daily-member-02",
-        "daily-member-03",
-        "daily-member-04",
-        "daily-member-05",
-        "daily-member-06",
-        "daily-member-07",
-        "daily-member-08",
-        "daily-member-09",
-        "daily-member-10",
-        "daily-member-11",
-        "daily-member-12",
-        "daily-member-13",
-        "daily-member-14"
-      ],
-      "start": 0,
-      "end": 720,
-      "zoneId": "day",
-      "description": "A shared table activity throughout the representative care day."
-    },
-    {
       "id": "daily-44",
       "label": "Language & reading circle",
       "category": "activities",
@@ -32480,7 +31819,8 @@
       "category": "activities",
       "actorIds": [
         "daily-member-52",
-        "daily-member-53"
+        "daily-member-53",
+        "daily-member-07"
       ],
       "start": 0,
       "end": 720,
@@ -32525,12 +31865,6 @@
       "label": "Tea & conversation",
       "category": "activities",
       "actorIds": [
-        "daily-member-15",
-        "daily-member-16",
-        "daily-member-17",
-        "daily-member-18",
-        "daily-member-19",
-        "daily-member-20",
         "daily-member-21",
         "daily-member-22",
         "daily-member-23"
@@ -32539,6 +31873,334 @@
       "end": 720,
       "zoneId": "day",
       "description": "A shared table activity throughout the representative care day."
+    },
+    {
+      "id": "day-performance",
+      "label": "Cantonese opera & familiar songs \u00b7 \u7cb5\u5287",
+      "category": "activities",
+      "actorIds": [
+        "activities-lead",
+        "member-group-01",
+        "member-group-02",
+        "member-wheelchair",
+        "care-aide-03",
+        "instructor-opera"
+      ],
+      "start": 0,
+      "end": 72,
+      "zoneId": "day",
+      "description": "A guest performer in full opera costume sings Cantonese opera excerpts; water-sleeve gestures and familiar songs invite requests from the room. Watch, clap or join in from a chair, wheelchair or standing position."
+    },
+    {
+      "id": "day-qigong",
+      "label": "Baduanjin qigong \u00b7 the Eight Brocades \u00b7 \u516b\u6bb5\u9326",
+      "category": "activities",
+      "actorIds": [
+        "activities-lead",
+        "member-group-01",
+        "member-group-02",
+        "member-wheelchair",
+        "care-aide-03",
+        "instructor-qigong"
+      ],
+      "start": 72,
+      "end": 144,
+      "zoneId": "day",
+      "description": "Eight slow, named movements such as 'holding up the heavens', led by a qigong teacher in practice silks. Every movement has a seated version; rest whenever needed."
+    },
+    {
+      "id": "day-devices",
+      "label": "Everyday device skills",
+      "category": "activities",
+      "actorIds": [
+        "activities-lead",
+        "member-group-01",
+        "member-group-02",
+        "member-wheelchair",
+        "care-aide-03"
+      ],
+      "start": 144,
+      "end": 216,
+      "zoneId": "day",
+      "description": "Practice WeChat and video calls with family, photos and larger text using step-by-step visual prompts. One-to-one help, a supported tablet and repeatable small steps."
+    },
+    {
+      "id": "day-exercise",
+      "label": "Everyday movement",
+      "category": "activities",
+      "actorIds": [
+        "activities-lead",
+        "member-group-01",
+        "member-group-02",
+        "member-wheelchair",
+        "care-aide-03"
+      ],
+      "start": 216,
+      "end": 288,
+      "zoneId": "day",
+      "description": "A staff-led group with familiar music and easy-to-follow demonstrations. Standing, chair-based or wheelchair upper-body movement; rest whenever needed."
+    },
+    {
+      "id": "day-dance",
+      "label": "Fan dance \u00b7 \u6247\u5b50\u821e",
+      "category": "activities",
+      "actorIds": [
+        "activities-lead",
+        "member-group-01",
+        "member-group-02",
+        "member-wheelchair",
+        "care-aide-03",
+        "instructor-dance"
+      ],
+      "start": 288,
+      "end": 360,
+      "zoneId": "day",
+      "description": "Silk folding fans open, turn and flutter to Chinese folk music, led by a dance teacher in a qipao. Standing steps or seated fan and arm movements."
+    },
+    {
+      "id": "day-tai-chi",
+      "label": "Tai chi together \u00b7 \u592a\u6975\u62f3",
+      "category": "activities",
+      "actorIds": [
+        "activities-lead",
+        "member-group-01",
+        "member-group-02",
+        "member-wheelchair",
+        "care-aide-03",
+        "instructor-taichi"
+      ],
+      "start": 360,
+      "end": 432,
+      "zoneId": "day",
+      "description": "Yang-style 'cloud hands' and slow weight shifts, led by a teacher in white practice silks. A seated version mirrors the upper-body sequence; a care aide stays nearby."
+    },
+    {
+      "id": "day-language",
+      "label": "Language circle & lantern riddles \u00b7 \u731c\u71c8\u8b0e",
+      "category": "activities",
+      "actorIds": [
+        "activities-lead",
+        "member-group-01",
+        "member-group-02",
+        "member-wheelchair",
+        "care-aide-03"
+      ],
+      "start": 432,
+      "end": 504,
+      "zoneId": "day",
+      "description": "Riddles hung on red lanterns and familiar sayings in Cantonese, Mandarin and English; a bilingual host reads each one aloud. Listen, point to a picture or speak at your own pace."
+    },
+    {
+      "id": "day-ribbon",
+      "label": "Silk ribbon dance \u00b7 \u5f69\u5e36\u821e",
+      "category": "activities",
+      "actorIds": [
+        "activities-lead",
+        "member-group-01",
+        "member-group-02",
+        "member-wheelchair",
+        "care-aide-03",
+        "instructor-dance"
+      ],
+      "start": 504,
+      "end": 576,
+      "zoneId": "day",
+      "description": "Long silk ribbons trace circles and waves to folk melodies. Short ribbons and seated arm patterns are available."
+    },
+    {
+      "id": "day-instruments",
+      "label": "Erhu & sing-along \u00b7 \u4e8c\u80e1",
+      "category": "activities",
+      "actorIds": [
+        "activities-lead",
+        "member-group-01",
+        "member-group-02",
+        "member-wheelchair",
+        "care-aide-03",
+        "instructor-erhu"
+      ],
+      "start": 576,
+      "end": 648,
+      "zoneId": "day",
+      "description": "A two-string erhu leads favorite folk songs; participants keep time with shakers and a hand drum. Lightweight shakers and a supported hand drum; listening is welcome."
+    },
+    {
+      "id": "day-tcm",
+      "label": "TCM & seasonal wellness talk \u00b7 \u4e2d\u91ab\u990a\u751f",
+      "category": "activities",
+      "actorIds": [
+        "activities-lead",
+        "member-group-01",
+        "member-group-02",
+        "member-wheelchair",
+        "care-aide-03",
+        "instructor-tcm"
+      ],
+      "start": 648,
+      "end": 720,
+      "zoneId": "day",
+      "description": "A TCM practitioner explains seasonal foods, herbal teas and acupressure points with a wall chart; the host interprets questions. Seated listening, visual prompts and time for questions; a quiet table option stays available."
+    },
+    {
+      "id": "day-calligraphy",
+      "label": "Calligraphy & brushwork \u00b7 \u66f8\u6cd5",
+      "category": "activities",
+      "actorIds": [
+        "daily-member-01",
+        "daily-member-02",
+        "daily-member-03",
+        "daily-member-04",
+        "daily-member-05",
+        "daily-member-06",
+        "daily-member-08",
+        "daily-member-09",
+        "daily-member-10",
+        "daily-member-11",
+        "daily-member-12",
+        "daily-member-13",
+        "daily-member-14",
+        "instructor-calligraphy"
+      ],
+      "start": 0,
+      "end": 144,
+      "zoneId": "day",
+      "description": "Brush, ink stone and rice paper: practising personally meaningful characters with a calligraphy teacher. Thick-handled brushes, supported paper and hand-over-hand help when requested."
+    },
+    {
+      "id": "day-paper-cutting",
+      "label": "Paper-cutting \u00b7 \u526a\u7d19",
+      "category": "activities",
+      "actorIds": [
+        "daily-member-01",
+        "daily-member-02",
+        "daily-member-03",
+        "daily-member-04",
+        "daily-member-05",
+        "daily-member-06",
+        "daily-member-08",
+        "daily-member-09",
+        "daily-member-10",
+        "daily-member-11",
+        "daily-member-12",
+        "daily-member-13",
+        "daily-member-14",
+        "instructor-papercut"
+      ],
+      "start": 144,
+      "end": 288,
+      "zoneId": "day",
+      "description": "Folding and cutting red paper into window flowers and the character \u798f, good fortune. Pre-drawn patterns, spring-loaded scissors, or tearing instead of cutting."
+    },
+    {
+      "id": "day-ink-painting",
+      "label": "Ink painting \u00b7 \u570b\u756b",
+      "category": "activities",
+      "actorIds": [
+        "daily-member-01",
+        "daily-member-02",
+        "daily-member-03",
+        "daily-member-04",
+        "daily-member-05",
+        "daily-member-06",
+        "daily-member-08",
+        "daily-member-09",
+        "daily-member-10",
+        "daily-member-11",
+        "daily-member-12",
+        "daily-member-13",
+        "daily-member-14",
+        "instructor-calligraphy"
+      ],
+      "start": 288,
+      "end": 432,
+      "zoneId": "day",
+      "description": "Bamboo, plum blossom and orchid in black ink, one brushstroke at a time. Large brushes and pre-printed outlines."
+    },
+    {
+      "id": "day-lanterns",
+      "label": "Lantern making \u00b7 \u7d2e\u71c8\u7c60",
+      "category": "activities",
+      "actorIds": [
+        "daily-member-01",
+        "daily-member-02",
+        "daily-member-03",
+        "daily-member-04",
+        "daily-member-05",
+        "daily-member-06",
+        "daily-member-08",
+        "daily-member-09",
+        "daily-member-10",
+        "daily-member-11",
+        "daily-member-12",
+        "daily-member-13",
+        "daily-member-14",
+        "instructor-papercut"
+      ],
+      "start": 432,
+      "end": 576,
+      "zoneId": "day",
+      "description": "Folding red paper lanterns for the next festival; finished lanterns hang over the activity floor. Pre-cut pieces and glue sticks; work in pairs."
+    },
+    {
+      "id": "day-couplets",
+      "label": "Spring couplets \u00b7 \u6625\u806f",
+      "category": "activities",
+      "actorIds": [
+        "daily-member-01",
+        "daily-member-02",
+        "daily-member-03",
+        "daily-member-04",
+        "daily-member-05",
+        "daily-member-06",
+        "daily-member-08",
+        "daily-member-09",
+        "daily-member-10",
+        "daily-member-11",
+        "daily-member-12",
+        "daily-member-13",
+        "daily-member-14",
+        "instructor-calligraphy"
+      ],
+      "start": 576,
+      "end": 720,
+      "zoneId": "day",
+      "description": "Writing paired good-wish verses on red paper, as families do for Lunar New Year. Thick-handled brushes, supported paper and hand-over-hand help when requested."
+    },
+    {
+      "id": "day-morning-tea",
+      "label": "Morning tea & Chinese newspapers \u00b7 \u65e9\u8336\u00b7\u8b80\u5831",
+      "category": "activities",
+      "actorIds": [
+        "daily-member-15",
+        "daily-member-16",
+        "daily-member-17",
+        "daily-member-18",
+        "daily-member-19",
+        "daily-member-20",
+        "instructor-tea"
+      ],
+      "start": 0,
+      "end": 360,
+      "zoneId": "day",
+      "description": "Jasmine and oolong tea with Chinese-language newspapers; the tea host refills cups and starts conversations about the day's news. Large-print papers; reading aloud is welcome."
+    },
+    {
+      "id": "day-gongfu-tea",
+      "label": "Gongfu tea \u00b7 \u529f\u592b\u8336",
+      "category": "activities",
+      "actorIds": [
+        "daily-member-15",
+        "daily-member-16",
+        "daily-member-17",
+        "daily-member-18",
+        "daily-member-19",
+        "daily-member-20",
+        "instructor-tea"
+      ],
+      "start": 360,
+      "end": 720,
+      "zoneId": "day",
+      "description": "Small-pot gongfu tea poured in rounds, with time to talk about family, food and festivals. Light cups with handles; caffeine-free chrysanthemum tea on request."
     }
   ],
   "roles": [
@@ -32547,6 +32209,7 @@
     "coordinator",
     "doctor",
     "driver",
+    "instructor",
     "nurse",
     "nutrition",
     "ot",

@@ -12,6 +12,7 @@ import {
 import { buildNeighborhood } from '../work/validation/neighborhood.mjs';
 import { sampleVan, vanWindows, ARRIVAL } from '../work/validation/arrival.mjs';
 import { dayProgram, programAt } from '../work/validation/day-room.mjs';
+import { floorPrograms } from '../work/validation/day-program.mjs';
 import { createCharacter } from '../work/validation/characters.mjs';
 const m = JSON.parse(
   readFileSync('public/models/seen-alhambra-planning.json', 'utf8'),
@@ -20,8 +21,8 @@ const scene = new T.Scene(),
   activity = createActivity(m, scene),
   neighborhood = buildNeighborhood(m);
 scene.add(neighborhood.root);
-assert.equal(activity.actors.length, 167);
-assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 167);
+assert.equal(activity.actors.length, 176);
+assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 176);
 for (const role of [
   'doctor',
   'nurse',
@@ -33,6 +34,7 @@ for (const role of [
   'coordinator',
   'social-worker',
   'activities',
+  'instructor',
   'nutrition',
   'participant',
 ])
@@ -358,18 +360,19 @@ assert.deepEqual(
   'Seek restores vans and ramps exactly',
 );
 console.log(
-  `Arrival checks: ${boardingSamples} van-ramp samples, ${entranceSamples} doorway samples, two desk staff, ${activityData.interactions.length} interaction tracks and 167 stable person templates.`,
+  `Arrival checks: ${boardingSamples} van-ramp samples, ${entranceSamples} doorway samples, two desk staff, ${activityData.interactions.length} interaction tracks and ${activityData.actors.length} stable person templates.`,
 );
 // The flexible layout and repertoire stay in sync with animation, accessibility and scrubbing.
-assert.equal(dayProgram.programs.length, 10);
-assert.equal(dayProgram.removedObjectIds.length, 15);
+assert.equal(floorPrograms.length, 10);
+assert.equal(dayProgram.programs.length, 17);
+assert.equal(dayProgram.removedObjectIds.length, 19);
 assert.ok(
   dayProgram.removedObjectIds.every((id) => m.objects.some((o) => o.id === id)),
 );
 assert.ok(!dayProgram.removedObjectIds.includes('day-diamond-table-04'));
 const groupIds = new Set(dayProgram.stations.map((s) => s.actorId));
 const signatures = new Set();
-for (const session of dayProgram.programs) {
+for (const session of floorPrograms) {
   const at = session.start + 12;
   activity.setOptions({ time: at, playing: false, filter: 'all' });
   assert.equal(programAt(at).id, session.id);
@@ -411,6 +414,17 @@ assert.ok(
   'The repertoire has distinct motion/gesture states',
 );
 assert.equal(programAt(720).id, programAt(0).id);
+// Every session in every zone has its interaction track.
+for (const session of dayProgram.programs)
+  assert.ok(
+    activityData.interactions.some(
+      (i) =>
+        i.id === 'day-' + session.id &&
+        i.start === session.start &&
+        i.end === session.end,
+    ),
+    `${session.id} has an interaction track`,
+  );
 // Passing traffic must stay outside the stationary activity group and its chairs.
 for (const a of activityData.actors.filter((a) => !groupIds.has(a.id)))
   for (const s of a.segments.filter((s) =>
@@ -431,7 +445,7 @@ for (const a of activityData.actors.filter((a) => !groupIds.has(a.id)))
       }
   }
 console.log(
-  'Day room checks: ten sessions, cleared front tables, seated and wheelchair modes, activity props, seek/repeat and protected circulation.',
+  'Day room checks: ten open-floor sessions and seven zone sessions, cleared front tables, seated and wheelchair modes, activity props, seek/repeat and protected circulation.',
 );
 globalThis.FileReader = class {
   readAsArrayBuffer(blob) {
@@ -456,11 +470,14 @@ assert.ok(
 assert.equal(buffer.readUInt32LE(0), 0x46546c67);
 const n = buffer.readUInt32LE(12),
   gltf = JSON.parse(buffer.subarray(20, 20 + n).toString());
-assert.equal(gltf.skins.length, 15);
-assert.equal(gltf.animations.length, 270);
+// One rig per role plus the three mobility aids, each with every action clip.
+const rigs = activityData.roles.length + 3,
+  clipsPerRig = createCharacter({ id: 'clip-count', role: 'nurse', variant: 0 }).clips().length;
+assert.equal(gltf.skins.length, rigs);
+assert.equal(gltf.animations.length, rigs * clipsPerRig);
 assert.ok(gltf.animations.some((a) => a.name === 'cast-doctor:walk'));
 writeFileSync('public/models/seen-health-animated-cast.glb', buffer);
 console.log(
-  `Validated ${activity.actors.length} actors, ${activityData.roles.length} roles, ${samples} path samples, ${minWall.toFixed(3)}m minimum wall clearance; pause, repeat, seek, speed, synchronized pairs, levels and 3D context. Exported 15 rigs and 270 clips (${(buffer.length / 1024 / 1024).toFixed(2)} MB).`,
+  `Validated ${activity.actors.length} actors, ${activityData.roles.length} roles, ${samples} path samples, ${minWall.toFixed(3)}m minimum wall clearance; pause, repeat, seek, speed, synchronized pairs, levels and 3D context. Exported ${rigs} rigs and ${rigs * clipsPerRig} clips (${(buffer.length / 1024 / 1024).toFixed(2)} MB).`,
 );
 activity.dispose();

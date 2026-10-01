@@ -92,6 +92,11 @@ const CARE_ACTIONS = new Set([
   'clap',
   'dance',
   'tai-chi',
+  'qigong',
+  'fan-dance',
+  'opera',
+  'erhu',
+  'tea',
   'device',
   'write',
   'craft',
@@ -446,6 +451,7 @@ export function computeMetrics(
     reception: 'Front desk',
     nutrition: 'Food service',
     coordinator: roleNames.coordinator || 'Care coordinator',
+    instructor: 'Guest instructor',
   });
   const roleMap = new Map<CharacterRole, string[]>();
   for (const [id, members] of staffPeople)

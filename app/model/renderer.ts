@@ -1952,6 +1952,159 @@ export function createViewer(
     });
   }
   renderer.domElement.addEventListener('wheel', wheel, { passive: true });
+  // Floating highlights name the session running in each day-room zone.
+  type Highlight = {
+    el: HTMLButtonElement;
+    zh: HTMLSpanElement;
+    en: HTMLSpanElement;
+    sub: HTMLSpanElement;
+    session: string;
+    /** The activity follow id for this session's interaction track. */
+    track: string;
+    shown: boolean;
+    following: boolean;
+    compact: boolean;
+    size: [number, number];
+    /** Anchor on screen and stem length this frame. */
+    x: number;
+    y: number;
+    stem: number;
+  };
+  const highlightLabels = new Map<string, Highlight>();
+  const highlightPoint = new T.Vector3();
+  const highlightSlots: Highlight[] = [];
+  const lowestFirst = (a: Highlight, b: Highlight) => b.y - a.y;
+  /**
+   * Day-room labels appear from the "Day activities" focus zoom (about 1.39)
+   * inward and stay hidden in the whole-building overviews (1.3 and below);
+   * hosts lend their names once the room is large enough to read (px/m).
+   */
+  const HIGHLIGHT_MIN_ZOOM = 1.35,
+    HIGHLIGHT_MIN_SCALE = 8,
+    HIGHLIGHT_DETAIL_SCALE = 22;
+  const followSession = (sessionId: string) => {
+    const id = 'interaction:day-' + sessionId;
+    activity.setOptions({ follow: id });
+    zoomTarget = Math.max(camera.zoom, 4.5);
+    const p = activity.actorPosition(id);
+    if (p) focusTarget = p;
+  };
+  function updateHighlights() {
+    if (options.labels === false) return;
+    const s = activity.getState();
+    const scale =
+      (host.clientHeight * camera.zoom) / (camera.top - camera.bottom);
+    const show =
+      s.enabled &&
+      !showcase &&
+      !recordingSize &&
+      activity.dayRoom.root.visible &&
+      !roof.visible &&
+      !ceiling.visible &&
+      camera.zoom >= HIGHLIGHT_MIN_ZOOM &&
+      scale >= HIGHLIGHT_MIN_SCALE;
+    const compact = scale < HIGHLIGHT_DETAIL_SCALE;
+    highlightSlots.length = 0;
+    for (const h of activity.dayRoom.highlights()) {
+      let label = highlightLabels.get(h.zoneId);
+      if (!label) {
+        const el = document.createElement('button'),
+          title = document.createElement('span'),
+          zh = document.createElement('span'),
+          en = document.createElement('span'),
+          sub = document.createElement('span');
+        el.type = 'button';
+        el.className = 'day-highlight';
+        el.dataset.zone = h.zoneId;
+        el.style.display = 'none';
+        title.className = 'day-highlight-title';
+        zh.className = 'day-highlight-zh';
+        zh.lang = 'zh-Hant';
+        en.className = 'day-highlight-en';
+        sub.className = 'day-highlight-sub';
+        title.appendChild(zh);
+        title.appendChild(en);
+        el.appendChild(title);
+        el.appendChild(sub);
+        const entry: Highlight = {
+          el,
+          zh,
+          en,
+          sub,
+          session: '',
+          track: '',
+          shown: false,
+          following: false,
+          compact: false,
+          size: [0, 0],
+          x: 0,
+          y: 0,
+          stem: 0,
+        };
+        el.onclick = () => followSession(entry.session);
+        host.appendChild(el);
+        highlightLabels.set(h.zoneId, entry);
+        label = entry;
+      }
+      if (label.session !== h.sessionId) {
+        label.session = h.sessionId;
+        label.track = 'interaction:day-' + h.sessionId;
+        label.zh.textContent = h.labelZh || '';
+        label.en.textContent = h.label;
+        label.sub.textContent = h.subtitle;
+        label.el.title = `${h.title} · ${h.subtitle}`;
+        label.el.setAttribute('aria-label', `Follow ${h.title}, ${h.subtitle}`);
+        label.size = [0, 0];
+      }
+      const following = s.follow === label.track;
+      if (following !== label.following) {
+        label.following = following;
+        label.el.classList.toggle('following', following);
+      }
+      if (show !== label.shown) {
+        label.shown = show;
+        label.el.style.display = show ? '' : 'none';
+      }
+      if (compact !== label.compact) {
+        label.compact = compact;
+        label.el.classList.toggle('compact', compact);
+        label.size = [0, 0];
+      }
+      if (!show) continue;
+      highlightPoint.copy(h.position).project(camera);
+      if (highlightPoint.z > 1) {
+        label.el.style.visibility = 'hidden';
+        continue;
+      }
+      label.el.style.visibility = 'visible';
+      if (!label.size[0])
+        label.size = [label.el.offsetWidth, label.el.offsetHeight];
+      label.x = (highlightPoint.x * 0.5 + 0.5) * host.clientWidth;
+      label.y = (-highlightPoint.y * 0.5 + 0.5) * host.clientHeight;
+      label.stem = 10;
+      highlightSlots.push(label);
+    }
+    // Labels never cover one another: a higher one rises on a longer stem.
+    highlightSlots.sort(lowestFirst);
+    for (let i = 0; i < highlightSlots.length; i++) {
+      const a = highlightSlots[i];
+      for (let pass = 0; pass < 2; pass++)
+        for (let j = 0; j < i; j++) {
+          const b = highlightSlots[j],
+            bottom = a.y - a.stem,
+            bTop = b.y - b.stem - b.size[1];
+          if (
+            Math.abs(a.x - b.x) < (a.size[0] + b.size[0]) / 2 + 6 &&
+            bottom > bTop - 6 &&
+            bottom - a.size[1] < b.y - b.stem + 6
+          )
+            a.stem = a.y - bTop + 6;
+        }
+      a.el.style.left = `${a.x}px`;
+      a.el.style.top = `${a.y}px`;
+      a.el.style.setProperty('--stem', `${a.stem}px`);
+    }
+  }
   let lastTime = performance.now(),
     paused = false;
   function loop(now = performance.now()) {
@@ -2045,6 +2198,7 @@ export function createViewer(
       placeShowcase();
     } else controls.update();
     roomLabels?.update(camera, groups, state, sectionPlane);
+    updateHighlights();
     renderScene();
   }
   update(defaultState);
@@ -2067,6 +2221,19 @@ export function createViewer(
       // Keep the stop and front desk above the care-day controls.
       if (model.contextStyle) focusTarget.y = -4;
       zoomTarget = model.contextStyle ? 3.3 : 2.3;
+      finishFocus(false);
+    },
+    /** Frame the concurrent day-room activity zones above the care-day controls. */
+    focusDayProgram: () => {
+      const xs = dayProgram.zones.map((z) => z.anchor[0]),
+        zs = dayProgram.zones.map((z) => z.anchor[1]);
+      // A lowered target lifts the zones above the activity panel on screen.
+      focusTarget = new T.Vector3(
+        (Math.min(...xs) + Math.max(...xs)) / 2,
+        -8,
+        (Math.min(...zs) + Math.max(...zs)) / 2,
+      ).add(basePosition('day'));
+      zoomTarget = 2.4;
       finishFocus(false);
     },
     activity,
@@ -2279,6 +2446,7 @@ export function createViewer(
       renderer.dispose();
       renderer.domElement.remove();
       labels.forEach((l) => l.remove());
+      highlightLabels.forEach((h) => h.el.remove());
       roomLabels?.dispose();
     },
   };

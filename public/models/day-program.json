@@ -1,6 +1,6 @@
 {
-  "version": "1.0",
-  "source": "Owner-requested day-center activity repertoire and flexible front-of-room layout, September 2026. Illustrative rotation, not a verified daily timetable.",
+  "version": "2.0",
+  "source": "Owner-requested day-center activity repertoire and flexible front-of-room layout, September 2026; concurrent Chinese-American cultural zones with guest instructors, October 2026. Illustrative rotation, not a verified daily timetable.",
   "removedObjectIds": [
     "day-diamond-table-01",
     "day-diamond-table-01-chair-1",
@@ -16,9 +16,13 @@
     "day-diamond-table-03-chair-1",
     "day-diamond-table-03-chair-2",
     "day-diamond-table-03-chair-3",
-    "day-diamond-table-03-chair-4"
+    "day-diamond-table-03-chair-4",
+    "daily-top-day-communal-table",
+    "daily-top-day-banquette-table-01",
+    "daily-top-day-banquette-table-02",
+    "daily-top-day-banquette-table-03"
   ],
-  "layoutNote": "Three front tables and their twelve chairs are cleared for a flexible activity floor. The original furniture plan remains in the source comparison. Other tables remain for small groups and quieter participation.",
+  "layoutNote": "Three front tables and their twelve chairs are cleared for a flexible activity floor, and the static tabletop sets on the long arts table and tea-corner tables 01–03 give way to session props. The original furniture plan remains in the source comparison. Other tables remain for small groups and quieter participation.",
   "stations": [
     {
       "actorId": "activities-lead",
@@ -66,116 +70,417 @@
       "mode": "support"
     }
   ],
+  "zones": [
+    {
+      "id": "floor",
+      "label": "Open floor",
+      "anchor": [
+        -6.6,
+        11.3
+      ],
+      "labelHeight": 2.75,
+      "instructorSpot": {
+        "position": [
+          -5.6,
+          10.7
+        ],
+        "heading": 0
+      }
+    },
+    {
+      "id": "arts-table",
+      "label": "Long arts table",
+      "anchor": [
+        -12.01,
+        14.95
+      ],
+      "labelHeight": 2.1,
+      "instructorSpot": {
+        "position": [
+          -12.007418,
+          12.261813
+        ],
+        "heading": 0,
+        "seatId": "day-communal-north"
+      },
+      "participants": [
+        "daily-member-01",
+        "daily-member-02",
+        "daily-member-03",
+        "daily-member-04",
+        "daily-member-05",
+        "daily-member-06",
+        "daily-member-08",
+        "daily-member-09",
+        "daily-member-10",
+        "daily-member-11",
+        "daily-member-12",
+        "daily-member-13",
+        "daily-member-14"
+      ]
+    },
+    {
+      "id": "tea-corner",
+      "label": "Tea corner",
+      "anchor": [
+        -1.55,
+        13.1
+      ],
+      "labelHeight": 2.1,
+      "instructorSpot": {
+        "position": [
+          -0.6,
+          13.1
+        ],
+        "heading": -1.5707963267948966,
+        "seated": true
+      },
+      "participants": [
+        "daily-member-15",
+        "daily-member-16",
+        "daily-member-17",
+        "daily-member-18",
+        "daily-member-19",
+        "daily-member-20"
+      ]
+    }
+  ],
+  "instructors": [
+    {
+      "id": "instructor-opera",
+      "name": "Ms. Leung",
+      "specialty": "Cantonese opera performer",
+      "attire": "Opera costume with water sleeves and headdress"
+    },
+    {
+      "id": "instructor-qigong",
+      "name": "Mr. Zhou",
+      "specialty": "Qigong teacher",
+      "attire": "Celadon practice silks"
+    },
+    {
+      "id": "instructor-dance",
+      "name": "Ms. Tang",
+      "specialty": "Folk dance teacher",
+      "attire": "Red qipao with gold piping"
+    },
+    {
+      "id": "instructor-taichi",
+      "name": "Mr. Wong",
+      "specialty": "Tai chi teacher",
+      "attire": "White silk tai chi uniform"
+    },
+    {
+      "id": "instructor-erhu",
+      "name": "Mr. Lam",
+      "specialty": "Erhu musician",
+      "attire": "Navy Tang jacket"
+    },
+    {
+      "id": "instructor-tcm",
+      "name": "Dr. Ho",
+      "specialty": "Traditional Chinese medicine practitioner",
+      "attire": "White mandarin-collar coat"
+    },
+    {
+      "id": "instructor-calligraphy",
+      "name": "Mr. Chan",
+      "specialty": "Calligraphy and ink-painting teacher",
+      "attire": "Maroon Tang jacket"
+    },
+    {
+      "id": "instructor-papercut",
+      "name": "Mrs. Yip",
+      "specialty": "Paper-cutting artist",
+      "attire": "Crimson Tang jacket"
+    },
+    {
+      "id": "instructor-tea",
+      "name": "Mrs. Liu",
+      "specialty": "Tea host",
+      "attire": "Jade qipao"
+    }
+  ],
   "programs": [
     {
       "id": "performance",
-      "label": "Performances",
+      "zone": "floor",
       "start": 0,
       "end": 72,
+      "label": "Cantonese opera",
+      "labelZh": "粵劇",
+      "instructorId": "instructor-opera",
+      "instructorAction": "opera",
       "leaderAction": "perform",
       "action": "clap",
-      "title": "Familiar songs & community performances",
-      "culture": "Songs and stories chosen with participants; a bilingual host invites requests.",
-      "access": "Watch, clap or join in from a chair, wheelchair or standing position."
+      "title": "Cantonese opera & familiar songs",
+      "culture": "A guest performer in full opera costume sings Cantonese opera excerpts; water-sleeve gestures and familiar songs invite requests from the room.",
+      "access": "Watch, clap or join in from a chair, wheelchair or standing position.",
+      "decor": [
+        "lanterns"
+      ]
     },
     {
-      "id": "language",
-      "label": "Language circle",
+      "id": "qigong",
+      "zone": "floor",
       "start": 72,
       "end": 144,
-      "leaderAction": "present",
-      "action": "conversation",
-      "title": "Language & conversation",
-      "culture": "Picture prompts, familiar sayings and conversation in preferred languages; Mandarin, Cantonese and English are example options.",
-      "access": "Listen, point to a picture or speak at your own pace."
+      "label": "Baduanjin qigong",
+      "labelZh": "八段錦",
+      "instructorId": "instructor-qigong",
+      "instructorAction": "qigong",
+      "leaderAction": "qigong",
+      "action": "qigong",
+      "title": "Baduanjin qigong · the Eight Brocades",
+      "culture": "Eight slow, named movements such as 'holding up the heavens', led by a qigong teacher in practice silks.",
+      "access": "Every movement has a seated version; rest whenever needed.",
+      "decor": []
     },
     {
       "id": "devices",
-      "label": "Device class",
+      "zone": "floor",
       "start": 144,
       "end": 216,
+      "label": "Device class",
       "leaderAction": "device",
       "action": "device",
       "title": "Everyday device skills",
-      "culture": "Practice video calls, photos and larger text using step-by-step visual prompts.",
-      "access": "One-to-one help, a supported tablet and repeatable small steps."
+      "culture": "Practice WeChat and video calls with family, photos and larger text using step-by-step visual prompts.",
+      "access": "One-to-one help, a supported tablet and repeatable small steps.",
+      "decor": []
     },
     {
       "id": "exercise",
-      "label": "Exercise",
+      "zone": "floor",
       "start": 216,
       "end": 288,
+      "label": "Exercise",
       "leaderAction": "exercise",
       "action": "exercise",
       "title": "Everyday movement",
       "culture": "A staff-led group with familiar music and easy-to-follow demonstrations.",
-      "access": "Standing, chair-based or wheelchair upper-body movement; rest whenever needed."
+      "access": "Standing, chair-based or wheelchair upper-body movement; rest whenever needed.",
+      "decor": []
     },
     {
       "id": "dance",
-      "label": "Dance",
+      "zone": "floor",
       "start": 288,
       "end": 360,
-      "leaderAction": "dance",
-      "action": "dance",
-      "title": "Music & dance",
-      "culture": "Participant-selected music, familiar rhythms and a simple shared sequence.",
-      "access": "Standing steps or seated rhythm and arm movements."
+      "label": "Fan dance",
+      "labelZh": "扇子舞",
+      "instructorId": "instructor-dance",
+      "instructorAction": "fan-dance",
+      "leaderAction": "fan-dance",
+      "action": "fan-dance",
+      "title": "Fan dance",
+      "culture": "Silk folding fans open, turn and flutter to Chinese folk music, led by a dance teacher in a qipao.",
+      "access": "Standing steps or seated fan and arm movements.",
+      "decor": [
+        "lanterns"
+      ]
     },
     {
       "id": "tai-chi",
-      "label": "Tai chi",
+      "zone": "floor",
       "start": 360,
       "end": 432,
+      "label": "Tai chi",
+      "labelZh": "太極拳",
+      "instructorId": "instructor-taichi",
+      "instructorAction": "tai-chi",
       "leaderAction": "tai-chi",
       "action": "tai-chi",
       "title": "Tai chi together",
-      "culture": "Slow, flowing gestures with a visible leader and time to follow.",
-      "access": "A seated version mirrors the upper-body sequence; a care aide stays nearby."
+      "culture": "Yang-style 'cloud hands' and slow weight shifts, led by a teacher in white practice silks.",
+      "access": "A seated version mirrors the upper-body sequence; a care aide stays nearby.",
+      "decor": []
     },
     {
-      "id": "calligraphy",
-      "label": "Calligraphy",
+      "id": "language",
+      "zone": "floor",
       "start": 432,
       "end": 504,
-      "leaderAction": "write",
-      "action": "write",
-      "title": "Calligraphy & brushwork",
-      "culture": "Explore personally meaningful characters and brush strokes, with large sample cards.",
-      "access": "Thick-handled brushes, supported paper and hand-over-hand help when requested."
+      "label": "Language circle",
+      "labelZh": "猜燈謎",
+      "leaderAction": "present",
+      "action": "conversation",
+      "title": "Language circle & lantern riddles",
+      "culture": "Riddles hung on red lanterns and familiar sayings in Cantonese, Mandarin and English; a bilingual host reads each one aloud.",
+      "access": "Listen, point to a picture or speak at your own pace.",
+      "decor": [
+        "riddle-lanterns"
+      ]
     },
     {
-      "id": "crafts",
-      "label": "Arts & crafts",
+      "id": "ribbon",
+      "zone": "floor",
       "start": 504,
       "end": 576,
-      "leaderAction": "craft",
-      "action": "craft",
-      "title": "Seasonal arts & crafts",
-      "culture": "Paper, color and collage inspired by the group’s interests and celebrations.",
-      "access": "Choose, arrange or create with large pieces and individual assistance."
+      "label": "Ribbon dance",
+      "labelZh": "彩帶舞",
+      "instructorId": "instructor-dance",
+      "instructorAction": "dance",
+      "leaderAction": "dance",
+      "action": "dance",
+      "title": "Silk ribbon dance",
+      "culture": "Long silk ribbons trace circles and waves to folk melodies.",
+      "access": "Short ribbons and seated arm patterns are available.",
+      "decor": []
     },
     {
       "id": "instruments",
-      "label": "Instruments",
+      "zone": "floor",
       "start": 576,
       "end": 648,
+      "label": "Erhu & sing-along",
+      "labelZh": "二胡",
+      "instructorId": "instructor-erhu",
+      "instructorAction": "erhu",
       "leaderAction": "music",
       "action": "music",
-      "title": "Rhythm & instruments",
-      "culture": "Simple percussion, listening and shared rhythms around favorite songs.",
-      "access": "Lightweight shakers and a supported hand drum; listening is welcome."
+      "title": "Erhu & sing-along",
+      "culture": "A two-string erhu leads favorite folk songs; participants keep time with shakers and a hand drum.",
+      "access": "Lightweight shakers and a supported hand drum; listening is welcome.",
+      "decor": []
     },
     {
       "id": "tcm",
-      "label": "TCM talk",
+      "zone": "floor",
       "start": 648,
       "end": 720,
+      "label": "TCM talk",
+      "labelZh": "中醫養生",
+      "instructorId": "instructor-tcm",
+      "instructorAction": "present",
       "leaderAction": "present",
       "action": "listen",
-      "title": "TCM & cultural wellness talks",
-      "culture": "A hosted educational conversation about traditional Chinese medicine, with bilingual discussion and questions.",
-      "access": "Seated listening, visual prompts and time for questions; a quiet table option stays available."
+      "title": "TCM & seasonal wellness talk",
+      "culture": "A TCM practitioner explains seasonal foods, herbal teas and acupressure points with a wall chart; the host interprets questions.",
+      "access": "Seated listening, visual prompts and time for questions; a quiet table option stays available.",
+      "decor": [
+        "herb-chart"
+      ]
+    },
+    {
+      "id": "calligraphy",
+      "zone": "arts-table",
+      "start": 0,
+      "end": 144,
+      "label": "Calligraphy",
+      "labelZh": "書法",
+      "instructorId": "instructor-calligraphy",
+      "instructorAction": "write",
+      "action": "write",
+      "title": "Calligraphy & brushwork",
+      "culture": "Brush, ink stone and rice paper: practising personally meaningful characters with a calligraphy teacher.",
+      "access": "Thick-handled brushes, supported paper and hand-over-hand help when requested.",
+      "decor": [
+        "couplets"
+      ]
+    },
+    {
+      "id": "paper-cutting",
+      "zone": "arts-table",
+      "start": 144,
+      "end": 288,
+      "label": "Paper-cutting",
+      "labelZh": "剪紙",
+      "instructorId": "instructor-papercut",
+      "instructorAction": "craft",
+      "action": "craft",
+      "title": "Paper-cutting",
+      "culture": "Folding and cutting red paper into window flowers and the character 福, good fortune.",
+      "access": "Pre-drawn patterns, spring-loaded scissors, or tearing instead of cutting.",
+      "decor": [
+        "paper-cuts"
+      ]
+    },
+    {
+      "id": "ink-painting",
+      "zone": "arts-table",
+      "start": 288,
+      "end": 432,
+      "label": "Ink painting",
+      "labelZh": "國畫",
+      "instructorId": "instructor-calligraphy",
+      "instructorAction": "write",
+      "action": "write",
+      "title": "Ink painting",
+      "culture": "Bamboo, plum blossom and orchid in black ink, one brushstroke at a time.",
+      "access": "Large brushes and pre-printed outlines.",
+      "decor": [
+        "scroll-paintings"
+      ]
+    },
+    {
+      "id": "lanterns",
+      "zone": "arts-table",
+      "start": 432,
+      "end": 576,
+      "label": "Lantern making",
+      "labelZh": "紮燈籠",
+      "instructorId": "instructor-papercut",
+      "instructorAction": "craft",
+      "action": "craft",
+      "title": "Lantern making",
+      "culture": "Folding red paper lanterns for the next festival; finished lanterns hang over the activity floor.",
+      "access": "Pre-cut pieces and glue sticks; work in pairs.",
+      "decor": [
+        "table-lanterns"
+      ]
+    },
+    {
+      "id": "couplets",
+      "zone": "arts-table",
+      "start": 576,
+      "end": 720,
+      "label": "Spring couplets",
+      "labelZh": "春聯",
+      "instructorId": "instructor-calligraphy",
+      "instructorAction": "write",
+      "action": "write",
+      "title": "Spring couplets",
+      "culture": "Writing paired good-wish verses on red paper, as families do for Lunar New Year.",
+      "access": "Thick-handled brushes, supported paper and hand-over-hand help when requested.",
+      "decor": [
+        "couplets"
+      ]
+    },
+    {
+      "id": "morning-tea",
+      "zone": "tea-corner",
+      "start": 0,
+      "end": 360,
+      "label": "Morning tea & papers",
+      "labelZh": "早茶·讀報",
+      "instructorId": "instructor-tea",
+      "instructorAction": "tea",
+      "action": "listen",
+      "title": "Morning tea & Chinese newspapers",
+      "culture": "Jasmine and oolong tea with Chinese-language newspapers; the tea host refills cups and starts conversations about the day's news.",
+      "access": "Large-print papers; reading aloud is welcome.",
+      "decor": [
+        "tea-set",
+        "newspapers"
+      ]
+    },
+    {
+      "id": "gongfu-tea",
+      "zone": "tea-corner",
+      "start": 360,
+      "end": 720,
+      "label": "Gongfu tea",
+      "labelZh": "功夫茶",
+      "instructorId": "instructor-tea",
+      "instructorAction": "tea",
+      "action": "tea",
+      "title": "Gongfu tea",
+      "culture": "Small-pot gongfu tea poured in rounds, with time to talk about family, food and festivals.",
+      "access": "Light cups with handles; caffeine-free chrysanthemum tea on request.",
+      "decor": [
+        "tea-set"
+      ]
     }
   ]
 }

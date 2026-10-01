@@ -673,8 +673,8 @@
     {
      "zoneId": "day",
      "heading": 3.1416,
-     "title": "Group movement in the day room · Dance",
-     "action": "dance",
+     "title": "Group movement in the day room · Fan dance",
+     "action": "fan-dance",
      "start": 288,
      "end": 288.8369,
      "path": [
@@ -713,15 +713,15 @@
        11.4
       ],
       [
-       -5,
-       10.2
+       -6,
+       11.2
       ],
       [
-       -4.8,
-       10.2
+       -5.2,
+       11.2
       ],
       [
-       -4.2,
+       -3.6,
        9.6
       ],
       [
@@ -758,10 +758,6 @@
       ],
       [
        4.2,
-       1.2
-      ],
-      [
-       4,
        1
       ],
       [
@@ -927,6 +923,10 @@
       ],
       [
        4.2,
+       19.6
+      ],
+      [
+       4,
        19.8
       ],
       [
@@ -2314,8 +2314,8 @@
     {
      "zoneId": "day",
      "heading": 3.1416,
-     "title": "Group movement in the day room · Dance",
-     "action": "dance",
+     "title": "Group movement in the day room · Fan dance",
+     "action": "fan-dance",
      "start": 288,
      "end": 288.8369,
      "path": [
@@ -2354,15 +2354,15 @@
        11.4
       ],
       [
-       -5,
-       10.2
+       -6,
+       11.2
       ],
       [
-       -4.8,
-       10.2
+       -5.2,
+       11.2
       ],
       [
-       -4.2,
+       -3.6,
        9.6
       ],
       [
@@ -2399,10 +2399,6 @@
       ],
       [
        4.2,
-       1.2
-      ],
-      [
-       4,
        1
       ],
       [
@@ -2568,6 +2564,10 @@
       ],
       [
        4.2,
+       19.6
+      ],
+      [
+       4,
        19.8
       ],
       [

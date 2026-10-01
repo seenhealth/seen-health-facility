@@ -18,11 +18,11 @@ const normalized = {
 };
 const data = JSON.parse(fs.readFileSync('app/data/activity-loop.json'));
 const cast = data.actors.filter((a) => a.id.startsWith('community-'));
-assert.equal(data.actors.length, 167);
+assert.equal(data.actors.length, 176);
 const profiles = JSON.parse(
   fs.readFileSync('app/data/character-templates.json'),
 ).people;
-assert.equal(new Set(data.actors.map((a) => a.profileId)).size, 167);
+assert.equal(new Set(data.actors.map((a) => a.profileId)).size, 176);
 assert(data.actors.every((a) => profiles.some((p) => p.id === a.profileId)));
 let samples = 0;
 for (const actor of cast) {
@@ -87,5 +87,5 @@ for (let t = 0; t <= 60; t += 0.1) {
   assert(p.zoom >= 1.2 && p.zoom <= 3.5);
 }
 console.log(
-  `Community: 167 unique profiles; ${samples} new cast placement samples; 4 converted rooms; animated games and fixed tilt-shift camera.`,
+  `Community: ${data.actors.length} unique profiles; ${samples} new cast placement samples; 4 converted rooms; animated games and fixed tilt-shift camera.`,
 );

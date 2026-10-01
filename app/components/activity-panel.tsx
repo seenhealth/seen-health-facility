@@ -23,7 +23,12 @@ import {
   vanWindows as siteVanWindows,
   alhambraVanWindows,
 } from '../model/arrival';
-import { dayProgram, programAt } from '../model/day-room';
+import {
+  dayProgram,
+  instructorOf,
+  sessionsAt,
+  zoneSessions,
+} from '../model/day-program';
 import type { createViewer } from '../model/renderer';
 
 export const activityViews = [
@@ -53,7 +58,12 @@ const palette: Record<string, string> = {
   treat: '#81a5bc',
   exercise: '#8db2a5',
   dance: '#b87166',
+  'fan-dance': '#c07a6e',
+  opera: '#cf8f86',
   'tai-chi': '#73a39a',
+  qigong: '#79a79c',
+  erhu: '#b99062',
+  tea: '#9fb08a',
   write: '#aa95b9',
   craft: '#cda168',
   music: '#bd9664',
@@ -102,7 +112,17 @@ export function ActivityPanel({
   useEffect(() => viewer?.activity.subscribe(setState), [viewer]);
   const time = state?.time || 0,
     change = (p: Partial<ActivitySnapshot>) => viewer?.activity.setOptions(p);
-  const session = programAt(time);
+  // Alhambra runs three zones at once; the other sites share the open-floor rotation.
+  const zones = dayProgram.zones.filter((z) => !siteSpecific || z.id === 'floor');
+  const followed = dayProgram.programs.find(
+    (p) => state?.follow === 'interaction:day-' + p.id,
+  );
+  const session = sessionsAt(time).find(
+    ({ zone }) => zone.id === (followed?.zone || 'floor'),
+  )!.session;
+  const guest = activityData.actors.some((a) => a.id === session.instructorId)
+    ? instructorOf(session)
+    : undefined;
   const chooseSession = (id: string) => {
     const p = dayProgram.programs.find((p) => p.id === id)!;
     change({ time: p.start + 3, enabled: true, filter: 'all' });
@@ -188,7 +208,7 @@ export function ActivityPanel({
             action:
               i.category === 'arrivals'
                 ? 'greet'
-                : i.category === 'rehab'
+                : i.category === 'activities'
                   ? 'exercise'
                   : 'consult',
           },
@@ -295,26 +315,32 @@ export function ActivityPanel({
               value={session.id}
               onChange={(e) => chooseSession(e.target.value)}
             >
-              {dayProgram.programs.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.label} · {dayTime(p.start)}
-                </option>
+              {zones.map((z) => (
+                <optgroup key={z.id} label={z.label}>
+                  {zoneSessions(z.id).map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.label}
+                      {p.labelZh ? ` ${p.labelZh}` : ''} · {dayTime(p.start)}
+                    </option>
+                  ))}
+                </optgroup>
               ))}
             </select>
             <button
-              onClick={() =>
+              onClick={() => {
+                const list = zoneSessions(session.zone);
                 chooseSession(
-                  dayProgram.programs[
-                    (dayProgram.programs.indexOf(session) + 1) %
-                      dayProgram.programs.length
-                  ].id,
-                )
-              }
+                  list[(list.indexOf(session) + 1) % list.length].id,
+                );
+              }}
             >
               Next activity →
             </button>
           </div>
-          <strong>{session.title}</strong>
+          <strong>
+            {session.title}
+            {guest && <span> · with {guest.name}</span>}
+          </strong>
           <p>{session.culture}</p>
           <p className="day-program-access">{session.access}</p>
           <div className="day-program-tags">
@@ -326,7 +352,7 @@ export function ActivityPanel({
           <small>
             {siteSpecific
               ? 'Activities use the existing room furniture. Choose a session, then play or follow its interaction track.'
-              : 'Three front tables cleared · Illustrative rotation · Choose a session, then play or follow its interaction track.'}
+              : 'Open floor, long arts table and tea corner run at once · Illustrative rotation · Choose a session, then play or follow its interaction track.'}
           </small>
         </div>
       )}
@@ -406,8 +432,9 @@ export function ActivityPanel({
         <div className="activity-follow">
           <Eye size={15} />
           <span>
-            <b>{selected.label}</b> ·{' '}
-            {currentStage?.title || 'Between activities'}
+            <b>{selected.label}</b>
+            {currentStage?.title !== selected.label &&
+              ` · ${currentStage?.title || 'Between activities'}`}
           </span>
           <button onClick={() => viewer?.followActor(null)}>
             Release camera

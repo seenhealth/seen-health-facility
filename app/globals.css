@@ -469,6 +469,112 @@ input[type='range'] {
 .model-label:hover {
   background: #dfebd8;
 }
+/* Floating day-room highlights: the session running in each activity zone. */
+.day-highlight {
+  --stem: 10px;
+  position: absolute;
+  transform: translate(-50%, calc(-100% - var(--stem)));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 5px 10px 6px 8px;
+  background: #fcfbf5f0;
+  border: 1px solid #ffffff;
+  border-left: 3px solid #a63a2e;
+  border-radius: 4px;
+  box-shadow: 0 3px 10px #3d221c26;
+  color: #42583b;
+  white-space: nowrap;
+  text-align: left;
+  line-height: 1.2;
+  cursor: pointer;
+  /* Above the canvas, beneath the viewer's toolbars and panels. */
+  z-index: 0;
+}
+.day-highlight::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 1px;
+  height: var(--stem);
+  background: #a63a2e;
+  pointer-events: none;
+}
+.day-highlight::before {
+  content: '';
+  position: absolute;
+  top: calc(100% + var(--stem) - 3px);
+  left: calc(50% - 2.5px);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #a63a2e;
+  box-shadow: 0 0 0 2px #fcfbf5c0;
+  pointer-events: none;
+}
+.day-highlight-title {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.day-highlight-zh {
+  color: #a63a2e;
+  font-family: 'Noto Serif TC', 'Songti TC', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans CJK TC', 'WenQuanYi Zen Hei', serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.day-highlight-zh:empty {
+  display: none;
+}
+.day-highlight-en {
+  color: #2f4a3a;
+  font-size: 12px;
+  font-weight: 600;
+}
+.day-highlight-sub {
+  color: #6b7769;
+  font-size: 10.5px;
+}
+.day-highlight.compact {
+  padding: 4px 8px 4px 7px;
+}
+.day-highlight.compact .day-highlight-sub {
+  display: none;
+}
+.day-highlight:hover,
+.day-highlight:focus-visible {
+  background: #fff5ec;
+  outline: 2px solid #a63a2e55;
+  outline-offset: 1px;
+}
+.day-highlight.following {
+  background: #a63a2e;
+  border-color: #a63a2e;
+}
+.day-highlight.following .day-highlight-zh,
+.day-highlight.following .day-highlight-en {
+  color: #fff;
+}
+.day-highlight.following .day-highlight-sub {
+  color: #f6dcd5;
+}
+@media (max-width: 800px) {
+  .day-highlight {
+    padding: 3px 7px 4px 6px;
+  }
+  .day-highlight-zh {
+    font-size: 13px;
+  }
+  .day-highlight-en {
+    font-size: 10px;
+  }
+  .day-highlight-sub {
+    display: none;
+  }
+}
 .model-room-label {
   position: absolute;
   transform: translate(-50%, -50%);

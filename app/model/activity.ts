@@ -9,7 +9,7 @@ import {
 import type { Facility, Vec2 } from './schema';
 import { buildArrival } from './arrival';
 import { buildSiteArrival } from './site-arrival';
-import { buildDayRoom } from './day-room';
+import { buildDayRoom, type DayHighlight } from './day-room';
 import { buildDeliveries } from './deliveries';
 
 export type Segment = {
@@ -389,7 +389,11 @@ export function createActivity(
   }));
   actors.forEach((a) => root.add(a.root));
   const dayRoom = data.siteSpecific
-    ? { root: new T.Group(), tick: (_time: number) => {} }
+    ? {
+        root: new T.Group(),
+        tick: (_time: number) => {},
+        highlights: (): DayHighlight[] => [],
+      }
     : buildDayRoom(actors);
   scene.add(dayRoom.root);
   const actorMap = new Map(actors.map((a) => [a.spec.id, a]));
