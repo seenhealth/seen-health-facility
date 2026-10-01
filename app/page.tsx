@@ -1307,7 +1307,7 @@ export default function Home() {
                       roof: 'Roof surfaces',
                       exterior: 'Exterior envelope',
                       ceilings: 'Ceilings & structure',
-                      community: 'Homes, pharmacy & partner sites',
+                      community: 'Community sites (homes, pharmacy, hospital & partners)',
                     } as const
                   )[k]
                 }
