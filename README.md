@@ -71,7 +71,7 @@ Exporting the specification, a GLB or a PNG of the view, opening a local specifi
 
 ## Validation
 
-The checked-in models work without private source documents or regeneration. A fresh clone validates everything offline with one command, and CI (`.github/workflows/validate.yml`, Node 22) runs the same on every push and pull request, followed by both builds:
+The checked-in models work without private source documents or regeneration. A fresh clone validates everything offline with one command, and CI (`.github/workflows/validate.yml`, Node 22) runs the same on every push and pull request, followed by the three builds:
 
 ```bash
 npm run validate    # type check, then every validator below, in this order

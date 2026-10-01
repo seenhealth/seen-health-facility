@@ -37,10 +37,10 @@ modules, per-frame placement is implemented four times, and 3D primitives are de
 | Measurement | Measure, Trace, the report and the trace validator sampled the raw loop, not the composed source the viewer plays. | Fixed in this PR: one shared composed source feeds the viewer, the panels, the report and validators. |
 | Fleet motion | Tight pull-out arcs and a docking heading snap still made vans pivot; the turn-rate bound could not catch it; delivery trucks snap 45° on departure. | Arcs and bound fixed in this PR; trucks and a per-vehicle turn check are follow-up items. |
 | Site coupling | Olympic and Alveare reuse Alhambra's van timetable; a facility without a context style inherits Alhambra's world. | Per-site van timetables fixed in this PR (`app/data/site-arrivals.json`); the general fix is the site registry below. |
-| Exporters | The GLB export scripts patch renderer imports by hand and broke when modules were added. | Follow-up: bundle with the existing Rolldown loader and add a headless renderer smoke test. |
+| Exporters | The GLB export scripts patch renderer imports by hand and broke when modules were added. | Fixed in this PR: the exporters bundle the renderer with the Rolldown loader, and `validate:renderer` is a headless smoke and disposal test for every site. |
 | Identity | The story and the community layer each had a "Mrs. Lin"; nothing detects one person in two places. | Rename in this PR; a person registry is part of the digital-twin work. |
 | Duplication | Placement logic ×4, point-in-polygon ×4, vehicle frame transform ×6, clock labels ×3, box helper ×16, five ways of compiling TypeScript for Node. | Shared kits in the migration order below. |
-| Validation | 19 validators, no runner, no CI, lint not enforced, several vacuous or orphaned checks. | `npm test` plus CI is the first infrastructure step. |
+| Validation | 19 validators, no runner, no CI, lint not enforced, several vacuous or orphaned checks. | Runner and CI added in this PR: `npm run validate` runs every validator (orphans included), `npm test` adds a `node:test` suite and CI runs both; lint enforcement and the vacuous checks are follow-up. |
 | Dependencies | The shadcn kit and about a dozen packages are unused. | Prune during the split of the renderer and the page. |
 
 ## 3. The chassis
@@ -144,7 +144,8 @@ feeds). Keep simulation and platform speaking one schema:
 ## 6. Migration order (the app works after every step)
 
 1. Correctness first: composed source everywhere (done), exporters bundled with Rolldown plus a headless
-   renderer smoke test, per-site van timetables (done), delivery departure fix, `npm test` and CI.
+   renderer smoke test (done), per-site van timetables (done), delivery departure fix, `npm test` and CI
+   (done).
 2. Golden outputs: snapshot report and trace summaries and a per-actor placement hash per site; later
    refactors keep them byte-identical unless a step says otherwise.
 3. Pure helpers: `chassis/geom` and `chassis/clock`; replace the polygon, frame, clock-label and `720`

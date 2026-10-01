@@ -31,7 +31,7 @@ The architecture review below was written for the September 2026 distributed-car
 | Fleet van pull-out arcs and docking heading snap that made vans pivot | §5 (turn-rate bullet) | Fixed in this PR |
 | Turn-radius check for every vehicle (trucks, street cars) | §5 (turn-rate bullet) | Follow-up |
 | No test runner, `npm test` or CI | §5 | Fixed in this PR |
-| Other validation gaps: orphaned validators, placement parity, fresh-compile check of the story tracks, golden outputs | §5 | Follow-up |
+| Other validation gaps: orphaned validators, placement parity, fresh-compile check of the story tracks, golden outputs | §5 | Partly fixed in this PR (orphaned validators run in `npm run validate`; `validate:scenario` fails when the committed tracks differ from a fresh compile); placement parity and golden outputs are follow-up |
 | Community pad orientation, label fitting and Plan-view gating | — | Fixed in this PR |
 | README and documentation wording | — | Fixed in this PR |
 
