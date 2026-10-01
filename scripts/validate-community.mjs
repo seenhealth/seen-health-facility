@@ -8,6 +8,13 @@ import {
 } from '../work/validation/community-assets.mjs';
 import { showcaseFrame } from '../work/validation/showcase.mjs';
 import { validateFacility } from '../work/validation/schema.mjs';
+import { missingInstances } from '../work/validation/community-settings.mjs';
+// Every facility stamped on a community pad has a current generated summary.
+assert.deepEqual(
+  missingInstances,
+  [],
+  `No current facility summary for ${missingInstances.join(', ')}: run npm run build:community`,
+);
 const model = JSON.parse(
   fs.readFileSync('public/models/seen-alhambra-planning.json'),
 );

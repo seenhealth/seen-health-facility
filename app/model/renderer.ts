@@ -39,7 +39,7 @@ import { buildAlveareExterior } from './alveare-exterior';
 import { buildRoomLabels } from './room-labels';
 import { createActivity, type ActivitySource } from './activity';
 import { alhambraSource } from './alhambra-source';
-import { COMMUNITY_SOURCE_ID, COMMUNITY_VIEW } from './community-people';
+import { COMMUNITY_SOURCE_ID, COMMUNITY_VIEW } from './community-settings';
 import { buildCommunityLayer } from './community-layer';
 import { registerCommunityVehicles } from './community-vehicles';
 import {
@@ -385,6 +385,12 @@ export type ViewerOptions = {
   labels?: boolean;
   /** Keep the street and neighbors visible while levels are stacked apart. */
   keepSiteWhenStacked?: boolean;
+  /**
+   * Resolves community facility URLs (registry `facility.url`) to validated
+   * specifications; the story resolves them against its asset base. Default:
+   * fetch the root-relative URL.
+   */
+  loadFacility?: (url: string) => Promise<Facility>;
 };
 const SHOT_DISTANCE = 150;
 export function createViewer(
@@ -479,8 +485,11 @@ export function createViewer(
   const maxAnisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
   const textures: T.Texture[] = [],
     materials = new Map<string, T.MeshStandardMaterial>();
-  const finish = (id: string): MaterialSpec => ({
-    ...(model.materials[id] || {
+  // Finishes and materials resolve against a facility's own `materials`
+  // (the viewer's model by default, or a facility stamped on a community
+  // pad), then the presentation palette.
+  const finish = (id: string, source: Facility = model): MaterialSpec => ({
+    ...(source.materials[id] || {
       color: id.startsWith('#') ? id : '#dce1d8',
       roughness: 0.8,
     }),
@@ -627,9 +636,10 @@ export function createViewer(
     textures.push(tex);
     return tex;
   }
-  const mat = (id: string) => {
-    if (!materials.has(id)) {
-      const d = finish(id);
+  const mat = (id: string, source: Facility = model) => {
+    const key = source === model ? id : `${source.id}::${id}`;
+    if (!materials.has(key)) {
+      const d = finish(id, source);
       let surfaceMap: T.Texture | null = d.pattern ? pattern(d.pattern) : null;
       if (d.textureUrl) {
         materialLoads.push(
@@ -651,7 +661,7 @@ export function createViewer(
         );
       }
       materials.set(
-        id,
+        key,
         new T.MeshStandardMaterial({
           color: d.color,
           roughness: d.roughness,
@@ -664,7 +674,7 @@ export function createViewer(
         }),
       );
     }
-    return materials.get(id)!;
+    return materials.get(key)!;
   };
   const mesh = (
     g: T.Object3D,
@@ -905,7 +915,12 @@ export function createViewer(
         withCommunity ? registerCommunityVehicles : undefined,
       )
     : createSiteActivity(model, scene, mat);
-  const community = withCommunity ? buildCommunityLayer(model, mat) : null;
+  const community = withCommunity
+    ? buildCommunityLayer(model, mat, {
+        loadFacility: options.loadFacility,
+        materialFor: (f) => (id) => mat(id, f),
+      })
+    : null;
   if (community) context.add(community.root);
   const furnitureRoots: T.Group[] = [];
   const exteriorAssets: T.Group[] = [],
@@ -2180,6 +2195,7 @@ export function createViewer(
       dimensions: model.dimensions.length,
     }),
     dispose: () => {
+      community?.dispose();
       stopRecording?.();
       disposed = true;
       cancelAnimationFrame(frame);

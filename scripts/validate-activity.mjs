@@ -20,7 +20,8 @@ const m = JSON.parse(
 );
 // The engine plays its source as given; the viewer gives it the composed
 // Alhambra source: the 167-person loop, the fleet crew (177) and the
-// community cast (203), with the community vehicles registered so their
+// community cast (195: the partner day center's cast is regenerated with
+// its facility instance), with the community vehicles registered so their
 // riders' seats resolve.
 const scene = new T.Scene(),
   activity = createActivity(
@@ -32,7 +33,7 @@ const scene = new T.Scene(),
   ),
   neighborhood = buildNeighborhood(m);
 scene.add(neighborhood.root);
-assert.equal(activity.actors.length, 203);
+assert.equal(activity.actors.length, 195);
 assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 167);
 for (const role of [
   'doctor',

@@ -6,12 +6,13 @@ import { FLEET_VAN_RAMP } from './photo-assets';
 import {
   careSettingById,
   careSettings,
+  COMMUNITY_SOURCE_ID,
+  COMMUNITY_VIEW,
   groundYAt,
   padPolygon,
   PAD_Y,
   PORCH_Y,
   settingZone,
-  toLocal,
   type CareSetting,
 } from './community-settings';
 import {
@@ -30,13 +31,7 @@ import {
  * static poses otherwise, and seats in the community vehicles while riding.
  * Loop seconds throughout: 1 s = 40 clock seconds, 8 AM = 0, 4 PM = 720.
  */
-/** Source id of the community layer (`ActorSpec.sourceId` after composition). */
-export const COMMUNITY_SOURCE_ID = 'community';
-/** The filter view the layer adds to the activity panel. */
-export const COMMUNITY_VIEW = {
-  id: 'community',
-  label: 'Homes, pharmacy, hospital & partners',
-};
+export { COMMUNITY_SOURCE_ID, COMMUNITY_VIEW } from './community-settings';
 const VAN = 'van-community';
 const CLOCK_END = 720;
 const VAN_FLOOR = 0.35;
@@ -261,8 +256,7 @@ export function communitySource(model: Facility): SourceExtension {
   const home = careSettingById('home-lin')!,
     pharmacy = careSettingById('pharmacy')!,
     hospital = careSettingById('hospital')!,
-    specialist = careSettingById('specialist')!,
-    adc = careSettingById('partner-adc')!;
+    specialist = careSettingById('specialist')!;
   const A = (s: CareSetting) => s.anchors;
   const actors: ActorSpec[] = [],
     interactions: Interaction[] = [];
@@ -290,8 +284,7 @@ export function communitySource(model: Facility): SourceExtension {
   const h = A(home),
     p = A(pharmacy),
     q = A(hospital),
-    c = A(specialist),
-    d = A(adc);
+    c = A(specialist);
   const homeZone = settingZone(home.id);
   // Van stops (the van is parked at each for these moments).
   const homeAm = vanStop(10),
@@ -1155,181 +1148,6 @@ export function communitySource(model: Facility): SourceExtension {
       268,
       'Back to the van',
       'The escort aide meets her at the door and they board for home.',
-    );
-  }
-
-  // --- Partner adult day center --------------------------------------------
-  {
-    const zone = settingZone(adc.id),
-      opts = { zoneId: zone };
-    const tables = [
-      ['adc-participant-1', d.seatA, d.tcB, 10],
-      ['adc-participant-2', d.seatB, d.tcC, 11],
-      ['adc-participant-3', d.seatC, d.tcE, 12],
-      ['adc-participant-4', d.seatD, d.tcF, 13],
-    ] as const;
-    tables.forEach(([id, seat, tc, variant], i) => {
-      // Face the table: toward the building when seated on its road side.
-      const faceTable = rel(
-        adc,
-        toLocal(adc, seat)[1] > toLocal(adc, d.tableFace)[1] ? Math.PI : 0,
-      );
-      add(
-        new Track(
-          id,
-          'participant',
-          {
-            ...opts,
-            label: `Day center participant ${i + 1}`,
-            variant,
-            mobility: i === 1 ? 'cane' : undefined,
-          },
-          seat,
-        )
-          .hold(170 + i * 2, 'seated', {
-            title: 'Morning coffee on the patio',
-            heading: faceTable,
-          })
-          .walk(180, [tc], { title: 'Out for tai chi' })
-          .hold(247.5, 'tai-chi', {
-            title: 'Morning tai chi',
-            heading: rel(adc, Math.PI),
-          })
-          .walk(262 - i * 2, [seat], { title: 'Back to the tables' })
-          .hold(420, 'tabletop', {
-            title: 'Tabletop games',
-            heading: faceTable,
-          })
-          .hold(CLOCK_END, 'seated', {
-            title: 'Afternoon on the patio',
-            heading: faceTable,
-          }),
-      );
-    });
-    const chairs = [
-      ['adc-participant-5', d.chairE, d.tcA, 14],
-      ['adc-participant-6', d.chairF, d.tcD, 15],
-    ] as const;
-    chairs.forEach(([id, chair, tc, variant], i) => {
-      add(
-        new Track(
-          id,
-          'participant',
-          {
-            ...opts,
-            label: `Day center participant ${i + 5}`,
-            variant,
-            mobility: i ? 'walker' : undefined,
-          },
-          chair,
-        )
-          .hold(172 + i * 3, 'seated', {
-            title: 'Morning coffee on the patio',
-            heading: rel(adc, Math.PI / 2),
-          })
-          .walk(180, [tc], { title: 'Out for tai chi' })
-          .hold(247.5, 'tai-chi', {
-            title: 'Morning tai chi',
-            heading: rel(adc, Math.PI),
-          })
-          .hold(270, 'conversation', {
-            title: 'Meeting the visiting PT',
-            heading: rel(adc, Math.PI / 2),
-          })
-          .hold(360, 'exercise', {
-            title: 'Strength & balance with the Seen PT',
-            heading: rel(adc, Math.PI / 2),
-          })
-          .walk(368 + i * 2, [chair], { title: 'Back to a chair' })
-          .hold(CLOCK_END, 'seated', {
-            title: 'Afternoon on the patio',
-            heading: rel(adc, Math.PI / 2),
-          }),
-      );
-    });
-    const lead = new Track(
-      'adc-lead',
-      'activities',
-      { ...opts, label: 'Day center activities lead', variant: 3 },
-      d.lead,
-    )
-      .hold(180, 'conversation', {
-        title: 'Welcoming the group',
-        heading: rel(adc, Math.PI),
-      })
-      .hold(247.5, 'tai-chi', {
-        title: 'Leading tai chi',
-        heading: rel(adc, Math.PI),
-      })
-      .walk(262, [d.leadTables], { title: 'Setting up the tables' })
-      .hold(420, 'present', { title: 'Tabletop games', heading: rel(adc) })
-      .walk(426, [d.lead], { title: 'Back to the patio front' })
-      .hold(CLOCK_END, 'conversation', {
-        title: 'Afternoon conversation',
-        heading: rel(adc, Math.PI),
-      });
-    add(lead);
-    const pt = new Track(
-      'visiting-pt',
-      'pt',
-      { ...opts, label: 'Visiting Seen physical therapist', variant: 8 },
-      d.sidewalkEnd,
-    )
-      .hidden(190, 'Driving from the center')
-      .walk(247.5, [d.sidewalkPad, d.patioCorner, d.patioEdge, d.ptGreet], {
-        title: 'Arriving at the partner center',
-      })
-      .hold(268, 'greet', {
-        title: 'Catching up with the activities lead',
-        face: d.lead,
-      })
-      .walk(272, [d.ptStand], { title: 'Setting up' })
-      .hold(360, 'exercise', {
-        title: 'Seated strength & balance',
-        heading: rel(adc, -Math.PI / 2),
-      })
-      .walk(420, [d.patioEdge, d.patioCorner, d.sidewalkPad, d.sidewalkEnd], {
-        title: 'Back to the center',
-      })
-      .hidden(CLOCK_END, 'At the center');
-    add(pt);
-    const six = [
-      'adc-participant-1',
-      'adc-participant-2',
-      'adc-participant-3',
-      'adc-participant-4',
-      'adc-participant-5',
-      'adc-participant-6',
-    ];
-    interact(
-      'partner-tai-chi',
-      'partner',
-      zone,
-      ['adc-lead', ...six],
-      180,
-      247.5,
-      'Partner center · morning tai chi',
-      'Six participants follow the activities lead on the patio: the same repertoire as the Seen day room.',
-    );
-    interact(
-      'partner-tabletop',
-      'partner',
-      zone,
-      ['adc-lead', ...six.slice(0, 4)],
-      262,
-      420,
-      'Partner center · tabletop games',
-      'Games at the patio tables after tai chi.',
-    );
-    interact(
-      'partner-pt',
-      'partner',
-      zone,
-      ['visiting-pt', 'adc-participant-5', 'adc-participant-6'],
-      270,
-      360,
-      'Visiting Seen PT · strength & balance',
-      'A Seen physical therapist visits the partner center for a seated strength and balance session with two participants.',
     );
   }
 

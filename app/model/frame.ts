@@ -44,3 +44,17 @@ export function composeFrames(outer: Placed, inner: Placed): Frame {
 export function transformPolygon(f: Placed, poly: readonly Vec2[]): Vec2[] {
   return poly.map((p) => toWorld(f, p));
 }
+/** Even-odd point-in-polygon test on the ground plane. */
+export function insidePolygon(p: Vec2, poly: readonly Vec2[]) {
+  let odd = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const a = poly[i],
+      b = poly[j];
+    if (
+      a[1] > p[1] !== b[1] > p[1] &&
+      p[0] < ((b[0] - a[0]) * (p[1] - a[1])) / (b[1] - a[1]) + a[0]
+    )
+      odd = !odd;
+  }
+  return odd;
+}

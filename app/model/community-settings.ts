@@ -1,5 +1,15 @@
 import type { Vec2 } from './schema';
-import { toLocal, toWorld, worldDir } from './frame';
+import dayProgram from '../data/day-program.json';
+import instanceSummaryFile from '../data/community-instances.json';
+import {
+  composeFrames,
+  insidePolygon,
+  toLocal,
+  toWorld,
+  transformPolygon,
+  worldDir,
+  type Frame,
+} from './frame';
 
 /**
  * Distributed-care settings around the Seen center: the registry that the
@@ -33,14 +43,49 @@ export type SettingKind =
  * present, runs `LANE` m outside the first.
  */
 export type DriveLoop = { depth: number; radius: number; lanes: 1 | 2 };
+/**
+ * A real facility specification (schema 2.0) stamped on the pad instead of
+ * schematic massing (facility-instance.ts). Its footprint, from the generated
+ * summary (app/data/community-instances.json, `npm run build:community`),
+ * sizes the pad and gives people inside it the floor height.
+ */
+export type CareFacility = {
+  /** Expected Facility.id; equal to the viewer's model id → stamped from that model, no fetch. */
+  id: string;
+  /** Root-relative spec URL, like sites.ts `model` ('/models/….json'). */
+  url: string;
+  /** Facility origin and rotation in the setting's local frame. */
+  frame: Frame;
+  levelIds?: string[];
+  excludeZoneIds?: string[];
+  excludeObjectIds?: string[];
+  /** Cut walls at the cutaway height (default true); instances ignore the main building's wall mode. */
+  cutaway?: boolean;
+  labels?: boolean | Record<string, string>;
+  /** Finished floor height (default 0; a home uses PORCH_Y so the porch meets its door). */
+  floorY?: number;
+  /** Clearance kept between the footprint and the pad edge (default 1.6 m). */
+  margin?: number;
+  /**
+   * Anchors of things the pad's site builder draws on the grounds (trees,
+   * benches, a patio's corners); `npm run build:community` checks each stays
+   * at least 1 m outside the footprint.
+   */
+  grounds?: string[];
+};
 export type CareSetting = {
   id: string;
   kind: SettingKind;
   name: string;
+  /** Short display name: trace places, story badges ('Partner ADC', 'Home', 'Pharmacy'). */
+  short: string;
+  /** Zone name in the trace and Measure (default `name`), e.g. 'Partner ADC · Seen layout'. */
+  traceName?: string;
   subtitle: string;
   position: Vec2;
   heading: number;
-  pad: { w: number; d: number };
+  /** `back` extends the pad behind its origin (local −z) without moving the front edge. */
+  pad: { w: number; d: number; back?: number };
   /** Access stub centre-line from the ring-street edge to the pad edge. */
   road: { from: Vec2; to: Vec2 };
   drive: DriveLoop;
@@ -50,6 +95,38 @@ export type CareSetting = {
   anchors: Record<string, Vec2>;
   services: string[];
   accent: string;
+  facility?: CareFacility;
+};
+/** A room of a stamped facility, in the setting's local frame or the world. */
+export type SettingRoom = {
+  id: string;
+  name: string;
+  /** Registry display name when the room is labelled. */
+  label?: string;
+  zoneId: string;
+  anchor: Vec2;
+  polygon: Vec2[];
+};
+/** One setting's entry in the generated summary (setting-local, 2 dp). */
+export type InstanceSummary = {
+  facilityId: string;
+  revision: string;
+  floorY: number;
+  /** The registry and cast inputs it was generated from (drift check). */
+  inputs: {
+    frame: Frame;
+    levelIds: string[];
+    excludeZoneIds: string[];
+    excludeObjectIds: string[];
+    castSha1: string | null;
+  };
+  /** Polygons of the drawn zones. */
+  footprint: Vec2[][];
+  rooms: SettingRoom[];
+};
+export type InstanceSummaries = {
+  version: 1;
+  instances: Record<string, InstanceSummary>;
 };
 
 export const LANE = 3.4;
@@ -58,6 +135,13 @@ export const PAD_Y = -0.05;
 export const PORCH_Y = 0.3;
 export const SETTING_ZONE_PREFIX = 'community:';
 export const settingZone = (id: string) => `${SETTING_ZONE_PREFIX}${id}`;
+/** Source id of the community layer (`ActorSpec.sourceId` after composition). */
+export const COMMUNITY_SOURCE_ID = 'community';
+/** The filter view the community layer adds to the activity panel. */
+export const COMMUNITY_VIEW = {
+  id: 'community',
+  label: 'Homes, pharmacy, hospital & partners',
+};
 
 // A setting's frame follows the one documented convention (frame.ts):
 // local → world like `Object3D.rotation.y`.
@@ -144,6 +228,19 @@ const boundsCache = new Map<string, [Vec2, Vec2]>();
  * that setting's paving; elsewhere it is the street level of the center's lot.
  */
 export function groundYAt(p: Vec2) {
+  // Inside a stamped facility: its finished floor.
+  for (const s of careSettings) {
+    const fp = footprintCache(s);
+    if (
+      fp &&
+      p[0] >= fp.bounds[0][0] &&
+      p[0] <= fp.bounds[1][0] &&
+      p[1] >= fp.bounds[0][1] &&
+      p[1] <= fp.bounds[1][1] &&
+      fp.polygons.some((poly) => insidePolygon(p, poly))
+    )
+      return s.facility!.floorY ?? 0;
+  }
   for (const s of careSettings) {
     let b = boundsCache.get(s.id);
     if (!b) boundsCache.set(s.id, (b = padBounds(s)));
@@ -173,10 +270,11 @@ export function groundYAt(p: Vec2) {
 export function padPolygon(
   s: Pick<CareSetting, 'position' | 'heading' | 'pad'>,
 ): Vec2[] {
+  const back = -s.pad.d / 2 - (s.pad.back ?? 0);
   return (
     [
-      [-s.pad.w / 2, -s.pad.d / 2],
-      [s.pad.w / 2, -s.pad.d / 2],
+      [-s.pad.w / 2, back],
+      [s.pad.w / 2, back],
       [s.pad.w / 2, s.pad.d / 2],
       [-s.pad.w / 2, s.pad.d / 2],
     ] as Vec2[]
@@ -193,6 +291,55 @@ export function padBounds(
     [Math.min(...xs), Math.min(...zs)],
     [Math.max(...xs), Math.max(...zs)],
   ];
+}
+
+/** World frame of a setting's facility origin (setting frame ∘ `facility.frame`). */
+export function facilityWorldFrame(
+  s: Pick<CareSetting, 'position' | 'heading' | 'facility'>,
+): Frame {
+  if (!s.facility) throw new Error('This setting has no facility');
+  return composeFrames(s, s.facility.frame);
+}
+const footprints = new Map<
+  string,
+  { polygons: Vec2[][]; bounds: [Vec2, Vec2] } | null
+>();
+function footprintCache(s: CareSetting) {
+  if (!footprints.has(s.id)) {
+    const summary = instanceSummary(s);
+    if (!summary) footprints.set(s.id, null);
+    else {
+      const polygons = summary.footprint.map((poly) =>
+          transformPolygon(s, poly),
+        ),
+        xs = polygons.flat().map((p) => p[0]),
+        zs = polygons.flat().map((p) => p[1]);
+      footprints.set(s.id, {
+        polygons,
+        bounds: [
+          [Math.min(...xs), Math.min(...zs)],
+          [Math.max(...xs), Math.max(...zs)],
+        ],
+      });
+    }
+  }
+  return footprints.get(s.id)!;
+}
+/** World polygons of a setting's stamped facility (its drawn zones), or []. */
+export function instanceFootprint(s: CareSetting): Vec2[][] {
+  return footprintCache(s)?.polygons ?? [];
+}
+/**
+ * Rooms of a setting's stamped facility in world coordinates, ids prefixed
+ * with the setting's zone (`community:partner-adc/day-open`), or [].
+ */
+export function instanceRooms(s: CareSetting): SettingRoom[] {
+  return (instanceSummary(s)?.rooms ?? []).map((r) => ({
+    ...r,
+    id: `${settingZone(s.id)}/${r.id}`,
+    anchor: toWorld(s, r.anchor),
+    polygon: transformPolygon(s, r.polygon),
+  }));
 }
 
 type Draft = Omit<CareSetting, 'anchors'> & { local: Record<string, Vec2> };
@@ -215,8 +362,73 @@ function labelAnchor(s: Omit<CareSetting, 'anchors'>): Vec2 {
     side = Math.sign(worldDir(s, [-1, 0])[0]) || -1;
   return [to[0] + side * (half + 0.6 + LABEL_PLATE.w / 2), z];
 }
+const instanceSummaries = (instanceSummaryFile as unknown as InstanceSummaries)
+  .instances;
+/**
+ * Settings whose facility has no current generated summary (never generated,
+ * or the registry's facility config changed since): their pads keep the
+ * authored size. `validate-community` fails while this is not empty.
+ */
+export const missingInstances: string[] = [];
+const sameJSON = (a: unknown, b: unknown) =>
+  JSON.stringify(a) === JSON.stringify(b);
+/** True when a summary was generated from this facility config. */
+export function summaryMatches(cfg: CareFacility, summary: InstanceSummary) {
+  const i = summary.inputs;
+  return (
+    summary.facilityId === cfg.id &&
+    summary.floorY === (cfg.floorY ?? 0) &&
+    sameJSON(i.frame, cfg.frame) &&
+    (!cfg.levelIds || sameJSON(i.levelIds, cfg.levelIds)) &&
+    sameJSON(i.excludeZoneIds, cfg.excludeZoneIds ?? []) &&
+    sameJSON(i.excludeObjectIds, cfg.excludeObjectIds ?? [])
+  );
+}
+/**
+ * The pad a building needs: wide enough for the footprint plus the margin on
+ * both sides, extended behind the origin (`back`) when the building is deep,
+ * never smaller than authored. The front edge, drive and anchors stay put; a
+ * building past the front edge is an authoring error.
+ */
+export function derivePad(
+  s: Pick<CareSetting, 'id' | 'pad' | 'facility'>,
+  summary: InstanceSummary,
+): CareSetting['pad'] {
+  const margin = s.facility?.margin ?? 1.6,
+    pts = summary.footprint.flat(),
+    xs = pts.map((p) => Math.abs(p[0])),
+    zs = pts.map((p) => p[1]),
+    front = Math.max(...zs) + margin;
+  if (front > s.pad.d / 2 + 1e-9)
+    throw new Error(
+      `${s.id}: the building reaches ${front.toFixed(2)} m, past the pad's front edge at ${s.pad.d / 2} m; move facility.frame or grow pad.d`,
+    );
+  return {
+    w: Math.max(s.pad.w, 2 * (Math.max(...xs) + margin)),
+    d: s.pad.d,
+    back: Math.max(
+      s.pad.back ?? 0,
+      -Math.min(...zs) + margin - s.pad.d / 2,
+      0,
+    ),
+  };
+}
+/** The current summary of a setting's facility, or undefined. */
+export function instanceSummary(
+  s: Pick<CareSetting, 'id' | 'facility'>,
+): InstanceSummary | undefined {
+  const summary = instanceSummaries[s.id];
+  return s.facility && summary && summaryMatches(s.facility, summary)
+    ? summary
+    : undefined;
+}
 const define = (d: Draft): CareSetting => {
-  const { local, ...rest } = d;
+  const { local, ...authored } = d;
+  const summary = instanceSummary(authored);
+  if (authored.facility && !summary) missingInstances.push(authored.id);
+  const rest = summary
+    ? { ...authored, pad: derivePad(authored, summary) }
+    : authored;
   const anchors = Object.fromEntries(
     Object.entries(local).map(([k, p]) => [k, toWorld(rest, p)]),
   );
@@ -237,6 +449,7 @@ export const careSettings: CareSetting[] = [
     id: 'home-lin',
     kind: 'home',
     name: "The Wongs' home",
+    short: 'Home',
     subtitle: 'Home care · home health · pill packs · meals · home mods',
     position: [-84, 12],
     heading: Math.PI / 2,
@@ -319,6 +532,7 @@ export const careSettings: CareSetting[] = [
     id: 'pharmacy',
     kind: 'pharmacy',
     name: 'Partner pharmacy · pill packs',
+    short: 'Pharmacy',
     subtitle: 'Weekly blister packs prepared and couriered',
     position: [-84, -22],
     heading: Math.PI / 2,
@@ -343,6 +557,7 @@ export const careSettings: CareSetting[] = [
     id: 'hospital',
     kind: 'hospital',
     name: 'Community hospital · ED & inpatient',
+    short: 'Hospital',
     subtitle: 'Admission, rounds and discharge coordination',
     position: [94, 14],
     heading: 0,
@@ -383,6 +598,7 @@ export const careSettings: CareSetting[] = [
     id: 'specialist',
     kind: 'specialist',
     name: 'Cardiology & specialty clinic',
+    short: 'Cardiology',
     subtitle: 'Contracted specialist visits with a Seen escort',
     position: [84, -56],
     heading: 0,
@@ -415,43 +631,73 @@ export const careSettings: CareSetting[] = [
     id: 'partner-adc',
     kind: 'partner-adc',
     name: 'Partner adult day center',
-    subtitle: 'Contracted day program with visiting Seen therapy',
-    position: [8, -64],
+    short: 'Partner ADC',
+    traceName: 'Partner ADC · Seen layout',
+    subtitle:
+      'Seen Health floor plan · partner day program · visiting Seen clinicians',
+    position: [4, -68],
     heading: 0,
-    pad: { w: 32, d: 26 },
-    road: { from: [8, -35.8], to: [8, -51] },
+    pad: { w: 62, d: 50 }, // minimum; the facility footprint derives w and back
+    road: { from: [4, -35.8], to: [4, -43] },
     drive: { depth: 6, radius: 6.2, lanes: 1 },
     apron: { w: 10, d: 3 },
     services: ['day-program'],
     accent: '#b39a5c',
+    // Seen's own ground floor, its west entrance and arrival court facing the
+    // street: facility (x, z) → pad (z + 0.99, −x − 8.15).
+    facility: {
+      id: 'seen-alhambra-planning',
+      url: '/models/seen-alhambra-planning.json',
+      frame: { position: [0.99, -8.15], heading: Math.PI / 2 },
+      levelIds: ['ground'],
+      excludeZoneIds: ['adjacent'],
+      // Seen's day room as Seen furnishes it (front tables cleared), and two
+      // dining places left open for wheelchairs.
+      excludeObjectIds: [
+        ...dayProgram.removedObjectIds,
+        'dining-table-02-chair-3',
+        'dining-table-04-chair-3',
+      ],
+      cutaway: true,
+      labels: {
+        'day-open': 'Day room',
+        'rehab-open': 'Physical therapy',
+        'dining-1421': 'Dining',
+        'clinic-nurse': 'Nurse station',
+        'lobby-arrival': 'Reception',
+        'admin-workstations': 'Games lounge',
+      },
+      margin: 1.6,
+      grounds: ['treeA', 'treeB', 'treeC', 'treeD', 'bench', 'patioMin', 'patioMax'],
+    },
     local: {
-      entrance: [2, -4.4],
-      lead: [-11.4, -3.8],
-      leadTables: [-11.4, -9.6],
-      tcA: [-14, -5.6],
-      tcB: [-11.4, -5.6],
-      tcC: [-8.8, -5.6],
-      tcD: [-14, -7.8],
-      tcE: [-11.4, -7.8],
-      tcF: [-8.8, -7.8],
-      seatA: [-13.2, -9.9],
-      seatB: [-13.2, -12.1],
-      seatC: [-9.0, -9.9],
-      seatD: [-9.0, -12.1],
-      chairE: [-15.2, -5.0],
-      chairF: [-15.2, -8.4],
-      ptStand: [-12.2, -6.7],
-      ptGreet: [-9.6, -3.6],
-      tableFace: [-11.1, -11],
-      sidewalkEnd: [8.7, 27.5],
-      sidewalkPad: [8.7, 13.5],
-      patioCorner: [8.7, -2.5],
-      patioEdge: [-6.2, -2.5],
+      // Visiting staff: street sidewalk → court walk (between the drive and
+      // the rehab block) → west door.
+      sidewalkEnd: [8.8, 31.4],
+      sidewalkPad: [8.8, 24.4],
+      courtA: [8.85, 21.5],
+      courtB: [8.6, 8.4],
+      doorOutside: [0, 7.15], // facility (−15.3, −0.99)
+      // The tai chi patio in the arrival court's west half, under a pergola.
+      patioMin: [-20, 9],
+      patioMax: [-11, 19],
+      // Grounds (outside the footprint and the drive; validated).
+      treeA: [-26.5, 19.5],
+      treeB: [-26.5, 1.5],
+      treeC: [-26.5, -17.5],
+      treeD: [-16.5, 21.0],
+      bench: [-19.3, 14.0],
     },
   }),
 ];
 export const careSettingById = (id: string) =>
   careSettings.find((s) => s.id === id);
+/** Facility specifications the community layer stamps (for static builds). */
+export const instanceFacilityUrls = (): string[] => [
+  ...new Set(
+    careSettings.flatMap((s) => (s.facility ? [s.facility.url] : [])),
+  ),
+];
 /** Service badges shown on label plates and in docs. */
 export const serviceLabels: Record<string, string> = {
   'home-care': 'Personal care',

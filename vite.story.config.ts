@@ -13,9 +13,14 @@ import react from '@vitejs/plugin-react';
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, type Plugin } from 'vite';
+import { instanceFacilityUrls } from './app/model/community-settings';
 
 const here = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 const FACILITY = 'models/seen-alhambra-planning.json';
+/** The story's model plus the facilities stamped on community pads. */
+const FACILITIES = [
+  ...new Set([FACILITY, ...instanceFacilityUrls().map((u) => u.slice(1))]),
+];
 const STATIC = ['brand/seen-health-horizontal.png', 'favicon.svg'];
 
 type Facility = {
@@ -23,25 +28,27 @@ type Facility = {
   assets?: Record<string, { modelUrl?: string }>;
 };
 
-/** Emits the facility JSON (minified) and every file it loads at runtime. */
+/** Emits the facility JSONs (minified) and every file they load at runtime. */
 function storyAssets(): Plugin {
   return {
     name: 'seen-story-assets',
     apply: 'build',
     generateBundle() {
-      const facility = JSON.parse(readFileSync(here(`public/${FACILITY}`), 'utf8')) as Facility;
       const runtime = new Set<string>(STATIC);
-      // site.image (the source plan) is only shown in plan mode; the story
-      // replaces it at runtime, so it is intentionally not copied.
-      for (const m of Object.values(facility.materials || {}))
-        if (m.textureUrl?.startsWith('/')) runtime.add(m.textureUrl.slice(1));
-      for (const a of Object.values(facility.assets || {}))
-        if (a.modelUrl?.startsWith('/')) runtime.add(a.modelUrl.slice(1));
-      this.emitFile({
-        type: 'asset',
-        fileName: FACILITY,
-        source: JSON.stringify(facility),
-      });
+      for (const file of FACILITIES) {
+        const facility = JSON.parse(readFileSync(here(`public/${file}`), 'utf8')) as Facility;
+        // site.image (the source plan) is only shown in plan mode; the story
+        // replaces it at runtime, so it is intentionally not copied.
+        for (const m of Object.values(facility.materials || {}))
+          if (m.textureUrl?.startsWith('/')) runtime.add(m.textureUrl.slice(1));
+        for (const a of Object.values(facility.assets || {}))
+          if (a.modelUrl?.startsWith('/')) runtime.add(a.modelUrl.slice(1));
+        this.emitFile({
+          type: 'asset',
+          fileName: file,
+          source: JSON.stringify(facility),
+        });
+      }
       for (const file of runtime) {
         const source = here(`public/${file}`);
         if (!existsSync(source)) {

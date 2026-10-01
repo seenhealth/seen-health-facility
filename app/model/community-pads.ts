@@ -21,7 +21,9 @@ import {
  * outlines only; everything casts and receives shadows.
  *
  * Geometry is authored in the setting's local frame (front toward +z) and the
- * returned group carries the setting's position and heading.
+ * returned group carries the setting's position and heading. A builder has two
+ * parts: `massing` (the building, replaced when a facility instance is
+ * stamped on the pad) and `site` (porches, ramps, planting, props), which stay.
  */
 const PALETTE = {
   plinth: '#e6e2d9',
@@ -229,7 +231,7 @@ function arc(
 /** Plinth, drive band, stub, sidewalk and apron shared by every kind. */
 function buildGround(s: CareSetting, h: Ctx) {
   const w = s.pad.w,
-    d = s.pad.d,
+    zBack = -s.pad.d / 2 - (s.pad.back ?? 0),
     zF = frontZ(s),
     zS = streetZ(s),
     cz = zF - s.drive.depth,
@@ -262,8 +264,8 @@ function buildGround(s: CareSetting, h: Ctx) {
     [rOut, cz],
     [rOut, zF],
     [w / 2, zF],
-    [w / 2, -d / 2],
-    [-w / 2, -d / 2],
+    [w / 2, zBack],
+    [-w / 2, zBack],
   );
   h.patch(
     outer,
@@ -413,22 +415,24 @@ function pitchedRoof(
 }
 
 function buildHouse(s: CareSetting, h: Ctx) {
-  const a = (k: string) => toLocalPoint(s, s.anchors[k]);
-  // Bungalow: body, pitched roof, chimney, door and windows.
+  const door = toLocalPoint(s, s.anchors.door);
+  // Bungalow: body, pitched roof, chimney, door, windows and the door canopy.
   h.box(0, PAD_Y, -10.6, 14, 3.0, 6.0, PALETTE.wallWarm);
   pitchedRoof(h, -7, 7, -13.6, -7.6, PAD_Y + 3.0, 1.9, PALETTE.houseRoof);
   h.box(-4.2, PAD_Y + 3.0, -11.6, 0.9, 2.0, 0.9, PALETTE.trim);
-  const door = a('door');
   h.box(door[0], PAD_Y + 0.3, -7.56, 0.95, 2.1, 0.08, s.accent);
   h.windows(-6.6, -1.6, PAD_Y + 1.0, -7.56, 1.35, 2.4, 1.4);
   h.windows(2.2, 6.6, PAD_Y + 1.0, -7.56, 1.35, 2.4, 1.4);
-  // Porch with posts, roof and a bench; the new ramp with rails from the pad.
+  h.box(door[0], PAD_Y + 2.5, -7.0, 2.6, 0.14, 1.3, PALETTE.houseRoof);
+}
+function buildHomeSite(s: CareSetting, h: Ctx) {
+  const a = (k: string) => toLocalPoint(s, s.anchors[k]);
+  // Porch with posts and a bench; the new ramp with rails from the pad.
   h.box(-0.6, PAD_Y, -6.3, 8.0, PORCH_Y - PAD_Y, 2.6, PALETTE.stone);
-  // Open porch with a low rail; a small canopy over the door keeps the stage visible.
+  // Open porch with a low rail.
   for (const x of [-4.5, 3.3])
     h.box(x, PORCH_Y, -5.1, 0.08, 0.9, 0.08, PALETTE.wallWarm);
   h.box(-2.7, PORCH_Y + 0.86, -5.1, 3.6, 0.06, 0.06, PALETTE.wallWarm);
-  h.box(door[0], PAD_Y + 2.5, -7.0, 2.6, 0.14, 1.3, PALETTE.houseRoof);
   const seat = a('porchSeat');
   h.box(seat[0] - 0.5, PORCH_Y, seat[1] - 0.45, 0.5, 0.42, 1.3, PALETTE.wood);
   h.box(-4.2, PORCH_Y, -7.15, 0.7, 0.72, 0.7, PALETTE.wood);
@@ -620,46 +624,76 @@ function buildSpecialist(s: CareSetting, h: Ctx) {
   h.tree(13.0, 11.2, 1.3, 2.8, 1);
   h.tree(13.2, -11.8, 1.2, 2.6, 2);
 }
-function buildPartnerAdc(s: CareSetting, h: Ctx) {
-  // Single-storey hall with a low-pitched roof, entrance canopy, patio and awning.
+/**
+ * The partner's own single-storey hall: the massing shown when no facility
+ * instance is stamped on the pad (or while one loads).
+ */
+function buildPartnerHall(s: CareSetting, h: Ctx) {
   h.box(3, PAD_Y, -8.5, 16, 3.4, 8.2, PALETTE.wallWarm);
   pitchedRoof(h, -5, 11, -12.6, -4.4, PAD_Y + 3.4, 1.2, PALETTE.roof, 0.6);
   h.windows(-4.4, 0.6, PAD_Y + 1.0, -4.36, 1.4, 2.2, 1.4);
   h.windows(3.6, 10.4, PAD_Y + 1.0, -4.36, 1.4, 2.2, 1.4);
-  const door = toLocalPoint(s, s.anchors.entrance);
-  h.box(door[0], PAD_Y, -4.36, 1.6, 2.2, 0.08, s.accent);
-  h.box(door[0], PAD_Y + 2.5, -3.6, 3.6, 0.16, 1.8, PALETTE.roof);
-  h.box(-10, PAD_Y, -7.8, 10, 0.05, 9.6, PALETTE.paver);
-  h.box(-7.4, PAD_Y + 2.9, -8.0, 4.8, 0.14, 9.2, s.accent);
-  for (const z of [-3.8, -12.2])
-    h.box(-9.6, PAD_Y, z, 0.16, 2.9, 0.16, PALETTE.metal);
-  for (const [x, z] of [
-    [-13.2, -11],
-    [-9.0, -11],
-  ]) {
-    h.cylinder(x, PAD_Y, z, 0.55, 0.74, PALETTE.wall);
-    h.cylinder(x, PAD_Y, z, 0.08, 0.7, PALETTE.metal);
-  }
-  for (const k of ['seatA', 'seatB', 'seatC', 'seatD']) {
-    const p = toLocalPoint(s, s.anchors[k]);
-    h.box(p[0], PAD_Y, p[1], 0.44, 0.44, 0.44, PALETTE.wood);
-  }
-  h.box(-15.3, PAD_Y, -7.8, 0.6, 0.5, 9.6, PALETTE.planting);
-  h.tree(-14.4, 1.4, 1.5, 3.0, 0);
-  h.tree(14.6, 1.0, 1.4, 2.8, 1);
-  h.tree(14.2, -11.4, 1.2, 2.6, 2);
+  h.box(2, PAD_Y, -4.36, 1.6, 2.2, 0.08, s.accent);
+  h.box(2, PAD_Y + 2.5, -3.6, 3.6, 0.16, 1.8, PALETTE.roof);
 }
+/**
+ * Grounds around the stamped building: the tai chi patio in the arrival
+ * court's west half under a slatted pergola (people stay visible from above),
+ * a bench, a planting strip along the west edge and four trees.
+ */
+function buildPartnerGrounds(s: CareSetting, h: Ctx) {
+  const a = (k: string) => toLocalPoint(s, s.anchors[k]);
+  const [x0, z0] = a('patioMin'),
+    [x1, z1] = a('patioMax'),
+    cx = (x0 + x1) / 2,
+    cz = (z0 + z1) / 2;
+  h.box(cx, PAD_Y, cz, x1 - x0, 0.02, z1 - z0, PALETTE.paver);
+  const postX = [x0 + 0.35, x1 - 0.35],
+    postZ = [z0 + 0.35, cz, z1 - 0.35];
+  for (const x of postX)
+    for (const z of postZ) h.box(x, PAD_Y, z, 0.16, 2.9, 0.16, PALETTE.metal);
+  for (const x of postX)
+    h.box(x, PAD_Y + 2.9, cz, 0.14, 0.18, z1 - z0 - 0.4, PALETTE.metal);
+  for (let z = z0 + 0.8; z < z1 - 0.5; z += 1.15)
+    h.box(cx, PAD_Y + 3.08, z, x1 - x0 - 0.2, 0.05, 0.34, s.accent);
+  const bench = a('bench');
+  h.box(bench[0], PAD_Y, bench[1], 0.5, 0.45, 1.8, PALETTE.wood);
+  const back = -s.pad.d / 2 - (s.pad.back ?? 0);
+  h.box(
+    -s.pad.w / 2 + 1,
+    PAD_Y,
+    (back + s.pad.d / 2) / 2,
+    0.8,
+    0.5,
+    s.pad.d / 2 - back - 3,
+    PALETTE.planting,
+  );
+  ['treeA', 'treeB', 'treeC', 'treeD'].forEach((k, i) => {
+    const [x, z] = a(k);
+    h.tree(x, z, i === 3 ? 1.4 : 1.6, i === 3 ? 2.8 : 3.1, i);
+  });
+}
+type Builder = (s: CareSetting, h: Ctx) => void;
+/** Per kind: the building massing (replaced by a stamped facility) and the site around it. */
 const BUILDERS: Partial<
-  Record<CareSetting['kind'], (s: CareSetting, h: Ctx) => void>
+  Record<CareSetting['kind'], { massing?: Builder; site?: Builder }>
 > = {
-  home: buildHouse,
-  pharmacy: buildPharmacy,
-  hospital: buildHospital,
-  specialist: buildSpecialist,
-  'partner-adc': buildPartnerAdc,
+  home: { massing: buildHouse, site: buildHomeSite },
+  pharmacy: { massing: buildPharmacy },
+  hospital: { massing: buildHospital },
+  specialist: { massing: buildSpecialist },
+  'partner-adc': { massing: buildPartnerHall, site: buildPartnerGrounds },
 };
-/** A complete pad for one setting, placed in the world. */
-export function buildCareSetting(setting: CareSetting, mat: Mat) {
+/**
+ * A complete pad for one setting, placed in the world: ground, `site` and
+ * (unless `massing: false`) `massing` groups under `local`, and the label
+ * plate in world space.
+ */
+export function buildCareSetting(
+  setting: CareSetting,
+  mat: Mat,
+  opts: { massing?: boolean } = {},
+) {
   const root = new T.Group();
   root.name = `care-setting-${setting.id}`;
   root.userData = {
@@ -672,9 +706,16 @@ export function buildCareSetting(setting: CareSetting, mat: Mat) {
   local.position.set(setting.position[0], 0, setting.position[1]);
   local.rotation.y = setting.heading;
   root.add(local);
-  const h = helpers(setting, local, mat);
-  buildGround(setting, h);
-  BUILDERS[setting.kind]?.(setting, h);
+  buildGround(setting, helpers(setting, local, mat));
+  const builders = BUILDERS[setting.kind];
+  for (const part of ['massing', 'site'] as const) {
+    const build = builders?.[part];
+    if (!build || (part === 'massing' && opts.massing === false)) continue;
+    const g = new T.Group();
+    g.name = part;
+    local.add(g);
+    build(setting, helpers(setting, g, mat));
+  }
   // Label plate in world space, readable from the default camera.
   const [lx, lz] = setting.anchors.label;
   const plateHost = helpers(setting, root, mat);

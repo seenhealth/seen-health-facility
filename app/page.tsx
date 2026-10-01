@@ -39,8 +39,10 @@ import {
 } from './model/schema';
 import { defaultState, type ViewerState } from './model/renderer';
 import type { createViewer } from './model/renderer';
-import { SETTING_ZONE_PREFIX } from './model/community-settings';
-import { COMMUNITY_VIEW } from './model/community-people';
+import {
+  COMMUNITY_VIEW,
+  SETTING_ZONE_PREFIX,
+} from './model/community-settings';
 import { roomLabelCode } from './model/room-labels';
 import { JourneyPanel } from './components/journey-panel';
 import type { JourneyStep } from './model/journeys';
