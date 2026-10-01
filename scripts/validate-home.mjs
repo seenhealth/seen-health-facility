@@ -16,8 +16,8 @@
 // The home-lin registry entry stands the house on its pad: the front door
 // within 0.3 m of the `door` anchor, the front wall on the porch slab's back
 // edge, the footprint ≥ 0.1 m from the porch slab and ramp and ≥ 1 m from the
-// drive, each room name plate ≥ 80 % clear at its anchor, and the derived pad
-// within the authored size. The ADL cast (app/data/community/
+// drive, each room name readable on its plate at the label anchor, and the
+// derived pad within the authored size. The ADL cast (app/data/community/
 // home-lin.cast.json) keeps today's actor ids and the contract windows, puts
 // every stop in a drawn room clear of furniture and walls, routes every walk
 // on the instance grid at the person's clearance in the time the gaps allow,
@@ -566,64 +566,64 @@ check(
   `The building is ${paving.toFixed(2)} m from the drive (≥ 1 m)`,
 );
 // Room name plates: the instance lays a world-aligned 3.6 × 0.7 m plate at
-// each labelled room's label anchor; most of it must lie in the room, clear of
-// furniture 0.25 m or taller that would hide it from above.
+// each labelled room's label anchor (no spot in a home's rooms fits a whole
+// plate), the name centred on it at up to 54 px of its 512 px canvas. The
+// name must read from above: its strip lies in the room, clear of everything
+// standing on the floor (full footprints: a shower tray hides it as well as a
+// bed does).
 const PLATE = { w: 3.6, d: 0.7 },
   plateTurn = setting.heading + cfg.frame.heading;
-const plateClear = (room) => {
+const plateCovers = model.objects
+  .filter((o) => o.position[1] <= 0.25)
+  .map((o) => {
+    const a = model.assets[o.assetId];
+    return {
+      o,
+      w: a.dimensions[0] * (o.scale?.[0] ?? 1),
+      d: a.dimensions[2] * (o.scale?.[2] ?? 1),
+    };
+  });
+const coveredBy = (p) =>
+  plateCovers.find(({ o, w, d }) => {
+    const dx = p[0] - o.position[0],
+      dz = p[1] - o.position[2],
+      x = Math.cos(o.rotation) * dx - Math.sin(o.rotation) * dz,
+      z = Math.sin(o.rotation) * dx + Math.cos(o.rotation) * dz;
+    return Math.abs(x) < w / 2 + 0.05 && Math.abs(z) < d / 2 + 0.05;
+  });
+const nameClear = (room, name) => {
   const anchor = roomLabels.roomLabelAnchor(room),
     c = Math.cos(plateTurn),
-    s = Math.sin(plateTurn);
-  const tall = model.objects
-    .filter(
-      (o) =>
-        model.assets[o.assetId].dimensions[1] * (o.scale?.[1] ?? 1) >= 0.25,
-    )
-    .map((o) => ({
-      o,
-      boxes: o.navigationFootprints || [
-        [
-          0,
-          0,
-          model.assets[o.assetId].dimensions[0] * (o.scale?.[0] ?? 1),
-          model.assets[o.assetId].dimensions[2] * (o.scale?.[2] ?? 1),
-        ],
-      ],
-    }));
-  const hidden = (p) =>
-    tall.some(({ o, boxes }) => {
-      const dx = p[0] - o.position[0],
-        dz = p[1] - o.position[2],
-        x = Math.cos(o.rotation) * dx - Math.sin(o.rotation) * dz,
-        z = Math.sin(o.rotation) * dx + Math.cos(o.rotation) * dz;
-      return boxes.some(
-        ([bx, bz, w, d]) =>
-          Math.abs(x - bx) < w / 2 + 0.05 && Math.abs(z - bz) < d / 2 + 0.05,
-      );
-    });
+    s = Math.sin(plateTurn),
+    // Bold Arial averages about 0.6 em a character; the canvas shrinks a
+    // longer name to 464 px.
+    textW = (Math.min(464, 0.6 * 54 * name.length) / 512) * PLATE.w,
+    hiders = new Set();
   let clear = 0,
     all = 0;
-  for (let i = 0; i <= 12; i++)
-    for (let j = 0; j <= 4; j++) {
-      const wx = (i / 12 - 0.5) * PLATE.w,
-        wz = (j / 4 - 0.5) * PLATE.d,
-        p = [anchor[0] + wx * c - wz * s, anchor[1] + wx * s + wz * c];
+  for (let i = 0; i <= 16; i++)
+    for (let j = 0; j <= 2; j++) {
+      const wx = (i / 16 - 0.5) * textW,
+        wz = (j / 2 - 0.5) * 0.3,
+        p = [anchor[0] + wx * c - wz * s, anchor[1] + wx * s + wz * c],
+        by = coveredBy(p);
       all++;
-      if (nav.insidePolygon(p, room.polygon) && !hidden(p)) clear++;
+      if (by) hiders.add(by.o.id);
+      else if (nav.insidePolygon(p, room.polygon)) clear++;
     }
-  return clear / all;
+  return { clear: clear / all, hiders: [...hiders] };
 };
-const plates = Object.keys(
+const plates = Object.entries(
   typeof cfg.labels === 'object' ? cfg.labels : {},
-).map((id) => {
+).map(([id, name]) => {
   const room = model.rooms.find((r) => r.id === id);
   assert(room, `Plate for ${id}, which is not a room`);
-  const clear = plateClear(room);
+  const { clear, hiders } = nameClear(room, name);
   check(
-    clear >= 0.8,
-    `The ${id} plate is only ${Math.round(clear * 100)} % clear at its anchor (≥ 80 %)`,
+    clear >= 0.9,
+    `The "${name}" plate in ${id} reads ${Math.round(clear * 100)} % clear at its anchor (≥ 90 %; under ${hiders.join(', ') || 'the walls'})`,
   );
-  return `${id.replace(/^home-/, '')} ${Math.round(clear * 100)} %`;
+  return `${name} ${Math.round(clear * 100)} %`;
 });
 // Pad derivation preview (SPEC-facility-instance §5.2): the front stays put.
 const margin = cfg.margin ?? 1.6;

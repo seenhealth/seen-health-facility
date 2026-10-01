@@ -184,9 +184,10 @@ the front wall's face on the porch slab's back edge (local z −7.6, `HOME_PORCH
 in `community-pads.ts`); the drawn footprint stays 0.10 m clear of the porch
 slab, which the pad keeps drawing (hence the excluded porch zone), and more
 than 3 m from the drive. The derived pad would need `back` 5.8 m and a 16.2 m
-width. Name plates go only in the living room, kitchen and bath: a 3.6 m floor
-plate at the label anchor of a bedroom or the dining nook would lie under the
-bed or the table.
+width. Name plates (Living room, Kitchen, Bath) go only where the name reads
+at the room's label anchor: the instance's 3.6 m floor plate would put a
+bedroom's or the dining nook's name under the bed or the table, and the bath's
+name stays short to clear the shower.
 
 ### The ADL day
 
@@ -337,9 +338,9 @@ removals, reservations or excluded zones); every room is reachable from the
 front door at wheelchair (0.37 m) and walker (0.33 m) clearance; every asset
 builds and the home kinds come out at their declared size from boxes and
 cylinders in defined materials; the registry frame meets the door anchor and
-the porch slab, keeps the building ≥ 1 m from the drive and each name plate
-≥ 80 % clear of the room's walls and furniture; and the cast keeps today's ids
-and the contract windows, clears
+the porch slab, keeps the building ≥ 1 m from the drive and each room name
+readable on its plate (≥ 90 % in the room and clear of floor items); and the
+cast keeps today's ids and the contract windows, clears
 furniture and walls at every stop, routes every walk on the instance grid in
 the time its gap allows and keeps people ≥ 0.6 m apart on foot (0.55 m seated).
 

@@ -316,13 +316,13 @@ export const careSettings: CareSetting[] = [
       excludeZoneIds: ['home-zone-porch'],
       cutaway: true,
       floorY: PORCH_Y,
-      // Plates only where a 3.6 m floor plate at the room's label anchor
-      // stays readable; in the bedrooms and the dining nook it would lie under
-      // the bed or the table (validate-home.mjs measures each).
+      // Name plates only where the name reads at the room's label anchor: in
+      // the bedrooms and the dining nook it would lie under the bed or the
+      // table, and a short "Bath" clears the shower (validate-home.mjs).
       labels: {
         'home-living': 'Living room',
         'home-kitchen': 'Kitchen',
-        'home-bath': 'Accessible bath',
+        'home-bath': 'Bath',
       },
       margin: 1.6,
     },
