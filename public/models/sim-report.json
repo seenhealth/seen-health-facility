@@ -6725,7 +6725,7 @@
       "offDuty": 0.09962121212121212
      },
      "onFloorSeconds": 7131,
-     "meanWalkMeters": 54.374969370676126
+     "meanWalkMeters": 54.00831897343387
     },
     {
      "role": "nurse",
@@ -6817,7 +6817,7 @@
       "offDuty": 0.12669753086419752
      },
      "onFloorSeconds": 5659,
-     "meanWalkMeters": 119.00788132823943
+     "meanWalkMeters": 118.98775309085734
     }
    ],
    "participants": [
@@ -8944,7 +8944,7 @@
       "waiting": 81,
       "offSite": 276
      },
-     "walkMeters": 191.44403527988854
+     "walkMeters": 187.90268563067585
     },
     {
      "id": "hospital-participant",
@@ -8961,7 +8961,7 @@
       "waiting": 47,
       "offSite": 556
      },
-     "walkMeters": 79.54048383294985
+     "walkMeters": 81.01737227766849
     },
     {
      "id": "adc-participant-1",
@@ -16250,7 +16250,7 @@
       "offDuty": 0.08888888888888889
      },
      "onFloorSeconds": 7216,
-     "meanWalkMeters": 76.81310226994687
+     "meanWalkMeters": 76.44645187270461
     },
     {
      "role": "nurse",
@@ -16388,7 +16388,7 @@
       "offDuty": 0.12669753086419752
      },
      "onFloorSeconds": 5659,
-     "meanWalkMeters": 123.04915767734565
+     "meanWalkMeters": 123.02902943996355
     }
    ],
    "participants": [
@@ -18447,7 +18447,7 @@
       "waiting": 81,
       "offSite": 276
      },
-     "walkMeters": 191.44403527988854
+     "walkMeters": 187.90268563067585
     },
     {
      "id": "hospital-participant",
@@ -18464,7 +18464,7 @@
       "waiting": 47,
       "offSite": 556
      },
-     "walkMeters": 79.54048383294985
+     "walkMeters": 81.01737227766849
     },
     {
      "id": "adc-participant-1",

@@ -3,6 +3,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import type { Vec2 } from './schema';
 import type { VehiclePose } from './activity';
 import { deliveryStops } from './deliveries';
+import { FLEET_VAN_SEATS } from './photo-assets';
 import {
   arcPoint,
   careSettingById,
@@ -339,11 +340,14 @@ export const communityVehicles: CommunityVehicle[] = [
     accent: '#174a49',
     variant: 'I',
     rest: { ...stop(home, 0), visible: true, phase: 'Waiting at the home' },
+    // The fleet body's own furniture: Mrs. Lin on the aisle seat of the first
+    // bench (the shortest step from the ramp with her walker), her escort
+    // beside her at the window, Mr. Lin's chair on the wheelchair plate.
     seats: {
-      driver: [-0.55, 0.58, -1.9],
-      participant: [0.5, 0.58, 1.0],
-      escort: [-0.35, 0.58, 0.8],
-      wheelchair: [0.2, 0.58, 1.3],
+      driver: FLEET_VAN_SEATS.driver,
+      participant: FLEET_VAN_SEATS.benches[1],
+      escort: FLEET_VAN_SEATS.benches[0],
+      wheelchair: FLEET_VAN_SEATS.wheelchair,
     },
     legs: [
       dwell(0, 113, stop(home, 0), 'Boarding at the porch', {
