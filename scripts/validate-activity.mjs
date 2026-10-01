@@ -20,7 +20,7 @@ const scene = new T.Scene(),
   activity = createActivity(m, scene),
   neighborhood = buildNeighborhood(m);
 scene.add(neighborhood.root);
-assert.equal(activity.actors.length, 167);
+assert.equal(activity.actors.length, 177);
 assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 167);
 for (const role of [
   'doctor',
