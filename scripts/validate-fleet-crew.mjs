@@ -103,7 +103,7 @@ const sources = [
   ['base loop', crew.withFleetCrew(activity.activityData)],
   ['story', crew.withFleetCrew(story.storyActivitySource().source)],
 ];
-const totals = { actors: 0, drivers: 0, riders: 0, rampEscorts: 0, samples: 0, fadeHidden: 0, outOfView: 0, officeWalks: 0 };
+const totals = { actors: 0, drivers: 0, riders: 0, rampEscorts: 0, rampAscents: 0, escortedUp: 0, samples: 0, fadeHidden: 0, outOfView: 0, officeWalks: 0 };
 /**
  * Moments when a fleet van is drawn see-through (fading in or out at the end
  * of the street), every 0.05 s. The engine itself is checked at these times:
@@ -312,35 +312,58 @@ for (const [name, source] of sources) {
   }
   assert.ok(seatedInFade > 0, `${name}: someone rides in a fading van`);
   engine.dispose();
-  // Ramp escorts: for every descent or ascent the driver trails the rider's party by 0.4–1.2 m on the ramp.
+  // Ramp escorts. Every rider who leaves a fleet van at the drop-off comes
+  // down its ramp with the driver close behind; every rider who boards there
+  // goes up it with the driver close behind or steadying them from beside the
+  // ramp foot. The driver trails the rider's party by 0.35–1.2 m on the ramp.
+  const dockPose = { position: new T.Vector3(fleet.FLEET_LOT.dock[0], 0, fleet.FLEET_LOT.dock[1]), heading: fleet.FLEET_LOT.dockHeading };
+  const sill = activity.seatInVehicle(dockPose, [RAMP.sill[0], 0, RAMP.sill[1]]),
+    foot = activity.seatInVehicle(dockPose, [RAMP.foot[0], 0, RAMP.foot[1]]);
+  const atPoint = (p, q) => Math.hypot(p[0] - q.x, p[1] - q.z) < 0.05;
+  const onRamp = (p) => Math.abs((p.x - sill.x) * (foot.z - sill.z) - (p.z - sill.z) * (foot.x - sill.x)) < 0.25 &&
+    Math.min(sill.x, foot.x) - 0.05 <= p.x && p.x <= Math.max(sill.x, foot.x) + 0.05 &&
+    Math.min(sill.z, foot.z) - 0.05 <= p.z && p.z <= Math.max(sill.z, foot.z) + 0.05;
+  const pathLength = (path) => path.reduce((sum, q, i) => (i ? sum + Math.hypot(q[0] - path[i - 1][0], q[1] - path[i - 1][1]) : 0), 0);
+  // Expected from the rides themselves: a stretch of riding a fleet van that
+  // ends with steps through its door sill is a descent to come, one that
+  // starts with steps through it an ascent just made.
+  const expected = { down: 0, up: 0 },
+    found = { down: 0, up: 0, escortedUp: 0, steadiedUp: 0 };
+  const viaSill = (seg) => !!seg && seg.action !== 'ride' && seg.path.some((q) => atPoint(q, sill));
+  for (const a of source.actors) {
+    if (a.role === 'driver' || a.escortFor) continue;
+    a.segments.forEach((s, i) => {
+      if (s.action !== 'ride' || !vanIds.includes(s.vehicleId) || a.segments[i - 1]?.action === 'ride') return;
+      let j = i;
+      while (a.segments[j + 1]?.action === 'ride') j++;
+      if (viaSill(a.segments[j + 1])) expected.down++;
+      if (viaSill(a.segments[i - 1])) expected.up++;
+    });
+  }
   for (const a of source.actors) {
     if (a.role === 'driver' || a.escortFor) continue;
     const escort = source.actors.find((e) => e.escortFor === a.id);
     for (const s of a.segments) {
       if (!vanIds.includes(s.vehicleId) || !['walk', 'roll'].includes(s.action)) continue;
-      const v = vanIds.indexOf(s.vehicleId),
-        dock = sim.sampleVan(v, s.start);
-      if (!dock.visible || dock.ramp < 0.999) continue;
-      const sill = activity.seatInVehicle(dock, [RAMP.sill[0], 0, RAMP.sill[1]]),
-        foot = activity.seatInVehicle(dock, [RAMP.foot[0], 0, RAMP.foot[1]]);
-      const onRamp = (p) => Math.abs((p.x - sill.x) * (foot.z - sill.z) - (p.z - sill.z) * (foot.x - sill.x)) < 0.25 &&
-        Math.min(sill.x, foot.x) - 0.05 <= p.x && p.x <= Math.max(sill.x, foot.x) + 0.05 &&
-        Math.min(sill.z, foot.z) - 0.05 <= p.z && p.z <= Math.max(sill.z, foot.z) + 0.05;
-      const down = Math.hypot(s.path[0][0] - sill.x, s.path[0][1] - sill.z) < 0.05 && s.path.length === 2;
-      const up =
-        s.path.length > 2 &&
-        Math.hypot(s.path.at(-1)[0] - sill.x, s.path.at(-1)[1] - sill.z) < 0.05 &&
-        Math.hypot(s.path.at(-2)[0] - foot.x, s.path.at(-2)[1] - foot.z) < 0.05;
+      const down = s.path.length === 2 && atPoint(s.path[0], sill) && atPoint(s.path[1], foot);
+      const up = s.path.length > 2 && atPoint(s.path.at(-1), sill) && atPoint(s.path.at(-2), foot);
       if (!down && !up) continue;
+      // When the rider sets foot on the ramp: the start of a descent, the last leg of a boarding walk.
+      const onAt = down ? s.start : s.start + ((s.end - s.start) * pathLength(s.path.slice(0, -1))) / pathLength(s.path);
+      const v = vanIds.indexOf(s.vehicleId),
+        dock = sim.sampleVan(v, onAt);
+      assert.ok(dock.visible && dock.ramp > 0.999 && dock.phase !== 'Parked in assigned bay', `${name}: ${a.id} uses ${s.vehicleId}'s ramp at ${onAt.toFixed(1)} while it is not deployed (${dock.phase}, ramp ${dock.ramp.toFixed(2)})`);
       const driver = drivers.find((d) => d.segments.some((x) => x.vehicleId === s.vehicleId));
       let trailing = 0,
-        seen = false;
-      for (let t = s.start; t < s.end + 12; t += 0.1) {
+        seen = false,
+        steadied = false;
+      for (let t = onAt - 1; t < s.end + 12; t += 0.1) {
         const r = place(source, byId, a, t),
           d = place(source, byId, driver, t);
+        // Steadying: beside the ramp foot, facing it, as the rider sets off up the ramp.
+        if (up && Math.abs(t - onAt) < 1 && !onRamp(d) && Math.hypot(d.x - foot.x, d.z - foot.z) < 1.6 && d.action === 'greet') steadied = true;
         if (!onRamp(r) && !onRamp(d)) continue;
-        const rear = escort ? place(source, byId, escort, t) : r;
-        const partyRear = escort ? rear : r;
+        const partyRear = escort ? place(source, byId, escort, t) : r;
         const gap = Math.hypot(d.x - partyRear.x, d.z - partyRear.z);
         if (onRamp(d) && d.action !== 'idle' && onRamp(partyRear)) {
           seen = true;
@@ -352,15 +375,26 @@ for (const [name, source] of sources) {
       }
       if (down) {
         assert.ok(seen && trailing >= 2, `${name}: ${driver.id} escorts ${a.id} down the ramp (${trailing.toFixed(1)} s trailing)`);
-        totals.rampEscorts++;
+        found.down++;
+      } else {
+        assert.ok((seen && trailing >= 2) || steadied, `${name}: ${driver.id} neither escorts ${a.id} up the ramp nor steadies them from its foot at ${onAt.toFixed(1)} (${trailing.toFixed(1)} s trailing)`);
+        found.up++;
+        if (seen && trailing >= 2) found.escortedUp++;
+        else found.steadiedUp++;
       }
     }
   }
+  assert.ok(expected.down > 0 && expected.up > 0, `${name}: riders use the fleet's ramps (${expected.down} down, ${expected.up} up)`);
+  assert.deepEqual([found.down, found.up], [expected.down, expected.up], `${name}: every ramp descent and ascent is checked (found ${found.down} down / ${found.up} up, expected ${expected.down} / ${expected.up})`);
+  assert.ok(found.escortedUp > 0, `${name}: the driver escorts at least one rider up a ramp`);
+  totals.rampEscorts += found.down;
+  totals.rampAscents += found.up;
+  totals.escortedUp += found.escortedUp;
   totals.actors += source.actors.length;
   totals.drivers += drivers.length;
   totals.riders += crewIds.length - drivers.length;
   console.log(`${name}: ${source.actors.length} actors, ${drivers.length} drivers, ${crewIds.length - drivers.length} riders seated.`);
 }
 console.log(
-  `Fleet crew: ${arrivals} drop-off arrivals set off out of sight, ${totals.outOfView} seated people appearing or vanishing only with their van out of sight, ${totals.officeWalks} driver walks between the fleet office and a parked van (nearest person ${officeGap.toFixed(2)} m), ${totals.rampEscorts} ramp descents escorted by the driver, ${driverDoorCrossings} cab-door passages through the open driver's door, ${slidingDoorCrossings} passages through the open sliding door, ${totals.fadeHidden} seated people hidden by the engine in vans below ${activity.SEATED_MIN_OPACITY} opacity, ${totals.samples.toLocaleString()} placement samples; cabin walks, seat visibility, driver-in-cab and wall clearance passed.`,
+  `Fleet crew: ${arrivals} drop-off arrivals set off out of sight, ${totals.outOfView} seated people appearing or vanishing only with their van out of sight, ${totals.officeWalks} driver walks between the fleet office and a parked van (nearest person ${officeGap.toFixed(2)} m), ${totals.rampEscorts} ramp descents escorted by the driver, ${totals.rampAscents} ascents attended (${totals.escortedUp} escorted up the ramp, the rest steadied from its foot), ${driverDoorCrossings} cab-door passages through the open driver's door, ${slidingDoorCrossings} passages through the open sliding door, ${totals.fadeHidden} seated people hidden by the engine in vans below ${activity.SEATED_MIN_OPACITY} opacity, ${totals.samples.toLocaleString()} placement samples; cabin walks, seat visibility, driver-in-cab and wall clearance passed.`,
 );
