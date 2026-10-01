@@ -8,9 +8,11 @@ import {
   ARRIVAL,
 } from '../work/validation/arrival.mjs';
 import {
+  FLEET_LOT,
   fleetParking,
   fleetReservations,
   fleetTimeline,
+  fleetVanLabel,
 } from '../work/validation/alhambra-fleet.mjs';
 import {
   deliveryStops,
@@ -64,11 +66,13 @@ const VANS = fleetParking.length;
  * street-car bodies toward +z.
  */
 const movers = [
-  ...fleetParking.map((_, i) => ({ name: `Van ${i}`, kind: 'van', nose: -1, sample: (t) => sampleVan(i, t) })),
+  ...fleetParking.map((_, i) => ({ name: fleetVanLabel(i), kind: 'van', nose: -1, sample: (t) => sampleVan(i, t) })),
   ...deliveryStops.map((stop, i) => ({ name: `Truck ${stop.id}`, kind: 'truck', nose: -1, sample: (t) => sampleDelivery(i, t) })),
   ...[0, 1].map((i) => ({ name: `Street car ${i}`, kind: 'car', nose: 1, sample: (t) => sampleStreetCar(i, t) })),
 ];
 const samples = (time) => [...movers.map((v) => body(v.sample(time), v.kind)), ...parkedCars];
+/** Name of entry `i` of `samples(time)`: a mover, or one of the parked cars after them. */
+const vehicleName = (i) => movers[i]?.name ?? `Parked car ${i - movers.length + 1}`;
 const streetCar = (i) => movers[i]?.kind === 'car';
 
 // Driveway: one maneuver on the lot at a time, four seconds apart.
@@ -87,8 +91,8 @@ for (let i = 0; i < VANS; i++)
       assert.equal(v.position.x, fleetParking[i].x);
       assert.equal(v.position.z, fleetParking[i].z);
     }
-    if (s.kind === 'away') assert.equal(v.visible, false, `Van ${i} off site is hidden at ${(s.start + s.end) / 2}`);
-    if (s.kind === 'parked') assert(v.phase.startsWith('Parked'), `Van ${i} parked at ${(s.start + s.end) / 2}`);
+    if (s.kind === 'away') assert.equal(v.visible, false, `${fleetVanLabel(i)} off site is hidden at ${(s.start + s.end) / 2}`);
+    if (s.kind === 'parked') assert(v.phase.startsWith('Parked'), `${fleetVanLabel(i)} parked at ${(s.start + s.end) / 2}`);
   }
 
 // Lot obstacles a van must keep clear of: the building, the entrance ramp and
@@ -160,6 +164,11 @@ const footprint = (v) => {
   ]);
 };
 const LOT_CLEARANCE = 0.3;
+// Where a fading van's centre may be: the last fade length before the vanish
+// points (the routes are symmetric about the cross street).
+assert.equal(FLEET_LOT.vanishNorth, -FLEET_LOT.vanishSouth, 'the fleet vanishes as far north as south');
+const FADE_FROM = FLEET_LOT.vanishNorth - FLEET_LOT.fade;
+const fadeBand = { from: Infinity, to: 0, reach: 0 };
 
 // Heading change between consecutive samples, in radians (wrapped).
 const turnBetween = (a, b) => Math.abs(Math.atan2(Math.sin(b - a), Math.cos(b - a)));
@@ -219,7 +228,7 @@ for (let frame = 0; frame < 36000; frame++) {
       const margin = streetCar(i) || streetCar(j) ? 0.85 : 0.5;
       assert(
         gap >= margin,
-        `Vehicles ${i}/${j} have only ${gap.toFixed(3)} m at ${time}s`,
+        `${vehicleName(i)} and ${vehicleName(j)} have only ${gap.toFixed(3)} m at ${time}s`,
       );
       closest = Math.min(closest, gap);
       if (margin === 0.85) streetClosest = Math.min(streetClosest, gap);
@@ -232,28 +241,40 @@ for (let frame = 0; frame < 36000; frame++) {
     if (i >= VANS) continue;
     const next = sampleVan(i, time + 0.002);
     const movement = next.position.clone().sub(a.position);
-    assert(movement.length() < 0.03, `Van ${i} teleports at ${time}s`);
+    assert(movement.length() < 0.03, `${fleetVanLabel(i)} teleports at ${time}s`);
     const front = new Vector3(-Math.sin(a.heading), 0, -Math.cos(a.heading));
     if (movement.length() > 0.00001 && a.phase === next.phase) {
       const alignment =
         movement.normalize().dot(front) * (a.reverse ? -1 : 1);
-      assert(alignment > 0.97, `Van ${i} drives sideways at ${time}s`);
+      assert(alignment > 0.97, `${fleetVanLabel(i)} drives sideways at ${time}s`);
       assert(
         a.door < 0.001 && a.ramp < 0.001 && a.cabDoor < 0.001,
         'Doors and ramps closed before movement',
       );
     }
-    // Fading happens only beyond the drawn street ends, and a van appears or
-    // disappears only once fully faded (never a pop inside the map).
-    if (a.opacity < 1)
+    // A van fades only over the last FLEET_LOT.fade metres before the end of
+    // its off-site route, with its whole body (nose and tail) still on the
+    // drawn street, and it appears or disappears only once fully faded (never
+    // a pop inside the map).
+    if (a.visible && a.opacity < 1) {
+      const centre = Math.abs(a.position.z),
+        reach = Math.max(...footprint(a).map(([, z]) => Math.abs(z)));
       assert(
-        Math.abs(a.position.z) > STREET_EXTENT.z - 5 || Math.abs(a.position.x) > STREET_EXTENT.x - 5,
-        `Van ${i} fades inside the map at ${time}s (${a.position.x.toFixed(1)}, ${a.position.z.toFixed(1)})`,
+        centre >= FADE_FROM - 1e-6,
+        `${fleetVanLabel(i)} fades ${(FADE_FROM - centre).toFixed(1)} m before the fade band at ${time}s (${a.position.x.toFixed(1)}, ${a.position.z.toFixed(1)})`,
       );
+      assert(
+        reach <= STREET_EXTENT.z,
+        `${fleetVanLabel(i)} fades ${(reach - STREET_EXTENT.z).toFixed(1)} m past the end of the drawn street at ${time}s (${a.position.x.toFixed(1)}, ${a.position.z.toFixed(1)})`,
+      );
+      fadeBand.from = Math.min(fadeBand.from, centre);
+      fadeBand.to = Math.max(fadeBand.to, centre);
+      fadeBand.reach = Math.max(fadeBand.reach, reach);
+    }
     if (later.visible !== a.visible)
       assert(
         (later.visible ? later.opacity : a.opacity) < 0.05,
-        `Van ${i} pops ${later.visible ? 'in' : 'out'} at ${time}s`,
+        `${fleetVanLabel(i)} pops ${later.visible ? 'in' : 'out'} at ${time}s`,
       );
     // Lot obstacles, ten times a second.
     if (frame % 5 === 0 && a.position.x > -42 && a.position.x < -10 && a.position.z > -32 && a.position.z < 12) {
@@ -261,7 +282,7 @@ for (let frame = 0; frame < 36000; frame++) {
       for (const [name, poly] of obstacles) {
         const gap = polygonGap(fp, poly);
         lotClosest = Math.min(lotClosest, gap);
-        assert(gap >= LOT_CLEARANCE, `Van ${i} is ${gap.toFixed(2)} m from the ${name} at ${time}s ("${a.phase}")`);
+        assert(gap >= LOT_CLEARANCE, `${fleetVanLabel(i)} is ${gap.toFixed(2)} m from the ${name} at ${time}s ("${a.phase}")`);
       }
     }
   }
@@ -290,5 +311,5 @@ const radii = [...tightest]
   .map(([kind, { radius, at }]) => `${kind} ${radius.toFixed(2)} m (${at})`)
   .join('; ');
 console.log(
-  `${pairs.toLocaleString()} vehicle-pair checks passed over 12 minutes at 50 Hz; minimum gap ${closest.toFixed(2)} m, street-traffic gap ${streetClosest.toFixed(2)} m, lot obstacles ${lotClosest.toFixed(2)} m. Driveway yielding, parking, orientation, doors, reverse, fades and loop continuity passed. Every fleet van, delivery truck, street car and the Olympic/Alveare vans (${siteSamples.toLocaleString()} site samples) drive nose-first outside reversing phases, never jump and turn no tighter than ${MIN_TURN_RADIUS} m; tightest: ${radii}.`,
+  `${pairs.toLocaleString()} vehicle-pair checks passed over 12 minutes at 50 Hz; minimum gap ${closest.toFixed(2)} m, street-traffic gap ${streetClosest.toFixed(2)} m, lot obstacles ${lotClosest.toFixed(2)} m. Fades stay on the drawn street: van centres at |z| ${fadeBand.from.toFixed(1)}–${fadeBand.to.toFixed(1)} m, bodies to ${fadeBand.reach.toFixed(1)} m (street drawn to ${STREET_EXTENT.z} m). Driveway yielding, parking, orientation, doors, reverse, fades and loop continuity passed. Every fleet van, delivery truck, street car and the Olympic/Alveare vans (${siteSamples.toLocaleString()} site samples) drive nose-first outside reversing phases, never jump and turn no tighter than ${MIN_TURN_RADIUS} m; tightest: ${radii}.`,
 );

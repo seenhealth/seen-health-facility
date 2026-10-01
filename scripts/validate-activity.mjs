@@ -11,6 +11,7 @@ import {
 } from '../work/validation/activity.mjs';
 import { alhambraSource } from '../work/validation/alhambra-source.mjs';
 import { registerCommunityVehicles } from '../work/validation/community-vehicles.mjs';
+import { COMMUNITY_SOURCE_ID } from '../work/validation/community-people.mjs';
 import { buildNeighborhood } from '../work/validation/neighborhood.mjs';
 import { sampleVan, vanWindows, ARRIVAL } from '../work/validation/arrival.mjs';
 import { dayProgram, programAt } from '../work/validation/day-room.mjs';
@@ -20,9 +21,9 @@ const m = JSON.parse(
 );
 // The engine plays its source as given; the viewer gives it the composed
 // Alhambra source: the 167-person loop, the fleet crew (177) and the
-// community cast (220: 18 hand-authored, 25 generated inside the partner day
-// center's facility instance), with the community vehicles registered so
-// their riders' seats resolve.
+// community cast (220: 12 hand-authored, 31 generated inside facility
+// instances, 25 in the partner day center and 6 in the Wongs' home), with the
+// community vehicles registered so their riders' seats resolve.
 const scene = new T.Scene(),
   activity = createActivity(
     m,
@@ -198,6 +199,35 @@ activity.updateView({
   site: true,
 });
 assert.equal(activity.root.visible, false);
+// The community toggle hides that source's people, and the panel's people
+// count (the snapshot's `people`) drops with it.
+const allView = {
+  level: 'all',
+  plan: false,
+  explode: 0,
+  stack: 0,
+  isolate: false,
+  selected: null,
+  site: true,
+};
+const communityIds = new Set(
+  activity.actors
+    .filter((a) => a.spec.sourceId === COMMUNITY_SOURCE_ID)
+    .map((a) => a.spec.id),
+);
+assert.equal(communityIds.size, 43, 'the community layer brings its cast');
+activity.updateView(allView);
+assert.equal(activity.getState().people, 220);
+activity.updateView({ ...allView, hiddenSources: [COMMUNITY_SOURCE_ID] });
+assert.equal(
+  activity.getState().people,
+  177,
+  'people count without the community layer',
+);
+assert.ok(
+  activity.actors.every((a) => !communityIds.has(a.spec.id) || !a.root.visible),
+  'community people hidden with their source',
+);
 activity.setOptions({ filter: 'doctor' });
 activity.updateView({
   level: 'ground',

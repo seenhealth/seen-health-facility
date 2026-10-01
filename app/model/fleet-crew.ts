@@ -15,6 +15,7 @@
 import { ARRIVAL, alhambraVanWindows, sampleVan } from './arrival';
 import {
   FLEET_CAB_DOOR,
+  FLEET_VAN,
   fleetParking,
   fleetTimeline,
   fleetVanId,
@@ -27,7 +28,7 @@ import {
   FLEET_VAN_SEATS,
   type VanSeat,
 } from './photo-assets';
-import type { ActivityData, ActorSpec, Interaction, Segment } from './activity';
+import { sampleActor, sampleEscort, type ActivityData, type ActorSpec, type Interaction, type Segment } from './activity';
 import type { Action } from './characters';
 import type { Vec2 } from './schema';
 
@@ -44,6 +45,15 @@ const STAFF_WALK = 1.35,
 const RIDE_PATH_SPEED = 1000;
 /** The driver follows the last member of a rider's party this far behind on the ramp. */
 const FOLLOW_GAP = 0.8;
+/** A driver walking out to a parked van reaches its door this long before opening it. */
+const DOOR_LEAD = 0.5;
+/**
+ * Clearance a driver on foot keeps from every other fleet van in view, and
+ * from everyone else on foot, while walking between the fleet office and a
+ * parked van.
+ */
+const LOT_CLEARANCE = 1.5,
+  PEOPLE_CLEARANCE = 0.8;
 /** Gap an escort keeps behind its partner (mirrors `sampleEscort`). */
 const escortGap = (rider: ActorSpec) =>
   rider.mobility === 'wheelchair' ? 0.74 : 0.95;
@@ -57,6 +67,12 @@ const SPOT = {
   topside: [1.6, -0.62] as Vec2,
   /** Standing room between the cab seats and the door opening. */
   inside: [0.55, -1.15] as Vec2,
+  /**
+   * Just inside the sliding-door opening, toward its front edge: the step in
+   * from `topside` to `inside` passes the door-side panel through the opening
+   * (FLEET_VAN_SIDE_DOOR), not through the panel ahead of it.
+   */
+  stepIn: [0.95, -0.47] as Vec2,
   /** Just outside the driver's door opening, and a step further out, behind the open door's swing. */
   cabDoorway: [
     -1.3,
@@ -70,6 +86,42 @@ const SPOT = {
 };
 const GROUND = ARRIVAL.streetY,
   FLOOR = ARRIVAL.vanFloorY;
+/** Top of the entrance landing and the lobby floor, and of the raised west sidewalk (neighborhood.ts). */
+const LANDING_Y = 0,
+  SIDEWALK_Y = GROUND + 0.18;
+type RoutePoint = { at: Vec2; y: number };
+/**
+ * The fleet office is inside the center. The drivers of the vans that park on
+ * the lot between runs (van E in its bay, van F at the west curb) walk out of
+ * the sliding entrance, step down off the south edge of its landing and cross
+ * the lot to the driver's door, and back the same way: they are never seen
+ * appearing in, or vanishing from, a parked van.
+ */
+const OFFICE = {
+  /** Just inside the sliding doors, where a driver leaves or reaches the office (out of sight). */
+  inside: [Math.round((ARRIVAL.door[0] + 0.45) * 1000) / 1000, ARRIVAL.door[1]] as Vec2,
+  /** Through the doors, across the landing and down its south step. */
+  exit: [
+    { at: ARRIVAL.door, y: LANDING_Y },
+    { at: [-15.35, -1.3], y: LANDING_Y },
+    { at: [-15.35, -2.05], y: GROUND },
+  ] as RoutePoint[],
+  /**
+   * On across the lot to each such van's driver door (`SPOT.cabOutside` is
+   * appended): diagonally over the lanes and round the bay noses to van E,
+   * and wide of a docked van's driver's door, through the gap in the curb
+   * islands and over the sidewalk to van F.
+   */
+  toVan: {
+    [fleetVanId(4)]: [{ at: [-23.6, -12.9], y: GROUND }],
+    [fleetVanId(5)]: [
+      { at: [-18, -3], y: GROUND },
+      { at: [-30.6, -3], y: GROUND },
+      { at: [-32.3, 1.2], y: GROUND },
+      { at: [-32.75, 1.75], y: SIDEWALK_Y },
+    ],
+  } as Record<string, RoutePoint[]>,
+};
 const DRIVER_NAMES = ['Casey', 'Taylor', 'Robin', 'Dana', 'Jamie', 'Kai', 'Priya', 'Wen'];
 type Mobility = ActorSpec['mobility'];
 /**
@@ -105,19 +157,51 @@ const length = (path: Vec2[]) =>
     0,
   );
 const round = (v: number) => Math.round(v * 1000) / 1000;
+/** The point `d` metres along `path`. */
+function pointAlong(path: Vec2[], d: number): Vec2 {
+  for (let i = 1; i < path.length; i++) {
+    const a = path[i - 1],
+      b = path[i],
+      l = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (d <= l || i === path.length - 1) {
+      const f = l ? Math.min(1, d / l) : 0;
+      return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];
+    }
+    d -= l;
+  }
+  return path[0];
+}
+/** Distance from `p` to the footprint of a van standing or driving at `van`. */
+function vanDistance(van: { position: { x: number; z: number }; heading: number }, p: Vec2) {
+  const dx = p[0] - van.position.x,
+    dz = p[1] - van.position.z,
+    s = Math.sin(van.heading),
+    c = Math.cos(van.heading);
+  const along = Math.abs(dx * s + dz * c) - FLEET_VAN.halfLength,
+    across = Math.abs(dx * c - dz * s) - FLEET_VAN.halfWidth;
+  return Math.hypot(Math.max(along, 0), Math.max(across, 0));
+}
 
+/** Van-local (x, z) → world for a van standing at (x, z) with `heading`. */
+const vanToWorld =
+  (at: Vec2, heading: number) =>
+  ([x, z]: Vec2): Vec2 => {
+    const c = Math.cos(heading),
+      s = Math.sin(heading);
+    return [round(at[0] + x * c + z * s), round(at[1] - x * s + z * c)];
+  };
 /** Docked pose of a van and helpers to place van-local points in the world. */
 function dockFrame(index: number) {
   const window = alhambraVanWindows[index];
   const pose = sampleVan(index, window.unload[0]);
-  const c = Math.cos(pose.heading),
-    s = Math.sin(pose.heading);
-  const world = ([x, z]: Vec2): Vec2 => [
-    round(pose.position.x + x * c + z * s),
-    round(pose.position.z - x * s + z * c),
-  ];
+  const world = vanToWorld([pose.position.x, pose.position.z], pose.heading);
   return { window, pose, world, sill: world(SPOT.sill), foot: world(SPOT.foot) };
 }
+/** Van-local → world for a van standing in its own bay or curb spot. */
+const parkedWorld = (index: number) => {
+  const spot = fleetParking[index];
+  return vanToWorld([spot.x, spot.z], spot.heading);
+};
 const seatPoint = (seat: VanSeat): Vec2 => [seat[0], seat[2]];
 
 // ---------------------------------------------------------------------------
@@ -253,25 +337,45 @@ class Track {
 // ---------------------------------------------------------------------------
 // Van timetable helpers
 // ---------------------------------------------------------------------------
-/** When the van last left its bay before `t` (0 when it was already under way at the start of the day). */
-function tripStartBefore(index: number, t: number) {
-  for (let s = t; s > 0; s -= 0.25)
-    if (sampleVan(index, s).phase.startsWith('Parked')) return round(Math.min(t, s + 0.25));
-  return 0;
-}
-/** When the van docked around `t` leaves again. */
-function departureAfter(index: number, t: number) {
-  const spell = vanSpells(index).find((s) => s.kind === 'docked' && t >= s.start - 1e-6 && t <= s.end);
-  return spell ? spell.end : LOOP;
-}
-/** First moment at or after `t` when the van is off site (invisible), or the end of the day. */
-function hiddenAfter(index: number, t: number) {
-  for (let s = t; s < LOOP; s += 0.25) if (!sampleVan(index, s).visible) return round(s);
-  return LOOP;
-}
 /** The van's day as the fleet plans it: trips, docked spells and waits (off site, in its bay or for the driveway). */
 const vanSpells = (index: number): FleetSpell[] =>
   fleetTimeline(index, alhambraVanWindows);
+/** The docked spell holding `t`. */
+function dockedAt(index: number, t: number) {
+  const spells = vanSpells(index),
+    k = spells.findIndex((s) => s.kind === 'docked' && t >= s.start - 1e-6 && t <= s.end + 1e-6);
+  if (k < 0) throw new Error(`withFleetCrew: ${vanIds[index]} is not at the drop-off at ${t}`);
+  return { spells, k, spell: spells[k] };
+}
+/** When the van docked around `t` leaves again. */
+const departureAfter = (index: number, t: number) => dockedAt(index, t).spell.end;
+/**
+ * When the trip that brings the van to the drop-off for the docked spell
+ * holding `t` sets off. Arrivals come in from off site, so the van is out of
+ * sight then: its riders take their seats at this moment, out of view.
+ */
+function arrivalStart(index: number, t: number) {
+  const { spells, k } = dockedAt(index, t),
+    trip = spells.at(k - 1)!;
+  if (trip.kind !== 'trip' || trip.trip !== 'toDock')
+    throw new Error(`withFleetCrew: ${vanIds[index]} reaches the drop-off at ${spells[k].start} without an arrival trip`);
+  return trip.start;
+}
+/**
+ * When the van that leaves the drop-off around `t` is out of sight: the end
+ * of its departure trip, once it has faded out at the end of the street (past
+ * the end of the day when the trip runs on into the next morning).
+ */
+function outOfSightAfter(index: number, t: number) {
+  const { spells, k } = dockedAt(index, t),
+    trip = spells[k + 1];
+  if (trip?.kind !== 'trip') throw new Error(`withFleetCrew: ${vanIds[index]} does not leave the drop-off after ${t}`);
+  if (trip.end < LOOP) return trip.end;
+  const next = spells[0];
+  return next.kind === 'trip' && next.start === 0 ? LOOP + next.end : LOOP;
+}
+/** Segment times are rounded to the millisecond: round a moment the van must already be out of sight up, never down. */
+const after = (t: number) => Math.ceil(t * 1000 - 1e-6) / 1000;
 
 // ---------------------------------------------------------------------------
 // Riders
@@ -416,6 +520,11 @@ function seatRider(
   const last = actor.segments.at(-1)!,
     lastEvent = events.find((e) => e.at === actor.segments.length - 1),
     dayEnd = lastEvent ? worldSeat(lastEvent) : last.path.at(-1)!;
+  // A ride home on a van whose departure runs on past the end of the day
+  // continues, seated and in view, until that van has faded out next morning.
+  const homeBy = lastEvent?.boards ? outOfSightAfter(lastEvent.index, last.start) - LOOP : 0;
+  if (homeBy > 0 && !events.some((e) => e.at === 0))
+    throw new Error(`${actor.id}: rides home on ${lastEvent!.vehicle} past the end of the day but does not start the day riding`);
   const out: Segment[] = [];
   actor.segments.forEach((s, i) => {
     const e = events.find((e) => e.at === i);
@@ -456,14 +565,23 @@ function seatRider(
       const lead = partner ?? actor;
       rideEnd = s.end - length(cabinPath(seatOf(e, lead)).map(frame.world)) / cabinSpeed(lead);
     }
-    // Hidden while the van is still parked in its bay or already off site;
-    // seated and visible while it is on the road or docked.
-    const tripStart = e.alights ? Math.max(rideStart, tripStartBefore(e.index, rideEnd)) : rideStart;
-    const offSite = e.boards ? Math.min(rideEnd, hiddenAfter(e.index, rideStart)) : rideEnd;
-    if (tripStart > rideStart)
-      track.ride(tripStart, e.vehicle, seat, seatWorld, 'Waiting at home for the van', false, i === 0 ? dayEnd : seatWorld);
-    else if (i === 0 && !near(dayEnd, seatWorld, 0.001))
-      throw new Error(`${actor.id}: the day would not close on itself (seat ${seatWorld.join(',')} vs ${dayEnd.join(',')})`);
+    // Seated in view only between the van setting off from where it was out
+    // of sight (an arrival comes in from off site) and the van fading out at
+    // the end of the street after its departure: riders are picked up and
+    // dropped off out of view, and the engine hides them while the van fades.
+    let from = i === 0 ? dayEnd : seatWorld;
+    if (i === 0 && homeBy > 0) {
+      track.ride(after(homeBy), lastEvent!.vehicle, seatOf(lastEvent!), dayEnd, 'Riding home', true);
+      from = dayEnd;
+    }
+    const seated = e.alights ? arrivalStart(e.index, rideEnd) : rideStart;
+    if (seated + 1e-6 < track.t)
+      throw new Error(`${actor.id}: ${e.vehicle} sets off at ${seated} with its riders, before ${actor.id} can be aboard (${track.t})`);
+    const offSite = e.boards ? Math.min(rideEnd, after(outOfSightAfter(e.index, rideStart))) : rideEnd;
+    if (seated > track.t)
+      track.ride(seated, e.vehicle, seat, seatWorld, 'Waiting at home for the van', false, from);
+    else if (!near(from, seatWorld, 0.001))
+      throw new Error(`${actor.id}: the day would not close on itself (seat ${seatWorld.join(',')} vs ${from.join(',')})`);
     track.ride(Math.min(offSite, rideEnd), e.vehicle, seat, seatWorld, e.boards ? 'Riding home' : 'Riding to Seen Health', true);
     if (offSite < rideEnd) track.ride(rideEnd, e.vehicle, seat, seatWorld, 'Dropped off at home', false);
     if (e.alights) {
@@ -526,33 +644,158 @@ const rampHeight = (p: Vec2, sill: Vec2, foot: Vec2) => {
 
 /**
  * One driver's day from the van's timeline and the riders who use its ramp:
- * seated and visible whenever the van is under way or waiting to go, seated
- * and hidden with it while it is off site, in the fleet office while it is
- * parked, and on foot at the drop-off.
+ * seated and visible while the van is on the road, seated and hidden with it
+ * while it is off site (so a driver takes the wheel of an arrival out of
+ * sight), on foot at the drop-off, and, for a van that parks on the lot
+ * between runs, in the fleet office: out of sight indoors, walking out to the
+ * van before it pulls out and back after it parks, so nobody appears in a
+ * parked van.
  */
-function driverDay(index: number, actors: ActorSpec[], escorts: Map<string, ActorSpec>): Segment[] {
+function driverDay(
+  index: number,
+  actors: ActorSpec[],
+  escorts: Map<string, ActorSpec>,
+  others: ActorSpec[],
+): Segment[] {
   const vehicle = vanIds[index],
     seat = FLEET_VAN_SEATS.driver,
-    bay = fleetParking[index],
     spells = vanSpells(index);
-  const parkedSeat: Vec2 = alhambraVanWindows[index]
-    ? dockFrame(index).world(seatPoint(seat))
-    : [bay.x, bay.z];
-  const track = new Track(parkedSeat, FLOOR, 0);
-  const ride = (until: number, title: string, visible: boolean) =>
-    track.ride(until, vehicle, seat, parkedSeat, title, visible);
-  if (spells.every((s) => s.kind === 'parked'))
-    return ride(LOOP, 'Spare van · no runs scheduled', false).segments;
-  const ramp = alhambraVanWindows[index] ? rampUses(index, actors, escorts) : { down: [], up: [] };
-  for (const spell of spells) {
-    if (spell.kind === 'docked') dockedDuty(track, index, spell, ramp);
-    // Rounded down to the millisecond (segment times are), so the driver is never seen in the van once it is parked.
-    else if (spell.kind === 'trip') ride(Math.floor(spell.end * 1000) / 1000, 'Driving the van', true);
-    else if (spell.kind === 'yielding') ride(spell.end, 'Waiting for the driveway', true);
-    else if (spell.kind === 'away') ride(spell.end, 'Off site · driving the route', false);
-    else ride(spell.end, 'Off the road · fleet office', false);
+  if (spells.every((s) => s.kind === 'parked')) {
+    const bay = fleetParking[index];
+    return new Track([bay.x, bay.z], FLOOR, 0).ride(LOOP, vehicle, seat, [bay.x, bay.z], 'Spare van · no runs scheduled', false).segments;
   }
+  const docks = !!alhambraVanWindows[index],
+    parks = spells.some((s) => s.kind === 'parked');
+  if (docks === parks)
+    throw new Error(`withFleetCrew: ${vehicle} must either serve the drop-off or park on the lot between runs`);
+  if (parks && (spells[0].kind !== 'parked' || spells.at(-1)!.kind !== 'parked'))
+    throw new Error(`withFleetCrew: ${vehicle} must start and end the day parked, its driver in the fleet office`);
+  // Where the driver sits: the van's pose at the drop-off or in its own spot.
+  const seatAt: Vec2 = (docks ? dockFrame(index).world : parkedWorld(index))(seatPoint(seat));
+  const track = docks ? new Track(seatAt, FLOOR, 0) : new Track(OFFICE.inside, LANDING_Y, 0);
+  const ride = (until: number, title: string, visible: boolean) =>
+    track.ride(until, vehicle, seat, seatAt, title, visible);
+  const ramp = docks ? rampUses(index, actors, escorts) : { down: [], up: [] };
+  spells.forEach((spell, k) => {
+    if (spell.kind === 'docked') dockedDuty(track, index, spell, ramp);
+    else if (spell.kind === 'trip')
+      // A trip that ends off site ends out of sight: rounded down to the
+      // millisecond (segment times are) so the driver is not drawn after it.
+      ride(spell.trip === 'home' ? spell.end : Math.floor(spell.end * 1000) / 1000, 'Driving the van', true);
+    else if (spell.kind === 'away') ride(spell.end, 'Off site · driving the route', false);
+    else if (spell.kind === 'yielding') ride(spell.end, 'Waiting for the driveway', true);
+    else {
+      const next = spells[k + 1];
+      parkedDuty(track, index, spell, spells[k - 1]?.trip === 'home', next?.kind === 'yielding' || next?.trip === 'out', others);
+    }
+  });
   return track.segments;
+}
+
+/**
+ * Whether a driver of van `index` who sets off along `route` at `start`
+ * (walking at STAFF_WALK) keeps LOT_CLEARANCE from every other fleet van in
+ * view and PEOPLE_CLEARANCE from everyone in `others` who is on foot and in
+ * view, all the way.
+ */
+function walkClear(index: number, route: Vec2[], start: number, others: ActorSpec[], byId: Map<string, ActorSpec>) {
+  const seconds = length(route) / STAFF_WALK;
+  // Only people whose day comes near the route at all.
+  const [x0, z0, x1, z1] = route.reduce(
+    ([a, b, c, d], [x, z]) => [Math.min(a, x), Math.min(b, z), Math.max(c, x), Math.max(d, z)],
+    [Infinity, Infinity, -Infinity, -Infinity],
+  );
+  const pad = PEOPLE_CLEARANCE + 2;
+  const nearby = others.filter(
+    (a) =>
+      a.levelId !== 'upper' &&
+      a.segments.some((s) => s.path.some(([x, z]) => x > x0 - pad && x < x1 + pad && z > z0 - pad && z < z1 + pad)),
+  );
+  for (let t = 0; t <= seconds + 0.1; t += 0.2) {
+    const p = pointAlong(route, t * STAFF_WALK);
+    for (const v of vanIds.keys()) {
+      if (v === index) continue;
+      const van = sampleVan(v, start + t);
+      if (van.visible && vanDistance(van, p) < LOT_CLEARANCE) return false;
+    }
+    for (const a of nearby) {
+      const partner = a.escortFor ? byId.get(a.escortFor) : undefined;
+      let q = partner ? sampleEscort(partner, start + t) : sampleActor(a, start + t);
+      if (partner && q.seat) q = sampleActor(a, start + t);
+      if (q.visible !== false && !q.seat && Math.hypot(q.x - p[0], q.z - p[1]) < PEOPLE_CLEARANCE) return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * A van parked on the lot: the driver gets out once it has parked (through
+ * the driver's door, which FLEET_CAB_DOOR opens) and walks back to the fleet
+ * office, and before the next run walks out to the van and gets in. Each walk
+ * goes when it is clear of the other vans and of everyone on foot in `others`
+ * (as late as possible going out, as early as possible coming back); the
+ * driver waits by the van meanwhile.
+ */
+function parkedDuty(
+  track: Track,
+  index: number,
+  spell: FleetSpell,
+  alights: boolean,
+  boards: boolean,
+  others: ActorSpec[],
+) {
+  const byId = new Map(others.map((a) => [a.id, a]));
+  const vehicle = vanIds[index],
+    seat = FLEET_VAN_SEATS.driver,
+    at = parkedWorld(index),
+    toVan = OFFICE.toVan[vehicle];
+  if (!toVan) throw new Error(`withFleetCrew: no walk from the fleet office to ${vehicle}`);
+  const P = { seat: at(seatPoint(seat)), doorway: at(SPOT.cabDoorway), outside: at(SPOT.cabOutside) };
+  const outsideY = toVan.at(-1)!.y;
+  const out = [...OFFICE.exit, ...toVan, { at: P.outside, y: outsideY }],
+    back = [...out].reverse().slice(1).concat({ at: OFFICE.inside, y: LANDING_Y });
+  const outPath = [OFFICE.inside, ...out.map((p) => p.at)],
+    backPath = [P.outside, ...back.map((p) => p.at)],
+    seconds = length(outPath) / STAFF_WALK;
+  const walk = (route: RoutePoint[], title: string) =>
+    track.walkAt(
+      route.map((p) => p.at),
+      STAFF_WALK,
+      title,
+      route.at(-1)!.y,
+      'walk',
+      { heights: [track.y, ...route.map((p) => p.y)] },
+    );
+  const inside: Extra = { vehicleId: vehicle };
+  const toOffice = facing(P.outside, P.doorway) + Math.PI;
+  const { swing, exit, entry } = FLEET_CAB_DOOR;
+  if (alights) {
+    track.ride(spell.start + exit.open + 0.2, vehicle, seat, P.seat, 'Opening the cab door', true);
+    track.walk([P.doorway, P.outside], spell.start + exit.close - 0.7, 'Out of the cab', outsideY, 'walk', inside);
+    let setOff = track.t;
+    while (!walkClear(index, backPath, setOff, others, byId)) {
+      setOff += 0.5;
+      if (setOff + seconds > spell.end) throw new Error(`withFleetCrew: no clear moment for ${vehicle}'s driver to cross the lot after ${spell.start}`);
+    }
+    if (setOff > track.t) track.stay(setOff, 'idle', 'Post-trip check by the van', toOffice);
+    walk(back, 'Back to the fleet office');
+  }
+  const departs = spell.end,
+    doorOpen = departs + entry.open + swing;
+  let leaves = boards ? departs + entry.open - DOOR_LEAD - seconds : spell.end;
+  while (boards && !walkClear(index, outPath, leaves, others, byId)) {
+    leaves -= 0.5;
+    if (leaves < track.t) throw new Error(`withFleetCrew: no clear moment for ${vehicle}'s driver to cross the lot before ${departs}`);
+  }
+  if (leaves < track.t)
+    throw new Error(`withFleetCrew: ${vehicle}'s driver is not back in the fleet office before walking out to the van at ${round(leaves)}`);
+  track.stay(leaves, 'idle', 'In the fleet office', 0, { visible: false });
+  if (!boards) return;
+  walk(out, 'Out to the van');
+  if (track.t < doorOpen - swing - DOOR_LEAD - 0.01) track.stay(doorOpen - swing - DOOR_LEAD, 'idle', 'Pre-trip check by the van', facing(P.outside, P.doorway));
+  track.stay(doorOpen, 'idle', 'At the cab door', facing(P.outside, P.doorway));
+  track.walk([P.doorway, P.seat], departs + entry.close, 'Into the cab', FLOOR, 'walk', inside);
+  track.ride(departs, vehicle, seat, P.seat, 'In the cab, ready to leave', true);
 }
 
 /** The docked choreography: out of the cab, ramp duty for each rider, back in before departure. */
@@ -573,6 +816,7 @@ function dockedDuty(track: Track, index: number, spell: FleetSpell, ramp: RampUs
     sill: frame.sill,
     topside: at(SPOT.topside),
     inside: at(SPOT.inside),
+    stepIn: at(SPOT.stepIn),
   };
   const morning = window.unload[0] >= spell.start && window.unload[0] < spell.end;
   const service = morning ? window.unload : window.boarding;
@@ -591,7 +835,7 @@ function dockedDuty(track: Track, index: number, spell: FleetSpell, ramp: RampUs
   track.walkAt([P.noseA, P.noseB, P.standby], STAFF_WALK, 'Around the nose to the ramp', GROUND);
   const rampReady = service[0] + 2;
   if (morning) {
-    const climb = length([P.foot, P.topside, P.inside]);
+    const climb = length([P.foot, P.topside, P.stepIn, P.inside]);
     for (const [i, u] of uses.entries()) {
       const speedDown = length(u.path) / (u.end - u.start),
         lag = (u.partyGap + FOLLOW_GAP) / speedDown,
@@ -608,7 +852,7 @@ function dockedDuty(track: Track, index: number, spell: FleetSpell, ramp: RampUs
       track.stay(rampReady, 'idle', 'Waiting for the ramp', faceSill);
       const climbSpeed = Math.min(1.9, Math.max(1.1, climb / Math.max(0.6, deadline - track.t)));
       track.walk([P.topside], track.t + length([P.foot, P.topside]) / climbSpeed, 'Up the ramp ahead of the rider', rampHeight(P.topside, P.sill, P.foot));
-      track.walk([P.inside], track.t + length([P.topside, P.inside]) / climbSpeed, 'Step inside', FLOOR, 'walk', inside);
+      track.walk([P.stepIn, P.inside], track.t + length([P.topside, P.stepIn, P.inside]) / climbSpeed, 'Step inside', FLOOR, 'walk', inside);
       track.stay(u.start + lag - 0.8, 'idle', 'Ready at the door', facing(P.inside, P.sill), inside);
       track.walk([P.sill], u.start + lag, 'Out behind the rider', FLOOR, 'walk', inside);
       track.walk([P.foot], u.end + lag, 'Escorting down the ramp', GROUND, 'escort', inside);
@@ -790,10 +1034,12 @@ export function withFleetCrew(data: ActivityData): ActivityData {
     seatsByVan.set(id, assignSeats(riders, escorts));
   });
   const seated = actors.map((a) => seatRider(a, seatsByVan, byId));
-  const drivers = vanIds.map((_, index): ActorSpec => {
+  // Drivers in van order: each one's walks to a parked van keep clear of everyone placed before.
+  const drivers: ActorSpec[] = [];
+  vanIds.forEach((_, index) => {
     const id = `driver-${index + 1}`,
       base = existing.get(id);
-    return {
+    drivers.push({
       id,
       label: base?.label ?? `Driver · ${DRIVER_NAMES[index]}`,
       role: 'driver',
@@ -801,8 +1047,8 @@ export function withFleetCrew(data: ActivityData): ActivityData {
       profileId: base?.profileId,
       levelId: 'site',
       offset: 0,
-      segments: driverDay(index, seated, escorts),
-    };
+      segments: driverDay(index, seated, escorts, [...seated, ...drivers]),
+    });
   });
   const interactions: Interaction[] = midday.map((rider) => {
     const van = rider.segments.find((s) => s.title === 'Unload on van ramp')!,

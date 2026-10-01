@@ -865,19 +865,6 @@ export function registerCommunityVehicles(
       label: v.name,
     });
 }
-/** World position of a seat at a moment (for authoring boarding walks). */
-export function seatWorld(id: string, seat: string, time: number) {
-  const v = communityVehicleById(id)!,
-    pose = sampleCommunityVehicle(id, time),
-    [sx, sy, sz] = v.seats[seat],
-    c = Math.cos(pose.heading),
-    sn = Math.sin(pose.heading);
-  return {
-    x: pose.position.x + sx * c + sz * sn,
-    y: pose.position.y + sy,
-    z: pose.position.z - sx * sn + sz * c,
-  };
-}
 /** Where a car's driver steps out: beside the driver door (local x −1.05). */
 export function carDoorWorld(pose: VehiclePose): Vec2 {
   const c = Math.cos(pose.heading),

@@ -8,6 +8,7 @@ import {
   type ActivitySource,
   type ActorSpec,
 } from '../model/activity';
+import { alhambraSource, alhambraVehicles } from '../model/alhambra-source';
 import { roleNames } from '../model/characters';
 import type { Facility } from '../model/schema';
 import type { createViewer } from '../model/renderer';
@@ -517,9 +518,13 @@ export default function MetricsPanel({
   const active = scenario === 'story' ? story : null;
   // Measure what the viewer plays: its composed source (center loop, fleet
   // crew, community settings) and its vehicles, so riders sit in their seats.
+  // Before the viewer is ready that is the same composed Alhambra source, with
+  // the same vehicles as pure samplers, so the numbers never start from the
+  // bare loop and are computed once.
   const scene = ready ? getViewer()?.activity : undefined;
-  const source = active?.source || scene?.data || activityData;
-  const vehicles = scene?.vehicles;
+  const alhambra = useMemo(() => alhambraSource(model), [model]);
+  const source = active?.source || scene?.data || alhambra;
+  const vehicles = source === alhambra ? alhambraVehicles() : scene?.vehicles;
   const metrics: SimMetrics | null = useMemo(() => {
     if (scenario === 'story' && !active) return null;
     return computeMetrics(source, model, {

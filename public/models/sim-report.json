@@ -2828,11 +2828,11 @@
      "name": "Street & vans",
      "levelId": "site",
      "participants": [
-      2,
-      2,
-      2,
-      2,
-      2,
+      4,
+      4,
+      4,
+      6,
+      6,
       2,
       2,
       2,
@@ -3010,20 +3010,11 @@
       4
      ],
      "staff": [
+      2,
       3,
       3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      4,
-      3,
-      3,
-      3,
-      3,
-      3,
+      5,
+      5,
       3,
       3,
       3,
@@ -3034,7 +3025,16 @@
       2,
       2,
       2,
-      2,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
       2,
       2,
       2,
@@ -3081,11 +3081,11 @@
       1,
       1,
       2,
+      5,
+      5,
+      5,
+      5,
       4,
-      4,
-      4,
-      4,
-      3,
       4,
       5,
       5,
@@ -3125,40 +3125,40 @@
       2,
       2,
       2,
-      1,
-      1,
-      1,
-      1,
+      2,
+      2,
+      2,
+      2,
       1,
       1,
       1,
       2,
       4,
       4,
-      4,
-      2,
-      2,
-      2,
-      2,
+      5,
+      3,
+      3,
+      3,
+      3,
       3,
       4,
       5,
       3,
       2,
+      2,
+      1,
+      1,
+      1,
+      2,
+      2,
       3,
-      2,
-      2,
-      2,
+      3,
+      3,
+      3,
       3,
       3,
       5,
-      4,
-      4,
-      3,
-      3,
-      3,
       5,
-      4,
       4,
       4,
       6,
@@ -3173,12 +3173,12 @@
       1,
       1,
       2,
-      3,
-      3,
-      3,
       2,
       2,
       2,
+      1,
+      1,
+      1,
       2,
       2,
       2,
@@ -3191,12 +3191,12 @@
       2,
       2
      ],
-     "peakParticipants": 5,
+     "peakParticipants": 6,
      "peakStaff": 7,
-     "meanParticipants": 1.8458333333333334,
-     "meanStaff": 2.6902777777777778,
-     "participantMinutes": 886,
-     "staffMinutes": 1291.3333333333333
+     "meanParticipants": 1.898611111111111,
+     "meanStaff": 2.688888888888889,
+     "participantMinutes": 911.3333333333333,
+     "staffMinutes": 1290.6666666666665
     },
     {
      "zoneId": "ot",
@@ -6201,11 +6201,11 @@
    ],
    "onSite": {
     "participants": [
-     122,
-     122,
-     122,
-     122,
-     122,
+     124,
+     124,
+     124,
+     126,
+     126,
      122,
      122,
      122,
@@ -6383,20 +6383,11 @@
      124
     ],
     "staff": [
+     40,
      41,
      41,
-     41,
-     41,
-     41,
-     41,
-     41,
-     41,
-     42,
-     41,
-     41,
-     41,
-     41,
-     41,
+     43,
+     43,
      41,
      41,
      41,
@@ -6407,7 +6398,16 @@
      40,
      40,
      40,
-     40,
+     41,
+     41,
+     41,
+     41,
+     41,
+     41,
+     41,
+     41,
+     41,
+     41,
      40,
      40,
      40,
@@ -6454,11 +6454,11 @@
      41,
      41,
      42,
+     45,
+     45,
+     45,
+     45,
      44,
-     44,
-     44,
-     44,
-     43,
      44,
      45,
      45,
@@ -6498,40 +6498,40 @@
      42,
      42,
      42,
-     41,
-     41,
-     41,
-     41,
+     42,
+     42,
+     42,
+     42,
      41,
      41,
      41,
      42,
      44,
      44,
+     45,
      44,
-     43,
-     43,
-     43,
-     43,
+     44,
+     44,
+     44,
      44,
      45,
      45,
      43,
      42,
-     43,
+     42,
+     41,
+     41,
+     41,
      42,
      42,
      42,
-     43,
-     43,
+     42,
+     42,
+     42,
+     42,
+     42,
      44,
-     43,
-     43,
-     42,
-     42,
-     42,
      44,
-     43,
      43,
      43,
      45,
@@ -6546,12 +6546,12 @@
      41,
      41,
      41,
-     42,
-     42,
-     42,
      41,
      41,
      41,
+     40,
+     40,
+     40,
      40,
      40,
      40,
@@ -6713,19 +6713,19 @@
       "walking": 964,
       "documenting": 61,
       "meeting": 0,
-      "driving": 794,
-      "offDuty": 752
+      "driving": 798,
+      "offDuty": 748
      },
      "share": {
-      "care": 0.7462332589285714,
-      "walking": 0.13448660714285715,
-      "documenting": 0.008510044642857142,
+      "care": 0.7458170663692136,
+      "walking": 0.13441160066926938,
+      "documenting": 0.008505298382598996,
       "meeting": 0,
-      "driving": 0.11077008928571429,
-      "offDuty": 0.09494949494949495
+      "driving": 0.11126603457891801,
+      "offDuty": 0.09444444444444444
      },
-     "onFloorSeconds": 7168,
-     "meanWalkMeters": 59.531677667471214
+     "onFloorSeconds": 7172,
+     "meanWalkMeters": 58.29350702678973
     },
     {
      "role": "nurse",
@@ -6802,22 +6802,22 @@
      "headcount": 9,
      "seconds": {
       "care": 412,
-      "walking": 321,
-      "documenting": 453,
+      "walking": 441,
+      "documenting": 465,
       "meeting": 0,
-      "driving": 4473,
-      "offDuty": 821
+      "driving": 3286,
+      "offDuty": 1876
      },
      "share": {
-      "care": 0.07280438239971726,
-      "walking": 0.05672380279201272,
-      "documenting": 0.08004947870648524,
+      "care": 0.0894874022589053,
+      "walking": 0.09578627280625543,
+      "documenting": 0.10099913119026933,
       "meeting": 0,
-      "driving": 0.7904223361017848,
-      "offDuty": 0.12669753086419752
+      "driving": 0.7137271937445699,
+      "offDuty": 0.2895061728395062
      },
-     "onFloorSeconds": 5659,
-     "meanWalkMeters": 100.48091063481897
+     "onFloorSeconds": 4604,
+     "meanWalkMeters": 109.91386387908686
     }
    ],
    "participants": [
@@ -7088,10 +7088,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 120,
-      "waiting": 319,
-      "offSite": 96
+      "waiting": 306,
+      "offSite": 109
      },
-     "walkMeters": 144.21248371542328
+     "walkMeters": 144.17144081786657
     },
     {
      "id": "arrival-cane",
@@ -7105,10 +7105,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 88,
-      "waiting": 352,
-      "offSite": 96
+      "waiting": 339,
+      "offSite": 109
      },
-     "walkMeters": 137.54757133309008
+     "walkMeters": 137.637376633717
     },
     {
      "id": "arrival-independent",
@@ -7122,10 +7122,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 84,
-      "waiting": 312,
-      "offSite": 147
+      "waiting": 329,
+      "offSite": 130
      },
-     "walkMeters": 123.71367095384323
+     "walkMeters": 119.4226420737108
     },
     {
      "id": "arrival-wheelchair",
@@ -7139,10 +7139,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 115,
-      "waiting": 277,
-      "offSite": 147
+      "waiting": 294,
+      "offSite": 130
      },
-     "walkMeters": 129.35370885546425
+     "walkMeters": 116.61093827878238
     },
     {
      "id": "community-01",
@@ -9315,10 +9315,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 41,
-      "waiting": 251,
-      "offSite": 375
+      "waiting": 250,
+      "offSite": 376
      },
-     "walkMeters": 79.98134689142441
+     "walkMeters": 75.7862222335355
     },
     {
      "id": "arrival-midday-c-2",
@@ -9332,10 +9332,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 39,
-      "waiting": 254,
-      "offSite": 374
+      "waiting": 252,
+      "offSite": 376
      },
-     "walkMeters": 80.21687266885338
+     "walkMeters": 69.69659857807277
     },
     {
      "id": "arrival-midday-d-3",
@@ -9349,10 +9349,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 40,
-      "waiting": 236,
-      "offSite": 391
+      "waiting": 253,
+      "offSite": 374
      },
-     "walkMeters": 75.26695613925321
+     "walkMeters": 78.47352512523844
     },
     {
      "id": "arrival-midday-d-4",
@@ -9366,10 +9366,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 37,
-      "waiting": 240,
-      "offSite": 390
+      "waiting": 256,
+      "offSite": 374
      },
-     "walkMeters": 78.36251370260635
+     "walkMeters": 78.38798705963698
     }
    ],
    "participantTotals": {
@@ -9381,8 +9381,8 @@
     "coordination": 720,
     "community": 14437,
     "moving": 948,
-    "waiting": 22344,
-    "offSite": 3292
+    "waiting": 22382,
+    "offSite": 3254
    },
    "hero": null,
    "handoffs": null,
@@ -9392,9 +9392,9 @@
     "staff": 70,
     "peakParticipantsOnSite": 129,
     "peakStaffOnFloor": 46,
-    "staffCareShare": 0.5981841621636449,
-    "staffWalkingShare": 0.09679896864799627,
-    "meanParticipantActiveShare": 0.7588626030825288
+    "staffCareShare": 0.6159408009941818,
+    "staffWalkingShare": 0.10306162797266,
+    "meanParticipantActiveShare": 0.7588486993574088
    },
    "seriesStep": 4
   },
@@ -12591,11 +12591,11 @@
      "name": "Street & vans",
      "levelId": "site",
      "participants": [
-      2,
-      2,
-      2,
-      2,
-      2,
+      4,
+      4,
+      4,
+      6,
+      6,
       2,
       2,
       2,
@@ -12773,20 +12773,11 @@
       4
      ],
      "staff": [
+      2,
       3,
       3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      4,
-      3,
-      3,
-      3,
-      3,
-      3,
+      5,
+      5,
       3,
       3,
       3,
@@ -12797,7 +12788,16 @@
       2,
       2,
       2,
-      2,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
       2,
       2,
       2,
@@ -12844,11 +12844,11 @@
       1,
       1,
       2,
+      5,
+      5,
+      5,
+      5,
       4,
-      4,
-      4,
-      4,
-      3,
       4,
       5,
       5,
@@ -12888,40 +12888,40 @@
       2,
       2,
       2,
-      1,
-      1,
-      1,
-      1,
+      2,
+      2,
+      2,
+      2,
       1,
       1,
       1,
       2,
       4,
       4,
-      4,
-      2,
-      2,
-      2,
-      2,
+      5,
+      3,
+      3,
+      3,
+      3,
       3,
       4,
       5,
       3,
       2,
+      2,
+      1,
+      1,
+      1,
+      2,
+      2,
       3,
-      2,
-      2,
-      2,
+      3,
+      3,
+      3,
       3,
       3,
       5,
-      4,
-      4,
-      3,
-      3,
-      3,
       5,
-      4,
       4,
       4,
       6,
@@ -12936,12 +12936,12 @@
       1,
       1,
       2,
-      3,
-      3,
-      3,
       2,
       2,
       2,
+      1,
+      1,
+      1,
       2,
       2,
       2,
@@ -12954,12 +12954,12 @@
       2,
       2
      ],
-     "peakParticipants": 5,
+     "peakParticipants": 6,
      "peakStaff": 7,
-     "meanParticipants": 1.8458333333333334,
-     "meanStaff": 2.6902777777777778,
-     "participantMinutes": 886,
-     "staffMinutes": 1291.3333333333333
+     "meanParticipants": 1.898611111111111,
+     "meanStaff": 2.688888888888889,
+     "participantMinutes": 911.3333333333333,
+     "staffMinutes": 1290.6666666666665
     },
     {
      "zoneId": "ot",
@@ -15964,11 +15964,11 @@
    ],
    "onSite": {
     "participants": [
-     118,
-     118,
-     118,
-     118,
-     118,
+     120,
+     120,
+     120,
+     122,
+     122,
      118,
      118,
      118,
@@ -16146,31 +16146,31 @@
      120
     ],
     "staff": [
+     50,
+     51,
+     51,
+     53,
+     53,
      51,
      51,
      51,
-     51,
-     51,
-     51,
-     51,
-     51,
-     48,
+     47,
      44,
-     40,
-     40,
-     40,
-     40,
-     40,
-     40,
-     40,
-     40,
-     40,
      39,
      39,
      39,
      39,
      39,
-     39,
+     40,
+     40,
+     40,
+     40,
+     40,
+     40,
+     40,
+     40,
+     40,
+     40,
      39,
      40,
      40,
@@ -16217,11 +16217,11 @@
      40,
      40,
      41,
-     43,
      44,
+     45,
+     45,
+     45,
      44,
-     44,
-     43,
      44,
      45,
      45,
@@ -16261,40 +16261,40 @@
      42,
      42,
      42,
-     41,
-     41,
-     41,
-     41,
+     42,
+     42,
+     42,
+     42,
      41,
      41,
      41,
      42,
      44,
      44,
+     45,
      44,
-     43,
-     43,
-     43,
-     43,
+     44,
+     44,
+     44,
      44,
      46,
      47,
      45,
      44,
-     45,
-     44,
-     44,
-     44,
-     45,
-     45,
-     45,
      44,
      43,
-     41,
-     41,
-     41,
+     43,
+     43,
+     44,
+     44,
+     43,
      43,
      42,
+     41,
+     41,
+     41,
+     43,
+     43,
      42,
      42,
      44,
@@ -16309,12 +16309,12 @@
      51,
      51,
      51,
-     52,
-     52,
-     52,
      51,
      51,
      51,
+     50,
+     50,
+     50,
      50,
      50,
      50,
@@ -16475,20 +16475,20 @@
       "care": 5194,
       "walking": 1123,
       "documenting": 61,
-      "meeting": 81,
-      "driving": 794,
-      "offDuty": 667
+      "meeting": 93,
+      "driving": 798,
+      "offDuty": 651
      },
      "share": {
-      "care": 0.7161174686336689,
-      "walking": 0.15483248311043707,
-      "documenting": 0.008410312973941817,
-      "meeting": 0.011167792637529298,
-      "driving": 0.109471942644423,
-      "offDuty": 0.08421717171717172
+      "care": 0.7145412023662127,
+      "walking": 0.15449167698445454,
+      "documenting": 0.008391800797908928,
+      "meeting": 0.012794056954189021,
+      "driving": 0.10978126289723483,
+      "offDuty": 0.0821969696969697
      },
-     "onFloorSeconds": 7253,
-     "meanWalkMeters": 81.96981056674191
+     "onFloorSeconds": 7269,
+     "meanWalkMeters": 80.73163992606042
     },
     {
      "role": "nurse",
@@ -16611,22 +16611,22 @@
      "headcount": 9,
      "seconds": {
       "care": 412,
-      "walking": 357,
-      "documenting": 453,
+      "walking": 477,
+      "documenting": 465,
       "meeting": 97,
-      "driving": 4340,
-      "offDuty": 821
+      "driving": 3153,
+      "offDuty": 1876
      },
      "share": {
-      "care": 0.07280438239971726,
-      "walking": 0.06308535076868704,
-      "documenting": 0.08004947870648524,
-      "meeting": 0.01714083760381693,
-      "driving": 0.7669199505212935,
-      "offDuty": 0.12669753086419752
+      "care": 0.0894874022589053,
+      "walking": 0.10360556038227628,
+      "documenting": 0.10099913119026933,
+      "meeting": 0.02106863596872285,
+      "driving": 0.6848392701998263,
+      "offDuty": 0.2895061728395062
      },
-     "onFloorSeconds": 5659,
-     "meanWalkMeters": 104.52218698392518
+     "onFloorSeconds": 4604,
+     "meanWalkMeters": 113.95514022819306
     }
    ],
    "participants": [
@@ -16897,10 +16897,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 120,
-      "waiting": 319,
-      "offSite": 96
+      "waiting": 306,
+      "offSite": 109
      },
-     "walkMeters": 144.21248371542328
+     "walkMeters": 144.17144081786657
     },
     {
      "id": "arrival-independent",
@@ -16914,10 +16914,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 84,
-      "waiting": 312,
-      "offSite": 147
+      "waiting": 329,
+      "offSite": 130
      },
-     "walkMeters": 123.71367095384323
+     "walkMeters": 119.4226420737108
     },
     {
      "id": "arrival-wheelchair",
@@ -16931,10 +16931,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 115,
-      "waiting": 277,
-      "offSite": 147
+      "waiting": 294,
+      "offSite": 130
      },
-     "walkMeters": 129.35370885546425
+     "walkMeters": 116.61093827878238
     },
     {
      "id": "community-01",
@@ -18665,10 +18665,10 @@
       "coordination": 25,
       "community": 0,
       "moving": 238,
-      "waiting": 97,
-      "offSite": 96
+      "waiting": 84,
+      "offSite": 109
      },
-     "walkMeters": 384.9888942864593
+     "walkMeters": 385.07869958708613
     },
     {
      "id": "home-participant",
@@ -19056,10 +19056,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 41,
-      "waiting": 251,
-      "offSite": 375
+      "waiting": 250,
+      "offSite": 376
      },
-     "walkMeters": 79.98134689142441
+     "walkMeters": 75.7862222335355
     },
     {
      "id": "arrival-midday-c-2",
@@ -19073,10 +19073,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 39,
-      "waiting": 254,
-      "offSite": 374
+      "waiting": 252,
+      "offSite": 376
      },
-     "walkMeters": 80.21687266885338
+     "walkMeters": 69.69659857807277
     },
     {
      "id": "arrival-midday-d-3",
@@ -19090,10 +19090,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 40,
-      "waiting": 236,
-      "offSite": 391
+      "waiting": 253,
+      "offSite": 374
      },
-     "walkMeters": 75.26695613925321
+     "walkMeters": 78.47352512523844
     },
     {
      "id": "arrival-midday-d-4",
@@ -19107,10 +19107,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 37,
-      "waiting": 240,
-      "offSite": 390
+      "waiting": 256,
+      "offSite": 374
      },
-     "walkMeters": 78.36251370260635
+     "walkMeters": 78.38798705963698
     }
    ],
    "participantTotals": {
@@ -19122,8 +19122,8 @@
     "coordination": 745,
     "community": 14437,
     "moving": 1098,
-    "waiting": 25689,
-    "offSite": 3292
+    "waiting": 25727,
+    "offSite": 3254
    },
    "hero": {
     "id": "hero-lin",
@@ -19140,10 +19140,10 @@
       "coordination": 25,
       "community": 0,
       "moving": 238,
-      "waiting": 97,
-      "offSite": 96
+      "waiting": 84,
+      "offSite": 109
      },
-     "walkMeters": 384.9888942864593
+     "walkMeters": 385.07869958708613
     },
     "touchpoints": [
      {
@@ -19262,9 +19262,9 @@
       "short": "PCA",
       "title": "Personal care attendant",
       "color": "#B8747E",
-      "minutes": 416,
+      "minutes": 407.3333333333333,
       "episodes": 1,
-      "firstAt": 0,
+      "firstAt": 12,
       "actorIds": [
        "arrival-aide-a",
        "aide-escort",
@@ -19287,7 +19287,7 @@
      }
     ],
     "disciplinesSeen": 11,
-    "walkMeters": 384.9888942864593
+    "walkMeters": 385.07869958708613
    },
    "handoffs": {
     "total": 15,
@@ -19480,10 +19480,10 @@
     "participants": 146,
     "staff": 78,
     "peakParticipantsOnSite": 125,
-    "peakStaffOnFloor": 52,
-    "staffCareShare": 0.5826156512465005,
-    "staffWalkingShare": 0.11371817091054526,
-    "meanParticipantActiveShare": 0.7191730291592542
+    "peakStaffOnFloor": 53,
+    "staffCareShare": 0.599215707782592,
+    "staffWalkingShare": 0.12024899906762464,
+    "meanParticipantActiveShare": 0.719183499945144
    },
    "seriesStep": 4
   }

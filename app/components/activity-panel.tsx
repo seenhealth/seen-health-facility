@@ -127,6 +127,8 @@ export function ActivityPanel({
     [search, setSearch] = useState(''),
     [activityView, setActivityView] = useState(!siteSpecific);
   useEffect(() => viewer?.activity.subscribe(setState), [viewer]);
+  // The cast in view: the community layer's people drop out with its toggle.
+  const people = state?.people ?? activityData.actors.length;
   const time = state?.time || 0,
     change = (p: Partial<ActivitySnapshot>) => viewer?.activity.setOptions(p);
   const rotation = useSyncExternalStore(
@@ -652,9 +654,7 @@ export function ActivityPanel({
                   change({ filter: e.target.value, follow: null })
                 }
               >
-                <option value="all">
-                  All {activityData.actors.length} people
-                </option>
+                <option value="all">All {people} people</option>
                 <option value="staff">Staff only</option>
                 {activityData.roles.map((r) => (
                   <option key={r} value={r}>
@@ -770,8 +770,7 @@ export function ActivityPanel({
       )}
       <div className="activity-caption">
         <span>
-          Continuous loop · {activityData.actors.length} people ·{' '}
-          {activityData.roles.length} roles
+          Continuous loop · {people} people · {activityData.roles.length} roles
         </span>
         <span>Representative care day · illustrative times</span>
       </div>
