@@ -1671,8 +1671,28 @@
         8
       ],
       "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
-      "notes": "Curbless roll-in shower, 1.60 m (x) by 1.50 m (z) overall = 1.55 x 1.45 m clear inside the tile (61 x 57 in): walls on the back (west) and north sides, entry open along the full south face and the east side; fold-down seat, hand shower on a slide bar, grab bars, curtain.",
-      "layer": "furniture"
+      "notes": "Curbless roll-in shower, 1.60 m (x) by 1.50 m (z) overall = 1.55 x 1.45 m clear inside the tile (61 x 57 in): walls on the back (west) and north sides, entry open along the full south face and the east side; fold-down seat, hand shower on a slide bar, grab bars, curtain. Navigation footprints cover only the two tiled walls and the fold-down seat: the curbless floor is walkable.",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          -0.773,
+          1.5,
+          0.053
+        ],
+        [
+          -0.725,
+          0,
+          0.05,
+          1.6
+        ],
+        [
+          -0.4,
+          -0.384,
+          0.49,
+          0.469
+        ]
+      ]
     },
     {
       "id": "home-bath-toilet",

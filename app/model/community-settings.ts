@@ -32,6 +32,28 @@ export type SettingKind =
  * present, runs `LANE` m outside the first.
  */
 export type DriveLoop = { depth: number; radius: number; lanes: 1 | 2 };
+/**
+ * A facility specification stamped on a pad (SPEC-facility-instance §5.1):
+ * written against that contract before facility-instance.ts lands. Until the
+ * instance chassis reads it, nothing does and the pad keeps its massing.
+ */
+export type CareFacility = {
+  /** Expected Facility.id; equal to the viewer's model id → stamped from that model, no fetch. */
+  id: string;
+  /** Root-relative spec URL, like sites.ts `model` ('/models/….json'). */
+  url: string;
+  /** Facility origin and rotation in the setting's local frame (frame.ts `Frame`). */
+  frame: { position: Vec2; heading: number };
+  levelIds?: string[];
+  excludeZoneIds?: string[];
+  excludeObjectIds?: string[];
+  cutaway?: boolean;
+  labels?: boolean | Record<string, string>;
+  /** Finished floor height (default 0; the home uses PORCH_Y so the porch meets its door). */
+  floorY?: number;
+  /** Clearance kept between the footprint and the pad edge (default 1.6 m). */
+  margin?: number;
+};
 export type CareSetting = {
   id: string;
   kind: SettingKind;
@@ -39,7 +61,8 @@ export type CareSetting = {
   subtitle: string;
   position: Vec2;
   heading: number;
-  pad: { w: number; d: number };
+  /** `back` extends the pad behind its origin (local −z) without moving the front edge (read once the instance derivation lands). */
+  pad: { w: number; d: number; back?: number };
   /** Access stub centre-line from the ring-street edge to the pad edge. */
   road: { from: Vec2; to: Vec2 };
   drive: DriveLoop;
@@ -49,6 +72,8 @@ export type CareSetting = {
   anchors: Record<string, Vec2>;
   services: string[];
   accent: string;
+  /** The building drawn from a facility specification instead of the massing. */
+  facility?: CareFacility;
 };
 
 export const LANE = 3.4;
@@ -263,7 +288,9 @@ export const careSettings: CareSetting[] = [
     subtitle: 'Home care · home health · pill packs · meals · home mods',
     position: [-84, 12],
     heading: Math.PI / 2,
-    pad: { w: 30, d: 28 },
+    // The owner allows the pad to grow 8 m west (behind the house) for the
+    // deeper plan and its yard; front edge, drive and anchors stay put.
+    pad: { w: 30, d: 28, back: 8 },
     road: { from: [-48.4, 12], to: [-70, 12] },
     drive: { depth: 7, radius: 6.2, lanes: 2 },
     apron: { w: 0, d: 0 },
@@ -276,6 +303,29 @@ export const careSettings: CareSetting[] = [
       'after-hours',
     ],
     accent: '#c98f5a',
+    // The Wongs' bungalow (public/models/seen-home-wong.json). Its plan frame
+    // is world-aligned (+x east, +z north): world = P + (−94.8, 12). The front
+    // wall's outer face (P x 3.2) lies on the porch slab's back edge (local
+    // z −7.6) and the front door's opening on the `door` anchor; the porch
+    // zone is left to the pad, which already draws it (validate-home.mjs).
+    facility: {
+      id: 'seen-home-wong',
+      url: '/models/seen-home-wong.json',
+      frame: { position: [0, -10.8], heading: -Math.PI / 2 },
+      levelIds: ['ground'],
+      excludeZoneIds: ['home-zone-porch'],
+      cutaway: true,
+      floorY: PORCH_Y,
+      labels: {
+        'home-living': 'Living room',
+        'home-kitchen': 'Kitchen',
+        'home-dining': 'Dining',
+        'home-bath': 'Accessible bath',
+        'home-primary': 'Bedroom',
+        'home-bedroom-2': 'Bedroom 2',
+      },
+      margin: 1.6,
+    },
     local: {
       kerb: [0.2, -4.4],
       rampFoot: [9.9, -6.3],
