@@ -272,7 +272,6 @@ export function buildArrivalVan(
       root.getObjectByName('passenger-door-1')!,
     ],
     cabDoor: root.getObjectByName('driver-door') ?? null,
-    opacity: 1,
   };
 }
 /** What a van body needs from a vehicle sampler; fleet vans also fade and open the driver's door. */
@@ -286,12 +285,17 @@ export type VanPose = {
   opacity?: number;
   cabDoor?: number;
 };
-/** Fade a van body (its own material copies) toward `opacity`; shadows drop while it is see-through. */
-function fadeVan(van: ReturnType<typeof buildArrivalVan>, opacity: number) {
-  if (van.opacity === opacity) return;
-  van.opacity = opacity;
+/**
+ * Fade a vehicle body toward `opacity` as it enters or leaves the map. The
+ * body must own its materials (the fleet van copies them, community cars
+ * build their own), so only that vehicle fades; shadows drop while it is
+ * see-through. Shared by every vehicle that fades.
+ */
+export function fadeVehicle(body: T.Object3D, opacity: number) {
+  if ((body.userData.opacity ?? 1) === opacity) return;
+  body.userData.opacity = opacity;
   const fading = opacity < 1;
-  van.root.traverse((o) => {
+  body.traverse((o) => {
     if (!(o instanceof T.Mesh)) return;
     o.userData.castShadow ??= o.castShadow;
     o.castShadow = !fading && o.userData.castShadow;
@@ -320,7 +324,7 @@ export function updateArrivalVan(
   van.root.position.copy(sample.position);
   van.root.rotation.y = sample.heading;
   van.root.visible = enabled && sample.visible;
-  fadeVan(van, sample.opacity ?? 1);
+  fadeVehicle(van.root, sample.opacity ?? 1);
   van.pivot.visible = sample.ramp > 0.001;
   van.pivot.rotation.z = T.MathUtils.lerp(Math.PI / 2, rampAngle, sample.ramp);
   van.doors.forEach(

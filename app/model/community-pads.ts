@@ -44,7 +44,6 @@ const PALETTE = {
   blanket: '#a9bcc4',
   stone: '#e2ddd3',
   rail: '#c4c7c4',
-  street: '#bbb7b0',
   cross: '#c25b52',
   green: '#4f9a63',
   wood: '#d5ac72',
@@ -680,30 +679,5 @@ export function buildCareSetting(setting: CareSetting, mat: Mat) {
   const [lx, lz] = setting.anchors.label;
   const plateHost = helpers(setting, root, mat);
   plateHost.label(lx, lz, 0);
-  if (setting.streetExtension) {
-    const { from, to, width } = setting.streetExtension,
-      length = Math.hypot(to[0] - from[0], to[1] - from[1]);
-    const slab = new T.Mesh(
-      new T.BoxGeometry(length, 0.2, width),
-      mat(PALETTE.street),
-    );
-    slab.position.set(
-      (from[0] + to[0]) / 2,
-      STREET_Y - 0.1,
-      (from[1] + to[1]) / 2,
-    );
-    slab.rotation.y = -Math.atan2(to[1] - from[1], to[0] - from[0]);
-    slab.receiveShadow = true;
-    slab.name = 'street-extension';
-    root.add(slab);
-    for (let x = 0; x < length; x += 6) {
-      const dash = new T.Mesh(
-        new T.BoxGeometry(3, 0.012, 0.12),
-        mat(PALETTE.marking),
-      );
-      dash.position.set(from[0] + x + 1.5, STREET_Y + 0.006, from[1]);
-      root.add(dash);
-    }
-  }
   return root;
 }

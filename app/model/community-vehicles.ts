@@ -2,8 +2,16 @@ import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import type { Vec2 } from './schema';
 import type { VehiclePose, VehicleRegistry } from './activity';
+import { FLEET_LOT } from './alhambra-fleet';
 import { deliveryStops } from './deliveries';
-import { FLEET_VAN_SEATS } from './photo-assets';
+import { STREET_EXTENT } from './neighborhood';
+import { FLEET_VAN_RAMP, FLEET_VAN_SEATS } from './photo-assets';
+import {
+  easeDistance,
+  laneFlow,
+  laneLine,
+  type StreetSide,
+} from './traffic-routes';
 import {
   arcPoint,
   careSettingById,
@@ -55,7 +63,8 @@ type Drive = {
   post?: Vec2;
   /**
    * Entering or leaving the map: opacity ramps in over the leg's first
-   * `FADE_METRES` or out over its last, beyond the Community framing.
+   * `FLEET_LOT.fade` metres or out over its last, beyond the Community
+   * framing (the same fade as the fleet vans).
    */
   fade?: 'in' | 'out';
 };
@@ -79,19 +88,20 @@ export type CommunityVehicle = {
   seats: Record<string, [number, number, number]>;
 };
 
-// --- Ring-street lanes (traffic-routes.ts circuits) and turning helpers -----
+// --- Ring-street lanes (traffic-routes.ts) and turning helpers -------------
 export type Lane = { x?: number; z?: number; dir: Vec2 };
-/** Lane centre-lines and the direction traffic flows on each. */
-export const RING: Record<
-  'west' | 'east' | 'north' | 'south',
-  { in: Lane; out: Lane }
-> = {
-  west: { in: { x: -43.8, dir: [0, 1] }, out: { x: -47.1, dir: [0, -1] } },
-  east: { in: { x: 52.2, dir: [0, -1] }, out: { x: 55.5, dir: [0, 1] } },
-  north: { in: { z: 39.4, dir: [1, 0] }, out: { z: 42.7, dir: [-1, 0] } },
-  south: { in: { z: -30.7, dir: [-1, 0] }, out: { z: -34, dir: [1, 0] } },
-};
-export const TURN_RADIUS = 6.4;
+/** A ring-street lane's centre-line and the direction traffic flows on it. */
+const ringLane = (side: StreetSide, lane: 0 | 1): Lane =>
+  side === 'north' || side === 'south'
+    ? { z: laneLine(side, lane), dir: laneFlow(side, lane) }
+    : { x: laneLine(side, lane), dir: laneFlow(side, lane) };
+/** A ring street's inner (`in`, lane 0) and outer (`out`, lane 1) lanes. */
+const ring = (side: StreetSide) => ({
+  in: ringLane(side, 0),
+  out: ringLane(side, 1),
+});
+/** Street-corner radius, shared with the fleet's street corners. */
+const TURN_RADIUS = FLEET_LOT.streetRadius;
 const add = (a: Vec2, b: Vec2, k = 1): Vec2 => [
   a[0] + b[0] * k,
   a[1] + b[1] * k,
@@ -287,18 +297,22 @@ const home = careSettingById('home-lin')!,
   pharmacy = careSettingById('pharmacy')!,
   hospital = careSettingById('hospital')!,
   specialist = careSettingById('specialist')!;
-const W = RING.west,
-  E = RING.east,
-  N = RING.north,
-  S = RING.south,
+const W = ring('west'),
+  E = ring('east'),
+  N = ring('north'),
+  S = ring('south'),
   R = TURN_RADIUS;
 /**
- * Where vehicles enter and leave the map: near the ends of the drawn streets
- * (which run to about x ±130, z ±95), beyond every pad and the Community
- * framing. Vehicles fade in or out over the last `FADE_METRES` before them.
+ * Where vehicles enter and leave the map: just short of the ends of the drawn
+ * streets (`STREET_EXTENT`), beyond every pad and the Community framing.
+ * Vehicles fade in or out over the last `FLEET_LOT.fade` metres before them.
  */
-export const OFF_MAP = { east: 124, west: -124, north: 90, south: -90 };
-export const FADE_METRES = 8;
+const OFF_MAP = {
+  east: STREET_EXTENT.x - 6,
+  west: 6 - STREET_EXTENT.x,
+  north: STREET_EXTENT.z - 5,
+  south: 5 - STREET_EXTENT.z,
+};
 /** Entry/exit leg z (or x) of a setting's lane plus the clearance a turn needs. */
 const legAt = (s: CareSetting, lane: 0 | 1, side: 'entry' | 'exit') =>
   legPoint(s, lane, side, 'street');
@@ -707,19 +721,8 @@ function curveOf(leg: Drive): Spline {
   }
   return c;
 }
-/** Distance fraction for a time fraction: eased starts/stops, cruise between. */
-export function driveProgress(u: number, easeIn = true, easeOut = true) {
-  const r = 0.22,
-    x = T.MathUtils.clamp(u, 0, 1),
-    a = easeIn ? r : 0,
-    b = easeOut ? r : 0,
-    cruise = 1 - a / 2 - b / 2;
-  let d: number;
-  if (x < a) d = (x * x) / (2 * a);
-  else if (x > 1 - b) d = cruise - (1 - x) ** 2 / (2 * b);
-  else d = x - a / 2;
-  return d / cruise;
-}
+/** Share of a leg's time spent speeding up (or slowing down) at an eased end. */
+const EASE = 0.22;
 const headingOf = (d: Vec2) => Math.atan2(d[0], d[1]) + Math.PI;
 const rise = (t: number, a: number, b: number) =>
   T.MathUtils.smoothstep(t, a, b);
@@ -768,10 +771,11 @@ export function sampleCommunityVehicle(id: string, time: number): VehiclePose {
     u =
       u0 +
       (u1 - u0) *
-        driveProgress(
+        easeDistance(
           (t - leg.from) / (leg.to - leg.from),
-          leg.easeIn,
-          leg.easeOut,
+          1,
+          leg.easeIn === false ? 0 : EASE,
+          leg.easeOut === false ? 0 : EASE,
         ),
     position = curve.getPointAt(u),
     d = curve.getTangentAt(u),
@@ -782,7 +786,7 @@ export function sampleCommunityVehicle(id: string, time: number): VehiclePose {
         : leg.fade === 'out'
           ? (u1 - u) * length
           : Infinity,
-    opacity = T.MathUtils.clamp(edge / FADE_METRES, 0, 1);
+    opacity = T.MathUtils.clamp(edge / FLEET_LOT.fade, 0, 1);
   return {
     position,
     heading: Math.atan2(d.x, d.z) + Math.PI,
@@ -825,15 +829,15 @@ export function carDoorWorld(pose: VehiclePose): Vec2 {
     [x, z] = [-1.05, 0.2];
   return [pose.position.x + x * c + z * sn, pose.position.z - x * sn + z * c];
 }
-/** Door sill and ramp foot of a fleet van in a pose (ramp on the right side). */
+/** Door sill and ramp foot of a fleet van in a pose (`FLEET_VAN_RAMP`, right side). */
 export function vanRampWorld(pose: VehiclePose) {
   const c = Math.cos(pose.heading),
     sn = Math.sin(pose.heading),
-    at = (x: number, z: number): Vec2 => [
+    at = ([x, z]: [number, number]): Vec2 => [
       pose.position.x + x * c + z * sn,
       pose.position.z - x * sn + z * c,
     ];
-  return { sill: at(1.0, -0.19), foot: at(4.15, -0.19) };
+  return { sill: at(FLEET_VAN_RAMP.sill), foot: at(FLEET_VAN_RAMP.foot) };
 }
 
 // --- Bodies -----------------------------------------------------------------

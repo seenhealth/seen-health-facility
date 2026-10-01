@@ -2,6 +2,7 @@ import type { Action, CharacterRole } from './characters';
 import type { ActorSpec, Interaction, Segment } from './activity';
 import type { Facility, Vec2 } from './schema';
 import type { SourceExtension } from './sources';
+import { FLEET_VAN_RAMP } from './photo-assets';
 import {
   careSettingById,
   careSettings,
@@ -246,6 +247,8 @@ function vanStop(time: number) {
   return {
     sill,
     foot,
+    /** Just inside the sliding door: the step between the window bench and the sill. */
+    cabin: at(FLEET_VAN_RAMP.sill[0] - 0.55, FLEET_VAN_RAMP.sill[1]),
     /** Beside the ramp foot toward the nose: where the driver stands to help. */
     aside: at(4.5, -1.5),
     driverDoor: at(-1.1, -1.9),
@@ -450,11 +453,9 @@ export function communitySource(model: Facility): SourceExtension {
         ys: [PORCH_Y, PORCH_Y],
       })
       .hold(110, 'greet', { title: 'Waving her off', face: homeAm.foot })
-      .walk(
-        114,
-        [h.pcaWait, h.kerb],
-        { title: 'Waiting for the pharmacy courier' },
-      )
+      .walk(114, [h.pcaWait, h.kerb], {
+        title: 'Waiting for the pharmacy courier',
+      })
       .hold(130, 'idle', {
         title: 'Waiting for the pharmacy courier',
         heading: rel(home),
@@ -463,10 +464,14 @@ export function communitySource(model: Facility): SourceExtension {
         title: 'Taking the pill packs from the courier',
         face: h.handover,
       })
-      .walk(152, [h.porchApproach, h.porchStepFoot, h.porchStep, h.porchAside], {
-        title: 'Back to the porch',
-        ys: [undefined, undefined, PORCH_Y, PORCH_Y],
-      })
+      .walk(
+        152,
+        [h.porchApproach, h.porchStepFoot, h.porchStep, h.porchAside],
+        {
+          title: 'Back to the porch',
+          ys: [undefined, undefined, PORCH_Y, PORCH_Y],
+        },
+      )
       .hold(200, 'serve', {
         title: 'Preparing lunch & tidying',
         face: h.porchTable,
@@ -476,22 +481,14 @@ export function communitySource(model: Facility): SourceExtension {
         ys: [PORCH_Y, PORCH_Y],
       })
       .hidden(310, 'Housekeeping & laundry')
-      .walk(
-        330,
-        [h.porch, h.rampTop, h.rampFoot, h.pcaMeetA, h.pcaMeetB],
-        {
-          title: 'Out to meet the van',
-          from: h.door,
-          fromY: PORCH_Y,
-          ys: [PORCH_Y, PORCH_Y, PAD_Y],
-        },
-      )
+      .walk(330, [h.porch, h.rampTop, h.rampFoot, h.pcaMeetA, h.pcaMeetB], {
+        title: 'Out to meet the van',
+        from: h.door,
+        fromY: PORCH_Y,
+        ys: [PORCH_Y, PORCH_Y, PAD_Y],
+      })
       .hold(340.5, 'greet', { title: 'Meeting the van', face: homeNoon.foot })
-      .walk(
-        358.5,
-        [h.pcaWalkA, h.pcaWalkB],
-        { title: 'Walking her home' },
-      )
+      .walk(358.5, [h.pcaWalkA, h.pcaWalkB], { title: 'Walking her home' })
       .hold(364, 'greet', { title: 'Up you go', face: h.rampFoot })
       .walk(
         393,
@@ -1060,10 +1057,12 @@ export function communitySource(model: Facility): SourceExtension {
       h.porch,
     )
       .ride(179, VAN, 'escort', 'Riding with Mrs. Wong')
-      .walk(182.5, [clinic.foot], {
+      // From the window bench by way of the door, then down the ramp.
+      .walk(182.5, [clinic.sill, clinic.foot], {
         title: 'Down the van ramp',
-        from: clinic.sill,
+        from: clinic.cabin,
         fromY: VAN_FLOOR,
+        ys: [VAN_FLOOR],
       })
       .walk(189, [c.kerb, c.entrance, c.checkIn], { title: 'Into the clinic' })
       .hold(192, 'greet', {
@@ -1080,7 +1079,10 @@ export function communitySource(model: Facility): SourceExtension {
       .walk(256.5, [c.entrance, c.kerb, clinic.foot], {
         title: 'Back to the van',
       })
-      .walk(260, [clinic.sill], { title: 'Up the van ramp', ys: [VAN_FLOOR] })
+      .walk(260, [clinic.sill, clinic.cabin], {
+        title: 'Up the van ramp',
+        ys: [VAN_FLOOR, VAN_FLOOR],
+      })
       .ride(CLOCK_END, VAN, 'escort', 'Riding along');
     add(escort);
     const md = new Track(
@@ -1442,7 +1444,8 @@ export function communitySource(model: Facility): SourceExtension {
           o.assetId === NURSE_LINE_DESK.assetId,
       )
       .sort(
-        (a, b) => b.position[2] - a.position[2] || b.position[0] - a.position[0],
+        (a, b) =>
+          b.position[2] - a.position[2] || b.position[0] - a.position[0],
       )[0];
     if (!desk)
       throw new Error(

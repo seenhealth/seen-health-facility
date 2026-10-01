@@ -61,7 +61,6 @@ export type CareSetting = {
   road: { from: Vec2; to: Vec2 };            // stub centre-line, street edge → pad edge
   drive: { depth: number; radius: number; lanes: 1 | 2 }; // horseshoe drive-through
   apron: { w: number; d: number };           // paved drop-off under the apex
-  streetExtension?: { from: Vec2; to: Vec2; width: number };
   anchors: Record<string, Vec2>;             // door, porch, bed, counter … (world)
   services: string[];
   accent: string;
@@ -98,10 +97,10 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 
 | id | kind | position | services |
 | --- | --- | --- | --- |
-| `home-lin` | home | The Wongs' home (the id predates the rename): (−84, 12), two-lane drive; the north street extended west for the aide's car | home-care, home-health, pill-packs, meals, home-mods, after-hours |
+| `home-lin` | home | The Wongs' home (the id predates the rename): (−84, 12), two-lane drive; the aide's car uses the north street's western reach | home-care, home-health, pill-packs, meals, home-mods, after-hours |
 | `pharmacy` | pharmacy | (−84, −22) | pill-packs |
-| `hospital` | hospital | (94, 14), stub from the north street, extended east to reach it | ed, discharge |
-| `specialist` | specialist | (84, −56), stub from the south street, extended east to reach it | specialist |
+| `hospital` | hospital | (94, 14), stub from the north street | ed, discharge |
+| `specialist` | specialist | (84, −56), stub from the south street | specialist |
 | `partner-adc` | partner-adc | (8, −64) | day-program |
 
 ## The day (care-day clock, 1 loop second = 40 clock seconds)
@@ -129,9 +128,11 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 anchors, and a builder in `community-pads.ts` (`BUILDERS[kind]`) if it is a new
 kind. The drive, plinth, stub, sidewalk and label come for free. Keep the pad
 outside the ring streets (north z≈41.3, south z≈−32.3, west x≈−44.4, east x≈54)
-and reach it from a lane that flows the right way (`RING` in
-`community-vehicles.ts`); if there is no street where the stub should join, add
-a `streetExtension`. Turn it (`heading`) so its front faces +x or +z; the
+and reach it from a lane that flows the right way (`ring(side)` in
+`community-vehicles.ts`, built from `laneLine`/`laneFlow` in
+`traffic-routes.ts`). The ring streets are drawn out to `STREET_EXTENT`
+(x ±130, z ±95, `neighborhood.ts`), past every pad, so a stub joins a drawn
+street wherever it meets the ring. Turn it (`heading`) so its front faces +x or +z; the
 framing, the label plate and the shadow camera follow from the registry.
 
 **A vehicle.** Add an itinerary to `communityVehicles`: `dwell(from, to, pose,
@@ -145,10 +146,13 @@ trace names it. Presentation is data: roof `decor` (`'pharmacy-cross'`,
 `'meal-cooler'`, built by `VEHICLE_DECOR`) and, for a Seen van on the fleet body,
 a livery `variant` letter after the center's own fleet. A Seen van's `seats`
 come from `FLEET_VAN_SEATS`, the furniture its body draws. A vehicle that
-enters or leaves the map does so at `OFF_MAP` (near the ends of the drawn
-streets, beyond every pad and the Community framing) with `fade: 'in'` or
-`'out'` on that leg, so it fades over the last `FADE_METRES` (8 m) instead of
-appearing or vanishing in view.
+enters or leaves the map does so at `OFF_MAP` (just short of the ends of the
+drawn streets, `STREET_EXTENT`, beyond every pad and the Community framing)
+with `fade: 'in'` or `'out'` on that leg, so it fades over the last
+`FLEET_LOT.fade` (8 m) instead of appearing or vanishing in view. Lanes,
+corner radius (`FLEET_LOT.streetRadius`, 6.4 m), easing (`easeDistance`),
+the van ramp (`FLEET_VAN_RAMP`) and the fade itself (`fadeVehicle` in
+`arrival.ts`) are shared with the center's fleet.
 
 **A person.** Use the `Track` builder in `community-people.ts`: `hold`,
 `walk`, `hidden`, `ride`, ending exactly at 720 s. Walks are straight lines

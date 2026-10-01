@@ -6725,7 +6725,7 @@
       "offDuty": 0.09734848484848485
      },
      "onFloorSeconds": 7149,
-     "meanWalkMeters": 53.76718550334062
+     "meanWalkMeters": 53.77922823162976
     },
     {
      "role": "nurse",
@@ -6748,7 +6748,7 @@
       "offDuty": 0.06033950617283951
      },
      "onFloorSeconds": 12178,
-     "meanWalkMeters": 11.11859990923039
+     "meanWalkMeters": 11.132429237518814
     },
     {
      "role": "social-worker",
@@ -6817,7 +6817,7 @@
       "offDuty": 0.12669753086419752
      },
      "onFloorSeconds": 5659,
-     "meanWalkMeters": 101.45958469241276
+     "meanWalkMeters": 101.4769579787643
     }
    ],
    "participants": [
@@ -8944,7 +8944,7 @@
       "waiting": 82,
       "offSite": 275
      },
-     "walkMeters": 175.27618002972312
+     "walkMeters": 174.85340317463724
     },
     {
      "id": "hospital-participant",
@@ -8961,7 +8961,7 @@
       "waiting": 45,
       "offSite": 558
      },
-     "walkMeters": 83.53516986701317
+     "walkMeters": 83.24209469091596
     },
     {
      "id": "adc-participant-1",
@@ -16250,7 +16250,7 @@
       "offDuty": 0.08661616161616162
      },
      "onFloorSeconds": 7234,
-     "meanWalkMeters": 76.20531840261133
+     "meanWalkMeters": 76.21736113090047
     },
     {
      "role": "nurse",
@@ -16273,7 +16273,7 @@
       "offDuty": 0.09385964912280702
      },
      "onFloorSeconds": 12396,
-     "meanWalkMeters": 14.176204223555155
+     "meanWalkMeters": 14.189305692459977
     },
     {
      "role": "social-worker",
@@ -16388,7 +16388,7 @@
       "offDuty": 0.12669753086419752
      },
      "onFloorSeconds": 5659,
-     "meanWalkMeters": 105.50086104151896
+     "meanWalkMeters": 105.51823432787052
     }
    ],
    "participants": [
@@ -18447,7 +18447,7 @@
       "waiting": 82,
       "offSite": 275
      },
-     "walkMeters": 175.27618002972312
+     "walkMeters": 174.85340317463724
     },
     {
      "id": "hospital-participant",
@@ -18464,7 +18464,7 @@
       "waiting": 45,
       "offSite": 558
      },
-     "walkMeters": 83.53516986701317
+     "walkMeters": 83.24209469091596
     },
     {
      "id": "adc-participant-1",

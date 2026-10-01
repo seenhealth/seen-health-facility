@@ -45,8 +45,6 @@ export type CareSetting = {
   drive: DriveLoop;
   /** Paved apron under the drop-off apex (local z extent behind the apex). */
   apron: { w: number; d: number };
-  /** A ring street continued past the crop so the stub has something to join. */
-  streetExtension?: { from: Vec2; to: Vec2; width: number };
   /** Named world positions: door, porch, counter, bed, label, … */
   anchors: Record<string, Vec2>;
   services: string[];
@@ -235,7 +233,8 @@ function labelAnchor(s: Omit<CareSetting, 'anchors'>): Vec2 {
     alongZ = Math.abs(to[1] - from[1]) > Math.abs(to[0] - from[0]),
     crosses = alongZ && Math.max(from[1], to[1]) > maxZ;
   if (!crosses) return [(minX + maxX) / 2, z];
-  const half = laneRadius(s as CareSetting, (s.drive.lanes - 1) as 0 | 1) + LANE / 2,
+  const half =
+      laneRadius(s as CareSetting, (s.drive.lanes - 1) as 0 | 1) + LANE / 2,
     side = Math.sign(worldDir(s, [-1, 0])[0]) || -1;
   return [to[0] + side * (half + 0.6 + LABEL_PLATE.w / 2), z];
 }
@@ -268,9 +267,6 @@ export const careSettings: CareSetting[] = [
     road: { from: [-48.4, 12], to: [-70, 12] },
     drive: { depth: 7, radius: 6.2, lanes: 2 },
     apron: { w: 0, d: 0 },
-    // The north street continued west past the home: the aide's car comes
-    // and goes along it, off the map beyond the Community framing.
-    streetExtension: { from: [-128, 41.3], to: [-48.5, 41.3], width: 10 },
     services: [
       'home-care',
       'home-health',
@@ -377,7 +373,6 @@ export const careSettings: CareSetting[] = [
     road: { from: [94, 36.3], to: [94, 29] },
     drive: { depth: 8, radius: 7, lanes: 1 },
     apron: { w: 10, d: 4.6 },
-    streetExtension: { from: [56.5, 41.3], to: [128, 41.3], width: 10 },
     services: ['ed', 'discharge'],
     accent: '#b9645c',
     local: {
@@ -418,7 +413,6 @@ export const careSettings: CareSetting[] = [
     road: { from: [84, -35.8], to: [84, -43] },
     drive: { depth: 6, radius: 6.2, lanes: 1 },
     apron: { w: 10, d: 4.6 },
-    streetExtension: { from: [55.5, -32.3], to: [104, -32.3], width: 7 },
     services: ['specialist'],
     accent: '#6d8fb3',
     local: {
