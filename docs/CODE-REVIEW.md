@@ -19,7 +19,7 @@ The architecture review below was written for the September 2026 distributed-car
 | Community visibility toggle applied after the engine ran | §2.2 item 10 | Fixed in this PR |
 | Three clock-label implementations | §2.2 item 11 | Follow-up |
 | Delivery trucks snap 45° and pivot when leaving | §2.2 item 12 | Follow-up |
-| The /story viewer builds the community layer; two "Mrs. Lin" actors | §2.2 item 13 | Follow-up |
+| The /story viewer builds the community layer; two "Mrs. Lin" actors | §2.2 item 13 | Partly fixed in this PR: the community household is the Wongs (`home-participant` "Mrs. Wong · at home", `hospital-participant` "Mr. Wong", setting `home-lin` "The Wongs' home"), so the story hero is the only Mrs. Lin; whether the /story viewer should build the community layer at all is follow-up |
 | Composed sources rebuilt per viewer | §2.2 item 14 | Follow-up |
 | Per-frame linear scans | §2.3 item 15 | Follow-up |
 | Double `update()` per UI action | §2.3 item 16 | Follow-up |

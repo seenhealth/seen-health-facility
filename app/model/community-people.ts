@@ -308,13 +308,13 @@ export function communitySource(model: Facility): SourceExtension {
   ];
   const crossingBack = (foot: Vec2): Vec2[] => [...crossing(foot)].reverse();
 
-  // --- Mrs. Lin's home ------------------------------------------------------
+  // --- The Wongs' home ------------------------------------------------------
   {
     const opts = { zoneId: homeZone };
-    const lin = new Track(
+    const wong = new Track(
       'home-participant',
       'participant',
-      { ...opts, label: 'Mrs. Lin · at home', variant: 3, mobility: 'walker' },
+      { ...opts, label: 'Mrs. Wong · at home', variant: 3, mobility: 'walker' },
       h.porchSeat,
       PORCH_Y,
     )
@@ -395,7 +395,7 @@ export function communitySource(model: Facility): SourceExtension {
         heading: rel(home),
       })
       .walk(566, [h.porch, h.door], { title: 'Inside', ys: [PORCH_Y, PORCH_Y] })
-      .hidden(644, 'Waiting for Mr. Lin')
+      .hidden(644, 'Waiting for Mr. Wong')
       .walk(648, [h.porch, h.porchGreet], {
         title: 'Out to meet the van',
         from: h.door,
@@ -403,7 +403,7 @@ export function communitySource(model: Facility): SourceExtension {
         ys: [PORCH_Y, PORCH_Y],
       })
       .hold(683.5, 'greet', {
-        title: 'Welcoming Mr. Lin home',
+        title: 'Welcoming Mr. Wong home',
         face: h.rampTop,
       })
       .walk(690, [h.porchSeatVia1, h.porchSeatVia2, h.porchSeat], {
@@ -418,7 +418,7 @@ export function communitySource(model: Facility): SourceExtension {
         title: 'Evening on the porch',
         heading: rel(home),
       });
-    add(lin);
+    add(wong);
     const pca = new Track(
       'home-pca',
       'aide',
@@ -554,7 +554,7 @@ export function communitySource(model: Facility): SourceExtension {
         title: 'Arriving for the home modification',
       })
       .hold(495, 'consult', {
-        title: 'Grab-bar placement with Mrs. Lin',
+        title: 'Grab-bar placement with Mrs. Wong',
         face: h.porchGreet,
       })
       .hold(540, 'craft', {
@@ -620,7 +620,7 @@ export function communitySource(model: Facility): SourceExtension {
       ['home-participant', 'home-pca'],
       52,
       71,
-      'Mrs. Lin · personal care at home',
+      'Mrs. Wong · personal care at home',
       'A personal care aide helps with hair, morning medicines and breakfast on the porch before the Seen van arrives.',
     );
     interact(
@@ -630,7 +630,7 @@ export function communitySource(model: Facility): SourceExtension {
       ['home-participant', 'home-pca', 'community-driver'],
       73,
       113,
-      'Mrs. Lin · boarding the Seen van',
+      'Mrs. Wong · boarding the Seen van',
       'Down the new ramp and up the van ramp with the aide and driver alongside: door-to-door transport to a contracted specialist.',
     );
     interact(
@@ -650,7 +650,7 @@ export function communitySource(model: Facility): SourceExtension {
       ['home-participant', 'home-pca', 'community-driver'],
       332,
       374.5,
-      'Mrs. Lin · home from the clinic',
+      'Mrs. Wong · home from the clinic',
       'The van ramp comes down, the aide meets her at the kerb and follows her up the ramp to the porch.',
     );
     interact(
@@ -671,7 +671,7 @@ export function communitySource(model: Facility): SourceExtension {
       462,
       586,
       'Home modifications · ramp & grab bars',
-      'An OT places grab bars with Mrs. Lin while the installer finishes the porch ramp rails.',
+      'An OT places grab bars with Mrs. Wong while the installer finishes the porch ramp rails.',
     );
     interact(
       'home-discharge-arrival',
@@ -680,8 +680,8 @@ export function communitySource(model: Facility): SourceExtension {
       ['hospital-participant', 'community-driver', 'home-participant'],
       644,
       686,
-      'Mr. Lin · home after discharge',
-      'The Seen driver wheels Mr. Lin down the van ramp and up the porch ramp; Mrs. Lin meets them at the door.',
+      'Mr. Wong · home after discharge',
+      'The Seen driver wheels Mr. Wong down the van ramp and up the porch ramp; Mrs. Wong meets them at the door.',
     );
     interact(
       'home-health-visit',
@@ -715,7 +715,7 @@ export function communitySource(model: Facility): SourceExtension {
       .walk(80, [p.doorway, p.loading], { title: 'Carrying totes to the car' })
       .hold(86, 'serve', { title: 'Loading pill packs', face: p.loadingCar })
       .walk(92, [pharmacyDoor], { title: 'Setting off' })
-      .hidden(130, 'Driving to Mrs. Lin’s home', homeDoor)
+      .hidden(130, 'Driving to the Wongs’ home', homeDoor)
       .walk(138, [h.courierWalkA, h.courierWalkB, h.handover], {
         title: 'Pill packs to the aide',
       })
@@ -833,12 +833,12 @@ export function communitySource(model: Facility): SourceExtension {
       q.kerbStep,
       hospitalStop.foot,
     ];
-    const mrLin = new Track(
+    const mrWong = new Track(
       'hospital-participant',
       'participant',
       {
         ...opts,
-        label: 'Mr. Lin · inpatient, discharged home',
+        label: 'Mr. Wong · inpatient, discharged home',
         variant: 8,
         mobility: 'wheelchair',
       },
@@ -904,7 +904,7 @@ export function communitySource(model: Facility): SourceExtension {
         ys: [PORCH_Y],
       })
       .hidden(CLOCK_END, 'Resting at home');
-    add(mrLin);
+    add(mrWong);
     const hospitalist = new Track(
       'hospitalist',
       'doctor',
@@ -952,7 +952,7 @@ export function communitySource(model: Facility): SourceExtension {
       .hold(525, 'consult', { title: 'Discharge huddle', face: q.huddleC })
       .walk(528, [q.cmBedside], { title: 'To the bedside' })
       .hold(556, 'conversation', {
-        title: 'Discharge instructions with Mr. Lin',
+        title: 'Discharge instructions with Mr. Wong',
         face: q.patient,
       })
       .hold(575, 'greet', { title: 'Seeing him off', face: hospitalStop.foot })
@@ -993,7 +993,7 @@ export function communitySource(model: Facility): SourceExtension {
       })
       .walk(566, push.slice(1), {
         action: 'escort',
-        title: 'Wheeling Mr. Lin to the van',
+        title: 'Wheeling Mr. Wong to the van',
       })
       .hold(575, 'greet', {
         title: 'Handing off to the driver',
@@ -1044,8 +1044,8 @@ export function communitySource(model: Facility): SourceExtension {
       ['seen-liaison-rn', 'hospital-participant', 'community-driver'],
       551,
       575,
-      'Mr. Lin · discharged to the Seen van',
-      'The liaison nurse wheels Mr. Lin under the canopy and up the van ramp; the driver secures the chair.',
+      'Mr. Wong · discharged to the Seen van',
+      'The liaison nurse wheels Mr. Wong under the canopy and up the van ramp; the driver secures the chair.',
     );
   }
 
@@ -1059,7 +1059,7 @@ export function communitySource(model: Facility): SourceExtension {
       { ...opts, label: 'Seen escort aide', variant: 9 },
       h.porch,
     )
-      .ride(179, VAN, 'escort', 'Riding with Mrs. Lin')
+      .ride(179, VAN, 'escort', 'Riding with Mrs. Wong')
       .walk(182.5, [clinic.foot], {
         title: 'Down the van ramp',
         from: clinic.sill,
@@ -1067,7 +1067,7 @@ export function communitySource(model: Facility): SourceExtension {
       })
       .walk(189, [c.kerb, c.entrance, c.checkIn], { title: 'Into the clinic' })
       .hold(192, 'greet', {
-        title: 'Checking Mrs. Lin in',
+        title: 'Checking Mrs. Wong in',
         face: c.receptionMa,
       })
       .walk(195, [c.waitB], { title: 'To the waiting area' })
@@ -1108,7 +1108,7 @@ export function communitySource(model: Facility): SourceExtension {
       c.receptionMa,
     )
       .hold(189, 'document', { title: 'Front desk', heading: rel(specialist) })
-      .hold(197, 'greet', { title: 'Checking in Mrs. Lin', face: c.checkIn })
+      .hold(197, 'greet', { title: 'Checking in Mrs. Wong', face: c.checkIn })
       .walk(212, [c.deskEnd, c.lobbyMid, c.doorway, c.examIn, c.examMa], {
         title: 'To the exam room',
       })
@@ -1132,7 +1132,7 @@ export function communitySource(model: Facility): SourceExtension {
       175,
       195,
       'Van drop-off at the clinic',
-      'Ramp down under the canopy; the escort aide walks Mrs. Lin in and checks her in.',
+      'Ramp down under the canopy; the escort aide walks Mrs. Wong in and checks her in.',
     );
     interact(
       'specialist-visit',
@@ -1356,7 +1356,7 @@ export function communitySource(model: Facility): SourceExtension {
         from: homeAm.driverDoor,
       })
       .hold(108, 'greet', {
-        title: 'Guiding Mrs. Lin aboard',
+        title: 'Guiding Mrs. Wong aboard',
         face: homeAm.foot,
       })
       .walk(113, back(homeAm), { title: 'Back to the wheel' })
@@ -1394,7 +1394,7 @@ export function communitySource(model: Facility): SourceExtension {
         face: hospitalStop.foot,
       })
       .walk(575, back(hospitalStop), { title: 'Back to the wheel' })
-      .ride(642, VAN, 'driver', 'Driving Mr. Lin home')
+      .ride(642, VAN, 'driver', 'Driving Mr. Wong home')
       .walk(647, around(homePm), {
         title: 'Deploying the ramp',
         from: homePm.driverDoor,
@@ -1403,7 +1403,7 @@ export function communitySource(model: Facility): SourceExtension {
       .walk(653.5, [pushHome[0]], { title: 'Taking the wheelchair' })
       .walk(670.5, pushHome.slice(1), {
         action: 'escort',
-        title: 'Wheeling Mr. Lin to the porch ramp',
+        title: 'Wheeling Mr. Wong to the porch ramp',
       })
       .walk(677.5, [h.rampTopBehind], {
         action: 'escort',
@@ -1467,7 +1467,7 @@ export function communitySource(model: Facility): SourceExtension {
         title: 'Nurse line & on-call coordination',
         heading: 0,
       })
-      .hold(708, 'conversation', { title: 'Call with Mrs. Lin', heading: 0 })
+      .hold(708, 'conversation', { title: 'Call with Mrs. Wong', heading: 0 })
       .hold(CLOCK_END, 'document', { title: 'Logging the call', heading: 0 });
     add(nurseLine);
     interact(
@@ -1478,7 +1478,7 @@ export function communitySource(model: Facility): SourceExtension {
       690,
       708,
       'Nurse line call · evening plan',
-      '24/7 nurse line and on-call coordination: the RN confirms the evening medicines and tomorrow’s pickup after Mr. Lin’s discharge.',
+      '24/7 nurse line and on-call coordination: the RN confirms the evening medicines and tomorrow’s pickup after Mr. Wong’s discharge.',
     );
   }
 

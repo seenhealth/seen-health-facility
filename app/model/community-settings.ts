@@ -260,7 +260,7 @@ export const careSettings: CareSetting[] = [
   define({
     id: 'home-lin',
     kind: 'home',
-    name: "Mrs. Lin's home",
+    name: "The Wongs' home",
     subtitle: 'Home care · home health · pill packs · meals · home mods',
     position: [-84, 12],
     heading: Math.PI / 2,

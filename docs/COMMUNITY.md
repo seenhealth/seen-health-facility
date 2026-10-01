@@ -97,7 +97,7 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 
 | id | kind | position | services |
 | --- | --- | --- | --- |
-| `home-lin` | home | (−84, 12), two-lane drive; the north street extended west for the aide's car | home-care, home-health, pill-packs, meals, home-mods, after-hours |
+| `home-lin` | home | The Wongs' home (the id predates the rename): (−84, 12), two-lane drive; the north street extended west for the aide's car | home-care, home-health, pill-packs, meals, home-mods, after-hours |
 | `pharmacy` | pharmacy | (−84, −22) | pill-packs |
 | `hospital` | hospital | (94, 14), stub from the north street, extended east to reach it | ed, discharge |
 | `specialist` | specialist | (84, −56), stub from the south street, extended east to reach it | specialist |
@@ -110,17 +110,17 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 | 8:00–8:55 | Pharmacy | Pharmacist and technician pack and check blister packs; courier loads at 8:52, leaves 9:01. |
 | 8:18 | Home | Personal care aide arrives by car (in along the north street's western reach), personal care on the porch 8:35–8:47. |
 | 8:38–9:14 | Hospital | Ambulance in along the north street's eastern reach to the ED; hospitalist takes the handoff (8:41–9:05). |
-| 9:15 | Home | Mrs. Lin (walker) down the new ramp and up the van ramp; the Seen van leaves at 9:15 with the escort aide and driver. |
+| 9:15 | Home | Mrs. Wong (walker) down the new ramp and up the van ramp; the Seen van leaves at 9:15 with the escort aide and driver. |
 | 9:27 | Home | Courier hands the pill packs to the aide; then to the center's rear receiving (10:04–11:28) and back to the pharmacy by 12:40. |
 | 9:55–10:45 | Specialist clinic | Drop-off under the canopy, check-in, vitals by the MA, cardiology follow-up 10:17–10:42; van leaves 11:02 and returns by the south and west streets. |
 | 10:00–12:00 | Partner ADC | Tai chi with six participants, tabletop games, visiting Seen PT with two of them 11:00–12:00. |
 | 10:30–10:55 | Hospital | Rounds with the Seen liaison nurse, hospitalist and case manager. |
 | 11:40 | Home | Van home; aide meets her and waves her up the ramp; aide drives off at 12:22. |
 | 12:05 | Home | Home-delivered lunch and wellness check (meals car on the outer lane, back at the center by 13:00). |
-| 13:00–14:30 | Home | OT and installer fit grab bars and finish the ramp rails with Mrs. Lin. |
-| 13:30–13:50 | Hospital | Discharge huddle; 14:10–14:16 Mr. Lin wheeled to the Seen van; van leaves 14:23. |
-| 15:07 | Home | Mr. Lin home: driver wheels him up the porch ramp; home health nurse (walked in from the road end at 14:40) does vitals and medication reconciliation. |
-| 15:40–15:52 | Home ↔ center | 24/7 nurse line call between the upstairs RN and Mrs. Lin. |
+| 13:00–14:30 | Home | OT and installer fit grab bars and finish the ramp rails with Mrs. Wong. |
+| 13:30–13:50 | Hospital | Discharge huddle; 14:10–14:16 Mr. Wong wheeled to the Seen van; van leaves 14:23. |
+| 15:07 | Home | Mr. Wong home: driver wheels him up the porch ramp; home health nurse (walked in from the road end at 14:40) does vitals and medication reconciliation. |
+| 15:40–15:52 | Home ↔ center | 24/7 nurse line call between the upstairs RN and Mrs. Wong. |
 
 ## Adding things
 

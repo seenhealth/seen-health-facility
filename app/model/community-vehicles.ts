@@ -362,9 +362,9 @@ export const communityVehicles: CommunityVehicle[] = [
     accent: '#174a49',
     variant: 'I',
     rest: { ...stop(home, 0), visible: true, phase: 'Waiting at the home' },
-    // The fleet body's own furniture: Mrs. Lin on the aisle seat of the first
+    // The fleet body's own furniture: Mrs. Wong on the aisle seat of the first
     // bench (the shortest step from the ramp with her walker), her escort
-    // beside her at the window, Mr. Lin's chair on the wheelchair plate.
+    // beside her at the window, Mr. Wong's chair on the wheelchair plate.
     seats: {
       driver: FLEET_VAN_SEATS.driver,
       participant: FLEET_VAN_SEATS.benches[1],
@@ -413,7 +413,7 @@ export const communityVehicles: CommunityVehicle[] = [
           ...zRun(W.in, S.in.z! + R, legAt(home, 0, 'entry')[1] - R - 2),
           ...arrive(home, 0, W.in, 0),
         ],
-        'Bringing Mrs. Lin home',
+        'Bringing Mrs. Wong home',
         { pre: beyond(specialist, 0, 0, 10), post: beyond(home, 0, 0, -10) },
       ),
       dwell(330, 480, stop(home, 0), 'Waiting at the home', {
@@ -447,7 +447,7 @@ export const communityVehicles: CommunityVehicle[] = [
           ...zRun(W.out, N.out.z! - R, legAt(home, 0, 'entry')[1] + R + 2),
           ...arrive(home, 0, W.out, 0),
         ],
-        'Bringing Mr. Lin home from hospital',
+        'Bringing Mr. Wong home from hospital',
         { pre: beyond(hospital, 0, 0, 10), post: beyond(home, 0, 0, -10) },
       ),
       dwell(642, 720, stop(home, 0), 'Waiting at the home', {

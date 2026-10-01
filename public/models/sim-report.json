@@ -4325,7 +4325,7 @@
     },
     {
      "zoneId": "community:home-lin",
-     "name": "Mrs. Lin's home",
+     "name": "The Wongs' home",
      "levelId": "site",
      "participants": [
       1,
@@ -8931,7 +8931,7 @@
     },
     {
      "id": "home-participant",
-     "label": "Mrs. Lin · at home",
+     "label": "Mrs. Wong · at home",
      "seconds": {
       "arrivals": 0,
       "clinical": 0,
@@ -8948,7 +8948,7 @@
     },
     {
      "id": "hospital-participant",
-     "label": "Mr. Lin · inpatient, discharged home",
+     "label": "Mr. Wong · inpatient, discharged home",
      "seconds": {
       "arrivals": 0,
       "clinical": 0,
@@ -13475,7 +13475,7 @@
     },
     {
      "zoneId": "community:home-lin",
-     "name": "Mrs. Lin's home",
+     "name": "The Wongs' home",
      "levelId": "site",
      "participants": [
       1,
@@ -18434,7 +18434,7 @@
     },
     {
      "id": "home-participant",
-     "label": "Mrs. Lin · at home",
+     "label": "Mrs. Wong · at home",
      "seconds": {
       "arrivals": 0,
       "clinical": 0,
@@ -18451,7 +18451,7 @@
     },
     {
      "id": "hospital-participant",
-     "label": "Mr. Lin · inpatient, discharged home",
+     "label": "Mr. Wong · inpatient, discharged home",
      "seconds": {
       "arrivals": 0,
       "clinical": 0,
