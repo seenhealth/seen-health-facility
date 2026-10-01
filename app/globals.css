@@ -375,6 +375,8 @@ input[type='range'] {
   grid-column: 2;
   grid-row: 2;
   position: relative;
+  isolation: isolate;
+  container-type: size;
   overflow: hidden;
   min-width: 0;
   /* Matches the viewer's paper backdrop while the canvas loads. */
@@ -463,6 +465,9 @@ input[type='range'] {
 }
 .view-switch {
   display: flex;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
   gap: 2px;
   border: 1px solid #d4ddcf;
   border-radius: 7px;
@@ -759,8 +764,10 @@ input[type='range'] {
 }
 .layer-popover {
   position: absolute;
-  left: 14px;
-  bottom: 62px;
+  left: 0;
+  bottom: calc(100% + 8px);
+  max-height: calc(100cqh - 100% - 40px);
+  overflow-y: auto;
   z-index: 7;
   padding: 17px;
   width: 270px;
@@ -1359,6 +1366,36 @@ td a {
     padding: 8px;
     font-size: 11px;
   }
+}
+/* Explorer overlays the model so the canvas keeps room beside the side panel. */
+@media (max-width: 1100px) {
+  .facility-app {
+    --sidebar: 0px;
+  }
+  .facility-sidebar {
+    grid-column: 1 / 3;
+    justify-self: start;
+    z-index: 5;
+    width: min(290px, 86vw);
+    box-shadow: 8px 0 30px #183a2b22;
+  }
+  .sidebar-close {
+    position: absolute;
+    top: 14px;
+    right: 12px;
+    display: flex;
+    padding: 6px;
+    border-radius: 6px;
+  }
+  .app-header {
+    gap: 14px;
+  }
+  .site-navigation button {
+    padding: 8px 9px;
+  }
+  .header-actions button span {
+    display: none;
+  }
   .sidebar-title {
     padding: 23px 18px 19px;
   }
@@ -1404,27 +1441,13 @@ td a {
     padding: 7px 9px;
     font-size: 12px;
   }
-  .header-actions button span {
-    display: none;
-  }
   .header-actions button {
     padding: 8px;
   }
-  /* The explorer overlays the model and panel rather than squeezing them. */
+  /* The explorer also covers the docked panel below the model. */
   .facility-sidebar {
     grid-column: 1;
     grid-row: 2 / -1;
-    z-index: 5;
-    width: min(290px, 86vw);
-    box-shadow: 8px 0 30px #183a2b22;
-  }
-  .sidebar-close {
-    position: absolute;
-    top: 14px;
-    right: 12px;
-    display: flex;
-    padding: 6px;
-    border-radius: 6px;
   }
   .model-workspace {
     grid-column: 1;
@@ -1512,7 +1535,7 @@ td a {
     top: 56px;
     right: 10px;
     width: 240px;
-    max-height: calc(100% - 120px);
+    max-height: calc(100% - 190px);
     padding: 15px;
   }
   .space-card h3 {
@@ -1549,10 +1572,6 @@ td a {
   .mini-player {
     right: 10px;
     bottom: 132px;
-  }
-  .layer-popover {
-    left: 10px;
-    bottom: 100px;
   }
   .dialog-shade {
     padding: 13px;
@@ -1707,20 +1726,11 @@ td a {
   .dialog-title .overline {
     font-size: 10px;
   }
-  .space-card {
-    top: 202px;
-    max-height: calc(100% - 358px);
-  }
   .model-label {
     font-size: 9px;
   }
 }
 
-/* Section controls stay accessible on shorter screens. */
-.layer-popover {
-  max-height: min(75vh, 620px);
-  overflow-y: auto;
-}
 .layer-popover .section-range {
   display: flex;
   flex-wrap: wrap;
@@ -1731,7 +1741,6 @@ td a {
 }
 .section-range input {
   width: 100%;
-  accent-color: var(--primary);
 }
 
 /* Guided workflow playback shares the facility's camera and room controls. */
@@ -2125,6 +2134,11 @@ td a {
   padding: 3px 8px;
   font-size: 12px;
 }
+.activity-tabs,
+.activity-scenes {
+  min-inline-size: 0;
+  border: 0;
+}
 .activity-tabs {
   display: flex;
   gap: 2px;
@@ -2156,6 +2170,8 @@ td a {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
+  margin: 0;
+  padding: 0;
 }
 .activity-panel .activity-scenes button {
   justify-content: flex-start;
@@ -2540,7 +2556,7 @@ td a {
 .clinic-option {padding:12px 18px;border-top:1px solid #e1e7df;}
 .clinic-option label {font-size:11px;display:block;margin-bottom:7px;color:#698171;}
 .clinic-option select {width:100%;font-size:11px;background:#f7faf4;border:1px solid #d4dfd1;border-radius:6px;padding:8px;color:#33513f;}
-.network-panel {grid-column:1/-1;grid-row:2/-1;min-height:0;background:#f4f6ef;z-index:5;padding:30px 36px;overflow:auto;}
+.network-panel {grid-column:1/-1;grid-row:2/-1;min-height:0;background:#f4f6ef;z-index:6;padding:30px 36px;overflow:auto;}
 .network-intro {display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:23px;}
 .network-intro h1 {font-family:Georgia,serif;font-size:32px;letter-spacing:-.7px;margin:10px 0;color:#254c3d;font-weight:400;}
 .network-intro p {font-size:13px;color:#728177;margin:0;}

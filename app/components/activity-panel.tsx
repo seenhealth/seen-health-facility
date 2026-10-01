@@ -399,7 +399,8 @@ export function ActivityPanel({
           <button onClick={() => viewer?.followActor(null)}>Release</button>
         </div>
       )}
-      <div className="activity-tabs" aria-label="Care day views">
+      <fieldset className="activity-tabs">
+        <legend className="sr-only">Care day views</legend>
         <button
           aria-pressed={tab === 'scenes'}
           onClick={() => setTab('scenes')}
@@ -418,16 +419,17 @@ export function ActivityPanel({
         >
           People <small>{people}</small>
         </button>
-      </div>
+      </fieldset>
       {tab === 'scenes' && (
         <>
-          <div className="activity-scenes" aria-label="View a workflow">
+          <fieldset className="activity-scenes">
+            <legend className="sr-only">View a workflow</legend>
             {views.map((v) => (
               <button key={v.id} onClick={() => chooseScene(v.id)}>
                 {v.label}
               </button>
             ))}
-          </div>
+          </fieldset>
           {activityView && (
             <div className="day-program">
               {!siteSpecific && (

@@ -369,7 +369,7 @@ attendee and the same person downstairs) are one person. Staff utilization
 covers staff seen at the center; partner staff who only appear at a home or
 partner site (the pharmacist, the hospitalist) are in occupancy and the trace.
 
-The **Measure** panel (header → Measure) shows occupancy small multiples by zone
+The **Measure** tab (side panel → Measure) shows occupancy small multiples by zone
 (click to jump the playback), staff time by role and, for the story scenario,
 Mrs. Lin's care team, with a marker synced to the viewer clock. Compare the base
 loop and "With Mrs. Lin's day" with the scenario toggle; both are measured as the

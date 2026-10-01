@@ -80,8 +80,8 @@ const communityState = (base: ViewerState): ViewerState => ({
   site: true,
   community: true,
 });
-// Below this width the sidebar overlays the model and the side panel docks below it.
-const narrow = () => window.matchMedia('(max-width: 800px)').matches;
+// Below this width the explorer overlays the model instead of taking a column.
+const narrow = () => window.matchMedia('(max-width: 1100px)').matches;
 const jsonDownload = (data: unknown, name: string) =>
   download(
     new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }),
@@ -90,7 +90,10 @@ const jsonDownload = (data: unknown, name: string) =>
 export default function Home() {
   const host = useRef<HTMLDivElement>(null),
     viewer = useRef<ReturnType<typeof createViewer> | null>(null),
-    upload = useRef<HTMLInputElement>(null);
+    upload = useRef<HTMLInputElement>(null),
+    panelToggle = useRef<HTMLButtonElement>(null),
+    explorerToggle = useRef<HTMLButtonElement>(null),
+    sidePanel = useRef<HTMLElement>(null);
   const [showcase, setShowcase] = useState(false);
   const previousView = useRef<ViewerState | null>(null);
   const [siteId, setSiteId] = useState<SiteId>('alhambra');
@@ -115,6 +118,8 @@ export default function Home() {
     [modal, setModal] = useState<'accuracy' | 'model' | null>(null),
     [showControls, setShowControls] = useState(false),
     [panelOpen, setPanelOpen] = useState(true),
+    // The space card follows explicit picks, not camera moves from the panel.
+    [cardOpen, setCardOpen] = useState(false),
     [panelTab, setPanelTab] = useState<'activity' | 'journeys' | 'measure'>(
       'activity',
     ),
@@ -160,6 +165,7 @@ export default function Home() {
         walls: 'cutaway',
       };
       setState(next);
+      setCardOpen(false);
       setView('iso');
       viewer.current.update(next);
       viewer.current.view('iso');
@@ -190,6 +196,7 @@ export default function Home() {
         sectionAxis: 'none',
       };
       setState(next);
+      setCardOpen(false);
       setView(z ? 'iso' : 'building');
       viewer.current.update(next);
       viewer.current.view('iso');
@@ -322,6 +329,7 @@ export default function Home() {
                 } as const)
               : {}),
           }));
+          setCardOpen(!!zone);
           if (selectedZone) {
             setView('iso');
             viewer.current?.view('iso');
@@ -448,6 +456,7 @@ export default function Home() {
         stack: 0,
         sectionAxis: 'none',
       });
+    setCardOpen(true);
     setView('iso');
     viewer.current?.view('iso');
     if (narrow()) setCollapsed(true);
@@ -469,6 +478,7 @@ export default function Home() {
     setView('iso');
     viewer.current?.view('iso');
     requestAnimationFrame(() => viewer.current?.focus(r.zoneId, r.id));
+    setCardOpen(true);
     if (narrow()) setCollapsed(true);
   };
   const selectLevel = (id: string) => {
@@ -611,18 +621,23 @@ export default function Home() {
         </nav>
         <div className="header-actions">
           {siteId === 'alhambra' && (
-            <button disabled={!ready} onClick={enterShowcase}>
+            <button
+              aria-label="Video view"
+              disabled={!ready}
+              onClick={enterShowcase}
+            >
               <Video size={16} />
               <span>Video view</span>
             </button>
           )}
-          <button onClick={() => setModal('model')}>
+          <button aria-label="Model files" onClick={() => setModal('model')}>
             <FolderOpen size={16} />
             <span>Model files</span>
           </button>
           <button
+            ref={panelToggle}
             className="panel-toggle"
-            aria-label={panelOpen ? 'Hide side panel' : 'Show side panel'}
+            aria-label="Side panel"
             aria-pressed={panelOpen}
             onClick={() => {
               setPanelOpen(!panelOpen);
@@ -653,7 +668,10 @@ export default function Home() {
           <button
             className="sidebar-close"
             aria-label="Hide room navigation"
-            onClick={() => setCollapsed(true)}
+            onClick={() => {
+              setCollapsed(true);
+              explorerToggle.current?.focus();
+            }}
           >
             <X size={18} />
           </button>
@@ -847,6 +865,7 @@ export default function Home() {
         )}
         <div className="level-toolbar">
           <button
+            ref={explorerToggle}
             className="icon-button"
             onClick={() => setCollapsed(!collapsed)}
             aria-label={
@@ -918,7 +937,7 @@ export default function Home() {
             Drag to orbit · Scroll to zoom · Right-drag to pan
           </div>
         </div>
-        {zone && !panelOpen && (
+        {zone && cardOpen && (
           <article
             className="space-card"
             style={{ '--zone': zone.color } as React.CSSProperties}
@@ -1033,6 +1052,9 @@ export default function Home() {
             onOpen={() => {
               setPanelTab('activity');
               setPanelOpen(true);
+              requestAnimationFrame(() =>
+                sidePanel.current?.querySelector('button')?.focus(),
+              );
             }}
           />
         )}
@@ -1121,157 +1143,159 @@ export default function Home() {
             />
             {siteId === 'olympic' ? 'Room labels' : 'Labels'}
           </label>
-        </div>
-        {showControls && (
-          <div className="layer-popover">
-            <div className="popover-heading">
-              Visible layers
-              <button
-                onClick={() => setShowControls(false)}
-                aria-label="Close layer settings"
-              >
-                <X size={15} />
-              </button>
-            </div>
-            <label className="section-range">
-              Explode areas <span>{Math.round(state.explode * 100)}%</span>
-              <input
-                type="range"
-                aria-label="Explode area separation"
-                min="0"
-                max="1"
-                step=".01"
-                value={state.explode}
-                onChange={(e) => {
-                  setView('iso');
-                  patch({
-                    explode: +e.target.value,
-                    roof: false,
-                    exterior: false,
-                    ceilings: false,
-                    walls: 'cutaway',
-                    sectionAxis: 'none',
-                    level: state.level === 'roof' ? 'ground' : state.level,
-                  });
-                }}
-              />
-            </label>
-            {state.level === 'all' && (
+          {showControls && (
+            <div className="layer-popover">
+              <div className="popover-heading">
+                Visible layers
+                <button
+                  onClick={() => setShowControls(false)}
+                  aria-label="Close layer settings"
+                >
+                  <X size={15} />
+                </button>
+              </div>
               <label className="section-range">
-                Separate levels <span>{Math.round(state.stack * 100)}%</span>
+                Explode areas <span>{Math.round(state.explode * 100)}%</span>
                 <input
                   type="range"
-                  aria-label="Vertical level separation"
+                  aria-label="Explode area separation"
                   min="0"
                   max="1"
                   step=".01"
-                  value={state.stack}
-                  onChange={(e) =>
+                  value={state.explode}
+                  onChange={(e) => {
+                    setView('iso');
                     patch({
-                      stack: +e.target.value,
-                      exterior: false,
+                      explode: +e.target.value,
                       roof: false,
+                      exterior: false,
                       ceilings: false,
                       walls: 'cutaway',
                       sectionAxis: 'none',
+                      level: state.level === 'roof' ? 'ground' : state.level,
+                    });
+                  }}
+                />
+              </label>
+              {state.level === 'all' && (
+                <label className="section-range">
+                  Separate levels <span>{Math.round(state.stack * 100)}%</span>
+                  <input
+                    type="range"
+                    aria-label="Vertical level separation"
+                    min="0"
+                    max="1"
+                    step=".01"
+                    value={state.stack}
+                    onChange={(e) =>
+                      patch({
+                        stack: +e.target.value,
+                        exterior: false,
+                        roof: false,
+                        ceilings: false,
+                        walls: 'cutaway',
+                        sectionAxis: 'none',
+                      })
+                    }
+                  />
+                </label>
+              )}
+              {model?.contextStyle && (
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={state.doorsOpen}
+                    onChange={(e) => patch({ doorsOpen: e.target.checked })}
+                  />
+                  Open doors & folding partitions
+                </label>
+              )}
+              <label>
+                Cut through building
+                <select
+                  value={state.sectionAxis}
+                  onChange={(e) =>
+                    patch({
+                      sectionAxis: e.target.value as ViewerState['sectionAxis'],
+                      plan: false,
                     })
                   }
-                />
+                >
+                  <option value="none">Off</option>
+                  <option value="z">Front to back</option>
+                  <option value="x">Right to left</option>
+                  <option value="y">Top to bottom</option>
+                </select>
               </label>
-            )}
-            {model?.contextStyle && (
+              {state.sectionAxis !== 'none' && (
+                <label className="section-range">
+                  Cut depth <span>{Math.round(state.section * 100)}%</span>
+                  <input
+                    type="range"
+                    aria-label="Building section depth"
+                    min="0"
+                    max="1"
+                    step=".01"
+                    value={state.section}
+                    onChange={(e) => patch({ section: +e.target.value })}
+                  />
+                </label>
+              )}
+              {(
+                [
+                  'furniture',
+                  'site',
+                  'colors',
+                  'roof',
+                  'exterior',
+                  'ceilings',
+                  'community',
+                ] as const
+              )
+                .filter((k) => k !== 'community' || (ready && hasCommunity))
+                .map((k) => (
+                <label key={k}>
+                  <input
+                    type="checkbox"
+                    checked={state[k]}
+                    onChange={(e) => patch({ [k]: e.target.checked })}
+                  />
+                  {
+                    (
+                      {
+                        furniture: 'Furniture & equipment',
+                        site: 'Street & parking context',
+                        colors: 'Color all areas',
+                        roof: 'Roof surfaces',
+                        exterior: 'Exterior envelope',
+                        ceilings: 'Ceilings & structure',
+                        community:
+                          'Community sites (homes, pharmacy, hospital & partners)',
+                      } as const
+                    )[k]
+                  }
+                </label>
+              ))}
               <label>
-                <input
-                  type="checkbox"
-                  checked={state.doorsOpen}
-                  onChange={(e) => patch({ doorsOpen: e.target.checked })}
-                />
-                Open doors & folding partitions
+                Interior walls
+                <select
+                  value={state.walls}
+                  onChange={(e) =>
+                    patch({ walls: e.target.value as ViewerState['walls'] })
+                  }
+                >
+                  <option value="cutaway">Cutaway</option>
+                  <option value="full">Full height</option>
+                  <option value="hidden">Hidden</option>
+                </select>
               </label>
-            )}
-            <label>
-              Cut through building
-              <select
-                value={state.sectionAxis}
-                onChange={(e) =>
-                  patch({
-                    sectionAxis: e.target.value as ViewerState['sectionAxis'],
-                    plan: false,
-                  })
-                }
-              >
-                <option value="none">Off</option>
-                <option value="z">Front to back</option>
-                <option value="x">Right to left</option>
-                <option value="y">Top to bottom</option>
-              </select>
-            </label>
-            {state.sectionAxis !== 'none' && (
-              <label className="section-range">
-                Cut depth <span>{Math.round(state.section * 100)}%</span>
-                <input
-                  type="range"
-                  aria-label="Building section depth"
-                  min="0"
-                  max="1"
-                  step=".01"
-                  value={state.section}
-                  onChange={(e) => patch({ section: +e.target.value })}
-                />
-              </label>
-            )}
-            {(
-              [
-                'furniture',
-                'site',
-                'colors',
-                'roof',
-                'exterior',
-                'ceilings',
-                'community',
-              ] as const
-            )
-              .filter((k) => k !== 'community' || (ready && hasCommunity))
-              .map((k) => (
-              <label key={k}>
-                <input
-                  type="checkbox"
-                  checked={state[k]}
-                  onChange={(e) => patch({ [k]: e.target.checked })}
-                />
-                {
-                  (
-                    {
-                      furniture: 'Furniture & equipment',
-                      site: 'Street & parking context',
-                      colors: 'Color all areas',
-                      roof: 'Roof surfaces',
-                      exterior: 'Exterior envelope',
-                      ceilings: 'Ceilings & structure',
-                      community: 'Community sites (homes, pharmacy, hospital & partners)',
-                    } as const
-                  )[k]
-                }
-              </label>
-            ))}
-            <label>
-              Interior walls
-              <select
-                value={state.walls}
-                onChange={(e) =>
-                  patch({ walls: e.target.value as ViewerState['walls'] })
-                }
-              >
-                <option value="cutaway">Cutaway</option>
-                <option value="full">Full height</option>
-                <option value="hidden">Hidden</option>
-              </select>
-            </label>
-          </div>
-        )}
+            </div>
+          )}
+        </div>
       </section>
       {panelOpen && (
         <aside
+          ref={sidePanel}
           className="side-panel"
           data-tab={panelTab}
           aria-label="Care day, journeys and measures"
@@ -1299,7 +1323,10 @@ export default function Home() {
             <button
               className="side-panel-close"
               aria-label="Close side panel"
-              onClick={() => setPanelOpen(false)}
+              onClick={() => {
+                setPanelOpen(false);
+                panelToggle.current?.focus();
+              }}
             >
               <X size={16} />
             </button>
