@@ -53,6 +53,12 @@ const PALETTE = {
   plate: '#f6f4ee',
   text: '#2f3a38',
 };
+/**
+ * The Wongs' porch slab in the home pad's local frame (centre and size): the
+ * house's front wall stands on its back edge (z = −7.6), where the `door`
+ * anchor is.
+ */
+export const HOME_PORCH = { x: -0.6, z: -6.3, w: 8.0, d: 2.6 };
 type Mat = (id: string) => T.MeshStandardMaterial;
 type Ctx = ReturnType<typeof helpers>;
 function helpers(setting: CareSetting, root: T.Group, mat: Mat) {
@@ -428,13 +434,27 @@ function buildHouse(s: CareSetting, h: Ctx) {
 function buildHomeSite(s: CareSetting, h: Ctx) {
   const a = (k: string) => toLocalPoint(s, s.anchors[k]);
   // Porch with posts and a bench; the new ramp with rails from the pad.
-  h.box(-0.6, PAD_Y, -6.3, 8.0, PORCH_Y - PAD_Y, 2.6, PALETTE.stone);
-  // Open porch with a low rail.
-  for (const x of [-4.5, 3.3])
-    h.box(x, PORCH_Y, -5.1, 0.08, 0.9, 0.08, PALETTE.wallWarm);
-  h.box(-2.7, PORCH_Y + 0.86, -5.1, 3.6, 0.06, 0.06, PALETTE.wallWarm);
+  const porch = HOME_PORCH,
+    front = porch.z + porch.d / 2,
+    rise = PORCH_Y - PAD_Y;
+  h.box(porch.x, PAD_Y, porch.z, porch.w, rise, porch.d, PALETTE.stone);
+  // Open porch with a low rail, broken where the porch step comes up from the
+  // pad (`porchStep`), with a half-height step there.
+  const step = a('porchStep')[0],
+    railZ = front - 0.1,
+    rail = PALETTE.wallWarm;
+  for (const [x0, x1] of [
+    [-4.5, step - 0.5],
+    [step + 0.5, -0.9],
+  ]) {
+    for (const x of [x0, x1]) h.box(x, PORCH_Y, railZ, 0.08, 0.9, 0.08, rail);
+    h.box((x0 + x1) / 2, PORCH_Y + 0.86, railZ, x1 - x0, 0.06, 0.06, rail);
+  }
+  h.box(3.3, PORCH_Y, railZ, 0.08, 0.9, 0.08, rail);
+  h.box(step, PAD_Y, front + 0.15, 1.0, rise / 2, 0.3, PALETTE.stone);
+  // The bench sits on the slab, clear of the house front at the slab's back edge.
   const seat = a('porchSeat');
-  h.box(seat[0] - 0.5, PORCH_Y, seat[1] - 0.45, 0.5, 0.42, 1.3, PALETTE.wood);
+  h.box(seat[0] - 0.35, PORCH_Y, seat[1] + 0.2, 0.5, 0.42, 1.3, PALETTE.wood);
   h.box(-4.2, PORCH_Y, -7.15, 0.7, 0.72, 0.7, PALETTE.wood);
   const foot = a('rampFoot'),
     top = a('rampTop'),

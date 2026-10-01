@@ -1,6 +1,388 @@
 {
  "version": 1,
  "instances": {
+  "home-lin": {
+   "facilityId": "seen-home-wong",
+   "revision": "2026-10-01 · Senior-friendly plan v1 (HOME-PLAN study, grid-aligned doors)",
+   "floorY": 0.3,
+   "inputs": {
+    "frame": {
+     "position": [
+      0,
+      -10.8
+     ],
+     "heading": -1.5707963267948966
+    },
+    "levelIds": [
+     "ground"
+    ],
+    "excludeZoneIds": [
+     "home-zone-porch"
+    ],
+    "excludeObjectIds": [],
+    "castSha1": "3d2dff901a61aa864141e259a2b6618c93b3b708"
+   },
+   "footprint": [
+    [
+     [
+      6.5,
+      -16.6
+     ],
+     [
+      6.5,
+      -7.6
+     ],
+     [
+      3.5,
+      -7.6
+     ],
+     [
+      3.5,
+      -7.7
+     ],
+     [
+      -2.84,
+      -7.7
+     ],
+     [
+      -2.84,
+      -11.1
+     ],
+     [
+      3.5,
+      -11.1
+     ],
+     [
+      3.5,
+      -12.34
+     ],
+     [
+      2.85,
+      -12.34
+     ],
+     [
+      2.85,
+      -16.6
+     ]
+    ],
+    [
+     [
+      2.85,
+      -16.6
+     ],
+     [
+      2.85,
+      -12.34
+     ],
+     [
+      3.5,
+      -12.34
+     ],
+     [
+      3.5,
+      -11.1
+     ],
+     [
+      -2.84,
+      -11.1
+     ],
+     [
+      -2.84,
+      -7.7
+     ],
+     [
+      -4.7,
+      -7.7
+     ],
+     [
+      -4.7,
+      -7.6
+     ],
+     [
+      -6.5,
+      -7.6
+     ],
+     [
+      -6.5,
+      -16.6
+     ]
+    ],
+    [
+     [
+      2.75,
+      -18.2
+     ],
+     [
+      2.75,
+      -16.6
+     ],
+     [
+      1.1,
+      -16.6
+     ],
+     [
+      1.1,
+      -18.2
+     ]
+    ]
+   ],
+   "rooms": [
+    {
+     "id": "home-living",
+     "name": "Entry & living room",
+     "label": "Living room",
+     "zoneId": "home-zone-day",
+     "anchor": [
+      0.36,
+      -9.45
+     ],
+     "polygon": [
+      [
+       3.5,
+       -11.1
+      ],
+      [
+       3.5,
+       -7.8
+      ],
+      [
+       -2.78,
+       -7.8
+      ],
+      [
+       -2.78,
+       -11.1
+      ]
+     ]
+    },
+    {
+     "id": "home-dining",
+     "name": "Dining nook",
+     "zoneId": "home-zone-day",
+     "anchor": [
+      4.9,
+      -10.1
+     ],
+     "polygon": [
+      [
+       6.3,
+       -12.4
+      ],
+      [
+       6.3,
+       -7.8
+      ],
+      [
+       3.5,
+       -7.8
+      ],
+      [
+       3.5,
+       -12.4
+      ]
+     ]
+    },
+    {
+     "id": "home-kitchen",
+     "name": "Kitchen",
+     "label": "Kitchen",
+     "zoneId": "home-zone-day",
+     "anchor": [
+      4.61,
+      -14.4
+     ],
+     "polygon": [
+      [
+       6.3,
+       -16.4
+      ],
+      [
+       6.3,
+       -12.4
+      ],
+      [
+       2.91,
+       -12.4
+      ],
+      [
+       2.91,
+       -16.4
+      ]
+     ]
+    },
+    {
+     "id": "home-hall",
+     "name": "Hallway",
+     "zoneId": "home-zone-night",
+     "anchor": [
+      -1.4,
+      -11.72
+     ],
+     "polygon": [
+      [
+       3.5,
+       -12.34
+      ],
+      [
+       3.5,
+       -11.1
+      ],
+      [
+       -6.3,
+       -11.1
+      ],
+      [
+       -6.3,
+       -12.28
+      ],
+      [
+       2.79,
+       -12.28
+      ],
+      [
+       2.79,
+       -12.34
+      ]
+     ]
+    },
+    {
+     "id": "home-laundry",
+     "name": "Laundry & back door",
+     "zoneId": "home-zone-night",
+     "anchor": [
+      1.91,
+      -14.4
+     ],
+     "polygon": [
+      [
+       2.79,
+       -16.4
+      ],
+      [
+       2.79,
+       -12.4
+      ],
+      [
+       1.04,
+       -12.4
+      ],
+      [
+       1.04,
+       -16.4
+      ]
+     ]
+    },
+    {
+     "id": "home-bath",
+     "name": "Accessible bathroom",
+     "label": "Bath",
+     "zoneId": "home-zone-night",
+     "anchor": [
+      -0.53,
+      -14.4
+     ],
+     "polygon": [
+      [
+       0.92,
+       -16.4
+      ],
+      [
+       0.92,
+       -12.4
+      ],
+      [
+       -1.98,
+       -12.4
+      ],
+      [
+       -1.98,
+       -16.4
+      ]
+     ]
+    },
+    {
+     "id": "home-primary",
+     "name": "Primary bedroom",
+     "zoneId": "home-zone-night",
+     "anchor": [
+      -4.2,
+      -14.4
+     ],
+     "polygon": [
+      [
+       -2.1,
+       -16.4
+      ],
+      [
+       -2.1,
+       -12.4
+      ],
+      [
+       -6.3,
+       -12.4
+      ],
+      [
+       -6.3,
+       -16.4
+      ]
+     ]
+    },
+    {
+     "id": "home-bedroom-2",
+     "name": "Second bedroom (family)",
+     "zoneId": "home-zone-night",
+     "anchor": [
+      -4.6,
+      -9.39
+     ],
+     "polygon": [
+      [
+       -2.9,
+       -10.98
+      ],
+      [
+       -2.9,
+       -7.8
+      ],
+      [
+       -6.3,
+       -7.8
+      ],
+      [
+       -6.3,
+       -10.98
+      ]
+     ]
+    },
+    {
+     "id": "home-back-landing",
+     "name": "Back landing",
+     "zoneId": "home-zone-back",
+     "anchor": [
+      1.92,
+      -17.4
+     ],
+     "polygon": [
+      [
+       2.75,
+       -18.2
+      ],
+      [
+       2.75,
+       -16.6
+      ],
+      [
+       1.1,
+       -16.6
+      ],
+      [
+       1.1,
+       -18.2
+      ]
+     ]
+    }
+   ]
+  },
   "partner-adc": {
    "facilityId": "seen-alhambra-planning",
    "revision": "Community care day · 167 people, direct day-room passage and rear deliveries",

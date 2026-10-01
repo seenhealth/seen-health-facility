@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import type { Segment } from '../app/model/activity';
 import { communitySource, wongClinicLeg } from '../app/model/community-people';
 import {
   careSettingById,
@@ -22,9 +21,10 @@ import {
 // (SPEC-facility-instance §8.6): a scheduled person leaves a stamped house
 // through its front door for an `away` window, the generator leaves a hidden
 // placeholder there, and `fillHoles` puts Mrs. Wong's clinic trip in it.
-// The house is a stand-in for the Wongs' home (another agent draws the real
-// plan): 8 × 6 m, front wall on the home pad's porch line with a 1 m door at
-// the `door` anchor, a living room in front and a bedroom behind.
+// The house is a stand-in for the Wongs' home (whose real plan,
+// seen-home-wong, build-community-tracks generates the same way): 8 × 6 m,
+// front wall on the home pad's porch line with a 1 m door at the `door`
+// anchor, a living room in front and a bedroom behind.
 const wall = (id: string, a: Vec2, b: Vec2) => ({
   id,
   zoneId: 'house',
@@ -131,7 +131,7 @@ const cast: CastFile = {
       mobility: 'walker',
       arrive: { t: 0, anchor: chair },
       leave: { t: 720, anchor: 'door' },
-      away: [[73, 374.5]],
+      away: [[80.5, 370]],
       stops: [
         {
           window: [0, 60],
@@ -174,14 +174,14 @@ void test('the generator leaves a hidden placeholder over the away window, at th
   checkInstanceCast(house, setting, generated, { nav });
   assert.deepEqual(
     holes.map((h) => [h.kind, h.start, h.end]),
-    [['away', 73, 374.5]],
+    [['away', 80.5, 370]],
   );
   assert.ok(near(holes[0].from, home.anchors.door), 'leaves by the door');
   assert.ok(near(holes[0].to, home.anchors.door), 'comes back by the door');
   const hidden = wong.segments.filter((s) => s.visible === false);
   assert.deepEqual(
     hidden.map((s) => [s.start, s.end]),
-    [[73, 374.5]],
+    [[80.5, 370]],
   );
 });
 
@@ -203,16 +203,16 @@ void test('the clinic trip fills the hole: one contiguous day, 0–720', () => {
   assert.ok(day.segments.every((s) => s.visible !== false), 'never hidden');
   const at = (t: number) =>
     day.segments.find((s) => s.start <= t && t < s.end)!;
-  // Seams: the generated walk reaches the door at 73 s and the trip leaves
-  // it; the trip brings her back to the door at 374.5 s and the generated
+  // Seams: the generated walk reaches the door at 80.5 s and the trip leaves
+  // it; the trip brings her back to the door at 370 s and the generated
   // track walks her in.
-  assert.equal(at(72.9).action, 'walk');
-  assert.ok(near(at(72.9).path.at(-1)!, home.anchors.door));
-  assert.equal(at(73).title, 'Out to the van');
-  assert.ok(near(at(73).path[0], home.anchors.door));
-  assert.equal(at(374).title, 'Onto the porch');
-  assert.ok(near(at(374).path.at(-1)!, home.anchors.door));
-  assert.ok(near(at(374.5).path[0], home.anchors.door));
+  assert.equal(at(80.4).action, 'walk');
+  assert.ok(near(at(80.4).path.at(-1)!, home.anchors.door));
+  assert.equal(at(80.5).title, 'Out to the van');
+  assert.ok(near(at(80.5).path[0], home.anchors.door));
+  assert.equal(at(369.9).title, 'In at the front door');
+  assert.ok(near(at(369.9).path.at(-1)!, home.anchors.door));
+  assert.ok(near(at(370).path[0], home.anchors.door));
   assert.deepEqual(
     day.segments.filter((s) => s.vehicleId).map((s) => [s.start, s.end]),
     [
@@ -222,25 +222,15 @@ void test('the clinic trip fills the hole: one contiguous day, 0–720', () => {
   );
 });
 
-void test('the trip is the hand-authored one, from the door instead of the porch chair', () => {
+void test("the Wongs' generated day carries the same trip in her away window", () => {
   const model = JSON.parse(
     readFileSync('public/models/seen-alhambra-planning.json', 'utf8'),
   ) as Facility;
-  const authored = (communitySource(model).actors ?? [])
+  const composed = (communitySource(model).actors ?? [])
     .find((a) => a.id === 'home-participant')!
-    .segments.filter((s) => s.start >= 73 && s.end <= 374.5);
-  const trip = leg(holes[0])!;
-  assert.equal(trip.length, authored.length);
-  // Only where it starts (the door, not her chair, so the first heading too)
-  // and where it ends differ.
-  const first = (s: Segment) => ({ ...s, path: s.path.slice(1), heading: 0 }),
-    last = (s: Segment) => ({ ...s, path: s.path.slice(0, -1) });
-  trip.forEach((s, i) => {
-    const a = authored[i];
-    if (i === 0) assert.deepEqual(first(s), first(a));
-    else if (i === trip.length - 1) assert.deepEqual(last(s), last(a));
-    else assert.deepEqual(s, a);
-  });
+    .segments.filter((s) => s.start >= 80.5 && s.end <= 370);
+  // Both holes run from the home's front door and back to it.
+  assert.deepEqual(composed, leg(holes[0]));
 });
 
 void test('a leg must cover its hole and meet the door', () => {

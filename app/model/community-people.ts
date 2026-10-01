@@ -1,4 +1,5 @@
 import type { ActorSpec, Interaction, Segment } from './activity';
+import type { CharacterRole } from './characters';
 import type { Facility, Vec2 } from './schema';
 import type { SourceExtension } from './sources';
 import { FLEET_VAN_RAMP } from './photo-assets';
@@ -45,6 +46,8 @@ import {
 export { COMMUNITY_SOURCE_ID, COMMUNITY_VIEW } from './community-settings';
 const VAN = 'van-community';
 const VAN_FLOOR = 0.35;
+/** Halfway up the home's porch ramp. */
+const RAMP_MID_Y = (PAD_Y + PORCH_Y) / 2;
 /** A follower's polyline: starts `m` metres behind the leader's start, stops `m` short. */
 export function offsetBehind(path: Vec2[], m: number): Vec2[] {
   const [a, b] = path,
@@ -110,20 +113,52 @@ function vanStop(time: number) {
   };
 }
 
-/** Van ramp foot → the home's porch ramp foot: down the drive edge, then a gentle loop in from the south. */
+/** Van ramp foot → the home's porch ramp foot: along the drive edge, then a short loop round onto the ramp. */
 function homeCrossing(foot: Vec2): Vec2[] {
   const h = careSettingById('home-lin')!.anchors;
   return [foot, h.crossA, h.crossB, h.crossC, h.crossD, h.rampFoot];
 }
+/** The point `m` metres from `a` toward `b`. */
+function toward(a: Vec2, b: Vec2, m: number): Vec2 {
+  const d = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+  return [a[0] + ((b[0] - a[0]) / d) * m, a[1] + ((b[1] - a[1]) / d) * m];
+}
+/** Mr. Wong's wheelchair route from his ward bay to the Seen van's ramp foot. */
+function hospitalRollPath(): Vec2[] {
+  const q = careSettingById('hospital')!.anchors;
+  return [q.patient, q.bayFront, q.walkway, q.kerbStep, vanStop(560).foot];
+}
 /**
- * Mrs. Wong's trip to the cardiology clinic, 73–374.5 s, appended to a track
- * that stands at the start of it at 73 s on the porch level: today her porch
- * chair; once the home is a stamped facility, the front door, where the leg
- * fills the `away` hole of her generated track (`wongClinicLeg`). Out across
- * the porch and down the ramp to the Seen van, the visit, the ride home, and
- * back up the ramp and through `back` (porch-level points) by 374.5 s.
+ * A hand-authored leg filling `hole` of a generated person: a `Track` in the
+ * setting's zone from `start` (default the hole's door point, at porch
+ * height) at `hole.start`, closed with `segmentsTo(hole.end)`. Label and
+ * variant come from the generated actor; the leg only carries segments.
  */
-export function wongClinicTrip(track: Track, back: Vec2[]): Track {
+function legTrack(
+  id: string,
+  role: CharacterRole,
+  hole: InstanceHole,
+  s: CareSetting,
+  start: Vec2 = hole.from,
+  y = start === hole.from ? PORCH_Y : undefined,
+): Track {
+  return new Track(
+    id,
+    role,
+    { zoneId: settingZone(s.id), label: id, variant: 0, start: hole.start },
+    start,
+    y,
+  );
+}
+/**
+ * Mrs. Wong's trip to the cardiology clinic: the leg that fills the `away`
+ * hole of her generated track (80.5–370 s). Out of the front door at
+ * `hole.from`, across the porch and down the new ramp to the Seen van (on
+ * board 108.5–181 s), the visit, the ride home (257.5–337 s), and back up
+ * the ramp to the door at `hole.to` by `hole.end`. The van's timetable
+ * fixes the times in between.
+ */
+export function wongClinicLeg(hole: InstanceHole, zoneId: string): Segment[] {
   const home = careSettingById('home-lin')!,
     specialist = careSettingById('specialist')!;
   const h = home.anchors,
@@ -131,12 +166,24 @@ export function wongClinicTrip(track: Track, back: Vec2[]): Track {
   const homeAm = vanStop(10),
     clinic = vanStop(200),
     homeNoon = vanStop(400);
-  return track
-    .walk(79, [h.porch, h.rampTop], {
+  return new Track(
+    'home-participant',
+    'participant',
+    {
+      zoneId,
+      label: 'Mrs. Wong',
+      variant: 3,
+      mobility: 'walker',
+      start: hole.start,
+    },
+    hole.from,
+    PORCH_Y,
+  )
+    .walk(85, [h.porch, h.rampTop], {
       title: 'Out to the van',
       ys: [PORCH_Y, PORCH_Y],
     })
-    .walk(87, [h.rampFoot], { title: 'Down the new ramp', ys: [PAD_Y] })
+    .walk(91.5, [h.rampFoot], { title: 'Down the new ramp', ys: [PAD_Y] })
     .walk(105, [...homeCrossing(homeAm.foot)].reverse().slice(1), {
       title: 'Across to the Seen van',
     })
@@ -166,50 +213,342 @@ export function wongClinicTrip(track: Track, back: Vec2[]): Track {
       from: homeNoon.sill,
       fromY: VAN_FLOOR,
     })
-    .walk(358.5, homeCrossing(homeNoon.foot).slice(1), { title: 'Home again' })
-    .walk(366.5, [h.rampTop], { title: 'Up the ramp', ys: [PORCH_Y] })
-    .walk(374.5, back, {
-      title: 'Onto the porch',
-      ys: back.map(() => PORCH_Y),
-    });
+    .walk(357, homeCrossing(homeNoon.foot).slice(1), { title: 'Home again' })
+    .walk(364.5, [h.rampTop], { title: 'Up the ramp', ys: [PORCH_Y] })
+    .walk(hole.end, [h.porch, hole.to], {
+      title: 'In at the front door',
+      ys: [PORCH_Y, PORCH_Y],
+    })
+    .segmentsTo(hole.end);
 }
 /**
- * The clinic trip as the leg that fills Mrs. Wong's `away` hole (73–374.5 s)
- * when she is a scheduled person of a stamped home: from the front door at
- * `hole.from` back to it at `hole.to`.
+ * The personal care aide outside the Wongs' house: from her car in the stall
+ * to the front door for 8:29 AM; ahead of Mrs. Wong to the ramp with the
+ * clinic bag, waving the van off and taking the pill packs from the courier
+ * on the drive; out to meet the van at noon and up the ramp behind her; and
+ * from the door at 12:59 PM to a hand-over with the OT on the porch and her
+ * car, which leaves at 469 s.
  */
-export function wongClinicLeg(hole: InstanceHole, zoneId: string): Segment[] {
-  const h = careSettingById('home-lin')!.anchors;
-  const track = new Track(
-    'home-participant',
+const aideLegs: Record<string, Leg> = {
+  'before 0–44': (hole, s) => {
+    const h = s.anchors;
+    return legTrack('home-pca', 'aide', hole, s, h.stallStand)
+      .hidden(28.5, 'Driving to the visit')
+      .walk(hole.end, [h.porchStepFoot, h.porchStep, hole.to], {
+        title: 'Arriving for the morning visit',
+        ys: [undefined, PORCH_Y, PORCH_Y],
+      })
+      .segmentsTo(hole.end);
+  },
+  'away 77–152.5': (hole, s) => {
+    const h = s.anchors,
+      homeAm = vanStop(10);
+    return legTrack('home-pca', 'aide', hole, s)
+      .walk(80, [h.porchFrontEast, h.rampTopAside], {
+        title: 'Ahead to the ramp with the clinic bag',
+        ys: [PORCH_Y, PORCH_Y],
+      })
+      .hold(110, 'greet', { title: 'Waving her off', face: homeAm.foot })
+      .walk(114, [h.pcaWait, h.kerb], {
+        title: 'Waiting for the pharmacy courier',
+      })
+      .hold(130, 'idle', {
+        title: 'Waiting for the pharmacy courier',
+        heading: rel(s),
+      })
+      .hold(141, 'greet', {
+        title: 'Taking the pill packs from the courier',
+        face: h.handover,
+      })
+      .walk(
+        hole.end,
+        [h.porchApproach, h.porchStepFoot, h.porchStep, hole.to],
+        {
+          title: 'In with the pill packs',
+          ys: [undefined, undefined, PORCH_Y, PORCH_Y],
+        },
+      )
+      .segmentsTo(hole.end);
+  },
+  'away 318.5–372.5': (hole, s) => {
+    const h = s.anchors,
+      homeNoon = vanStop(400);
+    return legTrack('home-pca', 'aide', hole, s)
+      .walk(332.5, [h.porch, h.rampTop, h.rampFoot, h.pcaMeetA, h.pcaMeetB], {
+        title: 'Out to meet the van',
+        ys: [PORCH_Y, PORCH_Y, PAD_Y],
+      })
+      .hold(340.5, 'greet', { title: 'Meeting the van', face: homeNoon.foot })
+      .walk(357, [h.pcaWalkA, h.pcaWalkB], { title: 'Walking her home' })
+      .hold(361.5, 'greet', { title: 'Up you go', face: h.rampFoot })
+      .walk(hole.end, [h.rampFoot, h.rampTop, h.porch, hole.to], {
+        title: 'Following her up the ramp',
+        ys: [PAD_Y, PORCH_Y, PORCH_Y, PORCH_Y],
+      })
+      .segmentsTo(hole.end);
+  },
+  'after 450.5–720': (hole, s) => {
+    const h = s.anchors;
+    return legTrack('home-pca', 'aide', hole, s)
+      .walk(452, [h.porchDriver], {
+        title: 'Out onto the porch',
+        ys: [PORCH_Y],
+      })
+      .hold(455, 'greet', { title: 'Hand-over to the OT', face: h.porch })
+      .walk(469, [h.porchStep, h.porchStepFoot, h.stallStand], {
+        title: 'Off to the next client',
+        ys: [PORCH_Y, PORCH_Y],
+      })
+      .hidden(hole.end, 'Driving to the next client')
+      .segmentsTo(hole.end);
+  },
+};
+/** In from the street along the sidewalk stub and up the porch ramp to the front door. */
+const upTheRamp = (h: Record<string, Vec2>, door: Vec2): Vec2[] => [
+  h.sidewalkPad,
+  h.padCorner,
+  h.rampFoot,
+  h.rampTop,
+  h.porch,
+  door,
+];
+const UP_THE_RAMP_YS = [undefined, undefined, PAD_Y, PORCH_Y, PORCH_Y, PORCH_Y];
+/**
+ * The OT: in from the street at 453 s, out to check the porch ramp (the
+ * `home-ramp-check` window) and back for the sign-off, gone at 582.5 s.
+ */
+const otLegs: Record<string, Leg> = {
+  'before 0–453': (hole, s) =>
+    legTrack('home-ot', 'ot', hole, s, s.anchors.sidewalkEnd)
+      .hidden(412, 'Driving over with the installer')
+      .walk(hole.end, upTheRamp(s.anchors, hole.to), {
+        title: 'Arriving for the home modification',
+        ys: UP_THE_RAMP_YS,
+      })
+      .segmentsTo(hole.end),
+  'away 520–551': (hole, s) => {
+    const h = s.anchors;
+    return legTrack('home-ot', 'ot', hole, s)
+      .walk(523.5, [h.porch, h.rampTop], {
+        title: 'Out to check the ramp',
+        ys: [PORCH_Y, PORCH_Y],
+      })
+      .hold(531, 'consult', {
+        title: 'Ramp check: landing, rails and edges',
+        face: h.rampMid,
+      })
+      .walk(536, [h.rampMid, h.rampFoot], {
+        title: 'Down the ramp: slope and handrail grip',
+        ys: [RAMP_MID_Y, PAD_Y],
+      })
+      .hold(543, 'consult', {
+        title: 'Ramp check: the level landing at the foot',
+        face: h.rampMid,
+      })
+      .walk(hole.end, [h.rampTop, h.porch, hole.to], {
+        title: 'Back in for the sign-off',
+        ys: [PORCH_Y, PORCH_Y, PORCH_Y],
+      })
+      .segmentsTo(hole.end);
+  },
+  'after 582.5–720': (hole, s) => {
+    const h = s.anchors;
+    return legTrack('home-ot', 'ot', hole, s)
+      .walk(
+        622.5,
+        [
+          h.porch,
+          h.rampTop,
+          h.rampFoot,
+          h.padCorner,
+          h.sidewalkPadOut,
+          h.sidewalkEndOut,
+        ],
+        { title: 'Leaving', ys: [PORCH_Y, PORCH_Y, PAD_Y] },
+      )
+      .hidden(hole.end, 'Back at the center')
+      .segmentsTo(hole.end);
+  },
+};
+/** The installer: the grab-bar kit from the crate on the pad, in at 456 s; out at 572.5 s to pack it. */
+const installerLegs: Record<string, Leg> = {
+  'before 0–456': (hole, s) => {
+    const h = s.anchors;
+    return legTrack('home-installer', 'aide', hole, s, h.sidewalkEnd)
+      .hidden(405, 'Driving over with the OT')
+      .walk(440, [h.sidewalkPad, h.padCorner, h.crateSide], {
+        title: 'Bringing the grab-bar kit',
+      })
+      .hold(446, 'craft', { title: 'Unpacking the kit', face: h.crate })
+      .walk(hole.end, [h.rampFoot, h.rampTop, h.porch, hole.to], {
+        title: 'In with the bars and the drill',
+        ys: [PAD_Y, PORCH_Y, PORCH_Y, PORCH_Y],
+      })
+      .segmentsTo(hole.end);
+  },
+  'after 572.5–720': (hole, s) => {
+    const h = s.anchors;
+    return legTrack('home-installer', 'aide', hole, s)
+      .walk(581, [h.porch, h.rampTop, h.rampFoot, h.crateSide], {
+        title: 'Out to the kit',
+        ys: [PORCH_Y, PORCH_Y, PAD_Y],
+      })
+      .hold(586, 'craft', { title: 'Packing the kit', face: h.crate })
+      .walk(616, [h.padCorner, h.sidewalkPadOut, h.sidewalkEndOut], {
+        title: 'Leaving',
+      })
+      .hidden(hole.end, 'Back at the depot')
+      .segmentsTo(hole.end);
+  },
+};
+/** The home health nurse: in from the street for 3:05 PM, out to her car at 3:44 PM. */
+const nurseLegs: Record<string, Leg> = {
+  'before 0–642.5': (hole, s) =>
+    legTrack('home-rn', 'nurse', hole, s, s.anchors.sidewalkEnd)
+      .hidden(603.5, 'On other visits')
+      .walk(hole.end, upTheRamp(s.anchors, hole.to), {
+        title: 'Arriving for the discharge visit',
+        ys: UP_THE_RAMP_YS,
+      })
+      .segmentsTo(hole.end),
+  'after 708–720': (hole, s) => {
+    const h = s.anchors;
+    return legTrack('home-rn', 'nurse', hole, s)
+      .walk(719, [h.porch, h.rampTop, h.rampFoot, h.padCorner], {
+        title: 'Heading to the car',
+        ys: [PORCH_Y, PORCH_Y, PAD_Y],
+      })
+      .hidden(hole.end, 'Driving to the next visit')
+      .segmentsTo(hole.end);
+  },
+};
+/**
+ * Mr. Wong's day before he rolls in at his front door (672 s): on the
+ * hospital ward (rounds, the discharge huddle and instructions), wheeled to
+ * the Seen van by the liaison nurse, the ride home, and pushed by the driver
+ * across the pad and up the porch ramp to the door. The hospital part is in
+ * the hospital's zone, the rest in the home's.
+ */
+function mrWongHospitalDay(hole: InstanceHole, s: CareSetting): Segment[] {
+  const hospital = careSettingById('hospital')!,
+    h = s.anchors,
+    hospitalStop = vanStop(560),
+    homePm = vanStop(700),
+    rollPath = hospitalRollPath();
+  const ward = new Track(
+    'hospital-participant',
     'participant',
     {
-      zoneId,
-      label: 'Mrs. Wong',
-      variant: 3,
-      mobility: 'walker',
-      start: hole.start,
+      zoneId: settingZone(hospital.id),
+      label: 'Mr. Wong',
+      variant: 8,
+      mobility: 'wheelchair',
     },
-    hole.from,
-    PORCH_Y,
-  );
-  return wongClinicTrip(track, [h.porch, hole.to]).segmentsTo(hole.end);
+    rollPath[0],
+  )
+    .hold(225, 'seated', {
+      title: 'On the ward, awaiting rounds',
+      heading: rel(hospital),
+    })
+    .hold(262, 'conversation', {
+      title: 'Rounds with the team',
+      heading: rel(hospital),
+    })
+    .hold(495, 'seated', {
+      title: 'Ready for discharge',
+      heading: rel(hospital),
+    })
+    .hold(525, 'listen', {
+      title: 'Discharge huddle at the bedside',
+      heading: rel(hospital),
+    })
+    .hold(556, 'conversation', {
+      title: 'Discharge instructions',
+      heading: rel(hospital),
+    })
+    .walk(566, rollPath.slice(1), {
+      action: 'roll',
+      title: 'Wheeled to the Seen van',
+    })
+    .walk(569.5, [hospitalStop.sill], {
+      action: 'roll',
+      title: 'Up the van ramp',
+      ys: [VAN_FLOOR],
+    })
+    .ride(649, VAN, 'wheelchair', 'Riding home from hospital')
+    .segmentsTo(649);
+  const home = new Track(
+    'hospital-participant',
+    'participant',
+    {
+      zoneId: settingZone(s.id),
+      label: 'Mr. Wong',
+      variant: 8,
+      mobility: 'wheelchair',
+      start: 649,
+    },
+    homePm.sill,
+    VAN_FLOOR,
+  )
+    .walk(652.5, [homePm.foot], { action: 'roll', title: 'Down the van ramp' })
+    .walk(663.5, homeCrossing(homePm.foot).slice(1), {
+      action: 'roll',
+      title: 'Across to the porch ramp',
+    })
+    .walk(668.5, [h.rampTop], {
+      action: 'roll',
+      title: 'Up the porch ramp',
+      ys: [PORCH_Y],
+    })
+    .walk(hole.end, [hole.to], {
+      action: 'roll',
+      title: 'To the front door',
+      ys: [PORCH_Y],
+    })
+    .segmentsTo(hole.end);
+  return [...ward, ...home];
 }
+/** A setting's hand-authored legs, by `<kind> <start>–<end>` of the hole they fill. */
+type Leg = (hole: InstanceHole, setting: CareSetting) => Segment[] | undefined;
+const holeKey = (hole: InstanceHole) =>
+  `${hole.kind} ${hole.start}–${hole.end}`;
+/**
+ * One person's legs by hole window. A hole that is not listed throws, so a
+ * re-timed cast cannot silently pick up the wrong leg or leave someone
+ * hidden; a listed leg that returns nothing keeps the placeholder hidden.
+ */
+const byWindow =
+  (id: string, legs: Record<string, Leg>): Leg =>
+  (hole, s) => {
+    const leg = legs[holeKey(hole)];
+    if (!leg)
+      throw new Error(
+        `${id}: no hand-authored leg for the ${holeKey(hole)} hole (HOLE_LEGS in community-people.ts; listed: ${Object.keys(legs).join(', ')})`,
+      );
+    return leg(hole, s);
+  };
 /**
  * Hand-authored legs for the holes of scheduled people in generated instance
  * casts, by actor id: each returns the segments from `hole.from` at
  * `hole.start` to `hole.to` at `hole.end` (instance-cast.ts `fillHoles`), or
- * nothing to keep the person out of sight. Mrs. Wong's clinic trip is ready
- * for the day her home is a stamped facility and her track is generated.
+ * nothing to keep the person out of sight. The Wongs' home: everyone inside
+ * the house comes from its cast (app/data/community/home-lin.cast.json);
+ * these are their times outside it.
  */
-const HOLE_LEGS: Record<
-  string,
-  (hole: InstanceHole, setting: CareSetting) => Segment[] | undefined
-> = {
-  'home-participant': (hole, s) =>
-    hole.kind === 'away' && hole.start === 73 && hole.end === 374.5
-      ? wongClinicLeg(hole, settingZone(s.id))
-      : undefined,
+const HOLE_LEGS: Record<string, Leg> = {
+  'home-participant': byWindow('home-participant', {
+    // Hidden in bed for the first half second, so the loop seam (sofa at
+    // 4 PM, bed at 8 AM) is out of sight.
+    'before 0–0.5': () => undefined,
+    'away 80.5–370': (hole, s) => wongClinicLeg(hole, settingZone(s.id)),
+  }),
+  'home-pca': byWindow('home-pca', aideLegs),
+  'home-ot': byWindow('home-ot', otLegs),
+  'home-installer': byWindow('home-installer', installerLegs),
+  'home-rn': byWindow('home-rn', nurseLegs),
+  'hospital-participant': byWindow('hospital-participant', {
+    'before 0–672': mrWongHospitalDay,
+  }),
 };
 const instanceCasts = castFile as unknown as InstanceCasts;
 
@@ -257,243 +596,11 @@ export function communitySource(model: Facility): SourceExtension {
   const crossing = homeCrossing;
 
   // --- The Wongs' home ------------------------------------------------------
+  // Everyone inside the house comes from its generated cast (below, with
+  // `HOLE_LEGS` for their times outside); here are the visitors who stay
+  // outside and the two touchpoints on the drive.
   {
     const opts = { zoneId: homeZone };
-    const wong = new Track(
-      'home-participant',
-      'participant',
-      { ...opts, label: 'Mrs. Wong · at home', variant: 3, mobility: 'walker' },
-      h.porchSeat,
-      PORCH_Y,
-    )
-      .hold(48, 'seated', {
-        title: 'Morning on the porch',
-        heading: rel(home),
-      })
-      .hold(52, 'greet', { title: 'Her aide arrives', face: h.pcaCare })
-      .hold(73, 'seated', {
-        title: 'Personal care & morning medicines',
-        heading: rel(home),
-      });
-    wongClinicTrip(wong, [h.porch, h.porchSeat])
-      .hold(420, 'seated', {
-        title: 'Lunch on the porch',
-        heading: rel(home),
-      })
-      .walk(425, [h.porch, h.door], {
-        title: 'Inside to rest',
-        ys: [PORCH_Y, PORCH_Y],
-      })
-      .hidden(458, 'Resting inside')
-      .walk(462, [h.porch, h.porchGreet], {
-        title: 'Out to see the ramp work',
-        from: h.door,
-        fromY: PORCH_Y,
-        ys: [PORCH_Y, PORCH_Y],
-      })
-      .hold(495, 'consult', {
-        title: 'Reviewing the grab bars with the OT',
-        face: h.barWork,
-      })
-      .walk(500, [h.porchSeatVia1, h.porchSeatVia2, h.porchSeat], {
-        title: 'Back to her chair',
-        ys: [PORCH_Y, PORCH_Y, PORCH_Y],
-      })
-      .hold(560, 'seated', {
-        title: 'Afternoon on the porch',
-        heading: rel(home),
-      })
-      .walk(566, [h.porch, h.door], { title: 'Inside', ys: [PORCH_Y, PORCH_Y] })
-      .hidden(644, 'Waiting for Mr. Wong')
-      .walk(648, [h.porch, h.porchGreet], {
-        title: 'Out to meet the van',
-        from: h.door,
-        fromY: PORCH_Y,
-        ys: [PORCH_Y, PORCH_Y],
-      })
-      .hold(683.5, 'greet', {
-        title: 'Welcoming Mr. Wong home',
-        face: h.rampTop,
-      })
-      .walk(690, [h.porchSeatVia1, h.porchSeatVia2, h.porchSeat], {
-        title: 'Sitting with him',
-        ys: [PORCH_Y, PORCH_Y, PORCH_Y],
-      })
-      .hold(708, 'conversation', {
-        title: 'On the phone with the nurse line',
-        heading: rel(home),
-      })
-      .hold(CLOCK_END, 'seated', {
-        title: 'Evening on the porch',
-        heading: rel(home),
-      });
-    add(wong);
-    const pca = new Track(
-      'home-pca',
-      'aide',
-      { ...opts, label: 'Personal care aide', variant: 2 },
-      h.stallStand,
-    )
-      .hidden(28, 'Driving to the visit')
-      .walk(
-        50,
-        [
-          h.padCornerNear,
-          h.padCornerFar,
-          h.porchStepFoot,
-          h.porchStep,
-          h.pcaCare,
-        ],
-        {
-          title: 'Arriving for the morning visit',
-          ys: [undefined, undefined, undefined, PORCH_Y, PORCH_Y],
-        },
-      )
-      .hold(52, 'greet', { title: 'Good morning', face: h.porchSeat })
-      .hold(71, 'treat', {
-        title: 'Personal care: hair, medicines, breakfast',
-        face: h.porchSeat,
-      })
-      .walk(78, [h.porchFrontEast, h.rampTopAside], {
-        title: 'Walking her to the ramp',
-        ys: [PORCH_Y, PORCH_Y],
-      })
-      .hold(110, 'greet', { title: 'Waving her off', face: homeAm.foot })
-      .walk(114, [h.pcaWait, h.kerb], {
-        title: 'Waiting for the pharmacy courier',
-      })
-      .hold(130, 'idle', {
-        title: 'Waiting for the pharmacy courier',
-        heading: rel(home),
-      })
-      .hold(141, 'greet', {
-        title: 'Taking the pill packs from the courier',
-        face: h.handover,
-      })
-      .walk(
-        152,
-        [h.porchApproach, h.porchStepFoot, h.porchStep, h.porchAside],
-        {
-          title: 'Back to the porch',
-          ys: [undefined, undefined, PORCH_Y, PORCH_Y],
-        },
-      )
-      .hold(200, 'serve', {
-        title: 'Preparing lunch & tidying',
-        face: h.porchTable,
-      })
-      .walk(204, [h.porch, h.door], {
-        title: 'Housekeeping inside',
-        ys: [PORCH_Y, PORCH_Y],
-      })
-      .hidden(310, 'Housekeeping & laundry')
-      .walk(330, [h.porch, h.rampTop, h.rampFoot, h.pcaMeetA, h.pcaMeetB], {
-        title: 'Out to meet the van',
-        from: h.door,
-        fromY: PORCH_Y,
-        ys: [PORCH_Y, PORCH_Y, PAD_Y],
-      })
-      .hold(340.5, 'greet', { title: 'Meeting the van', face: homeNoon.foot })
-      .walk(358.5, [h.pcaWalkA, h.pcaWalkB], { title: 'Walking her home' })
-      .hold(364, 'greet', { title: 'Up you go', face: h.rampFoot })
-      .walk(
-        393,
-        [
-          h.pcaBack,
-          h.porchApproach,
-          h.padCornerFar,
-          h.padCornerNear,
-          h.stallStand,
-        ],
-        { title: 'Off to the next client' },
-      )
-      .hidden(CLOCK_END, 'Driving to the next client');
-    add(pca);
-    const rn = new Track(
-      'home-rn',
-      'nurse',
-      { ...opts, label: 'Home health nurse', variant: 5 },
-      h.sidewalkEnd,
-    )
-      .hidden(600, 'On other visits')
-      .walk(
-        648,
-        [
-          h.sidewalkPad,
-          h.padCorner,
-          h.porchApproach,
-          h.porchStepFoot,
-          h.porchStep,
-          h.porchNurse,
-        ],
-        {
-          title: 'Arriving for the discharge visit',
-          ys: [undefined, undefined, undefined, undefined, PORCH_Y, PORCH_Y],
-        },
-      )
-      .hold(683.5, 'greet', { title: 'Meeting the van', face: h.rampTop })
-      .hold(696, 'treat', {
-        title: 'Vitals & medication reconciliation',
-        face: h.wheelchairSpot,
-      })
-      .hold(700, 'document', {
-        title: 'Charting the visit',
-        face: h.wheelchairSpot,
-      })
-      .walk(718, [h.porchStep, h.porchStepFoot, h.porchApproach, h.padCorner], {
-        title: 'Heading to the car',
-        ys: [PORCH_Y],
-      })
-      .hidden(CLOCK_END, 'Driving to the next visit');
-    add(rn);
-    const ot = new Track(
-      'home-ot',
-      'ot',
-      { ...opts, label: 'Occupational therapist', variant: 1 },
-      h.sidewalkEnd,
-    )
-      .hidden(426, 'Driving over with the installer')
-      .walk(468, [h.sidewalkPad, h.padCorner, h.barWork], {
-        title: 'Arriving for the home modification',
-      })
-      .hold(495, 'consult', {
-        title: 'Grab-bar placement with Mrs. Wong',
-        face: h.porchGreet,
-      })
-      .hold(540, 'craft', {
-        title: 'Fitting the porch grab bar',
-        face: h.porchStepOt,
-      })
-      .hold(575, 'document', { title: 'Home safety notes', face: h.rampWork })
-      .walk(612, [h.padCorner, h.sidewalkPadOut], { title: 'Leaving' })
-      .hidden(CLOCK_END, 'Back at the center');
-    add(ot);
-    const installer = new Track(
-      'home-installer',
-      'aide',
-      { ...opts, label: 'Home-mods installer', variant: 4 },
-      h.sidewalkEnd,
-    )
-      .hidden(430, 'Driving over with the OT')
-      .walk(470, [h.sidewalkPad, h.padCorner, h.crateSide], {
-        title: 'Bringing the grab-bar kit',
-      })
-      .hold(480, 'craft', { title: 'Unpacking the kit', face: h.crate })
-      .walk(484, [h.rampWork], { title: 'To the ramp' })
-      .hold(540, 'craft', {
-        title: 'Finishing the ramp rails',
-        face: h.rampMid,
-      })
-      .walk(546, [h.crateSide], { title: 'Back for tools' })
-      .hold(556, 'craft', { title: 'Packing the kit', face: h.crate })
-      .walk(562, [h.rampWork], { title: 'Final checks' })
-      .hold(586, 'craft', {
-        title: 'Final checks on the rails',
-        face: h.rampMid,
-      })
-      .walk(622, [h.padCorner, h.sidewalkPadOut], { title: 'Leaving' })
-      .hidden(CLOCK_END, 'Back at the depot');
-    add(installer);
     const mealsDoor = carDoor('meals-car', 380);
     const meals = new Track(
       'meals-driver',
@@ -501,37 +608,32 @@ export function communitySource(model: Facility): SourceExtension {
       { ...opts, label: 'Meals driver', variant: 6 },
       CENTER_LOT.meals.at,
     )
-      .hidden(371, 'Loading & driving meals', mealsDoor)
-      .walk(380, [h.mealsWalkA, h.mealsWalkB, h.porchStepFoot, h.porchStep], {
-        title: 'Meal bag to the door',
-        ys: [undefined, undefined, undefined, PORCH_Y],
+      .hidden(369.5, 'Loading & driving meals', mealsDoor)
+      .walk(
+        381,
+        [h.mealsWalkA, h.mealsWalkB, h.porchStepFoot, h.porchStep, h.doorStep],
+        {
+          title: 'Meal bag to the front door',
+          ys: [undefined, undefined, undefined, PORCH_Y, PORCH_Y],
+        },
+      )
+      .hold(386, 'serve', {
+        title: 'Lunch to the aide; a wellness check with Mrs. Wong',
+        face: h.door,
       })
-      .hold(387, 'serve', { title: 'Handing over lunch', face: h.porchSeat })
-      .hold(395, 'conversation', {
-        title: 'Wellness check-in',
-        face: h.porchSeat,
-      })
-      .walk(403, [h.porchStepFoot, h.mealsWalkB, h.mealsWalkA, mealsDoor], {
-        title: 'Back to the car',
-      })
+      .walk(
+        398,
+        [h.porchStep, h.porchStepFoot, h.mealsWalkB, h.mealsWalkA, mealsDoor],
+        { title: 'Back to the car', ys: [PORCH_Y, PAD_Y] },
+      )
       .hidden(CLOCK_END, 'Delivering the rest of the route');
     add(meals);
-    interact(
-      'home-personal-care',
-      'home',
-      homeZone,
-      ['home-participant', 'home-pca'],
-      52,
-      71,
-      'Mrs. Wong · personal care at home',
-      'A personal care aide helps with hair, morning medicines and breakfast on the porch before the Seen van arrives.',
-    );
     interact(
       'home-van-boarding',
       'home',
       homeZone,
       ['home-participant', 'home-pca', 'community-driver'],
-      73,
+      80.5,
       113,
       'Mrs. Wong · boarding the Seen van',
       'Down the new ramp and up the van ramp with the aide and driver alongside: door-to-door transport to a contracted specialist.',
@@ -545,56 +647,6 @@ export function communitySource(model: Facility): SourceExtension {
       141,
       'Pill packs delivered to the home',
       'The pharmacy courier hands the weekly blister packs to the aide, who files them for the medication routine.',
-    );
-    interact(
-      'home-return',
-      'home',
-      homeZone,
-      ['home-participant', 'home-pca', 'community-driver'],
-      332,
-      374.5,
-      'Mrs. Wong · home from the clinic',
-      'The van ramp comes down, the aide meets her at the kerb and follows her up the ramp to the porch.',
-    );
-    interact(
-      'home-meals',
-      'home',
-      homeZone,
-      ['meals-driver', 'home-participant'],
-      380,
-      395,
-      'Home-delivered lunch & wellness check',
-      'The meals driver hands over lunch and checks in; anything unusual goes back to the care team.',
-    );
-    interact(
-      'home-mods',
-      'home',
-      homeZone,
-      ['home-ot', 'home-installer', 'home-participant'],
-      462,
-      586,
-      'Home modifications · ramp & grab bars',
-      'An OT places grab bars with Mrs. Wong while the installer finishes the porch ramp rails.',
-    );
-    interact(
-      'home-discharge-arrival',
-      'home',
-      homeZone,
-      ['hospital-participant', 'community-driver', 'home-participant'],
-      644,
-      686,
-      'Mr. Wong · home after discharge',
-      'The Seen driver wheels Mr. Wong down the van ramp and up the porch ramp; Mrs. Wong meets them at the door.',
-    );
-    interact(
-      'home-health-visit',
-      'home',
-      homeZone,
-      ['home-rn', 'hospital-participant'],
-      683.5,
-      700,
-      'Post-discharge home health visit',
-      'A home health nurse checks vitals and reconciles the new medicines with the pill packs on the day he comes home.',
     );
   }
 
@@ -729,85 +781,7 @@ export function communitySource(model: Facility): SourceExtension {
   {
     const zone = settingZone(hospital.id),
       opts = { zoneId: zone };
-    const rollPath: Vec2[] = [
-      q.patient,
-      q.bayFront,
-      q.walkway,
-      q.kerbStep,
-      hospitalStop.foot,
-    ];
-    const mrWong = new Track(
-      'hospital-participant',
-      'participant',
-      {
-        ...opts,
-        label: 'Mr. Wong · inpatient, discharged home',
-        variant: 8,
-        mobility: 'wheelchair',
-      },
-      q.patient,
-    )
-      .hold(225, 'seated', {
-        title: 'On the ward, awaiting rounds',
-        heading: rel(hospital),
-      })
-      .hold(262, 'conversation', {
-        title: 'Rounds with the team',
-        heading: rel(hospital),
-      })
-      .hold(495, 'seated', {
-        title: 'Ready for discharge',
-        heading: rel(hospital),
-      })
-      .hold(525, 'listen', {
-        title: 'Discharge huddle at the bedside',
-        heading: rel(hospital),
-      })
-      .hold(556, 'conversation', {
-        title: 'Discharge instructions',
-        heading: rel(hospital),
-      })
-      .walk(566, rollPath.slice(1), {
-        action: 'roll',
-        title: 'Wheeled to the Seen van',
-      })
-      .walk(569.5, [hospitalStop.sill], {
-        action: 'roll',
-        title: 'Up the van ramp',
-        ys: [VAN_FLOOR],
-      })
-      .ride(649, VAN, 'wheelchair', 'Riding home from hospital')
-      .walk(652.5, [homePm.foot], {
-        action: 'roll',
-        title: 'Down the van ramp',
-        from: homePm.sill,
-        fromY: VAN_FLOOR,
-      })
-      .walk(670.5, crossing(homePm.foot).slice(1), {
-        action: 'roll',
-        title: 'Across to the porch ramp',
-      })
-      .walk(677.5, [h.rampTop], {
-        action: 'roll',
-        title: 'Up the porch ramp',
-        ys: [PORCH_Y],
-      })
-      .walk(683.5, [h.wheelchairSpot], {
-        action: 'roll',
-        title: 'Onto the porch',
-        ys: [PORCH_Y],
-      })
-      .hold(712, 'seated', {
-        title: 'Home health visit on the porch',
-        heading: rel(home),
-      })
-      .walk(715, [h.door], {
-        action: 'roll',
-        title: 'Inside to rest',
-        ys: [PORCH_Y],
-      })
-      .hidden(CLOCK_END, 'Resting at home');
-    add(mrWong);
+    const rollPath = hospitalRollPath();
     const hospitalist = new Track(
       'hospitalist',
       'doctor',
@@ -1134,26 +1108,26 @@ export function communitySource(model: Facility): SourceExtension {
       })
       .hold(652.5, 'greet', { title: 'Ramp down', face: homePm.foot })
       .walk(653.5, [pushHome[0]], { title: 'Taking the wheelchair' })
-      .walk(670.5, pushHome.slice(1), {
+      .walk(663.5, pushHome.slice(1), {
         action: 'escort',
         title: 'Wheeling Mr. Wong to the porch ramp',
       })
-      .walk(677.5, [h.rampTopBehind], {
+      .walk(668.5, [h.rampTopBehind], {
         action: 'escort',
         title: 'Up the porch ramp',
         ys: [PORCH_Y],
       })
-      .walk(683.5, [h.porchDriver], {
+      .walk(672, [toward(h.door, h.rampTop, 0.9)], {
         action: 'escort',
-        title: 'Onto the porch',
+        title: 'To the front door',
         ys: [PORCH_Y],
       })
-      .hold(686, 'greet', {
-        title: 'Handing off to the family',
-        face: h.wheelchairSpot,
+      .hold(676, 'greet', {
+        title: 'Handing over the discharge folder',
+        face: h.door,
       })
       .walk(
-        708,
+        700,
         [
           h.rampTop,
           h.rampFoot,
@@ -1204,16 +1178,6 @@ export function communitySource(model: Facility): SourceExtension {
       .hold(708, 'conversation', { title: 'Call with Mrs. Wong', heading: 0 })
       .hold(CLOCK_END, 'document', { title: 'Logging the call', heading: 0 });
     add(nurseLine);
-    interact(
-      'after-hours-call',
-      'after-hours',
-      homeZone,
-      ['nurse-line-rn', 'home-participant'],
-      690,
-      708,
-      'Nurse line call · evening plan',
-      '24/7 nurse line and on-call coordination: the RN confirms the evening medicines and tomorrow’s pickup after Mr. Wong’s discharge.',
-    );
   }
 
   // --- People inside facility instances (generated casts) --------------------

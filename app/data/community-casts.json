@@ -1,6 +1,5479 @@
 {
  "version": 1,
  "casts": {
+  "home-lin": {
+   "actors": [
+    {
+     "id": "home-participant",
+     "role": "participant",
+     "variant": 3,
+     "label": "Mrs. Wong · at home",
+     "offset": 0,
+     "mobility": "walker",
+     "segments": [
+      {
+       "start": 0,
+       "end": 0.5,
+       "action": "idle",
+       "path": [
+        [
+         -3.3,
+         -15.4
+        ],
+        [
+         -3.3,
+         -15.4
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Away",
+       "visible": false
+      },
+      {
+       "start": 0.5,
+       "end": 5.684,
+       "action": "seated",
+       "path": [
+        [
+         -3.3,
+         -15.4
+        ],
+        [
+         -3.3,
+         -15.4
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Awake on her side of the bed, walker at hand",
+       "seated": true,
+       "seatId": "home-primary-bed"
+      },
+      {
+       "start": 5.684,
+       "end": 11.5,
+       "action": "walk",
+       "path": [
+        [
+         -3.3,
+         -15.4
+        ],
+        [
+         -2.6,
+         -15.4
+        ],
+        [
+         -2.6,
+         -14
+        ],
+        [
+         -2.4,
+         -13.8
+        ],
+        [
+         -1.6,
+         -13.8
+        ],
+        [
+         -0.2,
+         -15.2
+        ],
+        [
+         0.2,
+         -15.2
+        ],
+        [
+         0.4,
+         -15.4
+        ],
+        [
+         0.45,
+         -15.95
+        ]
+       ],
+       "heading": 1.571,
+       "title": "To Bath"
+      },
+      {
+       "start": 11.5,
+       "end": 15.655,
+       "action": "seated",
+       "path": [
+        [
+         0.45,
+         -15.95
+        ],
+        [
+         0.45,
+         -15.95
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Toilets on her own: raised seat, side and vertical bars",
+       "seated": true,
+       "seatId": "home-bath-toilet"
+      },
+      {
+       "start": 15.655,
+       "end": 17.5,
+       "action": "walk",
+       "path": [
+        [
+         0.45,
+         -15.95
+        ],
+        [
+         0.4,
+         -15.4
+        ],
+        [
+         0.4,
+         -15.2
+        ],
+        [
+         0,
+         -14.8
+        ],
+        [
+         0,
+         -14.2
+        ],
+        [
+         0.1,
+         -14.15
+        ]
+       ],
+       "heading": 4.712,
+       "title": "To Bath"
+      },
+      {
+       "start": 17.5,
+       "end": 19,
+       "action": "tabletop",
+       "path": [
+        [
+         0.1,
+         -14.15
+        ],
+        [
+         0.1,
+         -14.15
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Washes at the roll-under basin, mirror set low"
+      },
+      {
+       "start": 19,
+       "end": 20.727,
+       "action": "idle",
+       "path": [
+        [
+         0.1,
+         -14.15
+        ],
+        [
+         0.1,
+         -14.15
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Washes at the roll-under basin, mirror set low"
+      },
+      {
+       "start": 20.727,
+       "end": 27,
+       "action": "walk",
+       "path": [
+        [
+         0.1,
+         -14.15
+        ],
+        [
+         0,
+         -14.2
+        ],
+        [
+         -1.2,
+         -14.2
+        ],
+        [
+         -1.6,
+         -13.8
+        ],
+        [
+         -3,
+         -13.8
+        ],
+        [
+         -3.2,
+         -13.6
+        ],
+        [
+         -3.6,
+         -13.6
+        ],
+        [
+         -3.8,
+         -13.4
+        ],
+        [
+         -5.2,
+         -13.4
+        ],
+        [
+         -5.2,
+         -12.8
+        ],
+        [
+         -4.55,
+         -12.7
+        ]
+       ],
+       "heading": 1.571,
+       "title": "To Primary bedroom"
+      },
+      {
+       "start": 27,
+       "end": 32.437,
+       "action": "seated",
+       "path": [
+        [
+         -4.55,
+         -12.7
+        ],
+        [
+         -4.55,
+         -12.7
+        ]
+       ],
+       "heading": 3.142,
+       "title": "Dresses her top half, seated in the dressing chair",
+       "seated": true,
+       "seatId": "home-primary-chair"
+      },
+      {
+       "start": 32.437,
+       "end": 45,
+       "action": "walk",
+       "path": [
+        [
+         -4.55,
+         -12.7
+        ],
+        [
+         -5.2,
+         -12.8
+        ],
+        [
+         -5.2,
+         -13.4
+        ],
+        [
+         -3.8,
+         -13.4
+        ],
+        [
+         -3.4,
+         -13
+        ],
+        [
+         -3.4,
+         -12
+        ],
+        [
+         -3.2,
+         -11.8
+        ],
+        [
+         3.8,
+         -11.8
+        ],
+        [
+         4.2,
+         -12.2
+        ],
+        [
+         5,
+         -12.2
+        ],
+        [
+         5.2,
+         -12.4
+        ],
+        [
+         5.38,
+         -13.04
+        ]
+       ],
+       "heading": 3.142,
+       "title": "To Kitchen"
+      },
+      {
+       "start": 45,
+       "end": 52,
+       "action": "seated",
+       "path": [
+        [
+         5.38,
+         -13.04
+        ],
+        [
+         5.38,
+         -13.04
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Waits at the seated kitchen worktop",
+       "seated": true,
+       "seatId": "home-kitchen-chair"
+      },
+      {
+       "start": 52,
+       "end": 56,
+       "action": "conversation",
+       "path": [
+        [
+         5.38,
+         -13.04
+        ],
+        [
+         5.38,
+         -13.04
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Morning check-in with her aide",
+       "seated": true,
+       "seatId": "home-kitchen-chair"
+      },
+      {
+       "start": 56,
+       "end": 64,
+       "action": "tabletop",
+       "path": [
+        [
+         5.38,
+         -13.04
+        ],
+        [
+         5.38,
+         -13.04
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Breakfast and morning pills at the 0.76 m worktop",
+       "seated": true,
+       "seatId": "home-kitchen-chair"
+      },
+      {
+       "start": 64,
+       "end": 65.559,
+       "action": "seated",
+       "path": [
+        [
+         5.38,
+         -13.04
+        ],
+        [
+         5.38,
+         -13.04
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Breakfast and morning pills at the 0.76 m worktop",
+       "seated": true,
+       "seatId": "home-kitchen-chair"
+      },
+      {
+       "start": 65.559,
+       "end": 71.7,
+       "action": "walk",
+       "path": [
+        [
+         5.38,
+         -13.04
+        ],
+        [
+         5.2,
+         -12.4
+        ],
+        [
+         5,
+         -12.2
+        ],
+        [
+         4.2,
+         -12.2
+        ],
+        [
+         3.4,
+         -11.4
+        ],
+        [
+         3.4,
+         -10.6
+        ],
+        [
+         3.2,
+         -10.4
+        ],
+        [
+         3.2,
+         -10.2
+        ],
+        [
+         3,
+         -10
+        ],
+        [
+         3,
+         -9.8
+        ],
+        [
+         2.8,
+         -9.6
+        ],
+        [
+         2.8,
+         -9.4
+        ],
+        [
+         2.6,
+         -9.2
+        ],
+        [
+         2.6,
+         -8.8
+        ],
+        [
+         2.4,
+         -8.6
+        ],
+        [
+         2.1,
+         -8.01
+        ]
+       ],
+       "heading": 1.571,
+       "title": "To Living room"
+      },
+      {
+       "start": 71.7,
+       "end": 75.779,
+       "action": "seated",
+       "path": [
+        [
+         2.1,
+         -8.01
+        ],
+        [
+         2.1,
+         -8.01
+        ]
+       ],
+       "heading": 3.142,
+       "title": "Stockings and shoes on the entry bench",
+       "seated": true,
+       "seatId": "home-living-entry-bench"
+      },
+      {
+       "start": 75.779,
+       "end": 80.5,
+       "action": "walk",
+       "path": [
+        [
+         2.1,
+         -8.01
+        ],
+        [
+         2.4,
+         -8.6
+        ],
+        [
+         2.4,
+         -9.4
+        ],
+        [
+         2.2,
+         -9.6
+        ],
+        [
+         1,
+         -9.6
+        ],
+        [
+         0.6,
+         -9.2
+        ],
+        [
+         0.6,
+         -8.4
+        ],
+        [
+         0.4,
+         -8.2
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 3.142,
+       "title": "To the door"
+      },
+      {
+       "start": 80.5,
+       "end": 370,
+       "action": "idle",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 0,
+       "title": "Away",
+       "visible": false
+      },
+      {
+       "start": 370,
+       "end": 372.876,
+       "action": "walk",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -8.2
+        ],
+        [
+         0.8,
+         -8.2
+        ],
+        [
+         1.2,
+         -8.6
+        ],
+        [
+         2.2,
+         -8.6
+        ],
+        [
+         2.1,
+         -8.01
+        ]
+       ],
+       "heading": 0,
+       "title": "To Living room"
+      },
+      {
+       "start": 372.876,
+       "end": 381,
+       "action": "seated",
+       "path": [
+        [
+         2.1,
+         -8.01
+        ],
+        [
+         2.1,
+         -8.01
+        ]
+       ],
+       "heading": 3.142,
+       "title": "Resting on the entry bench after the clinic",
+       "seated": true,
+       "seatId": "home-living-entry-bench"
+      },
+      {
+       "start": 381,
+       "end": 385,
+       "action": "greet",
+       "path": [
+        [
+         2.1,
+         -8.01
+        ],
+        [
+         2.1,
+         -8.01
+        ]
+       ],
+       "heading": 3.142,
+       "title": "Wellness check with the meals driver at the door",
+       "seated": true,
+       "seatId": "home-living-entry-bench"
+      },
+      {
+       "start": 385,
+       "end": 385.496,
+       "action": "seated",
+       "path": [
+        [
+         2.1,
+         -8.01
+        ],
+        [
+         2.1,
+         -8.01
+        ]
+       ],
+       "heading": 3.142,
+       "title": "Wellness check with the meals driver at the door",
+       "seated": true,
+       "seatId": "home-living-entry-bench"
+      },
+      {
+       "start": 385.496,
+       "end": 396,
+       "action": "walk",
+       "path": [
+        [
+         2.1,
+         -8.01
+        ],
+        [
+         2.4,
+         -8.6
+        ],
+        [
+         2.4,
+         -9.6
+        ],
+        [
+         0,
+         -12
+        ],
+        [
+         0,
+         -12.8
+        ],
+        [
+         -1.2,
+         -14
+        ],
+        [
+         -1.2,
+         -14.2
+        ],
+        [
+         -1.4,
+         -14.4
+        ],
+        [
+         -1.4,
+         -15
+        ],
+        [
+         -1.2,
+         -15.2
+        ],
+        [
+         -1.2,
+         -15.4
+        ],
+        [
+         -1,
+         -15.4
+        ],
+        [
+         -0.8,
+         -15.6
+        ],
+        [
+         -0.2,
+         -15.6
+        ],
+        [
+         -0.2,
+         -15.4
+        ],
+        [
+         0.4,
+         -15.4
+        ],
+        [
+         0.45,
+         -15.95
+        ]
+       ],
+       "heading": 3.142,
+       "title": "To Bath"
+      },
+      {
+       "start": 396,
+       "end": 401.32,
+       "action": "seated",
+       "path": [
+        [
+         0.45,
+         -15.95
+        ],
+        [
+         0.45,
+         -15.95
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Toileting, her aide at the door",
+       "seated": true,
+       "seatId": "home-bath-toilet"
+      },
+      {
+       "start": 401.32,
+       "end": 404,
+       "action": "walk",
+       "path": [
+        [
+         0.45,
+         -15.95
+        ],
+        [
+         0.4,
+         -15.4
+        ],
+        [
+         -0.2,
+         -15.4
+        ],
+        [
+         -0.2,
+         -15.6
+        ],
+        [
+         -0.4,
+         -15.8
+        ],
+        [
+         -0.6,
+         -15.8
+        ],
+        [
+         -0.8,
+         -16
+        ],
+        [
+         -1,
+         -16
+        ],
+        [
+         -1.63,
+         -15.984
+        ]
+       ],
+       "heading": 4.712,
+       "title": "To Bath"
+      },
+      {
+       "start": 404,
+       "end": 412.947,
+       "action": "seated",
+       "path": [
+        [
+         -1.63,
+         -15.984
+        ],
+        [
+         -1.63,
+         -15.984
+        ]
+       ],
+       "heading": 0,
+       "title": "Assisted shower on the fold-down seat",
+       "seated": true,
+       "seatId": "home-bath-shower"
+      },
+      {
+       "start": 412.947,
+       "end": 419.5,
+       "action": "walk",
+       "path": [
+        [
+         -1.63,
+         -15.984
+        ],
+        [
+         -1.6,
+         -15.4
+        ],
+        [
+         -1.6,
+         -13.8
+        ],
+        [
+         -3.2,
+         -13.8
+        ],
+        [
+         -3.4,
+         -13.6
+        ],
+        [
+         -3.6,
+         -13.6
+        ],
+        [
+         -3.8,
+         -13.4
+        ],
+        [
+         -5.2,
+         -13.4
+        ],
+        [
+         -5.2,
+         -12.8
+        ],
+        [
+         -4.55,
+         -12.7
+        ]
+       ],
+       "heading": 0,
+       "title": "To Primary bedroom"
+      },
+      {
+       "start": 419.5,
+       "end": 427.402,
+       "action": "seated",
+       "path": [
+        [
+         -4.55,
+         -12.7
+        ],
+        [
+         -4.55,
+         -12.7
+        ]
+       ],
+       "heading": 3.142,
+       "title": "Dressing in the bedroom chair",
+       "seated": true,
+       "seatId": "home-primary-chair"
+      },
+      {
+       "start": 427.402,
+       "end": 438.5,
+       "action": "walk",
+       "path": [
+        [
+         -4.55,
+         -12.7
+        ],
+        [
+         -5.2,
+         -12.8
+        ],
+        [
+         -5.2,
+         -13.4
+        ],
+        [
+         -3.8,
+         -13.4
+        ],
+        [
+         -3.4,
+         -13
+        ],
+        [
+         -3.4,
+         -12
+        ],
+        [
+         -3.2,
+         -11.8
+        ],
+        [
+         1.4,
+         -11.8
+        ],
+        [
+         1.6,
+         -11.6
+        ],
+        [
+         1.8,
+         -11.6
+        ],
+        [
+         2,
+         -11.4
+        ],
+        [
+         2.2,
+         -11.4
+        ],
+        [
+         2.4,
+         -11.2
+        ],
+        [
+         2.6,
+         -11.2
+        ],
+        [
+         2.8,
+         -11
+        ],
+        [
+         3.2,
+         -11
+        ],
+        [
+         3.4,
+         -10.8
+        ],
+        [
+         4.08,
+         -10.7
+        ]
+       ],
+       "heading": 3.142,
+       "title": "To Dining nook"
+      },
+      {
+       "start": 438.5,
+       "end": 458,
+       "action": "tabletop",
+       "path": [
+        [
+         4.08,
+         -10.7
+        ],
+        [
+         4.08,
+         -10.7
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Lunch at the dining table",
+       "seated": true,
+       "seatId": "home-dining-chair-n"
+      },
+      {
+       "start": 458,
+       "end": 464,
+       "action": "conversation",
+       "path": [
+        [
+         4.08,
+         -10.7
+        ],
+        [
+         4.08,
+         -10.7
+        ]
+       ],
+       "heading": 1.571,
+       "title": "The OT explains her visit",
+       "seated": true,
+       "seatId": "home-dining-chair-n"
+      },
+      {
+       "start": 464,
+       "end": 470,
+       "action": "tabletop",
+       "path": [
+        [
+         4.08,
+         -10.7
+        ],
+        [
+         4.08,
+         -10.7
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Finishes lunch",
+       "seated": true,
+       "seatId": "home-dining-chair-n"
+      },
+      {
+       "start": 470,
+       "end": 471.589,
+       "action": "seated",
+       "path": [
+        [
+         4.08,
+         -10.7
+        ],
+        [
+         4.08,
+         -10.7
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Finishes lunch",
+       "seated": true,
+       "seatId": "home-dining-chair-n"
+      },
+      {
+       "start": 471.589,
+       "end": 479.5,
+       "action": "walk",
+       "path": [
+        [
+         4.08,
+         -10.7
+        ],
+        [
+         3.4,
+         -10.8
+        ],
+        [
+         2.4,
+         -11.8
+        ],
+        [
+         0.2,
+         -11.8
+        ],
+        [
+         0,
+         -12
+        ],
+        [
+         0,
+         -14.8
+        ],
+        [
+         0.2,
+         -15
+        ],
+        [
+         0.2,
+         -15.2
+        ],
+        [
+         0.4,
+         -15.4
+        ],
+        [
+         0.45,
+         -15.95
+        ]
+       ],
+       "heading": 1.571,
+       "title": "To Bath"
+      },
+      {
+       "start": 479.5,
+       "end": 485.648,
+       "action": "seated",
+       "path": [
+        [
+         0.45,
+         -15.95
+        ],
+        [
+         0.45,
+         -15.95
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Dry-run toilet transfer with the OT",
+       "seated": true,
+       "seatId": "home-bath-toilet"
+      },
+      {
+       "start": 485.648,
+       "end": 488.5,
+       "action": "walk",
+       "path": [
+        [
+         0.45,
+         -15.95
+        ],
+        [
+         0.4,
+         -15.4
+        ],
+        [
+         -1.6,
+         -15.4
+        ],
+        [
+         -1.63,
+         -15.984
+        ]
+       ],
+       "heading": 4.712,
+       "title": "To Bath"
+      },
+      {
+       "start": 488.5,
+       "end": 495.12,
+       "action": "seated",
+       "path": [
+        [
+         -1.63,
+         -15.984
+        ],
+        [
+         -1.63,
+         -15.984
+        ]
+       ],
+       "heading": 0,
+       "title": "Dry-run shower transfer: seat height and reach",
+       "seated": true,
+       "seatId": "home-bath-shower"
+      },
+      {
+       "start": 495.12,
+       "end": 500,
+       "action": "walk",
+       "path": [
+        [
+         -1.63,
+         -15.984
+        ],
+        [
+         -1.6,
+         -15.4
+        ],
+        [
+         -1.6,
+         -13.8
+        ],
+        [
+         -2.4,
+         -13.8
+        ],
+        [
+         -2.6,
+         -14
+        ],
+        [
+         -2.6,
+         -15.4
+        ],
+        [
+         -3.3,
+         -15.4
+        ]
+       ],
+       "heading": 0,
+       "title": "To Primary bedroom"
+      },
+      {
+       "start": 500,
+       "end": 510.5,
+       "action": "listen",
+       "path": [
+        [
+         -3.3,
+         -15.4
+        ],
+        [
+         -3.3,
+         -15.4
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Listens as the OT checks Mr. Wong's side of the bed",
+       "seated": true,
+       "seatId": "home-primary-bed"
+      },
+      {
+       "start": 510.5,
+       "end": 512.288,
+       "action": "seated",
+       "path": [
+        [
+         -3.3,
+         -15.4
+        ],
+        [
+         -3.3,
+         -15.4
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Listens as the OT checks Mr. Wong's side of the bed",
+       "seated": true,
+       "seatId": "home-primary-bed"
+      },
+      {
+       "start": 512.288,
+       "end": 521,
+       "action": "walk",
+       "path": [
+        [
+         -3.3,
+         -15.4
+        ],
+        [
+         -2.6,
+         -15.4
+        ],
+        [
+         -2.6,
+         -14
+        ],
+        [
+         -2.4,
+         -13.8
+        ],
+        [
+         -1.6,
+         -13.8
+        ],
+        [
+         -1,
+         -13.2
+        ],
+        [
+         -0.6,
+         -13.2
+        ],
+        [
+         -0.2,
+         -12.8
+        ],
+        [
+         0,
+         -12.8
+        ],
+        [
+         0,
+         -9.2
+        ],
+        [
+         -0.78,
+         -9.1
+        ]
+       ],
+       "heading": 1.571,
+       "title": "To Living room"
+      },
+      {
+       "start": 521,
+       "end": 640,
+       "action": "listen",
+       "path": [
+        [
+         -0.78,
+         -9.1
+        ],
+        [
+         -0.78,
+         -9.1
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Resting on the sofa, the TV news on",
+       "seated": true,
+       "seatId": "home-living-sofa"
+      },
+      {
+       "start": 640,
+       "end": 669,
+       "action": "listen",
+       "path": [
+        [
+         -0.78,
+         -9.1
+        ],
+        [
+         -0.78,
+         -9.1
+        ]
+       ],
+       "heading": 4.712,
+       "title": "The home health nurse arrives and sets up",
+       "seated": true,
+       "seatId": "home-living-sofa"
+      },
+      {
+       "start": 669,
+       "end": 676.5,
+       "action": "greet",
+       "path": [
+        [
+         -0.78,
+         -9.1
+        ],
+        [
+         -0.78,
+         -9.1
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Welcomes Mr. Wong home",
+       "seated": true,
+       "seatId": "home-living-sofa"
+      },
+      {
+       "start": 676.5,
+       "end": 690,
+       "action": "listen",
+       "path": [
+        [
+         -0.78,
+         -9.1
+        ],
+        [
+         -0.78,
+         -9.1
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Beside him while the nurse works",
+       "seated": true,
+       "seatId": "home-living-sofa"
+      },
+      {
+       "start": 690,
+       "end": 708,
+       "action": "listen",
+       "path": [
+        [
+         -0.78,
+         -9.1
+        ],
+        [
+         -0.78,
+         -9.1
+        ]
+       ],
+       "heading": 4.712,
+       "title": "On the nurse-line call (speakerphone)",
+       "seated": true,
+       "seatId": "home-living-sofa"
+      },
+      {
+       "start": 708,
+       "end": 720,
+       "action": "seated",
+       "path": [
+        [
+         -0.78,
+         -9.1
+        ],
+        [
+         -0.78,
+         -9.1
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Home together, the TV on",
+       "seated": true,
+       "seatId": "home-living-sofa"
+      }
+     ]
+    },
+    {
+     "id": "home-pca",
+     "role": "aide",
+     "variant": 2,
+     "label": "Personal care aide",
+     "offset": 0,
+     "segments": [
+      {
+       "start": 0,
+       "end": 44,
+       "action": "idle",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Away",
+       "visible": false
+      },
+      {
+       "start": 44,
+       "end": 50.536,
+       "action": "walk",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.8
+        ],
+        [
+         2.6,
+         -10
+        ],
+        [
+         2.6,
+         -10.2
+        ],
+        [
+         2.8,
+         -10.4
+        ],
+        [
+         2.8,
+         -10.6
+        ],
+        [
+         3,
+         -10.8
+        ],
+        [
+         3,
+         -11.2
+        ],
+        [
+         3.2,
+         -11.4
+        ],
+        [
+         3.2,
+         -13.2
+        ],
+        [
+         4.8,
+         -14.8
+        ],
+        [
+         4.8,
+         -15.2
+        ],
+        [
+         5,
+         -15.4
+        ],
+        [
+         5.085,
+         -15.35
+        ]
+       ],
+       "heading": 4.712,
+       "title": "To Kitchen"
+      },
+      {
+       "start": 50.536,
+       "end": 52,
+       "action": "idle",
+       "path": [
+        [
+         5.085,
+         -15.35
+        ],
+        [
+         5.085,
+         -15.35
+        ]
+       ],
+       "heading": 3.141,
+       "title": "Morning check-in: sleep, pain, dizziness, ankles"
+      },
+      {
+       "start": 52,
+       "end": 53.5,
+       "action": "conversation",
+       "path": [
+        [
+         5.085,
+         -15.35
+        ],
+        [
+         5.085,
+         -15.35
+        ]
+       ],
+       "heading": 3.141,
+       "title": "Morning check-in: sleep, pain, dizziness, ankles"
+      },
+      {
+       "start": 53.5,
+       "end": 54.7,
+       "action": "serve",
+       "path": [
+        [
+         5.085,
+         -15.35
+        ],
+        [
+         5.085,
+         -15.35
+        ]
+       ],
+       "heading": 3.141,
+       "title": "Reheats congee on the front-control range"
+      },
+      {
+       "start": 54.7,
+       "end": 56.279,
+       "action": "idle",
+       "path": [
+        [
+         5.085,
+         -15.35
+        ],
+        [
+         5.085,
+         -15.35
+        ]
+       ],
+       "heading": 3.141,
+       "title": "Reheats congee on the front-control range"
+      },
+      {
+       "start": 56.279,
+       "end": 57.5,
+       "action": "walk",
+       "path": [
+        [
+         5.085,
+         -15.35
+        ],
+        [
+         5,
+         -15.4
+        ],
+        [
+         5,
+         -14.2
+        ],
+        [
+         5.2,
+         -14
+        ],
+        [
+         5.2,
+         -13.75
+        ]
+       ],
+       "heading": 3.141,
+       "title": "To Kitchen"
+      },
+      {
+       "start": 57.5,
+       "end": 59.2,
+       "action": "serve",
+       "path": [
+        [
+         5.2,
+         -13.75
+        ],
+        [
+         5.2,
+         -13.75
+        ]
+       ],
+       "heading": 0.513,
+       "title": "Sets up breakfast and opens the morning blister"
+      },
+      {
+       "start": 59.2,
+       "end": 60.844,
+       "action": "idle",
+       "path": [
+        [
+         5.2,
+         -13.75
+        ],
+        [
+         5.2,
+         -13.75
+        ]
+       ],
+       "heading": 0.513,
+       "title": "Sets up breakfast and opens the morning blister"
+      },
+      {
+       "start": 60.844,
+       "end": 61.5,
+       "action": "walk",
+       "path": [
+        [
+         5.2,
+         -13.75
+        ],
+        [
+         5.2,
+         -14.6
+        ],
+        [
+         5.3,
+         -14.69
+        ]
+       ],
+       "heading": 0.513,
+       "title": "To Kitchen"
+      },
+      {
+       "start": 61.5,
+       "end": 64,
+       "action": "serve",
+       "path": [
+        [
+         5.3,
+         -14.69
+        ],
+        [
+         5.3,
+         -14.69
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Washes up and packs the clinic bag"
+      },
+      {
+       "start": 64,
+       "end": 66.716,
+       "action": "idle",
+       "path": [
+        [
+         5.3,
+         -14.69
+        ],
+        [
+         5.3,
+         -14.69
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Washes up and packs the clinic bag"
+      },
+      {
+       "start": 66.716,
+       "end": 71.7,
+       "action": "walk",
+       "path": [
+        [
+         5.3,
+         -14.69
+        ],
+        [
+         5.2,
+         -14.6
+        ],
+        [
+         3.4,
+         -12.8
+        ],
+        [
+         3.4,
+         -12.6
+        ],
+        [
+         3.2,
+         -12.4
+        ],
+        [
+         3.2,
+         -12
+        ],
+        [
+         2.8,
+         -11.6
+        ],
+        [
+         2.8,
+         -11.4
+        ],
+        [
+         2.6,
+         -11.2
+        ],
+        [
+         2.6,
+         -10.8
+        ],
+        [
+         2.4,
+         -10.6
+        ],
+        [
+         2.4,
+         -10.4
+        ],
+        [
+         2.2,
+         -10.2
+        ],
+        [
+         2.2,
+         -9.6
+        ],
+        [
+         1.8,
+         -9.2
+        ],
+        [
+         1.8,
+         -9
+        ],
+        [
+         1.6,
+         -8.8
+        ],
+        [
+         1.55,
+         -8.8
+        ]
+       ],
+       "heading": 1.571,
+       "title": "To Living room"
+      },
+      {
+       "start": 71.7,
+       "end": 74.2,
+       "action": "treat",
+       "path": [
+        [
+         1.55,
+         -8.8
+        ],
+        [
+         1.55,
+         -8.8
+        ]
+       ],
+       "heading": 0.608,
+       "title": "Stockings, Velcro shoes and jacket"
+      },
+      {
+       "start": 74.2,
+       "end": 75.757,
+       "action": "idle",
+       "path": [
+        [
+         1.55,
+         -8.8
+        ],
+        [
+         1.55,
+         -8.8
+        ]
+       ],
+       "heading": 0.608,
+       "title": "Stockings, Velcro shoes and jacket"
+      },
+      {
+       "start": 75.757,
+       "end": 77,
+       "action": "walk",
+       "path": [
+        [
+         1.55,
+         -8.8
+        ],
+        [
+         1.6,
+         -8.8
+        ],
+        [
+         1.4,
+         -8.6
+        ],
+        [
+         1.2,
+         -8.6
+        ],
+        [
+         0.4,
+         -7.8
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 0.608,
+       "title": "To the door"
+      },
+      {
+       "start": 77,
+       "end": 152.5,
+       "action": "idle",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 0,
+       "title": "Away",
+       "visible": false
+      },
+      {
+       "start": 152.5,
+       "end": 156.52,
+       "action": "walk",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.8
+        ],
+        [
+         0.8,
+         -8.2
+        ],
+        [
+         1,
+         -8.2
+        ],
+        [
+         1.4,
+         -8.6
+        ],
+        [
+         4.4,
+         -8.6
+        ],
+        [
+         4.6,
+         -8.8
+        ],
+        [
+         4.8,
+         -8.8
+        ],
+        [
+         5,
+         -9
+        ],
+        [
+         5.4,
+         -9
+        ],
+        [
+         5.6,
+         -9.2
+        ],
+        [
+         5.55,
+         -9.2
+        ]
+       ],
+       "heading": 0,
+       "title": "To Dining nook"
+      },
+      {
+       "start": 156.52,
+       "end": 158.5,
+       "action": "idle",
+       "path": [
+        [
+         5.55,
+         -9.2
+        ],
+        [
+         5.55,
+         -9.2
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Files next week's pill packs and logs this morning's blister"
+      },
+      {
+       "start": 158.5,
+       "end": 165,
+       "action": "document",
+       "path": [
+        [
+         5.55,
+         -9.2
+        ],
+        [
+         5.55,
+         -9.2
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Files next week's pill packs and logs this morning's blister"
+      },
+      {
+       "start": 165,
+       "end": 167.049,
+       "action": "idle",
+       "path": [
+        [
+         5.55,
+         -9.2
+        ],
+        [
+         5.55,
+         -9.2
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Files next week's pill packs and logs this morning's blister"
+      },
+      {
+       "start": 167.049,
+       "end": 176,
+       "action": "walk",
+       "path": [
+        [
+         5.55,
+         -9.2
+        ],
+        [
+         5.6,
+         -9.2
+        ],
+        [
+         5.4,
+         -9.4
+        ],
+        [
+         4.4,
+         -9.4
+        ],
+        [
+         3.2,
+         -10.6
+        ],
+        [
+         3,
+         -10.6
+        ],
+        [
+         2.8,
+         -10.8
+        ],
+        [
+         2.6,
+         -10.8
+        ],
+        [
+         2.4,
+         -11
+        ],
+        [
+         2.2,
+         -11
+        ],
+        [
+         2,
+         -11.2
+        ],
+        [
+         0,
+         -11.2
+        ],
+        [
+         -0.8,
+         -12
+        ],
+        [
+         -3.2,
+         -12
+        ],
+        [
+         -3.4,
+         -12.2
+        ],
+        [
+         -3.4,
+         -12.6
+        ],
+        [
+         -4.8,
+         -14
+        ],
+        [
+         -5,
+         -14
+        ],
+        [
+         -5,
+         -14.2
+        ],
+        [
+         -5.25,
+         -14.45
+        ]
+       ],
+       "heading": 1.571,
+       "title": "To Primary bedroom"
+      },
+      {
+       "start": 176,
+       "end": 196,
+       "action": "serve",
+       "path": [
+        [
+         -5.25,
+         -14.45
+        ],
+        [
+         -5.25,
+         -14.45
+        ]
+       ],
+       "heading": 2.373,
+       "title": "Remakes the bed with fresh linen; night light on his side"
+      },
+      {
+       "start": 196,
+       "end": 199.412,
+       "action": "idle",
+       "path": [
+        [
+         -5.25,
+         -14.45
+        ],
+        [
+         -5.25,
+         -14.45
+        ]
+       ],
+       "heading": 2.373,
+       "title": "Remakes the bed with fresh linen; night light on his side"
+      },
+      {
+       "start": 199.412,
+       "end": 207,
+       "action": "walk",
+       "path": [
+        [
+         -5.25,
+         -14.45
+        ],
+        [
+         -5,
+         -14.2
+        ],
+        [
+         -5,
+         -14
+        ],
+        [
+         -2.4,
+         -14
+        ],
+        [
+         -2.2,
+         -13.8
+        ],
+        [
+         -1.2,
+         -13.8
+        ],
+        [
+         0,
+         -12.6
+        ],
+        [
+         0,
+         -12.2
+        ],
+        [
+         0.2,
+         -12
+        ],
+        [
+         1.8,
+         -12
+        ],
+        [
+         2,
+         -12.2
+        ],
+        [
+         2,
+         -14.4
+        ],
+        [
+         2.2,
+         -14.6
+        ],
+        [
+         2.2,
+         -14.8
+        ]
+       ],
+       "heading": 2.373,
+       "title": "To Laundry & back door"
+      },
+      {
+       "start": 207,
+       "end": 215,
+       "action": "serve",
+       "path": [
+        [
+         2.2,
+         -14.8
+        ],
+        [
+         2.2,
+         -14.8
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Loads the washer (on a pedestal: no bending)"
+      },
+      {
+       "start": 215,
+       "end": 216.535,
+       "action": "idle",
+       "path": [
+        [
+         2.2,
+         -14.8
+        ],
+        [
+         2.2,
+         -14.8
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Loads the washer (on a pedestal: no bending)"
+      },
+      {
+       "start": 216.535,
+       "end": 221,
+       "action": "walk",
+       "path": [
+        [
+         2.2,
+         -14.8
+        ],
+        [
+         2,
+         -14.6
+        ],
+        [
+         2,
+         -12.2
+        ],
+        [
+         1.8,
+         -12
+        ],
+        [
+         0.2,
+         -12
+        ],
+        [
+         0,
+         -12.2
+        ],
+        [
+         0,
+         -12.6
+        ],
+        [
+         -0.2,
+         -12.8
+        ],
+        [
+         -0.2,
+         -13
+        ],
+        [
+         -0.4,
+         -13.2
+        ],
+        [
+         -0.4,
+         -13.6
+        ],
+        [
+         -0.6,
+         -13.8
+        ]
+       ],
+       "heading": 4.712,
+       "title": "To Bath"
+      },
+      {
+       "start": 221,
+       "end": 250,
+       "action": "serve",
+       "path": [
+        [
+         -0.6,
+         -13.8
+        ],
+        [
+         -0.6,
+         -13.8
+        ]
+       ],
+       "heading": 2.687,
+       "title": "Cleans the bathroom: toilet, basin, bars, shower seat, dry floor"
+      },
+      {
+       "start": 250,
+       "end": 253.204,
+       "action": "idle",
+       "path": [
+        [
+         -0.6,
+         -13.8
+        ],
+        [
+         -0.6,
+         -13.8
+        ]
+       ],
+       "heading": 2.687,
+       "title": "Cleans the bathroom: toilet, basin, bars, shower seat, dry floor"
+      },
+      {
+       "start": 253.204,
+       "end": 259,
+       "action": "walk",
+       "path": [
+        [
+         -0.6,
+         -13.8
+        ],
+        [
+         -0.4,
+         -13.6
+        ],
+        [
+         -0.4,
+         -13.4
+        ],
+        [
+         0,
+         -13
+        ],
+        [
+         0,
+         -12.2
+        ],
+        [
+         0.2,
+         -12
+        ],
+        [
+         3.2,
+         -12
+        ],
+        [
+         3.8,
+         -12.6
+        ],
+        [
+         3.8,
+         -12.8
+        ],
+        [
+         5,
+         -14
+        ],
+        [
+         5,
+         -14.4
+        ],
+        [
+         5.2,
+         -14.6
+        ],
+        [
+         5.3,
+         -14.69
+        ]
+       ],
+       "heading": 2.687,
+       "title": "To Kitchen"
+      },
+      {
+       "start": 259,
+       "end": 285,
+       "action": "serve",
+       "path": [
+        [
+         5.3,
+         -14.69
+        ],
+        [
+         5.3,
+         -14.69
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Kitchen: dishes, counters, fridge; trash out the back door"
+      },
+      {
+       "start": 285,
+       "end": 286.468,
+       "action": "idle",
+       "path": [
+        [
+         5.3,
+         -14.69
+        ],
+        [
+         5.3,
+         -14.69
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Kitchen: dishes, counters, fridge; trash out the back door"
+      },
+      {
+       "start": 286.468,
+       "end": 291,
+       "action": "walk",
+       "path": [
+        [
+         5.3,
+         -14.69
+        ],
+        [
+         5.2,
+         -14.6
+        ],
+        [
+         3.2,
+         -12.6
+        ],
+        [
+         3.2,
+         -12
+        ],
+        [
+         2.2,
+         -12
+        ],
+        [
+         2,
+         -12.2
+        ],
+        [
+         2,
+         -13.8
+        ],
+        [
+         2.2,
+         -14
+        ],
+        [
+         2.2,
+         -14.07
+        ]
+       ],
+       "heading": 1.571,
+       "title": "To Laundry & back door"
+      },
+      {
+       "start": 291,
+       "end": 297,
+       "action": "serve",
+       "path": [
+        [
+         2.2,
+         -14.07
+        ],
+        [
+         2.2,
+         -14.07
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Moves the wash to the dryer"
+      },
+      {
+       "start": 297,
+       "end": 299.932,
+       "action": "idle",
+       "path": [
+        [
+         2.2,
+         -14.07
+        ],
+        [
+         2.2,
+         -14.07
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Moves the wash to the dryer"
+      },
+      {
+       "start": 299.932,
+       "end": 303,
+       "action": "walk",
+       "path": [
+        [
+         2.2,
+         -14.07
+        ],
+        [
+         2.2,
+         -12.8
+        ],
+        [
+         2,
+         -12.6
+        ],
+        [
+         2,
+         -11
+        ],
+        [
+         1.8,
+         -10.8
+        ],
+        [
+         1.8,
+         -10.6
+        ],
+        [
+         1.6,
+         -10.4
+        ],
+        [
+         1.6,
+         -10
+        ],
+        [
+         1.4,
+         -9.8
+        ]
+       ],
+       "heading": 4.712,
+       "title": "To Living room"
+      },
+      {
+       "start": 303,
+       "end": 315,
+       "action": "serve",
+       "path": [
+        [
+         1.4,
+         -9.8
+        ],
+        [
+         1.4,
+         -9.8
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Vacuums and clears the route to the armchair"
+      },
+      {
+       "start": 315,
+       "end": 316.757,
+       "action": "idle",
+       "path": [
+        [
+         1.4,
+         -9.8
+        ],
+        [
+         1.4,
+         -9.8
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Vacuums and clears the route to the armchair"
+      },
+      {
+       "start": 316.757,
+       "end": 318.5,
+       "action": "walk",
+       "path": [
+        [
+         1.4,
+         -9.8
+        ],
+        [
+         1.2,
+         -9.6
+        ],
+        [
+         1.2,
+         -9.4
+        ],
+        [
+         1,
+         -9.2
+        ],
+        [
+         1,
+         -9
+        ],
+        [
+         0.8,
+         -8.8
+        ],
+        [
+         0.8,
+         -8.6
+        ],
+        [
+         0.6,
+         -8.4
+        ],
+        [
+         0.6,
+         -8
+        ],
+        [
+         0.4,
+         -7.8
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 4.712,
+       "title": "To the door"
+      },
+      {
+       "start": 318.5,
+       "end": 372.5,
+       "action": "idle",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 0,
+       "title": "Away",
+       "visible": false
+      },
+      {
+       "start": 372.5,
+       "end": 373.743,
+       "action": "walk",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.8
+        ],
+        [
+         1.2,
+         -8.6
+        ],
+        [
+         1.4,
+         -8.6
+        ],
+        [
+         1.6,
+         -8.8
+        ],
+        [
+         1.55,
+         -8.8
+        ]
+       ],
+       "heading": 0,
+       "title": "To Living room"
+      },
+      {
+       "start": 373.743,
+       "end": 375.5,
+       "action": "idle",
+       "path": [
+        [
+         1.55,
+         -8.8
+        ],
+        [
+         1.55,
+         -8.8
+        ]
+       ],
+       "heading": 0.608,
+       "title": "Takes her jacket and bag; reads the after-visit note"
+      },
+      {
+       "start": 375.5,
+       "end": 378.5,
+       "action": "serve",
+       "path": [
+        [
+         1.55,
+         -8.8
+        ],
+        [
+         1.55,
+         -8.8
+        ]
+       ],
+       "heading": 0.608,
+       "title": "Takes her jacket and bag; reads the after-visit note"
+      },
+      {
+       "start": 378.5,
+       "end": 380.023,
+       "action": "idle",
+       "path": [
+        [
+         1.55,
+         -8.8
+        ],
+        [
+         1.55,
+         -8.8
+        ]
+       ],
+       "heading": 0.608,
+       "title": "Takes her jacket and bag; reads the after-visit note"
+      },
+      {
+       "start": 380.023,
+       "end": 381,
+       "action": "walk",
+       "path": [
+        [
+         1.55,
+         -8.8
+        ],
+        [
+         1.6,
+         -8.8
+        ],
+        [
+         1.2,
+         -8.8
+        ],
+        [
+         1,
+         -8.6
+        ],
+        [
+         0.6,
+         -8.6
+        ],
+        [
+         0.4,
+         -8.4
+        ],
+        [
+         0.4,
+         -8.35
+        ]
+       ],
+       "heading": 0.608,
+       "title": "To Living room"
+      },
+      {
+       "start": 381,
+       "end": 386,
+       "action": "serve",
+       "path": [
+        [
+         0.4,
+         -8.35
+        ],
+        [
+         0.4,
+         -8.35
+        ]
+       ],
+       "heading": 0,
+       "title": "Takes the meal bag from the driver at the door"
+      },
+      {
+       "start": 386,
+       "end": 387.562,
+       "action": "idle",
+       "path": [
+        [
+         0.4,
+         -8.35
+        ],
+        [
+         0.4,
+         -8.35
+        ]
+       ],
+       "heading": 0,
+       "title": "Takes the meal bag from the driver at the door"
+      },
+      {
+       "start": 387.562,
+       "end": 393,
+       "action": "walk",
+       "path": [
+        [
+         0.4,
+         -8.35
+        ],
+        [
+         0.4,
+         -8.8
+        ],
+        [
+         0.6,
+         -9
+        ],
+        [
+         0.6,
+         -9.2
+        ],
+        [
+         1,
+         -9.6
+        ],
+        [
+         1,
+         -9.8
+        ],
+        [
+         3.2,
+         -12
+        ],
+        [
+         3.2,
+         -14.8
+        ],
+        [
+         3.4,
+         -15
+        ],
+        [
+         3.4,
+         -15.2
+        ],
+        [
+         3.44,
+         -15.25
+        ]
+       ],
+       "heading": 0,
+       "title": "To Kitchen"
+      },
+      {
+       "start": 393,
+       "end": 393.5,
+       "action": "serve",
+       "path": [
+        [
+         3.44,
+         -15.25
+        ],
+        [
+         3.44,
+         -15.25
+        ]
+       ],
+       "heading": 3.141,
+       "title": "Puts lunch in the fridge"
+      },
+      {
+       "start": 393.5,
+       "end": 395.323,
+       "action": "idle",
+       "path": [
+        [
+         3.44,
+         -15.25
+        ],
+        [
+         3.44,
+         -15.25
+        ]
+       ],
+       "heading": 3.141,
+       "title": "Puts lunch in the fridge"
+      },
+      {
+       "start": 395.323,
+       "end": 401.5,
+       "action": "walk",
+       "path": [
+        [
+         3.44,
+         -15.25
+        ],
+        [
+         3.4,
+         -15.2
+        ],
+        [
+         3.2,
+         -15
+        ],
+        [
+         3.2,
+         -12
+        ],
+        [
+         0.2,
+         -12
+        ],
+        [
+         0,
+         -12.2
+        ],
+        [
+         0,
+         -13.8
+        ],
+        [
+         -0.2,
+         -14
+        ],
+        [
+         -0.2,
+         -14.4
+        ],
+        [
+         -0.45,
+         -14.65
+        ]
+       ],
+       "heading": 3.141,
+       "title": "To Bath"
+      },
+      {
+       "start": 401.5,
+       "end": 402.5,
+       "action": "consult",
+       "path": [
+        [
+         -0.45,
+         -14.65
+        ],
+        [
+         -0.45,
+         -14.65
+        ]
+       ],
+       "heading": 3.339,
+       "title": "Guards her turn from the toilet to the shower seat"
+      },
+      {
+       "start": 402.5,
+       "end": 404.081,
+       "action": "idle",
+       "path": [
+        [
+         -0.45,
+         -14.65
+        ],
+        [
+         -0.45,
+         -14.65
+        ]
+       ],
+       "heading": 3.339,
+       "title": "Guards her turn from the toilet to the shower seat"
+      },
+      {
+       "start": 404.081,
+       "end": 405,
+       "action": "walk",
+       "path": [
+        [
+         -0.45,
+         -14.65
+        ],
+        [
+         -0.4,
+         -14.6
+        ],
+        [
+         -0.6,
+         -14.6
+        ],
+        [
+         -0.8,
+         -14.8
+        ],
+        [
+         -1,
+         -14.8
+        ],
+        [
+         -1.2,
+         -15
+        ],
+        [
+         -1.4,
+         -15
+        ],
+        [
+         -1.3,
+         -15.1
+        ]
+       ],
+       "heading": 3.339,
+       "title": "To Bath"
+      },
+      {
+       "start": 405,
+       "end": 409.8,
+       "action": "treat",
+       "path": [
+        [
+         -1.3,
+         -15.1
+        ],
+        [
+         -1.3,
+         -15.1
+        ]
+       ],
+       "heading": 3.498,
+       "title": "Shower help: hand shower, back, legs and feet; dries her"
+      },
+      {
+       "start": 409.8,
+       "end": 411.385,
+       "action": "idle",
+       "path": [
+        [
+         -1.3,
+         -15.1
+        ],
+        [
+         -1.3,
+         -15.1
+        ]
+       ],
+       "heading": 3.498,
+       "title": "Shower help: hand shower, back, legs and feet; dries her"
+      },
+      {
+       "start": 411.385,
+       "end": 412.5,
+       "action": "walk",
+       "path": [
+        [
+         -1.3,
+         -15.1
+        ],
+        [
+         -1.4,
+         -15
+        ],
+        [
+         -1.2,
+         -14.8
+        ],
+        [
+         -1.2,
+         -14.6
+        ],
+        [
+         -0.8,
+         -14.2
+        ],
+        [
+         -0.8,
+         -14
+        ],
+        [
+         -0.6,
+         -13.8
+        ]
+       ],
+       "heading": 3.498,
+       "title": "To Bath"
+      },
+      {
+       "start": 412.5,
+       "end": 416.676,
+       "action": "idle",
+       "path": [
+        [
+         -0.6,
+         -13.8
+        ],
+        [
+         -0.6,
+         -13.8
+        ]
+       ],
+       "heading": 2.687,
+       "title": "Steps aside so she can walk ahead to the bedroom"
+      },
+      {
+       "start": 416.676,
+       "end": 419.5,
+       "action": "walk",
+       "path": [
+        [
+         -0.6,
+         -13.8
+        ],
+        [
+         -3.8,
+         -13.8
+        ],
+        [
+         -4,
+         -13.6
+        ],
+        [
+         -4.4,
+         -13.6
+        ],
+        [
+         -4.6,
+         -13.4
+        ],
+        [
+         -4.55,
+         -13.35
+        ]
+       ],
+       "heading": 2.687,
+       "title": "To Primary bedroom"
+      },
+      {
+       "start": 419.5,
+       "end": 423,
+       "action": "treat",
+       "path": [
+        [
+         -4.55,
+         -13.35
+        ],
+        [
+         -4.55,
+         -13.35
+        ]
+       ],
+       "heading": 0,
+       "title": "Dressing: clothes, socks, slippers, hair, hearing aids"
+      },
+      {
+       "start": 423,
+       "end": 424.454,
+       "action": "idle",
+       "path": [
+        [
+         -4.55,
+         -13.35
+        ],
+        [
+         -4.55,
+         -13.35
+        ]
+       ],
+       "heading": 0,
+       "title": "Dressing: clothes, socks, slippers, hair, hearing aids"
+      },
+      {
+       "start": 424.454,
+       "end": 433,
+       "action": "walk",
+       "path": [
+        [
+         -4.55,
+         -13.35
+        ],
+        [
+         -4.6,
+         -13.4
+        ],
+        [
+         -3.8,
+         -13.4
+        ],
+        [
+         -3.4,
+         -13
+        ],
+        [
+         -3.4,
+         -12.2
+        ],
+        [
+         -3.2,
+         -12
+        ],
+        [
+         3.2,
+         -12
+        ],
+        [
+         3.2,
+         -13.4
+        ],
+        [
+         3.4,
+         -13.6
+        ],
+        [
+         3.4,
+         -13.8
+        ],
+        [
+         3.6,
+         -14
+        ],
+        [
+         3.6,
+         -14.2
+        ],
+        [
+         3.8,
+         -14.4
+        ],
+        [
+         3.8,
+         -14.6
+        ],
+        [
+         4,
+         -14.8
+        ],
+        [
+         4,
+         -15.2
+        ],
+        [
+         4.2,
+         -15.4
+        ],
+        [
+         4.285,
+         -15.4
+        ]
+       ],
+       "heading": 0,
+       "title": "To Kitchen"
+      },
+      {
+       "start": 433,
+       "end": 435,
+       "action": "serve",
+       "path": [
+        [
+         4.285,
+         -15.4
+        ],
+        [
+         4.285,
+         -15.4
+        ]
+       ],
+       "heading": 3.141,
+       "title": "Heats and plates the delivered lunch"
+      },
+      {
+       "start": 435,
+       "end": 436.079,
+       "action": "idle",
+       "path": [
+        [
+         4.285,
+         -15.4
+        ],
+        [
+         4.285,
+         -15.4
+        ]
+       ],
+       "heading": 3.141,
+       "title": "Heats and plates the delivered lunch"
+      },
+      {
+       "start": 436.079,
+       "end": 440.5,
+       "action": "walk",
+       "path": [
+        [
+         4.285,
+         -15.4
+        ],
+        [
+         4.2,
+         -15.4
+        ],
+        [
+         4.2,
+         -14.2
+        ],
+        [
+         3.8,
+         -13.8
+        ],
+        [
+         3.8,
+         -12.4
+        ],
+        [
+         3.6,
+         -12.2
+        ],
+        [
+         3.6,
+         -11.6
+        ],
+        [
+         3.2,
+         -11.2
+        ],
+        [
+         3.2,
+         -10.2
+        ],
+        [
+         3.4,
+         -10
+        ],
+        [
+         4,
+         -10
+        ],
+        [
+         3.95,
+         -10
+        ]
+       ],
+       "heading": 3.141,
+       "title": "To Dining nook"
+      },
+      {
+       "start": 440.5,
+       "end": 443.5,
+       "action": "serve",
+       "path": [
+        [
+         3.95,
+         -10
+        ],
+        [
+         3.95,
+         -10
+        ]
+       ],
+       "heading": 2.205,
+       "title": "Sets up lunch: containers open, chicken cut, water"
+      },
+      {
+       "start": 443.5,
+       "end": 445.8,
+       "action": "document",
+       "path": [
+        [
+         3.95,
+         -10
+        ],
+        [
+         3.95,
+         -10
+        ]
+       ],
+       "heading": 2.205,
+       "title": "Logs the visit: ADLs, skin check, food and fluids"
+      },
+      {
+       "start": 445.8,
+       "end": 447.326,
+       "action": "idle",
+       "path": [
+        [
+         3.95,
+         -10
+        ],
+        [
+         3.95,
+         -10
+        ]
+       ],
+       "heading": 2.205,
+       "title": "Logs the visit: ADLs, skin check, food and fluids"
+      },
+      {
+       "start": 447.326,
+       "end": 450.5,
+       "action": "walk",
+       "path": [
+        [
+         3.95,
+         -10
+        ],
+        [
+         4,
+         -10
+        ],
+        [
+         2.8,
+         -8.8
+        ],
+        [
+         2.4,
+         -8.8
+        ],
+        [
+         2.2,
+         -8.6
+        ],
+        [
+         1.4,
+         -8.6
+        ],
+        [
+         1,
+         -8.2
+        ],
+        [
+         0.8,
+         -8.2
+        ],
+        [
+         0.4,
+         -7.8
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 2.205,
+       "title": "To the door"
+      },
+      {
+       "start": 450.5,
+       "end": 720,
+       "action": "idle",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 0,
+       "title": "Away",
+       "visible": false
+      }
+     ]
+    },
+    {
+     "id": "home-ot",
+     "role": "ot",
+     "variant": 1,
+     "label": "Occupational therapist",
+     "offset": 0,
+     "segments": [
+      {
+       "start": 0,
+       "end": 453,
+       "action": "idle",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Away",
+       "visible": false
+      },
+      {
+       "start": 453,
+       "end": 456.608,
+       "action": "walk",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.8
+        ],
+        [
+         0.8,
+         -8.2
+        ],
+        [
+         1,
+         -8.2
+        ],
+        [
+         1.4,
+         -8.6
+        ],
+        [
+         3.4,
+         -8.6
+        ],
+        [
+         3.6,
+         -8.8
+        ],
+        [
+         3.8,
+         -8.8
+        ],
+        [
+         4,
+         -9
+        ],
+        [
+         4.4,
+         -9
+        ],
+        [
+         4.6,
+         -9.2
+        ],
+        [
+         4.55,
+         -9.25
+        ]
+       ],
+       "heading": 4.712,
+       "title": "To Dining nook"
+      },
+      {
+       "start": 456.608,
+       "end": 458.5,
+       "action": "idle",
+       "path": [
+        [
+         4.55,
+         -9.25
+        ],
+        [
+         4.55,
+         -9.25
+        ]
+       ],
+       "heading": 2.904,
+       "title": "Explains the visit: bars and ramp before Mr. Wong is home"
+      },
+      {
+       "start": 458.5,
+       "end": 463.5,
+       "action": "conversation",
+       "path": [
+        [
+         4.55,
+         -9.25
+        ],
+        [
+         4.55,
+         -9.25
+        ]
+       ],
+       "heading": 2.904,
+       "title": "Explains the visit: bars and ramp before Mr. Wong is home"
+      },
+      {
+       "start": 463.5,
+       "end": 467.599,
+       "action": "idle",
+       "path": [
+        [
+         4.55,
+         -9.25
+        ],
+        [
+         4.55,
+         -9.25
+        ]
+       ],
+       "heading": 2.904,
+       "title": "Explains the visit: bars and ramp before Mr. Wong is home"
+      },
+      {
+       "start": 467.599,
+       "end": 473,
+       "action": "walk",
+       "path": [
+        [
+         4.55,
+         -9.25
+        ],
+        [
+         4.6,
+         -9.2
+        ],
+        [
+         4.4,
+         -9.4
+        ],
+        [
+         4.2,
+         -9.4
+        ],
+        [
+         3.8,
+         -9.8
+        ],
+        [
+         3.6,
+         -9.8
+        ],
+        [
+         1.4,
+         -12
+        ],
+        [
+         0.2,
+         -12
+        ],
+        [
+         0,
+         -12.2
+        ],
+        [
+         0,
+         -12.6
+        ],
+        [
+         -0.4,
+         -13
+        ],
+        [
+         -0.8,
+         -13
+        ],
+        [
+         -1,
+         -13.2
+        ]
+       ],
+       "heading": 2.904,
+       "title": "To Bath"
+      },
+      {
+       "start": 473,
+       "end": 476,
+       "action": "consult",
+       "path": [
+        [
+         -1,
+         -13.2
+        ],
+        [
+         -1,
+         -13.2
+        ]
+       ],
+       "heading": 2.656,
+       "title": "Checks the bar layout against the plan from the doorway"
+      },
+      {
+       "start": 476,
+       "end": 488,
+       "action": "consult",
+       "path": [
+        [
+         -1,
+         -13.2
+        ],
+        [
+         -1,
+         -13.2
+        ]
+       ],
+       "heading": 2.656,
+       "title": "Watches her dry-run toilet transfer and turn"
+      },
+      {
+       "start": 488,
+       "end": 489.048,
+       "action": "idle",
+       "path": [
+        [
+         -1,
+         -13.2
+        ],
+        [
+         -1,
+         -13.2
+        ]
+       ],
+       "heading": 2.656,
+       "title": "Watches her dry-run toilet transfer and turn"
+      },
+      {
+       "start": 489.048,
+       "end": 490,
+       "action": "walk",
+       "path": [
+        [
+         -1,
+         -13.2
+        ],
+        [
+         -1,
+         -14
+        ],
+        [
+         -0.8,
+         -14.2
+        ],
+        [
+         -0.8,
+         -14.4
+        ],
+        [
+         -0.85,
+         -14.4
+        ]
+       ],
+       "heading": 2.656,
+       "title": "To Bath"
+      },
+      {
+       "start": 490,
+       "end": 492.5,
+       "action": "consult",
+       "path": [
+        [
+         -0.85,
+         -14.4
+        ],
+        [
+         -0.85,
+         -14.4
+        ]
+       ],
+       "heading": 3.6,
+       "title": "Checks the seat height, hand-shower reach and grip"
+      },
+      {
+       "start": 492.5,
+       "end": 494.332,
+       "action": "idle",
+       "path": [
+        [
+         -0.85,
+         -14.4
+        ],
+        [
+         -0.85,
+         -14.4
+        ]
+       ],
+       "heading": 3.6,
+       "title": "Checks the seat height, hand-shower reach and grip"
+      },
+      {
+       "start": 494.332,
+       "end": 498,
+       "action": "walk",
+       "path": [
+        [
+         -0.85,
+         -14.4
+        ],
+        [
+         -0.8,
+         -14.4
+        ],
+        [
+         -1.2,
+         -14.4
+        ],
+        [
+         -1.8,
+         -13.8
+        ],
+        [
+         -4,
+         -13.8
+        ],
+        [
+         -4.2,
+         -14
+        ],
+        [
+         -5,
+         -14
+        ],
+        [
+         -5.2,
+         -14.2
+        ],
+        [
+         -5.2,
+         -14.4
+        ],
+        [
+         -5.25,
+         -14.45
+        ]
+       ],
+       "heading": 3.6,
+       "title": "To Primary bedroom"
+      },
+      {
+       "start": 498,
+       "end": 510.5,
+       "action": "consult",
+       "path": [
+        [
+         -5.25,
+         -14.45
+        ],
+        [
+         -5.25,
+         -14.45
+        ]
+       ],
+       "heading": 2.373,
+       "title": "Checks Mr. Wong's side: height, handle, turning circle, night light"
+      },
+      {
+       "start": 510.5,
+       "end": 512.348,
+       "action": "idle",
+       "path": [
+        [
+         -5.25,
+         -14.45
+        ],
+        [
+         -5.25,
+         -14.45
+        ]
+       ],
+       "heading": 2.373,
+       "title": "Checks Mr. Wong's side: height, handle, turning circle, night light"
+      },
+      {
+       "start": 512.348,
+       "end": 520,
+       "action": "walk",
+       "path": [
+        [
+         -5.25,
+         -14.45
+        ],
+        [
+         -5,
+         -14.2
+        ],
+        [
+         -5,
+         -14
+        ],
+        [
+         -4.2,
+         -13.2
+        ],
+        [
+         -4,
+         -13.2
+        ],
+        [
+         -3.4,
+         -12.6
+        ],
+        [
+         -3.4,
+         -12.2
+        ],
+        [
+         -2.8,
+         -11.6
+        ],
+        [
+         -0.4,
+         -11.6
+        ],
+        [
+         -0.2,
+         -11.4
+        ],
+        [
+         -0.2,
+         -11
+        ],
+        [
+         0,
+         -10.8
+        ],
+        [
+         0,
+         -8.6
+        ],
+        [
+         0.2,
+         -8.4
+        ],
+        [
+         0.2,
+         -8
+        ],
+        [
+         0.4,
+         -7.8
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 2.373,
+       "title": "To the door"
+      },
+      {
+       "start": 520,
+       "end": 551,
+       "action": "idle",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 0,
+       "title": "Away",
+       "visible": false
+      },
+      {
+       "start": 551,
+       "end": 556.169,
+       "action": "walk",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -11.8
+        ],
+        [
+         0,
+         -12.2
+        ],
+        [
+         0,
+         -14.6
+        ],
+        [
+         0.05,
+         -14.65
+        ]
+       ],
+       "heading": 0,
+       "title": "To Bath"
+      },
+      {
+       "start": 556.169,
+       "end": 558,
+       "action": "idle",
+       "path": [
+        [
+         0.05,
+         -14.65
+        ],
+        [
+         0.05,
+         -14.65
+        ]
+       ],
+       "heading": 2.628,
+       "title": "Checks the new bar and signs the work order"
+      },
+      {
+       "start": 558,
+       "end": 564,
+       "action": "consult",
+       "path": [
+        [
+         0.05,
+         -14.65
+        ],
+        [
+         0.05,
+         -14.65
+        ]
+       ],
+       "heading": 2.628,
+       "title": "Checks the new bar and signs the work order"
+      },
+      {
+       "start": 564,
+       "end": 565.511,
+       "action": "idle",
+       "path": [
+        [
+         0.05,
+         -14.65
+        ],
+        [
+         0.05,
+         -14.65
+        ]
+       ],
+       "heading": 2.628,
+       "title": "Checks the new bar and signs the work order"
+      },
+      {
+       "start": 565.511,
+       "end": 571.5,
+       "action": "walk",
+       "path": [
+        [
+         0.05,
+         -14.65
+        ],
+        [
+         0,
+         -14.6
+        ],
+        [
+         0,
+         -12.2
+        ],
+        [
+         1.8,
+         -10.4
+        ],
+        [
+         2,
+         -10.4
+        ],
+        [
+         2.2,
+         -10.2
+        ],
+        [
+         3,
+         -10.2
+        ],
+        [
+         3.6,
+         -9.6
+        ],
+        [
+         3.8,
+         -9.6
+        ],
+        [
+         4,
+         -9.4
+        ],
+        [
+         4.4,
+         -9.4
+        ],
+        [
+         4.6,
+         -9.2
+        ],
+        [
+         4.55,
+         -9.25
+        ]
+       ],
+       "heading": 2.628,
+       "title": "To Dining nook"
+      },
+      {
+       "start": 571.5,
+       "end": 577,
+       "action": "document",
+       "path": [
+        [
+         4.55,
+         -9.25
+        ],
+        [
+         4.55,
+         -9.25
+        ]
+       ],
+       "heading": 2.904,
+       "title": "Writes the home-safety note; what Mr. Wong may need"
+      },
+      {
+       "start": 577,
+       "end": 578.892,
+       "action": "idle",
+       "path": [
+        [
+         4.55,
+         -9.25
+        ],
+        [
+         4.55,
+         -9.25
+        ]
+       ],
+       "heading": 2.904,
+       "title": "Writes the home-safety note; what Mr. Wong may need"
+      },
+      {
+       "start": 578.892,
+       "end": 582.5,
+       "action": "walk",
+       "path": [
+        [
+         4.55,
+         -9.25
+        ],
+        [
+         4.6,
+         -9.2
+        ],
+        [
+         4,
+         -9.2
+        ],
+        [
+         3.4,
+         -8.6
+        ],
+        [
+         1.4,
+         -8.6
+        ],
+        [
+         1,
+         -8.2
+        ],
+        [
+         0.8,
+         -8.2
+        ],
+        [
+         0.4,
+         -7.8
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 2.904,
+       "title": "To the door"
+      },
+      {
+       "start": 582.5,
+       "end": 720,
+       "action": "idle",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 0,
+       "title": "Away",
+       "visible": false
+      }
+     ]
+    },
+    {
+     "id": "home-installer",
+     "role": "aide",
+     "variant": 4,
+     "label": "Home-mods installer",
+     "offset": 0,
+     "segments": [
+      {
+       "start": 0,
+       "end": 456,
+       "action": "idle",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Away",
+       "visible": false
+      },
+      {
+       "start": 456,
+       "end": 464.388,
+       "action": "walk",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.8
+        ],
+        [
+         0.2,
+         -8
+        ],
+        [
+         0.2,
+         -8.2
+        ],
+        [
+         0,
+         -8.4
+        ],
+        [
+         0,
+         -10.8
+        ],
+        [
+         -0.2,
+         -11
+        ],
+        [
+         -0.2,
+         -11.4
+        ],
+        [
+         -2.6,
+         -11.4
+        ],
+        [
+         -3.4,
+         -12.2
+        ],
+        [
+         -3.4,
+         -12.6
+        ],
+        [
+         -4.8,
+         -14
+        ],
+        [
+         -5,
+         -14
+        ],
+        [
+         -5,
+         -15.2
+        ],
+        [
+         -5.2,
+         -15.4
+        ],
+        [
+         -5.3,
+         -15.4
+        ]
+       ],
+       "heading": 4.712,
+       "title": "To Primary bedroom"
+      },
+      {
+       "start": 464.388,
+       "end": 466,
+       "action": "idle",
+       "path": [
+        [
+         -5.3,
+         -15.4
+        ],
+        [
+         -5.3,
+         -15.4
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Fits Mr. Wong's bed handle; night lights bed to bath"
+      },
+      {
+       "start": 466,
+       "end": 514.5,
+       "action": "craft",
+       "path": [
+        [
+         -5.3,
+         -15.4
+        ],
+        [
+         -5.3,
+         -15.4
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Fits Mr. Wong's bed handle; night lights bed to bath"
+      },
+      {
+       "start": 514.5,
+       "end": 516.375,
+       "action": "idle",
+       "path": [
+        [
+         -5.3,
+         -15.4
+        ],
+        [
+         -5.3,
+         -15.4
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Fits Mr. Wong's bed handle; night lights bed to bath"
+      },
+      {
+       "start": 516.375,
+       "end": 522,
+       "action": "walk",
+       "path": [
+        [
+         -5.3,
+         -15.4
+        ],
+        [
+         -5.2,
+         -15.4
+        ],
+        [
+         -5,
+         -15.2
+        ],
+        [
+         -5,
+         -14
+        ],
+        [
+         -2.4,
+         -14
+        ],
+        [
+         -2.2,
+         -13.8
+        ],
+        [
+         -1.8,
+         -13.8
+        ],
+        [
+         -1.6,
+         -14
+        ],
+        [
+         -1.4,
+         -14
+        ],
+        [
+         -1.2,
+         -14.2
+        ],
+        [
+         -1,
+         -14.2
+        ],
+        [
+         -0.8,
+         -14.4
+        ],
+        [
+         -0.4,
+         -14.4
+        ],
+        [
+         0,
+         -14.8
+        ],
+        [
+         0.4,
+         -14.8
+        ],
+        [
+         0.6,
+         -15
+        ],
+        [
+         0.55,
+         -15.1
+        ]
+       ],
+       "heading": 1.571,
+       "title": "To Bath"
+      },
+      {
+       "start": 522,
+       "end": 540,
+       "action": "craft",
+       "path": [
+        [
+         0.55,
+         -15.1
+        ],
+        [
+         0.55,
+         -15.1
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Fits the swing-up grab bar and hangs his weight on it"
+      },
+      {
+       "start": 540,
+       "end": 551,
+       "action": "craft",
+       "path": [
+        [
+         0.55,
+         -15.1
+        ],
+        [
+         0.55,
+         -15.1
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Vacuums the drill dust and packs the kit"
+      },
+      {
+       "start": 551,
+       "end": 558,
+       "action": "idle",
+       "path": [
+        [
+         0.55,
+         -15.1
+        ],
+        [
+         0.55,
+         -15.1
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Waits for the OT's sign-off"
+      },
+      {
+       "start": 558,
+       "end": 565,
+       "action": "consult",
+       "path": [
+        [
+         0.55,
+         -15.1
+        ],
+        [
+         0.55,
+         -15.1
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Sign-off with the OT"
+      },
+      {
+       "start": 565,
+       "end": 565.459,
+       "action": "idle",
+       "path": [
+        [
+         0.55,
+         -15.1
+        ],
+        [
+         0.55,
+         -15.1
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Sign-off with the OT"
+      },
+      {
+       "start": 565.459,
+       "end": 572.5,
+       "action": "walk",
+       "path": [
+        [
+         0.55,
+         -15.1
+        ],
+        [
+         0.6,
+         -15
+        ],
+        [
+         0.6,
+         -15.2
+        ],
+        [
+         0.4,
+         -15.4
+        ],
+        [
+         -0.4,
+         -15.4
+        ],
+        [
+         -0.8,
+         -15
+        ],
+        [
+         -0.8,
+         -13.4
+        ],
+        [
+         0,
+         -12.6
+        ],
+        [
+         0,
+         -8.6
+        ],
+        [
+         0.2,
+         -8.4
+        ],
+        [
+         0.2,
+         -8
+        ],
+        [
+         0.4,
+         -7.8
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 1.571,
+       "title": "To the door"
+      },
+      {
+       "start": 572.5,
+       "end": 720,
+       "action": "idle",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 0,
+       "title": "Away",
+       "visible": false
+      }
+     ]
+    },
+    {
+     "id": "home-rn",
+     "role": "nurse",
+     "variant": 5,
+     "label": "Home health nurse",
+     "offset": 0,
+     "segments": [
+      {
+       "start": 0,
+       "end": 642.5,
+       "action": "idle",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Away",
+       "visible": false
+      },
+      {
+       "start": 642.5,
+       "end": 649.258,
+       "action": "walk",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.8
+        ],
+        [
+         3.6,
+         -11
+        ],
+        [
+         3.6,
+         -11.2
+        ],
+        [
+         3.8,
+         -11.4
+        ],
+        [
+         3.8,
+         -11.6
+        ],
+        [
+         4,
+         -11.8
+        ],
+        [
+         4,
+         -12.8
+        ],
+        [
+         4.8,
+         -13.6
+        ],
+        [
+         4.8,
+         -13.8
+        ],
+        [
+         5,
+         -14
+        ],
+        [
+         5,
+         -14.4
+        ],
+        [
+         5.2,
+         -14.6
+        ],
+        [
+         5.3,
+         -14.69
+        ]
+       ],
+       "heading": 4.712,
+       "title": "To Kitchen"
+      },
+      {
+       "start": 649.258,
+       "end": 651,
+       "action": "idle",
+       "path": [
+        [
+         5.3,
+         -14.69
+        ],
+        [
+         5.3,
+         -14.69
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Washes her hands"
+      },
+      {
+       "start": 651,
+       "end": 653,
+       "action": "serve",
+       "path": [
+        [
+         5.3,
+         -14.69
+        ],
+        [
+         5.3,
+         -14.69
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Washes her hands"
+      },
+      {
+       "start": 653,
+       "end": 654.755,
+       "action": "idle",
+       "path": [
+        [
+         5.3,
+         -14.69
+        ],
+        [
+         5.3,
+         -14.69
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Washes her hands"
+      },
+      {
+       "start": 654.755,
+       "end": 659,
+       "action": "walk",
+       "path": [
+        [
+         5.3,
+         -14.69
+        ],
+        [
+         5.2,
+         -14.6
+        ],
+        [
+         5.2,
+         -14
+        ],
+        [
+         4.6,
+         -13.4
+        ],
+        [
+         4.6,
+         -12.2
+        ],
+        [
+         3.6,
+         -11.2
+        ],
+        [
+         3.6,
+         -10.2
+        ],
+        [
+         3.8,
+         -10
+        ],
+        [
+         4,
+         -10
+        ],
+        [
+         3.95,
+         -10
+        ]
+       ],
+       "heading": 1.571,
+       "title": "To Dining nook"
+      },
+      {
+       "start": 659,
+       "end": 665.5,
+       "action": "document",
+       "path": [
+        [
+         3.95,
+         -10
+        ],
+        [
+         3.95,
+         -10
+        ]
+       ],
+       "heading": 2.205,
+       "title": "Lays out BP cuff and oximeter; reads the discharge summary"
+      },
+      {
+       "start": 665.5,
+       "end": 666.976,
+       "action": "idle",
+       "path": [
+        [
+         3.95,
+         -10
+        ],
+        [
+         3.95,
+         -10
+        ]
+       ],
+       "heading": 2.205,
+       "title": "Lays out BP cuff and oximeter; reads the discharge summary"
+      },
+      {
+       "start": 666.976,
+       "end": 669,
+       "action": "walk",
+       "path": [
+        [
+         3.95,
+         -10
+        ],
+        [
+         4,
+         -10
+        ],
+        [
+         1.6,
+         -10
+        ],
+        [
+         1.4,
+         -9.8
+        ]
+       ],
+       "heading": 2.205,
+       "title": "To Living room"
+      },
+      {
+       "start": 669,
+       "end": 674,
+       "action": "greet",
+       "path": [
+        [
+         1.4,
+         -9.8
+        ],
+        [
+         1.4,
+         -9.8
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Meets Mr. Wong as he rolls in"
+      },
+      {
+       "start": 674,
+       "end": 675.525,
+       "action": "idle",
+       "path": [
+        [
+         1.4,
+         -9.8
+        ],
+        [
+         1.4,
+         -9.8
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Meets Mr. Wong as he rolls in"
+      },
+      {
+       "start": 675.525,
+       "end": 677,
+       "action": "walk",
+       "path": [
+        [
+         1.4,
+         -9.8
+        ],
+        [
+         0.4,
+         -8.8
+        ],
+        [
+         0.2,
+         -8.8
+        ],
+        [
+         0,
+         -8.6
+        ],
+        [
+         -0.05,
+         -8.68
+        ]
+       ],
+       "heading": 4.712,
+       "title": "To Living room"
+      },
+      {
+       "start": 677,
+       "end": 683.5,
+       "action": "consult",
+       "path": [
+        [
+         -0.05,
+         -8.68
+        ],
+        [
+         -0.05,
+         -8.68
+        ]
+       ],
+       "heading": 5.274,
+       "title": "Brakes on, footplates up: checks his stand-pivot technique"
+      },
+      {
+       "start": 683.5,
+       "end": 692,
+       "action": "treat",
+       "path": [
+        [
+         -0.05,
+         -8.68
+        ],
+        [
+         -0.05,
+         -8.68
+        ]
+       ],
+       "heading": 5.274,
+       "title": "Vitals: blood pressure, pulse, oxygen, temperature; skin check"
+      },
+      {
+       "start": 692,
+       "end": 698,
+       "action": "document",
+       "path": [
+        [
+         -0.05,
+         -8.68
+        ],
+        [
+         -0.05,
+         -8.68
+        ]
+       ],
+       "heading": 5.274,
+       "title": "Medication reconciliation with the pill pack; calls the pharmacy"
+      },
+      {
+       "start": 698,
+       "end": 700,
+       "action": "conversation",
+       "path": [
+        [
+         -0.05,
+         -8.68
+        ],
+        [
+         -0.05,
+         -8.68
+        ]
+       ],
+       "heading": 5.274,
+       "title": "Warning signs and the 24/7 nurse-line number"
+      },
+      {
+       "start": 700,
+       "end": 707.067,
+       "action": "idle",
+       "path": [
+        [
+         -0.05,
+         -8.68
+        ],
+        [
+         -0.05,
+         -8.68
+        ]
+       ],
+       "heading": 5.274,
+       "title": "Warning signs and the 24/7 nurse-line number"
+      },
+      {
+       "start": 707.067,
+       "end": 708,
+       "action": "walk",
+       "path": [
+        [
+         -0.05,
+         -8.68
+        ],
+        [
+         0,
+         -8.6
+        ],
+        [
+         0.2,
+         -8.4
+        ],
+        [
+         0.2,
+         -8
+        ],
+        [
+         0.4,
+         -7.8
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 5.274,
+       "title": "To the door"
+      },
+      {
+       "start": 708,
+       "end": 720,
+       "action": "idle",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 0,
+       "title": "Away",
+       "visible": false
+      }
+     ]
+    },
+    {
+     "id": "hospital-participant",
+     "role": "participant",
+     "variant": 8,
+     "label": "Mr. Wong · inpatient, discharged home",
+     "offset": 0,
+     "mobility": "wheelchair",
+     "segments": [
+      {
+       "start": 0,
+       "end": 672,
+       "action": "idle",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Away",
+       "visible": false
+      },
+      {
+       "start": 672,
+       "end": 673.828,
+       "action": "roll",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -8.2
+        ],
+        [
+         -0.8,
+         -8.2
+        ],
+        [
+         -0.78,
+         -8.22
+        ]
+       ],
+       "heading": 4.712,
+       "title": "To Living room"
+      },
+      {
+       "start": 673.828,
+       "end": 683.5,
+       "action": "seated",
+       "path": [
+        [
+         -0.78,
+         -8.22
+        ],
+        [
+         -0.78,
+         -8.22
+        ]
+       ],
+       "heading": 4.362,
+       "title": "Parked beside his armchair, brakes on",
+       "seated": true
+      },
+      {
+       "start": 683.5,
+       "end": 690,
+       "action": "seated",
+       "path": [
+        [
+         -0.78,
+         -8.22
+        ],
+        [
+         -0.78,
+         -8.22
+        ]
+       ],
+       "heading": 4.362,
+       "title": "Vitals in his wheelchair",
+       "seated": true
+      },
+      {
+       "start": 690,
+       "end": 708,
+       "action": "conversation",
+       "path": [
+        [
+         -0.78,
+         -8.22
+        ],
+        [
+         -0.78,
+         -8.22
+        ]
+       ],
+       "heading": 4.362,
+       "title": "Nurse-line call on speakerphone",
+       "seated": true
+      },
+      {
+       "start": 708,
+       "end": 720,
+       "action": "seated",
+       "path": [
+        [
+         -0.78,
+         -8.22
+        ],
+        [
+         -0.78,
+         -8.22
+        ]
+       ],
+       "heading": 4.362,
+       "title": "Home with Mrs. Wong, the TV on",
+       "seated": true
+      }
+     ]
+    }
+   ],
+   "interactions": [
+    {
+     "id": "home-personal-care",
+     "label": "Mrs. Wong · morning personal care at home",
+     "category": "home",
+     "description": "She toilets, washes and dresses her top half on her own in the accessible bath and bedroom; her aide arrives at 8:29, checks how she slept and gets her breakfast and morning pills at the seated worktop before her stockings, shoes and the van. An illustrative composite: in another care plan the aide could start at 8:00.",
+     "actorIds": [
+      "home-participant",
+      "home-pca"
+     ],
+     "start": 30,
+     "end": 72
+    },
+    {
+     "id": "home-return",
+     "label": "Mrs. Wong · home from the clinic",
+     "category": "home",
+     "description": "The van ramp comes down at 11:40, her aide walks beside her across the drive and up the ramp, and she comes in over the flush threshold to rest on the entry bench.",
+     "actorIds": [
+      "home-participant",
+      "home-pca",
+      "community-driver"
+     ],
+     "start": 330,
+     "end": 373
+    },
+    {
+     "id": "home-toileting",
+     "label": "Mrs. Wong · toileting help and transfer",
+     "category": "home",
+     "description": "She manages her own clothing on the raised toilet; the aide waits at the door, helps her stand with the grab bars and guards the turn to the shower seat.",
+     "actorIds": [
+      "home-participant",
+      "home-pca"
+     ],
+     "start": 397,
+     "end": 404
+    },
+    {
+     "id": "home-bathing",
+     "label": "Mrs. Wong · assisted shower",
+     "category": "home",
+     "description": "In the curbless roll-in shower: the aide tests the water, hands her the hand shower for her face and front, washes her back, legs and feet, checks heels and skin folds, then dries her on the seat.",
+     "actorIds": [
+      "home-participant",
+      "home-pca"
+     ],
+     "start": 404,
+     "end": 411
+    },
+    {
+     "id": "home-dressing-pm",
+     "label": "Mrs. Wong · dressing in the bedroom",
+     "category": "home",
+     "description": "Clean home clothes from the wardrobe, socks and slippers, hair combed and hearing aids back in, seated in the armchair-height dressing chair.",
+     "actorIds": [
+      "home-participant",
+      "home-pca"
+     ],
+     "start": 419.5,
+     "end": 425.5
+    },
+    {
+     "id": "home-meal-meds",
+     "label": "Breakfast and morning pills",
+     "category": "home",
+     "description": "The aide reheats congee on the front-control range, sets the bowl on a non-slip mat with a built-up spoon at the 0.76 m seated worktop, opens today's morning blister from the weekly pill pack and watches her take it with water.",
+     "actorIds": [
+      "home-pca",
+      "home-participant"
+     ],
+     "start": 52,
+     "end": 64
+    },
+    {
+     "id": "home-dressing-am",
+     "label": "Mrs. Wong · stockings and shoes",
+     "category": "home",
+     "description": "At the 0.45 m entry bench the aide puts on her compression stockings and Velcro shoes and helps with her jacket before the van.",
+     "actorIds": [
+      "home-pca",
+      "home-participant"
+     ],
+     "start": 71.7,
+     "end": 74.2
+    },
+    {
+     "id": "home-housekeeping",
+     "label": "Housekeeping and laundry",
+     "category": "home",
+     "description": "While Mrs. Wong is at the specialist the aide files the new weekly pill packs, remakes the bed for two, runs the laundry, cleans the bathroom and kitchen, and clears the route from the door to the armchair for Mr. Wong.",
+     "actorIds": [
+      "home-pca"
+     ],
+     "start": 152.5,
+     "end": 316
+    },
+    {
+     "id": "home-meals",
+     "label": "Meal hand-off at the door",
+     "category": "home",
+     "description": "The meals driver passes the insulated lunch bag to the aide at the door and checks in with Mrs. Wong, who answers from the entry bench; anything unusual goes back to the care team.",
+     "actorIds": [
+      "home-pca",
+      "meals-driver",
+      "home-participant"
+     ],
+     "start": 381,
+     "end": 386
+    },
+    {
+     "id": "home-lunch",
+     "label": "Lunch set-up",
+     "category": "home",
+     "description": "The delivered lunch heated in the counter-height microwave, plated and cut up at the table with a built-up spoon and a full water glass, plus the midday blister if one is prescribed; then the aide logs the visit.",
+     "actorIds": [
+      "home-pca",
+      "home-participant"
+     ],
+     "start": 430.5,
+     "end": 446
+    },
+    {
+     "id": "home-mods",
+     "label": "OT home-safety check and grab bar",
+     "category": "home",
+     "description": "The OT checks bar heights and watches dry-run toilet and shower transfers, the installer fits a swing-up bar and Mr. Wong's bed handle, and the OT checks his side of the bed and the ramp before he comes home.",
+     "actorIds": [
+      "home-ot",
+      "home-installer",
+      "home-participant"
+     ],
+     "start": 453,
+     "end": 583
+    },
+    {
+     "id": "home-ramp-check",
+     "label": "Ramp check",
+     "category": "home",
+     "description": "On the front ramp with a digital level: 0.35 m over 6.5 m is 1:18.6, gentler than the 1:12 maximum; rails on both sides, a level 2.6 m landing and a flush threshold at the door.",
+     "actorIds": [
+      "home-ot"
+     ],
+     "start": 523,
+     "end": 548
+    },
+    {
+     "id": "home-grab-bar",
+     "label": "Swing-up grab bar fitted",
+     "category": "home",
+     "description": "On the open side of the toilet the installer fits a swing-up grab bar into the blocking at the height the OT marked (top at 34 in, rated 250 lb) for Mr. Wong's wheelchair transfers.",
+     "actorIds": [
+      "home-installer"
+     ],
+     "start": 522,
+     "end": 540
+    },
+    {
+     "id": "home-transfer",
+     "label": "Mr. Wong · wheelchair positioning and transfer check",
+     "category": "home",
+     "description": "Beside his armchair, brakes on and footplates up, the nurse checks his stand-pivot technique. He stays in his wheelchair today: the armchair transfer waits for a per-segment mobility override.",
+     "actorIds": [
+      "home-rn",
+      "hospital-participant"
+     ],
+     "start": 674.5,
+     "end": 683.5
+    },
+    {
+     "id": "home-health-visit",
+     "label": "Post-discharge home health visit",
+     "category": "home",
+     "description": "A home health nurse checks his vitals and pressure points and reconciles the new medicines with the weekly pill pack on the day he comes home, then goes over the warning signs and the 24/7 nurse-line number.",
+     "actorIds": [
+      "home-rn",
+      "hospital-participant",
+      "home-participant"
+     ],
+     "start": 683.5,
+     "end": 700
+    },
+    {
+     "id": "home-discharge-arrival",
+     "label": "Mr. Wong · home after discharge",
+     "category": "home",
+     "description": "The Seen van brings him home at 3:08; the driver wheels him down the van ramp, across the drive and up the porch ramp, and he rolls himself in over the flush threshold to his armchair while Mrs. Wong welcomes him from the sofa.",
+     "actorIds": [
+      "hospital-participant",
+      "community-driver",
+      "home-participant",
+      "home-rn"
+     ],
+     "start": 642,
+     "end": 683.5
+    },
+    {
+     "id": "after-hours-call",
+     "label": "Nurse line call · evening plan",
+     "category": "after-hours",
+     "description": "24/7 nurse line and on-call coordination: from beside his armchair on speakerphone, the nurse confirms tonight's medicines and the re-packed blister with Mr. and Mrs. Wong, reminds them when to call, and confirms tomorrow's aide visit.",
+     "actorIds": [
+      "hospital-participant",
+      "nurse-line-rn",
+      "home-participant"
+     ],
+     "start": 690,
+     "end": 708
+    }
+   ],
+   "holes": {
+    "home-participant": [
+     {
+      "kind": "before",
+      "start": 0,
+      "end": 0.5,
+      "from": [
+       -3.3,
+       -15.4
+      ],
+      "to": [
+       -3.3,
+       -15.4
+      ]
+     },
+     {
+      "kind": "away",
+      "start": 80.5,
+      "end": 370,
+      "from": [
+       0.4,
+       -7.6
+      ],
+      "to": [
+       0.4,
+       -7.6
+      ]
+     }
+    ],
+    "home-pca": [
+     {
+      "kind": "before",
+      "start": 0,
+      "end": 44,
+      "from": [
+       0.4,
+       -7.6
+      ],
+      "to": [
+       0.4,
+       -7.6
+      ]
+     },
+     {
+      "kind": "away",
+      "start": 77,
+      "end": 152.5,
+      "from": [
+       0.4,
+       -7.6
+      ],
+      "to": [
+       0.4,
+       -7.6
+      ]
+     },
+     {
+      "kind": "away",
+      "start": 318.5,
+      "end": 372.5,
+      "from": [
+       0.4,
+       -7.6
+      ],
+      "to": [
+       0.4,
+       -7.6
+      ]
+     },
+     {
+      "kind": "after",
+      "start": 450.5,
+      "end": 720,
+      "from": [
+       0.4,
+       -7.6
+      ],
+      "to": [
+       0.4,
+       -7.6
+      ]
+     }
+    ],
+    "home-ot": [
+     {
+      "kind": "before",
+      "start": 0,
+      "end": 453,
+      "from": [
+       0.4,
+       -7.6
+      ],
+      "to": [
+       0.4,
+       -7.6
+      ]
+     },
+     {
+      "kind": "away",
+      "start": 520,
+      "end": 551,
+      "from": [
+       0.4,
+       -7.6
+      ],
+      "to": [
+       0.4,
+       -7.6
+      ]
+     },
+     {
+      "kind": "after",
+      "start": 582.5,
+      "end": 720,
+      "from": [
+       0.4,
+       -7.6
+      ],
+      "to": [
+       0.4,
+       -7.6
+      ]
+     }
+    ],
+    "home-installer": [
+     {
+      "kind": "before",
+      "start": 0,
+      "end": 456,
+      "from": [
+       0.4,
+       -7.6
+      ],
+      "to": [
+       0.4,
+       -7.6
+      ]
+     },
+     {
+      "kind": "after",
+      "start": 572.5,
+      "end": 720,
+      "from": [
+       0.4,
+       -7.6
+      ],
+      "to": [
+       0.4,
+       -7.6
+      ]
+     }
+    ],
+    "home-rn": [
+     {
+      "kind": "before",
+      "start": 0,
+      "end": 642.5,
+      "from": [
+       0.4,
+       -7.6
+      ],
+      "to": [
+       0.4,
+       -7.6
+      ]
+     },
+     {
+      "kind": "after",
+      "start": 708,
+      "end": 720,
+      "from": [
+       0.4,
+       -7.6
+      ],
+      "to": [
+       0.4,
+       -7.6
+      ]
+     }
+    ],
+    "hospital-participant": [
+     {
+      "kind": "before",
+      "start": 0,
+      "end": 672,
+      "from": [
+       0.4,
+       -7.6
+      ],
+      "to": [
+       0.4,
+       -7.6
+      ]
+     }
+    ]
+   },
+   "notes": [
+    "home-participant: walk to Bath arrives 1 s earlier (385.496–396 s)"
+   ]
+  },
   "partner-adc": {
    "actors": [
     {

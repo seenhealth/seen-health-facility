@@ -453,7 +453,9 @@ export const careSettings: CareSetting[] = [
     subtitle: 'Home care · home health · pill packs · meals · home mods',
     position: [-84, 12],
     heading: Math.PI / 2,
-    pad: { w: 30, d: 28 },
+    // The owner allows the pad to grow 8 m west (behind the house) for the
+    // deeper plan and its yard; front edge, drive and anchors stay put.
+    pad: { w: 30, d: 28, back: 8 },
     road: { from: [-48.4, 12], to: [-70, 12] },
     drive: { depth: 7, radius: 6.2, lanes: 2 },
     apron: { w: 0, d: 0 },
@@ -466,6 +468,29 @@ export const careSettings: CareSetting[] = [
       'after-hours',
     ],
     accent: '#c98f5a',
+    // The Wongs' bungalow (public/models/seen-home-wong.json). Its plan frame
+    // is world-aligned (+x east, +z north): world = P + (−94.8, 12). The front
+    // wall's outer face (P x 3.2) lies on the porch slab's back edge (local
+    // z −7.6) and the front door's opening on the `door` anchor; the porch
+    // zone is left to the pad, which already draws it (validate-home.mjs).
+    facility: {
+      id: 'seen-home-wong',
+      url: '/models/seen-home-wong.json',
+      frame: { position: [0, -10.8], heading: -Math.PI / 2 },
+      levelIds: ['ground'],
+      excludeZoneIds: ['home-zone-porch'],
+      cutaway: true,
+      floorY: PORCH_Y,
+      // Name plates only where the name reads at the room's label anchor: in
+      // the bedrooms and the dining nook it would lie under the bed or the
+      // table, and a short "Bath" clears the shower (validate-home.mjs).
+      labels: {
+        'home-living': 'Living room',
+        'home-kitchen': 'Kitchen',
+        'home-bath': 'Bath',
+      },
+      margin: 1.6,
+    },
     local: {
       kerb: [0.2, -4.4],
       rampFoot: [9.9, -6.3],
@@ -490,6 +515,8 @@ export const careSettings: CareSetting[] = [
       porchStep: [-3.4, -5.6],
       porchStepFoot: [-3.4, -4.5],
       door: [0.4, -7.6],
+      // Where a visitor waits on the porch, just outside the front door.
+      doorStep: [0.4, -6.9],
       inside: [0.4, -9.6],
       crate: [7.6, -3.4],
       crateSide: [8.6, -4.4],
@@ -504,11 +531,13 @@ export const careSettings: CareSetting[] = [
       padCorner: [12.4, -2],
       padCornerFar: [-12.4, -2],
       padCornerNear: [-12.4, 9],
-      // Van ramp foot → porch ramp: down the drive edge, a loop in from the side.
+      // Van ramp foot → porch ramp: along the drive edge, then a short loop
+      // round onto the ramp foot (14 m from the van's ramp, a walker or a
+      // pushed wheelchair at about 1.3 m/s).
       crossA: [6.0, -4.0],
-      crossB: [11.4, -4.8],
-      crossC: [13.4, -6.2],
-      crossD: [11.6, -7.2],
+      crossB: [10.8, -4.7],
+      crossC: [11.5, -5.6],
+      crossD: [10.7, -6.3],
       // The aide's kerb-side places and walks.
       pcaWait: [2.4, -4.6],
       handover: [-0.6, -3.6],
