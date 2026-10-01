@@ -340,6 +340,7 @@ const harness = {
   observers: [],
   frame: null,
   frameId: 0,
+  now: 0,
   canvasModule: null,
   textureRequests: [],
   missingTextures: [],
@@ -607,7 +608,7 @@ export async function loadHeadlessViewer({ canvas } = {}) {
         const callback = harness.frame;
         assert.ok(callback, 'The viewer has an animation frame pending');
         harness.frame = null;
-        harness.now = Math.max(harness.now ?? 0, performance.now()) + dt * 1000;
+        harness.now = Math.max(harness.now, performance.now()) + dt * 1000;
         callback(harness.now);
       }
     },
@@ -754,7 +755,7 @@ async function smokeTest() {
     }
     const used = [...s.used.keys()],
       usedGeometries = used.filter((r) => !r.isMaterial).length,
-      known = used.filter(
+      knownLeaks = used.filter(
         (r) => !((s.disposed.get(r) ?? -1) > s.used.get(r).last),
       ).length;
     assert.deepEqual(
@@ -792,7 +793,7 @@ async function smokeTest() {
       `${model.id}: no frame scheduled after dispose`,
     );
     console.log(
-      `${model.id}: 10 frames; ${usedGeometries} geometries and ${used.length - usedGeometries} materials reached the renderer (of ${s.created.geometries} and ${s.created.materials} constructed), all disposed but ${known} known leaks; ${harness.textureRequests.length} textures loaded; no listeners, elements or frames left.`,
+      `${model.id}: 10 frames; ${usedGeometries} geometries and ${used.length - usedGeometries} materials reached the renderer (of ${s.created.geometries} and ${s.created.materials} constructed), all disposed but ${knownLeaks} known leaks; ${harness.textureRequests.length} textures loaded; no listeners, elements or frames left.`,
     );
   }
   for (const k of KNOWN_LEAKS) {
