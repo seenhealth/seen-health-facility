@@ -120,6 +120,8 @@ export type VehiclePose = {
   position: T.Vector3;
   heading: number;
   visible: boolean;
+  /** Below 1 while the vehicle fades in or out at the map edge. */
+  opacity?: number;
   phase?: string;
   door?: number;
   ramp?: number;

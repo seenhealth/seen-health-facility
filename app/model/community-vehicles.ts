@@ -53,6 +53,11 @@ type Drive = {
    */
   pre?: Vec2;
   post?: Vec2;
+  /**
+   * Entering or leaving the map: opacity ramps in over the leg's first
+   * `FADE_METRES` or out over its last, beyond the Community framing.
+   */
+  fade?: 'in' | 'out';
 };
 export type VehicleLeg = Dwell | Drive;
 /** Roof dressing that says what a car is for (built by `VEHICLE_DECOR`). */
@@ -231,7 +236,9 @@ const drive = (
   to: number,
   path: Vec2[],
   phase: string,
-  extra: Partial<Pick<Drive, 'easeIn' | 'easeOut' | 'pre' | 'post'>> = {},
+  extra: Partial<
+    Pick<Drive, 'easeIn' | 'easeOut' | 'pre' | 'post' | 'fade'>
+  > = {},
 ): Drive => ({ kind: 'drive', from, to, path: dedupe(path), phase, ...extra });
 /** A point `delta` degrees further along a lane's arc from a stop: the phantom beyond it. */
 const beyond = (
@@ -286,11 +293,12 @@ const W = RING.west,
   S = RING.south,
   R = TURN_RADIUS;
 /**
- * Where vehicles enter and leave the map: past the drawn streets (which run
- * to about x ±130, z ±95) and beyond every pad, so they appear and vanish
- * out of the Community framing.
+ * Where vehicles enter and leave the map: near the ends of the drawn streets
+ * (which run to about x ±130, z ±95), beyond every pad and the Community
+ * framing. Vehicles fade in or out over the last `FADE_METRES` before them.
  */
 export const OFF_MAP = { east: 124, west: -124, north: 90, south: -90 };
+export const FADE_METRES = 8;
 /** Entry/exit leg z (or x) of a setting's lane plus the clearance a turn needs. */
 const legAt = (s: CareSetting, lane: 0 | 1, side: 'entry' | 'exit') =>
   legPoint(s, lane, side, 'street');
@@ -521,18 +529,22 @@ export const communityVehicles: CommunityVehicle[] = [
     name: 'Personal care aide · car',
     accent: '#b9c4b0',
     rest: {
-      at: [W.out.x!, 40],
-      dir: [0, -1],
+      at: [OFF_MAP.west, N.in.z!],
+      dir: [1, 0],
       visible: false,
       phase: 'Off duty',
     },
     seats: { driver: [-0.42, 0.3, -0.2] },
+    // In and out by the north street's western reach, clear of the fleet's
+    // west-street runs and beyond the Community framing.
     legs: [
       drive(
-        1,
-        18,
+        0,
+        28,
         [
-          ...zRun(W.out, 40, legAt(home, 1, 'entry')[1] + R + 2),
+          ...xRun(N.in, OFF_MAP.west, W.out.x! - R),
+          ...corner(N.in, W.out),
+          ...zRun(W.out, N.in.z! - R, legAt(home, 1, 'entry')[1] + R + 2),
           ...arrive(home, 1, W.out, -90),
           ...straight(
             toWorld(home, [
@@ -543,19 +555,21 @@ export const communityVehicles: CommunityVehicle[] = [
           ).slice(1),
         ],
         'Arriving for the morning visit',
-        { easeIn: false, post: past(homeStall, 2) },
+        { easeIn: false, fade: 'in', post: past(homeStall, 2) },
       ),
-      dwell(18, 394, homeStall, 'Parked in the stall'),
+      dwell(28, 394, homeStall, 'Parked in the stall'),
       drive(
         394,
-        476,
+        416,
         [
           ...straight(homeStall.at, homeExitTurn[0]).slice(0, -1),
           ...homeExitTurn,
-          ...viaNorthEastbound(legAt(home, 1, 'exit')[1] + R + 2, -36),
+          ...zRun(W.in, legAt(home, 1, 'exit')[1] + R + 2, N.out.z! - R),
+          ...corner(W.in, N.out),
+          ...xRun(N.out, W.in.x! - R, OFF_MAP.west),
         ],
         'Leaving for the next client',
-        { easeOut: false, pre: past(homeStall, -2) },
+        { easeOut: false, fade: 'out', pre: past(homeStall, -2) },
       ),
     ],
   },
@@ -589,12 +603,13 @@ export const communityVehicles: CommunityVehicle[] = [
         'Delivering meals to the home',
         { pre: past(CENTER_LOT.meals, -2), post: beyond(home, 1, 0, -10) },
       ),
-      // Held four seconds longer than the drop needs so the car crosses the
-      // westbound lane into the lot behind van F's afternoon pull-out.
-      dwell(367.5, 412, stop(home, 1), 'Meal bag drop'),
+      // Held after the drop so the car turns onto the south street behind
+      // the fleet's afternoon runs at the west corner and crosses into the lot
+      // after van F's pull-out.
+      dwell(367.5, 421, stop(home, 1), 'Meal bag drop'),
       drive(
-        412,
-        442,
+        421,
+        451,
         [
           ...depart(home, 1, 0, W.out),
           ...zRun(W.out, legAt(home, 1, 'exit')[1] - R - 2, S.out.z! + R),
@@ -610,7 +625,7 @@ export const communityVehicles: CommunityVehicle[] = [
         'Back to the center',
         { pre: beyond(home, 1, 0, 10), post: past(CENTER_LOT.meals, 2) },
       ),
-      dwell(442, 720, CENTER_LOT.meals, 'At the center kitchen'),
+      dwell(451, 720, CENTER_LOT.meals, 'At the center kitchen'),
     ],
   },
   {
@@ -634,7 +649,7 @@ export const communityVehicles: CommunityVehicle[] = [
           ...arrive(hospital, 0, N.out, 45),
         ],
         'Arriving at the emergency department',
-        { easeIn: false, post: beyond(hospital, 0, 45, -10) },
+        { easeIn: false, fade: 'in', post: beyond(hospital, 0, 45, -10) },
       ),
       dwell(75, 98, stop(hospital, 0, 45), 'At the ED bay'),
       drive(
@@ -645,7 +660,7 @@ export const communityVehicles: CommunityVehicle[] = [
           ...xRun(N.in, legAt(hospital, 0, 'exit')[0] + 9.7 + 2, OFF_MAP.east),
         ],
         'Leaving the hospital',
-        { easeOut: false, pre: beyond(hospital, 0, 45, 10) },
+        { easeOut: false, fade: 'out', pre: beyond(hospital, 0, 45, 10) },
       ),
     ],
   },
@@ -654,7 +669,13 @@ export const communityVehicleById = (id: string) =>
   communityVehicles.find((v) => v.id === id);
 
 // --- Sampling ---------------------------------------------------------------
-type Spline = { curve: T.CatmullRomCurve3; u0: number; u1: number };
+type Spline = {
+  curve: T.CatmullRomCurve3;
+  u0: number;
+  u1: number;
+  /** Arc length of the whole spline (phantom spans included). */
+  length: number;
+};
 const curves = new WeakMap<Drive, Spline>();
 function curveOf(leg: Drive): Spline {
   let c = curves.get(leg);
@@ -680,6 +701,7 @@ function curveOf(leg: Drive): Spline {
       curve,
       u0: leg.pre ? at(1) : 0,
       u1: leg.post ? at(pts.length - 2) : 1,
+      length: total,
     };
     curves.set(leg, c);
   }
@@ -742,7 +764,7 @@ export function sampleCommunityVehicle(id: string, time: number): VehiclePose {
       ramp: 0,
     };
   if (leg.kind === 'dwell') return dwellPose(leg, t);
-  const { curve, u0, u1 } = curveOf(leg),
+  const { curve, u0, u1, length } = curveOf(leg),
     u =
       u0 +
       (u1 - u0) *
@@ -752,11 +774,20 @@ export function sampleCommunityVehicle(id: string, time: number): VehiclePose {
           leg.easeOut,
         ),
     position = curve.getPointAt(u),
-    d = curve.getTangentAt(u);
+    d = curve.getTangentAt(u),
+    // Metres from the map edge for a leg that enters or leaves the map.
+    edge =
+      leg.fade === 'in'
+        ? (u - u0) * length
+        : leg.fade === 'out'
+          ? (u1 - u) * length
+          : Infinity,
+    opacity = T.MathUtils.clamp(edge / FADE_METRES, 0, 1);
   return {
     position,
     heading: Math.atan2(d.x, d.z) + Math.PI,
-    visible: true,
+    visible: opacity > 0,
+    opacity,
     phase: leg.phase,
     door: 0,
     ramp: 0,

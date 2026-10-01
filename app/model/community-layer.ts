@@ -26,6 +26,35 @@ export type Framing = {
   zoom: number;
   azimuth?: number;
 };
+/**
+ * Fade a car body toward `opacity` as it enters or leaves the map. Each body
+ * owns its materials (`buildCommunityVehicleBody`), so only that car fades;
+ * shadows drop while it is see-through.
+ */
+function fadeBody(body: T.Object3D, opacity: number) {
+  if (body.userData.opacity === opacity) return;
+  body.userData.opacity = opacity;
+  const fading = opacity < 1;
+  body.traverse((o) => {
+    if (!(o instanceof T.Mesh)) return;
+    o.userData.castShadow ??= o.castShadow;
+    o.castShadow = !fading && o.userData.castShadow;
+    for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
+      const base = (m.userData.fade ??= {
+        opacity: m.opacity,
+        transparent: m.transparent,
+        depthWrite: m.depthWrite,
+      });
+      m.opacity = base.opacity * opacity;
+      m.depthWrite = fading ? false : base.depthWrite;
+      const transparent = base.transparent || fading;
+      if (m.transparent !== transparent) {
+        m.transparent = transparent;
+        m.needsUpdate = true;
+      }
+    }
+  });
+}
 /** Orthographic zoom × metres of extent: five pads and the site ≈ 0.42. */
 const NETWORK_ZOOM = 88;
 /** Orthographic zoom × pad size: a 30 m home pad ≈ 2.2. */
@@ -83,6 +112,7 @@ export function buildCommunityLayer(
         b.object.position.copy(pose.position);
         b.object.rotation.y = pose.heading;
         b.object.visible = pose.visible;
+        fadeBody(b.object, pose.opacity ?? 1);
       }
       b.object.userData.phase = pose.phase;
     }

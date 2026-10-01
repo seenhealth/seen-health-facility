@@ -425,9 +425,9 @@ export function communitySource(model: Facility): SourceExtension {
       { ...opts, label: 'Personal care aide', variant: 2 },
       h.stallStand,
     )
-      .hidden(18, 'Driving to the visit')
+      .hidden(28, 'Driving to the visit')
       .walk(
-        48,
+        50,
         [
           h.padCornerNear,
           h.padCornerFar,

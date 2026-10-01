@@ -4515,8 +4515,8 @@
       2,
       2,
       2,
-      3,
-      3,
+      2,
+      2,
       3,
       3,
       3,
@@ -4694,9 +4694,9 @@
      "peakParticipants": 2,
      "peakStaff": 4,
      "meanParticipants": 0.6833333333333333,
-     "meanStaff": 2.1013888888888888,
+     "meanStaff": 2.0875,
      "participantMinutes": 328,
-     "staffMinutes": 1008.6666666666666
+     "staffMinutes": 1002
     },
     {
      "zoneId": "community:pharmacy",
@@ -13665,8 +13665,8 @@
       2,
       2,
       2,
-      3,
-      3,
+      2,
+      2,
       3,
       3,
       3,
@@ -13844,9 +13844,9 @@
      "peakParticipants": 2,
      "peakStaff": 4,
      "meanParticipants": 0.6833333333333333,
-     "meanStaff": 2.1013888888888888,
+     "meanStaff": 2.0875,
      "participantMinutes": 328,
-     "staffMinutes": 1008.6666666666666
+     "staffMinutes": 1002
     },
     {
      "zoneId": "community:pharmacy",
