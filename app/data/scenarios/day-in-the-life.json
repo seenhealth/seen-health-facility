@@ -75,7 +75,7 @@
       ],
       "title": "Medicines, packed and checked",
       "kicker": "8:20 AM \u00b7 Partner pharmacy",
-      "body": "Across town, a partner pharmacist checks every participant\u2019s weekly blister packs against the medication list Seen\u2019s nurses keep current. The home care coordinator has the drop-offs lined up, and by nine the courier is on the road.",
+      "body": "Across town, a partner pharmacist checks each participant\u2019s blister packs against the medication list Seen\u2019s nurses keep current. The home care coordinator lines up the drop-offs; by nine the courier is on the road.",
       "roles": [
         "rn",
         "home-care"
@@ -110,7 +110,7 @@
       ],
       "title": "Morning care at home",
       "kicker": "8:35 AM \u00b7 The Wongs\u2019 home",
-      "body": "A personal care attendant helps Mrs. Wong with her hair, breakfast and morning medicines, the routine her home care coordinator set up. Then a Seen van takes her to see her cardiologist, with an aide riding along.",
+      "body": "A personal care attendant helps Mrs. Wong with her hair, breakfast and morning medicines, a routine her home care coordinator set up. Then a Seen van takes her to her cardiologist.",
       "roles": [
         "pca",
         "home-care"
@@ -888,7 +888,7 @@
       ],
       "title": "Planning the trip home",
       "kicker": "1:35 PM \u00b7 Community hospital",
-      "body": "Mr. Wong, Mrs. Wong\u2019s husband, goes home today. Seen\u2019s liaison nurse plans his discharge with the hospitalist and the case manager; his home care coordinator lines up a home health visit and meals, and a Seen van will be at the canopy at 2:10.",
+      "body": "Mr. Wong, Mrs. Wong\u2019s husband, goes home today. Seen\u2019s liaison nurse plans his discharge with the hospitalist and the case manager; his home care coordinator lines up home health and meals, and a Seen van comes at 2:10.",
       "roles": [
         "rn",
         "home-care",

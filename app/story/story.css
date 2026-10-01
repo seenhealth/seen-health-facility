@@ -728,15 +728,15 @@
   text-align: right;
 }
 .story-idt-stats[data-network] {
-  gap: 11px;
+  gap: 10px;
 }
 .story-stat.network .story-stat-value {
   color: var(--net-ink);
 }
 .story-stat.network .story-stat-label {
-  width: 56px;
+  width: 58px;
   margin-left: auto;
-  font-size: 10px;
+  font-size: 9.5px;
   letter-spacing: 0;
   line-height: 1.2;
 }
@@ -1816,7 +1816,8 @@
     padding: 0 9px 0 8px;
   }
   .story-legend,
-  .story-places {
+  .story-places,
+  .story-chip.partner {
     display: none;
   }
   .story-meanwhile {
