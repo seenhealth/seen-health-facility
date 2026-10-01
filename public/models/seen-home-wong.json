@@ -1,0 +1,3859 @@
+{
+  "schemaVersion": "2.0",
+  "id": "seen-home-wong",
+  "name": "The Wongs' home · senior-friendly single-story bungalow",
+  "address": "Illustrative home on the community pad near the Alhambra center (not a real address)",
+  "units": "m",
+  "coordinateSystem": "Plan frame P: metres, origin at the centre of the 11.6 x 13.0 m footprint (house plus porch), +X east (the front door and the street), +Z north, Y up; y = 0 is the finished floor (PORCH_Y on the community pad). Placed on the home-lin pad with frame { position: [0, -10.8], heading: -pi/2 } (pad-local), i.e. world = P + (-94.8, 12.0).",
+  "revision": "2026-10-01 · Senior-friendly plan v1 (HOME-PLAN study, grid-aligned doors)",
+  "source": {
+    "title": "The Wongs' home: a senior-friendly floor plan and its ADL day (HOME-PLAN design study)",
+    "date": "2026-10-01",
+    "pages": 13,
+    "author": "Seen Health planning (illustrative design)"
+  },
+  "calibration": {
+    "method": "Designed in metres; no source drawing to calibrate",
+    "status": "Illustrative design dimensions",
+    "pixelsPerMeter": 56,
+    "sourcePixelOrigin": [
+      669.2,
+      692.4
+    ],
+    "referencePage": 1,
+    "areaPage": 1,
+    "anchorAreaSqFt": 1259.4,
+    "anchorPolygonPixels": [
+      [
+        344.4,
+        328.4
+      ],
+      [
+        848.4,
+        328.4
+      ],
+      [
+        848.4,
+        1056.4
+      ],
+      [
+        344.4,
+        1056.4
+      ]
+    ],
+    "notes": "Pixel values refer to the study drawing home-plan.svg (56 px per metre). Room sizes follow typical Alhambra / San Gabriel Valley 2-bed listings, enlarged where ADA and ICC A117.1 clearances need it. Not a field survey."
+  },
+  "levels": [
+    {
+      "id": "ground",
+      "name": "Main floor",
+      "elevation": 0,
+      "order": 0,
+      "referencePages": [
+        1
+      ],
+      "elevationStatus": "Finished floor at porch level (no entry step); PORCH_Y = 0.30 m on the community pad",
+      "notes": "Single story. Exterior walls 0.20 m, partitions 0.12 m, all 2.45 m high."
+    }
+  ],
+  "zones": [
+    {
+      "id": "home-zone-day",
+      "name": "Living, dining & kitchen",
+      "short": "Day rooms",
+      "color": "#c98f5a",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -5.8,
+          -6.5
+        ],
+        [
+          3.2,
+          -6.5
+        ],
+        [
+          3.2,
+          -3.5
+        ],
+        [
+          3.1,
+          -3.5
+        ],
+        [
+          3.1,
+          2.84
+        ],
+        [
+          -0.3,
+          2.84
+        ],
+        [
+          -0.3,
+          -3.5
+        ],
+        [
+          -1.54,
+          -3.5
+        ],
+        [
+          -1.54,
+          -2.85
+        ],
+        [
+          -5.8,
+          -2.85
+        ]
+      ],
+      "referencePages": [
+        1
+      ],
+      "floorMaterial": "wood",
+      "notes": "Front door, entry and living room, dining nook and the L-shaped kitchen. The polygon follows the outer wall faces except along the porch, where it stops at the front wall centre line so the footprint clears the existing porch slab by 0.1 m.",
+      "publishedAreaSqFt": null,
+      "tracedFootprintSqFt": 552.5,
+      "programId": "home",
+      "wallHeight": 2.45,
+      "wallHeightStatus": "Nominal 2.45 m (8 ft) ceiling; illustrative",
+      "geometryStatus": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "spread": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "home-zone-night",
+      "name": "Bedrooms, bath & laundry",
+      "short": "Night rooms",
+      "color": "#8fa9a3",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -5.8,
+          -2.85
+        ],
+        [
+          -1.54,
+          -2.85
+        ],
+        [
+          -1.54,
+          -3.5
+        ],
+        [
+          -0.3,
+          -3.5
+        ],
+        [
+          -0.3,
+          2.84
+        ],
+        [
+          3.1,
+          2.84
+        ],
+        [
+          3.1,
+          4.7
+        ],
+        [
+          3.2,
+          4.7
+        ],
+        [
+          3.2,
+          6.5
+        ],
+        [
+          -5.8,
+          6.5
+        ]
+      ],
+      "referencePages": [
+        1
+      ],
+      "floorMaterial": "wood",
+      "notes": "The 1.18 m hall, laundry with the back door, accessible bath, primary bedroom and bedroom 2.",
+      "publishedAreaSqFt": null,
+      "tracedFootprintSqFt": 698.1,
+      "programId": "home",
+      "wallHeight": 2.45,
+      "wallHeightStatus": "Nominal 2.45 m (8 ft) ceiling; illustrative",
+      "geometryStatus": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "spread": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "home-zone-back",
+      "name": "Back landing",
+      "short": "Back landing",
+      "color": "#b7b1a6",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -7.4,
+          -2.75
+        ],
+        [
+          -5.8,
+          -2.75
+        ],
+        [
+          -5.8,
+          -1.1
+        ],
+        [
+          -7.4,
+          -1.1
+        ]
+      ],
+      "referencePages": [
+        1
+      ],
+      "floorMaterial": "concrete",
+      "notes": "Level landing outside the back door, at floor height; the 1:12 back ramp descends from its south edge to the yard.",
+      "publishedAreaSqFt": null,
+      "tracedFootprintSqFt": 28.4,
+      "programId": "home",
+      "wallHeight": 2.45,
+      "wallHeightStatus": "Nominal 2.45 m (8 ft) ceiling; illustrative",
+      "geometryStatus": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "spread": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "home-zone-porch",
+      "name": "Covered front porch",
+      "short": "Porch",
+      "color": "#d6cbb8",
+      "levelId": "ground",
+      "polygon": [
+        [
+          3.2,
+          -3.4
+        ],
+        [
+          5.8,
+          -3.4
+        ],
+        [
+          5.8,
+          4.6
+        ],
+        [
+          3.2,
+          4.6
+        ]
+      ],
+      "referencePages": [
+        1
+      ],
+      "floorMaterial": "concrete",
+      "notes": "The existing 8.0 x 2.6 m porch, the front ramp's top landing. Kept for standalone viewing: the community pad already draws it, so the home-lin registry entry excludes this zone from the stamped instance.",
+      "publishedAreaSqFt": null,
+      "tracedFootprintSqFt": 223.9,
+      "programId": "home",
+      "wallHeight": 2.45,
+      "wallHeightStatus": "Nominal 2.45 m (8 ft) ceiling; illustrative",
+      "geometryStatus": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "spread": [
+        0,
+        0
+      ]
+    }
+  ],
+  "rooms": [
+    {
+      "id": "home-living",
+      "name": "Entry & living room",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -0.3,
+          -3.5
+        ],
+        [
+          3,
+          -3.5
+        ],
+        [
+          3,
+          2.78
+        ],
+        [
+          -0.3,
+          2.78
+        ]
+      ],
+      "kind": "living",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Step-free front door straight into the room; 1.5 m turning circle inside the door; entry bench; TV wall to the north; Mr. Wong's armchair by the north window with wheelchair parking beside it.",
+      "floorMaterial": "wood"
+    },
+    {
+      "id": "home-dining",
+      "name": "Dining nook",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -1.6,
+          -6.3
+        ],
+        [
+          3,
+          -6.3
+        ],
+        [
+          3,
+          -3.5
+        ],
+        [
+          -1.6,
+          -3.5
+        ]
+      ],
+      "kind": "dining",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Table for four (the east chair slides out for a wheelchair place); the weekly pill-pack organizer lives on the sideboard.",
+      "floorMaterial": "wood"
+    },
+    {
+      "id": "home-kitchen",
+      "name": "Kitchen",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -5.6,
+          -6.3
+        ],
+        [
+          -1.6,
+          -6.3
+        ],
+        [
+          -1.6,
+          -2.91
+        ],
+        [
+          -5.6,
+          -2.91
+        ]
+      ],
+      "kind": "kitchen",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "L-shaped, open to the dining nook: range with front controls, counter-height microwave, sink base with removable doors, 0.76 m seated worktop, 1.5 m turning circle.",
+      "floorMaterial": "vinyl"
+    },
+    {
+      "id": "home-hall",
+      "name": "Hallway",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -1.54,
+          -3.5
+        ],
+        [
+          -0.3,
+          -3.5
+        ],
+        [
+          -0.3,
+          6.3
+        ],
+        [
+          -1.48,
+          6.3
+        ],
+        [
+          -1.48,
+          -2.79
+        ],
+        [
+          -1.54,
+          -2.79
+        ]
+      ],
+      "kind": "circulation",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "1.18 m clear between the walls (42 in = 1.07 m recommended); open to the living room along its south part; linen cupboard at the north end.",
+      "floorMaterial": "wood"
+    },
+    {
+      "id": "home-laundry",
+      "name": "Laundry & back door",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -5.6,
+          -2.79
+        ],
+        [
+          -1.6,
+          -2.79
+        ],
+        [
+          -1.6,
+          -1.04
+        ],
+        [
+          -5.6,
+          -1.04
+        ]
+      ],
+      "kind": "utility",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Front-loading washer and dryer on 0.30 m pedestals; the laundry door lines up with the back door for a straight route to the landing and the 1:12 ramp.",
+      "floorMaterial": "vinyl"
+    },
+    {
+      "id": "home-bath",
+      "name": "Accessible bathroom",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -5.6,
+          -0.92
+        ],
+        [
+          -1.6,
+          -0.92
+        ],
+        [
+          -1.6,
+          1.98
+        ],
+        [
+          -5.6,
+          1.98
+        ]
+      ],
+      "kind": "bath",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Curbless 1.55 x 1.45 m roll-in shower with fold-down seat and hand shower; raised toilet with side, rear and vertical bars plus a swing-up bar on the open side; roll-under basin; 1.5 m turning circle; pocket doors to the hall and the primary bedroom.",
+      "floorMaterial": "wet-tile"
+    },
+    {
+      "id": "home-primary",
+      "name": "Primary bedroom",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -5.6,
+          2.1
+        ],
+        [
+          -1.6,
+          2.1
+        ],
+        [
+          -1.6,
+          6.3
+        ],
+        [
+          -5.6,
+          6.3
+        ]
+      ],
+      "kind": "bedroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Shared queen bed: Mrs. Wong's 1.0 m walker side by the en-suite door, Mr. Wong's 1.6 m wheelchair side with a 1.5 m turning circle and the bed's transfer handle by the north window.",
+      "floorMaterial": "wood"
+    },
+    {
+      "id": "home-bedroom-2",
+      "name": "Second bedroom (family)",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -0.18,
+          2.9
+        ],
+        [
+          3,
+          2.9
+        ],
+        [
+          3,
+          6.3
+        ],
+        [
+          -0.18,
+          6.3
+        ]
+      ],
+      "kind": "bedroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "For the family member who stays over: full bed, desk and wardrobe.",
+      "floorMaterial": "wood"
+    },
+    {
+      "id": "home-back-landing",
+      "name": "Back landing",
+      "zoneId": "home-zone-back",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -7.4,
+          -2.75
+        ],
+        [
+          -5.8,
+          -2.75
+        ],
+        [
+          -5.8,
+          -1.1
+        ],
+        [
+          -7.4,
+          -1.1
+        ]
+      ],
+      "kind": "landing",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "1.6 x 1.65 m level landing; the back door swings out onto it.",
+      "floorMaterial": "concrete"
+    },
+    {
+      "id": "home-porch",
+      "name": "Covered front porch",
+      "zoneId": "home-zone-porch",
+      "levelId": "ground",
+      "polygon": [
+        [
+          3.2,
+          -3.4
+        ],
+        [
+          5.8,
+          -3.4
+        ],
+        [
+          5.8,
+          4.6
+        ],
+        [
+          3.2,
+          4.6
+        ]
+      ],
+      "kind": "porch",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Existing porch: top at floor level (PORCH_Y), the front ramp's 2.6 m deep top landing.",
+      "floorMaterial": "concrete"
+    }
+  ],
+  "walls": [
+    {
+      "id": "home-wall-front-a",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "a": [
+        3.1,
+        -6.5
+      ],
+      "b": [
+        3.1,
+        -0.9
+      ],
+      "height": 2.45,
+      "thickness": 0.2,
+      "material": "wall",
+      "status": "Exterior wall, front (faces the drive) · Illustrative design (HOME-PLAN study); not a surveyed home",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "home-wall-front-b",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "a": [
+        3.1,
+        0.1
+      ],
+      "b": [
+        3.1,
+        6.5
+      ],
+      "height": 2.45,
+      "thickness": 0.2,
+      "material": "wall",
+      "status": "Exterior wall, front (faces the drive) · Illustrative design (HOME-PLAN study); not a surveyed home",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "home-wall-back-a",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "a": [
+        -5.7,
+        -6.5
+      ],
+      "b": [
+        -5.7,
+        -2.5
+      ],
+      "height": 2.45,
+      "thickness": 0.2,
+      "material": "wall",
+      "status": "Exterior wall, back (yard) · Illustrative design (HOME-PLAN study); not a surveyed home",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "home-wall-back-b",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "a": [
+        -5.7,
+        -1.5
+      ],
+      "b": [
+        -5.7,
+        6.5
+      ],
+      "height": 2.45,
+      "thickness": 0.2,
+      "material": "wall",
+      "status": "Exterior wall, back (yard) · Illustrative design (HOME-PLAN study); not a surveyed home",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "home-wall-south",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "a": [
+        -5.6,
+        -6.4
+      ],
+      "b": [
+        3,
+        -6.4
+      ],
+      "height": 2.45,
+      "thickness": 0.2,
+      "material": "wall",
+      "status": "Exterior wall, south (ramp side) · Illustrative design (HOME-PLAN study); not a surveyed home",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "home-wall-north",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "a": [
+        -5.6,
+        6.4
+      ],
+      "b": [
+        3,
+        6.4
+      ],
+      "height": 2.45,
+      "thickness": 0.2,
+      "material": "wall",
+      "status": "Exterior wall, north · Illustrative design (HOME-PLAN study); not a surveyed home",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "home-wall-p1-a",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "a": [
+        -1.54,
+        -2.79
+      ],
+      "b": [
+        -1.54,
+        -2.45
+      ],
+      "height": 2.45,
+      "thickness": 0.12,
+      "material": "wall",
+      "status": "Partition: back rooms / hall · Illustrative design (HOME-PLAN study); not a surveyed home",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "home-wall-p1-b",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "a": [
+        -1.54,
+        -1.55
+      ],
+      "b": [
+        -1.54,
+        -0.45
+      ],
+      "height": 2.45,
+      "thickness": 0.12,
+      "material": "wall",
+      "status": "Partition: back rooms / hall · Illustrative design (HOME-PLAN study); not a surveyed home",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "home-wall-p1-c",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "a": [
+        -1.54,
+        0.45
+      ],
+      "b": [
+        -1.54,
+        2.95
+      ],
+      "height": 2.45,
+      "thickness": 0.12,
+      "material": "wall",
+      "status": "Partition: back rooms / hall · Illustrative design (HOME-PLAN study); not a surveyed home",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "home-wall-p1-d",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "a": [
+        -1.54,
+        3.85
+      ],
+      "b": [
+        -1.54,
+        6.3
+      ],
+      "height": 2.45,
+      "thickness": 0.12,
+      "material": "wall",
+      "status": "Partition: back rooms / hall · Illustrative design (HOME-PLAN study); not a surveyed home",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "home-wall-p2",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "a": [
+        -5.6,
+        -2.85
+      ],
+      "b": [
+        -1.48,
+        -2.85
+      ],
+      "height": 2.45,
+      "thickness": 0.12,
+      "material": "wall",
+      "status": "Partition: kitchen / laundry · Illustrative design (HOME-PLAN study); not a surveyed home",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "home-wall-p3",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "a": [
+        -5.6,
+        -0.98
+      ],
+      "b": [
+        -1.6,
+        -0.98
+      ],
+      "height": 2.45,
+      "thickness": 0.12,
+      "material": "wall",
+      "status": "Partition: laundry / bath (wet wall) · Illustrative design (HOME-PLAN study); not a surveyed home",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "home-wall-p4-a",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "a": [
+        -5.6,
+        2.04
+      ],
+      "b": [
+        -3.45,
+        2.04
+      ],
+      "height": 2.45,
+      "thickness": 0.12,
+      "material": "wall",
+      "status": "Partition: bath / primary bedroom · Illustrative design (HOME-PLAN study); not a surveyed home",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "home-wall-p4-b",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "a": [
+        -2.55,
+        2.04
+      ],
+      "b": [
+        -1.6,
+        2.04
+      ],
+      "height": 2.45,
+      "thickness": 0.12,
+      "material": "wall",
+      "status": "Partition: bath / primary bedroom · Illustrative design (HOME-PLAN study); not a surveyed home",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "home-wall-p5-a",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "a": [
+        -0.24,
+        2.9
+      ],
+      "b": [
+        -0.24,
+        3.15
+      ],
+      "height": 2.45,
+      "thickness": 0.12,
+      "material": "wall",
+      "status": "Partition: hall / bedroom 2 · Illustrative design (HOME-PLAN study); not a surveyed home",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "home-wall-p5-b",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "a": [
+        -0.24,
+        4.05
+      ],
+      "b": [
+        -0.24,
+        6.3
+      ],
+      "height": 2.45,
+      "thickness": 0.12,
+      "material": "wall",
+      "status": "Partition: hall / bedroom 2 · Illustrative design (HOME-PLAN study); not a surveyed home",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "home-wall-p6",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "a": [
+        -0.3,
+        2.84
+      ],
+      "b": [
+        3,
+        2.84
+      ],
+      "height": 2.45,
+      "thickness": 0.12,
+      "material": "wall",
+      "status": "Partition: living room / bedroom 2 (TV wall) · Illustrative design (HOME-PLAN study); not a surveyed home",
+      "referencePages": [
+        1
+      ]
+    }
+  ],
+  "objects": [
+    {
+      "id": "home-living-tv-cabinet",
+      "assetId": "cabinet",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        1.15,
+        0,
+        2.57
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        0.875,
+        0.7333,
+        1.1667
+      ],
+      "roomId": "home-living",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Low TV cabinet on the TV wall (front faces the room).",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-living-tv",
+      "assetId": "screen",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        1.15,
+        0.55,
+        2.66
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        0.7857,
+        0.8125,
+        0.8333
+      ],
+      "roomId": "home-living",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "TV on the cabinet.",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-living-sofa",
+      "assetId": "home-sofa",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        1.15,
+        0,
+        0.8
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-living",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Faces the TV; firm 0.45 m seat with arms for sit-to-stand.",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-living-armchair",
+      "assetId": "photo-lounge-chair",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        2.45,
+        0,
+        1.85
+      ],
+      "rotation": 1.904041,
+      "scale": [
+        1.1304,
+        0.8974,
+        1
+      ],
+      "roomId": "home-living",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Mr. Wong's armchair (high seat, arms) by the north window; the RN visit and the nurse-line call happen here.",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-living-side-table",
+      "assetId": "home-side-table-lamp",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        -0.03,
+        0,
+        0.8
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-living",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Side table and lamp at the sofa end (no low coffee table: trip hazard).",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-living-entry-bench",
+      "assetId": "bench",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        2.79,
+        0,
+        -2.1
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        0.5,
+        0.9659,
+        0.6364
+      ],
+      "roomId": "home-living",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Entry bench: sit to rest after a trip, set down the meal bag; keeps the latch side of the door clear.",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-dining-table",
+      "assetId": "plan-dining-table",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        0.1,
+        0,
+        -4.9
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-dining",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-dining-chair-n",
+      "assetId": "photo-dining-chair",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        0.1,
+        0,
+        -4.08
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-dining",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Mrs. Wong's place (faces south, back to the living room).",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-dining-chair-s",
+      "assetId": "photo-dining-chair",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        0.1,
+        0,
+        -5.72
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-dining",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-dining-chair-w",
+      "assetId": "photo-dining-chair",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        -0.72,
+        0,
+        -4.9
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-dining",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-dining-chair-e",
+      "assetId": "photo-dining-chair",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        0.92,
+        0,
+        -4.9
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-dining",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Slides out to give Mr. Wong a wheelchair place with knee space under the table.",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-dining-sideboard",
+      "assetId": "cabinet",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        1.6,
+        0,
+        -6.09
+      ],
+      "rotation": 0,
+      "scale": [
+        0.75,
+        1.0667,
+        1.1667
+      ],
+      "roomId": "home-dining",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-dining-pill-organizer",
+      "assetId": "home-pill-organizer",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        1.6,
+        0.8,
+        -6.05
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-dining",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Weekly pill packs (pharmacy blister cards).",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-kitchen-fridge",
+      "assetId": "refrigerator",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        -5.21,
+        0,
+        -3.44
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-kitchen",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-kitchen-counter-1",
+      "assetId": "counter",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        -5.295,
+        0,
+        -4.285
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        0.525,
+        1,
+        1
+      ],
+      "roomId": "home-kitchen",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-kitchen-microwave",
+      "assetId": "home-microwave",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        -5.36,
+        0.91,
+        -4.285
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-kitchen",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-kitchen-upper-1",
+      "assetId": "cabinet",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        -5.435,
+        1.37,
+        -4.285
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        0.525,
+        0.9333,
+        0.9167
+      ],
+      "roomId": "home-kitchen",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Upper cabinet lowered to 1.37 m.",
+      "layer": "architecture"
+    },
+    {
+      "id": "home-kitchen-range",
+      "assetId": "home-range",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        -5.27,
+        0,
+        -5.085
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-kitchen",
+      "referencePages": [
+        9
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-kitchen-counter-corner",
+      "assetId": "counter",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        -5.295,
+        0,
+        -5.8825
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        0.5219,
+        1,
+        1
+      ],
+      "roomId": "home-kitchen",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-kitchen-counter-2",
+      "assetId": "counter",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        -4.69,
+        0,
+        -5.995
+      ],
+      "rotation": 0,
+      "scale": [
+        0.375,
+        1,
+        1
+      ],
+      "roomId": "home-kitchen",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-kitchen-sink-base",
+      "assetId": "counter",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        -3.89,
+        0,
+        -5.995
+      ],
+      "rotation": 0,
+      "scale": [
+        0.625,
+        1,
+        1
+      ],
+      "roomId": "home-kitchen",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Sink base with removable doors for knee space.",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-kitchen-sink",
+      "assetId": "interior-counter-sink",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        -3.89,
+        0.91,
+        -6
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-kitchen",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-kitchen-counter-3",
+      "assetId": "counter",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        -3.015,
+        0,
+        -5.995
+      ],
+      "rotation": 0,
+      "scale": [
+        0.4688,
+        1,
+        1
+      ],
+      "roomId": "home-kitchen",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-kitchen-worktop",
+      "assetId": "home-seated-worktop",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        -2.24,
+        0,
+        -5.995
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-kitchen",
+      "referencePages": [
+        9
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-kitchen-chair",
+      "assetId": "photo-dining-chair",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        -2.24,
+        0,
+        -5.38
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-kitchen",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Chair for seated prep at the worktop.",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-laundry-pedestal-w",
+      "assetId": "home-pedestal",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -4,
+        0,
+        -1.4
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-laundry",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-laundry-washer",
+      "assetId": "access-laundry",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -4,
+        0.3,
+        -1.4
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1.0147,
+        1,
+        1
+      ],
+      "roomId": "home-laundry",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-laundry-pedestal-d",
+      "assetId": "home-pedestal",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -3.27,
+        0,
+        -1.4
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-laundry",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-laundry-dryer",
+      "assetId": "access-laundry",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -3.27,
+        0.3,
+        -1.4
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1.0147,
+        1,
+        1
+      ],
+      "roomId": "home-laundry",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Same kind; optional parameter variant: 'dryer' for an opaque door.",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-laundry-upper",
+      "assetId": "cabinet",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -3.635,
+        1.55,
+        -1.205
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        0.9375,
+        0.9333,
+        0.9167
+      ],
+      "roomId": "home-laundry",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Detergent shelf above the machines.",
+      "layer": "architecture"
+    },
+    {
+      "id": "home-bath-shower",
+      "assetId": "access-shower",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -4.8,
+        0,
+        1.23
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1.0667
+      ],
+      "roomId": "home-bath",
+      "referencePages": [
+        7,
+        8
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Curbless roll-in shower, 1.60 m (x) by 1.50 m (z) overall = 1.55 x 1.45 m clear inside the tile (61 x 57 in): walls on the back (west) and north sides, entry open along the full south face and the east side; fold-down seat, hand shower on a slide bar, grab bars, curtain.",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-bath-toilet",
+      "assetId": "toilet",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -5.15,
+        0,
+        -0.575
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-bath",
+      "referencePages": [
+        7,
+        8
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Centreline 0.45 m (17.7 in) from the back wall; seat 0.46-0.48 m (comfort height + thin riser if needed).",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-bath-basin",
+      "assetId": "basin",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -3.35,
+        0,
+        -0.67
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-bath",
+      "referencePages": [
+        7,
+        8
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Wall-hung roll-under basin, rim 0.85 m (33.5 in), lever tap, insulated pipes.",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-bath-mirror",
+      "assetId": "home-mirror",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -3.35,
+        1,
+        -0.91
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-bath",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "architecture"
+    },
+    {
+      "id": "home-bath-cabinet",
+      "assetId": "interior-wash-storage",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -1.8,
+        0,
+        1.3
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-bath",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Towels and supplies within reach.",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-bath-gb-side",
+      "assetId": "home-grab-bar-42",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -5.56,
+        0.82,
+        -0.08
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-bath",
+      "referencePages": [
+        7,
+        8
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "42 in side bar on the back wall, 0.30 m from the rear wall, to 1.37 m (54 in); bar centre 0.86 m.",
+      "layer": "architecture"
+    },
+    {
+      "id": "home-bath-gb-rear",
+      "assetId": "home-grab-bar-36",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -5,
+        0.82,
+        -0.88
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-bath",
+      "referencePages": [
+        7,
+        8
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "36 in rear bar: 12 in to the wall side of the centreline, 24 in to the open side.",
+      "layer": "architecture"
+    },
+    {
+      "id": "home-bath-gb-vertical",
+      "assetId": "home-grab-bar-v18",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -5.56,
+        0.99,
+        0.1
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-bath",
+      "referencePages": [
+        7,
+        8
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "18 in vertical bar at 1.02 m from the rear wall (sit-to-stand).",
+      "layer": "architecture"
+    },
+    {
+      "id": "home-bath-gb-swing-up",
+      "assetId": "home-swing-up-bar",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -4.72,
+        0.72,
+        -0.54
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-bath",
+      "referencePages": [
+        7,
+        8
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Swing-up grab bar on the open side of the toilet for wheelchair transfers; fitted by the installer during the simulated day (1:30-1:53 PM) and drawn installed.",
+      "layer": "architecture"
+    },
+    {
+      "id": "home-primary-bed",
+      "assetId": "home-bed-queen",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -4.535,
+        0,
+        3.9
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-primary",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Shared queen bed, head on the back wall; mattress top 0.56 m (lower to about 0.51 m for level wheelchair transfers if the OT advises). The transfer handle on Mr. Wong's (north) side is part of the bed asset (`transferHandle: left`); the installer fits it on the day.",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-primary-nightstand-mrs",
+      "assetId": "home-nightstand",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -5.4,
+        0,
+        2.85
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-primary",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Mrs. Wong's side: lamp, phone, glasses. Bedside lamp on top (asset height includes the lamp).",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-primary-nightstand-mr",
+      "assetId": "home-nightstand",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -5.4,
+        0,
+        4.95
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-primary",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Mr. Wong's side. Bedside lamp on top (asset height includes the lamp).",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-primary-wardrobe",
+      "assetId": "home-wardrobe",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -2.5,
+        0,
+        6
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-primary",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-primary-chair",
+      "assetId": "photo-dining-chair",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -1.9,
+        0,
+        4.55
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-primary",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Dressing chair with arms; seat 0.46 m.",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-bed2-bed",
+      "assetId": "home-bed-full",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        1.75,
+        0,
+        5.275
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-bedroom-2",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-bed2-nightstand",
+      "assetId": "home-nightstand",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        0.8,
+        0,
+        6.08
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-bedroom-2",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Bedside lamp on top (asset height includes the lamp).",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-bed2-wardrobe",
+      "assetId": "home-wardrobe",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        1.9,
+        0,
+        3.2
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-bedroom-2",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-bed2-desk",
+      "assetId": "desk",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        2.725,
+        0,
+        4.1
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        0.7333,
+        1,
+        0.7857
+      ],
+      "roomId": "home-bedroom-2",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-bed2-chair",
+      "assetId": "chair",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        2.1,
+        0,
+        3.95
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-bedroom-2",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-hall-linen",
+      "assetId": "home-linen-cupboard",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -0.89,
+        0,
+        6.05
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-porch-bench",
+      "assetId": "bench",
+      "zoneId": "home-zone-porch",
+      "levelId": "ground",
+      "position": [
+        4.15,
+        0,
+        4.3
+      ],
+      "rotation": 0,
+      "scale": [
+        0.65,
+        0.9659,
+        0.7576
+      ],
+      "roomId": "home-porch",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Existing porch bench, moved to clear the new front wall.",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-porch-table",
+      "assetId": "plan-lounge-table",
+      "zoneId": "home-zone-porch",
+      "levelId": "ground",
+      "position": [
+        3.62,
+        0,
+        3.72
+      ],
+      "rotation": 0,
+      "scale": [
+        0.6756,
+        1,
+        0.6756
+      ],
+      "roomId": "home-porch",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-door-front-leaf",
+      "assetId": "home-door-front",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        3,
+        0,
+        0.1
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": null,
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "In-swing front door, lever handle, flush threshold (12 mm plate); latch-side pull space kept clear.",
+      "layer": "architecture"
+    },
+    {
+      "id": "home-door-back-leaf",
+      "assetId": "home-door-back",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -5.8,
+        0,
+        -2.5
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": null,
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Out-swing half-glass back door onto the level landing.",
+      "layer": "architecture"
+    },
+    {
+      "id": "home-door-laundry-leaf",
+      "assetId": "home-door-laundry",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -1.6,
+        0,
+        -2.45
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": null,
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Swings into the laundry; lined up with the back door.",
+      "layer": "architecture"
+    },
+    {
+      "id": "home-door-bath-hall-leaf",
+      "assetId": "home-pocket-door",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -1.54,
+        0,
+        0.9
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": null,
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Pocket door, slides north into the hall wall; D-pull, privacy latch openable from outside. Leaf shown open, inside its pocket (wall-finish layer: never above a cut wall).",
+      "layer": "wall-finish"
+    },
+    {
+      "id": "home-door-bath-ensuite-leaf",
+      "assetId": "home-pocket-door",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -2.1,
+        0,
+        2.04
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": null,
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Pocket door, slides east into the bath/bedroom wall: bedside to toilet in about 5 m. Leaf shown open, inside its pocket (wall-finish layer: never above a cut wall).",
+      "layer": "wall-finish"
+    },
+    {
+      "id": "home-door-primary-leaf",
+      "assetId": "home-door-primary",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -1.6,
+        0,
+        2.95
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": null,
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Swings into the bedroom over the foot-zone turning circle (doors may swing into turning space).",
+      "layer": "architecture"
+    },
+    {
+      "id": "home-door-bedroom-2-leaf",
+      "assetId": "home-door-bedroom-2",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -0.18,
+        0,
+        4.05
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": null,
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Swings into bedroom 2.",
+      "layer": "architecture"
+    },
+    {
+      "id": "home-door-front-threshold",
+      "assetId": "home-threshold",
+      "zoneId": "home-zone-day",
+      "levelId": "ground",
+      "position": [
+        3.1,
+        -0.35,
+        -0.4
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": null,
+      "referencePages": [
+        7,
+        8
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Flush aluminium threshold plate (top 12 mm above the floor, ADA 404.2.5 <= 13 mm); bridges the floor and the porch slab under the front door.",
+      "layer": "architecture"
+    },
+    {
+      "id": "home-back-ramp",
+      "assetId": "home-ramp-back",
+      "zoneId": "home-zone-back",
+      "levelId": "ground",
+      "position": [
+        -6.7,
+        -0.35,
+        -4.85
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": null,
+      "referencePages": [
+        7,
+        8
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "1:12 back ramp: 0.35 m rise over 4.2 m, 1.2 m wide deck, handrails both sides; foot on pad grade.",
+      "layer": "architecture"
+    },
+    {
+      "id": "home-front-ramp",
+      "assetId": "home-ramp-front",
+      "zoneId": "site",
+      "levelId": "site",
+      "position": [
+        4.5,
+        -0.35,
+        -6.65
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": null,
+      "referencePages": [
+        7,
+        8
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "The existing front ramp (0.35 m over 6.5 m, 1:18.6), drawn here for standalone viewing; the community pad draws the real one.",
+      "layer": "furniture"
+    }
+  ],
+  "assets": {
+    "refrigerator": {
+      "kind": "box",
+      "dimensions": [
+        0.85,
+        1.9,
+        0.78
+      ],
+      "material": "metal"
+    },
+    "counter": {
+      "kind": "counter",
+      "dimensions": [
+        1.6,
+        0.91,
+        0.61
+      ],
+      "material": "oak"
+    },
+    "cabinet": {
+      "kind": "cabinet",
+      "dimensions": [
+        1.6,
+        0.75,
+        0.36
+      ],
+      "material": "cabinet"
+    },
+    "screen": {
+      "kind": "screen",
+      "dimensions": [
+        1.4,
+        0.8,
+        0.06
+      ],
+      "material": "screen"
+    },
+    "toilet": {
+      "kind": "toilet",
+      "dimensions": [
+        0.46,
+        0.74,
+        0.69
+      ],
+      "material": "porcelain"
+    },
+    "basin": {
+      "kind": "basin",
+      "dimensions": [
+        0.6,
+        0.85,
+        0.5
+      ],
+      "material": "porcelain"
+    },
+    "bench": {
+      "kind": "bench",
+      "dimensions": [
+        2,
+        0.88,
+        0.66
+      ],
+      "material": "blue"
+    },
+    "plan-dining-table": {
+      "kind": "table",
+      "dimensions": [
+        0.97687,
+        0.75,
+        0.97687
+      ],
+      "material": "table"
+    },
+    "photo-dining-chair": {
+      "kind": "upholstered-chair",
+      "dimensions": [
+        0.55,
+        0.9,
+        0.57
+      ],
+      "material": "photo-seat",
+      "materials": {
+        "wood": "photo-chair-wood",
+        "metal": "photo-bronze"
+      }
+    },
+    "photo-lounge-chair": {
+      "kind": "lounge-chair",
+      "dimensions": [
+        0.69,
+        1.17,
+        0.86
+      ],
+      "material": "photo-blue-seat",
+      "materials": {
+        "wood": "photo-white",
+        "metal": "photo-white"
+      }
+    },
+    "chair": {
+      "kind": "chair",
+      "dimensions": [
+        0.53,
+        0.87,
+        0.57
+      ],
+      "material": "chair"
+    },
+    "desk": {
+      "kind": "desk",
+      "dimensions": [
+        1.5,
+        0.74,
+        0.7
+      ],
+      "material": "oak"
+    },
+    "access-shower": {
+      "kind": "care-shower",
+      "dimensions": [
+        1.5,
+        2.18,
+        1.5
+      ],
+      "material": "photo-teal-tile",
+      "parameters": {}
+    },
+    "access-laundry": {
+      "kind": "laundry-machine",
+      "dimensions": [
+        0.68,
+        0.92,
+        0.72
+      ],
+      "material": "photo-white",
+      "parameters": {}
+    },
+    "interior-wash-storage": {
+      "kind": "clinical-drawers",
+      "dimensions": [
+        0.76,
+        0.8,
+        0.4
+      ],
+      "material": "oak"
+    },
+    "interior-counter-sink": {
+      "kind": "counter-basin",
+      "dimensions": [
+        0.44,
+        0.25,
+        0.36
+      ],
+      "material": "photo-white"
+    },
+    "plan-lounge-table": {
+      "kind": "round-table",
+      "dimensions": [
+        0.81406,
+        0.48,
+        0.81406
+      ],
+      "material": "table"
+    },
+    "home-sofa": {
+      "kind": "compact-sofa",
+      "dimensions": [
+        1.9,
+        0.85,
+        0.85
+      ],
+      "material": "photo-seat",
+      "materials": {
+        "wood": "oak"
+      },
+      "parameters": {
+        "seats": 3
+      }
+    },
+    "home-side-table-lamp": {
+      "kind": "side-table-lamp",
+      "dimensions": [
+        0.44,
+        0.62,
+        0.44
+      ],
+      "material": "oak",
+      "materials": {
+        "wood": "oak",
+        "frame": "photo-black",
+        "base": "photo-white",
+        "shade": "home-lamp"
+      }
+    },
+    "home-seated-worktop": {
+      "kind": "table",
+      "dimensions": [
+        0.8,
+        0.76,
+        0.61
+      ],
+      "material": "photo-quartz"
+    },
+    "home-microwave": {
+      "kind": "box",
+      "dimensions": [
+        0.5,
+        0.3,
+        0.38
+      ],
+      "material": "photo-white"
+    },
+    "home-pedestal": {
+      "kind": "box",
+      "dimensions": [
+        0.69,
+        0.3,
+        0.72
+      ],
+      "material": "photo-white"
+    },
+    "home-pill-organizer": {
+      "kind": "box",
+      "dimensions": [
+        0.32,
+        0.06,
+        0.22
+      ],
+      "material": "photo-teal"
+    },
+    "home-mirror": {
+      "kind": "box",
+      "dimensions": [
+        0.6,
+        0.9,
+        0.02
+      ],
+      "material": "photo-silver"
+    },
+    "home-threshold": {
+      "kind": "box",
+      "dimensions": [
+        1,
+        0.362,
+        0.2
+      ],
+      "material": "photo-silver"
+    },
+    "home-pocket-door": {
+      "kind": "sliding-door",
+      "dimensions": [
+        0.95,
+        2.1,
+        0.06
+      ],
+      "material": "oak"
+    },
+    "home-bed-queen": {
+      "kind": "bed",
+      "dimensions": [
+        1.6,
+        1,
+        2.13
+      ],
+      "material": "photo-white",
+      "materials": {
+        "frame": "oak",
+        "blanket": "photo-blue-seat",
+        "pillow": "photo-white",
+        "metal": "photo-silver"
+      },
+      "parameters": {
+        "mattressTop": 0.56,
+        "transferHandle": "left",
+        "front": "head at local -z, foot at +z; left/right as seen from the foot (left = -x)"
+      }
+    },
+    "home-bed-full": {
+      "kind": "bed",
+      "dimensions": [
+        1.4,
+        0.95,
+        2.05
+      ],
+      "material": "photo-white",
+      "materials": {
+        "frame": "oak",
+        "blanket": "photo-mustard",
+        "pillow": "photo-white"
+      },
+      "parameters": {
+        "mattressTop": 0.55,
+        "front": "head at local -z, foot at +z"
+      }
+    },
+    "home-nightstand": {
+      "kind": "nightstand",
+      "dimensions": [
+        0.45,
+        0.95,
+        0.4
+      ],
+      "material": "oak",
+      "materials": {
+        "metal": "photo-silver",
+        "base": "photo-white",
+        "shade": "home-lamp"
+      },
+      "parameters": {
+        "lamp": true,
+        "front": "drawer front at local +z (the bedside)"
+      }
+    },
+    "home-wardrobe": {
+      "kind": "wardrobe",
+      "dimensions": [
+        1.2,
+        2,
+        0.6
+      ],
+      "material": "oak",
+      "materials": {
+        "metal": "photo-silver"
+      },
+      "parameters": {
+        "doors": 2,
+        "front": "doors at local +z"
+      }
+    },
+    "home-linen-cupboard": {
+      "kind": "wardrobe",
+      "dimensions": [
+        1,
+        2,
+        0.5
+      ],
+      "material": "photo-white",
+      "materials": {
+        "metal": "photo-silver",
+        "plinth": "photo-white"
+      },
+      "parameters": {
+        "doors": 2,
+        "front": "doors at local +z"
+      }
+    },
+    "home-range": {
+      "kind": "kitchen-range",
+      "dimensions": [
+        0.76,
+        0.92,
+        0.66
+      ],
+      "material": "photo-white",
+      "materials": {
+        "top": "photo-black",
+        "metal": "photo-silver",
+        "glass": "screen"
+      },
+      "parameters": {
+        "frontControls": true,
+        "front": "oven door and control knobs at local +z; no back guard"
+      }
+    },
+    "home-grab-bar-42": {
+      "kind": "grab-bar",
+      "dimensions": [
+        1.07,
+        0.08,
+        0.08
+      ],
+      "material": "photo-silver",
+      "parameters": {
+        "orientation": "horizontal",
+        "front": "wall plane at local -z; the bar stands 38 mm off it toward +z"
+      }
+    },
+    "home-grab-bar-36": {
+      "kind": "grab-bar",
+      "dimensions": [
+        0.915,
+        0.08,
+        0.08
+      ],
+      "material": "photo-silver",
+      "parameters": {
+        "orientation": "horizontal",
+        "front": "wall plane at local -z"
+      }
+    },
+    "home-grab-bar-v18": {
+      "kind": "grab-bar",
+      "dimensions": [
+        0.08,
+        0.46,
+        0.08
+      ],
+      "material": "photo-silver",
+      "parameters": {
+        "orientation": "vertical",
+        "front": "wall plane at local -z"
+      }
+    },
+    "home-swing-up-bar": {
+      "kind": "swing-up-grab-bar",
+      "dimensions": [
+        0.1,
+        0.2,
+        0.76
+      ],
+      "material": "photo-silver",
+      "parameters": {
+        "front": "wall plate at local -z; the U-bar projects along +z (shown down, in use)"
+      }
+    },
+    "home-bed-rail": {
+      "kind": "bed-rail",
+      "dimensions": [
+        0.08,
+        0.95,
+        0.55
+      ],
+      "material": "photo-silver",
+      "materials": {
+        "plate": "photo-black"
+      },
+      "parameters": {
+        "front": "floor-standing inverted U along local z; its plate slides under a mattress at x = 0"
+      }
+    },
+    "home-hospital-bed": {
+      "kind": "hospital-bed",
+      "dimensions": [
+        1,
+        1.05,
+        2.2
+      ],
+      "material": "photo-white",
+      "materials": {
+        "frame": "photo-silver",
+        "board": "photo-white"
+      },
+      "parameters": {
+        "headTilt": 0.5,
+        "front": "head at local -z; catalog entry for the optional hospital bed (not placed)"
+      }
+    },
+    "home-ramp-back": {
+      "kind": "ramp",
+      "dimensions": [
+        1.3,
+        1.27,
+        4.2
+      ],
+      "material": "concrete",
+      "materials": {
+        "rail": "photo-silver"
+      },
+      "parameters": {
+        "rise": 0.35,
+        "front": "high end (landing) at local -z, foot at +z; handrails both sides"
+      }
+    },
+    "home-ramp-front": {
+      "kind": "ramp",
+      "dimensions": [
+        1.3,
+        1.27,
+        6.5
+      ],
+      "material": "concrete",
+      "materials": {
+        "rail": "photo-silver"
+      },
+      "parameters": {
+        "rise": 0.35,
+        "front": "high end (porch) at local -z, foot at +z; handrails both sides"
+      }
+    },
+    "home-door-front": {
+      "kind": "plan-door",
+      "dimensions": [
+        0.95,
+        2.13,
+        0.043
+      ],
+      "material": "oak",
+      "parameters": {
+        "closedAngle": -1.570796,
+        "openAngle": 3.141593
+      }
+    },
+    "home-door-back": {
+      "kind": "plan-door",
+      "dimensions": [
+        0.95,
+        2.13,
+        0.043
+      ],
+      "material": "oak",
+      "parameters": {
+        "closedAngle": 1.570796,
+        "openAngle": 3.141593
+      }
+    },
+    "home-door-laundry": {
+      "kind": "plan-door",
+      "dimensions": [
+        0.9,
+        2.13,
+        0.043
+      ],
+      "material": "oak",
+      "parameters": {
+        "closedAngle": 1.570796,
+        "openAngle": 3.141593
+      }
+    },
+    "home-door-primary": {
+      "kind": "plan-door",
+      "dimensions": [
+        0.9,
+        2.13,
+        0.043
+      ],
+      "material": "oak",
+      "parameters": {
+        "closedAngle": 1.570796,
+        "openAngle": 3.141593
+      }
+    },
+    "home-door-bedroom-2": {
+      "kind": "plan-door",
+      "dimensions": [
+        0.9,
+        2.13,
+        0.043
+      ],
+      "material": "oak",
+      "parameters": {
+        "closedAngle": -1.570796,
+        "openAngle": 0
+      }
+    }
+  },
+  "materials": {
+    "wall": {
+      "color": "#f2efdf",
+      "roughness": 0.85
+    },
+    "wood": {
+      "color": "#e3c89e",
+      "roughness": 0.65,
+      "pattern": "herringbone"
+    },
+    "vinyl": {
+      "color": "#edece2",
+      "roughness": 0.65
+    },
+    "wet-tile": {
+      "color": "#618b82",
+      "roughness": 0.72,
+      "pattern": "tile"
+    },
+    "concrete": {
+      "color": "#c5c8c2",
+      "roughness": 0.95
+    },
+    "oak": {
+      "color": "#ddbd85",
+      "roughness": 0.65,
+      "pattern": "woodgrain"
+    },
+    "cabinet": {
+      "color": "#e3e3d6",
+      "roughness": 0.5
+    },
+    "table": {
+      "color": "#f4f2e7",
+      "roughness": 0.38
+    },
+    "metal": {
+      "color": "#b2bbb8",
+      "roughness": 0.4,
+      "metalness": 0.6
+    },
+    "porcelain": {
+      "color": "#eeeedd",
+      "roughness": 0.32
+    },
+    "screen": {
+      "color": "#14252b",
+      "roughness": 0.4
+    },
+    "blue": {
+      "color": "#39789e",
+      "roughness": 0.8
+    },
+    "chair": {
+      "color": "#ece2c5",
+      "roughness": 0.75
+    },
+    "glass": {
+      "color": "#7fabb7",
+      "roughness": 0.22,
+      "metalness": 0.15,
+      "opacity": 0.62
+    },
+    "light": {
+      "color": "#ead8ad",
+      "roughness": 0.5
+    },
+    "leaf": {
+      "color": "#477c47",
+      "roughness": 1
+    },
+    "photo-white": {
+      "color": "#f5f3ea",
+      "roughness": 0.55
+    },
+    "photo-silver": {
+      "color": "#c5c9c9",
+      "roughness": 0.35,
+      "metalness": 0.68
+    },
+    "photo-black": {
+      "color": "#242b2c",
+      "roughness": 0.55
+    },
+    "photo-quartz": {
+      "color": "#f4f2ea",
+      "roughness": 0.35
+    },
+    "photo-seat": {
+      "color": "#ede7d8",
+      "roughness": 0.84
+    },
+    "photo-blue-seat": {
+      "color": "#9ec6cb",
+      "roughness": 0.83
+    },
+    "photo-chair-wood": {
+      "color": "#b17b43",
+      "roughness": 0.55,
+      "pattern": "woodgrain"
+    },
+    "photo-bronze": {
+      "color": "#6b5845",
+      "roughness": 0.48,
+      "metalness": 0.3
+    },
+    "photo-teal": {
+      "color": "#57adbc",
+      "roughness": 0.65
+    },
+    "photo-teal-tile": {
+      "color": "#8db3ae",
+      "roughness": 0.42,
+      "pattern": "tile"
+    },
+    "photo-mosaic": {
+      "color": "#f1eadc",
+      "roughness": 0.75,
+      "pattern": "mosaic"
+    },
+    "photo-mustard": {
+      "color": "#c4a146",
+      "roughness": 0.65
+    },
+    "photo-blue-grey": {
+      "color": "#a1b8b6",
+      "roughness": 0.65
+    },
+    "photo-light": {
+      "color": "#fff8e8",
+      "roughness": 0.3,
+      "emissive": "#fff2d3",
+      "emissiveIntensity": 0.45
+    },
+    "home-lamp": {
+      "color": "#fbf1e0",
+      "roughness": 0.75,
+      "emissive": "#ffd8a3",
+      "emissiveIntensity": 0.75
+    },
+    "home-linen": {
+      "color": "#f3efe6",
+      "roughness": 0.9
+    }
+  },
+  "programs": [],
+  "referencePages": [
+    {
+      "page": 1,
+      "title": "HOME-PLAN · The Wongs' home design study (plan, ADL day, checks)",
+      "group": "Design study",
+      "text": "",
+      "findings": "Plan frame P, rooms, walls, door gaps, furniture schedule, turning circles and the ADL day. Generated and machine-checked by the home-plan scripts (no overlaps, circles clear, routes clear).",
+      "reviewStatus": "Reviewed for the illustrative plan",
+      "evidenceType": "Design drawing (illustrative)"
+    },
+    {
+      "page": 2,
+      "title": "Redfin · Alhambra 2-bedroom and single-story listings",
+      "group": "Housing stock",
+      "text": "",
+      "findings": "2-bed, 1-bath single-story homes of about 800-1,400 sq ft (818 S 6th St, 314 Palmetto Dr, a 1923 Spanish bungalow). https://www.redfin.com/city/208/CA/Alhambra/single-story",
+      "reviewStatus": "Reviewed for the illustrative plan",
+      "evidenceType": "Listing summary (search result)"
+    },
+    {
+      "page": 3,
+      "title": "Homes.com · Alhambra houses for sale",
+      "group": "Housing stock",
+      "text": "",
+      "findings": "Ranch and bungalow layouts: living room at the front, kitchen and service porch at the back. https://www.homes.com/alhambra-ca/houses-for-sale/",
+      "reviewStatus": "Reviewed for the illustrative plan",
+      "evidenceType": "Listing summary (search result)"
+    },
+    {
+      "page": 4,
+      "title": "Zillow · 2-bedroom homes in Alhambra (802 E Alhambra Rd)",
+      "group": "Housing stock",
+      "text": "",
+      "findings": "A 1940 2/2 single-family home of 1,248 sq ft. https://www.zillow.com/alhambra-ca/2-bedrooms/",
+      "reviewStatus": "Reviewed for the illustrative plan",
+      "evidenceType": "Listing summary (search result)"
+    },
+    {
+      "page": 5,
+      "title": "San Gabriel Valley 2/1 listings and Alhambra housing stock",
+      "group": "Housing stock",
+      "text": "",
+      "findings": "1920s-1950s Craftsman bungalows, Spanish Colonial Revival cottages and post-war ranches. https://www.coldwellbanker.com/city/ca/san-gabriel ; https://en.wikipedia.org/wiki/Alhambra,_California",
+      "reviewStatus": "Reviewed for the illustrative plan",
+      "evidenceType": "Context summary"
+    },
+    {
+      "page": 6,
+      "title": "Typical residential room sizes",
+      "group": "Housing stock",
+      "text": "",
+      "findings": "Living 14 x 16 ft, kitchen 10 x 12 ft, bedrooms 10-12 ft, 5 x 8 ft hall bath. https://roomsketch3d.com/learn/room-dimensions/standard-room-dimensions-guide",
+      "reviewStatus": "Reviewed for the illustrative plan",
+      "evidenceType": "Reference summary"
+    },
+    {
+      "page": 7,
+      "title": "2010 ADA Standards for Accessible Design",
+      "group": "Accessibility",
+      "text": "",
+      "findings": "Turning space 304.3, clear floor space 305.3, doors 404.2, ramps 405, toilets 604, roll-in showers 608, grab bars 609. https://www.ada.gov/law-and-regs/design-standards/2010-stds/",
+      "reviewStatus": "Reviewed for the illustrative plan",
+      "evidenceType": "Standard (interpreted, not quoted)"
+    },
+    {
+      "page": 8,
+      "title": "U.S. Access Board guides · turning space and toilet rooms",
+      "group": "Accessibility",
+      "text": "",
+      "findings": "60 in turning circle, 60 x 56 in toilet clearance, side and rear grab bars. https://www.access-board.gov/ada/guides/chapter-6-toilet-rooms/",
+      "reviewStatus": "Reviewed for the illustrative plan",
+      "evidenceType": "Guidance summary"
+    },
+    {
+      "page": 9,
+      "title": "ICC A117.1 dwelling units (Type A) and kitchen tip sheet",
+      "group": "Accessibility",
+      "text": "",
+      "findings": "Work surface at most 34 in high with knee clearance; 40 in between opposing counters. https://codes.iccsafe.org/content/icca117-12017/chapter-11-dwelling-units-and-sleeping-units",
+      "reviewStatus": "Reviewed for the illustrative plan",
+      "evidenceType": "Standard (interpreted, not quoted)"
+    },
+    {
+      "page": 10,
+      "title": "HUD · Aging in place; visitability",
+      "group": "Accessibility",
+      "text": "",
+      "findings": "Zero-step entrance, 36 in doors, 42 in halls, main-floor bedroom and bath. https://www.huduser.gov/portal/periodicals/em/fall13/highlight1.html ; https://ncil.org/visitability/about-visitability/",
+      "reviewStatus": "Reviewed for the illustrative plan",
+      "evidenceType": "Guidance summary"
+    },
+    {
+      "page": 11,
+      "title": "Wheelchair, walker and hospital-bed clearances",
+      "group": "Accessibility",
+      "text": "",
+      "findings": "Hall and bathroom space for walkers and wheelchairs; 36 x 80 in hospital bed with a 36 in caregiver side. https://www.oakleyhomeaccess.com/blog/how-much-space-does-a-wheelchair-or-walker-need-in-a-bathroom-or-hallway/",
+      "reviewStatus": "Reviewed for the illustrative plan",
+      "evidenceType": "Guidance summary"
+    },
+    {
+      "page": 12,
+      "title": "CDC STEADI · Check for Safety",
+      "group": "Care model",
+      "text": "",
+      "findings": "Room-by-room fall checklist: grab bars, night lights, no throw rugs, items within reach. https://www.cdc.gov/steadi/pdf/patient/customizable/CheckforSafety-Brochure-Final-Customizable-508.pdf",
+      "reviewStatus": "Reviewed for the illustrative plan",
+      "evidenceType": "Guidance summary"
+    },
+    {
+      "page": 13,
+      "title": "PACE (42 CFR 460) and CAPABLE home visits",
+      "group": "Care model",
+      "text": "",
+      "findings": "Home care, meals and home modifications by the interdisciplinary team; nurse, OT and handyperson visits. https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-E/part-460 ; https://www.ncoa.org/article/evidence-based-program-capable/",
+      "reviewStatus": "Reviewed for the illustrative plan",
+      "evidenceType": "Regulation and program summary"
+    }
+  ],
+  "accuracyIssues": [
+    {
+      "id": "illustrative-plan",
+      "title": "Illustrative plan, not a real home",
+      "detail": "An illustrative senior-friendly plan informed by typical Alhambra and San Gabriel Valley 2-bed listings (Redfin, Homes.com, Zillow; 800-1,400 sq ft bungalows and ranches) and by 2010 ADA Standards / ICC A117.1 Type A dwelling-unit guidance. It is enlarged 15-25 % over a typical 2/1 listing where wheelchair and walker clearances need it. No participant records, address or survey are used; listing pages served as inspiration only (WebFetch was blocked, values come from search summaries).",
+      "status": "Illustrative",
+      "pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "id": "accessibility-interpretation",
+      "title": "Accessibility values are interpretations",
+      "detail": "Door clear widths (0.90 m interior, 1.00 m exterior), the 1.18 m hall, seven 1.5 m turning circles, the toilet clearance (centreline 0.45 m, 1.525 x 1.42 m), the 1.55 x 1.45 m roll-in shower, the 0.76 m seated worktop and the grab-bar layout follow ADA 304, 404, 604, 608, 609 and ICC A117.1 as interpreted for a dwelling; the care-shower asset's bar layout differs slightly from ADA 608.3.2. Checked by scripts/validate-home.mjs, not by an accessibility consultant.",
+      "status": "Design interpretation",
+      "pages": [
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "id": "grid-aligned-doors",
+      "title": "Door gaps aligned to the navigation grid",
+      "detail": "Interior door gaps were shifted by up to 0.08 m from the study so that their centres fall on the 0.2 m navigation grid: a 0.9 m door passes a wheelchair (0.37 m clearance) only when a grid line runs through its middle. Clear widths are unchanged.",
+      "status": "Simulation adjustment",
+      "pages": [
+        1
+      ]
+    },
+    {
+      "id": "day-fittings",
+      "title": "Fittings shown in their end state",
+      "detail": "The swing-up grab bar and the bed transfer handle are fitted by the installer during the simulated day (1:14-1:53 PM) but the static plan shows them installed.",
+      "status": "Presentation simplification",
+      "pages": [
+        1
+      ]
+    },
+    {
+      "id": "roof-windows",
+      "title": "Roof and windows not modelled as geometry",
+      "detail": "The pitched roof (ridge along z at x = -1.3, eave 2.45 m, rise about 1.9 m, shed roof over the porch) and the windows are recorded in roofNote and windowSchedule only; the community instance is a cutaway and draws neither.",
+      "status": "Not modelled",
+      "pages": [
+        1
+      ]
+    },
+    {
+      "id": "morning-independence",
+      "title": "Morning independence is an assumption",
+      "detail": "Mrs. Wong toilets, washes and dresses her top half on her own before the aide arrives at 8:28. This is an illustrative composite of what the accessible bath enables; in another care plan the aide could start at 8:00.",
+      "status": "Care-plan assumption",
+      "pages": [
+        1,
+        12,
+        13
+      ]
+    }
+  ],
+  "site": {
+    "imageSize": [
+      2016,
+      1008
+    ],
+    "bounds": [
+      [
+        -11.2,
+        -15
+      ],
+      [
+        24.8,
+        15
+      ]
+    ],
+    "imagePixelBounds": [
+      0,
+      0,
+      2016,
+      1008
+    ],
+    "buildingOutline": [
+      [
+        -7.4,
+        -6.5
+      ],
+      [
+        3.2,
+        -6.5
+      ],
+      [
+        3.2,
+        -3.4
+      ],
+      [
+        5.8,
+        -3.4
+      ],
+      [
+        5.8,
+        4.6
+      ],
+      [
+        3.2,
+        4.6
+      ],
+      [
+        3.2,
+        6.5
+      ],
+      [
+        -5.8,
+        6.5
+      ],
+      [
+        -5.8,
+        -1.1
+      ],
+      [
+        -7.4,
+        -1.1
+      ]
+    ],
+    "referencePages": [
+      1
+    ],
+    "notes": "Bounds are the home-lin pad extended 8 m west (pad-local x -15..15, z -22..14) expressed in P. The outline is the house, porch and back landing. The yard planting, garden beds, drive and the porch rails belong to the community pad (community-pads.ts), not to this specification."
+  },
+  "roofSections": [],
+  "details": [],
+  "facade": {
+    "height": 2.45,
+    "status": "Stucco bungalow walls (illustrative); roof not modelled",
+    "wallMaterial": "wall",
+    "glazingMaterial": "glass",
+    "referencePages": [
+      1
+    ]
+  },
+  "dimensions": [
+    {
+      "id": "house-size",
+      "value": 13,
+      "unit": "m",
+      "sourceValue": "13.0 x 9.0 m (117 m2, 1,259 sq ft)",
+      "pages": [
+        1
+      ],
+      "status": "Design dimension",
+      "meaning": "House frontage (north-south) over the outer wall faces; depth 9.0 m."
+    },
+    {
+      "id": "net-room-area",
+      "value": 105,
+      "unit": "m2",
+      "sourceValue": "105.0 m2 (1,130 sq ft)",
+      "pages": [
+        1
+      ],
+      "status": "Computed from room polygons",
+      "meaning": "Net area of the eight interior rooms."
+    },
+    {
+      "id": "hall-clear-width",
+      "value": 1.18,
+      "unit": "m",
+      "sourceValue": "46 in",
+      "pages": [
+        1,
+        10
+      ],
+      "status": "Design dimension",
+      "meaning": "Clear width of the hall between the wall faces (42 in recommended)."
+    },
+    {
+      "id": "door-clear-interior",
+      "value": 0.9,
+      "unit": "m",
+      "sourceValue": "35.4 in",
+      "pages": [
+        7,
+        8
+      ],
+      "status": "Design dimension",
+      "meaning": "Clear opening of every interior door (32 in minimum, ADA 404.2.3)."
+    },
+    {
+      "id": "door-clear-exterior",
+      "value": 1,
+      "unit": "m",
+      "sourceValue": "39.4 in",
+      "pages": [
+        7,
+        8
+      ],
+      "status": "Design dimension",
+      "meaning": "Clear opening of the front and back doors."
+    },
+    {
+      "id": "turning-circle",
+      "value": 1.5,
+      "unit": "m",
+      "sourceValue": "60 in",
+      "pages": [
+        7,
+        8
+      ],
+      "status": "Design dimension",
+      "meaning": "Diameter of the seven turning circles (ADA 304.3.1)."
+    },
+    {
+      "id": "toilet-centreline",
+      "value": 0.45,
+      "unit": "m",
+      "sourceValue": "17.7 in",
+      "pages": [
+        7,
+        8
+      ],
+      "status": "Design dimension",
+      "meaning": "Toilet centreline from the side (back) wall (16-18 in, ADA 604.2)."
+    },
+    {
+      "id": "shower-clear",
+      "value": 1.55,
+      "unit": "m",
+      "sourceValue": "61 x 57 in",
+      "pages": [
+        7,
+        8
+      ],
+      "status": "Design dimension",
+      "meaning": "Roll-in shower clear length; 1.45 m deep, curbless (ADA 608.2.2)."
+    },
+    {
+      "id": "worktop-height",
+      "value": 0.76,
+      "unit": "m",
+      "sourceValue": "30 in",
+      "pages": [
+        9
+      ],
+      "status": "Design dimension",
+      "meaning": "Seated kitchen work surface, open below for knees and toes."
+    },
+    {
+      "id": "back-ramp-slope",
+      "value": 4.2,
+      "unit": "m",
+      "sourceValue": "0.35 m rise over 4.2 m = 1:12",
+      "pages": [
+        7,
+        8
+      ],
+      "status": "Design dimension",
+      "meaning": "Run of the back ramp at the 1:12 maximum slope (ADA 405.2)."
+    }
+  ],
+  "doorSchedule": [
+    {
+      "id": "home-door-front",
+      "type": "swing",
+      "wall": "home-wall-front",
+      "gap": [
+        -0.9,
+        0.1
+      ],
+      "clear": 1,
+      "hinge": [
+        3,
+        0.1
+      ],
+      "closed": [
+        3,
+        -0.85
+      ],
+      "open": [
+        2.05,
+        0.1
+      ],
+      "width": 0.95,
+      "objectId": "home-door-front-leaf",
+      "notes": "In-swing front door, lever handle, flush threshold (12 mm plate); latch-side pull space kept clear."
+    },
+    {
+      "id": "home-door-back",
+      "type": "swing",
+      "wall": "home-wall-back",
+      "gap": [
+        -2.5,
+        -1.5
+      ],
+      "clear": 1,
+      "hinge": [
+        -5.8,
+        -2.5
+      ],
+      "closed": [
+        -5.8,
+        -1.55
+      ],
+      "open": [
+        -6.75,
+        -2.5
+      ],
+      "width": 0.95,
+      "objectId": "home-door-back-leaf",
+      "notes": "Out-swing half-glass back door onto the level landing."
+    },
+    {
+      "id": "home-door-laundry",
+      "type": "swing",
+      "wall": "home-wall-p1",
+      "gap": [
+        -2.45,
+        -1.55
+      ],
+      "clear": 0.9,
+      "hinge": [
+        -1.6,
+        -2.45
+      ],
+      "closed": [
+        -1.6,
+        -1.55
+      ],
+      "open": [
+        -2.5,
+        -2.45
+      ],
+      "width": 0.9,
+      "objectId": "home-door-laundry-leaf",
+      "notes": "Swings into the laundry; lined up with the back door."
+    },
+    {
+      "id": "home-door-bath-hall",
+      "type": "pocket",
+      "wall": "home-wall-p1",
+      "gap": [
+        -0.45,
+        0.45
+      ],
+      "clear": 0.9,
+      "closedAt": [
+        -1.54,
+        0
+      ],
+      "openAt": [
+        -1.54,
+        0.9
+      ],
+      "width": 0.95,
+      "objectId": "home-door-bath-hall-leaf",
+      "notes": "Pocket door, slides north into the hall wall; D-pull, privacy latch openable from outside."
+    },
+    {
+      "id": "home-door-bath-ensuite",
+      "type": "pocket",
+      "wall": "home-wall-p4",
+      "gap": [
+        -3.45,
+        -2.55
+      ],
+      "clear": 0.9,
+      "closedAt": [
+        -3,
+        2.04
+      ],
+      "openAt": [
+        -2.1,
+        2.04
+      ],
+      "width": 0.95,
+      "objectId": "home-door-bath-ensuite-leaf",
+      "notes": "Pocket door, slides east into the bath/bedroom wall: bedside to toilet in about 5 m."
+    },
+    {
+      "id": "home-door-primary",
+      "type": "swing",
+      "wall": "home-wall-p1",
+      "gap": [
+        2.95,
+        3.85
+      ],
+      "clear": 0.9,
+      "hinge": [
+        -1.6,
+        2.95
+      ],
+      "closed": [
+        -1.6,
+        3.85
+      ],
+      "open": [
+        -2.5,
+        2.95
+      ],
+      "width": 0.9,
+      "objectId": "home-door-primary-leaf",
+      "notes": "Swings into the bedroom over the foot-zone turning circle (doors may swing into turning space)."
+    },
+    {
+      "id": "home-door-bedroom-2",
+      "type": "swing",
+      "wall": "home-wall-p5",
+      "gap": [
+        3.15,
+        4.05
+      ],
+      "clear": 0.9,
+      "hinge": [
+        -0.18,
+        4.05
+      ],
+      "closed": [
+        -0.18,
+        3.15
+      ],
+      "open": [
+        0.72,
+        4.05
+      ],
+      "width": 0.9,
+      "objectId": "home-door-bedroom-2-leaf",
+      "notes": "Swings into bedroom 2."
+    }
+  ],
+  "windowSchedule": [
+    {
+      "id": "home-win-dining-front",
+      "wall": "home-wall-front",
+      "offset": 0.9,
+      "width": 1.4,
+      "sill": 0.75,
+      "height": 1.35,
+      "roomId": "home-dining"
+    },
+    {
+      "id": "home-win-living-front-s",
+      "wall": "home-wall-front",
+      "offset": 3.4,
+      "width": 1.2,
+      "sill": 0.95,
+      "height": 1.15,
+      "roomId": "home-living"
+    },
+    {
+      "id": "home-win-living-front-n",
+      "wall": "home-wall-front",
+      "offset": 7.2,
+      "width": 1.6,
+      "sill": 0.75,
+      "height": 1.35,
+      "roomId": "home-living"
+    },
+    {
+      "id": "home-win-bed2-front",
+      "wall": "home-wall-front",
+      "offset": 11.3,
+      "width": 1.2,
+      "sill": 0.9,
+      "height": 1.2,
+      "roomId": "home-bedroom-2"
+    },
+    {
+      "id": "home-win-primary-north",
+      "wall": "home-wall-north",
+      "offset": 0.7,
+      "width": 1.2,
+      "sill": 0.9,
+      "height": 1.2,
+      "roomId": "home-primary"
+    },
+    {
+      "id": "home-win-bed2-north",
+      "wall": "home-wall-north",
+      "offset": 5.6,
+      "width": 1,
+      "sill": 0.9,
+      "height": 1.2,
+      "roomId": "home-bedroom-2"
+    },
+    {
+      "id": "home-win-kitchen-back",
+      "wall": "home-wall-back",
+      "offset": 1.9,
+      "width": 0.6,
+      "sill": 1.1,
+      "height": 0.9,
+      "roomId": "home-kitchen"
+    },
+    {
+      "id": "home-win-bath-back",
+      "wall": "home-wall-back",
+      "offset": 5.75,
+      "width": 1,
+      "sill": 1.45,
+      "height": 0.6,
+      "roomId": "home-bath"
+    },
+    {
+      "id": "home-win-primary-back",
+      "wall": "home-wall-back",
+      "offset": 11.75,
+      "width": 0.8,
+      "sill": 0.9,
+      "height": 1.2,
+      "roomId": "home-primary"
+    },
+    {
+      "id": "home-win-kitchen-south",
+      "wall": "home-wall-south",
+      "offset": 1.25,
+      "width": 0.9,
+      "sill": 1.05,
+      "height": 0.9,
+      "roomId": "home-kitchen"
+    },
+    {
+      "id": "home-win-dining-south",
+      "wall": "home-wall-south",
+      "offset": 5.9,
+      "width": 1.6,
+      "sill": 0.95,
+      "height": 1.15,
+      "roomId": "home-dining"
+    }
+  ],
+  "turningCircles": [
+    {
+      "id": "turn-entry",
+      "roomId": "home-living",
+      "centre": [
+        2.2,
+        -0.4
+      ],
+      "diameter": 1.5,
+      "required": false,
+      "notes": "Inside the front door"
+    },
+    {
+      "id": "turn-bath",
+      "roomId": "home-bath",
+      "centre": [
+        -3,
+        0.6
+      ],
+      "diameter": 1.5,
+      "required": true,
+      "notes": "Required; clear of all fixtures"
+    },
+    {
+      "id": "turn-primary-mr",
+      "roomId": "home-primary",
+      "centre": [
+        -4.3,
+        5.53
+      ],
+      "diameter": 1.5,
+      "required": true,
+      "notes": "Mr. Wong's side of the bed"
+    },
+    {
+      "id": "turn-primary-foot",
+      "roomId": "home-primary",
+      "centre": [
+        -2.55,
+        2.95
+      ],
+      "diameter": 1.5,
+      "required": false,
+      "notes": "Foot zone by the doors (walker turn)"
+    },
+    {
+      "id": "turn-kitchen",
+      "roomId": "home-kitchen",
+      "centre": [
+        -3.65,
+        -4.45
+      ],
+      "diameter": 1.5,
+      "required": true,
+      "notes": "Inside the L"
+    },
+    {
+      "id": "turn-dining",
+      "roomId": "home-dining",
+      "centre": [
+        2,
+        -4.75
+      ],
+      "diameter": 1.5,
+      "required": false,
+      "notes": "Beside the table"
+    },
+    {
+      "id": "turn-porch",
+      "roomId": "home-porch",
+      "centre": [
+        4.5,
+        -2.45
+      ],
+      "diameter": 1.5,
+      "required": false,
+      "notes": "Ramp top landing"
+    }
+  ],
+  "roofNote": "Pitched roof, ridge along z over x = -1.3, eave 2.45 m above the floor (2.75 m abs), rise about 1.9 m, extended as a shed roof over the porch on posts at x = 5.7. Not modelled: the community instance shows the house as a cutaway.",
+  "publication": {
+    "sourceDocuments": "not-published"
+  }
+}
