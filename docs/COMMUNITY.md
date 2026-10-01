@@ -144,7 +144,8 @@ registers every vehicle with the engine under its `name`, so a rider's segment
 with `vehicleId` and `seat` moves with it, the camera can follow it and the
 trace names it. Presentation is data: roof `decor` (`'pharmacy-cross'`,
 `'meal-cooler'`, built by `VEHICLE_DECOR`) and, for a Seen van on the fleet body,
-a livery `variant` letter after the center's own fleet. A Seen van's `seats`
+a livery `variant` letter after the center's own fleet (`fleetVanLetter`), which
+the layer passes straight to `buildArrivalVan`. A Seen van's `seats`
 come from `FLEET_VAN_SEATS`, the furniture its body draws. A vehicle that
 enters or leaves the map does so at `OFF_MAP` (just short of the ends of the
 drawn streets, `STREET_EXTENT`, beyond every pad and the Community framing)

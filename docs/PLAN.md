@@ -35,12 +35,12 @@ modules, per-frame placement is implemented four times, and 3D primitives are de
 | Theme | Finding | Where it stands |
 | --- | --- | --- |
 | Measurement | Measure, Trace, the report and the trace validator sampled the raw loop, not the composed source the viewer plays. | Fixed in this PR: one shared composed source feeds the viewer, the panels, the report and validators. |
-| Fleet motion | Tight pull-out arcs and a docking heading snap still made vans pivot; the turn-rate bound could not catch it; delivery trucks snap 45° on departure. | Arcs and bound fixed in this PR; trucks and a per-vehicle turn check are follow-up items. |
+| Fleet motion | Tight pull-out arcs and a docking heading snap still made vans pivot; the turn-rate bound could not catch it; delivery trucks snap 45° on departure. | Fixed in this PR: the fleet drives straight runs and arcs of at least 4 m (a short straight reverse out of the drop-off, drivers through the driver's door, fades beyond the street ends), delivery trucks back out and turn on 4.5 m arcs, street cars and the Olympic and Alveare vans drive rounded routes, and `validate:traffic` checks nose-first motion, jumps and a 4 m radius for every vehicle. |
 | Site coupling | Olympic and Alveare reuse Alhambra's van timetable; a facility without a context style inherits Alhambra's world. | Per-site van timetables fixed in this PR (`app/data/site-arrivals.json`); the general fix is the site registry below. |
 | Exporters | The GLB export scripts patch renderer imports by hand and broke when modules were added. | Fixed in this PR: the exporters bundle the renderer with the Rolldown loader, and `validate:renderer` is a headless smoke and disposal test for every site. |
 | Identity | The story and the community layer each had a "Mrs. Lin"; nothing detects one person in two places. | Renamed in this PR: the community household is the Wongs ("Mrs. Wong · at home", "Mr. Wong", "The Wongs' home"; actor and setting ids unchanged), so the story hero is the only Mrs. Lin. A person registry that detects one person in two places is part of the digital-twin work. |
-| Duplication | Placement logic ×4, point-in-polygon ×4, vehicle frame transform ×6, clock labels ×3, box helper ×16, five ways of compiling TypeScript for Node. | Shared kits in the migration order below. |
-| Validation | 19 validators, no runner, no CI, lint not enforced, several vacuous or orphaned checks. | Runner and CI added in this PR: `npm run validate` runs every validator (orphans included), `npm test` adds a `node:test` suite and CI runs both; lint enforcement and the vacuous checks are follow-up. |
+| Duplication | Placement logic ×4, point-in-polygon ×4, vehicle frame transform ×6, clock labels ×3, box helper ×16, five ways of compiling TypeScript for Node. | Started in this PR for vehicles: ring lanes, corner radius, easing, the van ramp, the fade, the fleet van ids and straight-and-arc routes (`vehicle-path.ts`) are each defined once. The other kits follow the migration order below. |
+| Validation | 19 validators, no runner, no CI, lint not enforced, several vacuous or orphaned checks. | Runner and CI added in this PR: `npm run validate` runs every validator (orphans included), `npm test` adds a `node:test` suite and CI runs both; the fleet-crew vehicle-id check now asserts against the engine's registered ids; lint enforcement and the remaining vacuous checks are follow-up. |
 | Dependencies | The shadcn kit and about a dozen packages are unused. | Prune during the split of the renderer and the page. |
 
 ## 3. The chassis
@@ -76,7 +76,7 @@ layers and reads the site's camera.
 | --- | --- | --- |
 | Sites | `app/data/sites.ts` plus `contextStyle`, `exteriorAppearance` and `siteId` checks in code | One `SiteConfig` per site: model, geography, context and exterior specs, arrival layout and timetable, cast kind, program, layers, camera framings, panel flags. A fourth site is a JSON file. |
 | Care settings | `community-settings.ts` (registry-shaped TypeScript) | JSON entries with a kind, a local frame, anchors, services and a cast template; the same schema around every site. |
-| Vehicles | Fleet, trucks, site vans, couriers and street cars each with their own sampler | One `VehicleDef` and one sampler; the traffic validator iterates the registry. |
+| Vehicles | Fleet, trucks, site vans, couriers and street cars each with their own sampler (sharing route pieces, lanes and easing) | One `VehicleDef` and one sampler; the traffic validator iterates the registry. |
 | Casts | `character-templates.json`, room scenes, `community-people.ts`, `fleet-crew.ts` | Cast templates per setting kind, parameterised by counts and anchors; one `Track` builder. |
 | Programs | `day-program.json` with repertoire and rotations | Rotation as a source transform that retitles sessions, so trace and metrics follow the chosen day. |
 | Scenarios | One scenario file | A library with a manifest: base source, extensions, hero, steps, shots. |
@@ -144,7 +144,7 @@ feeds). Keep simulation and platform speaking one schema:
 ## 6. Migration order (the app works after every step)
 
 1. Correctness first: composed source everywhere (done), exporters bundled with Rolldown plus a headless
-   renderer smoke test (done), per-site van timetables (done), delivery departure fix, `npm test` and CI
+   renderer smoke test (done), per-site van timetables (done), delivery departure fix (done), `npm test` and CI
    (done).
 2. Golden outputs: snapshot report and trace summaries and a per-actor placement hash per site; later
    refactors keep them byte-identical unless a step says otherwise.
@@ -168,10 +168,14 @@ feeds). Keep simulation and platform speaking one schema:
 - **Geometry.** Care settings sit on schematic pads beyond the ring streets of the Alhambra block, each with
   a horseshoe drive so no vehicle reverses or U-turns there. Real geography belongs to the network view.
   Community people use short straight paths on their pads; there is no outdoor navigation grid.
-- **Fleet.** Six vans use the west bays; two spare vans park at the west curb because a curb island blocks
-  a back-in at the two southern bays. Off-site trips leave through the driveway along the south street and
-  fade beyond the drawn scene. Alhambra's unload windows were shortened to fit the loop; Olympic and
-  Alveare keep their original van timetable.
+- **Fleet.** Vans A–E use five back-in bays on the west side of the lot, starting a stall north of the curb
+  island; van F and the two spares park at the west-street curb. Every move is straight runs and arcs of at
+  least 4 m; off-site trips leave through the driveway and down the west street and fade out beyond the
+  drawn street's end. A van leaves the drop-off by backing straight out 3 m, because a forward exit would
+  sweep the entrance ramp's landing. Alhambra's unload windows were shortened to fit the loop; Olympic and
+  Alveare keep their original van timetable, now their own data.
+- **Deliveries.** The trucks keep their nose-in stop at the rear receiving doors and back straight out
+  before turning away; they still appear and vanish on the south street east of the yard.
 - **Community timings** were shifted to clear fleet, truck and street-car movements (the van leaves the
   home 9:15, specialist visit 10:05, discharge pickup 2:23 PM, home-health visit 3:07 PM, nurse line
   3:40 PM). The discharged participant goes to the home on the pad.
@@ -194,6 +198,11 @@ Model details:
 - Should the community van idle at the home between runs (as now) or return to the fleet lot?
 - Keep the ambulance cameo at the hospital, and should the story page show the community layer?
 - Trim the curb island so all eight vans can use bays, or keep two spares at the curb?
+- Move the drop-off dock 3 m west so vans can leave it forward instead of backing out 3 m first?
+- Van E backs into the northernmost bay only while van D's bay is empty, so it makes one long neighborhood
+  run instead of two; is that acceptable?
+- Should delivery trucks back in to the receiving doors (tailgate at the door) and drive in from and out to
+  the ends of the drawn streets with a fade, as the vans do?
 - Should non-Monday rotations be baked into the day-room interaction tracks rather than re-posed at runtime?
 - Should handoff events also be attributed to the two staff members, and do analysts want CSV or NDJSON
   exports alongside the JSON trace?
