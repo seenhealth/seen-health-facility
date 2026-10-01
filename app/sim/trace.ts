@@ -10,7 +10,13 @@
  * and in Node (scripts/sim-report.mjs, scripts/validate-trace.mjs). The
  * output is deterministic for a given source, model and options.
  */
-import type { ActivitySource, ActorSpec, Interaction } from '../model/activity';
+import type {
+  ActivitySource,
+  ActorSpec,
+  Interaction,
+  VehicleLookup,
+} from '../model/activity';
+import { COMMUNITY_CATEGORIES } from '../model/community-settings';
 import { roleNames, type CharacterRole } from '../model/characters';
 import type { Facility, Vec2 } from '../model/schema';
 import { clockLabel } from './clock';
@@ -68,6 +74,8 @@ export type TraceOptions = {
   minEncounterSeconds?: number;
   /** A break in proximity shorter than this is bridged (default 3 s). */
   encounterGapSeconds?: number;
+  /** Vehicle poses for seated riders (see `MetricsOptions.vehicles`). */
+  vehicles?: VehicleLookup;
 };
 export type PersonJourney = {
   actorId: string;
@@ -100,6 +108,8 @@ export type TraceSummary = {
     activities: number;
     meals: number;
     coordination: number;
+    /** Home care, pharmacy, specialist, hospital, partner and nurse-line touchpoints. */
+    community: number;
   };
   medianEventsPerParticipant: number;
 };
@@ -129,7 +139,19 @@ const CATEGORY_BUCKET: Record<string, keyof TraceSummary['participantsWith']> =
     activities: 'activities',
     meals: 'meals',
     coordination: 'coordination',
+    ...Object.fromEntries(
+      COMMUNITY_CATEGORIES.map(([id]) => [id, 'community'] as const),
+    ),
   };
+/** Summary buckets in display order (the report and the validator print these). */
+export const TRACE_BUCKETS: (keyof TraceSummary['participantsWith'])[] = [
+  'clinical',
+  'therapy',
+  'activities',
+  'meals',
+  'coordination',
+  'community',
+];
 const round = (v: number, d = 2) => {
   const r = Math.round(v * 10 ** d) / 10 ** d;
   return r === 0 ? 0 : r; // never -0, so JSON round-trips are identical
@@ -162,7 +184,9 @@ export function traceTouchpoints(
     duration = source.duration,
     n = Math.round(duration / step);
   const groundZones = groundZonesOf(model);
-  const zoneName = new Map(model.zones.map((z) => [z.id, z.name] as const));
+  const zoneName = new Map(
+    [...model.zones, ...(source.zones || [])].map((z) => [z.id, z.name] as const),
+  );
   zoneName.set('site', 'Street & vans');
   const roomsByLevel = new Map<string, Room[]>();
   for (const r of model.rooms)
@@ -298,7 +322,7 @@ export function traceTouchpoints(
   let lastFrame: Frame[] = [];
   for (let k = 0; k < n; k++) {
     const t = k * step,
-      map = sampleFrame(source, groundZones, t),
+      map = sampleFrame(source, groundZones, t, opts.vehicles),
       frame = actors.map((a) => map.get(a.id)!);
     // Presence, zones, rooms and vehicles.
     for (const [i, a] of actors.entries()) {
@@ -532,13 +556,9 @@ export function traceSummary(
   const byKind: Record<string, number> = {};
   for (const k of KIND_ORDER) byKind[k] = 0;
   const perParticipant = new Map<string, number>(),
-    covered: Record<keyof TraceSummary['participantsWith'], Set<string>> = {
-      clinical: new Set(),
-      therapy: new Set(),
-      activities: new Set(),
-      meals: new Set(),
-      coordination: new Set(),
-    };
+    covered = Object.fromEntries(
+      TRACE_BUCKETS.map((k) => [k, new Set<string>()]),
+    ) as Record<keyof TraceSummary['participantsWith'], Set<string>>;
   const participants = new Set(
     source.actors
       .filter((a) => a.role === 'participant' && people.has(a.id))
@@ -565,13 +585,9 @@ export function traceSummary(
     people: people.size,
     events: events.length,
     byKind,
-    participantsWith: {
-      clinical: covered.clinical.size,
-      therapy: covered.therapy.size,
-      activities: covered.activities.size,
-      meals: covered.meals.size,
-      coordination: covered.coordination.size,
-    },
+    participantsWith: Object.fromEntries(
+      TRACE_BUCKETS.map((k) => [k, covered[k].size]),
+    ) as TraceSummary['participantsWith'],
     medianEventsPerParticipant: median,
   };
 }

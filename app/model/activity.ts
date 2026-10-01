@@ -11,7 +11,6 @@ import { buildArrival } from './arrival';
 import { buildSiteArrival } from './site-arrival';
 import { buildDayRoom } from './day-room';
 import { buildDeliveries, deliveryStops, sampleDelivery } from './deliveries';
-import { withFleetCrew } from './fleet-crew';
 
 export type Segment = {
   start: number;
@@ -46,6 +45,20 @@ export type ActorSpec = CharacterSpec & {
   programMode?: string;
   roomId?: string;
   arrivalVehicleId?: string;
+  /** Id of the `SourceExtension` that contributed this actor (set by `composeSources`). */
+  sourceId?: string;
+};
+/**
+ * A place outside the facility model that a composed source adds (a home, a
+ * pharmacy, a partner site). Metrics and the trace locate site-level people
+ * in these polygons; people there are away from the center.
+ */
+export type SourceZone = {
+  id: string;
+  name: string;
+  levelId: string;
+  polygon: Vec2[];
+  color?: string;
 };
 export type Interaction = {
   id: string;
@@ -70,6 +83,8 @@ export type ActivityData = {
   actors: ActorSpec[];
   roles: CharacterRole[];
   evidence: string[];
+  /** Zones beyond the facility model contributed by composed sources. */
+  zones?: SourceZone[];
 };
 export type ActivitySource = ActivityData;
 export const activityData = source as unknown as ActivityData;
@@ -116,18 +131,24 @@ export type VehicleSampler = (time: number) => VehiclePose;
  * follow it and metrics can locate it, whichever module built its body.
  */
 export function createVehicleRegistry() {
-  const samplers = new Map<string, VehicleSampler>();
+  const samplers = new Map<string, VehicleSampler>(),
+    labels = new Map<string, string>();
   return {
-    register(id: string, sample: VehicleSampler) {
+    register(id: string, sample: VehicleSampler, meta: { label?: string } = {}) {
       if (samplers.has(id)) throw new Error(`Vehicle ${id} is already registered`);
       samplers.set(id, sample);
+      if (meta.label) labels.set(id, meta.label);
     },
     has: (id: string) => samplers.has(id),
     sample: (id: string, time: number) => samplers.get(id)?.(time) ?? null,
+    /** Display name given at registration (falls back to the id). */
+    label: (id: string) => labels.get(id) ?? id,
     ids: () => [...samplers.keys()],
   };
 }
 export type VehicleRegistry = ReturnType<typeof createVehicleRegistry>;
+/** What metrics and the trace need to seat riders: a pose per vehicle id. */
+export type VehicleLookup = Pick<VehicleRegistry, 'sample'>;
 /** World placement of a seat offset in a vehicle frame (rotation.y = heading). */
 export function seatInVehicle(
   pose: VehiclePose,
@@ -403,7 +424,9 @@ export function createActivity(
 ) {
   if (data.duration !== activityData.duration)
     throw new Error(`Activity source must use the ${activityData.duration}s care-day clock`);
-  if (!data.siteSpecific) data = withFleetCrew(data);
+  // The engine plays its source as given; composition (community layer,
+  // fleet crew) happens upstream in alhambra-source.ts so Measure, the trace
+  // and the reports read the very same ActivityData.
   const arrival = data.siteSpecific
     ? buildSiteArrival(model, material)
     : buildArrival(model, material);
@@ -411,12 +434,17 @@ export function createActivity(
   const deliveries = data.siteSpecific ? null : buildDeliveries();
   if (deliveries) scene.add(deliveries.root);
   const vehicles = createVehicleRegistry();
-  arrival.vans.forEach((_, i) =>
-    vehicles.register(`van-${String.fromCharCode(97 + i)}`, (t) => arrival.sampleVan(i, t)),
-  );
+  arrival.vans.forEach((_, i) => {
+    const letter = String.fromCharCode(65 + i);
+    vehicles.register(`van-${letter.toLowerCase()}`, (t) => arrival.sampleVan(i, t), {
+      label: `Van ${letter}`,
+    });
+  });
   if (deliveries)
     deliveryStops.forEach((stop, i) =>
-      vehicles.register(stop.id, (t) => sampleDelivery(i, t)),
+      vehicles.register(stop.id, (t) => sampleDelivery(i, t), {
+        label: `Delivery truck · ${stop.kind}`,
+      }),
     );
   const root = new T.Group();
   root.name = 'care-day-actors';

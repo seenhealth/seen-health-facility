@@ -189,14 +189,24 @@ export function groundYAt(p: Vec2) {
   }
   return STREET_Y;
 }
+/** The pad rectangle's world corners (the setting's zone polygon). */
+export function padPolygon(
+  s: Pick<CareSetting, 'position' | 'heading' | 'pad'>,
+): Vec2[] {
+  return (
+    [
+      [-s.pad.w / 2, -s.pad.d / 2],
+      [s.pad.w / 2, -s.pad.d / 2],
+      [s.pad.w / 2, s.pad.d / 2],
+      [-s.pad.w / 2, s.pad.d / 2],
+    ] as Vec2[]
+  ).map((p) => toWorld(s, p));
+}
 /** World-space x/z of the pad rectangle (for framing and validation). */
-export function padBounds(s: CareSetting): [Vec2, Vec2] {
-  const corners = [
-    [-s.pad.w / 2, -s.pad.d / 2],
-    [s.pad.w / 2, -s.pad.d / 2],
-    [s.pad.w / 2, s.pad.d / 2],
-    [-s.pad.w / 2, s.pad.d / 2],
-  ].map((p) => toWorld(s, p as Vec2));
+export function padBounds(
+  s: Pick<CareSetting, 'position' | 'heading' | 'pad'>,
+): [Vec2, Vec2] {
+  const corners = padPolygon(s);
   const xs = corners.map((p) => p[0]),
     zs = corners.map((p) => p[1]);
   return [
@@ -212,7 +222,7 @@ const define = (d: Draft): CareSetting => {
     Object.entries(local).map(([k, p]) => [k, toWorld(rest, p)]),
   );
   // The label plate sits just past the pad's viewer-facing edge.
-  const [[minX, minZ], [maxX, maxZ]] = padBounds({ ...rest, anchors });
+  const [[minX, minZ], [maxX, maxZ]] = padBounds(rest);
   anchors.label ??= [(minX + maxX) / 2, maxZ + 2.6];
   anchors.padMin = [minX, minZ];
   anchors.padMax = [maxX, maxZ];

@@ -33,9 +33,9 @@ import { buildOlympicExterior } from './olympic-exterior';
 import { buildAlhambraExterior } from './alhambra-exterior';
 import { buildAlveareExterior } from './alveare-exterior';
 import { buildRoomLabels } from './room-labels';
-import { activityData, createActivity, type ActivitySource } from './activity';
-import { composeSources } from './sources';
-import { communitySource } from './community-people';
+import { createActivity, type ActivitySource } from './activity';
+import { alhambraSource } from './alhambra-source';
+import { COMMUNITY_SOURCE_ID, COMMUNITY_VIEW } from './community-people';
 import { buildCommunityLayer } from './community-layer';
 import {
   center,
@@ -1003,24 +1003,21 @@ export function createViewer(
   if (olympicExterior) context.add(olympicExterior.site);
   if (alhambraExterior) context.add(alhambraExterior.site);
   if (alveareExterior) context.add(alveareExterior.site);
-  // Models without a bespoke context style (Alhambra) get the distributed-care
-  // layer: its people are composed into the care-day source, its vehicles
-  // register with the activity engine so riders sit in them.
-  const communityData = model.contextStyle ? null : communitySource(model);
+  // Models without a bespoke context style (Alhambra) play the composed
+  // Alhambra source (alhambra-source.ts): the care-day loop, the fleet crew
+  // and the distributed-care layer. When that source carries the community
+  // view, the layer's pads and vehicles are built and its vehicles register
+  // with the engine so riders sit in them.
   const activity = model.contextStyle
     ? createSiteActivity(model, scene, mat)
-    : createActivity(
-        model,
-        scene,
-        mat,
-        composeSources(options.activity || activityData, communityData!),
-      );
-  const community = communityData
+    : createActivity(model, scene, mat, alhambraSource(model, options.activity));
+  const community = activity.data.views?.some((v) => v.id === COMMUNITY_VIEW.id)
     ? buildCommunityLayer(model, mat, activity.vehicles)
     : null;
   if (community) context.add(community.root);
-  const communityIds = new Set((communityData?.actors || []).map((a) => a.id));
-  const communityActors = activity.actors.filter((a) => communityIds.has(a.spec.id));
+  const communityActors = activity.actors.filter(
+    (a) => a.spec.sourceId === COMMUNITY_SOURCE_ID,
+  );
   const furnitureRoots: T.Group[] = [];
   const exteriorAssets: T.Group[] = [],
     roofAssets: T.Group[] = [];

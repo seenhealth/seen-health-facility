@@ -4,7 +4,9 @@ import type { Facility, Vec2 } from './schema';
 import type { SourceExtension } from './sources';
 import {
   careSettingById,
+  careSettings,
   groundYAt,
+  padPolygon,
   PAD_Y,
   PORCH_Y,
   settingZone,
@@ -25,6 +27,13 @@ import {
  * static poses otherwise, and seats in the community vehicles while riding.
  * Loop seconds throughout: 1 s = 40 clock seconds, 8 AM = 0, 4 PM = 720.
  */
+/** Source id of the community layer (`ActorSpec.sourceId` after composition). */
+export const COMMUNITY_SOURCE_ID = 'community';
+/** The filter view the layer adds to the activity panel. */
+export const COMMUNITY_VIEW = {
+  id: 'community',
+  label: 'Homes, pharmacy, hospital & partners',
+};
 const VAN = 'van-community';
 const CLOCK_END = 720;
 const VAN_FLOOR = 0.35;
@@ -1475,12 +1484,19 @@ export function communitySource(model: Facility): SourceExtension {
   }
 
   return {
-    id: 'community',
+    id: COMMUNITY_SOURCE_ID,
     description:
       'Around the center, the same care team runs home care, home health, pill-pack delivery, meals, home modifications, specialist escorts, hospital discharge coordination and a 24/7 nurse line, joined by door-to-door transport.',
     actors,
     interactions,
-    views: [{ id: 'community', label: 'Homes, pharmacy, hospital & partners' }],
+    views: [COMMUNITY_VIEW],
+    zones: careSettings.map((s) => ({
+      id: settingZone(s.id),
+      name: s.name,
+      levelId: 'site',
+      polygon: padPolygon(s),
+      color: s.accent,
+    })),
     evidence: [
       'Distributed-care settings are illustrative pads on the paper ground beyond the ring streets; timings are compressed onto the 720 s care-day clock.',
     ],

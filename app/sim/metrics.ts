@@ -10,9 +10,11 @@ import {
   sampleActor,
   sampleEscort,
   samplePairedActors,
+  seatInVehicle,
   type ActivitySource,
   type ActorSample,
   type ActorSpec,
+  type VehicleLookup,
 } from '../model/activity';
 import type { CharacterRole } from '../model/characters';
 import type { Facility, Vec2 } from '../model/schema';
@@ -72,7 +74,7 @@ export const PARTICIPANT_ACTIVITIES: ParticipantActivity[] = [
   'offSite',
 ];
 export const participantActivityLabels: Record<ParticipantActivity, string> = {
-  offSite: 'Home or in the van',
+  offSite: 'Home, in the van or away',
   arrivals: 'Arrival, check-in & departure',
   clinical: 'Clinical & personal care',
   rehab: 'Therapy',
@@ -230,6 +232,12 @@ export type MetricsOptions = {
   }[];
   /** Distance (m) that counts as being with the hero. */
   touchRadius?: number;
+  /**
+   * Vehicle poses for seated riders (the viewer's `activity.vehicles`, or
+   * `alhambraVehicles()` in Node). Without it riders stay on their nominal
+   * ride path.
+   */
+  vehicles?: VehicleLookup;
 };
 
 const zeros = (n: number) => Array.from({ length: n }, () => 0);
@@ -249,16 +257,25 @@ type Frame = {
   sample: ActorSample;
   visible: boolean;
   zoneId: string;
+  /** In one of the source's zones beyond the facility (a home, a partner site). */
+  away: boolean;
 };
-/** Sample every actor at time t exactly like the activity engine does. */
+/**
+ * Sample every actor at time t exactly like the activity engine does: escorts
+ * and pairs, riders seated in their vehicle when `vehicles` is given, ground
+ * people located by zone polygon and site-level people by the source's own
+ * zones (homes, partner sites), else the street ('site').
+ */
 export function sampleFrame(
   source: ActivitySource,
   groundZones: { id: string; polygon: Vec2[] }[],
   t: number,
+  vehicles?: VehicleLookup,
 ): Map<string, Frame> {
   const byId = new Map(source.actors.map((a) => [a.id, a] as const)),
     paired = new Map<string, ActorSample>(),
-    out = new Map<string, Frame>();
+    out = new Map<string, Frame>(),
+    away = source.zones || [];
   for (const a of source.actors)
     if (a.pairedWith) {
       const partner = byId.get(a.pairedWith);
@@ -269,16 +286,35 @@ export function sampleFrame(
     }
   for (const a of source.actors) {
     const leader = a.escortFor ? byId.get(a.escortFor) : undefined;
-    const s = leader
+    let s = leader
       ? sampleEscort(leader, t)
       : paired.get(a.id) || sampleActor(a, t);
+    // An escort rides in its own seat rather than on top of its partner.
+    if (leader && s.vehicleId && s.seat) s = sampleActor(a, t);
+    const ride =
+      vehicles && s.vehicleId && s.seat ? vehicles.sample(s.vehicleId, t) : null;
+    if (ride)
+      s = {
+        ...s,
+        ...seatInVehicle(ride, s.seat!, s.seatHeading),
+        visible: s.visible !== false && ride.visible,
+      };
+    const p: Vec2 = [s.x, s.z];
     let zoneId = s.zoneId;
     if (a.levelId === 'ground')
       zoneId =
-        groundZones.find((z) => insidePolygon([s.x, s.z], z.polygon))?.id ||
-        s.zoneId;
-    else if (a.levelId === 'site') zoneId = 'site';
-    out.set(a.id, { sample: s, visible: s.visible !== false, zoneId });
+        groundZones.find((z) => insidePolygon(p, z.polygon))?.id ||
+        (s.vehicleId || a.arrivalVehicleId ? 'site' : s.zoneId);
+    if (a.levelId === 'site' || zoneId === 'site')
+      zoneId =
+        away.find((z) => z.levelId === 'site' && insidePolygon(p, z.polygon))
+          ?.id || 'site';
+    out.set(a.id, {
+      sample: s,
+      visible: s.visible !== false,
+      zoneId,
+      away: away.some((z) => z.id === zoneId),
+    });
   }
   return out;
 }
@@ -311,7 +347,8 @@ export function computeMetrics(
   const zoneInfo = new Map<string, { name: string; levelId: string }>([
     ['site', { name: 'Street & vans', levelId: 'site' }],
   ]);
-  for (const z of model.zones) zoneInfo.set(z.id, { name: z.name, levelId: z.levelId });
+  for (const z of [...model.zones, ...(source.zones || [])])
+    zoneInfo.set(z.id, { name: z.name, levelId: z.levelId });
   const staff = source.actors.filter((a) => a.role !== 'participant'),
     participants = source.actors.filter((a) => a.role === 'participant');
   const zoneSeries = new Map<string, { participants: number[]; staff: number[] }>();
@@ -337,6 +374,8 @@ export function computeMetrics(
     participants.map((a) => [a.id, blank(PARTICIPANT_ACTIVITIES)]),
   );
   const walked = new Map(source.actors.map((a) => [a.id, 0]));
+  /** Staff seen at the center at least once; role utilization covers them. */
+  const atCenter = new Set<string>();
   const hero = options.heroId
     ? source.actors.find((a) => a.id === options.heroId) || null
     : null;
@@ -347,7 +386,7 @@ export function computeMetrics(
   // One extra frame closes the loop for walking distances.
   for (let k = 0; k <= n; k++) {
     const t = k * step,
-      frame = sampleFrame(source, groundZones, t % source.duration);
+      frame = sampleFrame(source, groundZones, t % source.duration, options.vehicles);
     if (prev)
       for (const a of source.actors) {
         const p = prev.get(a.id)!,
@@ -363,30 +402,32 @@ export function computeMetrics(
     for (const a of source.actors) {
       const f = frame.get(a.id)!;
       if (f.visible) {
-        const s = series(f.zoneId);
-        if (a.role === 'participant') {
-          s.participants[k]++;
-          onSite.participants[k]++;
-        } else {
-          s.staff[k]++;
-          onSite.staff[k]++;
+        const s = series(f.zoneId),
+          staffMember = a.role !== 'participant';
+        if (staffMember) s.staff[k]++;
+        else s.participants[k]++;
+        // On site means at the center: homes and partner sites do not count.
+        if (!f.away) {
+          if (staffMember) onSite.staff[k]++;
+          else onSite.participants[k]++;
+          if (staffMember) atCenter.add(identityOf(a));
         }
       }
       if (a.role !== 'participant') continue;
       {
         let cat: ParticipantActivity;
+        const mine = active.filter((i) => i.actorIds.includes(a.id));
+        const found = CATEGORY_PRIORITY.find((c) =>
+          mine.some((i) => categoryBucket(i.category) === c),
+        );
         if (!f.visible) cat = 'offSite';
-        else {
-          const mine = active.filter((i) => i.actorIds.includes(a.id));
-          const found = CATEGORY_PRIORITY.find((c) =>
-            mine.some((i) => categoryBucket(i.category) === c),
-          );
-          if (found && !(f.sample.action === 'walk' && found !== 'arrivals'))
-            cat = found;
-          else if (f.sample.action === 'walk' || f.sample.action === 'roll')
-            cat = 'moving';
-          else cat = 'waiting';
-        }
+        // Away from the center, only care touchpoints count; the rest is home.
+        else if (f.away) cat = found === 'community' ? found : 'offSite';
+        else if (found && !(f.sample.action === 'walk' && found !== 'arrivals'))
+          cat = found;
+        else if (f.sample.action === 'walk' || f.sample.action === 'roll')
+          cat = 'moving';
+        else cat = 'waiting';
         partSeconds.get(a.id)![cat] += step;
       }
     }
@@ -463,9 +504,12 @@ export function computeMetrics(
     nutrition: 'Food service',
     coordinator: roleNames.coordinator || 'Care coordinator',
   });
+  // Staff time by role describes the center's staff; partner staff who only
+  // appear at a home or partner site are in occupancy and the trace instead.
   const roleMap = new Map<CharacterRole, string[]>();
   for (const [id, members] of staffPeople)
-    roleMap.set(members[0].role, [...(roleMap.get(members[0].role) || []), id]);
+    if (atCenter.has(id))
+      roleMap.set(members[0].role, [...(roleMap.get(members[0].role) || []), id]);
   const walkedBy = (id: string) =>
     staffPeople.get(id)!.reduce((s, a) => s + walked.get(a.id)!, 0);
   const roles: RoleUtilization[] = [...roleMap.entries()]
