@@ -252,3 +252,114 @@ void test('a leg must cover its hole and meet the door', () => {
   // No leg: the placeholder stays, out of sight.
   assert.deepEqual(fillHoles(wong, holes, () => undefined).segments, wong.segments);
 });
+
+// A sofa in the living room and three more scheduled people: the shapes a
+// home's cast needs beyond the clinic trip.
+const sofaHouse = {
+  ...house,
+  assets: { sofa: { kind: 'sofa', dimensions: [2, 0.85, 0.8], material: 'fabric' } },
+  objects: [
+    {
+      id: 'living-sofa',
+      assetId: 'sofa',
+      zoneId: 'house',
+      levelId: 'ground',
+      roomId: 'living',
+      position: [2, 0, -2.5],
+      rotation: 0,
+      scale: [1, 1, 1],
+      referencePages: [],
+      status: 'test',
+      notes: '',
+      layer: 'furniture',
+    },
+  ],
+} as unknown as Facility;
+const onSofa: Vec2 = [1.5, -2.5];
+const homeCast = (seat?: string): CastFile => ({
+  setting: 'home-lin',
+  people: [
+    // Home from hospital at 600 s and present to the end of the day: the
+    // seam is out of sight (hidden at 0 s), so the day need not end where it
+    // starts.
+    {
+      id: 'home-resident',
+      role: 'participant',
+      label: 'Resident',
+      variant: 8,
+      arrive: { t: 600, anchor: 'door' },
+      leave: { t: 720, anchor: 'door' },
+      stops: [
+        {
+          window: [610, 720],
+          roomId: 'living',
+          at: onSofa,
+          heading: Math.PI,
+          action: 'seated',
+          seated: true,
+          ...(seat ? { seat } : {}),
+          title: 'On the sofa',
+          with: ['nurse-line-rn'],
+          interaction: {
+            id: 'home-evening-call',
+            category: 'after-hours',
+            label: 'Evening call',
+            description: 'A call with someone outside the house.',
+            window: [690, 708],
+          },
+        },
+      ],
+    },
+    // Stops shorter than the generator's 8 s minimum stay keep their windows.
+    {
+      id: 'home-visitor',
+      role: 'aide',
+      label: 'Visitor',
+      variant: 2,
+      arrive: { t: 100, anchor: 'door' },
+      leave: { t: 140, anchor: 'door' },
+      stops: [
+        { window: [108, 111], roomId: 'living', at: [-2.5, -1.5], heading: 0, action: 'serve', title: 'A short task' },
+        { window: [119, 122], roomId: 'bedroom', at: [-2, -4.5], heading: 0, action: 'serve', title: 'Another one' },
+      ],
+    },
+  ],
+});
+const generate = (cast: CastFile) =>
+  communityCastFromScenes(sofaHouse, setting.facility!.frame, cast, { setting, nav });
+
+void test('scheduled people: a late arrival present at 720 s, short stops, a sofa seat, outside members', () => {
+  const cast = generate(homeCast('living-sofa'));
+  const report = checkInstanceCast(sofaHouse, setting, cast, { nav });
+  assert.deepEqual(report.external, ['nurse-line-rn']);
+  assert.deepEqual(
+    cast.holes['home-resident'].map((h) => [h.kind, h.start, h.end]),
+    [['before', 0, 600]],
+  );
+  const call = cast.interactions.find((i) => i.id === 'home-evening-call')!;
+  assert.deepEqual(call.actorIds, ['home-resident', 'nurse-line-rn']);
+  const visitor = cast.actors.find((a) => a.id === 'home-visitor')!;
+  for (const [t0, t1] of [
+    [108, 111],
+    [119, 122],
+  ]) {
+    const hold = visitor.segments.find((s) => s.start <= t0 && s.end >= t1);
+    assert.ok(hold && hold.action === 'serve', `holds ${t0}–${t1}`);
+  }
+  // The sofa is named on the seated pose, for the furniture check only.
+  assert.ok(
+    cast.actors
+      .find((a) => a.id === 'home-resident')!
+      .segments.some((s) => s.seated && s.seatId === 'living-sofa'),
+  );
+  assert.ok(
+    placeInstanceCast(setting, cast).actors.every((a) =>
+      a.segments.every((s) => !('seatId' in s)),
+    ),
+  );
+  // Without `seat`, sitting at that point overlaps the sofa.
+  assert.throws(
+    () => checkInstanceCast(sofaHouse, setting, generate(homeCast()), { nav }),
+    /overlaps furniture/,
+  );
+});

@@ -274,7 +274,11 @@ export function checkInstanceSite(
  * - scheduled people (`stops`): an explicit timetable, routed between
  *   consecutive stops; before `arrive`, after `leave` and during `away`
  *   windows they are off the instance (`holes`), which community-people.ts
- *   may fill with hand-authored legs (instance-cast.ts `fillHoles`).
+ *   may fill with hand-authored legs (instance-cast.ts `fillHoles`). Each
+ *   stop holds for its whole window, however short (walks fit in the gaps;
+ *   the 8 s minimum stay is for scene people), and a stop's `with` may name
+ *   people outside the cast. A resident writes `arrive: { t: 0, anchor:
+ *   <first stop's point> }` and `leave: { t: 720, anchor: 'door' }`.
  *
  * Coordinates: points written as [x, z] are in the facility's own frame (as
  * in the facility JSON), with headings in that frame; anchor names are the
@@ -307,8 +311,10 @@ export type ScheduleStop = {
   action: Action;
   /** Default: true on an object, false at a point. */
   seated?: boolean;
+  /** At a point: the object sat on there (a bed, sofa, toilet or shower seat), which the furniture check then ignores. */
+  seat?: string;
   title: string;
-  /** Other actors in this stop's interaction. */
+  /** Other actors in this stop's interaction (only read with `interaction`); people outside the cast are allowed. */
   with?: string[];
   /** The stop's interaction (stable id); spans the stop window unless `window` is given. */
   interaction?: {
@@ -321,11 +327,11 @@ export type ScheduleStop = {
 };
 /** Follows an explicit schedule. */
 export type ScheduledPerson = CastCommon & {
-  /** Appears here (setting anchor name or facility-local point) at `t` and walks on to the first stop. */
+  /** Appears here (setting anchor name or facility-local point) at `t` and walks on to the first stop; t > 0 leaves a `before` hole. */
   arrive: { t: number; anchor: string | Vec2 };
   /** Reaches this anchor at `t` and is gone; away windows leave and come back through it too. */
   leave: { t: number; anchor: string | Vec2 };
-  /** Windows off the instance between stops (e.g. a van trip). */
+  /** Windows off the instance between stops (e.g. a van trip), out and back through the leave anchor; none before the first stop (use `arrive.t`) or after the last (use `leave.t`). */
   away?: [number, number][];
   stops: ScheduleStop[];
 };
@@ -368,7 +374,12 @@ export type InstanceScene = {
 /** An outdoor place: out through an entrance, then along setting anchors (door outward). */
 export type OutdoorPlace = { label: string; entrance: string; path: string[] };
 export type CastFile = {
+  version?: 1;
   setting: string;
+  /** The facility id the cast is written for; the build checks it against the registry when given. */
+  facility?: string;
+  /** Free text for authors; not read. */
+  notes?: string[];
   /** Facility-local point just inside a door, and the setting anchors outside it (outermost first; the last is just outside the door). */
   entrances?: Record<string, { inside: Vec2; path: string[] }>;
   places?: Record<string, OutdoorPlace>;
@@ -388,6 +399,8 @@ type Place = {
   heading: number;
   seated: boolean;
   seatId?: string;
+  /** What a scheduled stop sits on (its object, or `seat` at a point): the output names it for the furniture check. */
+  sitsOn?: string;
   roomId?: string;
   /** Outdoor place id. */
   placeId?: string;
@@ -405,6 +418,8 @@ type Stay = {
   visible: boolean;
   /** No minimum dwell: an appearance at a door, walking straight on. */
   instant?: boolean;
+  /** A scheduled stop's window end: the walk out never leaves before it (instead of `minDwell`). */
+  until?: number;
 };
 type Leg = { path: Vec2[]; gait: number; action: 'walk' | 'roll' };
 type Walk = { legs: Leg[]; start: number; end: number; factor: number };
@@ -1230,15 +1245,19 @@ export function communityCastFromScenes(
           heading: s.heading ?? pose.heading,
           seated: s.seated ?? true,
           seatId: s.at,
+          sitsOn: s.at,
           roomId: s.roomId,
           label: roomLabel(s.roomId),
         };
       }
+      if (s.seat && !objectById.has(s.seat))
+        throw new Error(`${where}: no object ${s.seat} to sit on`);
       return {
         kind: 'indoor',
         point: s.at,
         heading: s.heading ?? 0,
         seated: !!s.seated,
+        ...(s.seat ? { sitsOn: s.seat } : {}),
         roomId: s.roomId,
         label: roomLabel(s.roomId),
       };
@@ -1277,6 +1296,7 @@ export function communityCastFromScenes(
         action: s.action,
         title: s.title,
         visible: true,
+        until: s.window[1],
       });
       const next = stops[i + 1]?.window[0] ?? spec.leave.t;
       if (s.window[1] < next - 1e-9)
@@ -1313,8 +1333,10 @@ export function communityCastFromScenes(
       if (w[0] >= cursor - 1e-9)
         throw new Error(`${where}: away ${w.join('–')} after the last stop`);
     if (spec.leave.t < 720) hidden(leaveAt, spec.leave.t, 'after', 720);
-    else if (!same(stays[0].place.point, stays.at(-1)!.place.point))
-      throw new Error(`${where}: present at 720 s, so the day must end where it starts`);
+    // In sight at both ends of the day: the loop seam must not jump. Someone
+    // who arrives later is hidden at 0 s, so the seam is out of sight.
+    else if (spec.arrive.t <= 0 && !same(stays[0].place.point, stays.at(-1)!.place.point))
+      throw new Error(`${where}: present at 0 and 720 s, so the day must end where it starts`);
     who.stays = stays;
     if (mine.length) holes[spec.id] = mine;
   }
@@ -1475,12 +1497,18 @@ export function communityCastFromScenes(
       a = who.stays[k - 1],
       b = who.stays[k];
     // Leaving a run: it must have lasted `minDwell` (not at the day's start,
-    // an appearance or off the instance). Arriving late (soft): before the
-    // run's next slot starts there.
+    // an appearance or off the instance); a scheduled person's run lasts
+    // until its stops' windows end, however short they are. Arriving late
+    // (soft): before the run's next slot starts there.
     const first = runStart(who, k - 1),
       aStart = arrival(who, k - 1),
-      dwell =
-        first > 0 && who.stays[first].visible && !who.stays[first].instant
+      until = Math.max(
+        -Infinity,
+        ...who.stays.slice(first, k).map((s) => s.until ?? -Infinity),
+      ),
+      dwell = isScheduled(who.spec)
+        ? Math.max(0, until - aStart)
+        : first > 0 && who.stays[first].visible && !who.stays[first].instant
           ? minDwell
           : 0;
     let nextStart = Infinity;
@@ -1670,6 +1698,9 @@ export function communityCastFromScenes(
         title: stay.title,
         ...(stay.visible ? {} : { visible: false }),
         ...(stay.visible && stay.place.seated ? { seated: true } : {}),
+        ...(stay.visible && stay.place.seated && stay.place.sitsOn
+          ? { seatId: stay.place.sitsOn }
+          : {}),
       });
     });
     const kept: InstanceSegment[] = [];
@@ -1726,10 +1757,10 @@ export function communityCastFromScenes(
       end: scene.window[1],
     });
   }
-  for (const i of scheduledInteractions.values()) {
-    for (const id of i.actorIds) personOf(id, i.id);
-    interactions.push(i);
-  }
+  // A stop's `with` may name people outside the cast (hand-authored in
+  // community-people.ts); `npm run validate:community` checks that the
+  // composed source has them.
+  for (const i of scheduledInteractions.values()) interactions.push(i);
   for (const id of cast.keep?.actors ?? [])
     if (!people.has(id)) throw new Error(`${setting.id}: actor ${id} must be kept`);
   for (const id of cast.keep?.interactions ?? [])
@@ -1765,6 +1796,8 @@ export type CastReport = {
   furniturePoses: number;
   /** Closest two visible people at 0.25 s. */
   closest: { d: number; t: number; a: string; b: string };
+  /** People outside the cast that its interactions name (the composed source must have them). */
+  external: string[];
 };
 /** Position of a generated actor at t (setting-local), and whether it is visible. */
 function sampleAt(a: InstanceActor, t: number) {
@@ -1781,8 +1814,10 @@ function sampleAt(a: InstanceActor, t: number) {
  * walking samples (5 cm) on and around the building ≥ 0.20 m from walls and
  * any visible pose ≥ 0.15 m; stationary poses in a room clear of furniture
  * (`roomPlacement(view, room).clear(p, seated ? 0.19 : 0.28, seat)`); any two
- * visible people ≥ `spacing` apart at 0.25 s; interactions name known
- * actors; holes match their hidden placeholders. Throws on the first failure.
+ * visible people ≥ `spacing` apart at 0.25 s; interaction windows inside
+ * the day (members outside the cast are listed in `external`, for the
+ * composed-source check); holes match their hidden placeholders. Throws on
+ * the first failure.
  */
 export function checkInstanceCast(
   facility: Facility,
@@ -1831,6 +1866,7 @@ export function checkInstanceCast(
     minPoseWall: Infinity,
     furniturePoses: 0,
     closest: { d: Infinity, t: 0, a: '', b: '' },
+    external: [],
   };
   for (const a of cast.actors) {
     const segs = a.segments;
@@ -1885,7 +1921,7 @@ export function checkInstanceCast(
       const room = rooms.find((r) => insidePolygon(p, r.polygon));
       if (room) {
         report.furniturePoses++;
-        const seat = s.seated ? seatAt(p) : undefined;
+        const seat = s.seated ? (s.seatId ?? seatAt(p)) : undefined;
         if (!clearOf(room.id)(p, s.seated ? 0.19 : 0.28, seat))
           throw new Error(
             `${a.id}: "${s.title}" at ${s.start} s overlaps furniture or a wall in ${room.id} at (${p.map(r2).join(', ')})`,
@@ -1897,8 +1933,9 @@ export function checkInstanceCast(
     if (!(i.start >= 0 && i.end <= 720 && i.end > i.start))
       throw new Error(`${i.id}: window ${i.start}–${i.end}`);
     for (const id of i.actorIds)
-      if (!ids.has(id)) throw new Error(`${i.id} names unknown actor ${id}`);
+      if (!ids.has(id) && !report.external.includes(id)) report.external.push(id);
   }
+  report.external.sort();
   for (const [id, holes] of Object.entries(cast.holes)) {
     const a = cast.actors.find((x) => x.id === id);
     if (!a) throw new Error(`holes for unknown actor ${id}`);

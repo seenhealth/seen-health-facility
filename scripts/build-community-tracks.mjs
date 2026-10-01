@@ -79,6 +79,12 @@ export async function build({
     if (!castText) continue;
     const castFile = JSON.parse(castText);
     assert.equal(castFile.setting, s.id, `${castPath}: setting ${castFile.setting}`);
+    if (castFile.facility)
+      assert.equal(
+        castFile.facility,
+        s.facility.id,
+        `${castPath} is written for ${castFile.facility}, but ${s.id} stamps ${s.facility.id}`,
+      );
     const nav = community.instanceNavOptions(s.facility, summary.inputs.levelIds[0]);
     const t0 = Date.now();
     const cast = community.communityCastFromScenes(facility, s.facility.frame, castFile, {
@@ -90,7 +96,8 @@ export async function build({
     log(
       `${s.id}: ${report.people} people, ${cast.interactions.length} interactions, ${report.segments} segments, ${report.walks} walks (max ${report.maxGait} m/s) in ${Date.now() - t0} ms; ` +
         `walks ≥ ${report.minWalkWall} m and poses ≥ ${report.minPoseWall} m from walls; ${report.furniturePoses} poses clear of furniture; ` +
-        `closest ${report.closest.d} m (${report.closest.a} / ${report.closest.b} at ${report.closest.t} s); ${Object.keys(cast.holes).length} people with holes.`,
+        `closest ${report.closest.d} m (${report.closest.a} / ${report.closest.b} at ${report.closest.t} s); ${Object.keys(cast.holes).length} people with holes` +
+        (report.external.length ? `; interactions also name ${report.external.join(', ')} (outside the cast).` : '.'),
     );
     if (notes) for (const note of cast.notes) log(`  note: ${note}`);
     else if (cast.notes.length)

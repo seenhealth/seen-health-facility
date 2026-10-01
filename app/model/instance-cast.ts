@@ -19,7 +19,10 @@ import type { Vec2 } from './schema';
  * the pad or its paving outside, `groundYAt`), puts everyone on the `site`
  * level in the setting's zone and does the same for interactions.
  */
-export type InstanceSegment = Omit<Segment, 'zoneId' | 'heights'>;
+export type InstanceSegment = Omit<Segment, 'zoneId' | 'heights'> & {
+  /** A scheduled stop's point seat (the bed, sofa or toilet sat on), for the furniture check; dropped at placement. */
+  seatId?: string;
+};
 export type InstanceActor = Omit<
   ActorSpec,
   'levelId' | 'segments' | 'sourceId'
@@ -71,7 +74,7 @@ export function placeInstanceCast(
     actors: cast.actors.map((a) => ({
       ...a,
       levelId: 'site',
-      segments: a.segments.map((s) => {
+      segments: a.segments.map(({ seatId: _seat, ...s }) => {
         const path = s.path.map(world);
         return {
           ...s,
