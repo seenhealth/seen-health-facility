@@ -285,6 +285,12 @@ const W = RING.west,
   N = RING.north,
   S = RING.south,
   R = TURN_RADIUS;
+/**
+ * Where vehicles enter and leave the map: past the drawn streets (which run
+ * to about x ±130, z ±95) and beyond every pad, so they appear and vanish
+ * out of the Community framing.
+ */
+export const OFF_MAP = { east: 124, west: -124, north: 90, south: -90 };
 /** Entry/exit leg z (or x) of a setting's lane plus the clearance a turn needs. */
 const legAt = (s: CareSetting, lane: 0 | 1, side: 'entry' | 'exit') =>
   legPoint(s, lane, side, 'street');
@@ -366,16 +372,18 @@ export const communityVehicles: CommunityVehicle[] = [
         113,
         172.5,
         [
+          // Round by the north and east streets: the south street's
+          // eastbound lane carries the street traffic at this hour.
           ...depart(home, 0, 0, W.in),
-          ...zRun(W.in, legAt(home, 0, 'exit')[1] + R + 2, N.in.z! - R),
-          ...corner(W.in, N.in),
-          ...xRun(N.in, W.in.x! + R, legAt(specialist, 0, 'entry')[0] - R - 2),
-          ...arrive(specialist, 0, N.in, 0),
+          ...viaNorthEastbound(legAt(home, 0, 'exit')[1] + R + 2, S.out.z! + R),
+          ...corner(E.in, S.out),
+          ...xRun(S.out, E.in.x! + R, legAt(specialist, 0, 'entry')[0] - R - 2),
+          ...arrive(specialist, 0, S.out, 0),
         ],
         'Driving to the specialist',
         { pre: beyond(home, 0, 0, 10), post: beyond(specialist, 0, 0, -10) },
       ),
-      dwell(172.5, 268, stop(specialist, 0), 'Waiting at the clinic', {
+      dwell(172.5, 274, stop(specialist, 0), 'Waiting at the clinic', {
         door: [
           [175, 190],
           [248, 261.5],
@@ -386,14 +394,16 @@ export const communityVehicles: CommunityVehicle[] = [
         ],
       }),
       drive(
-        268,
+        274,
         330,
         [
-          ...depart(specialist, 0, 0, N.out),
-          ...xRun(N.out, legAt(specialist, 0, 'exit')[0] - R - 2, W.out.x! + R),
-          ...corner(N.out, W.out),
-          ...zRun(W.out, N.out.z! - R, legAt(home, 0, 'entry')[1] + R + 2),
-          ...arrive(home, 0, W.out, 0),
+          // Leaves at 274 so it passes the rear lot after the package truck
+          // has turned in and before the courier pulls out (312).
+          ...depart(specialist, 0, 0, S.in),
+          ...xRun(S.in, legAt(specialist, 0, 'exit')[0] - R - 2, W.in.x! + R),
+          ...corner(S.in, W.in),
+          ...zRun(W.in, S.in.z! + R, legAt(home, 0, 'entry')[1] - R - 2),
+          ...arrive(home, 0, W.in, 0),
         ],
         'Bringing Mrs. Lin home',
         { pre: beyond(specialist, 0, 0, 10), post: beyond(home, 0, 0, -10) },
@@ -407,11 +417,10 @@ export const communityVehicles: CommunityVehicle[] = [
         540,
         [
           ...depart(home, 0, 0, W.in),
-          ...viaNorthEastbound(
-            legAt(home, 0, 'exit')[1] + R + 2,
-            legAt(hospital, 0, 'entry')[1] + R + 2,
-          ),
-          ...arrive(hospital, 0, E.in, 0),
+          ...zRun(W.in, legAt(home, 0, 'exit')[1] + R + 2, N.in.z! - R),
+          ...corner(W.in, N.in),
+          ...xRun(N.in, W.in.x! + R, legAt(hospital, 0, 'entry')[0] - R - 2),
+          ...arrive(hospital, 0, N.in, 0),
         ],
         'Driving to the hospital for a discharge',
         { pre: beyond(home, 0, 0, 10), post: beyond(hospital, 0, 0, -10) },
@@ -424,11 +433,10 @@ export const communityVehicles: CommunityVehicle[] = [
         575,
         642,
         [
-          ...depart(hospital, 0, 0, E.out),
-          ...viaNorthWestbound(
-            legAt(hospital, 0, 'exit')[1] + R + 2,
-            legAt(home, 0, 'entry')[1] + R + 2,
-          ),
+          ...depart(hospital, 0, 0, N.out),
+          ...xRun(N.out, legAt(hospital, 0, 'exit')[0] - R - 2, W.out.x! + R),
+          ...corner(N.out, W.out),
+          ...zRun(W.out, N.out.z! - R, legAt(home, 0, 'entry')[1] + R + 2),
           ...arrive(home, 0, W.out, 0),
         ],
         'Bringing Mr. Lin home from hospital',
@@ -483,9 +491,10 @@ export const communityVehicles: CommunityVehicle[] = [
         'Driving to the center',
         { pre: beyond(home, 0, 0, 10), post: past(CENTER_LOT.courier, 2) },
       ),
-      dwell(186, 300, CENTER_LOT.courier, 'Pill packs to rear receiving'),
+      // Pulls out at 312, once the Seen van has passed on its way home.
+      dwell(186, 312, CENTER_LOT.courier, 'Pill packs to rear receiving'),
       drive(
-        300,
+        312,
         420,
         [
           CENTER_LOT.courier.at,
@@ -610,8 +619,8 @@ export const communityVehicles: CommunityVehicle[] = [
     name: 'Ambulance',
     accent: '#c25b52',
     rest: {
-      at: [E.out.x!, -36],
-      dir: [0, 1],
+      at: [OFF_MAP.east, N.out.z!],
+      dir: [-1, 0],
       visible: false,
       phase: 'Off site',
     },
@@ -621,8 +630,8 @@ export const communityVehicles: CommunityVehicle[] = [
         58,
         75,
         [
-          ...zRun(E.out, -36, legAt(hospital, 0, 'entry')[1] - R - 2),
-          ...arrive(hospital, 0, E.out, 45),
+          ...xRun(N.out, OFF_MAP.east, legAt(hospital, 0, 'entry')[0] + R + 2),
+          ...arrive(hospital, 0, N.out, 45),
         ],
         'Arriving at the emergency department',
         { easeIn: false, post: beyond(hospital, 0, 45, -10) },
@@ -632,8 +641,8 @@ export const communityVehicles: CommunityVehicle[] = [
         98,
         111,
         [
-          ...depart(hospital, 0, 45, E.in, 9.7),
-          ...zRun(E.in, legAt(hospital, 0, 'exit')[1] - 9.7 - 2, -36),
+          ...depart(hospital, 0, 45, N.in, 9.7),
+          ...xRun(N.in, legAt(hospital, 0, 'exit')[0] + 9.7 + 2, OFF_MAP.east),
         ],
         'Leaving the hospital',
         { easeOut: false, pre: beyond(hospital, 0, 45, 10) },

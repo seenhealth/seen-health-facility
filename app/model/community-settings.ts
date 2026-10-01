@@ -11,6 +11,11 @@ import type { Vec2 } from './schema';
  * points at the access road (the "front"), local +x is to the right when
  * looking from the road at the building. `heading` rotates the frame into the
  * world exactly like `Object3D.rotation.y`.
+ *
+ * Fronts face +x or +z, the sides the default and Community cameras look at
+ * (azimuth ≈ 0.58), so drop-offs, canopies and lobbies are in view: pads sit
+ * west of the west street, south of the south street, or south of the north
+ * street east of the center, each with its stub on its front.
  */
 export type SettingKind =
   | 'home'
@@ -363,12 +368,13 @@ export const careSettings: CareSetting[] = [
     kind: 'hospital',
     name: 'Community hospital · ED & inpatient',
     subtitle: 'Admission, rounds and discharge coordination',
-    position: [94, -6],
-    heading: -Math.PI / 2,
+    position: [94, 14],
+    heading: 0,
     pad: { w: 36, d: 30 },
-    road: { from: [58, -6], to: [79, -6] },
+    road: { from: [94, 36.3], to: [94, 29] },
     drive: { depth: 8, radius: 7, lanes: 1 },
     apron: { w: 10, d: 4.6 },
+    streetExtension: { from: [56.5, 41.3], to: [128, 41.3], width: 10 },
     services: ['ed', 'discharge'],
     accent: '#b9645c',
     local: {
@@ -393,7 +399,7 @@ export const careSettings: CareSetting[] = [
       walkway: [2.4, -5.4],
       edBay: [14, -5.4],
       edBayVan: [5, 2],
-      sidewalkEnd: [9.5, 35],
+      sidewalkEnd: [9.5, 21.6],
       sidewalkPad: [9.5, 13.5],
       sidewalkIn: [9.5, -5.4],
     },
@@ -403,13 +409,13 @@ export const careSettings: CareSetting[] = [
     kind: 'specialist',
     name: 'Cardiology & specialty clinic',
     subtitle: 'Contracted specialist visits with a Seen escort',
-    position: [72, 64],
-    heading: Math.PI,
+    position: [84, -56],
+    heading: 0,
     pad: { w: 28, d: 26 },
-    road: { from: [72, 46.3], to: [72, 51] },
+    road: { from: [84, -35.8], to: [84, -43] },
     drive: { depth: 6, radius: 6.2, lanes: 1 },
     apron: { w: 10, d: 4.6 },
-    streetExtension: { from: [56.5, 41.3], to: [92, 41.3], width: 10 },
+    streetExtension: { from: [55.5, -32.3], to: [104, -32.3], width: 7 },
     services: ['specialist'],
     accent: '#6d8fb3',
     local: {

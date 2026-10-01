@@ -1693,12 +1693,31 @@ export function createViewer(
     zoomTarget = T.MathUtils.clamp(30 / Math.max(size.x, size.y), 1.35, 8);
     finishFocus(instant);
   }
-  /** Frame the whole distributed-care network, or one setting's pad. */
+  /**
+   * Frame the whole distributed-care network, or one setting's pad. When the
+   * camera looks at a pad's back, it first orbits round (keeping elevation
+   * and distance) so the pad's front, where the drop-off happens, faces it.
+   */
   function focusSetting(id?: string) {
     const framing = community?.frame(id);
     if (!framing) {
       focus(null);
       return;
+    }
+    if (framing.azimuth !== undefined) {
+      const offset = camera.position.clone().sub(controls.target),
+        current = Math.atan2(offset.x, offset.z),
+        off = Math.atan2(
+          Math.sin(current - framing.azimuth),
+          Math.cos(current - framing.azimuth),
+        );
+      if (Math.abs(off) > 1.2)
+        offset.applyAxisAngle(
+          new T.Vector3(0, 1, 0),
+          framing.azimuth + Math.sign(off) * 0.6 - current,
+        );
+      camera.position.copy(controls.target).add(offset);
+      controls.update();
     }
     focusTarget = new T.Vector3(...framing.target);
     zoomTarget = framing.zoom;
