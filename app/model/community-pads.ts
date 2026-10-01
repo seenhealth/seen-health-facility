@@ -10,6 +10,7 @@ import {
   PORCH_Y,
   streetZ,
   STREET_Y,
+  toLocal,
   type CareSetting,
 } from './community-settings';
 
@@ -355,7 +356,7 @@ function buildGround(s: CareSetting, h: Ctx) {
   // Kerb ramps where people step between pavement and plinth.
   const kerb = s.anchors.kerb;
   if (kerb) {
-    const k = toLocalPoint(s, kerb);
+    const k = toLocal(s, kerb);
     const ramp = h.box(
       k[0],
       STREET_Y,
@@ -368,13 +369,6 @@ function buildGround(s: CareSetting, h: Ctx) {
     ramp.rotation.x = -Math.atan2(PAD_Y - STREET_Y, 1.2);
     ramp.position.y = (STREET_Y + PAD_Y) / 2;
   }
-}
-function toLocalPoint(s: CareSetting, p: Vec2): Vec2 {
-  const c = Math.cos(s.heading),
-    sn = Math.sin(s.heading),
-    dx = p[0] - s.position[0],
-    dz = p[1] - s.position[1];
-  return [dx * c - dz * sn, dx * sn + dz * c];
 }
 /** Stall markings around a parked car position (local), heading along -z. */
 function stall(h: Ctx, x: number, z: number) {
@@ -413,7 +407,7 @@ function pitchedRoof(
 }
 
 function buildHouse(s: CareSetting, h: Ctx) {
-  const a = (k: string) => toLocalPoint(s, s.anchors[k]);
+  const a = (k: string) => toLocal(s, s.anchors[k]);
   // Bungalow: body, pitched roof, chimney, door and windows.
   h.box(0, PAD_Y, -10.6, 14, 3.0, 6.0, PALETTE.wallWarm);
   pitchedRoof(h, -7, 7, -13.6, -7.6, PAD_Y + 3.0, 1.9, PALETTE.houseRoof);
@@ -490,7 +484,7 @@ function buildHouse(s: CareSetting, h: Ctx) {
   h.tree(-12.4, -11.6, 1.7, 3.2, 0);
   h.tree(12.6, -12.2, 1.4, 2.8, 1);
   h.tree(-13.2, 9.8, 1.2, 2.6, 2);
-  const st = toLocalPoint(s, s.anchors.stall);
+  const st = toLocal(s, s.anchors.stall);
   stall(h, st[0], st[1]);
 }
 function buildPharmacy(s: CareSetting, h: Ctx) {
@@ -552,7 +546,7 @@ function buildHospital(s: CareSetting, h: Ctx) {
   h.box(7.8, PAD_Y, -8.9, 6.0, 0.05, 5.4, PALETTE.paver);
   h.box(11.0, PAD_Y + 3.3, -6.16, 12, 0.5, 0.1, PALETTE.cross);
   h.windows(11.6, 16.6, PAD_Y + 1.2, -6.16, 1.5, 2.3, 1.4);
-  const bed = toLocalPoint(s, s.anchors.bed);
+  const bed = toLocal(s, s.anchors.bed);
   h.box(bed[0], PAD_Y, bed[1], 1.0, 0.55, 2.1, PALETTE.metal);
   h.box(bed[0], PAD_Y + 0.55, bed[1], 1.0, 0.16, 2.1, PALETTE.bed);
   h.box(bed[0], PAD_Y + 0.71, bed[1] + 0.25, 0.96, 0.08, 1.4, PALETTE.blanket);
@@ -567,7 +561,7 @@ function buildHospital(s: CareSetting, h: Ctx) {
   h.box(0, PAD_Y + 0.3, -6.16, 2.4, 2.4, 0.1, 'glass');
   // Ambulance bay hatching where the ambulance stops.
   const bay = lanePose(s, 0, 45),
-    local = toLocalPoint(s, bay.position),
+    local = toLocal(s, bay.position),
     dir = toLocalDir(s, bay.direction);
   for (let i = -2; i <= 2; i++)
     h.box(
@@ -583,11 +577,9 @@ function buildHospital(s: CareSetting, h: Ctx) {
   h.tree(16.4, 12.2, 1.4, 3.0, 1);
   h.tree(-16.4, -14.0, 1.2, 2.6, 2);
 }
-function toLocalDir(s: CareSetting, d: Vec2): Vec2 {
-  const c = Math.cos(s.heading),
-    sn = Math.sin(s.heading);
-  return [d[0] * c - d[1] * sn, d[0] * sn + d[1] * c];
-}
+/** A world direction in the pad's frame (no translation). */
+const toLocalDir = (s: CareSetting, d: Vec2): Vec2 =>
+  toLocal({ position: [0, 0], heading: s.heading }, d);
 function buildSpecialist(s: CareSetting, h: Ctx) {
   // Ground floor: glazed lobby and exam room under a solid upper storey.
   h.box(0, PAD_Y, -9.0, 22, 0.06, 7.2, PALETTE.paver);
@@ -607,14 +599,14 @@ function buildSpecialist(s: CareSetting, h: Ctx) {
   h.box(-2.2, PAD_Y, -9.3, 0.2, 3.3, 4.6, PALETTE.wall);
   h.box(3.2, PAD_Y, -8.6, 1.8, 1.05, 0.7, PALETTE.wood);
   for (const k of ['waitA', 'waitB']) {
-    const p = toLocalPoint(s, s.anchors[k]);
+    const p = toLocal(s, s.anchors[k]);
     h.box(p[0], PAD_Y, p[1] + 0.1, 0.5, 0.45, 0.5, PALETTE.blanket);
     h.box(p[0], PAD_Y + 0.45, p[1] + 0.32, 0.5, 0.45, 0.06, PALETTE.blanket);
   }
-  const exam = toLocalPoint(s, s.anchors.examSeat);
+  const exam = toLocal(s, s.anchors.examSeat);
   h.box(exam[0], PAD_Y, exam[1], 0.7, 0.5, 0.7, PALETTE.blanket);
   h.box(exam[0], PAD_Y + 0.5, exam[1] - 0.32, 0.7, 0.7, 0.08, PALETTE.blanket);
-  const desk = toLocalPoint(s, s.anchors.mdDesk);
+  const desk = toLocal(s, s.anchors.mdDesk);
   h.box(desk[0], PAD_Y, desk[1] - 0.85, 1.4, 0.75, 0.6, PALETTE.wood);
   h.tree(-13.0, 11.6, 1.5, 3.0, 0);
   h.tree(13.0, 11.2, 1.3, 2.8, 1);
@@ -626,7 +618,7 @@ function buildPartnerAdc(s: CareSetting, h: Ctx) {
   pitchedRoof(h, -5, 11, -12.6, -4.4, PAD_Y + 3.4, 1.2, PALETTE.roof, 0.6);
   h.windows(-4.4, 0.6, PAD_Y + 1.0, -4.36, 1.4, 2.2, 1.4);
   h.windows(3.6, 10.4, PAD_Y + 1.0, -4.36, 1.4, 2.2, 1.4);
-  const door = toLocalPoint(s, s.anchors.entrance);
+  const door = toLocal(s, s.anchors.entrance);
   h.box(door[0], PAD_Y, -4.36, 1.6, 2.2, 0.08, s.accent);
   h.box(door[0], PAD_Y + 2.5, -3.6, 3.6, 0.16, 1.8, PALETTE.roof);
   h.box(-10, PAD_Y, -7.8, 10, 0.05, 9.6, PALETTE.paver);
@@ -641,7 +633,7 @@ function buildPartnerAdc(s: CareSetting, h: Ctx) {
     h.cylinder(x, PAD_Y, z, 0.08, 0.7, PALETTE.metal);
   }
   for (const k of ['seatA', 'seatB', 'seatC', 'seatD']) {
-    const p = toLocalPoint(s, s.anchors[k]);
+    const p = toLocal(s, s.anchors[k]);
     h.box(p[0], PAD_Y, p[1], 0.44, 0.44, 0.44, PALETTE.wood);
   }
   h.box(-15.3, PAD_Y, -7.8, 0.6, 0.5, 9.6, PALETTE.planting);

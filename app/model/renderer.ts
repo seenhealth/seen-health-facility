@@ -2157,9 +2157,10 @@ export function createViewer(
     followActor: (id: string | null) => {
       activity.setOptions({ follow: id });
       if (id) {
+        // A vehicle (any the engine registered) gets a wider frame than a person.
         zoomTarget = id.startsWith('interaction:')
           ? 4.5
-          : id.startsWith('van-')
+          : activity.vehicles.has(id)
             ? 3.3
             : 9;
         const p = activity.actorPosition(id);
