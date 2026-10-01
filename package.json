@@ -24,7 +24,10 @@
     "validate:trace": "node scripts/validate-trace.mjs",
     "dev:story": "vite --config vite.story.config.ts",
     "build:story": "vite build --config vite.story.config.ts",
-    "preview:story": "vite preview --config vite.story.config.ts"
+    "preview:story": "vite preview --config vite.story.config.ts",
+    "dev:viewer": "vite --config vite.viewer.config.ts",
+    "build:viewer": "vite build --config vite.viewer.config.ts",
+    "preview:viewer": "vite preview --config vite.viewer.config.ts"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",

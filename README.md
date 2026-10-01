@@ -48,6 +48,27 @@ npm run build
 
 The application uses React, Three.js, Vinext/Vite and a Cloudflare-compatible runtime. `package-lock.json` pins dependencies.
 
+## Static viewer build
+
+The 3D viewer (`app/page.tsx`, all three sites) also builds as a plain static site for hosts without a server, including a sub-folder of another site. The entry is `viewer/site/index.html` + `viewer/site/main.tsx`, built by `vite.viewer.config.ts`.
+
+```bash
+npm run dev:viewer       # standalone dev server (reads assets straight from public/)
+npm run build:viewer     # → dist/viewer-site/
+npm run preview:viewer   # serve the built site locally
+```
+
+`dist/viewer-site/` (about 5.9 MB, 1.9 MB of it the van wrap texture) contains only what the viewer loads at runtime:
+
+- `index.html`, `assets/*.js|css` (React, three.js, the renderer and the bundled activity data; the Measure charts and GLB import/export load on demand)
+- the four facility specifications the viewer fetches, minified: `models/seen-alhambra-planning.json`, `seen-olympic.json`, `seen-olympic-option.json` (Olympic's alternate clinic layout) and `seen-alveare.json`
+- every file those specifications load (sign textures in `reference/photos/`, `reference/fleet/final-vans.png`), collected at build time
+- `brand/seen-health-horizontal.png`, `favicon.svg`
+
+The default relative base works from any folder whose URL ends in `/`; `VIEWER_BASE=/facility/ npm run build:viewer` sets an absolute base instead. App code requests its files root-relative (`/models/…`, `/reference/…`, `/brand/…`); `viewer/site/asset-base.ts` rebases those URLs onto the build's folder where they become requests (`fetch`, image loads, `src`/`href` attributes), so app code is unchanged and exported specifications keep portable paths.
+
+Exporting the specification, a GLB or a PNG of the view, opening a local specification and recording video all run in the browser. Not shipped: the GLB, Markdown and JSON files linked as downloads under **Model files**, the accuracy register, **Animated care day** and **Participant journeys** (those links 404). **Site map** tiles load from openstreetmap.org.
+
 ## Validation
 
 The checked-in models work without private source documents or regeneration. A fresh clone can run:
@@ -67,6 +88,7 @@ npm run build:scenario -- --check
 npm run validate:trace
 npm run build
 npm run build:story
+npm run build:viewer
 ```
 
 `validate:model` prepares the headless model modules used by the other validators. `validate:traffic` checks vehicle clearance, nose-first motion and turn rates at 50 Hz; `validate:fleet` checks the drivers' and riders' choreography (seated while the van moves, cabin walks, ramp escorts, wall clearance). `validate-activity.mjs` also exports the animated cast GLB. The production build sanitizes the public model data and checks that no architectural PDFs, drawing images or extracted source text are published.
