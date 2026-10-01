@@ -44,6 +44,8 @@ export const FLEET_VAN_RAMP = (() => {
 })();
 /** Driver's door on the −x side: hinged at its front edge, it swings out by up to `openAngle` rad. */
 export const FLEET_VAN_CAB_DOOR = { hinge: -2.38, rear: -1.23, openAngle: 1.2 };
+/** Sliding-door opening in the +x panel: local z of its front and rear edges. */
+export const FLEET_VAN_SIDE_DOOR = { front: -0.8, rear: 0.42 };
 
 /** Photo-informed, dimensioned components. Placement and palettes belong to the facility specification. */
 export function buildPhotoAsset(
@@ -327,8 +329,25 @@ export function buildPhotoAsset(
       3.1 - cab.rear,
       body,
     );
-    box(sideX, 0.74, -1.6, 0.07, belt - 0.74, 1.6, body);
-    box(sideX, 0.74, 1.76, 0.07, belt - 0.74, 2.68, body);
+    const opening = FLEET_VAN_SIDE_DOOR;
+    box(
+      sideX,
+      0.74,
+      (opening.front - 2.4) / 2,
+      0.07,
+      belt - 0.74,
+      opening.front + 2.4,
+      body,
+    );
+    box(
+      sideX,
+      0.74,
+      (opening.rear + 3.1) / 2,
+      0.07,
+      belt - 0.74,
+      3.1 - opening.rear,
+      body,
+    );
     // Window band: roof rail, pillars and see-through glazing on both sides.
     for (const side of [-1, 1]) {
       box(side * sideX, windowTop, 0.35, 0.09, roofY - windowTop, 5.5, body);

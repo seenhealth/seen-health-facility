@@ -24,7 +24,20 @@ const { sim, activity, crew, story, deliveries, fleet, body, arrival } = await l
   fleet: 'app/model/alhambra-fleet.ts',
   body: 'app/model/photo-assets.ts',
 });
-const { FLEET_VAN_RAMP: RAMP, FLEET_VAN_CAB_DOOR: CAB } = body;
+const { FLEET_VAN_RAMP: RAMP, FLEET_VAN_CAB_DOOR: CAB, FLEET_VAN_SIDE_DOOR: SIDE } = body;
+/** The van's side panels, van-local x (fleet van half width less the panel inset, as photo-assets.ts builds them). */
+const SIDE_X = fleet.FLEET_VAN.halfWidth - 0.03;
+/** Van-local (x, z) of a world point for a van pose. */
+const toLocal = (van, p) => {
+  const c = Math.cos(van.heading),
+    sn = Math.sin(van.heading),
+    dx = p.x - van.position.x,
+    dz = p.z - van.position.z;
+  return { x: dx * c - dz * sn, z: dx * sn + dz * c };
+};
+/** Where a walk from `a` to `b` (van-local) crosses the panel plane x = `wall`, as its z; null when it does not. */
+const crossing = (a, b, wall) =>
+  (a.x - wall) * (b.x - wall) < 0 ? a.z + ((b.z - a.z) * (wall - a.x)) / (b.x - a.x) : null;
 const model = sim.validateFacility(
   JSON.parse(readFileSync('public/models/seen-alhambra-planning.json', 'utf8')),
 );
@@ -107,6 +120,7 @@ for (let k = 0; k < DURATION / 0.05; k++) {
 }
 assert.ok(fadeTimes.length > 100, `the fleet fades in and out during the day (${fadeTimes.length} samples)`);
 let driverDoorCrossings = 0,
+  slidingDoorCrossings = 0,
   officeGap = Infinity;
 for (const [name, source] of sources) {
   const byId = new Map(source.actors.map((a) => [a.id, a]));
@@ -138,9 +152,11 @@ for (const [name, source] of sources) {
     prev = new Map();
   const drivers = source.actors.filter((a) => a.role === 'driver' && a.segments.some((s) => vanIds.includes(s.vehicleId)));
   const seatedInParked = [],
-    cabSide = new Map();
+    cabSide = new Map(),
+    doorSide = new Map();
   for (let t = 0; t <= DURATION + 1e-9; t += dt) {
-    const tt = t % DURATION;
+    const tt = t % DURATION,
+      vansNow = vanIds.map((_, v) => sim.sampleVan(v, tt));
     for (const id of crewIds) {
       const a = byId.get(id),
         f = place(source, byId, a, tt),
@@ -196,6 +212,23 @@ for (const [name, source] of sources) {
           assert.ok(c >= 0.15, `${name}: ${id} inside a wall at ${tt} (${f.x.toFixed(2)}, ${f.z.toFixed(2)}, ${c.toFixed(2)} m)`);
         }
       }
+      // On foot, everyone (riders, escorts, drivers) passes a standing van's
+      // door-side panel only through the open sliding door.
+      vansNow.forEach((van, v) => {
+        const key = `${id}@${v}`,
+          before = doorSide.get(key),
+          local = { ...toLocal(van, f), x0: van.position.x, z0: van.position.z, door: van.door };
+        doorSide.set(key, local);
+        if (!before || !van.visible || f.visible === false || f.seatedIn || p?.visible === false || p?.seatedIn) return;
+        if (before.x0 !== local.x0 || before.z0 !== local.z0 || Math.abs(local.z) > 3.2) return;
+        const z = crossing(before, local, SIDE_X);
+        if (z === null) return;
+        slidingDoorCrossings++;
+        assert.ok(
+          z >= SIDE.front && z <= SIDE.rear && Math.min(before.door, local.door) > 0.9,
+          `${name}: ${id} passes through ${vanIds[v]}'s door-side panel at ${tt.toFixed(2)} (z ${z.toFixed(2)}, opening ${SIDE.front}–${SIDE.rear}, door ${local.door.toFixed(2)}, "${f.title}")`,
+        );
+      });
       prev.set(id, f);
     }
     // Drivers are in their seat, and seen there, whenever their van moves in
@@ -210,17 +243,11 @@ for (const [name, source] of sources) {
         assert.equal(f.seatedIn, vid, `${name}: ${d.id} is out of the cab while ${vid} moves at ${tt} ("${f.title}")`);
         if (activity.seatsShown(van)) assert.ok(f.visible !== false, `${name}: ${vid} drives in view without its driver at ${tt} ("${f.title}")`);
       }
-      const c = Math.cos(van.heading),
-        sn = Math.sin(van.heading),
-        dx = f.x - van.position.x,
-        dz = f.z - van.position.z,
-        local = { x: dx * c - dz * sn, z: dx * sn + dz * c, door: van.cabDoor, onFoot: !f.seatedIn && f.visible !== false };
+      const local = { ...toLocal(van, f), door: van.cabDoor, onFoot: !f.seatedIn && f.visible !== false };
       const before = cabSide.get(d.id);
       if (before && before.onFoot && local.onFoot && van.visible && Math.abs(local.z) < 3.2) {
-        const wall = -1.095;
-        if ((before.x - wall) * (local.x - wall) < 0) {
-          const k = (wall - before.x) / (local.x - before.x),
-            z = before.z + (local.z - before.z) * k;
+        const z = crossing(before, local, -SIDE_X);
+        if (z !== null) {
           driverDoorCrossings++;
           assert.ok(
             z >= CAB.hinge && z <= CAB.rear && Math.min(before.door, local.door) > 0.9,
@@ -335,5 +362,5 @@ for (const [name, source] of sources) {
   console.log(`${name}: ${source.actors.length} actors, ${drivers.length} drivers, ${crewIds.length - drivers.length} riders seated.`);
 }
 console.log(
-  `Fleet crew: ${arrivals} drop-off arrivals set off out of sight, ${totals.outOfView} seated people appearing or vanishing only with their van out of sight, ${totals.officeWalks} driver walks between the fleet office and a parked van (nearest person ${officeGap.toFixed(2)} m), ${totals.rampEscorts} ramp descents escorted by the driver, ${driverDoorCrossings} cab-door passages through the open driver's door, ${totals.fadeHidden} seated people hidden by the engine in vans below ${activity.SEATED_MIN_OPACITY} opacity, ${totals.samples.toLocaleString()} placement samples; cabin walks, seat visibility, driver-in-cab and wall clearance passed.`,
+  `Fleet crew: ${arrivals} drop-off arrivals set off out of sight, ${totals.outOfView} seated people appearing or vanishing only with their van out of sight, ${totals.officeWalks} driver walks between the fleet office and a parked van (nearest person ${officeGap.toFixed(2)} m), ${totals.rampEscorts} ramp descents escorted by the driver, ${driverDoorCrossings} cab-door passages through the open driver's door, ${slidingDoorCrossings} passages through the open sliding door, ${totals.fadeHidden} seated people hidden by the engine in vans below ${activity.SEATED_MIN_OPACITY} opacity, ${totals.samples.toLocaleString()} placement samples; cabin walks, seat visibility, driver-in-cab and wall clearance passed.`,
 );

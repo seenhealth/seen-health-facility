@@ -67,6 +67,12 @@ const SPOT = {
   topside: [1.6, -0.62] as Vec2,
   /** Standing room between the cab seats and the door opening. */
   inside: [0.55, -1.15] as Vec2,
+  /**
+   * Just inside the sliding-door opening, toward its front edge: the step in
+   * from `topside` to `inside` passes the door-side panel through the opening
+   * (FLEET_VAN_SIDE_DOOR), not through the panel ahead of it.
+   */
+  stepIn: [0.95, -0.47] as Vec2,
   /** Just outside the driver's door opening, and a step further out, behind the open door's swing. */
   cabDoorway: [
     -1.3,
@@ -810,6 +816,7 @@ function dockedDuty(track: Track, index: number, spell: FleetSpell, ramp: RampUs
     sill: frame.sill,
     topside: at(SPOT.topside),
     inside: at(SPOT.inside),
+    stepIn: at(SPOT.stepIn),
   };
   const morning = window.unload[0] >= spell.start && window.unload[0] < spell.end;
   const service = morning ? window.unload : window.boarding;
@@ -828,7 +835,7 @@ function dockedDuty(track: Track, index: number, spell: FleetSpell, ramp: RampUs
   track.walkAt([P.noseA, P.noseB, P.standby], STAFF_WALK, 'Around the nose to the ramp', GROUND);
   const rampReady = service[0] + 2;
   if (morning) {
-    const climb = length([P.foot, P.topside, P.inside]);
+    const climb = length([P.foot, P.topside, P.stepIn, P.inside]);
     for (const [i, u] of uses.entries()) {
       const speedDown = length(u.path) / (u.end - u.start),
         lag = (u.partyGap + FOLLOW_GAP) / speedDown,
@@ -845,7 +852,7 @@ function dockedDuty(track: Track, index: number, spell: FleetSpell, ramp: RampUs
       track.stay(rampReady, 'idle', 'Waiting for the ramp', faceSill);
       const climbSpeed = Math.min(1.9, Math.max(1.1, climb / Math.max(0.6, deadline - track.t)));
       track.walk([P.topside], track.t + length([P.foot, P.topside]) / climbSpeed, 'Up the ramp ahead of the rider', rampHeight(P.topside, P.sill, P.foot));
-      track.walk([P.inside], track.t + length([P.topside, P.inside]) / climbSpeed, 'Step inside', FLOOR, 'walk', inside);
+      track.walk([P.stepIn, P.inside], track.t + length([P.topside, P.stepIn, P.inside]) / climbSpeed, 'Step inside', FLOOR, 'walk', inside);
       track.stay(u.start + lag - 0.8, 'idle', 'Ready at the door', facing(P.inside, P.sill), inside);
       track.walk([P.sill], u.start + lag, 'Out behind the rider', FLOOR, 'walk', inside);
       track.walk([P.foot], u.end + lag, 'Escorting down the ramp', GROUND, 'escort', inside);
