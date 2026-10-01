@@ -136,25 +136,35 @@ void test('rejects actors that leave the start or the end of the day uncovered',
   );
 });
 
-// composeSources checks only the first start and the last end today; the
-// contiguity check is part of review finding F5 (app/model/sources.ts). Drop
-// `todo` once that lands.
-void test(
-  'rejects actors with a gap between segments',
-  { todo: 'composeSources contiguity check (F5, app/model/sources.ts)' },
-  () => {
-    assert.throws(
-      () =>
-        composeSources(base(), {
-          id: 'gap',
-          actors: [
-            actor('gap', [
-              [0, 100],
-              [120, DAY],
-            ]),
-          ],
-        }),
-      /gap/,
-    );
-  },
-);
+void test('rejects actors with a gap between segments', () => {
+  assert.throws(
+    () =>
+      composeSources(base(), {
+        id: 'gap',
+        actors: [
+          actor('gap', [
+            [0, 100],
+            [120, DAY],
+          ]),
+        ],
+      }),
+    /gap: gap has a gap between segments 0 and 1/,
+  );
+});
+
+void test('rejects a seat that names no vehicle', () => {
+  const rider = actor('rider', [
+    [0, 100],
+    [100, DAY],
+  ]);
+  rider.segments[1].seat = [0, 0.5, 0];
+  assert.throws(
+    () => composeSources(base(), { id: 'ride', actors: [rider] }),
+    /rider segment 1 .* has a seat but no vehicleId/,
+  );
+  rider.segments[1].vehicleId = 'van-a';
+  assert.equal(
+    composeSources(base(), { id: 'ride', actors: [rider] }).actors.length,
+    2,
+  );
+});

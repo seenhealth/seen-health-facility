@@ -11,7 +11,7 @@ The architecture review below was written for the September 2026 distributed-car
 | GLB export scripts broken by new renderer imports; no renderer smoke test | §2.1 item 3, §5 | Fixed in this PR (exporters and a headless renderer smoke test) |
 | Olympic and Alveare reuse Alhambra's Van A/B timetable | §2.1 item 4 | Fixed in this PR (per-site timetables in `app/data/site-arrivals.json`; `validate-site-arrivals.mjs` asserts they are independent of `alhambraVanWindows`) |
 | A facility without `contextStyle` inherits Alhambra's loop, streets, fleet and community | §2.1 item 5 | Follow-up |
-| Validators that can pass vacuously | §2.2 item 6 | Follow-up |
+| Validators that can pass vacuously | §2.2 item 6 | Partly fixed in this PR: `composeSources` rejects a gap between an added actor's segments and a seat without a `vehicleId`, and `createActivity` rejects a seat in a vehicle that is not registered; `validate-trace` reads the composed source and the Olympic checks no longer compare against `HEAD`. The fleet-crew vehicle-id and ramp-escort totals and the community-traffic proximity check are follow-up |
 | Day-program rotation leaking into Olympic and Alveare | §2.2 item 7 | Fixed in this PR |
 | Day-program rotation as global module state that only re-poses the scene (titles, metrics and trace stay on Monday) | §2.2 item 7 | Follow-up |
 | `sampleActor` ignores the source's clock; `720` hard-coded in 18 files | §2.2 item 8 | Follow-up |

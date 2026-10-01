@@ -443,11 +443,19 @@ export function samplePairedActors(
     },
   };
 }
+/**
+ * Plays `data` in `scene`. The engine registers the center's vehicles (or the
+ * site's arrival vans) itself; `registerVehicles` adds any others the source
+ * seats people in (the community layer's vehicles) before the seats are
+ * checked, so a seat in an unknown vehicle fails here instead of the rider
+ * silently standing on the nominal path.
+ */
 export function createActivity(
   model: Facility,
   scene: T.Scene,
   material?: (id: string) => T.MeshStandardMaterial,
   data: ActivityData = activityData,
+  registerVehicles?: (vehicles: VehicleRegistry) => void,
 ) {
   if (data.duration !== activityData.duration)
     throw new Error(`Activity source must use the ${activityData.duration}s care-day clock`);
@@ -467,6 +475,14 @@ export function createActivity(
     arrival.sampleVan,
     !!deliveries,
   );
+  registerVehicles?.(vehicles);
+  for (const a of data.actors)
+    a.segments.forEach((s, i) => {
+      if (s.seat && !(s.vehicleId && vehicles.has(s.vehicleId)))
+        throw new Error(
+          `${a.id} segment ${i} (${s.start}–${s.end} s) is seated in ${s.vehicleId ? `vehicle ${s.vehicleId}, which is not registered` : 'no vehicle (vehicleId missing)'}; registered: ${vehicles.ids().join(', ')}`,
+        );
+    });
   const root = new T.Group();
   root.name = 'care-day-actors';
   scene.add(root);

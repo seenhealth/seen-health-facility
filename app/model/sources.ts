@@ -20,8 +20,11 @@ export type SourceExtension = Partial<
 
 /**
  * Base loop plus extensions; actor, interaction and zone ids must stay
- * unique. Each extension's actors are tagged with its id (`sourceId`) so a
- * viewer can show or hide one source's people as a layer.
+ * unique. Every added actor covers the whole clock without gaps (each segment
+ * starts where the previous one ends) and every seated segment names its
+ * vehicle; `createActivity` then checks that vehicle is registered. Each
+ * extension's actors are tagged with its id (`sourceId`) so a viewer can show
+ * or hide one source's people as a layer.
  */
 export function composeSources(
   base: ActivityData,
@@ -45,6 +48,17 @@ export function composeSources(
         throw new Error(
           `${part.id}: ${a.id} must cover 0–${base.duration} s of the care-day clock`,
         );
+      a.segments.forEach((s, i) => {
+        const prev = a.segments[i - 1];
+        if (prev && Math.abs(s.start - prev.end) > 1e-6)
+          throw new Error(
+            `${part.id}: ${a.id} has a gap between segments ${i - 1} and ${i} (ends ${prev.end} s, next starts ${s.start} s)`,
+          );
+        if (s.seat && !s.vehicleId)
+          throw new Error(
+            `${part.id}: ${a.id} segment ${i} (${s.start}–${s.end} s) has a seat but no vehicleId`,
+          );
+      });
       actorIds.add(a.id);
       actors.push({ ...a, sourceId: part.id });
       roles.add(a.role);

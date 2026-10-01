@@ -10,6 +10,7 @@ import {
   timelineFor,
 } from '../work/validation/activity.mjs';
 import { alhambraSource } from '../work/validation/alhambra-source.mjs';
+import { registerCommunityVehicles } from '../work/validation/community-vehicles.mjs';
 import { buildNeighborhood } from '../work/validation/neighborhood.mjs';
 import { sampleVan, vanWindows, ARRIVAL } from '../work/validation/arrival.mjs';
 import { dayProgram, programAt } from '../work/validation/day-room.mjs';
@@ -19,9 +20,16 @@ const m = JSON.parse(
 );
 // The engine plays its source as given; the viewer gives it the composed
 // Alhambra source: the 167-person loop, the fleet crew (177) and the
-// community cast (203).
+// community cast (203), with the community vehicles registered so their
+// riders' seats resolve.
 const scene = new T.Scene(),
-  activity = createActivity(m, scene, undefined, alhambraSource(m)),
+  activity = createActivity(
+    m,
+    scene,
+    undefined,
+    alhambraSource(m),
+    registerCommunityVehicles,
+  ),
   neighborhood = buildNeighborhood(m);
 scene.add(neighborhood.root);
 assert.equal(activity.actors.length, 203);

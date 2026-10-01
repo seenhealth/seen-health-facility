@@ -1,6 +1,5 @@
 import * as T from 'three';
 import type { Facility } from './schema';
-import type { VehicleRegistry } from './activity';
 import { buildArrivalVan, updateArrivalVan } from './arrival';
 import {
   careSettingById,
@@ -12,7 +11,6 @@ import { buildCareSetting } from './community-pads';
 import {
   buildCommunityVehicleBody,
   communityVehicles,
-  registerCommunityVehicles,
   sampleCommunityVehicle,
   variantIndex,
   VEHICLE_DECOR,
@@ -62,14 +60,15 @@ const NETWORK_ZOOM = 88;
 const PAD_ZOOM = 66;
 /**
  * The distributed-care layer around the center: every setting's pad, the
- * community vehicles (registered with the activity engine so riders sit in
- * them) and camera framings for the whole network and each setting. The
- * people come from `communitySource()`, composed into the care-day source.
+ * community vehicles' bodies and camera framings for the whole network and
+ * each setting. The people come from `communitySource()`, composed into the
+ * care-day source; the vehicles' samplers are registered with the activity
+ * engine (`createActivity(…, registerCommunityVehicles)`) so riders sit in
+ * them.
  */
 export function buildCommunityLayer(
   model: Facility,
   mat: (id: string) => T.MeshStandardMaterial,
-  vehicles: VehicleRegistry,
 ) {
   const root = new T.Group();
   root.name = 'community-layer';
@@ -78,7 +77,6 @@ export function buildCommunityLayer(
       'Illustrative distributed-care settings on the paper ground beyond the ring streets; positions, massing and timings are not surveyed.',
   };
   for (const setting of careSettings) root.add(buildCareSetting(setting, mat));
-  registerCommunityVehicles(vehicles);
   const bodies = communityVehicles.map((v) => {
     if (v.kind === 'van') {
       // The shared fleet body in the registry's livery letter.

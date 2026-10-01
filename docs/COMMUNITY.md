@@ -20,9 +20,9 @@ clock; no participant records are used.
 | --- | --- |
 | `app/model/community-settings.ts` | The registry (`careSettings`): kind, name, position, heading, pad size, access road, horseshoe drive, anchors, services, accent. Frame helpers (`toWorld`, `lanePath`, `lanePose`, `groundYAt`). No three.js. |
 | `app/model/community-pads.ts` | `buildCareSetting(setting, mat)`: plinth, drive band, stub and sidewalk, label plate, trees and the building massing per kind. |
-| `app/model/community-vehicles.ts` | `communityVehicles` itineraries (dwell/drive legs) with each vehicle's name, roof decor and livery, `sampleCommunityVehicle(id, time)` pure samplers (with the fade at the map edge), lane and turning helpers, car and ambulance bodies. |
+| `app/model/community-vehicles.ts` | `communityVehicles` itineraries (dwell/drive legs) with each vehicle's name, roof decor and livery, `sampleCommunityVehicle(id, time)` pure samplers (with the fade at the map edge), `registerCommunityVehicles(registry)` (the samplers under their names), lane and turning helpers, car and ambulance bodies. |
 | `app/model/community-people.ts` | `communitySource(model)`: the cast, touchpoint interactions and the `community` view as a `SourceExtension` composed into the care-day source. |
-| `app/model/community-layer.ts` | `buildCommunityLayer(model, mat, vehicles)`: pads + vehicle bodies, registers the samplers with their names, `tick(time)`, `frame(settingId?)` camera framings and the network `bounds` / `shadowExtent`. |
+| `app/model/community-layer.ts` | `buildCommunityLayer(model, mat)`: pads + vehicle bodies, `tick(time)`, `frame(settingId?)` camera framings and the network `bounds` / `shadowExtent`. |
 | `app/model/alhambra-source.ts` | `alhambraSource(model, base)`: the care day exactly as the viewer plays it (base loop + community layer + fleet crew), and `alhambraVehicles()`, pure samplers under the engine's vehicle ids. |
 | `scripts/validate-community-traffic.mjs` | `npm run validate:community`: clearance, driving and cast checks (below). |
 
@@ -31,10 +31,11 @@ Wiring: `alhambraSource(model, base)` composes the Alhambra care day once,
 loop. The renderer, the Measure panel (metrics and trace), the story scenario
 (`composedStorySource`), `scripts/sim-report.mjs` and `scripts/validate-trace.mjs`
 all read it, so every count, trace and report describes the people the scene
-animates (203 in the base loop). `renderer.ts` builds the layer when the played
-source carries the `community` view, ticks it, sizes the sun's shadow camera
-from the network's bounds while the layer is visible, and exposes
-`focusSetting(id?)` and `view('community')`.
+animates (203 in the base loop). When the played source carries the `community`
+view, `renderer.ts` passes `registerCommunityVehicles` to `createActivity`
+(which rejects a seat in an unregistered vehicle), builds the layer, ticks it,
+sizes the sun's shadow camera from the network's bounds while the layer is
+visible, and exposes `focusSetting(id?)` and `view('community')`.
 
 `ViewerState.community` (default on, the **Community sites** toggle under
 Layers) shows or hides the layer. The pads live in the site context, so they
@@ -137,7 +138,7 @@ framing, the label plate and the shadow camera follow from the registry.
 phase, { door, ramp })` and `drive(from, to, path, phase, { pre, post })` legs
 covering the parts of the day it is on screen, a `rest` pose for the remainder,
 and `seats` for riders. Build street legs from `zRun`/`xRun`, `corner`,
-`arrive(setting, lane, fromLane, stopDeg)` and `depart(...)`. The layer
+`arrive(setting, lane, fromLane, stopDeg)` and `depart(...)`. The renderer
 registers every vehicle with the engine under its `name`, so a rider's segment
 with `vehicleId` and `seat` moves with it, the camera can follow it and the
 trace names it. Presentation is data: roof `decor` (`'pharmacy-cross'`,
