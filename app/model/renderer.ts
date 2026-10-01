@@ -1015,9 +1015,6 @@ export function createViewer(
     ? buildCommunityLayer(model, mat, activity.vehicles)
     : null;
   if (community) context.add(community.root);
-  const communityActors = activity.actors.filter(
-    (a) => a.spec.sourceId === COMMUNITY_SOURCE_ID,
-  );
   const furnitureRoots: T.Group[] = [];
   const exteriorAssets: T.Group[] = [],
     roofAssets: T.Group[] = [];
@@ -1410,7 +1407,10 @@ export function createViewer(
   };
   function update(next: ViewerState) {
     state = next;
-    activity.updateView(next);
+    activity.updateView({
+      ...next,
+      hiddenSources: next.community === false ? [COMMUNITY_SOURCE_ID] : [],
+    });
     ground.visible = state.plan;
     neighborhood.root.visible = !state.plan;
     if (siteMassing)
@@ -1606,7 +1606,8 @@ export function createViewer(
         !options.keepSiteWhenStacked
       );
     if (community) {
-      community.root.visible = state.community !== false;
+      // Like the ring streets, the 3D pads stay out of the flat plan view.
+      community.root.visible = state.community !== false && !state.plan;
       // Pads out to ±130 m receive shadows only while the layer is on screen;
       // otherwise the map keeps its finer building shadows.
       const extent = context.visible && community.root.visible ? 130 : 65;
@@ -2020,8 +2021,6 @@ export function createViewer(
     activity.tick(typeof document !== 'undefined' && document.hidden ? 0 : dt);
     neighborhood.tick(activity.getState().time);
     community?.tick(activity.getState().time);
-    if (community && state.community === false)
-      for (const a of communityActors) a.root.visible = false;
     // Entry leaves open for approaching transport parties, even with the design door toggle shut.
     if (model.contextStyle) {
       const travelers = activity.root.visible

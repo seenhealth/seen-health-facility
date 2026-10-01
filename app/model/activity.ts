@@ -476,6 +476,8 @@ export function createActivity(
       isolate: false,
       selected: null as string | null,
       site: true,
+      /** Composed sources (`ActorSpec.sourceId`) whose people are hidden. */
+      hiddenSources: [] as readonly string[],
     },
     noticeTime = 0;
   const listeners = new Set<(s: ActivitySnapshot) => void>();
@@ -633,17 +635,19 @@ export function createActivity(
       a.root.position.set(s.x, s.y ?? levelY(a.spec.levelId) + zoneOffset, s.z);
       a.root.rotation.y = s.heading;
       a.root.scale.setScalar(a.profile.height * options.scale);
+      // Site-level people (drivers, the community cast) live in the site
+      // context, so they show only with it, whatever the level.
       a.root.visible =
         s.visible !== false &&
         visibleRole(a.spec.role) &&
+        !(a.spec.sourceId && view.hiddenSources.includes(a.spec.sourceId)) &&
+        (a.spec.levelId !== 'site' || view.site) &&
         (!a.spec.arrivalVehicleId ||
           s.zoneId !== 'site' ||
           (view.site && !view.isolate)) &&
         (view.level === 'all' ||
           view.level === a.spec.levelId ||
-          (a.spec.levelId === 'site' &&
-            view.site &&
-            view.level === 'ground')) &&
+          (a.spec.levelId === 'site' && view.level === 'ground')) &&
         (!view.isolate || !view.selected || view.selected === s.zoneId);
       const cargo = a.spec.id.startsWith('delivery-')
         ? a.root.getObjectByName('delivery-cargo')
@@ -715,8 +719,12 @@ export function createActivity(
     getState,
     setOptions,
     tick,
-    updateView(next: typeof view) {
-      view = next;
+    updateView(
+      next: Omit<typeof view, 'hiddenSources'> & {
+        hiddenSources?: readonly string[];
+      },
+    ) {
+      view = { ...next, hiddenSources: next.hiddenSources ?? [] };
       tick(0, true);
     },
     subscribe(fn: (s: ActivitySnapshot) => void) {
