@@ -3028,7 +3028,7 @@
       3,
       3,
       3,
-      3,
+      2,
       2,
       2,
       2,
@@ -3124,7 +3124,7 @@
       4,
       3,
       2,
-      2,
+      1,
       1,
       1,
       1,
@@ -3153,7 +3153,7 @@
       3,
       5,
       4,
-      4,
+      3,
       3,
       3,
       3,
@@ -3193,10 +3193,10 @@
      ],
      "peakParticipants": 5,
      "peakStaff": 6,
-     "meanParticipants": 1.8458333333333334,
-     "meanStaff": 2.675,
-     "participantMinutes": 886,
-     "staffMinutes": 1284
+     "meanParticipants": 1.8402777777777777,
+     "meanStaff": 2.65,
+     "participantMinutes": 883.3333333333333,
+     "staffMinutes": 1272
     },
     {
      "zoneId": "ot",
@@ -6401,7 +6401,7 @@
      41,
      41,
      41,
-     41,
+     40,
      40,
      40,
      40,
@@ -6497,7 +6497,7 @@
      44,
      43,
      42,
-     42,
+     41,
      41,
      41,
      41,
@@ -6526,7 +6526,7 @@
      43,
      44,
      43,
-     43,
+     42,
      42,
      42,
      42,
@@ -6713,19 +6713,19 @@
       "walking": 952,
       "documenting": 50,
       "meeting": 0,
-      "driving": 794,
-      "offDuty": 771
+      "driving": 793,
+      "offDuty": 772
      },
      "share": {
-      "care": 0.7487760525947685,
-      "walking": 0.1331654776891873,
-      "documenting": 0.006993985172751434,
+      "care": 0.7488808058198098,
+      "walking": 0.1331841074426413,
+      "documenting": 0.006994963626189144,
       "meeting": 0,
-      "driving": 0.11106448454329276,
-      "offDuty": 0.09734848484848485
+      "driving": 0.11094012311135983,
+      "offDuty": 0.09747474747474748
      },
-     "onFloorSeconds": 7149,
-     "meanWalkMeters": 53.77922823162976
+     "onFloorSeconds": 7148,
+     "meanWalkMeters": 53.7792282314766
     },
     {
      "role": "nurse",
@@ -6817,7 +6817,7 @@
       "offDuty": 0.12669753086419752
      },
      "onFloorSeconds": 5659,
-     "meanWalkMeters": 101.4769579787643
+     "meanWalkMeters": 105.06947093190898
     }
    ],
    "participants": [
@@ -7088,10 +7088,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 120,
-      "waiting": 319,
-      "offSite": 96
+      "waiting": 318,
+      "offSite": 97
      },
-     "walkMeters": 144.21248371542328
+     "walkMeters": 144.2124837047435
     },
     {
      "id": "arrival-cane",
@@ -7105,10 +7105,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 88,
-      "waiting": 352,
-      "offSite": 96
+      "waiting": 351,
+      "offSite": 97
      },
-     "walkMeters": 137.54757133309008
+     "walkMeters": 137.5475713205047
     },
     {
      "id": "arrival-independent",
@@ -7125,7 +7125,7 @@
       "waiting": 312,
       "offSite": 147
      },
-     "walkMeters": 123.71367095384323
+     "walkMeters": 123.7136709399587
     },
     {
      "id": "arrival-wheelchair",
@@ -7142,7 +7142,7 @@
       "waiting": 277,
       "offSite": 147
      },
-     "walkMeters": 129.35370885546425
+     "walkMeters": 129.35370886550666
     },
     {
      "id": "community-01",
@@ -9077,10 +9077,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 41,
-      "waiting": 251,
-      "offSite": 375
+      "waiting": 250,
+      "offSite": 376
      },
-     "walkMeters": 79.98134689142441
+     "walkMeters": 79.98134688081261
     },
     {
      "id": "arrival-midday-c-2",
@@ -9094,10 +9094,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 39,
-      "waiting": 254,
-      "offSite": 374
+      "waiting": 253,
+      "offSite": 375
      },
-     "walkMeters": 80.21687266885338
+     "walkMeters": 80.21687265784162
     },
     {
      "id": "arrival-midday-d-3",
@@ -9114,7 +9114,7 @@
       "waiting": 236,
       "offSite": 391
      },
-     "walkMeters": 75.26695613925321
+     "walkMeters": 75.26695612507632
     },
     {
      "id": "arrival-midday-d-4",
@@ -9131,7 +9131,7 @@
       "waiting": 240,
       "offSite": 390
      },
-     "walkMeters": 78.36251370260635
+     "walkMeters": 78.36251368993918
     }
    ],
    "participantTotals": {
@@ -9143,8 +9143,8 @@
     "coordination": 720,
     "community": 1700,
     "moving": 948,
-    "waiting": 22344,
-    "offSite": 5949
+    "waiting": 22340,
+    "offSite": 5953
    },
    "hero": null,
    "handoffs": null,
@@ -9154,9 +9154,9 @@
     "staff": 67,
     "peakParticipantsOnSite": 129,
     "peakStaffOnFloor": 45,
-    "staffCareShare": 0.6014760147601476,
-    "staffWalkingShare": 0.09310458776229553,
-    "meanParticipantActiveShare": 0.7337254649731562
+    "staffCareShare": 0.6014925784154435,
+    "staffWalkingShare": 0.09310715170875444,
+    "meanParticipantActiveShare": 0.7337285479911516
    },
    "seriesStep": 4
   },
@@ -12553,7 +12553,7 @@
       3,
       3,
       3,
-      3,
+      2,
       2,
       2,
       2,
@@ -12649,7 +12649,7 @@
       4,
       3,
       2,
-      2,
+      1,
       1,
       1,
       1,
@@ -12678,7 +12678,7 @@
       3,
       5,
       4,
-      4,
+      3,
       3,
       3,
       3,
@@ -12718,10 +12718,10 @@
      ],
      "peakParticipants": 5,
      "peakStaff": 6,
-     "meanParticipants": 1.8458333333333334,
-     "meanStaff": 2.675,
-     "participantMinutes": 886,
-     "staffMinutes": 1284
+     "meanParticipants": 1.8402777777777777,
+     "meanStaff": 2.65,
+     "participantMinutes": 883.3333333333333,
+     "staffMinutes": 1272
     },
     {
      "zoneId": "ot",
@@ -15926,7 +15926,7 @@
      40,
      40,
      40,
-     40,
+     39,
      39,
      39,
      39,
@@ -16022,7 +16022,7 @@
      44,
      43,
      42,
-     42,
+     41,
      41,
      41,
      41,
@@ -16051,7 +16051,7 @@
      45,
      45,
      44,
-     43,
+     42,
      41,
      41,
      41,
@@ -16238,19 +16238,19 @@
       "walking": 1111,
       "documenting": 50,
       "meeting": 81,
-      "driving": 794,
-      "offDuty": 686
+      "driving": 793,
+      "offDuty": 687
      },
      "share": {
-      "care": 0.7185512855957976,
-      "walking": 0.15358031517832457,
-      "documenting": 0.006911805363560962,
-      "meeting": 0.011197124688968758,
-      "driving": 0.10975946917334808,
-      "offDuty": 0.08661616161616162
+      "care": 0.7186506290612471,
+      "walking": 0.1536015484584543,
+      "documenting": 0.006912760956726116,
+      "meeting": 0.011198672749896308,
+      "driving": 0.10963638877367621,
+      "offDuty": 0.08674242424242425
      },
-     "onFloorSeconds": 7234,
-     "meanWalkMeters": 76.21736113090047
+     "onFloorSeconds": 7233,
+     "meanWalkMeters": 76.21736113074729
     },
     {
      "role": "nurse",
@@ -16388,7 +16388,7 @@
       "offDuty": 0.12669753086419752
      },
      "onFloorSeconds": 5659,
-     "meanWalkMeters": 105.51823432787052
+     "meanWalkMeters": 109.1107472810152
     }
    ],
    "participants": [
@@ -16659,10 +16659,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 120,
-      "waiting": 319,
-      "offSite": 96
+      "waiting": 318,
+      "offSite": 97
      },
-     "walkMeters": 144.21248371542328
+     "walkMeters": 144.2124837047435
     },
     {
      "id": "arrival-independent",
@@ -16679,7 +16679,7 @@
       "waiting": 312,
       "offSite": 147
      },
-     "walkMeters": 123.71367095384323
+     "walkMeters": 123.7136709399587
     },
     {
      "id": "arrival-wheelchair",
@@ -16696,7 +16696,7 @@
       "waiting": 277,
       "offSite": 147
      },
-     "walkMeters": 129.35370885546425
+     "walkMeters": 129.35370886550666
     },
     {
      "id": "community-01",
@@ -18427,10 +18427,10 @@
       "coordination": 25,
       "community": 0,
       "moving": 238,
-      "waiting": 97,
-      "offSite": 96
+      "waiting": 96,
+      "offSite": 97
      },
-     "walkMeters": 384.9888942864593
+     "walkMeters": 384.9888942738738
     },
     {
      "id": "home-participant",
@@ -18580,10 +18580,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 41,
-      "waiting": 251,
-      "offSite": 375
+      "waiting": 250,
+      "offSite": 376
      },
-     "walkMeters": 79.98134689142441
+     "walkMeters": 79.98134688081261
     },
     {
      "id": "arrival-midday-c-2",
@@ -18597,10 +18597,10 @@
       "coordination": 0,
       "community": 0,
       "moving": 39,
-      "waiting": 254,
-      "offSite": 374
+      "waiting": 253,
+      "offSite": 375
      },
-     "walkMeters": 80.21687266885338
+     "walkMeters": 80.21687265784162
     },
     {
      "id": "arrival-midday-d-3",
@@ -18617,7 +18617,7 @@
       "waiting": 236,
       "offSite": 391
      },
-     "walkMeters": 75.26695613925321
+     "walkMeters": 75.26695612507632
     },
     {
      "id": "arrival-midday-d-4",
@@ -18634,7 +18634,7 @@
       "waiting": 240,
       "offSite": 390
      },
-     "walkMeters": 78.36251370260635
+     "walkMeters": 78.36251368993918
     }
    ],
    "participantTotals": {
@@ -18646,8 +18646,8 @@
     "coordination": 745,
     "community": 1700,
     "moving": 1098,
-    "waiting": 25689,
-    "offSite": 5949
+    "waiting": 25685,
+    "offSite": 5953
    },
    "hero": {
     "id": "hero-lin",
@@ -18664,10 +18664,10 @@
       "coordination": 25,
       "community": 0,
       "moving": 238,
-      "waiting": 97,
-      "offSite": 96
+      "waiting": 96,
+      "offSite": 97
      },
-     "walkMeters": 384.9888942864593
+     "walkMeters": 384.9888942738738
     },
     "touchpoints": [
      {
@@ -18786,7 +18786,7 @@
       "short": "PCA",
       "title": "Personal care attendant",
       "color": "#B8747E",
-      "minutes": 416,
+      "minutes": 415.3333333333333,
       "episodes": 1,
       "firstAt": 0,
       "actorIds": [
@@ -18811,7 +18811,7 @@
      }
     ],
     "disciplinesSeen": 11,
-    "walkMeters": 384.9888942864593
+    "walkMeters": 384.9888942738738
    },
    "handoffs": {
     "total": 15,
@@ -19005,9 +19005,9 @@
     "staff": 75,
     "peakParticipantsOnSite": 125,
     "peakStaffOnFloor": 52,
-    "staffCareShare": 0.5857555805363739,
-    "staffWalkingShare": 0.11019217386649537,
-    "meanParticipantActiveShare": 0.6890646593274321
+    "staffCareShare": 0.5857712587992827,
+    "staffWalkingShare": 0.11019512325687214,
+    "meanParticipantActiveShare": 0.6890699014323933
    },
    "seriesStep": 4
   }

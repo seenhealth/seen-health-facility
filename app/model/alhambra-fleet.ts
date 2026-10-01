@@ -1,5 +1,6 @@
 import * as T from 'three';
 import type { Vec2 } from './schema';
+import { STREET_EXTENT } from './neighborhood';
 import { laneLine, STREET_CORNER_RADIUS } from './traffic-routes';
 import { jogLength, Pen, pieceAt, type Piece } from './vehicle-path';
 import { vehicleGap } from './vehicle-clearance';
@@ -21,9 +22,10 @@ import { vehicleGap } from './vehicle-clearance';
  * driveway lane passes the bay noses 1.3 m off, lane changes use 8 m arcs)
  * and by scheduling where it cannot: a maneuver that sweeps near a parking
  * spot or the drop-off is booked only while that spot is empty (see
- * `tripNeeds`). Vans leave the map along the west street, which is drawn to
- * z = ±95, and fade out over the last metres beyond its end; they come back
- * the same way. Times are loop seconds (1 s = 40 clock seconds, 8 AM = 0).
+ * `tripNeeds`). Vans leave the map along the west street and fade out over
+ * its last metres, short of the end of the drawn street (`STREET_EXTENT`), so
+ * a fading van never hangs over bare ground; they come back the same way.
+ * Times are loop seconds (1 s = 40 clock seconds, 8 AM = 0).
  */
 
 // ---------------------------------------------------------------------------
@@ -138,9 +140,13 @@ export const FLEET_LOT = {
   dockBackTo: -23.5,
   /** Straight run before a forward arc that starts from standstill. */
   lead: 0.6,
-  /** West-street ends of the off-site routes (the street is drawn to ±95) and the fade length before them. */
-  vanishSouth: -99,
-  vanishNorth: 99,
+  /**
+   * West-street ends of the off-site routes and the fade length before them:
+   * 5 m short of the drawn street's ends, as for the community vehicles, so
+   * the whole van (its nose is 3.2 m ahead of its centre) fades on the street.
+   */
+  vanishSouth: 5 - STREET_EXTENT.z,
+  vanishNorth: STREET_EXTENT.z - 5,
   fade: 8,
   /** Ring-street lanes the fleet uses (traffic-routes.ts). */
   westbound: laneLine('south', 0),

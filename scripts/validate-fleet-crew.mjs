@@ -1,11 +1,13 @@
 // Fleet crew choreography: drivers seated while their van moves, riders seated
-// only in a visible van, cabin walks and ramp escorts continuous, the driver
+// only in a visible van (and hidden by the engine while it fades below
+// SEATED_MIN_OPACITY), cabin walks and ramp escorts continuous, the driver
 // close behind each rider's party on the ramp, and the new lobby waits clear of
 // walls. Runs over the base loop and the story source, as the viewer plays them.
 //
 //   npm run validate:fleet
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import * as T from 'three';
 import { loadSim } from './build-scenario.mjs';
 
 const { sim, activity, crew, story, deliveries, fleet, body } = await loadSim({
@@ -62,7 +64,7 @@ function place(source, byId, a, t) {
   const ride = s.vehicleId && s.seat ? vehicle(s.vehicleId, t) : null;
   if (ride) {
     const placed = activity.seatInVehicle(ride, s.seat, s.seatHeading);
-    s = { ...s, ...placed, visible: s.visible !== false && ride.visible, seatedIn: s.vehicleId };
+    s = { ...s, ...placed, visible: s.visible !== false && activity.seatsShown(ride), seatedIn: s.vehicleId };
   }
   return s;
 }
@@ -71,7 +73,22 @@ const sources = [
   ['base loop', crew.withFleetCrew(activity.activityData)],
   ['story', crew.withFleetCrew(story.storyActivitySource().source)],
 ];
-const totals = { actors: 0, drivers: 0, riders: 0, rampEscorts: 0, samples: 0 };
+const totals = { actors: 0, drivers: 0, riders: 0, rampEscorts: 0, samples: 0, fadeHidden: 0 };
+/**
+ * Moments when a fleet van is drawn see-through (fading in or out at the end
+ * of the street), every 0.05 s. The engine itself is checked at these times:
+ * nobody seated in a van may be drawn while it is below SEATED_MIN_OPACITY.
+ */
+const fadeTimes = [];
+for (let k = 0; k < DURATION / 0.05; k++) {
+  const t = k * 0.05;
+  if (vanIds.some((_, v) => {
+    const van = sim.sampleVan(v, t);
+    return van.visible && van.opacity < 1;
+  }))
+    fadeTimes.push(t);
+}
+assert.ok(fadeTimes.length > 100, `the fleet fades in and out during the day (${fadeTimes.length} samples)`);
 let driverDoorCrossings = 0;
 for (const [name, source] of sources) {
   const byId = new Map(source.actors.map((a) => [a.id, a]));
@@ -155,7 +172,7 @@ for (const [name, source] of sources) {
         f = place(source, byId, d, tt);
       if (vanSpeed(v, tt) > 0.05) {
         assert.equal(f.seatedIn, vid, `${name}: ${d.id} is out of the cab while ${vid} moves at ${tt} ("${f.title}")`);
-        if (van.visible) assert.ok(f.visible !== false, `${name}: ${vid} drives in view without its driver at ${tt} ("${f.title}")`);
+        if (activity.seatsShown(van)) assert.ok(f.visible !== false, `${name}: ${vid} drives in view without its driver at ${tt} ("${f.title}")`);
       }
       const c = Math.cos(van.heading),
         sn = Math.sin(van.heading),
@@ -179,6 +196,28 @@ for (const [name, source] of sources) {
     }
   }
   assert.deepEqual(seatedInParked.slice(0, 3), [], `${name}: nobody sits in a van parked in its bay`);
+  // The engine draws nobody seated in a van that has faded below
+  // SEATED_MIN_OPACITY (characters share materials, so they cannot fade with
+  // it), and still draws its riders once it is solid enough.
+  const engine = activity.createActivity(model, new T.Scene(), undefined, source);
+  let seatedInFade = 0;
+  for (const t of fadeTimes) {
+    engine.setOptions({ time: t, playing: false });
+    for (const a of engine.actors) {
+      const s = a.sample;
+      if (!s.vehicleId || !s.seat || !vanIds.includes(s.vehicleId)) continue;
+      const van = engine.vehicles.sample(s.vehicleId, t);
+      if (!van.visible || van.opacity >= 1) continue;
+      seatedInFade++;
+      if (van.opacity < activity.SEATED_MIN_OPACITY) {
+        assert.ok(!a.root.visible, `${name}: ${a.spec.id} is drawn in ${s.vehicleId} at opacity ${van.opacity.toFixed(2)} at ${t.toFixed(2)} ("${s.title}")`);
+        totals.fadeHidden++;
+      } else if (s.visible !== false)
+        assert.ok(a.root.visible, `${name}: ${a.spec.id} is hidden in ${s.vehicleId} at opacity ${van.opacity.toFixed(2)} at ${t.toFixed(2)} ("${s.title}")`);
+    }
+  }
+  assert.ok(seatedInFade > 0, `${name}: someone rides in a fading van`);
+  engine.dispose();
   // Ramp escorts: for every descent or ascent the driver trails the rider's party by 0.4–1.2 m on the ramp.
   for (const a of source.actors) {
     if (a.role === 'driver' || a.escortFor) continue;
@@ -229,5 +268,5 @@ for (const [name, source] of sources) {
   console.log(`${name}: ${source.actors.length} actors, ${drivers.length} drivers, ${crewIds.length - drivers.length} riders seated.`);
 }
 console.log(
-  `Fleet crew: ${totals.rampEscorts} ramp descents escorted by the driver, ${driverDoorCrossings} cab-door passages through the open driver's door, ${totals.samples.toLocaleString()} placement samples; cabin walks, seat visibility, driver-in-cab and wall clearance passed.`,
+  `Fleet crew: ${totals.rampEscorts} ramp descents escorted by the driver, ${driverDoorCrossings} cab-door passages through the open driver's door, ${totals.fadeHidden} seated people hidden by the engine in vans below ${activity.SEATED_MIN_OPACITY} opacity, ${totals.samples.toLocaleString()} placement samples; cabin walks, seat visibility, driver-in-cab and wall clearance passed.`,
 );

@@ -129,6 +129,15 @@ export type VehiclePose = {
 };
 export type VehicleSampler = (time: number) => VehiclePose;
 /**
+ * People seated in a vehicle are drawn only while it is at least this opaque.
+ * Characters share their materials, so rather than fading with a vehicle that
+ * enters or leaves the map they disappear as it passes half opacity.
+ */
+export const SEATED_MIN_OPACITY = 0.5;
+/** Whether the people seated in a vehicle at this pose are drawn. */
+export const seatsShown = (pose: VehiclePose) =>
+  pose.visible && (pose.opacity ?? 1) >= SEATED_MIN_OPACITY;
+/**
  * Every animated vehicle (vans, delivery trucks, couriers, partner shuttles)
  * registers a pure sampler here so riders can be seated in it, the camera can
  * follow it and metrics can locate it, whichever module built its body.
@@ -666,7 +675,7 @@ export function createActivity(
           : null;
       if (ride) {
         const placed = seatInVehicle(ride, s.seat!, s.seatHeading);
-        s = { ...s, ...placed, visible: s.visible !== false && ride.visible };
+        s = { ...s, ...placed, visible: s.visible !== false && seatsShown(ride) };
       }
       if (
         (!data.siteSpecific || a.spec.arrivalVehicleId) &&
