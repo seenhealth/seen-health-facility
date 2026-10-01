@@ -109,10 +109,13 @@ export function ActivityPanel({
   const siteSpecific = !!activityData.siteSpecific;
   // Site arrivals carry their own timetable; Alhambra's fleet uses its schedule.
   const siteArrival = viewer?.activity.arrival;
-  const vanWindows =
-    siteSpecific && siteArrival && 'windows' in siteArrival
-      ? siteArrival.windows
-      : alhambraVanWindows;
+  const vanWindows = useMemo(
+    () =>
+      siteSpecific && siteArrival && 'windows' in siteArrival
+        ? siteArrival.windows
+        : alhambraVanWindows,
+    [siteSpecific, siteArrival],
+  );
   const dayRoomId = activityData.dayRoomId || 'day';
   const views = activityData.views || activityViews;
   const [state, setState] = useState<ActivitySnapshot | null>(null),
@@ -232,7 +235,7 @@ export function ActivityPanel({
         ],
       })),
     ],
-    [activityData, siteSpecific],
+    [activityData, vanWindows],
   );
   const visible = tracks.filter(
     (t) =>
