@@ -17,7 +17,7 @@ Interactive planning models of **Alhambra (1839 W Valley), 1630 Olympic and Alve
 
 ## A day at Seen Health
 
-`/story` follows Mrs. Lin, a composite participant, through a care day with the eleven-discipline team. Scrolling controls the camera and simulation clock. Its itinerary uses the reviewed room layout: social work in the side office, table tennis in the games lounge and karaoke in the rear corner room.
+`/story` follows Mrs. Lin, a composite participant, through a care day with the eleven-discipline team, and cuts away six times to the homes, partner sites and hospital the same team serves. Scrolling controls the camera and simulation clock. Its itinerary uses the reviewed room layout: social work in the side office, table tennis in the games lounge and karaoke in the rear corner room.
 
 ```bash
 npm run build:scenario   # compile and validate the story tracks
@@ -92,7 +92,7 @@ npm run build:viewer
 | `npm run validate:traffic` | Vehicle clearance (including the lot's curbs, ramp and building), nose-first motion, a 4 m minimum turning radius, fades beyond the street ends and loop continuity at 50 Hz; the motion rules (nose-first, no jumps, 4 m radius) cover every fleet van, delivery truck and street car and the Olympic and Alveare vans |
 | `npm run validate:fleet` | Drivers' and riders' choreography (seated while the van moves, cabin walks, ramp escorts, the driver's door, wall clearance) |
 | `npm run validate:community` | Distributed-care vehicles and cast (see [docs/COMMUNITY.md](docs/COMMUNITY.md)) |
-| `npm run validate:scenario` | Story tracks (wall clearance, continuity, dwell); fails if the committed tracks JSON differs from a fresh compile |
+| `npm run validate:scenario` | Story tracks (wall clearance, continuity, dwell) and timeline (cutaways feature real community interactions; trimming never hides a hero focus time, stop or kicker); fails if the committed tracks JSON differs from a fresh compile |
 | `npm run validate:trace` | Touchpoint trace of the composed source the viewer plays: structure, coverage, determinism and file freshness |
 | `npm run validate:renderer` | Headless viewer per site: 10 frames through every render mode, then disposal leaves no geometry, material, listener, element or frame behind |
 | `npm run validate:public` | No architectural PDFs, drawings or source text in `public/` (also runs before `npm run build`) |

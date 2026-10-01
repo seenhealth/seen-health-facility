@@ -178,7 +178,7 @@ disappears (`visible: false` off duty); `exit` optionally differs.
 
 ```jsonc
 "placement": {
-  "mode": "visit",                  // meeting | arrival | checkin | visit | departure
+  "mode": "visit",                  // meeting | arrival | checkin | visit | departure | cutaway
   "stops": [{
     "id": "clinic",
     "window": [140, 185],           // when this stop should be on screen
@@ -215,6 +215,34 @@ disappears (`visible: false` off duty); `exit` optionally differs.
 - `duties` (with absolute `window`s) attach companions to steps where the hero
   follows copied tracks, e.g. the center manager at check-in.
 
+### Cutaway steps
+
+A cutaway looks in on the care network around the center (a partner site or a
+home) for a few seconds of the story, without the hero:
+
+```jsonc
+{
+  "id": "network-partner",
+  "window": [289, 300],                 // inside a gap between the hero's stops
+  "zoneId": "community:partner-adc",    // settingZone(settingId)
+  "roomId": null,
+  "settingId": "partner-adc",           // a careSettings id
+  "interactionIds": ["partner-pt"],     // community interactions; the first is the camera's follow target
+  "title": "Therapy that travels", "kicker": "11:15 AM · Partner day center", "body": "…",
+  "roles": ["pt"],                      // IDT disciplines involved
+  "partners": ["Activities lead"],      // external roles (story only)
+  "handoffs": [{ "from": "pt", "to": "rn", "note": "Both steadier on turns; keep the walker" }],
+  "heroPresent": false,
+  "placement": { "mode": "cutaway" }
+}
+```
+
+It adds no stops, companions, meetings or interactions, so the compiled actors
+and interactions do not change. The story trims the hero chapters next to a
+cutaway on screen only (`scrubWindows`, `app/sim/story-timeline.ts`); the hero
+steps' `window`s stay as authored. Metrics, the sim report and the trace
+validator count the hero's steps only (steps without `settingId`).
+
 ### What the compiler does
 
 1. Copies the replaced actor's van ride, ramp, sliding entrance and check-in
@@ -238,7 +266,13 @@ disappears (`visible: false` off duty); `exit` optionally differs.
    take turns presenting. Each attendee shares a profile with the downstairs
    person they are, so the same RN is seen at the huddle and in the clinic.
 8. Emits interactions per stop, arrival, check-in, departure and meeting, and a
-   `steps` summary with arrive/depart and a **focus time** for each step.
+   `steps` summary with arrive/depart and a **focus time** for each step. A
+   cutaway's summary has `heroPresent: false`, `roomId: null`, its `settingId`
+   and featured `interactionIds`, `focusActorId: 'interaction:<first id>'` and a
+   focus time in the middle of the featured interactions' span inside the
+   window. The interactions come from `CompileOptions.context` (the composed
+   source; `build-scenario` passes `alhambraSource(model, activityData)`);
+   without it the focus is mid-window.
 9. Removes the replaced actor and its interactions from the merged source.
 
 ## Running it
@@ -267,6 +301,17 @@ furniture), the base loop or the scenario. Validation checks:
 - new walks keep clear of the day-room activity stations;
 - it reports walks through furniture footprints and close contacts (< 0.45 m)
   between new people and anyone else, for review;
+- the story timeline (`validateStory`): every cutaway names a known setting
+  and its zone, lies inside the day and lasts at least 6 s, features
+  interactions that exist in the composed story source at that setting (or on
+  the site or upstairs) and overlap its window by at least 4 s, covering at
+  least 60 % of it together; its kicker time lies inside the window and its
+  compiled focus time inside a featured interaction; roles and handoff ends
+  are IDT ids. The scrub windows start at 0, meet end to start and end by
+  720 s; every hero chapter keeps at least 20 s, its focus time with a 1 s
+  margin, its kicker and the start of every stop, and no stop runs past a cut
+  to a cutaway. The build prints the timeline and integration notices
+  (`HOME_AM_RETIME`, interactions due to be featured);
 - with `--check` (`npm run validate:scenario`, part of `npm run validate`), the
   committed `day-in-the-life.tracks.json` equals the fresh compile.
 
@@ -288,7 +333,8 @@ Measure and the reports read that one.
 
 Each `CompiledStep` has `window`, `focusTime`, `focusActorId`, `stops` (anchor,
 heading, action, arrive/depart, overlap, companions, partners, interaction id),
-`companionIds`, `interactionIds`, `handoffs` and `roles`.
+`companionIds`, `interactionIds`, `handoffs` and `roles`; cutaways also carry
+`settingId`.
 
 ## What is measured (`app/sim/metrics.ts`)
 
