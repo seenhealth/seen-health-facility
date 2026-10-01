@@ -6,6 +6,7 @@ export * from './nav';
 export * from './scenario';
 export * from './clock';
 export * from './metrics';
+export * from './trace';
 export { validateFacility } from '../model/schema';
 export {
   activityData,

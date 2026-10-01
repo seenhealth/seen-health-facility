@@ -17,6 +17,8 @@
     "prebuild": "node scripts/prepare-public-models.mjs && node scripts/validate-public-assets.mjs",
     "build:scenario": "node scripts/build-scenario.mjs",
     "sim:report": "node scripts/sim-report.mjs",
+    "trace:report": "node scripts/sim-report.mjs --trace-only",
+    "validate:trace": "node scripts/validate-trace.mjs",
     "dev:story": "vite --config vite.story.config.ts",
     "build:story": "vite build --config vite.story.config.ts",
     "preview:story": "vite preview --config vite.story.config.ts"

@@ -220,6 +220,11 @@ export type MetricsOptions = {
 };
 
 const zeros = (n: number) => Array.from({ length: n }, () => 0);
+/** Ground-floor zones used to locate people by point-in-polygon, like the engine. */
+export const groundZonesOf = (model: Pick<Facility, 'zones'>) =>
+  model.zones
+    .filter((z) => z.levelId === 'ground' && z.id !== 'adjacent')
+    .map((z) => ({ id: z.id, polygon: z.polygon }));
 const blank = <K extends string>(keys: readonly K[]) =>
   Object.fromEntries(keys.map((k) => [k, 0])) as Record<K, number>;
 const minutesPer = (s: ActivitySource) => s.dayDurationMinutes / s.duration;
@@ -289,9 +294,7 @@ export function computeMetrics(
     perSecond = minutesPer(source);
   const n = Math.round(source.duration / step);
   const times = Array.from({ length: n }, (_, i) => i * step);
-  const groundZones = model.zones
-    .filter((z) => z.levelId === 'ground' && z.id !== 'adjacent')
-    .map((z) => ({ id: z.id, polygon: z.polygon }));
+  const groundZones = groundZonesOf(model);
   const zoneInfo = new Map<string, { name: string; levelId: string }>([
     ['site', { name: 'Street & vans', levelId: 'site' }],
   ]);
