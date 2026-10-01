@@ -86,6 +86,7 @@ npm run build:story
 | Facility specifications and exports | `public/models/` |
 | Story itinerary, routes and metrics | `app/data/scenarios/`, `app/sim/`, `app/story/` |
 | Accuracy and modeling decisions | [MODEL_NOTES.md](MODEL_NOTES.md), `public/models/*review*.md` |
+| Code review status and roadmap | [docs/CODE-REVIEW.md](docs/CODE-REVIEW.md), [docs/PLAN.md](docs/PLAN.md) |
 
 Keep the downloadable activity/template/program JSON copies synchronized with `app/data/`. Authoring scripts are retained, but many regenerate earlier stages or require private source material; do not run the old generation chain blindly over the reviewed models. `apply-recreation-rooms.py` preserves the newer community layout when present. Recompile the story after changing room geometry, seats or the base activity tracks.
 
