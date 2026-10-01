@@ -180,8 +180,17 @@ function TraceTab({
   const zoneColor = (id: string) =>
     (id !== 'site' && zoneOf(id)?.color) || SITE_COLOR;
   const vehicleLabel = (id: string) => getViewer()?.activity.vehicles.label(id) ?? id;
-  const roomName = (id: string | null | undefined) =>
-    id ? model.rooms.find((r) => r.id === id)?.name : undefined;
+  // Facility rooms, plus the rooms of facilities stamped on community pads.
+  const rooms = useMemo(
+    () =>
+      new Map(
+        [...(source.zones ?? []).flatMap((z) => z.rooms ?? []), ...model.rooms].map(
+          (r) => [r.id, r.name] as const,
+        ),
+      ),
+    [model, source],
+  );
+  const roomName = (id: string | null | undefined) => (id ? rooms.get(id) : undefined);
   const place = (e: TouchpointEvent) => roomName(e.roomId) || zoneName(e.zoneId);
   const q = query.trim().toLowerCase();
   const matches = (a: ActorSpec) =>

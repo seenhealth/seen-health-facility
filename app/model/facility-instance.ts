@@ -235,6 +235,8 @@ function roomPlate(name: string, heading: number, anchor: Vec2) {
  * Where a room's plate lies: the free spot nearest the room's label anchor
  * (room-labels.ts) where the world-aligned plate stays inside the room and
  * clear of furniture taller than 25 cm (a day room's planter would hide it).
+ * Furniture counts with its whole box, not its walkable footprints: the
+ * plate must not show between the rails of a set of parallel bars.
  */
 function plateAnchor(
   facility: Facility,
@@ -247,8 +249,9 @@ function plateAnchor(
     s = Math.sin(heading);
   // Plate outline (world-aligned) sampled around a local centre.
   const outline: Vec2[] = [];
-  for (const u of [-0.5, -0.25, 0, 0.25, 0.5])
+  for (let i = 0; i <= 8; i++)
     for (const v of [-0.5, 0, 0.5]) {
+      const u = i / 8 - 0.5;
       const wx = u * (PLATE.w + 0.2),
         wz = v * (PLATE.d + 0.2);
       // World offset → facility-local offset (inverse of the frame rotation).
@@ -261,22 +264,18 @@ function plateAnchor(
       if (!a || a.dimensions[1] * o.scale[1] < 0.25) return null;
       return {
         o,
-        boxes: o.navigationFootprints || [
-          [0, 0, a.dimensions[0] * o.scale[0], a.dimensions[2] * o.scale[2]],
-        ],
+        w: a.dimensions[0] * o.scale[0],
+        d: a.dimensions[2] * o.scale[2],
       };
     })
     .filter((b) => !!b);
   const blocked = (p: Vec2) =>
-    blockers.some(({ o, boxes }) => {
+    blockers.some(({ o, w, d }) => {
       const dx = p[0] - o.position[0],
         dz = p[1] - o.position[2],
         x = Math.cos(o.rotation) * dx - Math.sin(o.rotation) * dz,
         z = Math.sin(o.rotation) * dx + Math.cos(o.rotation) * dz;
-      return boxes.some(
-        ([bx, bz, w, d]) =>
-          Math.abs(x - bx) < w / 2 + 0.05 && Math.abs(z - bz) < d / 2 + 0.05,
-      );
+      return Math.abs(x) < w / 2 + 0.05 && Math.abs(z) < d / 2 + 0.05;
     });
   const fits = (q: Vec2) =>
     outline.every(([ox, oz]) => {

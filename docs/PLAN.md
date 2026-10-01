@@ -42,6 +42,7 @@ modules, per-frame placement is implemented four times, and 3D primitives are de
 | Duplication | Placement logic ×4, point-in-polygon ×4, vehicle frame transform ×6, clock labels ×3, box helper ×16, five ways of compiling TypeScript for Node. | Started in this PR for vehicles: ring lanes, corner radius, easing, the van ramp, the fade, the fleet van ids and straight-and-arc routes (`vehicle-path.ts`) are each defined once. The other kits follow the migration order below. |
 | Validation | 19 validators, no runner, no CI, lint not enforced, several vacuous or orphaned checks. | Runner and CI added in this PR: `npm run validate` runs every validator (orphans included), `npm test` adds a `node:test` suite and CI runs both; the fleet-crew vehicle-id check now asserts against the engine's registered ids; lint enforcement and the remaining vacuous checks are follow-up. |
 | Dependencies | The shadcn kit and about a dozen packages are unused. | Prune during the split of the renderer and the page. |
+| Facility instances | A care setting could only be schematic massing; nothing could put a real building, or its people, on a pad. | Built after this PR: any schema 2.0 facility is stamped on a pad (`facility-instance.ts`, registry `facility`) with people generated inside it at build time from a cast file (`npm run build:community`): scene people placed by room scenes, and scheduled people with explicit stops whose time off the instance is a hole that hand-authored legs fill (`fillHoles`, `HOLE_LEGS`). The partner adult day center is Seen's Alhambra ground floor. Renderer geometry, batching and frame helpers it needed are extracted (`facility-geometry.ts`, `batch.ts`, `frame.ts`, `presentation.ts`). The Wongs' home is the next consumer. |
 
 ## 3. The chassis
 
@@ -100,6 +101,13 @@ weekly IDT video huddle). Scenario: a partnership day from a 9:10 van departure 
 trace showing which disciplines touched each participant at the partner site. Measure: staff time on the
 road and on-site, participant activity minutes by setting, van utilisation. Missing pieces today: person
 identity across settings and a setting that can be either a pad or a full facility.
+
+Status: the layout and the day are built. The partner pad carries Seen's own Alhambra ground floor ("Seen
+Health floor plan", trace zone "Partner ADC · Seen layout") with twenty participants, the partner's
+activities lead, aide and nurse and a visiting Seen PT and RN, generated from
+`app/data/community/partner-adc.cast.json`: morning in the day room, tai chi on the patio, PT and medication
+reviews, tabletop games, lunch, music and afternoon conversation; the trace names its rooms. Still missing:
+the van drop-off and pickup, a meal delivery, the IDT huddle and person identity across settings.
 
 ### 4.2 Replicating another building quickly
 
@@ -167,7 +175,9 @@ feeds). Keep simulation and platform speaking one schema:
   the home and the center's on-call desk; an evening clock variant is a scenario-library item.
 - **Geometry.** Care settings sit on schematic pads beyond the ring streets of the Alhambra block, each with
   a horseshoe drive so no vehicle reverses or U-turns there. Real geography belongs to the network view.
-  Community people use short straight paths on their pads; there is no outdoor navigation grid.
+  Community people use short straight paths on their pads; there is no outdoor navigation grid. People
+  inside a facility stamped on a pad walk on that facility's own navigation grid, and along anchors
+  outdoors.
 - **Fleet.** Vans A–E use five back-in bays on the west side of the lot, starting a stall north of the curb
   island; van F and the two spares park at the west-street curb. Every move is straight runs and arcs of at
   least 4 m; off-site trips leave through the driveway and down the west street and fade out beyond the

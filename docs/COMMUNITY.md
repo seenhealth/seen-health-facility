@@ -8,7 +8,10 @@ specialist appointments, hospital admissions with discharge coordination and a
 settings *around* the center, in the same scene, on the same 720 s care-day
 clock and with the same engine and presentation palette, so it reads as one
 distributed care system. Everything is data first: a partner adult day center
-or a second Seen center is another registry entry.
+or a second Seen center is another registry entry, and a pad can carry a real
+facility specification instead of schematic massing (a *facility instance*):
+the partner adult day center is Seen's own Alhambra ground floor, stamped on
+its pad with its own generated cast.
 
 Everything here is illustrative. Pads sit on the paper ground beyond the ring
 streets, massing is schematic and timings are compressed onto the care-day
@@ -18,11 +21,16 @@ clock; no participant records are used.
 
 | File | Role |
 | --- | --- |
-| `app/model/community-settings.ts` | The registry (`careSettings`): kind, name, position, heading, pad size, access road, horseshoe drive, anchors, services, accent. Frame helpers (`toWorld`, `lanePath`, `lanePose`, `groundYAt`). No three.js. |
-| `app/model/community-pads.ts` | `buildCareSetting(setting, mat)`: plinth, drive band, stub and sidewalk, label plate, trees and the building massing per kind. |
+| `app/model/community-settings.ts` | The registry (`careSettings`): kind, name, position, heading, pad size, access road, horseshoe drive, anchors, services, accent, and the optional stamped `facility`. Frame helpers (`toWorld`, `lanePath`, `lanePose`, `groundYAt`), the generated instance summaries (`instanceRooms`, `instanceFootprint`, `missingInstances`). No three.js. |
+| `app/model/community-pads.ts` | `buildCareSetting(setting, mat, { massing })`: plinth, drive band, stub and sidewalk, label plate, the building `massing` and the `site` around it (trees, patio) per kind. |
+| `app/model/facility-instance.ts` | `buildFacilityInstance(facility, frame, options)`: any schema 2.0 facility as a static cutaway with room plates, merged by material; `instanceSelection` (what is drawn), shared with build-time navigation. Knows nothing of settings or sites. |
+| `app/model/community-track.ts` | The hand-authored `Track` builder (`hold`, `walk`, `hidden`, `ride`; `start` and `segmentsTo` for legs that fill holes). |
+| `app/model/instance-cast.ts` | `placeInstanceCast(setting, cast)`: a generated cast into world actors and interactions; `fillHoles` stitches hand-authored legs into a scheduled person's track. |
+| `app/sim/community-cast.ts` | Build time only: instance navigation options and view, the summary, the site checks, the cast generator `communityCastFromScenes` and its validator `checkInstanceCast`. |
+| `scripts/build-community-tracks.mjs` | `npm run build:community` / `npm run validate:community-tracks`: writes and checks `app/data/community-instances.json` and `app/data/community-casts.json` from `app/data/community/<setting>.cast.json`. |
 | `app/model/community-vehicles.ts` | `communityVehicles` itineraries (dwell/drive legs) with each vehicle's name, roof decor and livery, `sampleCommunityVehicle(id, time)` pure samplers (with the fade at the map edge), `registerCommunityVehicles(registry)` (the samplers under their names), lane and turning helpers, car and ambulance bodies. |
-| `app/model/community-people.ts` | `communitySource(model)`: the cast, touchpoint interactions and the `community` view as a `SourceExtension` composed into the care-day source. |
-| `app/model/community-layer.ts` | `buildCommunityLayer(model, mat)`: pads + vehicle bodies, `tick(time)`, `frame(settingId?)` camera framings and the network `bounds` / `shadowExtent`. |
+| `app/model/community-people.ts` | `communitySource(model)`: the hand-authored cast, the placed instance casts (with `HOLE_LEGS`), touchpoint interactions, the setting zones with their instance rooms and the `community` view as a `SourceExtension` composed into the care-day source. |
+| `app/model/community-layer.ts` | `buildCommunityLayer(model, mat, { loadFacility, materialFor })`: pads, facility instances (`instance(id)`, `ready`) and vehicle bodies, `tick(time)`, `frame(settingId?)` camera framings, the network `bounds` / `shadowExtent` and `dispose()`. |
 | `app/model/alhambra-source.ts` | `alhambraSource(model, base)`: the care day exactly as the viewer plays it (base loop + community layer + fleet crew), and `alhambraVehicles()`, pure samplers under the engine's vehicle ids. |
 | `scripts/validate-community-traffic.mjs` | `npm run validate:community`: clearance, driving and cast checks (below). |
 
@@ -31,11 +39,13 @@ Wiring: `alhambraSource(model, base)` composes the Alhambra care day once,
 loop. The renderer, the Measure panel (metrics and trace), the story scenario
 (`composedStorySource`), `scripts/sim-report.mjs` and `scripts/validate-trace.mjs`
 all read it, so every count, trace and report describes the people the scene
-animates (203 in the base loop). When the played source carries the `community`
-view, `renderer.ts` passes `registerCommunityVehicles` to `createActivity`
-(which rejects a seat in an unregistered vehicle), builds the layer, ticks it,
-sizes the sun's shadow camera from the network's bounds while the layer is
-visible, and exposes `focusSetting(id?)` and `view('community')`.
+animates (220 in the base loop: the center's 167, the fleet crew's 10 and the
+community's 43, of whom 25 are generated inside the partner day center). When
+the played source carries the `community` view, `renderer.ts` passes
+`registerCommunityVehicles` to `createActivity` (which rejects a seat in an
+unregistered vehicle), builds the layer, ticks it, sizes the sun's shadow
+camera from the network's bounds while the layer is visible, and exposes
+`focusSetting(id?)` and `view('community')`.
 
 `ViewerState.community` (default on, the **Community sites** toggle under
 Layers) shows or hides the layer. The pads live in the site context, so they
@@ -49,21 +59,28 @@ The activity panel lists the new touchpoint categories. `computeMetrics` and
 the sim report (`npm run sim:report`) fold them into one participant bucket,
 "Care at home & in the community", and the trace summary counts participants
 with a community touchpoint. The settings are zones of the composed source
-(`ActivityData.zones`, `community:<id>`), so occupancy and the trace name them;
-on-site counts and staff time by role cover the center.
+(`ActivityData.zones`, `community:<id>`), so occupancy and the trace name them
+(a setting with a facility by its `traceName`, e.g. "Partner ADC · Seen
+layout"); the zone carries the instance's rooms (`SourceZone.rooms`), so trace
+`enter` events read "Partner ADC · Day room" inside them. On-site counts and
+staff time by role cover the center.
 
 ## The registry
 
 ```ts
 export type CareSetting = {
   id: string; kind: SettingKind; name: string; subtitle: string;
-  position: Vec2; heading: number; pad: { w: number; d: number };
+  short: string;                             // 'Partner ADC', 'Home': trace room names, badges
+  traceName?: string;                        // zone name in the trace and Measure (default name)
+  position: Vec2; heading: number;
+  pad: { w: number; d: number; back?: number }; // back: extends behind the origin
   road: { from: Vec2; to: Vec2 };            // stub centre-line, street edge → pad edge
   drive: { depth: number; radius: number; lanes: 1 | 2 }; // horseshoe drive-through
   apron: { w: number; d: number };           // paved drop-off under the apex
   anchors: Record<string, Vec2>;             // door, porch, bed, counter … (world)
   services: string[];
   accent: string;
+  facility?: CareFacility;                   // a stamped specification (Facility instances)
 };
 ```
 
@@ -101,7 +118,7 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 | `pharmacy` | pharmacy | (−84, −22) | pill-packs |
 | `hospital` | hospital | (94, 14), stub from the north street | ed, discharge |
 | `specialist` | specialist | (84, −56), stub from the south street | specialist |
-| `partner-adc` | partner-adc | (8, −64) | day-program |
+| `partner-adc` | partner-adc | Partner adult day center, "Seen Health floor plan": (4, −68), Seen's Alhambra ground floor stamped on a 62 × 50 m pad | day-program |
 
 ## The day (care-day clock, 1 loop second = 40 clock seconds)
 
@@ -113,7 +130,13 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 | 9:15 | Home | Mrs. Wong (walker) down the new ramp and up the van ramp; the Seen van leaves at 9:15 with the escort aide and driver. |
 | 9:27 | Home | Courier hands the pill packs to the aide; then to the center's rear receiving (10:04–11:28) and back to the pharmacy by 12:40. |
 | 9:55–10:45 | Specialist clinic | Drop-off under the canopy, check-in, vitals by the MA, cardiology follow-up 10:17–10:42; van leaves 11:02 and returns by the south and west streets. |
-| 10:00–12:00 | Partner ADC | Tai chi with six participants, tabletop games, visiting Seen PT with two of them 11:00–12:00. |
+| 8:00–12:00 | Partner ADC | Twenty participants settle at the day-room tables (two wheelchair places at table ends); the activities lead welcomes them, the aide serves coffee, the partner nurse charts at the nurse station all day. |
+| 9:52–10:45 | Partner ADC | Tai chi on the patio under the slatted awning: eight participants and the lead, out through the front door and along the clinic front, arriving and leaving staggered. |
+| 11:00–11:50 | Partner ADC | Visiting Seen PT (walks in from the road end at 10:20) with participant 5 at the parallel bars and participant 6 on seated strength. |
+| 11:11–11:40 | Partner ADC | Visiting Seen RN reviews medications at the nurse station with participants 8 and 10, one after the other. |
+| 11:40–12:10 | Partner ADC | Tabletop games in the day room with the lead. |
+| 12:01–13:03 | Partner ADC | Lunch in the dining room: participants come in staggered from 12:00 to 12:20, the aide sets up and serves, two chairs are left out for the wheelchairs; she clears up until 14:30. |
+| 13:20–16:00 | Partner ADC | Seated music led from the front of the day room (the lead sets up from 12:13; walkers and wheelchairs join a little later), then afternoon conversation at the same tables. |
 | 10:30–10:55 | Hospital | Rounds with the Seen liaison nurse, hospitalist and case manager. |
 | 11:40 | Home | Van home; aide meets her and waves her up the ramp; aide drives off at 12:22. |
 | 12:05 | Home | Home-delivered lunch and wellness check (meals car on the outer lane, back at the center by 13:00). |
@@ -121,6 +144,384 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 | 13:30–13:50 | Hospital | Discharge huddle; 14:10–14:16 Mr. Wong wheeled to the Seen van; van leaves 14:23. |
 | 15:07 | Home | Mr. Wong home: driver wheels him up the porch ramp; home health nurse (walked in from the road end at 14:40) does vitals and medication reconciliation. |
 | 15:40–15:52 | Home ↔ center | 24/7 nurse line call between the upstairs RN and Mrs. Wong. |
+
+## Facility instances
+
+A setting with `facility` stamps a real facility specification (schema 2.0,
+the same JSON the viewer opens) on its pad instead of its schematic massing,
+drawn as a static cutaway with room plates, and gets people generated inside
+it at build time. Nothing in the generic code knows a site or a program: the
+registry entry, the specification and the cast file are the whole input.
+
+### Registry fields
+
+```ts
+export type CareFacility = {
+  id: string;                  // expected Facility.id; the viewer's own model id → stamped from it, no fetch
+  url: string;                 // root-relative spec, '/models/seen-alhambra-planning.json'
+  frame: Frame;                // facility origin and rotation in the setting's local frame
+  levelIds?: string[];         // default: the level at elevation 0
+  excludeZoneIds?: string[];   // zones not drawn (Alhambra: 'adjacent')
+  excludeObjectIds?: string[]; // objects not drawn, nor obstacles, nor seats
+  cutaway?: boolean;           // walls cut at CUTAWAY_HEIGHT (default true; ignores the wall mode)
+  labels?: boolean | Record<string, string>; // room plates: rooms ≥ 12 m², or these ids with names
+  floorY?: number;             // finished floor (default 0; a home uses PORCH_Y)
+  margin?: number;             // footprint to pad edge (default 1.6 m)
+  grounds?: string[];          // anchors the site builder draws on (trees, patio corners): ≥ 1 m outside
+};
+```
+
+`frame` composes with the setting's frame (`facilityWorldFrame`): with
+`heading` h a facility point (x, z) lands at `position + (x cos h + z sin h,
+−x sin h + z cos h)`. The partner uses `{ position: [0.99, −8.15], heading:
+π/2 }`, which puts the plan's west entrance (facility (−14.65, −0.99)) on the
+pad's front axis facing the drive; it excludes the `adjacent` zone, the
+day-room tables the day program clears and two dining chairs (wheelchair
+places), labels six rooms (Day room, Physical therapy, Dining, Nurse station,
+Reception, Games lounge) and draws only the ground floor. The pad is derived
+from the footprint (`derivePad`: wide enough for footprint + margin, extended
+behind the origin by `pad.back` when deep, never smaller than authored, the
+front edge and drive fixed; a building past the front edge throws).
+
+At run time the layer (`community-layer.ts`) stamps the instance synchronously
+when the facility is the viewer's own model, otherwise when `loadFacility`
+resolves (the massing stays until then and on failure); the story and both
+static builds ship every facility a registry entry stamps
+(`instanceFacilityUrls`). The instance is one merged static group: about 116
+draw calls (196 with shadows) and 305k triangles for the partner. People
+inside get the floor height from `groundYAt`, which checks instance footprints
+first.
+
+### Pipeline
+
+```
+public/models/<facility>.json ───────────────┐
+app/data/community/<setting>.cast.json ──────┤ scripts/build-community-tracks.mjs
+app/model/community-settings.ts (registry) ──┘ (Rolldown via loadSim, like build-scenario)
+        │ instance view + nav grid, communityCastFromScenes, checkInstanceCast
+        ▼
+app/data/community-instances.json   per setting: footprint + rooms (setting-local, 2 dp) and
+                                    the inputs they came from (frame, levels, exclusions, cast SHA-1)
+app/data/community-casts.json       per setting: setting-local tracks, interactions, holes, notes
+        │ static imports
+        ▼
+community-settings.ts (pads, groundYAt, rooms)    community-people.ts → placeInstanceCast(setting, cast)
+```
+
+The geometry summary and the tracks are separate files so that code needing
+only geometry (`community-settings.ts`, imported by the page, metrics and the
+trace) never carries the tracks, which only `community-people.ts` imports
+(about 11 KB gzipped for the partner; the summary is about 3.5 KB). A summary
+whose inputs no longer match the registry is ignored: the pad keeps its
+authored size, the setting is listed in `missingInstances`, and
+`validate-community.mjs` (in `npm run validate:activity`) fails until the
+build is re-run.
+
+```bash
+npm run build:community            # generate, validate and write both JSON files
+npm run validate:community-tracks  # the same in memory; fails on drift (part of npm run validate)
+node scripts/build-community-tracks.mjs --notes   # also list every walk the generator moved
+npm run sim:report                 # then refresh the published report and trace
+```
+
+The check validates, per setting: footprint + margin inside the pad and ≥ 1 m
+from the drive band, stub legs and apron (edges sampled every 0.1 m), the
+label plate and every `grounds` anchor outside the footprint; every track
+contiguous 0–720 with jumps only while hidden (including the loop seam),
+walking ≤ 1.65 m/s, walking samples near the building ≥ 0.20 m from walls and
+poses ≥ 0.15 m, stationary poses clear of furniture on the instance view
+(`roomPlacement(...).clear(p, seated ? 0.19 : 0.28, seatId)`, the seat being
+the chair at that point or a scheduled stop's `seat`), interaction windows
+inside the day (members outside the cast are listed for the composed-source
+check), every hole with its placeholder, and no two people in sight within
+0.60 m of each other, sampled every 0.25 s. The build log prints, per
+setting, the pad slack and paving clearance, the people, walks, the closest
+pair, the people with holes and the outside interaction members.
+
+### Cast files
+
+`app/data/community/<setting>.cast.json` lists everyone inside the instance in
+one `people` array and one id namespace, in two kinds: **scene people** are
+placed by the `scenes` that name them and routed between scenes; **scheduled
+people** follow their own `stops` and leave the instance for **holes** that
+hand-authored legs can fill. A person with a `stops` array is scheduled; any
+other is a scene person. Points written `[x, z]` are in the facility's own
+frame (as in its JSON), with headings in that frame (heading h faces
+(sin h, cos h), so 0 faces +z); anchor names are the setting's registry
+anchors (`define({ local })`), with headings in the setting's frame. Seconds
+are loop seconds (0–720). The types are in `app/sim/community-cast.ts`.
+
+```ts
+type CastFile = {
+  version?: 1;
+  setting: string;                                   // registry id (checked)
+  facility?: string;                                 // the facility id it is written for (checked when given)
+  notes?: string[];                                  // free text, not read
+  entrances?: Record<string, {
+    inside: [x, z];                                  // just inside the door (facility frame)
+    path: string[];                                  // setting anchors, outermost first, the last just outside the door
+  }>;
+  places?: Record<string, {                          // outdoor places reached through an entrance
+    label: string; entrance: string;
+    path: string[];                                  // anchors from the door outward to the place
+  }>;
+  people: (ScenePerson | ScheduledPerson)[];
+  scenes?: Scene[];
+  keep?: { actors?: string[]; interactions?: string[] }; // ids other code relies on: the build fails without them
+};
+type Person = {
+  id: string; role: CharacterRole; label: string; variant: number;
+  mobility?: 'cane' | 'walker' | 'wheelchair';       // routing clearance 0.26 / 0.33 / 0.37 m (else 0.21)
+  gait?: number;                                     // m per loop second; staff 1.0, participant 0.75, cane 0.65,
+};                                                   // walker 0.5, wheelchair 0.6 by default; ≤ 1.65
+type ScenePerson = Person & {
+  visit?: { entrance: string; outdoorGait?: number }; // off the pad until their first slot, in and out through it
+};
+type ScheduledPerson = Person & {
+  arrive: { t: number; anchor: string | [x, z] };    // appears there at t and walks to the first stop; t > 0: a `before` hole
+  leave: { t: number; anchor: string | [x, z] };     // reached by t, then gone (t < 720: an `after` hole);
+                                                     // away windows go out and back through this anchor
+  away?: [number, number][];                         // `away` holes, each between two stops
+  stops: {
+    window: [number, number];                        // held for the whole window, however short
+    roomId: string;                                  // a drawn room of the instance
+    at: string | [x, z];                             // a seat or other object id (seatPose: on it, facing its front), or a point
+    heading?: number;                                // facility frame; default the seat's front, else 0
+    action: Action;
+    seated?: boolean;                                // default true on an object, false at a point
+    seat?: string;                                   // at a point: the object sat on (bed, sofa, toilet, shower seat),
+                                                     // which the furniture check then ignores
+    title: string;
+    with?: string[];                                 // other members of this stop's interaction (only read with
+                                                     // `interaction`); people outside the cast are allowed
+    interaction?: { id: string; category: string; label: string; description: string; window?: [number, number] };
+  }[];
+};
+type Scene = {
+  id: string;                                        // the interaction id (keep stable)
+  room?: string; place?: string;                     // a facility room id, or an outdoor place
+  window: [number, number];
+  label: string; description: string; category: string; // category: one of COMMUNITY_CATEGORIES
+  leaderAction?: Action; memberAction?: Action;
+  interaction?: boolean;                             // false: places people, emits no interaction
+  with?: string[];                                   // members without a slot
+  near?: [x, z];                                     // free seats fill outward from here
+  slots: {
+    who: string;
+    action: Action | 'lead' | 'member';
+    seat?: true | 'home' | string;                   // a free seat; this person's first place in this room; a seat id
+    spot?: string;                                   // stand (or park a wheelchair) by this object
+    at?: { point?: [x, z]; anchor?: string; heading: number }; // a room point, or an outdoor anchor
+    window?: [number, number];                       // inside the scene's (staggered arrivals)
+    title?: string;
+  }[];
+};
+```
+
+A **scene person**, from the partner's cast: the visiting PT walks in from
+the street through the `front` entrance in time for the scene, treats two
+participants at the parallel bars and leaves after it; nobody writes her
+walks or times.
+
+```json
+{
+  "entrances": {
+    "front": { "inside": [-14.1, -0.99],
+               "path": ["sidewalkEnd", "sidewalkPad", "courtA", "courtB", "doorOutside"] }
+  },
+  "people": [
+    { "id": "visiting-pt", "role": "pt", "label": "Visiting Seen physical therapist",
+      "variant": 8, "visit": { "entrance": "front" } },
+    { "id": "adc-participant-5", "role": "participant", "label": "Day center participant 5", "variant": 14 },
+    { "id": "adc-participant-6", "role": "participant", "label": "Day center participant 6", "variant": 15,
+      "mobility": "walker" }
+  ],
+  "scenes": [
+    { "id": "partner-pt", "room": "rehab-open", "window": [270, 345], "category": "partner",
+      "label": "Visiting Seen PT · strength & balance",
+      "description": "A Seen physical therapist visits the partner center for strength and balance …",
+      "slots": [
+        { "who": "visiting-pt", "action": "treat", "spot": "rehab-parallel-bars", "title": "Strength & balance" },
+        { "who": "adc-participant-5", "action": "exercise", "spot": "rehab-parallel-bars",
+          "title": "Parallel bars with the Seen PT" },
+        { "who": "adc-participant-6", "action": "exercise", "seat": "rehab-ot-chair-participant",
+          "title": "Seated strength with the Seen PT" }
+      ] }
+  ]
+}
+```
+
+Two **scheduled people** on the Wongs' home plan (`seen-home-wong`; this
+file generates and validates as written): a home health nurse visits through
+the front door (`door` anchor) from 642.5 to 709.5 s, with a 15 s trip to her
+car (`away`), and Mrs. Wong, a resident, starts the day in bed and ends it on
+the sofa (points with `seat`), with her clinic trip as an `away` window.
+Their time outside is filled by hand-authored legs (below); `nurse-line-rn`
+is a hand-authored actor outside the cast. A resident who comes home during
+the day (Mr. Wong from hospital) writes `arrive: { t: 672, anchor: 'door' }`
+and `leave: { t: 720, anchor: 'door' }`; his hospital day fills the
+`before` hole.
+
+```json
+{
+  "setting": "home-lin", "facility": "seen-home-wong",
+  "people": [
+    { "id": "home-rn", "role": "nurse", "label": "Home health nurse", "variant": 5, "gait": 1.35,
+      "arrive": { "t": 642.5, "anchor": "door" }, "leave": { "t": 709.5, "anchor": "door" },
+      "away": [[678, 693]],
+      "stops": [
+        { "window": [650, 652.5], "roomId": "home-kitchen", "at": [-3.89, -5.3], "heading": 3.142,
+          "action": "serve", "title": "Washes her hands" },
+        { "window": [657, 666], "roomId": "home-dining", "at": [0.8, -3.95], "heading": -2.507,
+          "action": "document", "title": "Reads the discharge summary" },
+        { "window": [671, 675], "roomId": "home-living", "at": [2.12, -0.4], "heading": 0.562,
+          "action": "consult", "title": "Checks her blood pressure", "with": ["home-participant"],
+          "interaction": { "id": "home-health-visit", "category": "home", "label": "Home health visit",
+                           "description": "Vitals on the sofa." } },
+        { "window": [698, 702], "roomId": "home-living", "at": [2.12, -0.4], "heading": 0.562,
+          "action": "conversation", "title": "Warning signs and the nurse-line number" }
+      ] },
+    { "id": "home-participant", "role": "participant", "label": "Mrs. Wong · at home", "variant": 3,
+      "mobility": "walker", "gait": 1.1,
+      "arrive": { "t": 0.5, "anchor": [-4.6, 3.3] }, "leave": { "t": 720, "anchor": "door" },
+      "away": [[80.5, 370]],
+      "stops": [
+        { "window": [0.5, 20], "roomId": "home-primary", "at": [-4.6, 3.3], "heading": 3.142,
+          "seat": "home-primary-bed", "seated": true, "action": "seated", "title": "Awake on her side of the bed" },
+        { "window": [45, 65], "roomId": "home-kitchen", "at": "home-kitchen-chair", "action": "tabletop",
+          "title": "Breakfast at the seated worktop" },
+        { "window": [72.5, 77.5], "roomId": "home-living", "at": "home-living-entry-bench", "action": "seated",
+          "title": "Shoes on at the entry bench" },
+        { "window": [374, 386], "roomId": "home-living", "at": "home-living-entry-bench", "action": "seated",
+          "title": "Resting after the clinic" },
+        { "window": [521, 720], "roomId": "home-living", "at": [0.6, 0.78], "heading": 0,
+          "seat": "home-living-sofa", "seated": true, "action": "listen", "title": "On the sofa, the news on",
+          "with": ["nurse-line-rn"],
+          "interaction": { "id": "after-hours-call", "category": "after-hours", "label": "Nurse line call",
+                           "description": "The evening plan by phone.", "window": [690, 708] } }
+      ] }
+  ]
+}
+```
+
+Rules the build enforces for scheduled people: stops in time order without
+overlap, every stop's `roomId` a drawn room, `away` windows inside `[arrive.t,
+leave.t]` and each between two stops (time off before the first stop is
+`arrive.t`, after the last `leave.t`), every walk between consecutive places
+fitting its gap at the person's gait on the instance grid, and a person in
+sight at both 0 and 720 s (`arrive.t` 0, `leave.t` 720) ending the day where
+it starts, since the clock loops. A resident present all day writes
+`arrive: { t: 0, anchor: <the first stop's point> }` and `leave: { t: 720,
+anchor: 'door' }`; one who must start and end in different places (in bed at
+8 AM, on the sofa at 4 PM) arrives at a fraction of a second (`t: 0.5`), so
+the loop seam is out of sight. A scheduled person is never in a scene, and
+their stops are indoors, in drawn rooms: time outside (a porch, a garden, a
+trip) is a hole that hand-authored legs fill. Each stop's `interaction` id
+may recur across people with the same window and category; members merge.
+Interactions may name people outside the cast (hand-authored community
+actors): the build lists them and `npm run validate:community` checks that
+the composed source has them.
+
+How the generator works (`communityCastFromScenes`, deterministic): places
+first, then timelines, then walks. A free seat is a seat-kind object in the
+room that is clear of furniture, reachable at the person's clearance and has a
+way out past seated and standing neighbours; seats fill a table the scene
+already uses, then nearest `near`. Every place keeps 0.6 m from every other
+place booked for an overlapping window (more beside a wheelchair or between a
+seat and a standing place); a chair the registry excludes is a wheelchair
+place at its table. Slots may nest: a narrower slot interrupts the person's
+open one, and they walk back when it ends if there is time. Walks run on the
+instance's navigation grid (`walkBetween`, the person's mobility clearance)
+and outdoors along anchors; each ends when the next slot starts (or leaves
+when an interrupting one ends) and, when it would pass anyone closer than
+0.6 m, is moved up to 30 s (waiting at the origin or the destination),
+slowed, routed beside the other walk or around people standing still. A
+scene person's every stay lasts at least 8 s; a scheduled stop lasts its
+window, so its walks must fit the gaps with room for those moves (a walk
+timed to its plain route with no slack fails as soon as someone stands near
+the route). What cannot fit throws, naming the person, the place and the
+time; widen a slot window or stagger a group. People are not escorted: two
+people never walk through a door side by side.
+
+**Holes and the stitch.** A scheduled person is hidden at the arrive anchor
+before `arrive.t` (a `before` hole), walks out to the leave anchor for each
+`away` window (arriving by its start, waiting in sight at the door if early),
+is hidden there for the window (an `away` hole) and walks back in from it when
+the window ends, and is hidden after `leave.t` (an `after` hole). Each hole is
+one hidden placeholder segment in the generated track and an entry in
+`holes[actorId] = [{ kind, start, end, from, to }]` (setting-local in
+`community-casts.json`, world after `placeInstanceCast`; `from` and `to` are
+the arrive anchor for a `before` hole and the leave anchor otherwise, so both
+are the door for a visit through it).
+
+Legs are registered per actor id in `HOLE_LEGS` in `community-people.ts`:
+
+```ts
+const HOLE_LEGS: Record<string, (hole: InstanceHole, setting: CareSetting) => Segment[] | undefined> = {
+  'home-participant': (hole, s) =>
+    hole.kind === 'away' && hole.start === 73 && hole.end === 374.5
+      ? wongClinicLeg(hole, settingZone(s.id))  // a Track from hole.from at hole.start … segmentsTo(hole.end)
+      : undefined,                              // no legs: the placeholder stays, hidden
+};
+```
+
+The function receives every hole of that person and returns the segments
+that replace it, or nothing to leave it hidden; match on `kind` and the
+window so a re-timed cast cannot silently pick up the wrong leg.
+`fillHoles` (`instance-cast.ts`) then requires, per filled hole, that the
+first segment starts at `hole.start` and the last ends at `hole.end` (it
+covers the hole exactly), that the first point is `hole.from` unless the hole
+is `before` (the day may start anywhere) and the last point is `hole.to`
+unless it is `after` (the day may end anywhere), within 5 cm; segments may be
+hidden or ride a vehicle inside. A hand-authored leg is typically a `Track`
+(`community-track.ts`) built with `start: hole.start` at `hole.from` and
+closed with `segmentsTo(hole.end)`, ending with a walk onto `hole.to`; a
+`before` leg is the visitor's arrival (hidden off the map, then a walk up to
+the door by `hole.end`), an `after` leg the departure from the door. An actor
+id is either generated or hand-authored, never both (`communitySource`
+throws), and an interaction id is defined once in the composed source
+(`composeSources` throws on duplicates). Mrs. Wong's clinic trip is written
+this way (`wongClinicTrip(track, back)`, `wongClinicLeg(hole, zoneId)`), ready
+for the day her home is an instance: `test/community-cast.test.ts` generates
+her on a stand-in house with `away: [[73, 374.5]]`, fills the hole from the
+front door and back, and checks the composed day against the hand-authored
+one; its trip times are fixed by the Seen van (on board 108.5–181 and
+257.5–337 s), so a cast with another away window re-times the walks at either
+end of the trip.
+
+### The partner adult day center
+
+The partner pad (`partner-adc`, (4, −68), heading 0, pad 62 × 50 m south of
+the south street, stub from (4, −35.8)) stamps Seen's own Alhambra ground
+floor, `seen-alhambra-planning`, as "Seen Health floor plan": facility frame
+`{ position: [0.99, −8.15], heading: π/2 }` so the plan's west entrance and
+arrival court face the drive, `adjacent` zone excluded, Seen's cleared
+day-room tables (`day-program.json` `removedObjectIds`, explicit in the
+registry) and two dining chairs (wheelchair places) excluded, six room plates
+(Day room, Physical therapy, Dining, Nurse station, Reception, Games lounge),
+margin 1.6 m, `grounds` for the trees, bench and patio corners. Its pad
+builder draws the hall massing only when the instance is missing, and the
+grounds (four trees, a bench, planting and the tai chi patio under a slatted
+pergola in the arrival court's west half) always. Same id as the viewer's model, so
+the instance is stamped synchronously with no fetch.
+
+Its cast, `app/data/community/partner-adc.cast.json`, is all scene people:
+twenty participants (canes 2, 9 and 20; walkers 6 and 17; wheelchairs 13 and
+18), the partner's activities lead, aide and nurse, and visiting Seen PT and
+RN (`visit` through the `front` entrance: sidewalk, court walk, west door).
+Scenes: morning in the day room (0–360), tai chi for eight on the patio
+(outdoor place `patio`, 168–247.5), PT with participants 5 and 6 at the bars
+and the OT chair (270–345), the RN's medication reviews with participants 8
+and 10 at the nurse station with the partner nurse (286–330), tabletop games
+(330–375), lunch in the dining room with staggered arrivals and the two
+wheelchair places (362–455), the aide clearing up, music (480–600) and
+afternoon conversation (600–720); the partner nurse charts all day.
+`keep` pins the ids other code uses (`adc-participant-1…6`, `adc-lead`,
+`visiting-pt`, `partner-tai-chi`, `partner-tabletop`, `partner-pt`, which the
+story's partner cutaway features). The trace names the zone "Partner ADC ·
+Seen layout" and its rooms "Partner ADC · Day room" and so on; Measure counts
+one occupancy series for the pad (25 people). Nobody arrives by van yet (see
+Roadmap hooks).
 
 ## Adding things
 
@@ -134,6 +535,15 @@ and reach it from a lane that flows the right way (`ring(side)` in
 (x ±130, z ±95, `neighborhood.ts`), past every pad, so a stub joins a drawn
 street wherever it meets the ring. Turn it (`heading`) so its front faces +x or +z; the
 framing, the label plate and the shadow camera follow from the registry.
+
+**A setting with a building.** Give the entry a `facility` (above) and a
+`site` builder for the grounds if the kind needs one, run `npm run
+build:community` and read its report (pad slack, paving and grounds
+clearances). Place the facility with `frame` so its entrance faces the drive
+and its door sits on an anchor the cast's `entrances` lead to; the pad grows
+to fit. Then write `app/data/community/<setting>.cast.json` and re-run until
+the build passes; commit the cast file and both generated JSON files, then run
+`npm run sim:report`.
 
 **A vehicle.** Add an itinerary to `communityVehicles`: `dwell(from, to, pose,
 phase, { door, ramp })` and `drive(from, to, path, phase, { pre, post })` legs
@@ -155,7 +565,9 @@ corner radius (`FLEET_LOT.streetRadius`, 6.4 m), easing (`easeDistance`),
 the van ramp (`FLEET_VAN_RAMP`) and the fade itself (`fadeVehicle` in
 `arrival.ts`) are shared with the center's fleet.
 
-**A person.** Use the `Track` builder in `community-people.ts`: `hold`,
+**A person inside a facility instance** goes in its cast file (above), never
+in `community-people.ts`. **A person on a pad** uses the `Track` builder
+(`community-track.ts`) in `community-people.ts`: `hold`,
 `walk`, `hidden`, `ride`, ending exactly at 720 s. Walks are straight lines
 between anchors on the pad (there is no navigation grid outside the building);
 keep ≥ 0.6 m from props and other people. Add every place a person stands or
@@ -182,19 +594,29 @@ name, every decor a builder and every fleet-body van its own livery letter. The
 cast: contiguous 0–720 tracks, walks ≤ 1.65 m/s, every visible walk point on a
 pad, its stub corridor or the center's site, seats only in registered vehicles,
 steps of at most 2 m into or out of a seat, nobody within 0.55 m of anyone else
-on foot (including the center's cast), and every interaction names known
-actors, categories and zones. Screenshots for review: `?site=alhambra&debug=1`, then
-`window.__viewer.focusSetting('hospital')` or `view('community')`.
+on foot (including the center's cast while near the center), and every
+interaction names known actors, categories and zones. `npm run
+validate:community-tracks` checks facility instances and their generated
+casts (see Facility instances); `validate-community.mjs` (in `npm run
+validate:activity`) fails while an instance summary is stale. Screenshots for
+review: `?site=alhambra&debug=1`, then
+`window.__viewer.focusSetting('partner-adc')` or `view('community')`.
 
 ## Roadmap hooks
 
-- **Partner ADC scenario.** The pad, patio and cast are in place; a Seen van
-  drop at its drive is one more `van-…` itinerary plus riders (out of scope
-  this session).
-- **Replicate a building.** `buildCareSetting` is a function of a setting, so
-  a second home or clinic is a registry entry; to replicate the Alhambra
-  building itself as a spoke, add a `seen-center` kind whose builder places the
-  facility JSON's massing on a pad.
+- **Partner ADC scenario.** The Seen layout, its cast and the visiting PT and
+  RN are in place; a Seen van drop at its drive (8:30, pickup 3:30) is one
+  more `van-…` itinerary plus riders arriving through the `front` entrance.
+- **Replicate a building.** Any facility specification can be stamped on a
+  pad (`facility`); the Wongs' home is next (its plan and cast are being drawn:
+  a `facility` with `floorY: PORCH_Y` whose front door sits on the `door`
+  anchor, and the six people who go indoors there as scheduled people). Each
+  of them then leaves `community-people.ts` as a `Track` and comes back as
+  `HOLE_LEGS` for the outdoor parts of the day (the aide's car and porch,
+  Mrs. Wong's clinic trip, Mr. Wong's hospital day and ride home, the
+  visitors' walks from the road), and the interactions the cast defines leave
+  the hand-authored list. A second Seen center is another entry with a
+  `seen-center` kind.
 - **Network of centers.** The camera framing (`frame()`), the zone naming
   (`community:<id>`) and the view (`community`) already treat settings as a
   set; a hub-and-spoke network is more settings plus vehicles whose legs join

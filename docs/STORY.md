@@ -20,7 +20,7 @@ npm run preview:story   # serve the built site locally
 `dist/story-site/` contains only what the story needs at runtime (about 3.8 MB before compression):
 
 - `index.html`, `assets/*.js|css` (React, three.js and the facility renderer; the renderer, schema and hero tracks load as separate chunks after the opening paints)
-- `models/seen-alhambra-planning.json` (facility specification, minified)
+- `models/seen-alhambra-planning.json` (facility specification, minified), plus any other specification a community pad stamps (`instanceFacilityUrls()` in `app/model/community-settings.ts`; the partner day center stamps the Alhambra plan itself, so today there is none)
 - every texture the facility references (`reference/photos/*-sign.png`, `reference/fleet/final-vans.png`), collected from the specification at build time
 - `brand/seen-health-horizontal.png`, `favicon.svg`
 
