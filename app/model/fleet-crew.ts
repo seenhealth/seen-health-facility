@@ -13,7 +13,11 @@
  * van's docked pose, so the same choreography works wherever the dock is.
  */
 import { ARRIVAL, alhambraVanWindows, sampleVan } from './arrival';
-import { fleetParking, fleetReservations } from './alhambra-fleet';
+import {
+  fleetParking,
+  fleetTimeline,
+  type FleetSpell,
+} from './alhambra-fleet';
 import { FLEET_VAN_SEATS, type VanSeat } from './photo-assets';
 import type { ActivityData, ActorSpec, Interaction, Segment } from './activity';
 import type { Action } from './characters';
@@ -24,6 +28,12 @@ const LOOP = 720;
 const STAFF_WALK = 1.35,
   CABIN_WALK = 0.7,
   CABIN_ROLL = 0.55;
+/**
+ * Nominal speed along a ride segment's placeholder path (m per loop second;
+ * see `Track.ride`): fast enough that an escort following its partner is
+ * handed to its own seat within a millisecond of the partner sitting down.
+ */
+const RIDE_PATH_SPEED = 1000;
 /** The driver follows the last member of a rider's party this far behind on the ramp. */
 const FOLLOW_GAP = 0.8;
 /** Gap an escort keeps behind its partner (mirrors `sampleEscort`). */
@@ -203,9 +213,12 @@ class Track {
    * Seated in a vehicle until `until`. The nominal path (what the engine uses
    * when it is not placing the person in the vehicle) starts and ends at the
    * seat's docked world point via a far detour: `sampleEscort` measures its
-   * gap back along the partner's nominal path, and a long ride path keeps that
-   * measurement inside the ride segment, where the `seat` lets the engine hand
-   * an escort over to its own seat instead of leaving it behind at the dock.
+   * gap back along the partner's nominal path, and a fast ride path keeps that
+   * measurement inside the ride segment from its first frame, where the
+   * `seat` lets the engine hand an escort over to its own seat instead of
+   * leaving it behind at the dock (until then the engine slides the escort
+   * along the partner's last steps). The detour grows with the ride's length
+   * so that the nominal speed stays at RIDE_PATH_SPEED or more.
    */
   ride(
     until: number,
@@ -216,8 +229,9 @@ class Track {
     visible: boolean,
     from: Vec2 = seatWorld,
   ) {
+    const detour = Math.max(300, (RIDE_PATH_SPEED * (until - this.t)) / 2);
     this.push(
-      segment(this.t, until, 'ride', [from, [seatWorld[0], seatWorld[1] + 300], seatWorld], {
+      segment(this.t, until, 'ride', [from, [seatWorld[0], seatWorld[1] + detour], seatWorld], {
         heights: [FLOOR, FLOOR, FLOOR],
         heading: 0,
         title,
@@ -251,28 +265,9 @@ function hiddenAfter(index: number, t: number) {
   for (let s = t; s < LOOP; s += 0.25) if (!sampleVan(index, s).visible) return round(s);
   return LOOP;
 }
-/** Intervals during which a van is away from its bay, and how it is engaged. */
-type VanSpell = { start: number; end: number; kind: 'moving' | 'docked' | 'yielding' };
-function vanSpells(index: number): VanSpell[] {
-  const w = alhambraVanWindows[index];
-  if (w)
-    return [
-      [w.inbound, w.outbound],
-      [w.returning, w.leaving],
-    ]
-      .filter(([go]) => go[0] >= 0)
-      .flatMap(([go, leave]): VanSpell[] => [
-        { start: go[0], end: go[1], kind: 'moving' },
-        { start: go[1], end: leave[0], kind: 'docked' },
-        { start: leave[0], end: leave[1], kind: 'moving' },
-      ]);
-  return fleetReservations(alhambraVanWindows)
-    .filter((r) => r.van === index)
-    .flatMap((r): VanSpell[] => [
-      { start: r.requested, end: r.start, kind: 'yielding' },
-      { start: r.start, end: r.end, kind: 'moving' },
-    ]);
-}
+/** The van's day as the fleet plans it: trips, docked spells and waits (off site, in its bay or for the driveway). */
+const vanSpells = (index: number): FleetSpell[] =>
+  fleetTimeline(index, alhambraVanWindows);
 
 // ---------------------------------------------------------------------------
 // Riders
@@ -525,7 +520,12 @@ const rampHeight = (p: Vec2, sill: Vec2, foot: Vec2) => {
   return round(FLOOR + (GROUND - FLOOR) * Math.min(1, f));
 };
 
-/** One driver's day from the van timetable and the riders who use its ramp. */
+/**
+ * One driver's day from the van's timeline and the riders who use its ramp:
+ * seated and visible whenever the van is under way or waiting to go, seated
+ * and hidden with it while it is off site, in the fleet office while it is
+ * parked, and on foot at the drop-off.
+ */
 function driverDay(index: number, actors: ActorSpec[], escorts: Map<string, ActorSpec>): Segment[] {
   const vehicle = vanIds[index],
     seat = FLEET_VAN_SEATS.driver,
@@ -535,24 +535,24 @@ function driverDay(index: number, actors: ActorSpec[], escorts: Map<string, Acto
     ? dockFrame(index).world(seatPoint(seat))
     : [bay.x, bay.z];
   const track = new Track(parkedSeat, FLOOR, 0);
-  const hidden = (until: number, title: string) =>
-    track.ride(until, vehicle, seat, parkedSeat, title, false);
-  const driving = (until: number, title = 'Driving the van') =>
-    track.ride(until, vehicle, seat, parkedSeat, title, true);
-  if (!spells.length) return hidden(LOOP, 'Spare van · no runs scheduled').segments;
+  const ride = (until: number, title: string, visible: boolean) =>
+    track.ride(until, vehicle, seat, parkedSeat, title, visible);
+  if (spells.every((s) => s.kind === 'parked'))
+    return ride(LOOP, 'Spare van · no runs scheduled', false).segments;
   const ramp = alhambraVanWindows[index] ? rampUses(index, actors, escorts) : { down: [], up: [] };
   for (const spell of spells) {
-    if (track.t < spell.start) hidden(spell.start, 'Off the road · fleet office');
-    if (spell.kind === 'yielding') driving(spell.end, 'Waiting for the driveway');
-    else if (spell.kind === 'moving') driving(spell.end);
-    else dockedDuty(track, index, spell, ramp);
+    if (spell.kind === 'docked') dockedDuty(track, index, spell, ramp);
+    // Rounded down to the millisecond (segment times are), so the driver is never seen in the van once it is parked.
+    else if (spell.kind === 'trip') ride(Math.floor(spell.end * 1000) / 1000, 'Driving the van', true);
+    else if (spell.kind === 'yielding') ride(spell.end, 'Waiting for the driveway', true);
+    else if (spell.kind === 'away') ride(spell.end, 'Off site · driving the route', false);
+    else ride(spell.end, 'Off the road · fleet office', false);
   }
-  if (track.t < LOOP) hidden(LOOP, 'Off the road · fleet office');
   return track.segments;
 }
 
 /** The docked choreography: out of the cab, ramp duty for each rider, back in before departure. */
-function dockedDuty(track: Track, index: number, spell: VanSpell, ramp: RampUses) {
+function dockedDuty(track: Track, index: number, spell: FleetSpell, ramp: RampUses) {
   const frame = dockFrame(index),
     { window } = frame,
     vehicle = vanIds[index],
