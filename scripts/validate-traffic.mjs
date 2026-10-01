@@ -2,14 +2,27 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { Vector3 } from 'three';
-import { sampleVan, alhambraVanWindows } from '../work/validation/arrival.mjs';
 import {
+  sampleVan,
+  alhambraVanWindows,
+  ARRIVAL,
+} from '../work/validation/arrival.mjs';
+import {
+  FLEET_LOT,
   fleetParking,
   fleetReservations,
+  fleetTimeline,
+  fleetVanLabel,
 } from '../work/validation/alhambra-fleet.mjs';
-import { sampleDelivery } from '../work/validation/deliveries.mjs';
+import {
+  deliveryStops,
+  sampleDelivery,
+} from '../work/validation/deliveries.mjs';
 import { sampleStreetCar } from '../work/validation/traffic-routes.mjs';
 import { vehicleGap } from '../work/validation/vehicle-clearance.mjs';
+import { buildSiteArrival } from '../work/validation/site-arrival.mjs';
+import { siteCurbs, STREET_EXTENT } from '../work/validation/neighborhood.mjs';
+import { validateFacility } from '../work/validation/schema.mjs';
 
 const body = (p, kind) => ({
   ...p,
@@ -46,30 +59,160 @@ const parkedCars = [
     'car',
   ),
 );
-const samples = (time) => [
-  ...Array.from({ length: 8 }, (_, i) => body(sampleVan(i, time), 'van')),
-  ...Array.from({ length: 2 }, (_, i) =>
-    body(sampleDelivery(i, time), 'truck'),
-  ),
-  ...Array.from({ length: 2 }, (_, i) => body(sampleStreetCar(i, time), 'car')),
-  ...parkedCars,
+const VANS = fleetParking.length;
+/**
+ * Every moving vehicle: fleet vans, delivery trucks and street cars. `nose` is
+ * the local z of the bonnet: vans and trucks drive toward local −z, the
+ * street-car bodies toward +z.
+ */
+const movers = [
+  ...fleetParking.map((_, i) => ({ name: fleetVanLabel(i), kind: 'van', nose: -1, sample: (t) => sampleVan(i, t) })),
+  ...deliveryStops.map((stop, i) => ({ name: `Truck ${stop.id}`, kind: 'truck', nose: -1, sample: (t) => sampleDelivery(i, t) })),
+  ...[0, 1].map((i) => ({ name: `Street car ${i}`, kind: 'car', nose: 1, sample: (t) => sampleStreetCar(i, t) })),
 ];
+const samples = (time) => [...movers.map((v) => body(v.sample(time), v.kind)), ...parkedCars];
+/** Name of entry `i` of `samples(time)`: a mover, or one of the parked cars after them. */
+const vehicleName = (i) => movers[i]?.name ?? `Parked car ${i - movers.length + 1}`;
+const streetCar = (i) => movers[i]?.kind === 'car';
+
+// Driveway: one maneuver on the lot at a time, four seconds apart.
 const reservations = fleetReservations(alhambraVanWindows);
 for (let i = 1; i < reservations.length; i++)
   assert(
     reservations[i].start - reservations[i - 1].end >= 4,
     'Shared driveway has a four-second clearance interval',
   );
-for (const r of reservations.filter((r) => r.van >= 4)) {
-  const waiting = sampleVan(r.van, r.requested),
-    bay = fleetParking[r.van];
-  assert.equal(waiting.phase, 'Yielding to driveway traffic');
-  assert.equal(waiting.position.x, bay.x);
-  assert.equal(waiting.position.z, bay.z);
-}
+// Timeline: a van yielding the driveway waits in its bay; off site it is hidden.
+for (let i = 0; i < VANS; i++)
+  for (const s of fleetTimeline(i, alhambraVanWindows)) {
+    const v = sampleVan(i, (s.start + s.end) / 2);
+    if (s.kind === 'yielding') {
+      assert.equal(v.phase, 'Yielding to driveway traffic');
+      assert.equal(v.position.x, fleetParking[i].x);
+      assert.equal(v.position.z, fleetParking[i].z);
+    }
+    if (s.kind === 'away') assert.equal(v.visible, false, `${fleetVanLabel(i)} off site is hidden at ${(s.start + s.end) / 2}`);
+    if (s.kind === 'parked') assert(v.phase.startsWith('Parked'), `${fleetVanLabel(i)} parked at ${(s.start + s.end) / 2}`);
+  }
 
+// Lot obstacles a van must keep clear of: the building, the entrance ramp and
+// its landing, the curb islands and the west sidewalk (vans cross the south
+// sidewalk only at the driveway).
+const rect = (x0, z0, x1, z1) => [
+  [x0, z0],
+  [x1, z0],
+  [x1, z1],
+  [x0, z1],
+];
+const curbs = siteCurbs(m);
+const obstacles = [
+  ['building', m.site.buildingOutline],
+  [
+    'entrance ramp',
+    rect(ARRIVAL.rampX - 0.64, ARRIVAL.rampTopZ, ARRIVAL.rampX + 0.64, ARRIVAL.rampBottomZ),
+  ],
+  ['ramp landing', rect(-16.16, -1.632, -14.1, -0.352)],
+  ['west sidewalk', curbs.sidewalks[0]],
+  ...curbs.islands.map((p, i) => [`curb island ${i}`, p]),
+];
+const inside = (p, poly) => {
+  let odd = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const a = poly[i],
+      b = poly[j];
+    if (a[1] > p[1] !== b[1] > p[1] && p[0] < ((b[0] - a[0]) * (p[1] - a[1])) / (b[1] - a[1]) + a[0])
+      odd = !odd;
+  }
+  return odd;
+};
+const segmentGap = (p, a, b) => {
+  const dx = b[0] - a[0],
+    dz = b[1] - a[1],
+    l = dx * dx + dz * dz,
+    t = l ? Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dz) / l)) : 0;
+  return Math.hypot(a[0] + dx * t - p[0], a[1] + dz * t - p[1]);
+};
+const crosses = (a, b, c, d) => {
+  const o = (p, q, r) => Math.sign((q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0]));
+  return o(a, b, c) !== o(a, b, d) && o(c, d, a) !== o(c, d, b);
+};
+function polygonGap(A, B) {
+  if (A.some((p) => inside(p, B)) || B.some((p) => inside(p, A))) return 0;
+  let best = Infinity;
+  for (let i = 0; i < A.length; i++)
+    for (let j = 0; j < B.length; j++) {
+      const a = A[i],
+        b = A[(i + 1) % A.length],
+        c = B[j],
+        d = B[(j + 1) % B.length];
+      if (crosses(a, b, c, d)) return 0;
+      best = Math.min(best, segmentGap(a, c, d), segmentGap(b, c, d), segmentGap(c, a, b), segmentGap(d, a, b));
+    }
+  return best;
+}
+const footprint = (v) => {
+  const fx = -Math.sin(v.heading),
+    fz = -Math.cos(v.heading);
+  return [
+    [1, 1],
+    [1, -1],
+    [-1, -1],
+    [-1, 1],
+  ].map(([a, b]) => [
+    v.position.x + fx * 3.175 * a + fz * 1.125 * b,
+    v.position.z + fz * 3.175 * a - fx * 1.125 * b,
+  ]);
+};
+const LOT_CLEARANCE = 0.3;
+// Where a fading van's centre may be: the last fade length before the vanish
+// points (the routes are symmetric about the cross street).
+assert.equal(FLEET_LOT.vanishNorth, -FLEET_LOT.vanishSouth, 'the fleet vanishes as far north as south');
+const FADE_FROM = FLEET_LOT.vanishNorth - FLEET_LOT.fade;
+const fadeBand = { from: Infinity, to: 0, reach: 0 };
+
+// Heading change between consecutive samples, in radians (wrapped).
+const turnBetween = (a, b) => Math.abs(Math.atan2(Math.sin(b - a), Math.cos(b - a)));
+/**
+ * Minimum turning radius of a van's centre (the radius the reviewers measure):
+ * over any 0.02 s step a visible, moving van may turn by at most the distance
+ * it covered divided by this radius. A 6.35 m van turning tighter than this
+ * swings its tail out faster than it moves forward and reads as pivoting.
+ */
+const MIN_TURN_RADIUS = 4;
+const tightest = new Map();
+/**
+ * Nose-first everywhere except in a phase that says it is reversing (a step
+ * that ends or starts one may go either way), no jump between frames, and no
+ * turn tighter than MIN_TURN_RADIUS while visible: a vehicle that turns
+ * without moving (a pivot or a heading snap) fails too. `a` and `later` are
+ * samples 0.02 s apart.
+ */
+function checkMotion(name, kind, nose, a, later, time) {
+  if (a.visible === false || later.visible === false) return;
+  const front = new Vector3(nose * Math.sin(a.heading), 0, nose * Math.cos(a.heading));
+  const step = later.position.clone().sub(a.position);
+  const distance = step.length();
+  assert(distance < 0.3, `${name} jumps ${distance.toFixed(2)} m at ${time}s ("${a.phase}" → "${later.phase}")`);
+  if (distance > 0.001) {
+    const forward = step.dot(front) > 0,
+      reversing = [a.phase, later.phase].map((p) => p.startsWith('Reversing'));
+    assert(
+      forward ? !(reversing[0] && reversing[1]) : reversing[0] || reversing[1],
+      `${name} moves ${forward ? 'forward' : 'backward'} during "${a.phase}" at ${time}s`,
+    );
+  }
+  const turn = turnBetween(a.heading, later.heading);
+  const best = tightest.get(kind) ?? { radius: Infinity, at: '' };
+  if (turn > 1e-9 && distance / turn < best.radius)
+    tightest.set(kind, { radius: distance / turn, at: `${name} at ${time}s ("${a.phase}")` });
+  assert(
+    turn <= (distance / MIN_TURN_RADIUS) * 1.01 + 1e-9,
+    `${name} turns ${((turn * 180) / Math.PI).toFixed(1)}° over ${distance.toFixed(3)} m (radius ${(distance / turn).toFixed(2)} m < ${MIN_TURN_RADIUS} m) at ${time}s ("${a.phase}")`,
+  );
+}
 let closest = Infinity,
   streetClosest = Infinity,
+  lotClosest = Infinity,
   pairs = 0;
 for (let frame = 0; frame < 36000; frame++) {
   const time = frame / 50,
@@ -82,32 +225,64 @@ for (let frame = 0; frame < 36000; frame++) {
       if (b.visible === false) continue;
       const gap = vehicleGap(a, b);
       // Parked bays leave 55 cm between vans. Street crossings get a larger buffer.
-      const margin = i === 10 || i === 11 || j === 10 || j === 11 ? 0.85 : 0.5;
+      const margin = streetCar(i) || streetCar(j) ? 0.85 : 0.5;
       assert(
         gap >= margin,
-        `Vehicles ${i}/${j} have only ${gap.toFixed(3)} m at ${time}s`,
+        `${vehicleName(i)} and ${vehicleName(j)} have only ${gap.toFixed(3)} m at ${time}s`,
       );
       closest = Math.min(closest, gap);
       if (margin === 0.85) streetClosest = Math.min(streetClosest, gap);
       pairs++;
     }
-    if (i < 8) {
-      const next = sampleVan(i, time + 0.002);
-      const movement = next.position.clone().sub(a.position);
-      assert(movement.length() < 0.03, `Van ${i} teleports at ${time}s`);
-      if (movement.length() > 0.00001 && a.phase === next.phase) {
-        const front = new Vector3(
-          -Math.sin(a.heading),
-          0,
-          -Math.cos(a.heading),
-        );
-        const alignment =
-          movement.normalize().dot(front) * (a.reverse ? -1 : 1);
-        assert(alignment > 0.97, `Van ${i} drives sideways at ${time}s`);
-        assert(
-          a.door < 0.001 && a.ramp < 0.001,
-          'Doors and ramps closed before movement',
-        );
+    if (i >= movers.length) continue;
+    const mover = movers[i],
+      later = mover.sample(time + 0.02);
+    checkMotion(mover.name, mover.kind, mover.nose, a, later, time);
+    if (i >= VANS) continue;
+    const next = sampleVan(i, time + 0.002);
+    const movement = next.position.clone().sub(a.position);
+    assert(movement.length() < 0.03, `${fleetVanLabel(i)} teleports at ${time}s`);
+    const front = new Vector3(-Math.sin(a.heading), 0, -Math.cos(a.heading));
+    if (movement.length() > 0.00001 && a.phase === next.phase) {
+      const alignment =
+        movement.normalize().dot(front) * (a.reverse ? -1 : 1);
+      assert(alignment > 0.97, `${fleetVanLabel(i)} drives sideways at ${time}s`);
+      assert(
+        a.door < 0.001 && a.ramp < 0.001 && a.cabDoor < 0.001,
+        'Doors and ramps closed before movement',
+      );
+    }
+    // A van fades only over the last FLEET_LOT.fade metres before the end of
+    // its off-site route, with its whole body (nose and tail) still on the
+    // drawn street, and it appears or disappears only once fully faded (never
+    // a pop inside the map).
+    if (a.visible && a.opacity < 1) {
+      const centre = Math.abs(a.position.z),
+        reach = Math.max(...footprint(a).map(([, z]) => Math.abs(z)));
+      assert(
+        centre >= FADE_FROM - 1e-6,
+        `${fleetVanLabel(i)} fades ${(FADE_FROM - centre).toFixed(1)} m before the fade band at ${time}s (${a.position.x.toFixed(1)}, ${a.position.z.toFixed(1)})`,
+      );
+      assert(
+        reach <= STREET_EXTENT.z,
+        `${fleetVanLabel(i)} fades ${(reach - STREET_EXTENT.z).toFixed(1)} m past the end of the drawn street at ${time}s (${a.position.x.toFixed(1)}, ${a.position.z.toFixed(1)})`,
+      );
+      fadeBand.from = Math.min(fadeBand.from, centre);
+      fadeBand.to = Math.max(fadeBand.to, centre);
+      fadeBand.reach = Math.max(fadeBand.reach, reach);
+    }
+    if (later.visible !== a.visible)
+      assert(
+        (later.visible ? later.opacity : a.opacity) < 0.05,
+        `${fleetVanLabel(i)} pops ${later.visible ? 'in' : 'out'} at ${time}s`,
+      );
+    // Lot obstacles, ten times a second.
+    if (frame % 5 === 0 && a.position.x > -42 && a.position.x < -10 && a.position.z > -32 && a.position.z < 12) {
+      const fp = footprint(a);
+      for (const [name, poly] of obstacles) {
+        const gap = polygonGap(fp, poly);
+        lotClosest = Math.min(lotClosest, gap);
+        assert(gap >= LOT_CLEARANCE, `${fleetVanLabel(i)} is ${gap.toFixed(2)} m from the ${name} at ${time}s ("${a.phase}")`);
       }
     }
   }
@@ -119,6 +294,22 @@ for (const t of [0, 130.8, 280.76, 460.74, 489.56, 719.98])
     samples(t).forEach((v, i) =>
       assert(v.position.distanceTo(samples(t + shift)[i].position) < 1e-9),
     );
+// The other sites' vans, sampled as their viewer drives them (site-arrival's
+// sampler on each facility's own timetable), obey the same motion rules.
+let siteSamples = 0;
+for (const site of ['seen-olympic', 'seen-alveare']) {
+  const model = validateFacility(JSON.parse(fs.readFileSync(`public/models/${site}.json`, 'utf8')));
+  const arrival = buildSiteArrival(model);
+  for (const index of arrival.windows.keys())
+    for (let frame = 0; frame < 36000; frame++) {
+      const time = frame / 50;
+      checkMotion(`${site} van ${index}`, 'site van', -1, arrival.sampleVan(index, time), arrival.sampleVan(index, time + 0.02), time);
+      siteSamples++;
+    }
+}
+const radii = [...tightest]
+  .map(([kind, { radius, at }]) => `${kind} ${radius.toFixed(2)} m (${at})`)
+  .join('; ');
 console.log(
-  `${pairs.toLocaleString()} vehicle-pair checks passed over 12 minutes at 50 Hz; minimum gap ${closest.toFixed(2)} m, street-traffic gap ${streetClosest.toFixed(2)} m. Driveway yielding, parking, orientation, doors, reverse and loop continuity passed.`,
+  `${pairs.toLocaleString()} vehicle-pair checks passed over 12 minutes at 50 Hz; minimum gap ${closest.toFixed(2)} m, street-traffic gap ${streetClosest.toFixed(2)} m, lot obstacles ${lotClosest.toFixed(2)} m. Fades stay on the drawn street: van centres at |z| ${fadeBand.from.toFixed(1)}–${fadeBand.to.toFixed(1)} m, bodies to ${fadeBand.reach.toFixed(1)} m (street drawn to ${STREET_EXTENT.z} m). Driveway yielding, parking, orientation, doors, reverse, fades and loop continuity passed. Every fleet van, delivery truck, street car and the Olympic/Alveare vans (${siteSamples.toLocaleString()} site samples) drive nose-first outside reversing phases, never jump and turn no tighter than ${MIN_TURN_RADIUS} m; tightest: ${radii}.`,
 );

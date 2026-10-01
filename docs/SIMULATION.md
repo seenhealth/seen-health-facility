@@ -20,11 +20,13 @@ flowchart LR
   C[Compiler<br/>app/sim/scenario.ts]
   T[Compiled tracks<br/>day-in-the-life.tracks.json]
   M[Merge<br/>app/sim/story-source.ts]
+  A[Alhambra source<br/>app/model/alhambra-source.ts<br/>+ community layer + fleet crew]
   E[Activity engine<br/>app/model/activity.ts]
   R[Renderer<br/>app/model/renderer.ts]
   X[Metrics<br/>app/sim/metrics.ts]
+  W[Touchpoint trace<br/>app/sim/trace.ts]
   U[Measure panel<br/>app/components/metrics-panel.tsx]
-  J[Report<br/>scripts/sim-report.mjs → public/models/sim-report.json]
+  J[Report<br/>scripts/sim-report.mjs → public/models/sim-report.json<br/>+ touchpoint-trace.json]
 
   F --> N
   P --> N
@@ -34,27 +36,55 @@ flowchart LR
   C -->|npm run build:scenario| T
   T --> M
   B --> M
-  M -->|ActivitySource| E
+  B --> A
+  M --> A
+  A -->|ActivitySource| E
   E --> R
-  M --> X
-  B --> X
+  A --> X
   X --> U
   X --> J
+  A --> W
+  W --> U
+  W --> J
 ```
 
 - **Build time** (Node): `scripts/build-scenario.mjs` bundles the TypeScript
   modules with Rolldown (already installed with Vite) into `work/sim/`, compiles
   the scenario, validates it and writes the tracks JSON.
+  `scripts/build-community-tracks.mjs` does the same for the people inside
+  facility instances on community pads (`npm run build:community`: cast files
+  in `app/data/community/` → `app/data/community-casts.json`, routed on each
+  instance's own navigation grid; docs/COMMUNITY.md, "Facility instances").
 - **Run time** (browser): `storyActivitySource()` merges the precompiled tracks
   into the base loop. No navigation work happens in the browser.
+- **Composition**: `alhambraSource(model, base)` (`app/model/alhambra-source.ts`)
+  adds the distributed-care layer (`communitySource`, docs/COMMUNITY.md) and the
+  fleet crew (`withFleetCrew`) to a base loop, memoised per base. The renderer,
+  the Measure panel, `composedStorySource(model)` and the report scripts all use
+  it; the engine plays its source as given.
 - **Measurement** uses `sampleActor`, `sampleEscort` and `samplePairedActors`
-  from the activity engine, so it measures exactly what is animated.
+  from the activity engine, seats riders in their vehicles through the same
+  samplers the scene uses, and reads that same composed source, so it measures
+  exactly what is animated.
 
 ## The clock
 
 One 720-second loop is the 8 AM–4 PM day: 1 loop second = 2/3 of a clock
-minute. Vans (`vanWindows` in `app/model/arrival.ts`), the day-room program and
-every activity source run on this clock. `app/sim/clock.ts` converts between loop
+minute. Vans (`vanWindows` in `app/model/arrival.ts`, routes in
+`app/model/alhambra-fleet.ts`), the day-room program and every activity source
+run on this clock.
+
+Every vehicle route is a chain of straight runs and circular arcs of the
+vehicle's centre (`app/model/vehicle-path.ts`: the `Pen` turtle, `roundedPath`
+for corner-point data, `pathAt`), so turning radii are exact: 4 m in the fleet
+lot and at the Olympic and Alveare bays, 4.5 m for the delivery trucks (which
+back straight out of receiving before pulling away) and 6.4 m
+(`STREET_CORNER_RADIUS`) at the ring-street corners for street cars, fleet and
+community vehicles. Speeds blend with the shared `easeDistance`
+(`app/model/traffic-routes.ts`). `npm run validate:traffic` checks nose-first
+motion, jumps and the 4 m minimum radius for every one of them at 50 Hz.
+
+`app/sim/clock.ts` converts between loop
 seconds, clock minutes and labels:
 
 | Helper | Example |
@@ -64,6 +94,36 @@ seconds, clock minutes and labels:
 | `clockToLoop('12:30 PM')` | 405 |
 | `loopDurationMinutes(45)` | 30 |
 | `hourTicks()` | chart ticks for 8 AM … 4 PM |
+
+### Fleet crew (`app/model/fleet-crew.ts`)
+
+`withFleetCrew(source)` is applied by `alhambraSource()` to every Alhambra
+source (the base loop and the story alike), so the viewer, Measure and the
+reports see the same crew. It is a pure transform: riders
+whose `ride` segments name a fleet van get a cabin seat (`seat`, `seatHeading`,
+the van-local anchors in `FLEET_VAN_SEATS`) and a short cabin walk between seat
+and door sill; escorted riders sit in the front row with their escort directly
+behind, which is where `sampleEscort` places the escort the moment the rider
+stands up. Ride segments carry a long, fast nominal path so that, as soon as
+the rider is seated, `sampleEscort` measures its gap inside the ride segment and
+the engine hands the escort over to its own seat. Each van gets a driver
+(`driver-1` … `driver-8`) whose day follows the van's `fleetTimeline`: hidden
+while the van is off site, seated for whole trips (the engine draws people
+seated in a van only while it is at least half opaque, `SEATED_MIN_OPACITY`, so
+they vanish with a van fading at the street end), and at the dock out through
+the driver's door once it swings open (`FLEET_CAB_DOOR`), around the nose, up
+the ramp and in through the sliding-door opening (`FLEET_VAN_SIDE_DOOR`) ahead
+of each rider and 0.9 m behind the rider's party on the way down, a handoff at
+the foot, then back in through the driver's door before departure. Vans A–D
+never park between runs (every drop-off arrival comes in from off site, its
+riders seated as it sets off out of sight); the drivers of vans E (bay) and F
+(curb) wait in the fleet office inside the center, walk out through the
+sliding entrance and across the lot to the parked van, get in through the
+driver's door and, after the run, get out and walk back. Vans C and D, which arrive
+without actors, get two mid-day riders each who walk the base loop's walking
+arrival's ramp, entrance and lobby routes, check in behind the front-desk queue,
+wait in the lobby and ride home on Van A or Van B.
+`npm run validate:fleet` checks all of this as the viewer plays it.
 
 ## Navigation (`app/sim/nav.ts`)
 
@@ -129,7 +189,7 @@ disappears (`visible: false` off duty); `exit` optionally differs.
 
 ```jsonc
 "placement": {
-  "mode": "visit",                  // meeting | arrival | checkin | visit | departure
+  "mode": "visit",                  // meeting | arrival | checkin | visit | departure | cutaway
   "stops": [{
     "id": "clinic",
     "window": [140, 185],           // when this stop should be on screen
@@ -166,6 +226,34 @@ disappears (`visible: false` off duty); `exit` optionally differs.
 - `duties` (with absolute `window`s) attach companions to steps where the hero
   follows copied tracks, e.g. the center manager at check-in.
 
+### Cutaway steps
+
+A cutaway looks in on the care network around the center (a partner site or a
+home) for a few seconds of the story, without the hero:
+
+```jsonc
+{
+  "id": "network-partner",
+  "window": [289, 300],                 // inside a gap between the hero's stops
+  "zoneId": "community:partner-adc",    // settingZone(settingId)
+  "roomId": null,
+  "settingId": "partner-adc",           // a careSettings id
+  "interactionIds": ["partner-pt"],     // community interactions; the first is the camera's follow target
+  "title": "Therapy that travels", "kicker": "11:15 AM · Partner day center", "body": "…",
+  "roles": ["pt"],                      // IDT disciplines involved
+  "partners": ["Activities lead"],      // external roles (story only)
+  "handoffs": [{ "from": "pt", "to": "rn", "note": "Both steadier on turns; keep the walker" }],
+  "heroPresent": false,
+  "placement": { "mode": "cutaway" }
+}
+```
+
+It adds no stops, companions, meetings or interactions, so the compiled actors
+and interactions do not change. The story trims the hero chapters next to a
+cutaway on screen only (`scrubWindows`, `app/sim/story-timeline.ts`); the hero
+steps' `window`s stay as authored. Metrics, the sim report and the trace
+validator count the hero's steps only (steps without `settingId`).
+
 ### What the compiler does
 
 1. Copies the replaced actor's van ride, ramp, sliding entrance and check-in
@@ -189,16 +277,24 @@ disappears (`visible: false` off duty); `exit` optionally differs.
    take turns presenting. Each attendee shares a profile with the downstairs
    person they are, so the same RN is seen at the huddle and in the clinic.
 8. Emits interactions per stop, arrival, check-in, departure and meeting, and a
-   `steps` summary with arrive/depart and a **focus time** for each step.
+   `steps` summary with arrive/depart and a **focus time** for each step. A
+   cutaway's summary has `heroPresent: false`, `roomId: null`, its `settingId`
+   and featured `interactionIds`, `focusActorId: 'interaction:<first id>'` and a
+   focus time in the middle of the featured interactions' span inside the
+   window. The interactions come from `CompileOptions.context` (the composed
+   source; `build-scenario` passes `alhambraSource(model, activityData)`);
+   without it the focus is mid-window.
 9. Removes the replaced actor and its interactions from the merged source.
 
 ## Running it
 
 ```bash
 npm run build:scenario                  # compile, validate, write tracks JSON
-node scripts/build-scenario.mjs --check # compile and validate only
-node scripts/build-scenario.mjs --check --model path/to/facility.json
-node scripts/sim-report.mjs             # report + public/models/sim-report.json
+node scripts/build-scenario.mjs --check # compile, validate, fail if the committed tracks are stale
+node scripts/build-scenario.mjs --check --model path/to/facility.json   # no drift check
+node scripts/sim-report.mjs             # report + public/models/sim-report.json + touchpoint-trace.json
+npm run trace:report                    # touchpoint trace only (summary table + JSON)
+npm run validate:trace                  # trace structure, hero coverage, file freshness and size
 ```
 
 Re-run `npm run build:scenario` after changing the facility (e.g. new
@@ -215,7 +311,20 @@ furniture), the base loop or the scenario. Validation checks:
 - the hero boards Van A only when it is parked with doors and ramp open;
 - new walks keep clear of the day-room activity stations;
 - it reports walks through furniture footprints and close contacts (< 0.45 m)
-  between new people and anyone else, for review.
+  between new people and anyone else, for review;
+- the story timeline (`validateStory`): every cutaway names a known setting
+  and its zone, lies inside the day and lasts at least 6 s, features
+  interactions that exist in the composed story source at that setting (or on
+  the site or upstairs) and overlap its window by at least 4 s, covering at
+  least 60 % of it together; its kicker time lies inside the window and its
+  compiled focus time inside a featured interaction; roles and handoff ends
+  are IDT ids. The scrub windows start at 0, meet end to start and end by
+  720 s; every hero chapter keeps at least 20 s, its focus time with a 1 s
+  margin, its kicker and the start of every stop, and no stop runs past a cut
+  to a cutaway. The build prints the timeline with focus times and the
+  featured interactions;
+- with `--check` (`npm run validate:scenario`, part of `npm run validate`), the
+  committed `day-in-the-life.tracks.json` equals the fresh compile.
 
 ## Using the story source
 
@@ -223,38 +332,178 @@ furniture), the base loop or the scenario. Validation checks:
 import { storyActivitySource, storySteps, storyStep } from '@/app/sim/story-source';
 
 const { source, heroId } = storyActivitySource(); // memoised ActivitySource
-createViewer(host, model, onSelect, { activity: source });
+createViewer(host, model, onSelect, { activity: source }); // composed by the renderer
 const clinic = storyStep('clinic');
 viewer.activity.setOptions({ time: clinic.focusTime, playing: false });
 viewer.followActor(clinic.focusActorId); // 'hero-lin' or 'interaction:idt-huddle'
 ```
 
+`composedStorySource(model)` returns the same story as the viewer plays it
+(`alhambraSource(model, source)`: plus the community layer and the fleet crew);
+Measure and the reports read that one.
+
 Each `CompiledStep` has `window`, `focusTime`, `focusActorId`, `stops` (anchor,
 heading, action, arrive/depart, overlap, companions, partners, interaction id),
-`companionIds`, `interactionIds`, `handoffs` and `roles`.
+`companionIds`, `interactionIds`, `handoffs` and `roles`; cutaways also carry
+`settingId`.
 
 ## What is measured (`app/sim/metrics.ts`)
 
-`computeMetrics(source, model, { step, heroId, steps })` samples every actor
-every `step` loop seconds (1 s in the report, 2 s in the panel):
+`computeMetrics(source, model, { step, heroId, steps, vehicles })` samples every
+actor every `step` loop seconds (1 s in the report, 2 s in the panel). `vehicles`
+(the viewer's `activity.vehicles`, or `alhambraVehicles()` in Node) seats riders
+where the scene draws them:
 
 | Measure | Definition |
 | --- | --- |
-| Zone occupancy | visible participants and staff per zone at each sample (ground zones by point-in-polygon, like the engine; `site` outdoors); peaks, means and person-hours |
-| On site | participants and staff visible anywhere |
+| Zone occupancy | visible participants and staff per zone at each sample (ground zones by point-in-polygon, like the engine; the home and partner sites by the composed source's `zones`; `site` for the street and vans); peaks, means and person-hours |
+| On site | participants and staff visible at the center (not at a home or partner site) |
 | Staff utilization | per role and per person: **direct care & programs** (treat, consult, tabletop, exercise, serve, greet, present, conversation, music …), **walking & escorting**, **documenting & standby** (document, idle, listen), **team meetings** (seated upstairs), **driving**; shares of on-duty time |
 | Walking distance | visible displacement per person, averaged per role |
-| Participant time | per participant: arrivals, clinical, therapy, activities, meals, coordination (from interaction categories), walking between, waiting & free time, off site |
+| Participant time | per participant: arrivals, clinical, therapy, activities, meals, coordination, care at home & in the community (from interaction categories), walking between, waiting & free time, home, in the van or away (away from the center only community touchpoints count) |
 | Hero touchpoints | per IDT discipline: minutes with someone of that discipline within 1.6 m or in a shared interaction, encounters, first time |
 | Handoffs | counted from the scenario's step handoffs, per step and discipline |
 
 Staff are counted as people: tracks sharing a `profileId` (an upstairs meeting
-attendee and the same person downstairs) are one person.
+attendee and the same person downstairs) are one person. Staff utilization
+covers staff seen at the center; partner staff who only appear at a home or
+partner site (the pharmacist, the hospitalist) are in occupancy and the trace.
 
 The **Measure** panel (header → Measure) shows occupancy small multiples by zone
 (click to jump the playback), staff time by role and, for the story scenario,
 Mrs. Lin's care team, with a marker synced to the viewer clock. Compare the base
-loop and "With Mrs. Lin's day" with the scenario toggle.
+loop and "With Mrs. Lin's day" with the scenario toggle; both are measured as the
+scene plays them (the center, the fleet crew and the community settings). Its **Trace** tab lists
+one person's touchpoints end to end (next section).
+
+## Touchpoint trace (digital-twin seed)
+
+`app/sim/trace.ts` turns the same tracks into an **event stream**: an ordered log
+of what happened to whom, where and with whom, for every person on the clock:
+the center's loop, the fleet crew and the community cast (`alhambraSource`).
+Metrics answer "how much"; the trace answers "what happened to this person, in
+order", which is the shape a digital twin of operations ingests and compares.
+
+```ts
+import { traceTouchpoints, personJourney, traceSummary } from '@/app/sim/trace';
+
+const events = traceTouchpoints(source, model, { step: 1 }); // sorted by t, then actorId
+const lin = personJourney(events, 'hero-lin');               // one person's day
+const totals = traceSummary(events, source);                 // events by kind, coverage
+```
+
+### Event schema
+
+Every event is a `TouchpointEvent`:
+
+| Field | Meaning |
+| --- | --- |
+| `t`, `clock` | loop seconds and the clock label (`clockLabel`), e.g. `144.93`, `9:36 AM` |
+| `actorId`, `actorLabel`, `role` | the person (one event per person involved) |
+| `kind` | one of the kinds below |
+| `zoneId`, `roomId`, `levelId`, `x`, `z` | where: ground zones by point-in-polygon like the engine, rooms by `model.rooms` polygons and the rooms of facility instances on community pads (`SourceZone.rooms`, `community:partner-adc/day-open`) (`null` in open areas), the home and partner sites by the source's `zones` (`community:<id>`), `site` for the street and vans |
+| `with` | other actor ids involved (interaction members, the encounter partner, the two staff of a handoff) |
+| `interactionId`, `category`, `title` | the interaction; `title` is also the place name on `enter` and `"RN → PT"` on a handoff |
+| `vehicleId` | the vehicle on `board` / `alight` (named by the vehicle registry's labels in the panel) |
+| `durationSeconds` | coalesced encounters and `interaction-end` |
+
+Events are sorted by `t`, then `actorId`, then a fixed kind order
+(`day-start, alight, on-site, leave, enter, board, off-site, interaction-end,
+handoff, interaction-start, encounter, day-end`), so the output is
+reproducible byte for byte.
+
+### How each kind is derived
+
+The tracer samples every actor every `step` seconds (2 s in the panel, 1 s in
+the report) with the same `sampleFrame` helper metrics uses, so what is traced
+is exactly what is animated.
+
+| Kind | Rule |
+| --- | --- |
+| `day-start` / `day-end` | every person, at 0 s and 720 s |
+| `on-site` / `off-site` | the track becomes visible / hidden (hidden = indoors at home, off duty or driving a car; riders seated in a van stay visible) |
+| `enter` / `leave` | the (zone, room) pair changes while visible; a room change inside a zone is a `leave` + `enter` of the same zone |
+| `board` / `alight` | a segment with `vehicleId` and action `ride` begins / ends |
+| `interaction-start` / `-end` | `source.interactions`, one pair per member, at the authored times |
+| `encounter` | two visible people on the same level (or one outdoors) within `encounterRadius` (1.6 m) for at least `minEncounterSeconds` (4 s); breaks shorter than `encounterGapSeconds` (3 s) are bridged; one event per person at the start of the run, with the partner in `with` and the length in `durationSeconds` |
+| `handoff` | a participant's attending staff change role: staff attend through a shared interaction, an `escortFor` link or a `pairedWith` link; when someone of a different role than the most recent attender starts attending at a later sample, the participant gets a `handoff` from that person to the newcomer |
+
+`personJourney` adds per-person zone dwell (from `enter`/`leave`), the IDT
+disciplines met (roles of everyone in `with`, through `care-team.json`),
+encounter and interaction counts and the first/last time on site.
+`traceSummary` counts events by kind, participants with at least one clinical,
+therapy, activities, meals, coordination or community (home, pharmacy,
+specialist, hospital, partner, after-hours) interaction, and the median events
+per participant.
+
+### Report, export and validation
+
+`npm run sim:report` (or `npm run trace:report` for the trace alone) traces the
+base loop and the story source, both composed as the viewer plays them, at 1 s
+and writes `public/models/touchpoint-trace.json`: `{ sources: { base, story } }`,
+each with a `summary` and one event per line, about 2.3 MB for ~8,100 events
+(220 people in the base loop, 235 in the story), under the 3 MB bound.
+Compactness comes from coalescing encounters, not from short keys. The console
+prints events by kind, participants covered per category and the hero's
+discipline coverage. `npm run validate:trace` recomputes the trace and asserts
+ordering, one `day-start`/`day-end` per person, alternating presence, stays and
+rides, start/end pairing per interaction and per person, mutual encounters,
+finite coordinates, determinism, that Mrs. Lin's trace includes every discipline
+the scenario steps' `roles` claim, that the community layer is traced and its
+touchpoints counted, that no event lies off the drawn world (riders are seated),
+and that the published file is current and within the size bound. Both scripts
+read the trace options and the size bound from `scripts/trace-config.mjs`.
+
+In the viewer, the Measure panel's **Trace** tab has a person picker
+(participants first, then staff, with search), counters (events, encounters,
+disciplines), a zone-dwell strip, the ordered timeline (clock · place · event ·
+who with) and **Download trace (JSON)** for the scenario shown. Clicking an entry
+sets the clock there and follows the person when they are in the scene (the
+story-only cast is traced, but the main viewer animates the base loop).
+
+### Limits
+
+- The events are derived from composite, scripted tracks, not from records:
+  they show what the model animates, on its compressed clock, not what
+  happened at a center.
+- An encounter is proximity, not conversation: neighbours at a dining table
+  count, passers-by do not (below 4 s), and a 1.6 m radius misses care given
+  from behind a chair or across a treatment bed.
+- Handoffs are inferred from who starts attending next, so they include
+  joint starts (RN and PCP in the same minute both appear as handoffs from the
+  front desk) and they do not know why a handoff happened; the scenario's
+  authored `handoffs` carry that meaning.
+- Rooms are only as good as the room polygons: open areas trace at zone level,
+  and a person walking a corridor along a room boundary may enter and leave it
+  briefly.
+- The in-browser trace samples every 2 s, the report every 1 s, so counts
+  differ slightly between the panel and the file.
+
+### From simulation to operations data
+
+The same event kinds are the join points to real signals. Each row names the
+operational record that would produce the event; none of these integrations
+exist in this repository.
+
+| Trace kind | Real signal |
+| --- | --- |
+| `board` / `alight` | van manifest and boarding log: driver app pickup / drop-off confirmations, vehicle GPS geofence at the home and the center |
+| `on-site` / `off-site` | day-center check-in and check-out: front-desk or kiosk check-in, attendance roster |
+| `enter` / `leave` | room-level location where it exists: scheduled room use, clinic room assignment, badge or indoor positioning if deployed |
+| `interaction` · `clinical` | clinic visit records: encounter open/close times, vitals feed timestamps, medication administration |
+| `interaction` · `rehab` | therapy session notes with start and end times |
+| `interaction` · `meals` | meal service: tray tickets, dietary orders, dining attendance |
+| `interaction` · `activities` | program attendance and engagement notes |
+| `interaction` · `coordination` / `arrivals` | social-work notes, care-coordination tasks, family phone calls and texts, front-desk registration |
+| `encounter` | no direct record; approximated by staff assignment and task logs, or by proximity devices where consented |
+| `handoff` | care-team handoffs: IDT huddle notes, task reassignments, secure messages between disciplines |
+| `day-start` / `day-end` | the day's scheduled attendance and transport manifest |
+
+With such feeds, `TouchpointEvent` becomes the common schema: real events and
+simulated events can be compared per person (did the day go as planned?), per
+zone (where does time go?) and per discipline (who did each participant see?),
+which is the starting point for calibrating the simulation (see the roadmap
+below).
 
 ## Limitations
 

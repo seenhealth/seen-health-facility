@@ -468,6 +468,8 @@ export function snap(
     maxDistance?: number;
     /** Only cells connected to the main circulating floor (default true). */
     connected?: boolean;
+    /** Cells to skip (e.g. too close to someone standing there). */
+    avoid?: (p: Vec2) => boolean;
   } = {},
 ): Vec2 {
   const clearance = options.clearance ?? WALL_CLEARANCE,
@@ -490,6 +492,7 @@ export function snap(
       if (labels && labels[idx] !== 0) continue;
       const q = cellPoint(g, idx),
         d = distance(p, q);
+      if (options.avoid?.(q)) continue;
       if (d < bestD) {
         bestD = d;
         best = q;
@@ -561,12 +564,15 @@ const NEIGHBOURS = [
 /**
  * Shortest collision-safe route between two walkable cells (8-connected, no
  * corner cutting), reduced to direction changes like build-activity.py.
+ * `avoid` marks further cells as blocked (never the start or goal), e.g.
+ * around people standing still while the walk happens.
  */
 export function route(
   g: NavGrid,
   a: Vec2,
   b: Vec2,
   clearance = WALL_CLEARANCE,
+  avoid?: (p: Vec2) => boolean,
 ): Vec2[] {
   const sx = Math.round(a[0] / NAV_STEP),
     sz = Math.round(a[1] / NAV_STEP),
@@ -574,7 +580,14 @@ export function route(
     gz = Math.round(b[1] / NAV_STEP);
   const start = cellIndex(g, sx, sz),
     goal = cellIndex(g, gx, gz);
-  const ok = (ix: number, iz: number) => isNode(g, ix, iz, clearance);
+  const walkable = (ix: number, iz: number) => isNode(g, ix, iz, clearance),
+    ok = avoid
+      ? (ix: number, iz: number) =>
+          walkable(ix, iz) &&
+          ((ix === sx && iz === sz) ||
+            (ix === gx && iz === gz) ||
+            !avoid([round3(ix * NAV_STEP), round3(iz * NAV_STEP)]))
+      : walkable;
   if (start < 0 || !ok(sx, sz))
     throw new NavError(`Route start is not walkable: ${a.join(',')}`);
   if (goal < 0 || !ok(gx, gz))

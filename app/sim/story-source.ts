@@ -8,6 +8,8 @@
  * ActivitySource object (and the activity engine's per-segment caches).
  */
 import { activityData, type ActivitySource } from '../model/activity';
+import { alhambraSource } from '../model/alhambra-source';
+import type { Facility } from '../model/schema';
 import compiled from '../data/scenarios/day-in-the-life.tracks.json';
 import { mergeTracks, type CompiledStep, type CompiledTracks } from './tracks';
 
@@ -21,6 +23,18 @@ export function storyActivitySource(): { source: ActivitySource; heroId: string 
       heroId: storyTracks.heroId,
     };
   return memo;
+}
+/**
+ * The story source as the viewer plays it on Alhambra: the hero's loop plus
+ * the community layer and the fleet crew (`alhambraSource`). Measure and the
+ * reports read this so they trace the same people /story animates.
+ */
+export function composedStorySource(model: Facility): {
+  source: ActivitySource;
+  heroId: string;
+} {
+  const { source, heroId } = storyActivitySource();
+  return { source: alhambraSource(model, source), heroId };
 }
 /** Compiled steps: hero stops, arrive/depart times, focus times and companions. */
 export function storySteps(): CompiledStep[] {

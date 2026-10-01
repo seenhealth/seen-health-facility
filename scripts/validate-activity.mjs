@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import * as T from 'three';
 import {
   activityData,
@@ -9,6 +9,9 @@ import {
   sampleEscort,
   timelineFor,
 } from '../work/validation/activity.mjs';
+import { alhambraSource } from '../work/validation/alhambra-source.mjs';
+import { registerCommunityVehicles } from '../work/validation/community-vehicles.mjs';
+import { COMMUNITY_SOURCE_ID } from '../work/validation/community-people.mjs';
 import { buildNeighborhood } from '../work/validation/neighborhood.mjs';
 import { sampleVan, vanWindows, ARRIVAL } from '../work/validation/arrival.mjs';
 import { dayProgram, programAt } from '../work/validation/day-room.mjs';
@@ -16,11 +19,22 @@ import { createCharacter } from '../work/validation/characters.mjs';
 const m = JSON.parse(
   readFileSync('public/models/seen-alhambra-planning.json', 'utf8'),
 );
+// The engine plays its source as given; the viewer gives it the composed
+// Alhambra source: the 167-person loop, the fleet crew (177) and the
+// community cast (220: 12 hand-authored, 31 generated inside facility
+// instances, 25 in the partner day center and 6 in the Wongs' home), with the
+// community vehicles registered so their riders' seats resolve.
 const scene = new T.Scene(),
-  activity = createActivity(m, scene),
+  activity = createActivity(
+    m,
+    scene,
+    undefined,
+    alhambraSource(m),
+    registerCommunityVehicles,
+  ),
   neighborhood = buildNeighborhood(m);
 scene.add(neighborhood.root);
-assert.equal(activity.actors.length, 167);
+assert.equal(activity.actors.length, 220);
 assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 167);
 for (const role of [
   'doctor',
@@ -185,6 +199,35 @@ activity.updateView({
   site: true,
 });
 assert.equal(activity.root.visible, false);
+// The community toggle hides that source's people, and the panel's people
+// count (the snapshot's `people`) drops with it.
+const allView = {
+  level: 'all',
+  plan: false,
+  explode: 0,
+  stack: 0,
+  isolate: false,
+  selected: null,
+  site: true,
+};
+const communityIds = new Set(
+  activity.actors
+    .filter((a) => a.spec.sourceId === COMMUNITY_SOURCE_ID)
+    .map((a) => a.spec.id),
+);
+assert.equal(communityIds.size, 43, 'the community layer brings its cast');
+activity.updateView(allView);
+assert.equal(activity.getState().people, 220);
+activity.updateView({ ...allView, hiddenSources: [COMMUNITY_SOURCE_ID] });
+assert.equal(
+  activity.getState().people,
+  177,
+  'people count without the community layer',
+);
+assert.ok(
+  activity.actors.every((a) => !communityIds.has(a.spec.id) || !a.root.visible),
+  'community people hidden with their source',
+);
 activity.setOptions({ filter: 'doctor' });
 activity.updateView({
   level: 'ground',
@@ -459,8 +502,14 @@ const n = buffer.readUInt32LE(12),
 assert.equal(gltf.skins.length, 15);
 assert.equal(gltf.animations.length, 270);
 assert.ok(gltf.animations.some((a) => a.name === 'cast-doctor:walk'));
-writeFileSync('public/models/seen-health-animated-cast.glb', buffer);
+// The checked cast is written to work/ so validation leaves the tree clean;
+// `--out public/models` publishes it.
+const out = process.argv.includes('--out')
+  ? process.argv[process.argv.indexOf('--out') + 1]
+  : 'work/validation';
+mkdirSync(out, { recursive: true });
+writeFileSync(`${out}/seen-health-animated-cast.glb`, buffer);
 console.log(
-  `Validated ${activity.actors.length} actors, ${activityData.roles.length} roles, ${samples} path samples, ${minWall.toFixed(3)}m minimum wall clearance; pause, repeat, seek, speed, synchronized pairs, levels and 3D context. Exported 15 rigs and 270 clips (${(buffer.length / 1024 / 1024).toFixed(2)} MB).`,
+  `Validated ${activity.actors.length} actors, ${activityData.roles.length} roles, ${samples} path samples, ${minWall.toFixed(3)}m minimum wall clearance; pause, repeat, seek, speed, synchronized pairs, levels and 3D context. Exported 15 rigs and 270 clips (${(buffer.length / 1024 / 1024).toFixed(2)} MB) to ${out}/.`,
 );
 activity.dispose();

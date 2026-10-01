@@ -1,0 +1,487 @@
+{
+  "setting": "partner-adc",
+  "entrances": {
+    "front": { "inside": [-14.1, -0.99], "path": ["sidewalkEnd", "sidewalkPad", "courtA", "courtB", "doorOutside"] }
+  },
+  "places": { "patio": { "label": "Patio", "entrance": "front", "path": ["courtWest", "patioGate"] } },
+  "people": [
+    {
+      "id": "adc-participant-1",
+      "role": "participant",
+      "label": "Day center participant 1",
+      "variant": 10,
+      "gait": 0.65
+    },
+    {
+      "id": "adc-participant-2",
+      "role": "participant",
+      "label": "Day center participant 2",
+      "variant": 11,
+      "mobility": "cane"
+    },
+    {
+      "id": "adc-participant-3",
+      "role": "participant",
+      "label": "Day center participant 3",
+      "variant": 12,
+      "gait": 0.65
+    },
+    {
+      "id": "adc-participant-4",
+      "role": "participant",
+      "label": "Day center participant 4",
+      "variant": 13,
+      "gait": 0.65
+    },
+    { "id": "adc-participant-5", "role": "participant", "label": "Day center participant 5", "variant": 14 },
+    {
+      "id": "adc-participant-6",
+      "role": "participant",
+      "label": "Day center participant 6",
+      "variant": 15,
+      "mobility": "walker"
+    },
+    {
+      "id": "adc-participant-7",
+      "role": "participant",
+      "label": "Day center participant 7",
+      "variant": 16,
+      "gait": 0.65
+    },
+    {
+      "id": "adc-participant-8",
+      "role": "participant",
+      "label": "Day center participant 8",
+      "variant": 17,
+      "gait": 0.65
+    },
+    {
+      "id": "adc-participant-9",
+      "role": "participant",
+      "label": "Day center participant 9",
+      "variant": 18,
+      "mobility": "cane"
+    },
+    {
+      "id": "adc-participant-10",
+      "role": "participant",
+      "label": "Day center participant 10",
+      "variant": 19,
+      "gait": 0.65
+    },
+    { "id": "adc-participant-11", "role": "participant", "label": "Day center participant 11", "variant": 20 },
+    { "id": "adc-participant-12", "role": "participant", "label": "Day center participant 12", "variant": 21 },
+    {
+      "id": "adc-participant-13",
+      "role": "participant",
+      "label": "Day center participant 13",
+      "variant": 22,
+      "mobility": "wheelchair"
+    },
+    { "id": "adc-participant-14", "role": "participant", "label": "Day center participant 14", "variant": 23 },
+    { "id": "adc-participant-15", "role": "participant", "label": "Day center participant 15", "variant": 24 },
+    { "id": "adc-participant-16", "role": "participant", "label": "Day center participant 16", "variant": 25 },
+    {
+      "id": "adc-participant-17",
+      "role": "participant",
+      "label": "Day center participant 17",
+      "variant": 26,
+      "mobility": "walker"
+    },
+    {
+      "id": "adc-participant-18",
+      "role": "participant",
+      "label": "Day center participant 18",
+      "variant": 27,
+      "mobility": "wheelchair"
+    },
+    { "id": "adc-participant-19", "role": "participant", "label": "Day center participant 19", "variant": 28 },
+    {
+      "id": "adc-participant-20",
+      "role": "participant",
+      "label": "Day center participant 20",
+      "variant": 29,
+      "mobility": "cane"
+    },
+    { "id": "adc-lead", "role": "activities", "label": "Day center activities lead", "variant": 3 },
+    { "id": "adc-nurse", "role": "nurse", "label": "Day center nurse", "variant": 21 },
+    { "id": "adc-aide", "role": "aide", "label": "Day center aide", "variant": 22 },
+    {
+      "id": "visiting-pt",
+      "role": "pt",
+      "label": "Visiting Seen physical therapist",
+      "variant": 8,
+      "visit": { "entrance": "front" }
+    },
+    {
+      "id": "visiting-rn",
+      "role": "nurse",
+      "label": "Visiting Seen nurse",
+      "variant": 9,
+      "visit": { "entrance": "front" }
+    }
+  ],
+  "scenes": [
+    {
+      "id": "partner-morning",
+      "room": "day-open",
+      "window": [0, 360],
+      "label": "Partner center · morning in the day room",
+      "description": "Twenty participants settle in with coffee and conversation at the tables of a Seen-designed day room; the partner’s activities lead and aide run the floor.",
+      "category": "partner",
+      "memberAction": "conversation",
+      "near": [-10.5, 9.5],
+      "slots": [
+        { "who": "adc-participant-1", "action": "member", "seat": true },
+        { "who": "adc-participant-3", "action": "member", "seat": true },
+        { "who": "adc-participant-4", "action": "member", "seat": true },
+        { "who": "adc-participant-7", "action": "member", "seat": true },
+        { "who": "adc-participant-8", "action": "member", "seat": true },
+        { "who": "adc-participant-10", "action": "member", "seat": true },
+        { "who": "adc-participant-2", "action": "member", "seat": true },
+        { "who": "adc-participant-9", "action": "member", "seat": true },
+        { "who": "adc-participant-6", "action": "member", "seat": true },
+        { "who": "adc-participant-13", "action": "member", "spot": "day-tree-table-3" },
+        { "who": "adc-participant-17", "action": "member", "seat": true },
+        { "who": "adc-participant-18", "action": "member", "spot": "day-banquette-table-04" },
+        { "who": "adc-participant-20", "action": "member", "seat": true },
+        { "who": "adc-participant-5", "action": "member", "seat": true },
+        { "who": "adc-participant-11", "action": "member", "seat": true },
+        { "who": "adc-participant-12", "action": "member", "seat": true },
+        { "who": "adc-participant-14", "action": "member", "seat": true },
+        { "who": "adc-participant-15", "action": "member", "seat": true },
+        { "who": "adc-participant-16", "action": "member", "seat": true },
+        { "who": "adc-participant-19", "action": "member", "seat": true },
+        {
+          "who": "adc-lead",
+          "action": "conversation",
+          "at": { "point": [-7, 10], "heading": 0 },
+          "window": [0, 170],
+          "title": "Welcoming the group"
+        },
+        { "who": "adc-aide", "action": "serve", "spot": "day-banquette-table-03", "title": "Coffee and snacks" }
+      ]
+    },
+    {
+      "id": "partner-tai-chi",
+      "place": "patio",
+      "window": [168, 247.5],
+      "label": "Partner center · morning tai chi",
+      "description": "Eight participants follow the activities lead under the slatted patio awning: the same repertoire as the Seen day room.",
+      "category": "partner",
+      "slots": [
+        {
+          "who": "adc-lead",
+          "action": "tai-chi",
+          "at": { "anchor": "tcLead", "heading": 3.1416 },
+          "title": "Leading tai chi"
+        },
+        {
+          "who": "adc-participant-1",
+          "action": "tai-chi",
+          "at": { "anchor": "tc1", "heading": 0 },
+          "window": [168, 247.5],
+          "title": "Morning tai chi"
+        },
+        {
+          "who": "adc-participant-3",
+          "action": "tai-chi",
+          "at": { "anchor": "tc2", "heading": 0 },
+          "window": [172, 244],
+          "title": "Morning tai chi"
+        },
+        {
+          "who": "adc-participant-4",
+          "action": "tai-chi",
+          "at": { "anchor": "tc3", "heading": 0 },
+          "window": [176, 240.5],
+          "title": "Morning tai chi"
+        },
+        {
+          "who": "adc-participant-7",
+          "action": "tai-chi",
+          "at": { "anchor": "tc4", "heading": 0 },
+          "window": [180, 237],
+          "title": "Morning tai chi"
+        },
+        {
+          "who": "adc-participant-8",
+          "action": "tai-chi",
+          "at": { "anchor": "tc5", "heading": 0 },
+          "window": [184, 233.5],
+          "title": "Morning tai chi"
+        },
+        {
+          "who": "adc-participant-10",
+          "action": "tai-chi",
+          "at": { "anchor": "tc6", "heading": 0 },
+          "window": [188, 230],
+          "title": "Morning tai chi"
+        },
+        {
+          "who": "adc-participant-2",
+          "action": "tai-chi",
+          "at": { "anchor": "tc7", "heading": 0 },
+          "window": [192, 226.5],
+          "title": "Morning tai chi"
+        },
+        {
+          "who": "adc-participant-9",
+          "action": "tai-chi",
+          "at": { "anchor": "tc8", "heading": 0 },
+          "window": [196, 223],
+          "title": "Morning tai chi"
+        }
+      ]
+    },
+    {
+      "id": "partner-patio-tidy",
+      "place": "patio",
+      "window": [247.5, 280],
+      "label": "Activities lead",
+      "description": "The activities lead puts the patio back in order after tai chi.",
+      "category": "partner",
+      "interaction": false,
+      "slots": [
+        {
+          "who": "adc-lead",
+          "action": "idle",
+          "at": { "anchor": "tcLead", "heading": 3.1416 },
+          "title": "Tidying the patio"
+        }
+      ]
+    },
+    {
+      "id": "partner-pt",
+      "room": "rehab-open",
+      "window": [270, 345],
+      "label": "Visiting Seen PT · strength & balance",
+      "description": "A Seen physical therapist visits the partner center for strength and balance with two participants who are also enrolled with Seen.",
+      "category": "partner",
+      "slots": [
+        { "who": "visiting-pt", "action": "treat", "spot": "rehab-parallel-bars", "title": "Strength & balance" },
+        {
+          "who": "adc-participant-5",
+          "action": "exercise",
+          "spot": "rehab-parallel-bars",
+          "title": "Parallel bars with the Seen PT"
+        },
+        {
+          "who": "adc-participant-6",
+          "action": "exercise",
+          "seat": "rehab-ot-chair-participant",
+          "title": "Seated strength with the Seen PT"
+        }
+      ]
+    },
+    {
+      "id": "partner-rn-review",
+      "room": "clinic-nurse",
+      "window": [286, 330],
+      "label": "Visiting Seen RN · medication review",
+      "description": "The visiting Seen nurse reviews medicines with two participants at the nurse station, with the partner’s own nurse.",
+      "category": "partner",
+      "with": ["adc-nurse"],
+      "slots": [
+        { "who": "visiting-rn", "action": "consult", "seat": "clinic-nurse-task-chair-0", "title": "Medication review" },
+        {
+          "who": "adc-participant-8",
+          "action": "consult",
+          "spot": "clinic-photo-nurse-station",
+          "window": [286, 307],
+          "title": "Medication review with the Seen nurse"
+        },
+        {
+          "who": "adc-participant-10",
+          "action": "consult",
+          "spot": "clinic-photo-nurse-station",
+          "window": [306, 328],
+          "title": "Medication review with the Seen nurse"
+        }
+      ]
+    },
+    {
+      "id": "partner-tabletop",
+      "room": "day-open",
+      "window": [330, 375],
+      "label": "Partner center · tabletop games",
+      "description": "Games at the day-room tables after tai chi.",
+      "category": "partner",
+      "slots": [
+        { "who": "adc-lead", "action": "present", "spot": "day-tree-table-2", "title": "Tabletop games" },
+        { "who": "adc-participant-11", "action": "tabletop", "seat": "home", "title": "Tabletop games" },
+        { "who": "adc-participant-12", "action": "tabletop", "seat": "home", "title": "Tabletop games" },
+        { "who": "adc-participant-14", "action": "tabletop", "seat": "home", "title": "Tabletop games" },
+        { "who": "adc-participant-15", "action": "tabletop", "seat": "home", "title": "Tabletop games" },
+        { "who": "adc-participant-16", "action": "tabletop", "seat": "home", "title": "Tabletop games" },
+        { "who": "adc-participant-19", "action": "tabletop", "seat": "home", "title": "Tabletop games" }
+      ]
+    },
+    {
+      "id": "partner-nurse-desk",
+      "room": "clinic-nurse",
+      "window": [0, 720],
+      "label": "Day center nurse",
+      "description": "The partner’s nurse charts at the nurse station.",
+      "category": "partner",
+      "interaction": false,
+      "slots": [
+        {
+          "who": "adc-nurse",
+          "action": "document",
+          "seat": "clinic-nurse-task-chair-1",
+          "title": "Charting at the nurse station"
+        }
+      ]
+    },
+    {
+      "id": "partner-lunch",
+      "room": "dining-1421",
+      "window": [362, 455],
+      "label": "Partner center · lunch",
+      "description": "The aide sets up and serves lunch in the dining room, with two places left open for wheelchairs.",
+      "category": "partner",
+      "memberAction": "seated",
+      "slots": [
+        { "who": "adc-participant-1", "action": "member", "seat": true, "window": [390, 455], "title": "Lunch" },
+        { "who": "adc-participant-2", "action": "member", "seat": true, "window": [390, 455], "title": "Lunch" },
+        { "who": "adc-participant-3", "action": "member", "seat": true, "window": [390, 455], "title": "Lunch" },
+        { "who": "adc-participant-4", "action": "member", "seat": true, "window": [390, 455], "title": "Lunch" },
+        { "who": "adc-participant-5", "action": "member", "seat": true, "window": [410, 455], "title": "Lunch" },
+        { "who": "adc-participant-6", "action": "member", "seat": true, "window": [430, 455], "title": "Lunch" },
+        { "who": "adc-participant-7", "action": "member", "seat": true, "window": [394, 455], "title": "Lunch" },
+        { "who": "adc-participant-8", "action": "member", "seat": true, "window": [394, 455], "title": "Lunch" },
+        { "who": "adc-participant-9", "action": "member", "seat": true, "window": [394, 455], "title": "Lunch" },
+        { "who": "adc-participant-10", "action": "member", "seat": true, "window": [394, 455], "title": "Lunch" },
+        { "who": "adc-participant-11", "action": "member", "seat": true, "window": [398, 455], "title": "Lunch" },
+        { "who": "adc-participant-12", "action": "member", "seat": true, "window": [398, 455], "title": "Lunch" },
+        {
+          "who": "adc-participant-13",
+          "action": "member",
+          "spot": "dining-table-02-chair-3",
+          "window": [398, 455],
+          "title": "Lunch"
+        },
+        { "who": "adc-participant-14", "action": "member", "seat": true, "window": [398, 455], "title": "Lunch" },
+        { "who": "adc-participant-15", "action": "member", "seat": true, "window": [402, 455], "title": "Lunch" },
+        { "who": "adc-participant-16", "action": "member", "seat": true, "window": [402, 455], "title": "Lunch" },
+        { "who": "adc-participant-17", "action": "member", "seat": true, "window": [402, 455], "title": "Lunch" },
+        {
+          "who": "adc-participant-18",
+          "action": "member",
+          "spot": "dining-table-04-chair-3",
+          "window": [402, 455],
+          "title": "Lunch"
+        },
+        { "who": "adc-participant-19", "action": "member", "seat": true, "window": [402, 455], "title": "Lunch" },
+        { "who": "adc-participant-20", "action": "member", "seat": true, "window": [402, 455], "title": "Lunch" },
+        { "who": "adc-aide", "action": "serve", "spot": "kitchen-equipment-6", "title": "Setting up and serving lunch" }
+      ]
+    },
+    {
+      "id": "partner-lunch-clearing",
+      "room": "dining-1421",
+      "window": [455, 585],
+      "label": "Aide",
+      "description": "The aide clears up after lunch.",
+      "category": "partner",
+      "interaction": false,
+      "slots": [
+        { "who": "adc-aide", "action": "serve", "spot": "kitchen-equipment-6", "title": "Clearing up after lunch" }
+      ]
+    },
+    {
+      "id": "partner-music-setup",
+      "room": "day-open",
+      "window": [380, 480],
+      "label": "Activities lead",
+      "description": "The activities lead sets up for music at the front of the day room.",
+      "category": "partner",
+      "interaction": false,
+      "slots": [
+        {
+          "who": "adc-lead",
+          "action": "present",
+          "at": { "point": [-7, 10], "heading": 0 },
+          "title": "Setting up for music"
+        }
+      ]
+    },
+    {
+      "id": "partner-music",
+      "room": "day-open",
+      "window": [480, 600],
+      "label": "Partner center · music",
+      "description": "Seated music and clapping, led from the front of the day room.",
+      "category": "partner",
+      "slots": [
+        { "who": "adc-lead", "action": "music", "at": { "point": [-7, 10], "heading": 0 }, "title": "Leading music" },
+        { "who": "adc-participant-1", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
+        { "who": "adc-participant-2", "action": "clap", "seat": "home", "window": [530, 600], "title": "Music" },
+        { "who": "adc-participant-3", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
+        { "who": "adc-participant-4", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
+        { "who": "adc-participant-5", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
+        { "who": "adc-participant-6", "action": "clap", "seat": "home", "window": [530, 600], "title": "Music" },
+        { "who": "adc-participant-7", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
+        { "who": "adc-participant-8", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
+        { "who": "adc-participant-9", "action": "clap", "seat": "home", "window": [530, 600], "title": "Music" },
+        { "who": "adc-participant-10", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
+        { "who": "adc-participant-11", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
+        { "who": "adc-participant-12", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
+        { "who": "adc-participant-13", "action": "clap", "seat": "home", "window": [510, 600], "title": "Music" },
+        { "who": "adc-participant-14", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
+        { "who": "adc-participant-15", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
+        { "who": "adc-participant-16", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
+        { "who": "adc-participant-17", "action": "clap", "seat": "home", "window": [530, 600], "title": "Music" },
+        { "who": "adc-participant-18", "action": "clap", "seat": "home", "window": [510, 600], "title": "Music" },
+        { "who": "adc-participant-19", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
+        { "who": "adc-participant-20", "action": "clap", "seat": "home", "window": [530, 600], "title": "Music" }
+      ]
+    },
+    {
+      "id": "partner-afternoon",
+      "room": "day-open",
+      "window": [600, 720],
+      "label": "Partner center · afternoon",
+      "description": "Conversation at the tables until pickup.",
+      "category": "partner",
+      "slots": [
+        { "who": "adc-participant-1", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-participant-2", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-participant-3", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-participant-4", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-participant-5", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-participant-6", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-participant-7", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-participant-8", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-participant-9", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-participant-10", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-participant-11", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-participant-12", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-participant-13", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-participant-14", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-participant-15", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-participant-16", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-participant-17", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-participant-18", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-participant-19", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-participant-20", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-lead", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
+        { "who": "adc-aide", "action": "serve", "seat": "home", "title": "Afternoon snacks" }
+      ]
+    }
+  ],
+  "keep": {
+    "actors": [
+      "adc-participant-1",
+      "adc-participant-2",
+      "adc-participant-3",
+      "adc-participant-4",
+      "adc-participant-5",
+      "adc-participant-6",
+      "adc-lead",
+      "visiting-pt"
+    ],
+    "interactions": ["partner-tai-chi", "partner-tabletop", "partner-pt"]
+  }
+}

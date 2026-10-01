@@ -3,11 +3,17 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties }
 import {
   clockLabel,
   hero,
+  isCutaway,
   isTeamMeeting,
   kickerTime,
   memberById,
   members,
+  networkSteps,
+  networkTotals,
   palette,
+  placeLabel,
+  scrub,
+  shortLabel,
   steps,
   totals,
 } from './data';
@@ -29,13 +35,19 @@ const BEATS: BeatDef[] = [
   { kind: 'opening' },
   { kind: 'reveal' },
   { kind: 'team' },
+  { kind: 'network' },
   ...steps.map((step, stepIndex) => ({ kind: 'chapter' as const, step, stepIndex })),
   { kind: 'finale' },
   { kind: 'cta' },
 ];
+const NETWORK = BEATS.findIndex((b) => b.kind === 'network');
 const FIRST_CHAPTER = BEATS.findIndex((b) => b.kind === 'chapter');
 const FINALE = BEATS.findIndex((b) => b.kind === 'finale');
 const MOBILE = '(max-width: 760px)';
+/** The places the cutaways visit, in story order (from their kickers). */
+const PLACES = [...new Set(networkSteps.map(placeLabel))];
+const NUMBER_WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+const inWords = (n: number) => NUMBER_WORDS[n] || String(n);
 
 function Kicker({ text }: { text: string }) {
   const [time, ...rest] = text.split('·');
@@ -49,7 +61,7 @@ function Kicker({ text }: { text: string }) {
   );
 }
 
-function RoleChips({ roles }: { roles: string[] }) {
+function RoleChips({ roles, partners = [] }: { roles: string[]; partners?: string[] }) {
   if (roles.length >= members.length)
     return (
       <p className="story-chips">
@@ -64,7 +76,10 @@ function RoleChips({ roles }: { roles: string[] }) {
       </p>
     );
   return (
-    <ul className="story-chips" aria-label="Disciplines involved">
+    <ul
+      className="story-chips"
+      aria-label={partners.length ? 'Disciplines and partners involved' : 'Disciplines involved'}
+    >
       {roles.map((r) => {
         const m = memberById.get(r);
         if (!m) return null;
@@ -75,6 +90,12 @@ function RoleChips({ roles }: { roles: string[] }) {
           </li>
         );
       })}
+      {partners.map((p) => (
+        <li key={p} className="story-chip partner">
+          <i aria-hidden="true" />
+          {p}
+        </li>
+      ))}
     </ul>
   );
 }
@@ -109,18 +130,22 @@ export function StoryExperience({
   const ringMode: RingMode =
     current.kind === 'team'
       ? 'intro'
-      : step
-        ? isTeamMeeting(step)
-          ? 'mesh'
-          : 'step'
-        : 'idle';
+      : current.kind === 'network'
+        ? 'network'
+        : step
+          ? isCutaway(step)
+            ? 'away'
+            : isTeamMeeting(step)
+              ? 'mesh'
+              : 'step'
+          : 'idle';
   const finaleRevealed = beat === FINALE ? phase : beat > FINALE ? steps.length + 1 : 0;
 
   const framing = useCallback((kind: BeatKind): Framing => {
     const l = layoutRef.current;
     if (kind === 'opening') return { x: 0, y: l.openingY, zoom: l.wideZoom };
     if (kind === 'reveal') return { x: l.revealX, y: 0.02, zoom: l.wideZoom };
-    if (kind === 'team') return { x: l.chapterX, y: l.chapterY, zoom: l.wideZoom };
+    if (kind === 'team' || kind === 'network') return { x: l.chapterX, y: l.chapterY, zoom: l.wideZoom };
     if (kind === 'chapter') return { x: l.chapterX, y: l.chapterY, zoom: l.zoom };
     return { x: 0, y: 0.04, zoom: l.wideZoom };
   }, []);
@@ -319,8 +344,9 @@ export function StoryExperience({
       </div>
       <p className="sr-only">
         As you scroll, an animated 3D model of the Seen Health center in Alhambra follows {hero.name}{' '}
-        from room to room, while a diagram of her eleven-person care team shows who is involved in each
-        moment and how information is handed from one discipline to the next.
+        from room to room and looks in on the homes, partner sites and hospital around the center, while a
+        diagram of her eleven-person care team shows who is involved in each moment and how information is
+        handed from one discipline to the next.
       </p>
       <output className="story-loading" aria-live="polite">
         {status === 'loading' ? (
@@ -332,7 +358,14 @@ export function StoryExperience({
       </output>
 
       <div className="story-idt-wrap">
-        <IdtPanel mode={ringMode} step={step} stepIndex={stepIndex} phase={phase} onSelect={goToStep} />
+        <IdtPanel
+          mode={ringMode}
+          step={step}
+          stepIndex={stepIndex}
+          phase={phase}
+          onSelect={goToStep}
+          showNetwork={beat >= NETWORK}
+        />
       </div>
       <div className="story-idt-compact" aria-hidden="true">
         <IdtRing mode={ringMode} step={step} phase={phase} compact />
@@ -344,22 +377,32 @@ export function StoryExperience({
         </span>
         <ol className="story-rail-track">
           <li className="story-rail-fill" aria-hidden="true" />
-          {steps.map((s, i) => (
-            <li
-              key={s.id}
-              className="story-rail-tick"
-              data-state={i < stepIndex ? 'past' : i === stepIndex ? 'now' : 'next'}
-              style={{ '--at': s.window[0] / 720 } as CSSProperties}
-            >
-              <button
-                type="button"
-                onClick={() => goToStep(i)}
-                aria-label={`${kickerTime(s)}: ${s.title}`}
-                aria-current={i === stepIndex ? 'step' : undefined}
-                data-label={`${kickerTime(s)} · ${s.title}`}
-              />
-            </li>
-          ))}
+          {steps.map((s, i) => {
+            const away = isCutaway(s);
+            return (
+              <li
+                key={s.id}
+                className="story-rail-tick"
+                data-kind={away ? 'network' : undefined}
+                data-state={i < stepIndex ? 'past' : i === stepIndex ? 'now' : 'next'}
+                style={{ '--at': scrub[i][0] / 720 } as CSSProperties}
+              >
+                <button
+                  type="button"
+                  onClick={() => goToStep(i)}
+                  aria-label={
+                    away
+                      ? `${kickerTime(s)}, meanwhile at ${placeLabel(s)}: ${s.title}`
+                      : `${kickerTime(s)}: ${s.title}`
+                  }
+                  aria-current={i === stepIndex ? 'step' : undefined}
+                  data-label={
+                    away ? `${kickerTime(s)} · Meanwhile · ${shortLabel(s)}` : `${kickerTime(s)} · ${s.title}`
+                  }
+                />
+              </li>
+            );
+          })}
         </ol>
       </nav>
 
@@ -373,7 +416,7 @@ export function StoryExperience({
               </h1>
               <p className="story-lede">
                 Follow {hero.name}, {hero.age}, through a day at our PACE center, and meet the team that plans,
-                delivers and oversees every part of her care.
+                delivers and oversees every part of her care, wherever it happens.
               </p>
             </div>
             <button type="button" className="story-cue" onClick={() => scrollToBeat(1)}>
@@ -427,23 +470,61 @@ export function StoryExperience({
           </div>
         </section>
 
+        <section
+          className="story-beat story-network"
+          ref={registerSection}
+          data-beat-index={NETWORK}
+          aria-labelledby="story-network-title"
+        >
+          <div className="story-pin">
+            <article className="story-card">
+              <p className="story-kicker">
+                <span className="time">Beyond the building</span>
+              </p>
+              <h2 id="story-network-title" className="story-headline">
+                One team, many places.
+              </h2>
+              <p className="story-body">
+                Most of a participant’s week happens outside the center: at home, at the pharmacy, in a
+                specialist’s office, at a partner day center or in a hospital. The same team plans for every one of
+                those places. While we follow {hero.name}, we will look in on a few.
+              </p>
+              <ul className="story-places" aria-label="Places across the care network">
+                {PLACES.map((p) => (
+                  <li key={p}>
+                    <i aria-hidden="true" />
+                    {p}
+                  </li>
+                ))}
+              </ul>
+            </article>
+          </div>
+        </section>
+
         {steps.map((s, i) => (
           <section
             key={s.id}
             id={`moment-${s.id}`}
             className="story-beat story-chapter"
             data-team={isTeamMeeting(s) || undefined}
+            data-network={isCutaway(s) || undefined}
             ref={registerSection} data-beat-index={FIRST_CHAPTER + i}
             aria-labelledby={`moment-${s.id}-title`}
           >
             <div className="story-pin">
               <article className="story-card">
+                {isCutaway(s) && (
+                  <p className="story-meanwhile">
+                    <i aria-hidden="true" />
+                    Meanwhile, across the network
+                  </p>
+                )}
                 <Kicker text={s.kicker} />
                 <h2 id={`moment-${s.id}-title`} className="story-headline">
                   {s.title}
                 </h2>
                 <p className="story-body">{s.body}</p>
-                <RoleChips roles={s.roles} />
+                <RoleChips roles={s.roles} partners={s.partners} />
                 {s.handoffs.length > 0 && (
                   <ol className="story-handoffs" aria-label="Handoffs">
                     {s.handoffs.map((h, k) => {
@@ -485,7 +566,8 @@ export function StoryExperience({
                 </h2>
                 <p className="story-body">
                   Eleven disciplines each saw a different part of {hero.name}’s day. Every observation was handed
-                  to the person who could act on it, and all of it landed in one shared care plan.
+                  to the person who could act on it, and all of it landed in one shared care plan. And across town,
+                  the same disciplines kept {inWords(networkTotals.moments)} more moments of care on track.
                 </p>
               </div>
               <Swimlane revealed={finaleRevealed} />
@@ -493,6 +575,12 @@ export function StoryExperience({
                 <Counter className="story-total" value={finaleRevealed > steps.length ? totals.disciplines : 0} label="disciplines" />
                 <Counter className="story-total" value={finaleRevealed > steps.length ? totals.touchpoints : 0} label="touchpoints" />
                 <Counter className="story-total" value={finaleRevealed > steps.length ? totals.handoffs : 0} label="handoffs" />
+                {/* The same count as the panel's "Across the network" counter at the end of the day. */}
+                <Counter
+                  className="story-total network"
+                  value={finaleRevealed > steps.length ? networkTotals.touchpoints : 0}
+                  label={`touchpoints across the network · ${networkTotals.moments} moments`}
+                />
                 <Counter className="story-total" value={finaleRevealed > steps.length ? 1 : 0} label="shared care plan" />
               </div>
             </div>
@@ -521,8 +609,9 @@ export function StoryExperience({
           </div>
           <footer className="story-foot">
             <p>
-              {hero.name} is a composite, illustrative participant. Her day is compressed and does not describe a
-              real person or record.
+              {hero.name} and the Wongs are composite, illustrative participants, and the partner sites around the
+              center are illustrative too. Their days are compressed and do not describe real people, places or
+              records.
             </p>
             <p>
               The eleven roles shown are the disciplines a PACE interdisciplinary team must include (42 CFR

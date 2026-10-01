@@ -1,27 +1,30 @@
 import type { CameraShot, ViewerState, createViewer } from '../model/renderer';
 import type { Facility } from '../model/schema';
 import {
+  BUILDING,
   CHAPTER_SHOTS,
   DEFAULT_CHAPTER_SHOT,
+  DEFAULT_CUTAWAY_SHOT,
   FINALE_SHOT,
+  NETWORK_SHOT,
   OPENING_SHOT,
   REVEAL_SHOT,
   TEAM_SHOT,
   clamp01,
   easeInOut,
   mixShots,
+  scrubTime,
   smoothstep,
   stepRoom,
-  stepTime,
   stopBlend,
   unwrap,
   type Shot,
   type ShotSpec,
 } from './choreography';
-import { clock, type Step } from './data';
+import { clock, isCutaway, scrub, type Step } from './data';
 
 export type Viewer = ReturnType<typeof createViewer>;
-export type BeatKind = 'opening' | 'reveal' | 'team' | 'chapter' | 'finale' | 'cta';
+export type BeatKind = 'opening' | 'reveal' | 'team' | 'network' | 'chapter' | 'finale' | 'cta';
 export type BeatDef = { kind: BeatKind; step?: Step; stepIndex?: number };
 /**
  * Screen-space position of the subject, as a fraction of the stage size from
@@ -70,6 +73,13 @@ const INTERIOR: ViewerState = {
   roof: false,
   exterior: false,
 };
+/**
+ * Cutaways: the community cast shows at `ground` (site-level people), while
+ * the center's upper floor and roof stay hidden and no room is highlighted.
+ */
+const CUTAWAY: ViewerState = { ...INTERIOR, level: 'ground', selected: null, room: null };
+/** Height of camera anchors above the floor (rooms, zones, pads). */
+const ANCHOR_Y = 0.8;
 
 /** Handoff k of n is revealed once chapter progress passes this point. */
 export const handoffAt = (k: number, n: number) =>
@@ -111,6 +121,9 @@ export function createDirector(opts: {
   let time = 0,
     timeSet = -1;
   let cam: Shot | null = null;
+  /** Latest camera and clock goals (for debug()). */
+  let lastGoal: Shot | null = null,
+    lastGoalTime = 0;
   const vel = { x: 0, y: 0, z: 0, zoom: 0, az: 0, el: 0 };
   let viewKey = '';
   const sectionVars = sections.map(() => ({ vis: -1, enter: 99, p: -1 }));
@@ -146,7 +159,8 @@ export function createDirector(opts: {
   // ---- sim time -----------------------------------------------------------
   function timeAt(i: number, p: number) {
     const b = beats[i];
-    if (b.kind === 'chapter' && b.step) return stepTime(b.step, p);
+    // Chapters scrub their scrub window (contiguous, so time never jumps).
+    if (b.kind === 'chapter' && b.stepIndex !== undefined) return scrubTime(scrub[b.stepIndex], p);
     if (b.kind === 'finale' || b.kind === 'cta') return LAST_TIME;
     return 0;
   }
@@ -170,9 +184,12 @@ export function createDirector(opts: {
         stack: Math.round((1 - settle) * 130) / 100,
       };
     }
-    if (b.kind === 'team') return INTERIOR;
+    // Team and network keep the whole building open, so nothing pops between
+    // them and the upstairs huddle.
+    if (b.kind === 'team' || b.kind === 'network') return INTERIOR;
     if (b.kind === 'finale' || b.kind === 'cta') return EXTERIOR;
     const s = b.step!;
+    if (isCutaway(s)) return CUTAWAY;
     const zone = model?.zones.find((z) => z.id === s.zoneId);
     const room = stepRoom(s, t);
     return {
@@ -192,13 +209,47 @@ export function createDirector(opts: {
     if (b.kind === 'opening') return OPENING_SHOT;
     if (b.kind === 'reveal') return REVEAL_SHOT;
     if (b.kind === 'team') return TEAM_SHOT;
+    if (b.kind === 'network') return NETWORK_SHOT;
     if (b.kind === 'chapter' && b.step)
-      return CHAPTER_SHOTS[b.step.id] || DEFAULT_CHAPTER_SHOT;
+      return (
+        CHAPTER_SHOTS[b.step.id] || (isCutaway(b.step) ? DEFAULT_CUTAWAY_SHOT : DEFAULT_CHAPTER_SHOT)
+      );
     return FINALE_SHOT;
+  }
+  /**
+   * A `place` anchor from the community layer: the network's framing, or for
+   * a setting an instance room's centre (once its facility instance is
+   * stamped), a registry anchor (world coordinates) or the pad centre. Null
+   * without the layer.
+   */
+  function placeFrame(
+    place: NonNullable<ShotSpec['place']>,
+  ): { target: [number, number, number]; zoom: number } | null {
+    const layer = viewer?.community;
+    if (!layer) return null;
+    const frame = layer.frame(place === 'network' ? undefined : place.setting);
+    if (!frame) return null;
+    let point: [number, number] | null | undefined = null;
+    if (place !== 'network') {
+      if (place.room) point = layer.instance(place.setting)?.roomCenter(place.room);
+      if (!point && place.anchor)
+        point = layer.settings.find((s) => s.id === place.setting)?.anchors[place.anchor];
+    }
+    const [x, z] = point || [frame.target[0], frame.target[2]];
+    return { target: [x, ANCHOR_Y, z], zoom: frame.zoom };
+  }
+  /** The anchor a shot reads from the layer: its own `place`, else a cutaway's setting. */
+  function placeOf(b: BeatDef, spec: ShotSpec): ShotSpec['place'] {
+    if (spec.place) return spec.place;
+    return b.step?.settingId ? { setting: b.step.settingId } : undefined;
   }
   /** A fresh anchor array (callers adjust it in place). */
   function anchorFor(b: BeatDef, spec: ShotSpec, t: number): [number, number, number] {
-    if (spec.anchor || !b.step) return spec.anchor ? [...spec.anchor] : [0, 0, 0];
+    if (spec.anchor) return [...spec.anchor];
+    const place = placeOf(b, spec);
+    // Without the community layer (a facility without it), fall back to the building.
+    if (place) return placeFrame(place)?.target || [...BUILDING];
+    if (!b.step) return [0, 0, 0];
     const blend = stopBlend(b.step, t);
     if (!blend.length) {
       const zone = anchors.get(b.step.zoneId);
@@ -216,24 +267,36 @@ export function createDirector(opts: {
     }
     return w ? [out[0] / w, out[1] / w, out[2] / w] : [0, 0, 0];
   }
+  /** Who the camera leans toward: the hero in her chapters, the first featured interaction in a cutaway. */
+  function subjectOf(b: BeatDef) {
+    if (!viewer || !b.step) return null;
+    if (isCutaway(b.step)) {
+      const id = b.step.interactionIds?.[0];
+      return id ? viewer.activity.actorPosition(`interaction:${id}`) : null;
+    }
+    return heroId && b.step.heroPresent ? viewer.activity.actorPosition(heroId) : null;
+  }
   function shotFor(i: number, p: number, t: number): Shot {
     const b = beats[i],
       spec = specFor(i);
     const target = anchorFor(b, spec, t);
-    if (viewer && heroId && b.step?.heroPresent && spec.follow) {
-      const h = viewer.activity.actorPosition(heroId);
-      if (h) {
-        const d = Math.hypot(h.x - target[0], h.z - target[2]),
-          r = spec.radius || 8,
-          w = spec.follow * (1 - smoothstep(r * 0.7, r, d));
-        target[0] += (h.x - target[0]) * w;
-        target[1] += (h.y - target[1]) * w;
-        target[2] += (h.z - target[2]) * w;
-      }
+    const h = spec.follow ? subjectOf(b) : null;
+    // Far-off subjects are ignored (the nurse line's call is split between
+    // the center and the home, so its centroid sits between them).
+    if (h && spec.follow) {
+      const d = Math.hypot(h.x - target[0], h.z - target[2]),
+        r = spec.radius || 8,
+        w = spec.follow * (1 - smoothstep(r * 0.7, r, d));
+      target[0] += (h.x - target[0]) * w;
+      target[1] += (h.y - target[1]) * w;
+      target[2] += (h.z - target[2]) * w;
     }
     const pp = b.kind === 'cta' ? 1 : p;
-    const zoom =
-      spec.zoom * (1 + ((spec.push || 1) - 1) * pp) * (opts.framing(b.kind).zoom || 1);
+    // The network shot's zoom is a factor on the layer's own framing, so the
+    // whole network stays in view as settings are added.
+    const place = placeOf(b, spec),
+      base = place === 'network' ? spec.zoom * (placeFrame(place)?.zoom || 0.42) : spec.zoom;
+    const zoom = base * (1 + ((spec.push || 1) - 1) * pp) * (opts.framing(b.kind).zoom || 1);
     const azimuth = spec.azimuth + (spec.drift || 0) * (pp - 0.5);
     return frameShot({ target, zoom, azimuth, elevation: spec.elevation }, b.kind);
   }
@@ -432,6 +495,7 @@ export function createDirector(opts: {
     }
     // Sim clock eases toward the scroll-determined time.
     const goalTime = Math.min(LAST_TIME, timeAt(i, p));
+    lastGoalTime = goalTime;
     const k = reduced ? 1 : 1 - Math.exp(-dt * 7);
     time += (goalTime - time) * k;
     if (Math.abs(goalTime - time) < 0.01) time = goalTime;
@@ -454,6 +518,7 @@ export function createDirector(opts: {
         viewer.update(view);
       }
       const goal = targetShot(i, y, time);
+      lastGoal = goal;
       const snap = !cam;
       if (stepCamera(goal, dt, snap)) busy = true;
       viewer.setShot(cam as CameraShot);
@@ -516,8 +581,18 @@ export function createDirector(opts: {
       lastY = -1;
       wake();
     },
-    /** Current camera (for tuning shots from the console with ?debug=1). */
-    debug: () => ({ cam, time, beat: beatIndex, y: window.scrollY }),
+    /**
+     * Current camera and clock, and the goals the springs are easing toward
+     * (for tuning shots from the console with ?debug=1).
+     */
+    debug: () => ({
+      cam,
+      goal: lastGoal,
+      time,
+      goalTime: lastGoalTime,
+      beat: beatIndex,
+      y: window.scrollY,
+    }),
     dispose() {
       cancelAnimationFrame(frame);
       running = false;

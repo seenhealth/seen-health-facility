@@ -26,6 +26,98 @@ const SITE = {
   cars: ['#ebe8e2', '#d7d3cb', '#cacdca', '#efeee9', '#c0bdb6'],
 };
 
+// Raised sidewalks and curb islands, traced on the supplied plan (source pixels).
+const SIDEWALKS_PX = [
+  [
+    [180, 260],
+    [180, 2390],
+    [240, 2535],
+    [500, 2535],
+    [3564, 2365],
+    [3564, 2195],
+    [2788, 2250],
+    [1610, 2315],
+    [1050, 2335],
+    [1050, 2260],
+    [350, 2260],
+    [350, 210],
+  ],
+  [
+    [180, 260],
+    [210, 180],
+    [270, 145],
+    [3564, 145],
+    [3564, 197],
+    [350, 197],
+    [350, 260],
+  ],
+] as Vec2[][];
+const CURB_ISLANDS_PX = [
+  [
+    [350, 210],
+    [550, 210],
+    [550, 229],
+    [378, 229],
+    [378, 898],
+    [350, 898],
+  ],
+  [
+    [350, 1470],
+    [478, 1470],
+    [478, 1517],
+    [390, 1517],
+    [390, 2255],
+    [350, 2255],
+  ],
+  [
+    [804, 210],
+    [990, 210],
+    [804, 309],
+  ],
+  [
+    [2720, 209],
+    [3020, 209],
+    [3070, 328],
+    [2860, 455],
+  ],
+  [
+    [2780, 997],
+    [2960, 997],
+    [2990, 1340],
+    [2780, 1400],
+  ],
+  [
+    [2830, 2205],
+    [2870, 2040],
+    [2900, 2040],
+    [2900, 2200],
+  ],
+  [
+    [3210, 2180],
+    [3390, 1930],
+    [3425, 2190],
+  ],
+] as Vec2[][];
+/** Sidewalk and curb-island outlines in site metres (shared with the fleet clearance check). */
+export function siteCurbs(model: Pick<Facility, 'calibration'>) {
+  const px = ([x, z]: Vec2): Vec2 => [
+    (x - model.calibration.sourcePixelOrigin[0]) /
+      model.calibration.pixelsPerMeter,
+    (z - model.calibration.sourcePixelOrigin[1]) /
+      model.calibration.pixelsPerMeter,
+  ];
+  return {
+    sidewalks: SIDEWALKS_PX.map((p) => p.map(px)),
+    islands: CURB_ISLANDS_PX.map((p) => p.map(px)),
+  };
+}
+/**
+ * Drawn extent of the ring streets beyond the block: past the distributed-care
+ * pads, so vehicles leave and enter the map off screen. The south street stops
+ * at the west street because the partner pharmacy's pad sits on its line.
+ */
+export const STREET_EXTENT = { x: 130, z: 95 };
+
 /** Owned plan-derived ground geometry; surrounding building heights are illustrative. */
 export function buildNeighborhood(model: Facility) {
   const root = new T.Group();
@@ -122,88 +214,31 @@ export function buildNeighborhood(model: Facility) {
   box(-44.4, -0.43, 5, 8, 0.2, 82, SITE.street);
   box(3, -0.43, -32.3, 105, 0.2, 7, SITE.street);
   box(54, -0.43, 5, 8, 0.2, 82, SITE.street);
-  const sidewalks = [
-    [
-      [180, 260],
-      [180, 2390],
-      [240, 2535],
-      [500, 2535],
-      [3564, 2365],
-      [3564, 2195],
-      [2788, 2250],
-      [1610, 2315],
-      [1050, 2335],
-      [1050, 2260],
-      [350, 2260],
-      [350, 210],
-    ],
-    [
-      [180, 260],
-      [210, 180],
-      [270, 145],
-      [3564, 145],
-      [3564, 197],
-      [350, 197],
-      [350, 260],
-    ],
-  ] as Vec2[][];
-  sidewalks.forEach((p, i) =>
-    patch(
-      p.map((q) => px(...q)),
-      -0.23,
-      0.18,
-      SITE.sidewalk,
-      `raised-sidewalk-${i}`,
-    ),
+  // Extensions out to STREET_EXTENT, 2 mm lower so they never fight with the
+  // slabs above or with a pad's own street stub.
+  const { x: farX, z: farZ } = STREET_EXTENT;
+  const slab = (x0: number, x1: number, z0: number, z1: number) =>
+    box(
+      (x0 + x1) / 2,
+      -0.432,
+      (z0 + z1) / 2,
+      x1 - x0,
+      0.2,
+      z1 - z0,
+      SITE.street,
+    );
+  slab(-farX, -48.5, 36.3, 46.3);
+  slab(56.5, farX, 36.3, 46.3);
+  slab(55.5, farX, -35.8, -28.8);
+  for (const x of [-44.4, 54]) {
+    slab(x - 4, x + 4, -farZ, -36);
+    slab(x - 4, x + 4, 46, farZ);
+  }
+  const curbs = siteCurbs(model);
+  curbs.sidewalks.forEach((p, i) =>
+    patch(p, -0.23, 0.18, SITE.sidewalk, `raised-sidewalk-${i}`),
   );
-  const islands = [
-    [
-      [350, 210],
-      [550, 210],
-      [550, 229],
-      [378, 229],
-      [378, 898],
-      [350, 898],
-    ],
-    [
-      [350, 1470],
-      [478, 1470],
-      [478, 1517],
-      [390, 1517],
-      [390, 2255],
-      [350, 2255],
-    ],
-    [
-      [804, 210],
-      [990, 210],
-      [804, 309],
-    ],
-    [
-      [2720, 209],
-      [3020, 209],
-      [3070, 328],
-      [2860, 455],
-    ],
-    [
-      [2780, 997],
-      [2960, 997],
-      [2990, 1340],
-      [2780, 1400],
-    ],
-    [
-      [2830, 2205],
-      [2870, 2040],
-      [2900, 2040],
-      [2900, 2200],
-    ],
-    [
-      [3210, 2180],
-      [3390, 1930],
-      [3425, 2190],
-    ],
-  ] as Vec2[][];
-  islands.forEach((p, i) => {
-    const pts = p.map((q) => px(...q));
+  curbs.islands.forEach((pts, i) => {
     patch(pts, -0.23, 0.2, SITE.curb, `island-curb-${i}`);
     const cx = pts.reduce((s, q) => s + q[0], 0) / pts.length,
       cz = pts.reduce((s, q) => s + q[1], 0) / pts.length;
@@ -234,17 +269,67 @@ export function buildNeighborhood(model: Facility) {
     strip(px(780, y + 160), px(1032, y + 25), 0.075, SITE.marking);
   for (let y = 535; y < 2120; y += 138)
     strip(px(3170, y + 166), px(3390, y - 47), 0.075, SITE.marking);
-  for (let x = -40; x < 52; x += 6)
-    strip([x, 41.4], [x + 3, 41.4], 0.12, SITE.marking, -0.217);
-  for (let z = -26; z < 37; z += 6)
-    strip([-44.4, z], [-44.4, z + 3], 0.12, SITE.marking, -0.217);
-  for (let x = -40; x < 50; x += 5)
-    strip([x, -32.3], [x + 2.5, -32.3], 0.1, SITE.marking, -0.217);
+  // Centre-line dashes, continued along the extensions (east of x 56.5 they
+  // keep the phase of the pads' own street stubs).
+  const dashes = (
+    from: number,
+    to: number,
+    step: number,
+    length: number,
+    at: (v: number) => [Vec2, Vec2],
+    width: number,
+  ) => {
+    for (let v = from; v + length <= to; v += step) {
+      const [a, b] = at(v);
+      strip(a, b, width, SITE.marking, -0.217);
+    }
+  };
+  const northLine = (x: number): [Vec2, Vec2] => [
+      [x, 41.4],
+      [x + 3, 41.4],
+    ],
+    westLine = (z: number): [Vec2, Vec2] => [
+      [-44.4, z],
+      [-44.4, z + 3],
+    ];
+  dashes(-40, 55, 6, 3, northLine, 0.12);
+  dashes(-farX, -49, 6, 3, northLine, 0.12);
+  dashes(56.5, farX, 6, 3, northLine, 0.12);
+  dashes(-26, 40, 6, 3, westLine, 0.12);
+  dashes(-farZ, -37, 6, 3, westLine, 0.12);
+  dashes(47, farZ, 6, 3, westLine, 0.12);
+  dashes(
+    -40,
+    50,
+    5,
+    2.5,
+    (x) => [
+      [x, -32.3],
+      [x + 2.5, -32.3],
+    ],
+    0.1,
+  );
+  dashes(
+    59,
+    farX,
+    5,
+    2.5,
+    (x) => [
+      [x, -32.3],
+      [x + 2.5, -32.3],
+    ],
+    0.1,
+  );
   // Crosswalks, blue loading access and parking bays are geometry rather than a photograph.
   for (let z = 38; z < 45; z += 0.85)
     box(-36, -0.208, z, 3.2, 0.012, 0.4, SITE.marking);
   for (let i = 0; i < 10; i++)
-    strip(px(351 + i * 42, 1010), px(393 + i * 42, 1060), 0.07, SITE.accessible);
+    strip(
+      px(351 + i * 42, 1010),
+      px(393 + i * 42, 1060),
+      0.07,
+      SITE.accessible,
+    );
   for (const y of [936, 1160]) {
     const [x, z] = px(530, y);
     box(x, -0.208, z, 1.2, 0.012, 1.2, SITE.accessible);
@@ -380,13 +465,7 @@ export function buildNeighborhood(model: Facility) {
     [3290, 1520, 0.78],
   ].forEach((p, i) => {
     const [x, z] = px(p[0], p[1]);
-    car(
-      `parked-car-${i}`,
-      x,
-      z,
-      p[2],
-      SITE.cars[i],
-    );
+    car(`parked-car-${i}`, x, z, p[2], SITE.cars[i]);
   });
   const traffic = [
     car('street-car-1', 0, 39.4, Math.PI / 2, SITE.cars[3]),
