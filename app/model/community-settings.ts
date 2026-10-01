@@ -268,6 +268,9 @@ export const careSettings: CareSetting[] = [
     road: { from: [-48.4, 12], to: [-70, 12] },
     drive: { depth: 7, radius: 6.2, lanes: 2 },
     apron: { w: 0, d: 0 },
+    // The north street continued west past the home: the aide's car comes
+    // and goes along it, off the map beyond the Community framing.
+    streetExtension: { from: [-128, 41.3], to: [-48.5, 41.3], width: 10 },
     services: [
       'home-care',
       'home-health',
