@@ -7,9 +7,9 @@ Interactive planning models of **Alhambra (1839 W Valley), 1630 Olympic and Alve
 ## Explore
 
 - Switch between sites or see their locations together on the map. Olympic includes both floors and its upstairs option. Room labels are off by default and can be enabled for design review.
-- Alhambra has 167 distinct people, with most day-room and dining seats occupied, group activities, arts and crafts, conversation and food service. Its former administration rooms contain mahjong, Wii, ping pong, pool and karaoke. The upstairs offices remain.
+- Alhambra has 167 distinct people in its base loop (177 once the fleet crew is added: a driver per van and four mid-day riders), with most day-room and dining seats occupied, group activities, arts and crafts, conversation and food service. Its former administration rooms contain mahjong, Wii, ping pong, pool and karaoke. The upstairs offices remain.
 - The Alhambra day room runs a weekly repertoire. Monday is the baked base loop (performances, language circle, device class, exercise, dance, tai chi, calligraphy, arts and crafts, instruments, TCM talk). Tuesday to Friday rotate culturally specific sessions into the same ten slots: Cantonese opera, tea and dim sum, xiangqi, go and mahjong, qigong, brush painting, paper cutting and lanterns, dumpling making with the dietitian, Chinese knotting, Cantopop and Mandopop, fan dance, story circles in Toisanese, Cantonese and Mandarin, bilingual news, planter gardening, mindfulness, birthdays, a school visit, Vietnamese folk songs, Korean, Spanish and Tagalog circles, a fall-prevention talk and gongfu tea. Pick the day beside the **Day room program** picker or open `?program=tue` (`wed`, `thu`, `fri`); the panel lists each session's cultures, languages and format. Data: `programs`, `repertoire` and `rotations` in `app/data/day-program.json`, checked by `npm run validate:day-program`.
-- Eight Alhambra vans run staggered trips, park in marked bays, yield at shared driveways and deploy ramps. Package and food deliveries use the rear employee entrance and receiving area. Olympic and Alveare have site-specific van arrivals, escorts and activity; Alveare drop-off is on the east side beside reception.
+- Alhambra's eight ProMaster-style vans have see-through cabins with seated riders and a driver each. Six run staggered trips: out through the south driveway, westbound off site and back to a short swing-and-reverse into their bays, yielding at the shared driveway; two spares park at the west curb. At the dock the driver comes around the nose, meets each rider at the top of the ramp and escorts them down, hands off at the foot, stows the ramp and drives on; afternoons mirror this. Package and food deliveries use the rear employee entrance and receiving area. Olympic and Alveare have site-specific van arrivals, escorts and activity; Alveare drop-off is on the east side beside reception.
 - Video mode holds the camera still, speeds up the activities and can record a one-minute 1080p clip. Tilt shift is optional. Hide all controls for a clean view; **H** or **Esc** restores them and **R** starts recording.
 - The viewer includes the pull request's architectural presentation palette, clay figures, soft lighting and optional ambient occlusion. `?quality=balanced` selects lighter rendering; `?quality=high` enables the full pipeline.
 - **Measure** shows occupancy and staff-time metrics for Alhambra's base loop or the participant story. Its **Trace** tab lists one person's touchpoints end to end (zones, van boarding, interactions, encounters, handoffs) and downloads them as JSON.
@@ -60,13 +60,14 @@ node scripts/validate-site-activity.mjs
 node scripts/validate-site-arrivals.mjs
 node scripts/validate-additional-sites.mjs
 npm run validate:traffic
+npm run validate:fleet
 npm run build:scenario -- --check
 npm run validate:trace
 npm run build
 npm run build:story
 ```
 
-`validate:model` prepares the headless model modules used by the other validators. `validate-activity.mjs` also exports the animated cast GLB. The production build sanitizes the public model data and checks that no architectural PDFs, drawing images or extracted source text are published.
+`validate:model` prepares the headless model modules used by the other validators. `validate:traffic` checks vehicle clearance, nose-first motion and turn rates at 50 Hz; `validate:fleet` checks the drivers' and riders' choreography (seated while the van moves, cabin walks, ramp escorts, wall clearance). `validate-activity.mjs` also exports the animated cast GLB. The production build sanitizes the public model data and checks that no architectural PDFs, drawing images or extracted source text are published.
 
 ## Editing and model generation
 
@@ -75,7 +76,7 @@ npm run build:story
 | Site navigation, map and display controls | `app/page.tsx`, `app/data/sites.ts`, `app/components/` |
 | Rendering, presentation quality and recording | `app/model/renderer.ts`, `app/model/showcase.ts` |
 | People and day-room program | `app/model/characters.ts`, `app/model/day-room.ts`, `app/data/` |
-| Vans, traffic and deliveries | `app/model/arrival.ts`, `app/model/traffic-routes.ts`, `app/model/deliveries.ts` |
+| Vans, traffic and deliveries | `app/model/arrival.ts`, `app/model/alhambra-fleet.ts` (bays, legs, trips), `app/model/fleet-crew.ts` (drivers and riders), `app/model/traffic-routes.ts`, `app/model/deliveries.ts` |
 | Additional-site activity and arrivals | `app/model/site-activity.ts`, `app/model/site-arrival.ts` |
 | Exterior models | `app/model/alhambra-exterior.ts`, `app/model/olympic-exterior.ts`, `app/model/alveare-exterior.ts` |
 | Reviewed activity furniture | `app/model/community-assets.ts` |

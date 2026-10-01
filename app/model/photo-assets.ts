@@ -1,6 +1,30 @@
 import * as T from 'three';
 import type { Asset } from './schema';
 
+export type VanSeat = [number, number, number];
+/**
+ * Seat anchors inside the fleet van, in its local frame (x toward the sliding
+ * door, y up from the ground, z toward the rear; the nose is at −z). People
+ * sit facing the nose (`seatHeading: Math.PI`). Kept next to the geometry so
+ * the benches drawn by `buildPhotoAsset` and the riders placed by
+ * `fleet-crew.ts` agree.
+ */
+export const FLEET_VAN_SEATS = {
+  floorY: 0.58,
+  driver: [-0.55, 0.62, -1.95] as VanSeat,
+  /** Three left-hand benches (2+1 layout), two seats each, front to back: outer seat first. */
+  benches: [0.77, 1.67, 2.57].flatMap((z): VanSeat[] => [
+    [-0.72, 0.62, z],
+    [-0.28, 0.62, z],
+  ]),
+  /** Wheelchair bay on the door side, behind the sliding-door opening. */
+  wheelchair: [0.7, 0.62, 1.45] as VanSeat,
+  /** Fold-down attendant seat behind the wheelchair bay. */
+  attendant: [0.72, 0.62, 2.37] as VanSeat,
+  /** Sill of the sliding-door opening, where the ramp hinges (`pivot` in arrival.ts). */
+  door: [1.035, 0.58, -0.19] as VanSeat,
+};
+
 /** Photo-informed, dimensioned components. Placement and palettes belong to the facility specification. */
 export function buildPhotoAsset(
   spec: Asset,
@@ -202,146 +226,177 @@ export function buildPhotoAsset(
       box(0, h - 0.04, z, w, 0.04, 0.04, white);
     }
   } else if (spec.kind === 'fleet-van') {
-    // Final two-column wrap sheet is the texture authority; dimensions remain estimates.
+    // RAM ProMaster high-roof proportions on the 2.25 × 2.8 × 6.35 m envelope:
+    // nose at −z, sliding door on +x, floor at y 0.58. The final two-column
+    // wrap sheet remains the texture authority for the four decals.
     const black = palette('trim', 'photo-black'),
-      glass = palette('glass', 'screen');
-    if (p.operable === true) {
-      top(0, 0.46, 0, w * 0.91, 0.12, d * 0.92, 0.04, black);
-      top(0, 0.58, -d * 0.335, w * 0.9, h * 0.59, d * 0.28, 0.1, spec.material);
-      top(
-        -w * 0.43,
-        0.58,
-        d * 0.15,
-        0.09,
-        h * 0.68,
-        d * 0.66,
-        0.035,
-        spec.material,
+      glass = palette('glass', 'screen'),
+      lamp = palette('lamp', 'photo-white'),
+      rearLamp = palette('rearLamp', 'photo-red-cart'),
+      body = spec.material,
+      dark = '#2b2f31',
+      seat = '#3d4346',
+      operable = p.operable === true;
+    const half = w / 2,
+      nose = -d / 2,
+      rear = d / 2,
+      sideX = half - 0.03,
+      belt = 1.55,
+      windowTop = 2.1,
+      roofY = 2.45;
+    // See-through glazing so seated people read from outside. The palette's
+    // glass finish is opaque, so the builder clones it into a transparent
+    // material (opacity 0.34, roughness 0.12) instead of adding a schema entry.
+    const glazing = material(glass).clone();
+    glazing.transparent = true;
+    glazing.opacity = 0.34;
+    glazing.roughness = 0.12;
+    glazing.metalness = 0.15;
+    glazing.depthWrite = false;
+    glazing.side = T.DoubleSide;
+    const pane = (
+      x: number,
+      y: number,
+      z: number,
+      a: number,
+      b: number,
+      c: number,
+    ) => {
+      const m = new T.Mesh(new T.BoxGeometry(a, b, c), glazing);
+      m.position.set(x, y + b / 2, z);
+      m.renderOrder = 2;
+      g.add(m);
+      return m;
+    };
+    /** Box with its centre at (x, y, z), pitched about x by `rx` (positive tips the top toward +z). */
+    const pitched = (
+      x: number,
+      y: number,
+      z: number,
+      a: number,
+      b: number,
+      c: number,
+      rx: number,
+      mat: string | T.Material,
+    ) => {
+      const m = new T.Mesh(
+        new T.BoxGeometry(a, b, c),
+        typeof mat === 'string' ? material(mat) : mat,
       );
-      top(
-        w * 0.43,
-        0.58,
-        d * 0.29,
-        0.09,
-        h * 0.68,
-        d * 0.45,
-        0.035,
-        spec.material,
-      );
-      top(
-        w * 0.43,
-        0.58,
-        -d * 0.2,
-        0.09,
-        h * 0.68,
-        d * 0.12,
-        0.035,
-        spec.material,
-      );
-      top(0, 0.58, d * 0.448, w * 0.9, h * 0.68, 0.1, 0.035, spec.material);
-      for (const z of [d * 0.15, d * 0.3])
-        for (const x of [-w * 0.23, w * 0.23]) {
-          top(x, 0.77, z, 0.4, 0.12, 0.42, 0.035, glass);
-          top(x, 0.89, z + 0.17, 0.4, 0.54, 0.08, 0.035, glass);
-        }
-    } else {
-      top(0, 0.32, 0, w * 0.91, h * 0.39, d * 0.97, 0.16, spec.material);
-      top(
-        0,
-        h * 0.39,
-        d * 0.075,
-        w * 0.9,
-        h * 0.55,
-        d * 0.8,
-        0.16,
-        spec.material,
-      );
-    }
-    top(
-      0,
-      h * 0.92,
-      d * 0.06,
-      w * 0.85,
-      h * 0.08,
-      d * 0.78,
-      0.18,
-      spec.material,
-    );
-    top(0, 0.3, -d * 0.46, w * 0.94, 0.32, d * 0.08, 0.05, black);
-    top(0, 0.33, d * 0.47, w * 0.93, 0.25, d * 0.06, 0.04, black);
-    const windshield = box(
-      0,
-      h * 0.58,
-      -d * 0.337,
-      w * 0.78,
-      h * 0.27,
-      0.045,
-      glass,
-    );
-    windshield.rotation.x = -0.22;
-    box(0, 0.55, -d * 0.498, w * 0.65, 0.35, 0.03, black);
-    for (let i = 0; i < 5; i++)
-      box(0, 0.58 + i * 0.052, -d * 0.502, w * 0.58, 0.012, 0.012, metal);
-    for (const x of [-w * 0.38, w * 0.38]) {
-      box(
-        x,
-        h * 0.36,
-        -d * 0.477,
-        w * 0.17,
-        0.22,
-        0.05,
-        palette('lamp', 'photo-white'),
-      );
-      box(
-        x,
-        0.64,
-        d * 0.483,
-        0.09,
-        0.66,
-        0.045,
-        palette('rearLamp', 'photo-red-cart'),
-      );
-      box(x * 1.21, h * 0.55, -d * 0.285, 0.045, 0.14, 0.3, black);
-      top(x * 1.22, h * 0.53, -d * 0.27, 0.17, 0.32, 0.18, 0.035, black);
-    }
+      m.position.set(x, y, z);
+      m.rotation.x = rx;
+      m.castShadow = m.receiveShadow = typeof mat === 'string';
+      if (typeof mat !== 'string') m.renderOrder = 2;
+      g.add(m);
+      return m;
+    };
+    // Underbody, interior floor and the black lower cladding band.
+    box(0, 0.46, 0.35, w * 0.88, 0.1, d * 0.9, black);
+    box(0, 0.52, 0.5, 1.98, 0.06, 5.1, dark);
+    for (const side of [-1, 1])
+      box(side * sideX, 0.4, 0.3, 0.07, 0.36, 5.7, black);
+    // Teal body below the beltline; the +x panel leaves the door opening free.
+    box(-sideX, 0.74, 0.35, 0.07, belt - 0.74, 5.5, body);
+    box(sideX, 0.74, -1.6, 0.07, belt - 0.74, 1.6, body);
+    box(sideX, 0.74, 1.76, 0.07, belt - 0.74, 2.68, body);
+    // Window band: roof rail, pillars and see-through glazing on both sides.
     for (const side of [-1, 1]) {
-      box(
-        side * w * 0.454,
-        h * 0.53,
-        -d * 0.25,
-        0.025,
-        h * 0.28,
-        d * 0.19,
-        glass,
-      );
-      if (p.operable !== true || side < 0)
-        box(side * w * 0.456, 0.48, d * 0.08, 0.04, 0.16, d * 0.7, black);
-      else box(side * w * 0.456, 0.48, d * 0.29, 0.04, 0.16, d * 0.45, black);
-      for (const z of [-d * 0.31, d * 0.3]) {
-        const tire = cylinder(side * w * 0.43, 0, z, 0.36, 0.22, black);
+      box(side * sideX, windowTop, 0.35, 0.09, roofY - windowTop, 5.5, body);
+      box(side * sideX, belt, -1.15, 0.08, windowTop - belt, 0.14, body);
+      box(side * sideX, belt, 0.55, 0.08, windowTop - belt, 0.26, body);
+      box(side * sideX, belt, 3.0, 0.08, windowTop - belt, 0.2, body);
+      pane(side * sideX, belt, -1.72, 0.03, windowTop - belt, 1.0);
+      pane(side * sideX, belt, 1.79, 0.03, windowTop - belt, 2.22);
+    }
+    pane(-sideX, belt, -0.33, 0.03, windowTop - belt, 1.5);
+    // Tall rounded roof cap, header and the short sloped cab roof.
+    top(0, roofY, 0.75, 2.0, h - roofY, 4.7, 0.22, body);
+    box(0, 2.02, -2.02, 1.96, 0.12, 0.14, body);
+    pitched(0, 2.29, -1.81, 1.96, 0.1, 0.55, -0.67, body);
+    // Raked windshield between A-pillars, cowl, sloped hood and front fenders.
+    pitched(0, 1.675, -2.235, 1.86, 0.865, 0.04, 0.52, glazing);
+    for (const x of [-0.96, 0.96]) pitched(x, 1.675, -2.235, 0.1, 0.9, 0.12, 0.52, body);
+    box(0, 1.22, -2.5, 1.96, 0.08, 0.2, black);
+    pitched(0, 1.17, -2.79, 1.96, 0.06, 0.62, -0.362, body);
+    for (const side of [-1, 1]) box(side * (half - 0.06), 0.74, -2.8, 0.09, 0.4, 0.7, body);
+    // Nose: teal face with headlamps over a black bumper and grille.
+    box(0, 0.74, nose + 0.06, 2.0, 0.34, 0.1, body);
+    box(0, 0.3, nose + 0.05, 2.16, 0.44, 0.13, black);
+    box(0, 0.42, nose - 0.01, 1.2, 0.26, 0.04, black);
+    for (let i = 0; i < 4; i++) box(0, 0.44 + i * 0.065, nose - 0.02, 1.1, 0.012, 0.012, metal);
+    for (const y of [0.4, 0.68]) box(0, y, nose - 0.015, 1.26, 0.025, 0.02, metal);
+    for (const side of [-1, 1]) {
+      box(side * 0.78, 0.8, nose + 0.02, 0.44, 0.22, 0.06, lamp);
+      box(side * 0.99, 0.8, nose + 0.05, 0.06, 0.22, 0.06, '#e0a24a');
+      box(side * (half + 0.1), 1.5, -2.3, 0.1, 0.24, 0.16, black);
+      box(side * (half + 0.02), 1.58, -2.3, 0.1, 0.04, 0.05, black);
+    }
+    // Rear: twin doors with high windows, tall tail lamps and a black bumper.
+    box(0, 0.76, rear - 0.045, 2.1, roofY - 0.76, 0.08, body);
+    for (const side of [-1, 1]) {
+      pane(side * 0.5, 1.8, rear + 0.01, 0.74, 0.4, 0.02);
+      box(side * 1.0, 0.78, rear - 0.005, 0.15, 0.95, 0.05, rearLamp);
+    }
+    box(0, 0.76, rear + 0.005, 0.025, roofY - 0.76, 0.02, black);
+    box(0.12, 1.15, rear + 0.015, 0.03, 0.22, 0.02, black);
+    box(0, 2.36, rear + 0.005, 0.3, 0.05, 0.02, rearLamp);
+    box(0, 0.3, rear - 0.035, 2.16, 0.42, 0.14, black);
+    // Wheels: tyres proud of the cladding, hubs and black arch flares.
+    for (const side of [-1, 1])
+      for (const z of [-2.2, 1.75]) {
+        const tire = cylinder(side * 1.035, 0, z, 0.36, 0.25, black);
         tire.rotation.z = Math.PI / 2;
         tire.position.y = 0.36;
-        const rim = cylinder(side * w * 0.485, 0, z, 0.22, 0.024, metal);
+        const rim = cylinder(side * 1.165, 0, z, 0.2, 0.03, metal);
         rim.rotation.z = Math.PI / 2;
         rim.position.y = 0.36;
+        const flare = add(
+          new T.CylinderGeometry(0.5, 0.5, 0.06, 20, 1, true, 0, Math.PI),
+          black,
+          side * 1.15,
+          0.36,
+          z,
+        );
+        flare.rotation.z = Math.PI / 2;
       }
+    // Passenger side: two sliding leaves that part along z (`passenger-door-0/1`
+    // slide ±0.6 when open; the ramp hinges at the sill, local (1.035, 0.58, −0.19)).
+    for (const [i, zc] of [-0.495, 0.114].entries()) {
+      const leaf: T.Object3D[] = [
+        box(sideX + 0.02, 0.76, zc, 0.06, belt - 0.76, 0.6, body),
+        pane(sideX + 0.03, belt, zc, 0.02, windowTop - belt, 0.56),
+        box(sideX + 0.03, belt, zc, 0.05, 0.035, 0.6, black),
+        box(sideX + 0.03, windowTop - 0.035, zc, 0.05, 0.035, 0.6, black),
+        box(sideX + 0.03, belt, zc - 0.29, 0.05, windowTop - belt, 0.03, black),
+        box(sideX + 0.03, belt, zc + 0.29, 0.05, windowTop - belt, 0.03, black),
+        box(sideX + 0.07, 1.2, zc + (i ? -0.22 : 0.22), 0.02, 0.03, 0.14, black),
+      ];
+      if (!operable) continue;
+      const door = new T.Group();
+      door.name = `passenger-door-${i}`;
+      g.add(door);
+      for (const part of leaf) door.attach(part);
     }
-    // Passenger side has a tall paired entrance door, as shown in the design sheet.
-    if (p.operable === true) {
-      for (const [i, z] of [-d * 0.078, d * 0.018].entries()) {
-        const door = new T.Group();
-        door.name = `passenger-door-${i}`;
-        g.add(door);
-        const leaf = box(w * 0.46, 0.49, z, 0.05, h * 0.7, d * 0.096, black);
-        door.attach(leaf);
-        const pane = box(w * 0.481, 0.65, z, 0.013, h * 0.59, d * 0.078, glass);
-        door.attach(pane);
-      }
-    } else {
-      box(w * 0.46, 0.47, -d * 0.03, 0.035, h * 0.7, d * 0.2, black);
-      for (const z of [-d * 0.078, d * 0.018])
-        box(w * 0.481, 0.61, z, 0.012, h * 0.6, d * 0.085, glass);
+    // Interior: cab seats, dashboard, three left-hand benches, the wheelchair
+    // bay and an attendant seat on the door side (anchors in FLEET_VAN_SEATS).
+    for (const x of [-0.55, 0.55]) {
+      box(x, 0.97, -2.05, 0.5, 0.12, 0.5, seat);
+      box(x, 1.09, -1.77, 0.5, 0.58, 0.1, seat);
+      box(x, 1.67, -1.77, 0.26, 0.16, 0.08, seat);
     }
+    box(0, 0.95, -2.55, 1.96, 0.28, 0.32, dark);
+    const wheel = add(new T.TorusGeometry(0.18, 0.022, 8, 24), black, -0.55, 1.2, -2.32);
+    wheel.rotation.x = -Math.PI / 2 + 0.55;
+    for (const zRow of [0.65, 1.55, 2.45]) {
+      box(-0.5, 0.97, zRow, 0.9, 0.12, 0.48, seat);
+      box(-0.5, 1.09, zRow + 0.27, 0.9, 0.5, 0.09, seat);
+    }
+    box(0.72, 0.97, 2.25, 0.5, 0.12, 0.48, seat);
+    box(0.72, 1.09, 2.52, 0.5, 0.5, 0.09, seat);
+    box(0.7, 0.58, 1.45, 0.6, 0.012, 1.2, '#4a5153');
+    rod(new T.Vector3(0.95, 0.9, -0.88), new T.Vector3(0.95, 1.95, -0.88), 0.015, metal);
+    // Wrap decals: same sheet rectangles as before (variant B offsets the sheet
+    // column), sized to the lower body so the window band stays clear.
     const decal = (
       x: number,
       y: number,
@@ -363,34 +418,25 @@ export function buildPhotoAsset(
       o.rotation.y = ry;
     };
     const variant = p.variant === 'B' ? 0.5 : 0;
-    decal(-w * 0.461, h * 0.615, d * 0.15, d * 0.58, h * 0.46, -Math.PI / 2, [
+    decal(-(half + 0.02), 1.155, 0.9, 2.21, 0.774, -Math.PI / 2, [
       0.167 + variant,
       0.326,
       0.452 + variant,
       0.419,
     ]);
-    decal(w * 0.487, h * 0.6, d * 0.285, d * 0.31, h * 0.49, Math.PI / 2, [
+    decal(half + 0.02, 1.155, 2.0, 1.1, 0.77, Math.PI / 2, [
       0.026 + variant,
       0.597,
       0.202 + variant,
       0.691,
     ]);
-    decal(
-      0,
-      h * 0.49,
-      -d * 0.489,
-      w * 0.68,
-      h * 0.14,
-      Math.PI,
-      [0.407, 0.14, 0.592, 0.169],
-    );
-    decal(0, h * 0.56, d * 0.49, w * 0.84, h * 0.61, 0, [
+    decal(0, 0.91, nose - 0.005, 1.04, 0.265, Math.PI, [0.407, 0.14, 0.592, 0.169]);
+    decal(0, 1.27, rear + 0.025, 1.13, 1.03, 0, [
       0.14 + variant,
       0.812,
       0.35 + variant,
       0.951,
     ]);
-    box(0, 0.57, d * 0.49, 0.016, h * 0.69, 0.016, black);
   } else if (
     spec.kind === 'upholstered-chair' ||
     spec.kind === 'lounge-chair'
