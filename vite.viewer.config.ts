@@ -16,12 +16,19 @@ import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, type Logger, type Plugin } from 'vite';
 import { sites } from './app/data/sites';
+import { instanceFacilityUrls } from './app/model/community-settings';
 
 const here = (p: string) => fileURLToPath(new URL(p, import.meta.url));
-/** Every specification app/page.tsx fetches: one per site, plus Olympic's clinic option. */
+/**
+ * Every specification the viewer fetches: one per site, Olympic's clinic
+ * option and the facilities stamped on community pads.
+ */
 const FACILITIES = [
-  ...sites.map((s) => s.model),
-  '/models/seen-olympic-option.json',
+  ...new Set([
+    ...sites.map((s) => s.model),
+    '/models/seen-olympic-option.json',
+    ...instanceFacilityUrls(),
+  ]),
 ].map((p) => p.slice(1));
 const STATIC = [
   'brand/seen-health-horizontal.png',

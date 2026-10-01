@@ -1,13 +1,20 @@
 import * as T from 'three';
-import type { Facility } from './schema';
+import { validateFacility, type Facility } from './schema';
 import { buildArrivalVan, fadeVehicle, updateArrivalVan } from './arrival';
 import {
   careSettingById,
   careSettings,
+  facilityWorldFrame,
   LABEL_PLATE,
+  PAD_Y,
   padBounds,
+  type CareSetting,
 } from './community-settings';
 import { buildCareSetting } from './community-pads';
+import {
+  buildFacilityInstance,
+  type FacilityInstance,
+} from './facility-instance';
 import {
   buildCommunityVehicleBody,
   communityVehicles,
@@ -28,6 +35,20 @@ export type Framing = {
 const NETWORK_ZOOM = 88;
 /** Orthographic zoom × pad size: a 30 m home pad ≈ 2.2. */
 const PAD_ZOOM = 66;
+type Mat = (id: string) => T.MeshStandardMaterial;
+export type CommunityLayerOptions = {
+  /** Fetch + validate a facility by its registry URL (default: fetch(url) → json → validateFacility). */
+  loadFacility?: (url: string) => Promise<Facility>;
+  /** Material resolver for another facility (default: the layer's `mat`). */
+  materialFor?: (facility: Facility) => Mat;
+};
+/** The default loader, as app/page.tsx loads the viewer's own model. */
+const fetchFacility = (url: string) =>
+  fetch(url)
+    .then((r) =>
+      r.ok ? r.json() : Promise.reject(Error(`${url}: ${r.status}`)),
+    )
+    .then(validateFacility);
 /**
  * The distributed-care layer around the center: every setting's pad, the
  * community vehicles' bodies and camera framings for the whole network and
@@ -35,10 +56,17 @@ const PAD_ZOOM = 66;
  * care-day source; the vehicles' samplers are registered with the activity
  * engine (`createActivity(…, registerCommunityVehicles)`) so riders sit in
  * them.
+ *
+ * A setting with a `facility` gets that specification stamped on its pad
+ * (facility-instance.ts) in place of its massing: synchronously when it is
+ * the viewer's own model (no fetch), otherwise once `loadFacility` resolves,
+ * keeping the massing until then and on failure. Instances are static
+ * cutaways that ignore the main building's wall mode.
  */
 export function buildCommunityLayer(
   model: Facility,
-  mat: (id: string) => T.MeshStandardMaterial,
+  mat: Mat,
+  options: CommunityLayerOptions = {},
 ) {
   const root = new T.Group();
   root.name = 'community-layer';
@@ -46,7 +74,64 @@ export function buildCommunityLayer(
     accuracy:
       'Illustrative distributed-care settings on the paper ground beyond the ring streets; positions, massing and timings are not surveyed.',
   };
-  for (const setting of careSettings) root.add(buildCareSetting(setting, mat));
+  const pads = new Map<string, T.Group>(),
+    instances = new Map<string, FacilityInstance>();
+  let disposed = false;
+  for (const setting of careSettings) {
+    const pad = buildCareSetting(setting, mat, {
+      massing: setting.facility?.id !== model.id,
+    });
+    pads.set(setting.id, pad);
+    root.add(pad);
+  }
+  const materialFor = options.materialFor ?? (() => mat),
+    loadFacility = options.loadFacility ?? fetchFacility;
+  function stamp(s: CareSetting, f: Facility) {
+    const cfg = s.facility!;
+    if (disposed) return;
+    if (f.id !== cfg.id) {
+      console.warn(
+        `Community instance ${s.id}: expected facility ${cfg.id}, got ${f.id}; keeping the massing`,
+      );
+      return;
+    }
+    const inst = buildFacilityInstance(f, facilityWorldFrame(s), {
+      ...cfg,
+      mat: f === model ? mat : materialFor(f),
+      floorY: cfg.floorY ?? 0,
+      groundY: PAD_Y,
+      name: `instance-${s.id}`,
+    });
+    const pad = pads.get(s.id)!;
+    pad.add(inst.root);
+    // The massing stays in the scene (so dispose() frees it), hidden.
+    const massing = pad.getObjectByName('massing');
+    if (massing) massing.visible = false;
+    instances.set(s.id, inst);
+  }
+  // The viewer's own facility is stamped before the first await, so it exists
+  // when this function returns; others resolve later.
+  const ready = Promise.all(
+    careSettings.map(async (s) => {
+      if (!s.facility) return;
+      if (s.facility.id === model.id)
+        try {
+          return stamp(s, model);
+        } catch (e) {
+          console.error('Community instance failed to build', s.id, e);
+          return;
+        }
+      try {
+        stamp(s, await loadFacility(s.facility.url));
+      } catch (e) {
+        console.warn(
+          'Community instance unavailable; keeping the massing',
+          s.id,
+          e,
+        );
+      }
+    }),
+  ).then(() => undefined);
   const bodies = communityVehicles.map((v) => {
     if (v.kind === 'van') {
       // The shared fleet body in the registry's livery letter.
@@ -133,7 +218,7 @@ export function buildCommunityLayer(
     const [[x0, z0], [x1, z1]] = padBounds(s);
     return {
       target: [(x0 + x1) / 2, 0, (z0 + z1) / 2],
-      zoom: PAD_ZOOM / Math.max(s.pad.w, s.pad.d),
+      zoom: PAD_ZOOM / Math.max(s.pad.w, s.pad.d + (s.pad.back ?? 0)),
       azimuth: s.heading,
     };
   }
@@ -146,6 +231,15 @@ export function buildCommunityLayer(
     bounds,
     shadowExtent,
     vehicleIds: communityVehicles.map((v) => v.id),
+    /** The stamped instance of a setting, or null (not stamped yet, failed, or none). */
+    instance: (settingId: string): FacilityInstance | null =>
+      instances.get(settingId) ?? null,
+    /** Resolves when every setting with a facility is stamped or has fallen back to its massing. */
+    ready,
+    /** Stops late loads from adding to a disposed scene. */
+    dispose() {
+      disposed = true;
+    },
   };
 }
 export type CommunityLayer = ReturnType<typeof buildCommunityLayer>;

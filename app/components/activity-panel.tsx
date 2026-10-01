@@ -29,7 +29,7 @@ import {
   subscribeProgramRotation,
   type RotationDay,
 } from '../model/day-room';
-import { COMMUNITY_CATEGORIES } from '../model/community-people';
+import { COMMUNITY_CATEGORIES } from '../model/community-settings';
 import type { createViewer } from '../model/renderer';
 
 export const activityViews = [

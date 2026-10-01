@@ -679,7 +679,21 @@ async function smokeTest() {
     harness.observers.length = harness.renderers.length = 0;
     const s = beginSession();
     const host = viewer.host();
-    const api = createViewer(host, model, () => {});
+    // Community facilities resolve from public/ (the partner day center is
+    // Alhambra's own model; another facility would load here).
+    const api = createViewer(host, model, () => {}, {
+      loadFacility: async (url) =>
+        viewer.schema.validateFacility(
+          JSON.parse(readFileSync(resolve(root, 'public' + url), 'utf8')),
+        ),
+    });
+    await api.community?.ready;
+    for (const s of api.community?.settings ?? [])
+      if (s.facility)
+        assert.ok(
+          api.community.instance(s.id),
+          `${model.id}: community instance ${s.id} is stamped`,
+        );
     const canvas = harness.renderers[0].domElement;
     const scene = viewer.scene;
     assert.ok(scene?.isScene, `${model.id}: first frame renders the scene`);

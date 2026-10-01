@@ -259,7 +259,9 @@ const onDrawnGround = (p) =>
     const [x, z] = toLocal(s, p),
       corridor = laneRadius(s, s.drive.lanes - 1) + LANE / 2 + 2;
     return (
-      (Math.abs(x) <= s.pad.w / 2 + 0.5 && Math.abs(z) <= s.pad.d / 2 + 0.5) ||
+      (Math.abs(x) <= s.pad.w / 2 + 0.5 &&
+        z <= s.pad.d / 2 + 0.5 &&
+        z >= -s.pad.d / 2 - (s.pad.back ?? 0) - 0.5) ||
       (Math.abs(x) <= corridor &&
         z >= frontZ(s) - 0.5 &&
         z <= streetZ(s) + 0.5)
@@ -347,10 +349,13 @@ for (const i of source.interactions) {
       `${i.id} names ${id}`,
     );
 }
-// Nobody stands in anyone else (community cast against itself and the center's cast).
+// Nobody stands in anyone else (community cast against itself, and against
+// the center's cast while on or beside the center's site).
 const groundOrSite = activityData.actors.filter(
   (a) => a.levelId === 'ground' || a.levelId === 'site',
 );
+const nearCenter = (p) =>
+  p.x >= siteX0 - 2 && p.x <= siteX1 + 2 && p.z >= siteZ0 - 2 && p.z <= siteZ1 + 2;
 let samples = 0,
   nearest = Infinity;
 for (let t = 0; t < 720; t += 0.5) {
@@ -370,7 +375,7 @@ for (let t = 0; t < 720; t += 0.5) {
         `${a.id} and ${b.id} are ${d.toFixed(2)} m apart at ${t}s ("${p.title}" / "${q.title}")`,
       );
     }
-    if (a.levelId === 'site' && !p.inVehicle)
+    if (a.levelId === 'site' && !p.inVehicle && nearCenter(p))
       for (const b of groundOrSite) {
         const q = sampleActor(b, t);
         if (q.visible === false) continue;

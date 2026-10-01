@@ -51,6 +51,10 @@ flowchart LR
 - **Build time** (Node): `scripts/build-scenario.mjs` bundles the TypeScript
   modules with Rolldown (already installed with Vite) into `work/sim/`, compiles
   the scenario, validates it and writes the tracks JSON.
+  `scripts/build-community-tracks.mjs` does the same for the people inside
+  facility instances on community pads (`npm run build:community`: cast files
+  in `app/data/community/` → `app/data/community-casts.json`, routed on each
+  instance's own navigation grid; docs/COMMUNITY.md, "Facility instances").
 - **Run time** (browser): `storyActivitySource()` merges the precompiled tracks
   into the base loop. No navigation work happens in the browser.
 - **Composition**: `alhambraSource(model, base)` (`app/model/alhambra-source.ts`)
@@ -344,7 +348,7 @@ Every event is a `TouchpointEvent`:
 | `t`, `clock` | loop seconds and the clock label (`clockLabel`), e.g. `144.93`, `9:36 AM` |
 | `actorId`, `actorLabel`, `role` | the person (one event per person involved) |
 | `kind` | one of the kinds below |
-| `zoneId`, `roomId`, `levelId`, `x`, `z` | where: ground zones by point-in-polygon like the engine, rooms by `model.rooms` polygons (`null` in open areas), the home and partner sites by the source's `zones` (`community:<id>`), `site` for the street and vans |
+| `zoneId`, `roomId`, `levelId`, `x`, `z` | where: ground zones by point-in-polygon like the engine, rooms by `model.rooms` polygons and the rooms of facility instances on community pads (`SourceZone.rooms`, `community:partner-adc/day-open`) (`null` in open areas), the home and partner sites by the source's `zones` (`community:<id>`), `site` for the street and vans |
 | `with` | other actor ids involved (interaction members, the encounter partner, the two staff of a handoff) |
 | `interactionId`, `category`, `title` | the interaction; `title` is also the place name on `enter` and `"RN → PT"` on a handoff |
 | `vehicleId` | the vehicle on `board` / `alight` (named by the vehicle registry's labels in the panel) |
@@ -384,8 +388,8 @@ per participant.
 `npm run sim:report` (or `npm run trace:report` for the trace alone) traces the
 base loop and the story source, both composed as the viewer plays them, at 1 s
 and writes `public/models/touchpoint-trace.json`: `{ sources: { base, story } }`,
-each with a `summary` and one event per line, about 1.6 MB for ~6,200 events
-(203 people in the base loop, 218 in the story), under the 3 MB bound.
+each with a `summary` and one event per line, about 2.3 MB for ~8,100 events
+(220 people in the base loop, 235 in the story), under the 3 MB bound.
 Compactness comes from coalescing encounters, not from short keys. The console
 prints events by kind, participants covered per category and the hero's
 discipline coverage. `npm run validate:trace` recomputes the trace and asserts

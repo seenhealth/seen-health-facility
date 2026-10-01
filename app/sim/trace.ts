@@ -189,9 +189,14 @@ export function traceTouchpoints(
   );
   zoneName.set('site', 'Street & vans');
   const roomsByLevel = new Map<string, Room[]>();
-  for (const r of model.rooms)
-    if (r.kind !== 'shell')
-      roomsByLevel.set(r.levelId, [...(roomsByLevel.get(r.levelId) || []), r]);
+  const addRoom = (levelId: string, r: Room) =>
+    roomsByLevel.set(levelId, [...(roomsByLevel.get(levelId) || []), r]);
+  for (const r of model.rooms) if (r.kind !== 'shell') addRoom(r.levelId, r);
+  // Rooms of facilities stamped on source zones (community pads).
+  const zoneRooms = (source.zones || []).flatMap((z) =>
+    (z.rooms || []).map((r) => [z.levelId, r] as const),
+  );
+  for (const [levelId, r] of zoneRooms) addRoom(levelId, r);
   const actors = source.actors,
     selected = opts.actorIds ? new Set(opts.actorIds) : null,
     included = (id: string) => !selected || selected.has(id);
@@ -239,7 +244,11 @@ export function traceTouchpoints(
     lastRoom.set(a.id, room);
     return { zoneId: f.zoneId, roomId: room?.id ?? null };
   };
-  const roomTitle = new Map(model.rooms.map((r) => [r.id, r.name] as const));
+  const roomTitle = new Map(
+    [...model.rooms, ...zoneRooms.map(([, r]) => r)].map(
+      (r) => [r.id, r.name] as const,
+    ),
+  );
   const placeName = (loc: Location) =>
     (loc.roomId && roomTitle.get(loc.roomId)) ||
     zoneName.get(loc.zoneId) ||

@@ -60,6 +60,8 @@ export type SourceZone = {
   levelId: string;
   polygon: Vec2[];
   color?: string;
+  /** Rooms of a facility drawn inside the zone (a stamped instance), named for the trace. */
+  rooms?: { id: string; name: string; polygon: Vec2[] }[];
 };
 export type Interaction = {
   id: string;

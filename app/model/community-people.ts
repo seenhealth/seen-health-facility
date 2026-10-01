@@ -1,4 +1,3 @@
-import type { Action, CharacterRole } from './characters';
 import type { ActorSpec, Interaction, Segment } from './activity';
 import type { Facility, Vec2 } from './schema';
 import type { SourceExtension } from './sources';
@@ -6,21 +5,29 @@ import { FLEET_VAN_RAMP } from './photo-assets';
 import {
   careSettingById,
   careSettings,
-  groundYAt,
+  COMMUNITY_SOURCE_ID,
+  COMMUNITY_VIEW,
+  instanceRooms,
   padPolygon,
   PAD_Y,
   PORCH_Y,
   settingZone,
-  toLocal,
   type CareSetting,
 } from './community-settings';
 import {
   CENTER_LOT,
   carDoorWorld,
-  communityVehicleById,
   sampleCommunityVehicle,
   vanRampWorld,
 } from './community-vehicles';
+import { CLOCK_END, Track } from './community-track';
+import castFile from '../data/community-casts.json';
+import {
+  fillHoles,
+  placeInstanceCast,
+  type InstanceCasts,
+  type InstanceHole,
+} from './instance-cast';
 
 /**
  * People and touchpoints in the distributed-care settings, on the same 720 s
@@ -29,19 +36,15 @@ import {
  * every track covers 0–720 contiguously: short straight walks on the pads,
  * static poses otherwise, and seats in the community vehicles while riding.
  * Loop seconds throughout: 1 s = 40 clock seconds, 8 AM = 0, 4 PM = 720.
+ *
+ * People inside a facility stamped on a pad come from its generated cast
+ * (app/data/community-casts.json, `npm run build:community`), placed with
+ * the setting (`placeInstanceCast`); hand-authored legs fill the windows a
+ * scheduled person spends off the instance (`HOLE_LEGS`).
  */
-/** Source id of the community layer (`ActorSpec.sourceId` after composition). */
-export const COMMUNITY_SOURCE_ID = 'community';
-/** The filter view the layer adds to the activity panel. */
-export const COMMUNITY_VIEW = {
-  id: 'community',
-  label: 'Homes, pharmacy, hospital & partners',
-};
+export { COMMUNITY_SOURCE_ID, COMMUNITY_VIEW } from './community-settings';
 const VAN = 'van-community';
-const CLOCK_END = 720;
 const VAN_FLOOR = 0.35;
-const seatOf = (vehicleId: string, seat: string) =>
-  communityVehicleById(vehicleId)!.seats[seat];
 /** A follower's polyline: starts `m` metres behind the leader's start, stops `m` short. */
 export function offsetBehind(path: Vec2[], m: number): Vec2[] {
   const [a, b] = path,
@@ -69,8 +72,6 @@ export function offsetBehind(path: Vec2[], m: number): Vec2[] {
   }
   return out;
 }
-const facing = (from: Vec2, to: Vec2) =>
-  Math.atan2(to[0] - from[0], to[1] - from[1]);
 /**
  * A heading in a setting's local frame (0 = facing the front, toward the
  * access road; π = facing the back) turned into the world, so poses follow
@@ -85,154 +86,6 @@ const carDoor = (vehicleId: string, time: number) =>
  * the office chair furthest along the perimeter (largest z, then x).
  */
 const NURSE_LINE_DESK = { zoneId: 'upper-office', assetId: 'upperfit-chair' };
-
-type TrackOptions = {
-  label: string;
-  variant: number;
-  levelId?: string;
-  zoneId: string;
-  /** False for people on a building level, whose height comes from the level. */
-  ground?: boolean;
-  mobility?: 'cane' | 'walker' | 'wheelchair';
-  seated?: boolean;
-  seatId?: string;
-};
-type WalkOptions = {
-  action?: 'walk' | 'roll' | 'escort';
-  title?: string;
-  /** Heights per point (undefined entries fall back to the ground). */
-  ys?: (number | undefined)[];
-  /** Start here instead of the cursor (stepping out of a seat). */
-  from?: Vec2;
-  fromY?: number;
-};
-/** Appends contiguous segments and keeps a cursor so nothing teleports. */
-class Track {
-  private t = 0;
-  private at: Vec2;
-  private y: number | undefined;
-  private heading = 0;
-  readonly segments: Segment[] = [];
-  constructor(
-    readonly id: string,
-    readonly role: CharacterRole,
-    private readonly o: TrackOptions,
-    start: Vec2,
-    y?: number,
-  ) {
-    this.at = start;
-    this.y = y ?? this.groundAt(start);
-  }
-  private push(s: Omit<Segment, 'start' | 'end' | 'zoneId'> & { end: number }) {
-    if (s.end <= this.t)
-      throw new Error(
-        `${this.id}: segment ending ${s.end} does not advance past ${this.t}`,
-      );
-    const { end, ...rest } = s;
-    this.segments.push({ start: this.t, end, zoneId: this.o.zoneId, ...rest });
-    this.t = end;
-  }
-  private groundAt(p: Vec2) {
-    return this.o.ground === false ? undefined : groundYAt(p);
-  }
-  private heights() {
-    return this.y === undefined ? undefined : [this.y, this.y];
-  }
-  /** Stay put doing `action` until `until`. */
-  hold(
-    until: number,
-    action: Action,
-    opts: { title?: string; face?: Vec2; heading?: number; y?: number } = {},
-  ) {
-    if (opts.heading !== undefined) this.heading = opts.heading;
-    else if (opts.face) this.heading = facing(this.at, opts.face);
-    if (opts.y !== undefined) this.y = opts.y;
-    this.push({
-      end: until,
-      action,
-      path: [this.at, this.at],
-      heading: this.heading,
-      heights: this.heights(),
-      title: opts.title,
-    });
-    return this;
-  }
-  /** Out of sight (indoors, in a car) until `until`; may relocate meanwhile. */
-  hidden(until: number, title: string, at?: Vec2, y?: number) {
-    if (at) {
-      this.at = at;
-      this.y = y ?? this.groundAt(at);
-    }
-    this.push({
-      end: until,
-      action: 'idle',
-      path: [this.at, this.at],
-      heading: this.heading,
-      heights: this.heights(),
-      visible: false,
-      title,
-    });
-    return this;
-  }
-  /** Walk from the cursor through `points`; heights follow the ground unless given. */
-  walk(until: number, points: Vec2[], opts: WalkOptions = {}) {
-    if (opts.from) {
-      this.at = opts.from;
-      this.y = opts.fromY ?? this.groundAt(opts.from);
-    }
-    const path = [this.at, ...points];
-    const ys = path.map((p, i) =>
-      i === 0 ? this.y : (opts.ys?.[i - 1] ?? this.groundAt(p)),
-    );
-    const heights = ys.every((v) => v !== undefined)
-      ? (ys as number[])
-      : undefined;
-    this.push({
-      end: until,
-      action: opts.action || 'walk',
-      path,
-      heading: this.heading,
-      heights,
-      title: opts.title,
-    });
-    this.at = path.at(-1)!;
-    this.y = heights?.at(-1);
-    this.heading = facing(path.at(-2)!, path.at(-1)!);
-    return this;
-  }
-  /** Ride in a registered vehicle seat until `until`. */
-  ride(until: number, vehicleId: string, seat: string, title: string) {
-    this.push({
-      end: until,
-      action: 'ride',
-      path: [this.at, this.at],
-      heading: this.heading,
-      heights: this.heights(),
-      vehicleId,
-      seat: seatOf(vehicleId, seat),
-      seatHeading: Math.PI,
-      seated: true,
-      title,
-    });
-    return this;
-  }
-  build(): ActorSpec {
-    if (this.t !== CLOCK_END)
-      throw new Error(`${this.id} ends at ${this.t}, not ${CLOCK_END}`);
-    return {
-      id: this.id,
-      role: this.role,
-      variant: this.o.variant,
-      label: this.o.label,
-      offset: 0,
-      levelId: this.o.levelId || 'site',
-      segments: this.segments,
-      mobility: this.o.mobility,
-      seated: this.o.seated,
-      seatId: this.o.seatId,
-    };
-  }
-}
 
 /** Points around the Seen van at a stop: door sill, ramp foot, the driver's places. */
 function vanStop(time: number) {
@@ -257,12 +110,114 @@ function vanStop(time: number) {
   };
 }
 
+/** Van ramp foot → the home's porch ramp foot: down the drive edge, then a gentle loop in from the south. */
+function homeCrossing(foot: Vec2): Vec2[] {
+  const h = careSettingById('home-lin')!.anchors;
+  return [foot, h.crossA, h.crossB, h.crossC, h.crossD, h.rampFoot];
+}
+/**
+ * Mrs. Wong's trip to the cardiology clinic, 73–374.5 s, appended to a track
+ * that stands at the start of it at 73 s on the porch level: today her porch
+ * chair; once the home is a stamped facility, the front door, where the leg
+ * fills the `away` hole of her generated track (`wongClinicLeg`). Out across
+ * the porch and down the ramp to the Seen van, the visit, the ride home, and
+ * back up the ramp and through `back` (porch-level points) by 374.5 s.
+ */
+export function wongClinicTrip(track: Track, back: Vec2[]): Track {
+  const home = careSettingById('home-lin')!,
+    specialist = careSettingById('specialist')!;
+  const h = home.anchors,
+    c = specialist.anchors;
+  const homeAm = vanStop(10),
+    clinic = vanStop(200),
+    homeNoon = vanStop(400);
+  return track
+    .walk(79, [h.porch, h.rampTop], {
+      title: 'Out to the van',
+      ys: [PORCH_Y, PORCH_Y],
+    })
+    .walk(87, [h.rampFoot], { title: 'Down the new ramp', ys: [PAD_Y] })
+    .walk(105, [...homeCrossing(homeAm.foot)].reverse().slice(1), {
+      title: 'Across to the Seen van',
+    })
+    .walk(108.5, [homeAm.sill], { title: 'Up the van ramp', ys: [VAN_FLOOR] })
+    .ride(181, VAN, 'participant', 'Riding to the cardiology clinic')
+    .walk(184.5, [clinic.foot], {
+      title: 'Down the van ramp',
+      from: clinic.sill,
+      fromY: VAN_FLOOR,
+    })
+    .walk(191, [c.kerb, c.entrance, c.checkInB], { title: 'Into the clinic' })
+    .hold(195, 'greet', { title: 'Checking in', face: c.receptionMa })
+    .walk(206, [c.doorway, c.examIn, c.examSeat], {
+      title: 'To the exam room',
+    })
+    .hold(243, 'seated', {
+      title: 'Cardiology follow-up',
+      heading: rel(specialist),
+    })
+    .walk(254, [c.examIn, c.doorway, c.entrance, c.kerb, clinic.foot], {
+      title: 'Back to the van',
+    })
+    .walk(257.5, [clinic.sill], { title: 'Up the van ramp', ys: [VAN_FLOOR] })
+    .ride(337, VAN, 'participant', 'Riding home')
+    .walk(340.5, [homeNoon.foot], {
+      title: 'Down the van ramp',
+      from: homeNoon.sill,
+      fromY: VAN_FLOOR,
+    })
+    .walk(358.5, homeCrossing(homeNoon.foot).slice(1), { title: 'Home again' })
+    .walk(366.5, [h.rampTop], { title: 'Up the ramp', ys: [PORCH_Y] })
+    .walk(374.5, back, {
+      title: 'Onto the porch',
+      ys: back.map(() => PORCH_Y),
+    });
+}
+/**
+ * The clinic trip as the leg that fills Mrs. Wong's `away` hole (73–374.5 s)
+ * when she is a scheduled person of a stamped home: from the front door at
+ * `hole.from` back to it at `hole.to`.
+ */
+export function wongClinicLeg(hole: InstanceHole, zoneId: string): Segment[] {
+  const h = careSettingById('home-lin')!.anchors;
+  const track = new Track(
+    'home-participant',
+    'participant',
+    {
+      zoneId,
+      label: 'Mrs. Wong',
+      variant: 3,
+      mobility: 'walker',
+      start: hole.start,
+    },
+    hole.from,
+    PORCH_Y,
+  );
+  return wongClinicTrip(track, [h.porch, hole.to]).segmentsTo(hole.end);
+}
+/**
+ * Hand-authored legs for the holes of scheduled people in generated instance
+ * casts, by actor id: each returns the segments from `hole.from` at
+ * `hole.start` to `hole.to` at `hole.end` (instance-cast.ts `fillHoles`), or
+ * nothing to keep the person out of sight. Mrs. Wong's clinic trip is ready
+ * for the day her home is a stamped facility and her track is generated.
+ */
+const HOLE_LEGS: Record<
+  string,
+  (hole: InstanceHole, setting: CareSetting) => Segment[] | undefined
+> = {
+  'home-participant': (hole, s) =>
+    hole.kind === 'away' && hole.start === 73 && hole.end === 374.5
+      ? wongClinicLeg(hole, settingZone(s.id))
+      : undefined,
+};
+const instanceCasts = castFile as unknown as InstanceCasts;
+
 export function communitySource(model: Facility): SourceExtension {
   const home = careSettingById('home-lin')!,
     pharmacy = careSettingById('pharmacy')!,
     hospital = careSettingById('hospital')!,
-    specialist = careSettingById('specialist')!,
-    adc = careSettingById('partner-adc')!;
+    specialist = careSettingById('specialist')!;
   const A = (s: CareSetting) => s.anchors;
   const actors: ActorSpec[] = [],
     interactions: Interaction[] = [];
@@ -290,8 +245,7 @@ export function communitySource(model: Facility): SourceExtension {
   const h = A(home),
     p = A(pharmacy),
     q = A(hospital),
-    c = A(specialist),
-    d = A(adc);
+    c = A(specialist);
   const homeZone = settingZone(home.id);
   // Van stops (the van is parked at each for these moments).
   const homeAm = vanStop(10),
@@ -300,16 +254,7 @@ export function communitySource(model: Facility): SourceExtension {
     hospitalStop = vanStop(560),
     homePm = vanStop(700);
   /** Pad crossing between the van's ramp foot and the porch ramp foot. */
-  /** Van ramp foot → porch ramp foot: down the drive edge, then a gentle loop in from the south. */
-  const crossing = (foot: Vec2): Vec2[] => [
-    foot,
-    h.crossA,
-    h.crossB,
-    h.crossC,
-    h.crossD,
-    h.rampFoot,
-  ];
-  const crossingBack = (foot: Vec2): Vec2[] => [...crossing(foot)].reverse();
+  const crossing = homeCrossing;
 
   // --- The Wongs' home ------------------------------------------------------
   {
@@ -329,47 +274,8 @@ export function communitySource(model: Facility): SourceExtension {
       .hold(73, 'seated', {
         title: 'Personal care & morning medicines',
         heading: rel(home),
-      })
-      .walk(79, [h.porch, h.rampTop], {
-        title: 'Out to the van',
-        ys: [PORCH_Y, PORCH_Y],
-      })
-      .walk(87, [h.rampFoot], { title: 'Down the new ramp', ys: [PAD_Y] })
-      .walk(105, crossingBack(homeAm.foot).slice(1), {
-        title: 'Across to the Seen van',
-      })
-      .walk(108.5, [homeAm.sill], { title: 'Up the van ramp', ys: [VAN_FLOOR] })
-      .ride(181, VAN, 'participant', 'Riding to the cardiology clinic')
-      .walk(184.5, [clinic.foot], {
-        title: 'Down the van ramp',
-        from: clinic.sill,
-        fromY: VAN_FLOOR,
-      })
-      .walk(191, [c.kerb, c.entrance, c.checkInB], { title: 'Into the clinic' })
-      .hold(195, 'greet', { title: 'Checking in', face: c.receptionMa })
-      .walk(206, [c.doorway, c.examIn, c.examSeat], {
-        title: 'To the exam room',
-      })
-      .hold(243, 'seated', {
-        title: 'Cardiology follow-up',
-        heading: rel(specialist),
-      })
-      .walk(254, [c.examIn, c.doorway, c.entrance, c.kerb, clinic.foot], {
-        title: 'Back to the van',
-      })
-      .walk(257.5, [clinic.sill], { title: 'Up the van ramp', ys: [VAN_FLOOR] })
-      .ride(337, VAN, 'participant', 'Riding home')
-      .walk(340.5, [homeNoon.foot], {
-        title: 'Down the van ramp',
-        from: homeNoon.sill,
-        fromY: VAN_FLOOR,
-      })
-      .walk(358.5, crossing(homeNoon.foot).slice(1), { title: 'Home again' })
-      .walk(366.5, [h.rampTop], { title: 'Up the ramp', ys: [PORCH_Y] })
-      .walk(374.5, [h.porch, h.porchSeat], {
-        title: 'Onto the porch',
-        ys: [PORCH_Y, PORCH_Y],
-      })
+      });
+    wongClinicTrip(wong, [h.porch, h.porchSeat])
       .hold(420, 'seated', {
         title: 'Lunch on the porch',
         heading: rel(home),
@@ -1158,181 +1064,6 @@ export function communitySource(model: Facility): SourceExtension {
     );
   }
 
-  // --- Partner adult day center --------------------------------------------
-  {
-    const zone = settingZone(adc.id),
-      opts = { zoneId: zone };
-    const tables = [
-      ['adc-participant-1', d.seatA, d.tcB, 10],
-      ['adc-participant-2', d.seatB, d.tcC, 11],
-      ['adc-participant-3', d.seatC, d.tcE, 12],
-      ['adc-participant-4', d.seatD, d.tcF, 13],
-    ] as const;
-    tables.forEach(([id, seat, tc, variant], i) => {
-      // Face the table: toward the building when seated on its road side.
-      const faceTable = rel(
-        adc,
-        toLocal(adc, seat)[1] > toLocal(adc, d.tableFace)[1] ? Math.PI : 0,
-      );
-      add(
-        new Track(
-          id,
-          'participant',
-          {
-            ...opts,
-            label: `Day center participant ${i + 1}`,
-            variant,
-            mobility: i === 1 ? 'cane' : undefined,
-          },
-          seat,
-        )
-          .hold(170 + i * 2, 'seated', {
-            title: 'Morning coffee on the patio',
-            heading: faceTable,
-          })
-          .walk(180, [tc], { title: 'Out for tai chi' })
-          .hold(247.5, 'tai-chi', {
-            title: 'Morning tai chi',
-            heading: rel(adc, Math.PI),
-          })
-          .walk(262 - i * 2, [seat], { title: 'Back to the tables' })
-          .hold(420, 'tabletop', {
-            title: 'Tabletop games',
-            heading: faceTable,
-          })
-          .hold(CLOCK_END, 'seated', {
-            title: 'Afternoon on the patio',
-            heading: faceTable,
-          }),
-      );
-    });
-    const chairs = [
-      ['adc-participant-5', d.chairE, d.tcA, 14],
-      ['adc-participant-6', d.chairF, d.tcD, 15],
-    ] as const;
-    chairs.forEach(([id, chair, tc, variant], i) => {
-      add(
-        new Track(
-          id,
-          'participant',
-          {
-            ...opts,
-            label: `Day center participant ${i + 5}`,
-            variant,
-            mobility: i ? 'walker' : undefined,
-          },
-          chair,
-        )
-          .hold(172 + i * 3, 'seated', {
-            title: 'Morning coffee on the patio',
-            heading: rel(adc, Math.PI / 2),
-          })
-          .walk(180, [tc], { title: 'Out for tai chi' })
-          .hold(247.5, 'tai-chi', {
-            title: 'Morning tai chi',
-            heading: rel(adc, Math.PI),
-          })
-          .hold(270, 'conversation', {
-            title: 'Meeting the visiting PT',
-            heading: rel(adc, Math.PI / 2),
-          })
-          .hold(360, 'exercise', {
-            title: 'Strength & balance with the Seen PT',
-            heading: rel(adc, Math.PI / 2),
-          })
-          .walk(368 + i * 2, [chair], { title: 'Back to a chair' })
-          .hold(CLOCK_END, 'seated', {
-            title: 'Afternoon on the patio',
-            heading: rel(adc, Math.PI / 2),
-          }),
-      );
-    });
-    const lead = new Track(
-      'adc-lead',
-      'activities',
-      { ...opts, label: 'Day center activities lead', variant: 3 },
-      d.lead,
-    )
-      .hold(180, 'conversation', {
-        title: 'Welcoming the group',
-        heading: rel(adc, Math.PI),
-      })
-      .hold(247.5, 'tai-chi', {
-        title: 'Leading tai chi',
-        heading: rel(adc, Math.PI),
-      })
-      .walk(262, [d.leadTables], { title: 'Setting up the tables' })
-      .hold(420, 'present', { title: 'Tabletop games', heading: rel(adc) })
-      .walk(426, [d.lead], { title: 'Back to the patio front' })
-      .hold(CLOCK_END, 'conversation', {
-        title: 'Afternoon conversation',
-        heading: rel(adc, Math.PI),
-      });
-    add(lead);
-    const pt = new Track(
-      'visiting-pt',
-      'pt',
-      { ...opts, label: 'Visiting Seen physical therapist', variant: 8 },
-      d.sidewalkEnd,
-    )
-      .hidden(190, 'Driving from the center')
-      .walk(247.5, [d.sidewalkPad, d.patioCorner, d.patioEdge, d.ptGreet], {
-        title: 'Arriving at the partner center',
-      })
-      .hold(268, 'greet', {
-        title: 'Catching up with the activities lead',
-        face: d.lead,
-      })
-      .walk(272, [d.ptStand], { title: 'Setting up' })
-      .hold(360, 'exercise', {
-        title: 'Seated strength & balance',
-        heading: rel(adc, -Math.PI / 2),
-      })
-      .walk(420, [d.patioEdge, d.patioCorner, d.sidewalkPad, d.sidewalkEnd], {
-        title: 'Back to the center',
-      })
-      .hidden(CLOCK_END, 'At the center');
-    add(pt);
-    const six = [
-      'adc-participant-1',
-      'adc-participant-2',
-      'adc-participant-3',
-      'adc-participant-4',
-      'adc-participant-5',
-      'adc-participant-6',
-    ];
-    interact(
-      'partner-tai-chi',
-      'partner',
-      zone,
-      ['adc-lead', ...six],
-      180,
-      247.5,
-      'Partner center · morning tai chi',
-      'Six participants follow the activities lead on the patio: the same repertoire as the Seen day room.',
-    );
-    interact(
-      'partner-tabletop',
-      'partner',
-      zone,
-      ['adc-lead', ...six.slice(0, 4)],
-      262,
-      420,
-      'Partner center · tabletop games',
-      'Games at the patio tables after tai chi.',
-    );
-    interact(
-      'partner-pt',
-      'partner',
-      zone,
-      ['visiting-pt', 'adc-participant-5', 'adc-participant-6'],
-      270,
-      360,
-      'Visiting Seen PT · strength & balance',
-      'A Seen physical therapist visits the partner center for a seated strength and balance session with two participants.',
-    );
-  }
-
   // --- The Seen van's driver and the after-hours nurse line -----------------
   {
     const around = (s: ReturnType<typeof vanStop>): Vec2[] => [
@@ -1485,6 +1216,26 @@ export function communitySource(model: Facility): SourceExtension {
     );
   }
 
+  // --- People inside facility instances (generated casts) --------------------
+  const authored = new Set(actors.map((a) => a.id));
+  for (const s of careSettings) {
+    const cast = instanceCasts.casts[s.id];
+    if (!s.facility || !cast) continue;
+    const placed = placeInstanceCast(s, cast);
+    for (const a of placed.actors) {
+      if (authored.has(a.id))
+        throw new Error(
+          `${a.id} is authored here and generated in the ${s.id} cast; keep one`,
+        );
+      const holes = placed.holes[a.id],
+        legs = HOLE_LEGS[a.id];
+      actors.push(
+        holes && legs ? fillHoles(a, holes, (hole) => legs(hole, s)) : a,
+      );
+    }
+    interactions.push(...placed.interactions);
+  }
+
   return {
     id: COMMUNITY_SOURCE_ID,
     description:
@@ -1492,13 +1243,21 @@ export function communitySource(model: Facility): SourceExtension {
     actors,
     interactions,
     views: [COMMUNITY_VIEW],
-    zones: careSettings.map((s) => ({
-      id: settingZone(s.id),
-      name: s.name,
-      levelId: 'site',
-      polygon: padPolygon(s),
-      color: s.accent,
-    })),
+    zones: careSettings.map((s) => {
+      const rooms = instanceRooms(s).map((r) => ({
+        id: r.id,
+        name: `${s.short} · ${r.label ?? r.name}`,
+        polygon: r.polygon,
+      }));
+      return {
+        id: settingZone(s.id),
+        name: s.traceName ?? s.name,
+        levelId: 'site',
+        polygon: padPolygon(s),
+        color: s.accent,
+        ...(rooms.length ? { rooms } : {}),
+      };
+    }),
     evidence: [
       'Distributed-care settings are illustrative pads on the paper ground beyond the ring streets; timings are compressed onto the 720 s care-day clock.',
     ],
