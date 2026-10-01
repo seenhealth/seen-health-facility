@@ -19,10 +19,7 @@ import {
   type ActivitySnapshot,
 } from '../model/activity';
 import { roleNames, roleColors, characterLibrary } from '../model/characters';
-import {
-  vanWindows as siteVanWindows,
-  alhambraVanWindows,
-} from '../model/arrival';
+import { alhambraVanWindows } from '../model/arrival';
 import {
   dayProgram,
   programAt,
@@ -110,7 +107,12 @@ export function ActivityPanel({
 }) {
   const activityData = viewer?.activity.data || alhambraActivityData;
   const siteSpecific = !!activityData.siteSpecific;
-  const vanWindows = siteSpecific ? siteVanWindows : alhambraVanWindows;
+  // Site arrivals carry their own timetable; Alhambra's fleet uses its schedule.
+  const siteArrival = viewer?.activity.arrival;
+  const vanWindows =
+    siteSpecific && siteArrival && 'windows' in siteArrival
+      ? siteArrival.windows
+      : alhambraVanWindows;
   const dayRoomId = activityData.dayRoomId || 'day';
   const views = activityData.views || activityViews;
   const [state, setState] = useState<ActivitySnapshot | null>(null),
