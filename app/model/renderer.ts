@@ -1608,9 +1608,10 @@ export function createViewer(
     if (community) {
       // Like the ring streets, the 3D pads stay out of the flat plan view.
       community.root.visible = state.community !== false && !state.plan;
-      // Pads out to ±130 m receive shadows only while the layer is on screen;
+      // The network's pads receive shadows only while the layer is on screen;
       // otherwise the map keeps its finer building shadows.
-      const extent = context.visible && community.root.visible ? 130 : 65;
+      const extent =
+        context.visible && community.root.visible ? community.shadowExtent : 65;
       if (sun.shadow.camera.right !== extent) {
         Object.assign(sun.shadow.camera, {
           left: -extent,

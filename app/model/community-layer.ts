@@ -2,7 +2,12 @@ import * as T from 'three';
 import type { Facility } from './schema';
 import type { VehicleRegistry } from './activity';
 import { buildArrivalVan, updateArrivalVan } from './arrival';
-import { careSettingById, careSettings, padBounds } from './community-settings';
+import {
+  careSettingById,
+  careSettings,
+  LABEL_PLATE,
+  padBounds,
+} from './community-settings';
 import { buildCareSetting } from './community-pads';
 import {
   buildCommunityVehicleBody,
@@ -12,8 +17,19 @@ import {
   VEHICLE_DECOR,
 } from './community-vehicles';
 
-/** Camera framing: orbit target and orthographic zoom. */
-export type Framing = { target: [number, number, number]; zoom: number };
+/**
+ * Camera framing: orbit target and orthographic zoom, plus the azimuth from
+ * which a setting's front (drive, canopy, lobby) is seen.
+ */
+export type Framing = {
+  target: [number, number, number];
+  zoom: number;
+  azimuth?: number;
+};
+/** Orthographic zoom × metres of extent: five pads and the site ≈ 0.42. */
+const NETWORK_ZOOM = 88;
+/** Orthographic zoom × pad size: a 30 m home pad ≈ 2.2. */
+const PAD_ZOOM = 66;
 /**
  * The distributed-care layer around the center: every setting's pad, the
  * community vehicles (registered with the activity engine so riders sit in
@@ -71,13 +87,58 @@ export function buildCommunityLayer(
       b.object.userData.phase = pose.phase;
     }
   }
-  /** Whole network when no id is given; one setting's pad otherwise. */
+  // World x/z bounds of the whole network: every pad, its label plate and
+  // the center's own site. They drive the network framing and the shadow
+  // camera, so a new registry entry is framed and lit wherever it sits.
+  const [[sx0, sz0], [sx1, sz1]] = model.site.bounds;
+  const bounds = careSettings.reduce(
+    ([[x0, z0], [x1, z1]], s) => {
+      const [[a0, b0], [a1, b1]] = padBounds(s),
+        [lx, lz] = s.anchors.label;
+      return [
+        [
+          Math.min(x0, a0, lx - LABEL_PLATE.w / 2),
+          Math.min(z0, b0, lz - LABEL_PLATE.d / 2),
+        ],
+        [
+          Math.max(x1, a1, lx + LABEL_PLATE.w / 2),
+          Math.max(z1, b1, lz + LABEL_PLATE.d / 2),
+        ],
+      ];
+    },
+    [
+      [sx0, sz0],
+      [sx1, sz1],
+    ],
+  );
+  const [[bx0, bz0], [bx1, bz1]] = bounds;
+  /** Radius around the origin (the sun's target) that the shadows must cover. */
+  const shadowExtent =
+    Math.ceil(
+      Math.max(
+        ...[
+          [bx0, bz0],
+          [bx0, bz1],
+          [bx1, bz0],
+          [bx1, bz1],
+        ].map(([x, z]) => Math.hypot(x, z)),
+      ),
+    ) + 6;
+  /** Whole network when no id is given; one setting's pad, seen from its front, otherwise. */
   function frame(settingId?: string): Framing | null {
-    if (!settingId) return { target: [5, 0, 0], zoom: 0.42 };
+    if (!settingId)
+      return {
+        target: [(bx0 + bx1) / 2, 0, (bz0 + bz1) / 2],
+        zoom: NETWORK_ZOOM / Math.max(bx1 - bx0, bz1 - bz0),
+      };
     const s = careSettingById(settingId);
     if (!s) return null;
     const [[x0, z0], [x1, z1]] = padBounds(s);
-    return { target: [(x0 + x1) / 2, 0, (z0 + z1) / 2], zoom: 2.2 };
+    return {
+      target: [(x0 + x1) / 2, 0, (z0 + z1) / 2],
+      zoom: PAD_ZOOM / Math.max(s.pad.w, s.pad.d),
+      azimuth: s.heading,
+    };
   }
   tick(0);
   return {
@@ -85,6 +146,8 @@ export function buildCommunityLayer(
     tick,
     settings: careSettings,
     frame,
+    bounds,
+    shadowExtent,
     vehicleIds: communityVehicles.map((v) => v.id),
   };
 }
