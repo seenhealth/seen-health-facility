@@ -108,11 +108,18 @@ stands up. Ride segments carry a long, fast nominal path so that, as soon as
 the rider is seated, `sampleEscort` measures its gap inside the ride segment and
 the engine hands the escort over to its own seat. Each van gets a driver
 (`driver-1` … `driver-8`) whose day follows the van's `fleetTimeline`: hidden
-while the van is parked or off site, seated and visible for whole trips and
-while it yields, and at the dock out through the driver's door once it swings
-open (`FLEET_CAB_DOOR`), around the nose, up the ramp ahead of each rider and
-0.9 m behind the rider's party on the way down, a handoff at the foot, then back
-in through the driver's door before departure. Vans C and D, which arrive
+while the van is off site, seated for whole trips (the engine draws people
+seated in a van only while it is at least half opaque, `SEATED_MIN_OPACITY`, so
+they vanish with a van fading at the street end), and at the dock out through
+the driver's door once it swings open (`FLEET_CAB_DOOR`), around the nose, up
+the ramp and in through the sliding-door opening (`FLEET_VAN_SIDE_DOOR`) ahead
+of each rider and 0.9 m behind the rider's party on the way down, a handoff at
+the foot, then back in through the driver's door before departure. Vans A–D
+never park between runs (every drop-off arrival comes in from off site, its
+riders seated as it sets off out of sight); the drivers of vans E (bay) and F
+(curb) wait in the fleet office inside the center, walk out through the
+sliding entrance and across the lot to the parked van, get in through the
+driver's door and, after the run, get out and walk back. Vans C and D, which arrive
 without actors, get two mid-day riders each who walk the base loop's walking
 arrival's ramp, entrance and lobby routes, check in behind the front-desk queue,
 wait in the lobby and ride home on Van A or Van B.

@@ -35,7 +35,7 @@ modules, per-frame placement is implemented four times, and 3D primitives are de
 | Theme | Finding | Where it stands |
 | --- | --- | --- |
 | Measurement | Measure, Trace, the report and the trace validator sampled the raw loop, not the composed source the viewer plays. | Fixed in this PR: one shared composed source feeds the viewer, the panels, the report and validators. |
-| Fleet motion | Tight pull-out arcs and a docking heading snap still made vans pivot; the turn-rate bound could not catch it; delivery trucks snap 45° on departure. | Fixed in this PR: the fleet drives straight runs and arcs of at least 4 m (a short straight reverse out of the drop-off, drivers through the driver's door, fades beyond the street ends), delivery trucks back out and turn on 4.5 m arcs, street cars and the Olympic and Alveare vans drive rounded routes, and `validate:traffic` checks nose-first motion, jumps and a 4 m radius for every vehicle. |
+| Fleet motion | Tight pull-out arcs and a docking heading snap still made vans pivot; the turn-rate bound could not catch it; delivery trucks snap 45° on departure. | Fixed in this PR: the fleet drives straight runs and arcs of at least 4 m (a short straight reverse out of the drop-off, drivers through the driver's door, every drop-off arrival from off site, drivers walking from the fleet office to parked vans, fades over the drawn street's last metres), delivery trucks back out and turn on 4.5 m arcs, street cars and the Olympic and Alveare vans drive rounded routes, and `validate:traffic` checks nose-first motion, jumps and a 4 m radius for every vehicle. |
 | Site coupling | Olympic and Alveare reuse Alhambra's van timetable; a facility without a context style inherits Alhambra's world. | Per-site van timetables fixed in this PR (`app/data/site-arrivals.json`); the general fix is the site registry below. |
 | Exporters | The GLB export scripts patch renderer imports by hand and broke when modules were added. | Fixed in this PR: the exporters bundle the renderer with the Rolldown loader, and `validate:renderer` is a headless smoke and disposal test for every site. |
 | Identity | The story and the community layer each had a "Mrs. Lin"; nothing detects one person in two places. | Renamed in this PR: the community household is the Wongs ("Mrs. Wong · at home", "Mr. Wong", "The Wongs' home"; actor and setting ids unchanged), so the story hero is the only Mrs. Lin. A person registry that detects one person in two places is part of the digital-twin work. |
@@ -178,12 +178,16 @@ feeds). Keep simulation and platform speaking one schema:
   Community people use short straight paths on their pads; there is no outdoor navigation grid. People
   inside a facility stamped on a pad walk on that facility's own navigation grid, and along anchors
   outdoors.
-- **Fleet.** Vans A–E use five back-in bays on the west side of the lot, starting a stall north of the curb
-  island; van F and the two spares park at the west-street curb. Every move is straight runs and arcs of at
-  least 4 m; off-site trips leave through the driveway and down the west street and fade out beyond the
-  drawn street's end. A van leaves the drop-off by backing straight out 3 m, because a forward exit would
-  sweep the entrance ramp's landing. Alhambra's unload windows were shortened to fit the loop; Olympic and
-  Alveare keep their original van timetable, now their own data.
+- **Fleet.** Five back-in bays line the west side of the lot, starting a stall north of the curb island;
+  van F and the two spares park at the west-street curb. Vans A–D never come back to their bays during the
+  day: every drop-off arrival comes in from off site (riders board out of view) and between runs they stay
+  on their rounds, because only the northernmost bay can turn south toward the street. Van E (that bay) and
+  van F (curb) make the neighborhood runs; their drivers walk from the fleet office in the center out to the
+  parked van and back. Every move is straight runs and arcs of at least 4 m; off-site trips leave through
+  the driveway and down the west street and fade out over the drawn street's last metres, the people seated
+  in a van hidden once it is below half opacity. A van leaves the drop-off by backing straight out 3 m,
+  because a forward exit would sweep the entrance ramp's landing. Alhambra's unload windows were shortened
+  to fit the loop; Olympic and Alveare keep their original van timetable, now their own data.
 - **Deliveries.** The trucks keep their nose-in stop at the rear receiving doors and back straight out
   before turning away; they still appear and vanish on the south street east of the yard.
 - **Community timings** were shifted to clear fleet, truck and street-car movements (the van leaves the
@@ -211,8 +215,9 @@ Model details:
 - Keep the ambulance cameo at the hospital, and should the story page show the community layer?
 - Trim the curb island so all eight vans can use bays, or keep two spares at the curb?
 - Move the drop-off dock 3 m west so vans can leave it forward instead of backing out 3 m first?
-- Van E backs into the northernmost bay only while van D's bay is empty, so it makes one long neighborhood
-  run instead of two; is that acceptable?
+- Van E backs into the northernmost bay only while van D's bay is empty, so it was given one long
+  neighborhood run instead of two; now that vans A–D stay on their rounds, van D's bay is always empty.
+  Should van E make two runs again?
 - Should delivery trucks back in to the receiving doors (tailgate at the door) and drive in from and out to
   the ends of the drawn streets with a fade, as the vans do?
 - Should non-Monday rotations be baked into the day-room interaction tracks rather than re-posed at runtime?
