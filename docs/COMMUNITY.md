@@ -97,7 +97,7 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 
 | id | kind | position | services |
 | --- | --- | --- | --- |
-| `home-lin` | home | (−84, 12), two-lane drive | home-care, home-health, pill-packs, meals, home-mods, after-hours |
+| `home-lin` | home | (−84, 12), two-lane drive; the north street extended west for the aide's car | home-care, home-health, pill-packs, meals, home-mods, after-hours |
 | `pharmacy` | pharmacy | (−84, −22) | pill-packs |
 | `hospital` | hospital | (94, 14), stub from the north street, extended east to reach it | ed, discharge |
 | `specialist` | specialist | (84, −56), stub from the south street, extended east to reach it | specialist |
