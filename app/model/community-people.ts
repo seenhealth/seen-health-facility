@@ -490,16 +490,31 @@ export function communitySource(model: Facility): SourceExtension {
       .hold(340.5, 'greet', { title: 'Meeting the van', face: homeNoon.foot })
       .walk(358.5, [h.pcaWalkA, h.pcaWalkB], { title: 'Walking her home' })
       .hold(364, 'greet', { title: 'Up you go', face: h.rampFoot })
+      // Her visit now runs to 1:12 PM (the car leaves at 469 s): she follows
+      // Mrs. Wong up the ramp and in for the indoor care, then walks back to
+      // the car. The instance cast (home-lin.cast.json) details the indoor part.
+      .walk(378, [h.rampFoot, h.rampTop, h.porch, h.door], {
+        title: 'Following her up the ramp',
+        ys: [PAD_Y, PORCH_Y, PORCH_Y, PORCH_Y],
+      })
+      .hidden(446, 'Care visit indoors')
       .walk(
-        393,
+        469,
         [
-          h.pcaBack,
+          h.porch,
+          h.porchStep,
+          h.porchStepFoot,
           h.porchApproach,
           h.padCornerFar,
           h.padCornerNear,
           h.stallStand,
         ],
-        { title: 'Off to the next client' },
+        {
+          title: 'Off to the next client',
+          from: h.door,
+          fromY: PORCH_Y,
+          ys: [PORCH_Y, PORCH_Y],
+        },
       )
       .hidden(CLOCK_END, 'Driving to the next client');
     add(pca);

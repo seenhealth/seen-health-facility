@@ -229,6 +229,58 @@ function depart(
     ...turn,
   ];
 }
+/**
+ * Like `depart` from the outer lane, but pulling round onto the inner lane's
+ * exit leg: the outer arc to `fromDeg`, then a cubic curve tangent to it that
+ * joins the inner exit leg at local z `joinZ`, then the inner leg to the
+ * street. For when the outer exit leg is occupied (the home's stall sits on
+ * it); the curve keeps a ≥ 5 m turn radius and passes the van at the inner
+ * apex and a car in the stall (z 9–13) with ≥ 0.5 m to spare.
+ */
+function departInner(
+  s: CareSetting,
+  startDeg: number,
+  fromDeg: number,
+  joinZ: number,
+  to: Lane,
+): Vec2[] {
+  const r1 = laneRadius(s, 1),
+    r0 = laneRadius(s, 0),
+    cz = frontZ(s) - s.drive.depth,
+    a = (fromDeg * Math.PI) / 180,
+    p0: Vec2 = [r1 * Math.sin(a), cz - r1 * Math.cos(a)],
+    p1: Vec2 = [p0[0] - Math.cos(a) * 7, p0[1] - Math.sin(a) * 7],
+    p3: Vec2 = [-r0, joinZ],
+    p2: Vec2 = [p3[0], p3[1] - 1.5];
+  const at = (t: number): Vec2 => {
+    const u = 1 - t,
+      k = [u * u * u, 3 * u * u * t, 3 * u * t * t, t * t * t];
+    return [0, 1].map(
+      (i) => k[0] * p0[i] + k[1] * p1[i] + k[2] * p2[i] + k[3] * p3[i],
+    ) as Vec2;
+  };
+  // Resample evenly (SAMPLE apart) so the spline through it stays smooth.
+  const dense = Array.from({ length: 401 }, (_, i) => at(i / 400)),
+    curve: Vec2[] = [];
+  let run = 0;
+  for (let i = 1; i < dense.length; i++) {
+    run += Math.hypot(
+      dense[i][0] - dense[i - 1][0],
+      dense[i][1] - dense[i - 1][1],
+    );
+    if (run >= SAMPLE || i === dense.length - 1) {
+      curve.push(toWorld(s, dense[i]));
+      run = 0;
+    }
+  }
+  const turn = turnOutOf(legPoint(s, 0, 'exit', 'street'), outwardOf(s), to);
+  return [
+    ...arcPath(s, 1, startDeg, fromDeg),
+    ...curve,
+    ...straight(curve.at(-1)!, turn[0]).slice(1, -1),
+    ...turn,
+  ];
+}
 /** Apex stop of a lane as a dwell pose. */
 function stop(s: CareSetting, lane: 0 | 1, deg = 0) {
   const p = lanePose(s, lane, deg);
@@ -571,10 +623,12 @@ export const communityVehicles: CommunityVehicle[] = [
         'Arriving for the morning visit',
         { easeIn: false, fade: 'in', post: past(homeStall, 2) },
       ),
-      dwell(28, 394, homeStall, 'Parked in the stall'),
+      // The aide's visit runs to 1:12 PM: the post-clinic toileting, shower,
+      // dressing and lunch set-up happen indoors before she leaves.
+      dwell(28, 469, homeStall, 'Parked in the stall'),
       drive(
-        394,
-        416,
+        469,
+        491,
         [
           ...straight(homeStall.at, homeExitTurn[0]).slice(0, -1),
           ...homeExitTurn,
@@ -625,8 +679,10 @@ export const communityVehicles: CommunityVehicle[] = [
         421,
         451,
         [
-          ...depart(home, 1, 0, W.out),
-          ...zRun(W.out, legAt(home, 1, 'exit')[1] - R - 2, S.out.z! + R),
+          // The aide's car is parked in the stall on the outer exit leg until
+          // 469 s, so the meals car pulls round onto the inner lane's exit.
+          ...departInner(home, 0, -32.5, 10.5, W.out),
+          ...zRun(W.out, legAt(home, 0, 'exit')[1] - R - 2, S.out.z! + R),
           ...corner(W.out, S.out),
           ...xRun(S.out, W.out.x! + R, -30),
           [-25, -33.2],

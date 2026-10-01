@@ -15,8 +15,9 @@
 //
 // The home-lin registry entry stands the house on its pad: the front door
 // within 0.3 m of the `door` anchor, the front wall on the porch slab's back
-// edge, the footprint ≥ 0.1 m from the porch slab and ramp, and the derived
-// pad within the authored size. The ADL cast (app/data/community/
+// edge, the footprint ≥ 0.1 m from the porch slab and ramp and ≥ 1 m from the
+// drive, each room name plate ≥ 80 % clear at its anchor, and the derived pad
+// within the authored size. The ADL cast (app/data/community/
 // home-lin.cast.json) keeps today's actor ids and the contract windows, puts
 // every stop in a drawn room clear of furniture and walls, routes every walk
 // on the instance grid at the person's clearance in the time the gaps allow,
@@ -28,21 +29,32 @@ import { loadSim } from './build-scenario.mjs';
 
 const FILE = process.argv[2] || 'public/models/seen-home-wong.json';
 const CAST = 'app/data/community/home-lin.cast.json';
-const { schema, nav, assets, home, settings, pads, layout, scenario, people } =
-  await loadSim(
-    {
-      schema: 'app/model/schema.ts',
-      nav: 'app/sim/nav.ts',
-      assets: 'app/model/assets.ts',
-      home: 'app/model/home-assets.ts',
-      settings: 'app/model/community-settings.ts',
-      pads: 'app/model/community-pads.ts',
-      layout: 'app/model/site-activity-data.ts',
-      scenario: 'app/sim/scenario.ts',
-      people: 'app/model/community-people.ts',
-    },
-    { dir: 'work/home' },
-  );
+const {
+  schema,
+  nav,
+  assets,
+  home,
+  settings,
+  pads,
+  layout,
+  scenario,
+  people,
+  roomLabels,
+} = await loadSim(
+  {
+    schema: 'app/model/schema.ts',
+    nav: 'app/sim/nav.ts',
+    assets: 'app/model/assets.ts',
+    home: 'app/model/home-assets.ts',
+    settings: 'app/model/community-settings.ts',
+    pads: 'app/model/community-pads.ts',
+    layout: 'app/model/site-activity-data.ts',
+    scenario: 'app/sim/scenario.ts',
+    people: 'app/model/community-people.ts',
+    roomLabels: 'app/model/room-labels.ts',
+  },
+  { dir: 'work/home' },
+);
 const text = readFileSync(FILE, 'utf8');
 const model = schema.validateFacility(JSON.parse(text));
 assert.deepEqual(
@@ -524,6 +536,95 @@ for (const [name, poly] of Object.entries(porchParts)) {
     `Footprint is ${porchGaps[name].toFixed(2)} m from the ${name} (≥ 0.1 m)`,
   );
 }
+// The building stays ≥ 1 m from the drive band and apron (edges every 0.1 m),
+// as the chassis checks it when it stamps the instance.
+const edgeSamples = (poly, step) =>
+  poly.flatMap((a, i) => {
+    const b = poly[(i + 1) % poly.length],
+      n = Math.max(1, Math.ceil(nav.distance(a, b) / step));
+    return Array.from({ length: n }, (_, k) => [
+      a[0] + ((b[0] - a[0]) * k) / n,
+      a[1] + ((b[1] - a[1]) * k) / n,
+    ]);
+  });
+const pavingClearance = (p, max) => {
+  for (let r = 0; r <= max + 1e-9; r += 0.05)
+    for (let k = 0; k < (r ? 24 : 1); k++) {
+      const a = (k / 24) * Math.PI * 2,
+        q = [p[0] + Math.sin(a) * r, p[1] + Math.cos(a) * r];
+      if (settings.isPaved(setting, settings.toWorld(setting, q))) return r;
+    }
+  return Infinity;
+};
+const paving = Math.min(
+  ...footprint.flatMap((poly) =>
+    edgeSamples(poly, 0.1).map((p) => pavingClearance(p, 3)),
+  ),
+);
+check(
+  paving >= 1,
+  `The building is ${paving.toFixed(2)} m from the drive (≥ 1 m)`,
+);
+// Room name plates: the instance lays a world-aligned 3.6 × 0.7 m plate at
+// each labelled room's label anchor; most of it must lie in the room, clear of
+// furniture 0.25 m or taller that would hide it from above.
+const PLATE = { w: 3.6, d: 0.7 },
+  plateTurn = setting.heading + cfg.frame.heading;
+const plateClear = (room) => {
+  const anchor = roomLabels.roomLabelAnchor(room),
+    c = Math.cos(plateTurn),
+    s = Math.sin(plateTurn);
+  const tall = model.objects
+    .filter(
+      (o) =>
+        model.assets[o.assetId].dimensions[1] * (o.scale?.[1] ?? 1) >= 0.25,
+    )
+    .map((o) => ({
+      o,
+      boxes: o.navigationFootprints || [
+        [
+          0,
+          0,
+          model.assets[o.assetId].dimensions[0] * (o.scale?.[0] ?? 1),
+          model.assets[o.assetId].dimensions[2] * (o.scale?.[2] ?? 1),
+        ],
+      ],
+    }));
+  const hidden = (p) =>
+    tall.some(({ o, boxes }) => {
+      const dx = p[0] - o.position[0],
+        dz = p[1] - o.position[2],
+        x = Math.cos(o.rotation) * dx - Math.sin(o.rotation) * dz,
+        z = Math.sin(o.rotation) * dx + Math.cos(o.rotation) * dz;
+      return boxes.some(
+        ([bx, bz, w, d]) =>
+          Math.abs(x - bx) < w / 2 + 0.05 && Math.abs(z - bz) < d / 2 + 0.05,
+      );
+    });
+  let clear = 0,
+    all = 0;
+  for (let i = 0; i <= 12; i++)
+    for (let j = 0; j <= 4; j++) {
+      const wx = (i / 12 - 0.5) * PLATE.w,
+        wz = (j / 4 - 0.5) * PLATE.d,
+        p = [anchor[0] + wx * c - wz * s, anchor[1] + wx * s + wz * c];
+      all++;
+      if (nav.insidePolygon(p, room.polygon) && !hidden(p)) clear++;
+    }
+  return clear / all;
+};
+const plates = Object.keys(
+  typeof cfg.labels === 'object' ? cfg.labels : {},
+).map((id) => {
+  const room = model.rooms.find((r) => r.id === id);
+  assert(room, `Plate for ${id}, which is not a room`);
+  const clear = plateClear(room);
+  check(
+    clear >= 0.8,
+    `The ${id} plate is only ${Math.round(clear * 100)} % clear at its anchor (≥ 80 %)`,
+  );
+  return `${id.replace(/^home-/, '')} ${Math.round(clear * 100)} %`;
+});
 // Pad derivation preview (SPEC-facility-instance §5.2): the front stays put.
 const margin = cfg.margin ?? 1.6;
 const fx = footprint.flat().map((p) => p[0]),
@@ -868,6 +969,6 @@ console.log(
     `Every room reachable from the front door: ${reach.wheelchair} cells at wheelchair and ${reach.walker} at walker clearance ` +
     `(grid ${grid.nx}×${grid.nz}, ${grid.buildMs} ms). ` +
     `${Object.keys(model.assets).length} assets build; home kinds ${[...builtKinds].join(', ')} at their declared size; ${used.size} materials, all defined.\n` +
-    `Registry: front door ${doorOffset.toFixed(2)} m from the door anchor, front wall on the porch's back edge, footprint ${porchGaps['porch slab'].toFixed(2)} m from the porch slab and ${porchGaps.ramp.toFixed(2)} m from the ramp; derived pad ${need.w.toFixed(1)} m wide with back ${need.back.toFixed(2)} m (authored ${setting.pad.back}).\n` +
+    `Registry: front door ${doorOffset.toFixed(2)} m from the door anchor, front wall on the porch's back edge, footprint ${porchGaps['porch slab'].toFixed(2)} m from the porch slab and ${porchGaps.ramp.toFixed(2)} m from the ramp, ${Number.isFinite(paving) ? paving.toFixed(2) + ' m' : 'over 3 m'} from the drive; plates clear ${plates.join(', ')}; derived pad ${need.w.toFixed(1)} m wide with back ${need.back.toFixed(2)} m (authored ${setting.pad.back}).\n` +
     `Cast: ${cast.people.length} people, ${cast.people.reduce((n, p) => n + p.stops.length, 0)} stops, ${walks} walks routed at each person's clearance (fastest ${fastest.text}, ${(fastest.ratio * 100).toFixed(0)} % of its limit), ${interactions.size} interactions; nearest pair ${nearest.d.toFixed(2)} m (${nearest.text}).`,
 );
