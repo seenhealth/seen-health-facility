@@ -1,8 +1,12 @@
 // Fleet crew choreography: drivers seated while their van moves, riders seated
 // only in a visible van (and hidden by the engine while it fades below
-// SEATED_MIN_OPACITY), cabin walks and ramp escorts continuous, the driver
-// close behind each rider's party on the ramp, and the new lobby waits clear of
-// walls. Runs over the base loop and the story source, as the viewer plays them.
+// SEATED_MIN_OPACITY), no person becoming visible (or vanishing) while seated
+// in a vehicle in view (every arrival comes in from off site; the drivers of
+// the vans parked on the lot walk to and from the fleet office and in and out
+// through the driver's door), cabin walks and ramp escorts continuous, the
+// driver close behind each rider's party on the ramp, and the new lobby waits
+// clear of walls. Runs over the base loop and the story source, as the viewer
+// plays them.
 //
 //   npm run validate:fleet
 import assert from 'node:assert/strict';
@@ -10,8 +14,9 @@ import { readFileSync } from 'node:fs';
 import * as T from 'three';
 import { loadSim } from './build-scenario.mjs';
 
-const { sim, activity, crew, story, deliveries, fleet, body } = await loadSim({
+const { sim, activity, crew, story, deliveries, fleet, body, arrival } = await loadSim({
   sim: 'app/sim/index.ts',
+  arrival: 'app/model/arrival.ts',
   activity: 'app/model/activity.ts',
   crew: 'app/model/fleet-crew.ts',
   story: 'app/sim/story-source.ts',
@@ -51,6 +56,18 @@ const vehicle = (id, t) => {
   const d = deliveries.deliveryStops.findIndex((s) => s.id === id);
   return d >= 0 ? deliveries.sampleDelivery(d, t) : null;
 };
+// Every arrival at the drop-off sets off from off site, so its riders take
+// their seats out of view.
+let arrivals = 0;
+for (const v of vanIds.keys())
+  for (const s of fleet.fleetTimeline(v, arrival.alhambraVanWindows))
+    if (s.trip === 'toDock') {
+      arrivals++;
+      assert.equal(sim.sampleVan(v, s.start).visible, false, `${fleet.fleetVanLabel(v)} sets off for the drop-off at ${s.start} in view`);
+    }
+assert.ok(arrivals >= 6, `the fleet makes its drop-off arrivals (${arrivals})`);
+/** A van standing in its bay or at the curb (parked, or yielding the driveway). */
+const standing = (van) => /^(Parked|Yielding)/.test(van.phase);
 const vanSpeed = (v, t) => {
   const a = sim.sampleVan(v, t),
     b = sim.sampleVan(v, t + 0.02);
@@ -73,7 +90,7 @@ const sources = [
   ['base loop', crew.withFleetCrew(activity.activityData)],
   ['story', crew.withFleetCrew(story.storyActivitySource().source)],
 ];
-const totals = { actors: 0, drivers: 0, riders: 0, rampEscorts: 0, samples: 0, fadeHidden: 0 };
+const totals = { actors: 0, drivers: 0, riders: 0, rampEscorts: 0, samples: 0, fadeHidden: 0, outOfView: 0, officeWalks: 0 };
 /**
  * Moments when a fleet van is drawn see-through (fading in or out at the end
  * of the street), every 0.05 s. The engine itself is checked at these times:
@@ -89,7 +106,8 @@ for (let k = 0; k < DURATION / 0.05; k++) {
     fadeTimes.push(t);
 }
 assert.ok(fadeTimes.length > 100, `the fleet fades in and out during the day (${fadeTimes.length} samples)`);
-let driverDoorCrossings = 0;
+let driverDoorCrossings = 0,
+  officeGap = Infinity;
 for (const [name, source] of sources) {
   const byId = new Map(source.actors.map((a) => [a.id, a]));
   assert.equal(new Set(source.actors.map((a) => a.id)).size, source.actors.length, `${name}: unique ids`);
@@ -136,8 +154,26 @@ for (const [name, source] of sources) {
         const van = vehicle(f.seatedIn, tt);
         // Riders are seated only while their van is visible (the engine hides them otherwise) …
         if (f.visible !== false) assert.ok(van.visible, `${name}: ${id} visibly seated in an invisible ${f.seatedIn} at ${tt}`);
-        // … and never shown sitting in a van parked in its bay.
-        if (f.visible !== false && van.phase.startsWith('Parked')) seatedInParked.push(`${id}@${tt}`);
+        // … and never shown sitting in a van that stands in its bay (its
+        // driver walks in through the driver's door just before it pulls out).
+        if (f.visible !== false && standing(van) && a.role !== 'driver') seatedInParked.push(`${id}@${tt}`);
+      }
+      // No person becomes visible (or vanishes) while seated in a vehicle in
+      // view, parked or not: riders are picked up while their van is out of
+      // sight before its arrival and dropped off once it has faded out after
+      // its departure; drivers take the wheel of an arrival out of sight and
+      // walk in and out of a parked van through the driver's door.
+      if (p && t > 0 && (f.visible !== false) !== (p.visible !== false)) {
+        const appears = f.visible !== false,
+          seat = appears ? f.seatedIn : p.seatedIn,
+          van = seat && vehicle(seat, appears ? (tt - dt + DURATION) % DURATION : tt);
+        if (seat) {
+          assert.ok(
+            !activity.seatsShown(van),
+            `${name}: ${id} ${appears ? 'becomes visible' : 'vanishes'} while seated in ${seat}, which is in view (${van.phase}) at ${tt.toFixed(2)} ("${p.title}" → "${f.title}")`,
+          );
+          totals.outOfView++;
+        }
       }
       // People inside a van's footprint while it moves must be seated in it.
       if (f.visible !== false && !f.seatedIn && a.levelId !== 'upper')
@@ -195,7 +231,38 @@ for (const [name, source] of sources) {
       cabSide.set(d.id, local);
     }
   }
-  assert.deepEqual(seatedInParked.slice(0, 3), [], `${name}: nobody sits in a van parked in its bay`);
+  assert.deepEqual(seatedInParked.slice(0, 3), [], `${name}: no rider sits in a van standing in its bay`);
+  // Drivers of the vans that park on the lot between runs come from the fleet
+  // office in the center: before each pull-out from a bay or curb spot they
+  // are seen walking up and getting in (never popping into the cab), after
+  // each return getting out and walking off, and on those walks they keep
+  // clear of everyone else in view.
+  const people = source.actors.filter((x) => ['ground', 'site'].includes(x.levelId));
+  for (const d of drivers) {
+    const v = vanIds.indexOf(d.segments.find((s) => vanIds.includes(s.vehicleId)).vehicleId);
+    for (const s of fleet.fleetTimeline(v, arrival.alhambraVanWindows)) {
+      if (s.trip !== 'out' && s.trip !== 'home') continue;
+      const [from, to] = s.trip === 'out' ? [s.start - 8, s.start] : [s.end, s.end + 8];
+      for (let t = from; t <= to; t += 0.1)
+        assert.ok(place(source, byId, d, t).visible !== false, `${name}: ${d.id} is out of sight at ${t.toFixed(1)}, ${s.trip === 'out' ? 'before' : 'after'} ${vanIds[v]}'s ${s.trip === 'out' ? 'pull-out at ' + s.start.toFixed(1) : 'return at ' + s.end.toFixed(1)}`);
+      assert.ok(!place(source, byId, d, from).seatedIn === (s.trip === 'out'), `${name}: ${d.id} ${s.trip === 'out' ? 'walks up to' : 'gets out of'} ${vanIds[v]} around ${s.trip === 'out' ? s.start : s.end}`);
+      totals.officeWalks++;
+    }
+    for (const seg of d.segments) {
+      if (!['Out to the van', 'Back to the fleet office'].includes(seg.title)) continue;
+      for (let t = seg.start; t <= seg.end; t += 0.1) {
+        const me = place(source, byId, d, t);
+        for (const o of people) {
+          if (o === d) continue;
+          const q = place(source, byId, o, t);
+          if (q.visible === false) continue;
+          const gap = Math.hypot(q.x - me.x, q.z - me.z);
+          assert.ok(gap >= 0.6, `${name}: ${d.id} passes ${gap.toFixed(2)} m from ${o.id} at ${t.toFixed(1)} ("${seg.title}" / "${q.title}")`);
+          officeGap = Math.min(officeGap, gap);
+        }
+      }
+    }
+  }
   // The engine draws nobody seated in a van that has faded below
   // SEATED_MIN_OPACITY (characters share materials, so they cannot fade with
   // it), and still draws its riders once it is solid enough.
@@ -268,5 +335,5 @@ for (const [name, source] of sources) {
   console.log(`${name}: ${source.actors.length} actors, ${drivers.length} drivers, ${crewIds.length - drivers.length} riders seated.`);
 }
 console.log(
-  `Fleet crew: ${totals.rampEscorts} ramp descents escorted by the driver, ${driverDoorCrossings} cab-door passages through the open driver's door, ${totals.fadeHidden} seated people hidden by the engine in vans below ${activity.SEATED_MIN_OPACITY} opacity, ${totals.samples.toLocaleString()} placement samples; cabin walks, seat visibility, driver-in-cab and wall clearance passed.`,
+  `Fleet crew: ${arrivals} drop-off arrivals set off out of sight, ${totals.outOfView} seated people appearing or vanishing only with their van out of sight, ${totals.officeWalks} driver walks between the fleet office and a parked van (nearest person ${officeGap.toFixed(2)} m), ${totals.rampEscorts} ramp descents escorted by the driver, ${driverDoorCrossings} cab-door passages through the open driver's door, ${totals.fadeHidden} seated people hidden by the engine in vans below ${activity.SEATED_MIN_OPACITY} opacity, ${totals.samples.toLocaleString()} placement samples; cabin walks, seat visibility, driver-in-cab and wall clearance passed.`,
 );

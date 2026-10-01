@@ -25,7 +25,10 @@ import { vehicleGap } from './vehicle-clearance';
  * `tripNeeds`). Vans leave the map along the west street and fade out over
  * its last metres, short of the end of the drawn street (`STREET_EXTENT`), so
  * a fading van never hangs over bare ground; they come back the same way.
- * Times are loop seconds (1 s = 40 clock seconds, 8 AM = 0).
+ * Every drop-off arrival comes in from off site, so riders are picked up out
+ * of view, and between runs the timetabled vans stay on their rounds instead
+ * of parking (see `fleetPlan`). Times are loop seconds (1 s = 40 clock
+ * seconds, 8 AM = 0).
  */
 
 // ---------------------------------------------------------------------------
@@ -228,22 +231,6 @@ const awayPose = (index: number) => ({
 });
 
 export const fleetRoutes = {
-  /** Bay → drop-off: straight out past the bay noses, left onto the aisle, then the swing-in. */
-  bayToDock(index: number): FleetLeg[] {
-    const b = fleetParking[index],
-      aisleX = aisleOf(index),
-      pen = new Pen(b.x, b.z, EAST);
-    if (b.z + R > swingFrom(aisleX).startZ + 1e-6)
-      throw new Error(
-        `Bay ${index} is too far north for the drop-off swing-in`,
-      );
-    return [
-      leg(pen, 'bay-out', 'Pulling out of assigned bay', LOT, (p) =>
-        p.lineToX(aisleX - R).arc(R, -Math.PI / 2),
-      ),
-      ...laneToDock(pen),
-    ];
-  },
   /** Back straight out of the drop-off (the van is nosed against the entrance ramp). */
   dockReverse(): FleetLeg[] {
     const pen = new Pen(L.dock[0], L.dock[1], WEST);
@@ -560,11 +547,9 @@ const pause = (seconds: number, phase: string, visible = true): Move => ({
   visible,
 });
 const r = fleetRoutes;
-function buildMoves(kind: FleetTripKind, index: number, from: Place): Move[] {
-  if (kind === 'toDock')
-    return from === 'bay'
-      ? [drive(r.bayToDock(index))]
-      : [drive(r.awayToDock(), false, true)];
+function buildMoves(kind: FleetTripKind, index: number): Move[] {
+  // Drop-off arrivals always come in from off site, where the riders board.
+  if (kind === 'toDock') return [drive(r.awayToDock(), false, true)];
   if (kind === 'fromDock')
     return [
       drive(r.dockReverse(), true, true, true),
@@ -579,12 +564,12 @@ function buildMoves(kind: FleetTripKind, index: number, from: Place): Move[] {
     drive(r.backIn(index), true, true, true),
   ];
 }
-/** A trip's moves depend only on its kind, van and origin: build each set once. */
+/** A trip's moves depend only on its kind and van: build each set once. */
 const movesCache = new Map<string, Move[]>();
-function tripMoves(kind: FleetTripKind, index: number, from: Place): Move[] {
-  const key = `${kind}:${index}:${from}`;
+function tripMoves(kind: FleetTripKind, index: number): Move[] {
+  const key = `${kind}:${index}`;
   let moves = movesCache.get(key);
-  if (!moves) movesCache.set(key, (moves = buildMoves(kind, index, from)));
+  if (!moves) movesCache.set(key, (moves = buildMoves(kind, index)));
   return moves;
 }
 const naturalSeconds = (moves: Move[]) =>
@@ -597,8 +582,8 @@ const driveSeconds = (moves: Move[]) =>
 /** Fastest a timetabled trip may be squeezed (× nominal speeds) before a departure runs over its window. */
 const MAX_RATE = 1.25;
 /**
- * Fit a trip to a timetable window. Arrivals end on time (the van waits
- * first if the window is generous); departures start on time and finish
+ * Fit a trip to a timetable window. Arrivals end on time (the van waits off
+ * site first if the window is generous); departures start on time and finish
  * early, or run over the window end if even MAX_RATE would not fit.
  */
 function fitTrip(
@@ -608,7 +593,7 @@ function fitTrip(
   [a, b]: number[],
   awayPhase: string,
 ): Trip {
-  const moves = tripMoves(kind, van, from),
+  const moves = tripMoves(kind, van),
     natural = naturalSeconds(moves),
     driving = driveSeconds(moves),
     to: Place = kind === 'toDock' ? 'dock' : kind === 'home' ? 'bay' : 'away';
@@ -622,14 +607,7 @@ function fitTrip(
       start: a,
       end: b,
       rate: 1,
-      moves: [
-        pause(
-          wait,
-          from === 'bay' ? 'Ready to leave · driver aboard' : awayPhase,
-          from === 'bay',
-        ),
-        ...moves,
-      ],
+      moves: [pause(wait, awayPhase, false), ...moves],
     };
   }
   const rate = driving / (b - a - (natural - driving));
@@ -733,7 +711,7 @@ function tripNeeds(trip: Trip): Need[] {
   byKey.set(key, needs);
   return needs;
 }
-/** Seconds a trip spends at its origin before it moves (a timetabled van waiting in its bay). */
+/** Seconds a trip spends at its origin before it moves (an arrival held off site until its window). */
 const waitAtStart = (trip: Trip) =>
   trip.moves[0].kind === 'pause' ? trip.moves[0].seconds : 0;
 /** Where a van stands over the day (between its trips), as intervals within 0..720. */
@@ -776,7 +754,7 @@ function neighbourConflict(trips: Trip[][]): string | null {
 }
 
 // ---------------------------------------------------------------------------
-// The day plan: timetabled trips, then returns to the bays and scheduled runs
+// The day plan: timetabled trips, then the neighborhood runs around them
 // ---------------------------------------------------------------------------
 export type FleetReservation = {
   van: number;
@@ -787,17 +765,15 @@ export type FleetReservation = {
 /**
  * Neighborhood runs by the vans without a timetable: out from the bay or
  * curb at `requested` (or the first clear moment after it), back after at
- * least `away` s. Van E backs into the northernmost bay, which it can do only
- * while van D's bay beside it is empty, so it makes one long morning round
- * and is home while D is out; van F at the curb makes two short ones.
+ * least `away` s. Van E makes one long morning round from the northernmost
+ * bay (the only bay with room to turn south toward the street; it backs in
+ * only beside an empty bay), van F two short ones from the west curb.
  */
 const NEIGHBORHOOD_RUNS = [
   { van: 4, requested: 304, away: 100 },
-  { van: 5, requested: 20, away: 20 },
+  { van: 5, requested: 24, away: 20 },
   { van: 5, requested: 520, away: 20 },
 ];
-/** Minimum time off site before a van that took riders away comes back to its bay. */
-const HOME_AFTER = 8;
 /** Driveway clearance between consecutive maneuvers on the lot. */
 const DRIVEWAY_GAP = 4;
 type FleetPlan = { trips: Trip[][]; reservations: FleetReservation[] };
@@ -810,49 +786,20 @@ type Booking = {
   awayPhase: string;
 };
 const planCache = new WeakMap<Window[], FleetPlan>();
-/** Orders in which to try the returns home (the first that books cleanly wins). */
-function* orders<X>(items: X[]): Generator<X[]> {
-  if (items.length < 2) {
-    yield items;
-    return;
-  }
-  for (const [i, item] of items.entries())
-    for (const rest of orders(items.filter((_, j) => j !== i)))
-      yield [item, ...rest];
-}
+/**
+ * The day plan. Every arrival at the drop-off comes in from off site, so its
+ * riders board out of view, and between runs (from a departure to the next
+ * arrival, round the clock) a timetabled van stays on its rounds instead of
+ * coming home: a parked van could only reach the street by turning south out
+ * of its bay, which sweeps the bay north of it and, from all but the
+ * northernmost bay, runs into the curb island at the end of the aisle.
+ */
 function fleetPlan(windows: Window[]): FleetPlan {
   const cached = planCache.get(windows);
   if (cached) return cached;
-  // Timetabled vans go home to their bays after their last departure of the
-  // day; a departure that runs over the end of the day comes home next
-  // morning. Returns are tried in every order until one fits around the
-  // parked neighbours (a van backs in only beside an empty bay).
-  const timetabled = timetabledTrips(windows);
-  const homes = windows.map((_, van): Booking => {
-    const list = timetabled.trips[van],
-      last = list.filter((t) => t.kind === 'fromDock').at(-1)!,
-      first = list.reduce((m, t) => Math.min(m, t.start), FLEET_LOOP),
-      wraps = last.end > FLEET_LOOP - 30;
-    return {
-      van,
-      kind: 'home',
-      from: 'away',
-      requested: last.end + HOME_AFTER - (wraps ? FLEET_LOOP : 0),
-      deadline: wraps ? first : FLEET_LOOP,
-      awayPhase: last.awayPhase,
-    };
-  });
-  const failures = new Set<string>();
-  for (const order of orders(homes)) {
-    try {
-      const plan = bookDay(timetabledTrips(windows), order);
-      planCache.set(windows, plan);
-      return plan;
-    } catch (error) {
-      failures.add(error instanceof Error ? error.message : String(error));
-    }
-  }
-  throw new Error(`No fleet day plan fits:\n${[...failures].join('\n')}`);
+  const plan = bookDay(timetabledTrips(windows));
+  planCache.set(windows, plan);
+  return plan;
 }
 /** The trips fixed by the passenger timetable; their windows reserve the driveway for their whole span. */
 function timetabledTrips(windows: Window[]): FleetPlan {
@@ -860,7 +807,15 @@ function timetabledTrips(windows: Window[]): FleetPlan {
   const reservations: FleetReservation[] = [];
   windows.forEach((w, van) => {
     const add = (trip: Trip) => trips[van].push(trip);
-    add(fitTrip(van, 'toDock', 'bay', w.inbound, ''));
+    add(
+      fitTrip(
+        van,
+        'toDock',
+        'away',
+        w.inbound,
+        'Off site · picking up participants',
+      ),
+    );
     add(
       fitTrip(
         van,
@@ -901,8 +856,8 @@ function timetabledTrips(windows: Window[]): FleetPlan {
   });
   return { trips, reservations };
 }
-/** Book the returns (in the given order) and the neighborhood runs around the timetable. */
-function bookDay(plan: FleetPlan, homes: Booking[]): FleetPlan {
+/** Book the neighborhood runs around the timetable. */
+function bookDay(plan: FleetPlan): FleetPlan {
   const { trips, reservations } = plan;
   const busy = (van: number, a: number, b: number) =>
     trips[van].some((t) =>
@@ -923,7 +878,7 @@ function bookDay(plan: FleetPlan, homes: Booking[]): FleetPlan {
     deadline,
     awayPhase,
   }: Booking) => {
-    const moves = tripMoves(kind, van, from),
+    const moves = tripMoves(kind, van),
       seconds = naturalSeconds(moves);
     for (let start = requested; start + seconds <= deadline; start += 0.5) {
       const trip: Trip = {
@@ -953,7 +908,6 @@ function bookDay(plan: FleetPlan, homes: Booking[]): FleetPlan {
       `No clear slot for van ${van} (${kind}) between ${requested} and ${deadline}`,
     );
   };
-  for (const home of homes) book(home);
   for (const run of NEIGHBORHOOD_RUNS) {
     const out = book({
       van: run.van,
@@ -975,6 +929,16 @@ function bookDay(plan: FleetPlan, homes: Booking[]): FleetPlan {
   const conflict = neighbourConflict(trips);
   if (conflict) throw new Error(`Fleet timetable: ${conflict}`);
   for (const list of trips) list.sort((a, b) => a.start - b.start);
+  // Every trip starts where the van's previous trip, round the clock, left it.
+  trips.forEach((list, van) =>
+    list.forEach((t, i) => {
+      const before = list.at(i - 1)!;
+      if (before !== t && before.to !== t.from)
+        throw new Error(
+          `Fleet timetable: van ${van} starts a ${t.kind} trip at ${t.start.toFixed(1)} from its ${t.from}, but its ${before.kind} trip left it at the ${before.to}`,
+        );
+    }),
+  );
   reservations.sort((a, b) => a.start - b.start);
   return { trips, reservations };
 }
@@ -1053,9 +1017,10 @@ export type FleetSample = {
   cabDoor: number;
 };
 /**
- * The driver's door while docked (seconds from docking and to departure): it
- * swings open as the driver gets out and shuts behind them, and again for the
- * return to the cab. fleet-crew.ts times the driver's steps to these values.
+ * The driver's door while docked or parked (seconds from stopping and to the
+ * next departure): it swings open as the driver gets out and shuts behind
+ * them, and again for the return to the cab. fleet-crew.ts times the driver's
+ * steps to these values.
  */
 export const FLEET_CAB_DOOR = {
   swing: 0.5,
@@ -1171,7 +1136,17 @@ export function sampleFleetVan(
   if (!last || last.to === 'bay') {
     if (next && next.from === 'bay' && next.requested <= t)
       return { ...parked, phase: 'Yielding to driveway traffic' };
-    return parked;
+    // The driver's door opens for the driver getting out after a run and
+    // getting in before the next one (fleet-crew.ts walks them to and from
+    // the fleet office), as at the drop-off.
+    return {
+      ...parked,
+      cabDoor: cabDoorAt(
+        t,
+        last?.kind === 'home' ? endOnClock(last) : -Infinity,
+        next?.from === 'bay' ? next.requested : Infinity,
+      ),
+    };
   }
   if (last.to === 'away') return awaySample(index, parked, last.awayPhase);
   // Docked at the drop-off until the next trip leaves.
