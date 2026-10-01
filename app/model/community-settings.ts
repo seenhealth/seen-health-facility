@@ -216,14 +216,31 @@ export function padBounds(
 }
 
 type Draft = Omit<CareSetting, 'anchors'> & { local: Record<string, Vec2> };
+/** Label plate size (world x × z), drawn by community-pads.ts. */
+export const LABEL_PLATE = { w: 14.2, d: 2.6 };
+/**
+ * The label plate sits just past the pad's viewer-facing (max z) edge. When
+ * the access stub leaves through that edge, the plate moves beside the stub
+ * on its exit-leg side (the sidewalk runs along the entry leg).
+ */
+function labelAnchor(s: Omit<CareSetting, 'anchors'>): Vec2 {
+  const [[minX], [maxX, maxZ]] = padBounds(s),
+    z = maxZ + LABEL_PLATE.d,
+    { from, to } = s.road,
+    alongZ = Math.abs(to[1] - from[1]) > Math.abs(to[0] - from[0]),
+    crosses = alongZ && Math.max(from[1], to[1]) > maxZ;
+  if (!crosses) return [(minX + maxX) / 2, z];
+  const half = laneRadius(s as CareSetting, (s.drive.lanes - 1) as 0 | 1) + LANE / 2,
+    side = Math.sign(worldDir(s, [-1, 0])[0]) || -1;
+  return [to[0] + side * (half + 0.6 + LABEL_PLATE.w / 2), z];
+}
 const define = (d: Draft): CareSetting => {
   const { local, ...rest } = d;
   const anchors = Object.fromEntries(
     Object.entries(local).map(([k, p]) => [k, toWorld(rest, p)]),
   );
-  // The label plate sits just past the pad's viewer-facing edge.
   const [[minX, minZ], [maxX, maxZ]] = padBounds(rest);
-  anchors.label ??= [(minX + maxX) / 2, maxZ + 2.6];
+  anchors.label ??= labelAnchor(rest);
   anchors.padMin = [minX, minZ];
   anchors.padMax = [maxX, maxZ];
   return { ...rest, anchors };
