@@ -223,8 +223,8 @@ disappears (`visible: false` off duty); `exit` optionally differs.
 
 ```bash
 npm run build:scenario                  # compile, validate, write tracks JSON
-node scripts/build-scenario.mjs --check # compile and validate only
-node scripts/build-scenario.mjs --check --model path/to/facility.json
+node scripts/build-scenario.mjs --check # compile, validate, fail if the committed tracks are stale
+node scripts/build-scenario.mjs --check --model path/to/facility.json   # no drift check
 node scripts/sim-report.mjs             # report + public/models/sim-report.json + touchpoint-trace.json
 npm run trace:report                    # touchpoint trace only (summary table + JSON)
 npm run validate:trace                  # trace structure, hero coverage, file freshness and size
@@ -244,7 +244,9 @@ furniture), the base loop or the scenario. Validation checks:
 - the hero boards Van A only when it is parked with doors and ramp open;
 - new walks keep clear of the day-room activity stations;
 - it reports walks through furniture footprints and close contacts (< 0.45 m)
-  between new people and anyone else, for review.
+  between new people and anyone else, for review;
+- with `--check` (`npm run validate:scenario`, part of `npm run validate`), the
+  committed `day-in-the-life.tracks.json` equals the fresh compile.
 
 ## Using the story source
 

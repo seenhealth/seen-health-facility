@@ -50,26 +50,37 @@ The application uses React, Three.js, Vinext/Vite and a Cloudflare-compatible ru
 
 ## Validation
 
-The checked-in models work without private source documents or regeneration. A fresh clone can run:
+The checked-in models work without private source documents or regeneration. A fresh clone validates everything offline with one command, and CI (`.github/workflows/validate.yml`, Node 22) runs the same on every push and pull request, followed by both builds:
 
 ```bash
-npx tsc --noEmit --incremental false
-npm run validate:model
-node scripts/validate-community.mjs
-node scripts/validate-day-life.mjs
-node scripts/validate-site-activity.mjs
-node scripts/validate-site-arrivals.mjs
-node scripts/validate-additional-sites.mjs
-npm run validate:traffic
-npm run validate:fleet
-npm run validate:community
-npm run build:scenario -- --check
-npm run validate:trace
+npm run validate    # type check, then every validator below, in this order
+npm test            # npm run validate, then the unit tests
 npm run build
 npm run build:story
 ```
 
-`validate:model` prepares the headless model modules used by the other validators. `validate:traffic` checks vehicle clearance, nose-first motion and turn rates at 50 Hz; `validate:fleet` checks the drivers' and riders' choreography (seated while the van moves, cabin walks, ramp escorts, wall clearance). `validate-activity.mjs` also exports the animated cast GLB. The production build sanitizes the public model data and checks that no architectural PDFs, drawing images or extracted source text are published.
+| Command | Checks |
+| --- | --- |
+| `npx tsc --noEmit --incremental false` | Types (first step of `validate`) |
+| `npm run validate:model` | Alhambra schema, geometry and asset builders; published JSON copies match `app/data/` |
+| `npm run validate:layout` | Alhambra stairs and apertures, fixture openings, walking clearance around photographed equipment |
+| `npm run validate:sites` | Olympic, Olympic option and Alveare: sources and scale, room review, Olympic day spaces and exterior, site activity and van arrivals |
+| `npm run validate:day-program` | Weekly day-room repertoire and rotations |
+| `npm run validate:activity` | Base care-day loop (continuity, wall clearance, pairs, arrivals, day room, animated cast), day life and converted community rooms |
+| `npm run validate:traffic` | Vehicle clearance, nose-first motion and turn rates at 50 Hz |
+| `npm run validate:fleet` | Drivers' and riders' choreography (seated while the van moves, cabin walks, ramp escorts, wall clearance) |
+| `npm run validate:community` | Distributed-care vehicles and cast |
+| `npm run validate:scenario` | Story tracks (wall clearance, continuity, dwell); fails if the committed tracks JSON differs from a fresh compile |
+| `npm run validate:trace` | Touchpoint trace structure, coverage, determinism and file freshness |
+| `npm run validate:renderer` | Headless viewer per site: 10 frames through every render mode, then disposal leaves no geometry, material, listener, element or frame behind |
+| `npm run validate:public` | No architectural PDFs, drawings or source text in `public/` (also runs before `npm run build`) |
+| `npm run test:unit` | `node --test` suite in `test/`: clock labels, source composition, vehicle seat frames, driveway reservations |
+
+Validators only write to `work/` (gitignored). The renderer, story, trace, fleet and Olympic checks, the GLB exporters and the unit tests bundle app TypeScript with Rolldown (`loadSim` in `scripts/build-scenario.mjs`); the other validators read the modules transpiled by `scripts/compile-model-modules.mjs`, which their npm scripts run first.
+
+`validate:activity` writes the animated cast GLB to `work/validation/`; publish it with `node scripts/compile-model-modules.mjs && node scripts/validate-activity.mjs --out public/models`. Facility GLBs are regenerated with `node scripts/export-model.mjs` (Alhambra, with integration checks) and `node scripts/export-additional-sites.mjs public/models/seen-<site>.json`; both run the headless viewer from `validate:renderer`, need `@napi-rs/canvas` for texture pixels and accept `--out <dir>`.
+
+`npm run lint` (oxlint) is not part of `validate` yet: it still reports pre-existing errors in `app/`, `components/ui/` and a few scripts.
 
 ## Editing and model generation
 
