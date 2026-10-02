@@ -31,7 +31,7 @@
       },
       {
        "start": 0.5,
-       "end": 5.684,
+       "end": 3.184,
        "action": "seated",
        "path": [
         [
@@ -49,8 +49,8 @@
        "seatId": "home-primary-bed"
       },
       {
-       "start": 5.684,
-       "end": 11.5,
+       "start": 3.184,
+       "end": 9,
        "action": "walk",
        "path": [
         [
@@ -94,8 +94,8 @@
        "title": "To Bath"
       },
       {
-       "start": 11.5,
-       "end": 15.655,
+       "start": 9,
+       "end": 12.155,
        "action": "seated",
        "path": [
         [
@@ -113,8 +113,8 @@
        "seatId": "home-bath-toilet"
       },
       {
-       "start": 15.655,
-       "end": 17.5,
+       "start": 12.155,
+       "end": 14,
        "action": "walk",
        "path": [
         [
@@ -146,8 +146,8 @@
        "title": "To Bath"
       },
       {
-       "start": 17.5,
-       "end": 19,
+       "start": 14,
+       "end": 15.5,
        "action": "tabletop",
        "path": [
         [
@@ -163,8 +163,8 @@
        "title": "Washes at the roll-under basin, mirror set low"
       },
       {
-       "start": 19,
-       "end": 20.727,
+       "start": 15.5,
+       "end": 16.873,
        "action": "idle",
        "path": [
         [
@@ -180,8 +180,8 @@
        "title": "Washes at the roll-under basin, mirror set low"
       },
       {
-       "start": 20.727,
-       "end": 27,
+       "start": 16.873,
+       "end": 21,
        "action": "walk",
        "path": [
         [
@@ -201,87 +201,101 @@
          -13.8
         ],
         [
-         -3,
+         -3.6,
          -13.8
         ],
         [
-         -3.2,
-         -13.6
-        ],
-        [
-         -3.6,
-         -13.6
-        ],
-        [
-         -3.8,
-         -13.4
-        ],
-        [
-         -5.2,
-         -13.4
-        ],
-        [
-         -5.2,
-         -12.8
-        ],
-        [
-         -4.55,
-         -12.7
+         -3.55,
+         -14.46
         ]
        ],
        "heading": 1.571,
        "title": "To Primary bedroom"
       },
       {
-       "start": 27,
-       "end": 32.437,
+       "start": 21,
+       "end": 23,
        "action": "seated",
        "path": [
         [
-         -4.55,
-         -12.7
+         -3.55,
+         -14.46
         ],
         [
-         -4.55,
-         -12.7
+         -3.55,
+         -14.46
         ]
        ],
-       "heading": 3.142,
-       "title": "Dresses her top half, seated in the dressing chair",
+       "heading": 0,
+       "title": "Dresses her top half, sitting at the foot of the bed",
        "seated": true,
-       "seatId": "home-primary-chair"
+       "seatId": "home-primary-bed"
       },
       {
-       "start": 32.437,
-       "end": 45,
+       "start": 23,
+       "end": 38.5,
+       "action": "phone",
+       "path": [
+        [
+         -3.55,
+         -14.46
+        ],
+        [
+         -3.55,
+         -14.46
+        ]
+       ],
+       "heading": 0,
+       "title": "Light-headed: presses her PERS pendant; the nurse line on the console speaker",
+       "seated": true,
+       "seatId": "home-primary-bed"
+      },
+      {
+       "start": 38.5,
+       "end": 41.389,
+       "action": "seated",
+       "path": [
+        [
+         -3.55,
+         -14.46
+        ],
+        [
+         -3.55,
+         -14.46
+        ]
+       ],
+       "heading": 0,
+       "title": "Light-headed: presses her PERS pendant; the nurse line on the console speaker",
+       "seated": true,
+       "seatId": "home-primary-bed"
+      },
+      {
+       "start": 41.389,
+       "end": 52,
        "action": "walk",
        "path": [
         [
-         -4.55,
-         -12.7
+         -3.55,
+         -14.46
         ],
         [
-         -5.2,
+         -3.6,
+         -13.8
+        ],
+        [
+         -1,
+         -13.8
+        ],
+        [
+         0,
          -12.8
         ],
         [
-         -5.2,
-         -13.4
-        ],
-        [
-         -3.8,
-         -13.4
-        ],
-        [
-         -3.4,
-         -13
-        ],
-        [
-         -3.4,
+         0,
          -12
         ],
         [
-         -3.2,
+         0.2,
          -11.8
         ],
         [
@@ -305,27 +319,8 @@
          -13.04
         ]
        ],
-       "heading": 3.142,
+       "heading": 0,
        "title": "To Kitchen"
-      },
-      {
-       "start": 45,
-       "end": 52,
-       "action": "seated",
-       "path": [
-        [
-         5.38,
-         -13.04
-        ],
-        [
-         5.38,
-         -13.04
-        ]
-       ],
-       "heading": 1.571,
-       "title": "Waits at the seated kitchen worktop",
-       "seated": true,
-       "seatId": "home-kitchen-chair"
       },
       {
        "start": 52,
@@ -1475,7 +1470,7 @@
         ]
        ],
        "heading": 3.141,
-       "title": "Morning check-in: sleep, pain, dizziness, ankles"
+       "title": "Morning check-in after the nurse line's call: dizziness, blood pressure, sleep, ankles"
       },
       {
        "start": 52,
@@ -1492,7 +1487,7 @@
         ]
        ],
        "heading": 3.141,
-       "title": "Morning check-in: sleep, pain, dizziness, ankles"
+       "title": "Morning check-in after the nurse line's call: dizziness, blood pressure, sleep, ankles"
       },
       {
        "start": 53,
@@ -5078,6 +5073,19 @@
      "end": 72
     },
     {
+     "id": "home-pers-call",
+     "label": "Mrs. Wong · PERS call to the nurse line",
+     "category": "after-hours",
+     "description": "Alone before her aide arrives, Mrs. Wong feels light-headed as she stands to get ready, sits back down at the foot of the bed and presses her personal emergency response (PERS) pendant. The response center answers through the console on her nightstand and conferences in Seen’s 24/7 nurse line: the nurse keeps her seated and talking, checks for chest pain, a fall or new weakness, has her sip water and stand slowly with the walker, and lets her aide (in at 8:29) and today’s cardiology clinic know.",
+     "actorIds": [
+      "home-participant",
+      "nurse-line-rn"
+     ],
+     "start": 23,
+     "end": 38.5,
+     "channel": "phone"
+    },
+    {
      "id": "home-return",
      "label": "Mrs. Wong · home from the clinic",
      "category": "home",
@@ -5271,7 +5279,8 @@
       "home-participant"
      ],
      "start": 690,
-     "end": 708
+     "end": 708,
+     "channel": "phone"
     }
    ],
    "holes": {
