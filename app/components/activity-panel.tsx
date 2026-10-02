@@ -4,13 +4,9 @@ import {
   Download,
   Eye,
   Pause,
+  PanelRightOpen,
   Play,
   RotateCcw,
-  Users,
-  X,
-  Rows3,
-  ChevronDown,
-  ChevronUp,
 } from 'lucide-react';
 import {
   activityData as alhambraActivityData,
@@ -32,6 +28,7 @@ import {
 import { COMMUNITY_CATEGORIES } from '../model/community-settings';
 import type { createViewer } from '../model/renderer';
 
+type Viewer = ReturnType<typeof createViewer>;
 export const activityViews = [
   { id: 'site', label: 'Arrivals & reception' },
   { id: 'clinic', label: 'Doctors & nurses' },
@@ -96,14 +93,46 @@ type Track = {
   zone: string;
   stages: { start: number; end: number; title: string; action: string }[];
 };
+type Tab = 'scenes' | 'timeline' | 'people';
+
+/** Play/pause and clock for when the side panel is closed. */
+export function MiniPlayer({
+  viewer,
+  onOpen,
+}: {
+  viewer: Viewer | null;
+  onOpen: () => void;
+}) {
+  const [state, setState] = useState<ActivitySnapshot | null>(null);
+  useEffect(() => viewer?.activity.subscribe(setState), [viewer]);
+  return (
+    <div className="mini-player">
+      <button
+        aria-label={state?.playing ? 'Pause animation' : 'Play animation'}
+        disabled={!state}
+        onClick={() =>
+          viewer?.activity.setOptions({
+            playing: !state?.playing,
+            enabled: true,
+          })
+        }
+      >
+        {state?.playing ? <Pause size={15} /> : <Play size={15} />}
+      </button>
+      <output>{dayTime(state?.time || 0)}</output>
+      <button aria-label="Open care day panel" onClick={onOpen}>
+        <PanelRightOpen size={16} />
+      </button>
+    </div>
+  );
+}
+
 export function ActivityPanel({
   viewer,
   onScene,
-  onClose,
 }: {
-  viewer: ReturnType<typeof createViewer> | null;
+  viewer: Viewer | null;
   onScene: (zone: string, actor?: string | null) => void;
-  onClose: () => void;
 }) {
   const activityData = viewer?.activity.data || alhambraActivityData;
   const siteSpecific = !!activityData.siteSpecific;
@@ -119,11 +148,10 @@ export function ActivityPanel({
   const dayRoomId = activityData.dayRoomId || 'day';
   const views = activityData.views || activityViews;
   const [state, setState] = useState<ActivitySnapshot | null>(null),
-    [expanded, setExpanded] = useState(false),
-    [showTracks, setShowTracks] = useState(false),
+    [tab, setTab] = useState<Tab>('scenes'),
     [trackKind, setTrackKind] = useState('interactions'),
     [category, setCategory] = useState('activities'),
-    [horizon, setHorizon] = useState(720),
+    [horizon, setHorizon] = useState(180),
     [search, setSearch] = useState(''),
     [activityView, setActivityView] = useState(!siteSpecific);
   useEffect(() => viewer?.activity.subscribe(setState), [viewer]);
@@ -151,6 +179,31 @@ export function ActivityPanel({
     else u.searchParams.set('program', day);
     window.history.replaceState(null, '', u);
     change({ enabled: true });
+  };
+  const chooseScene = (id: string) => {
+    onScene(id);
+    setActivityView(id === dayRoomId);
+    if (siteSpecific) {
+      setCategory(
+        activityData.interactions.find((i) => i.zoneId === id)?.category ||
+          'all',
+      );
+    }
+    if (id === dayRoomId) {
+      setCategory('activities');
+      setTrackKind('interactions');
+    }
+    if (id === 'site') {
+      setCategory('arrivals');
+      if (siteSpecific)
+        change({
+          time: 49,
+          enabled: true,
+          playing: true,
+          speed: 1,
+          follow: null,
+        });
+    }
   };
   const interactions = activityData.interactions.filter(
       (i) => category === 'all' || i.category === category,
@@ -278,137 +331,8 @@ export function ActivityPanel({
     );
   };
   return (
-    <section
-      className="activity-panel"
-      aria-label="Animated care day and timeline"
-    >
-      <div className="activity-heading">
-        <div>
-          <span className="overline">LIFE AT SEEN HEALTH</span>
-          <strong>
-            <span className={state?.playing ? 'activity-pulse' : ''} />
-            {state?.playing ? 'Care day in motion' : 'Care day paused'}
-          </strong>
-        </div>
-        <button onClick={onClose} aria-label="Close animation controls">
-          <X size={18} />
-        </button>
-      </div>
-      <div className="activity-scenes" aria-label="View a workflow">
-        {views.map((v) => (
-          <button
-            key={v.id}
-            onClick={() => {
-              onScene(v.id);
-              setActivityView(v.id === dayRoomId);
-              if (siteSpecific) {
-                setCategory(
-                  activityData.interactions.find((i) => i.zoneId === v.id)
-                    ?.category || 'all',
-                );
-              }
-              if (v.id === dayRoomId) {
-                setCategory('activities');
-                setTrackKind('interactions');
-              }
-              if (v.id === 'site') {
-                setCategory('arrivals');
-                if (siteSpecific)
-                  change({
-                    time: 49,
-                    enabled: true,
-                    playing: true,
-                    speed: 1,
-                    follow: null,
-                  });
-              }
-            }}
-          >
-            {v.label}
-          </button>
-        ))}
-      </div>
-      {activityView && (
-        <div className="day-program-panel">
-          {!siteSpecific && (
-            <div className="day-program-week">
-              <span>Weekly repertoire</span>
-              <div className="track-tabs">
-                {rotationDays.map((d) => (
-                  <button
-                    key={d}
-                    aria-pressed={rotation === d}
-                    onClick={() => chooseRotation(d)}
-                  >
-                    {dayLabels[d]}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-          <div className="day-program-topline">
-            <label htmlFor="day-session">Day room program</label>
-            <select
-              id="day-session"
-              value={session.id}
-              onChange={(e) => chooseSession(e.target.value)}
-            >
-              {dayProgram.programs.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.label} · {dayTime(p.start)}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={() =>
-                chooseSession(
-                  dayProgram.programs[
-                    (dayProgram.programs.indexOf(session) + 1) %
-                      dayProgram.programs.length
-                  ].id,
-                )
-              }
-            >
-              Next activity →
-            </button>
-          </div>
-          <strong>{session.title}</strong>
-          <div className="day-program-tags day-program-chips">
-            {session.cultures.map((c) => (
-              <span key={'culture:' + c} title="Culture">
-                {c}
-              </span>
-            ))}
-            {session.languages.map((l) => (
-              <span
-                key={'language:' + l}
-                className="chip-language"
-                title="Language"
-              >
-                {l}
-              </span>
-            ))}
-            <span className="chip-format">{formatLabels[session.format]}</span>
-            {session.season && (
-              <span className="chip-format">{session.season}</span>
-            )}
-          </div>
-          <p>{session.culture}</p>
-          <p className="day-program-access">{session.access}</p>
-          <div className="day-program-tags">
-            <span>Standing</span>
-            <span>Chair-based</span>
-            <span>Wheelchair welcome</span>
-            <span>Quiet creative table</span>
-          </div>
-          <small>
-            {siteSpecific
-              ? 'Activities use the existing room furniture. Choose a session, then play or follow its interaction track.'
-              : 'Three front tables cleared · Illustrative weekly repertoire · Choose a day and session, then play or follow its interaction track.'}
-          </small>
-        </div>
-      )}
-      <div className="activity-transport">
+    <section className="activity-panel" aria-label="Animated care day">
+      <div className="activity-player">
         <button
           className="activity-play"
           aria-label={state?.playing ? 'Pause animation' : 'Play animation'}
@@ -416,9 +340,16 @@ export function ActivityPanel({
           onClick={() => change({ playing: !state?.playing, enabled: true })}
         >
           {state?.playing ? <Pause size={18} /> : <Play size={18} />}
-          <span>{state?.playing ? 'Pause' : 'Play'}</span>
         </button>
+        <div className="activity-clock">
+          <output>{dayTime(time)}</output>
+          <small>
+            <span className={state?.playing ? 'activity-pulse' : ''} />
+            {state?.elapsedLabel || '0:00'} / 12:00 loop
+          </small>
+        </div>
         <button
+          className="activity-icon"
           title="Restart the care day"
           aria-label="Restart loop"
           onClick={() => {
@@ -428,45 +359,19 @@ export function ActivityPanel({
             onScene('site');
           }}
         >
-          <RotateCcw size={17} />
+          <RotateCcw size={15} />
         </button>
-        <output>
-          {dayTime(time)} <span>· {state?.elapsedLabel || '0:00'} / 12:00</span>
-        </output>
-        <label>
-          Speed
-          <select
-            value={state?.speed || 4}
-            onChange={(e) => change({ speed: Number(e.target.value) })}
-          >
-            {[0.25, 0.5, 1, 2, 4].map((s) => (
-              <option key={s} value={s}>
-                {s}×
-              </option>
-            ))}
-          </select>
-        </label>
-        <button
-          aria-pressed={showTracks}
-          onClick={() => {
-            setShowTracks(!showTracks);
-            setExpanded(false);
-          }}
+        <select
+          aria-label="Playback speed"
+          value={state?.speed || 4}
+          onChange={(e) => change({ speed: Number(e.target.value) })}
         >
-          <Rows3 size={17} />
-          <span>Tracks</span>
-          {showTracks ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
-        </button>
-        <button
-          aria-pressed={expanded}
-          onClick={() => {
-            setExpanded(!expanded);
-            setShowTracks(false);
-          }}
-        >
-          <Users size={17} />
-          <span>People</span>
-        </button>
+          {[0.25, 0.5, 1, 2, 4].map((s) => (
+            <option key={s} value={s}>
+              {s}×
+            </option>
+          ))}
+        </select>
       </div>
       <input
         className="activity-scrubber"
@@ -482,21 +387,123 @@ export function ActivityPanel({
       />
       {selected && (
         <div className="activity-follow">
-          <Eye size={15} />
+          <Eye size={14} />
           <span>
             <b>
               {selected.id === 'interaction:day-' + session.baseId
                 ? session.title
                 : selected.label}
-            </b>{' '}
-            · {currentStage?.title || 'Between activities'}
+            </b>
+            {currentStage?.title || 'Between activities'}
           </span>
-          <button onClick={() => viewer?.followActor(null)}>
-            Release camera
-          </button>
+          <button onClick={() => viewer?.followActor(null)}>Release</button>
         </div>
       )}
-      {showTracks && (
+      <fieldset className="activity-tabs">
+        <legend className="sr-only">Care day views</legend>
+        <button
+          aria-pressed={tab === 'scenes'}
+          onClick={() => setTab('scenes')}
+        >
+          Scenes
+        </button>
+        <button
+          aria-pressed={tab === 'timeline'}
+          onClick={() => setTab('timeline')}
+        >
+          Timeline
+        </button>
+        <button
+          aria-pressed={tab === 'people'}
+          onClick={() => setTab('people')}
+        >
+          People <small>{people}</small>
+        </button>
+      </fieldset>
+      {tab === 'scenes' && (
+        <>
+          <fieldset className="activity-scenes">
+            <legend className="sr-only">View a workflow</legend>
+            {views.map((v) => (
+              <button key={v.id} onClick={() => chooseScene(v.id)}>
+                {v.label}
+              </button>
+            ))}
+          </fieldset>
+          {activityView && (
+            <div className="day-program">
+              {!siteSpecific && (
+                <div className="day-program-week">
+                  <span>Weekly repertoire</span>
+                  <div className="track-tabs">
+                    {rotationDays.map((d) => (
+                      <button
+                        key={d}
+                        aria-pressed={rotation === d}
+                        onClick={() => chooseRotation(d)}
+                      >
+                        {dayLabels[d]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className="day-program-head">
+                <label htmlFor="day-session">Day room program</label>
+                <button
+                  onClick={() =>
+                    chooseSession(
+                      dayProgram.programs[
+                        (dayProgram.programs.indexOf(session) + 1) %
+                          dayProgram.programs.length
+                      ].id,
+                    )
+                  }
+                >
+                  Next →
+                </button>
+              </div>
+              <select
+                id="day-session"
+                value={session.id}
+                onChange={(e) => chooseSession(e.target.value)}
+              >
+                {dayProgram.programs.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.label} · {dayTime(p.start)}
+                  </option>
+                ))}
+              </select>
+              <strong>{session.title}</strong>
+              <div className="day-program-tags day-program-chips">
+                {session.cultures.map((c) => (
+                  <span key={'culture:' + c} title="Culture">
+                    {c}
+                  </span>
+                ))}
+                {session.languages.map((l) => (
+                  <span
+                    key={'language:' + l}
+                    className="chip-language"
+                    title="Language"
+                  >
+                    {l}
+                  </span>
+                ))}
+                <span className="chip-format">
+                  {formatLabels[session.format]}
+                </span>
+                {session.season && (
+                  <span className="chip-format">{session.season}</span>
+                )}
+              </div>
+              <p>{session.culture}</p>
+              <p className="day-program-access">{session.access}</p>
+            </div>
+          )}
+        </>
+      )}
+      {tab === 'timeline' && (
         <div className="care-timeline">
           <div className="track-toolbar">
             <div className="track-tabs">
@@ -550,7 +557,7 @@ export function ActivityPanel({
           <div className="timeline-axis">
             <span>{visible.length} tracks</span>
             <div>
-              {[0, 0.25, 0.5, 0.75, 1].map((t) => (
+              {[0, 0.5, 1].map((t) => (
                 <span key={t} style={{ left: `${t * 100}%` }}>
                   {dayTime(windowStart + t * horizon)}
                 </span>
@@ -617,7 +624,7 @@ export function ActivityPanel({
                             )
                           }
                         >
-                          {width > 9 ? s.title : ''}
+                          {width > 22 ? s.title : ''}
                         </button>
                       );
                     })}
@@ -632,20 +639,17 @@ export function ActivityPanel({
             ))}
           </div>
           <div className="timeline-help">
-            <span>
-              <i style={{ background: palette.walk }} />
-              Travel <i style={{ background: palette.greet }} />
-              Welcome <i style={{ background: palette.consult }} />
-              Care <i style={{ background: palette.exercise }} />
-              Activities
-            </span>
-            <span>Select a stage to pause & follow</span>
+            <i style={{ background: palette.walk }} />
+            Travel <i style={{ background: palette.greet }} />
+            Welcome <i style={{ background: palette.consult }} />
+            Care <i style={{ background: palette.exercise }} />
+            Activities
           </div>
         </div>
       )}
-      {expanded && (
+      {tab === 'people' && (
         <div className="activity-options">
-          <div className="activity-option-row">
+          <div className="activity-fields">
             <label>
               Show
               <select
@@ -693,12 +697,6 @@ export function ActivityPanel({
               Animated care day
             </label>
           </div>
-          <p className="template-note">
-            One shared model per role, one consistent appearance per person.
-            Doctors and dietitians wear white coats; nurses, PT, OT and aides
-            wear V-neck scrubs; desk, coordination, social work, recreation and
-            the center manager wear lanyards; food service wears an apron.
-          </p>
           <div className="activity-cast">
             {activityData.actors
               .filter(
@@ -727,37 +725,26 @@ export function ActivityPanel({
                 </button>
               ))}
           </div>
-          <div className="activity-downloads">
-            <a href="/models/seen-health-animated-cast.glb" download>
-              <Download size={15} />
-              Role models
-            </a>
-            <a href="/models/character-templates.json" download>
-              Person & wardrobe templates
-            </a>
-            <button
-              onClick={() => {
-                const url = URL.createObjectURL(
-                  new Blob([JSON.stringify(activityData, null, 2)], {
-                    type: 'application/json',
-                  }),
-                );
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'care-day-tracks.json';
-                a.click();
-                setTimeout(() => URL.revokeObjectURL(url), 1000);
-              }}
-            >
-              Care-day tracks
-            </button>
-          </div>
-          <details>
-            <summary>Workflow sources & interpretation</summary>
+          <details className="activity-about">
+            <summary>About this care day</summary>
+            <p>
+              Continuous loop · {people} people · {activityData.roles.length}{' '}
+              roles. A representative 8 AM–4 PM day compressed into twelve
+              minutes; times are illustrative.
+              {siteSpecific
+                ? ' Activities use the existing room furniture.'
+                : ' Three front day-room tables are cleared for the weekly program repertoire.'}
+            </p>
+            <p>
+              One shared model per role, one consistent appearance per person.
+              Doctors and dietitians wear white coats; nurses, PT, OT and aides
+              wear V-neck scrubs; desk, coordination, social work, recreation
+              and the center manager wear lanyards; food service wears an apron.
+            </p>
             <p>
               {siteSpecific
-                ? 'Staff and participants share the Alhambra character models and activity repertoire, placed in this site’s corresponding rooms. Walking stays within each room and avoids modeled furniture. Timings illustrate an 8 AM–4 PM day in a twelve-minute loop.'
-                : 'The Orbit review informs therapy, clinical, social-work, escort and coordination patterns. The arrival follows your described ramp and right turn into the sliding entrance. These are stable composite people and illustrative timings, shown as an 8 AM–4 PM day compressed into a twelve-minute loop.'}
+                ? 'Staff and participants share the Alhambra character models and activity repertoire, placed in this site’s corresponding rooms. Walking stays within each room and avoids modeled furniture.'
+                : 'The Orbit review informs therapy, clinical, social-work, escort and coordination patterns. The arrival follows your described ramp and right turn into the sliding entrance. These are stable composite people.'}
             </p>
             <p>
               Upper-floor movement connections are not animated. People are
@@ -765,15 +752,34 @@ export function ActivityPanel({
               can be reused across scenes; they are not a verified employee
               roster.
             </p>
+            <div className="activity-downloads">
+              <a href="/models/seen-health-animated-cast.glb" download>
+                <Download size={14} />
+                Role models
+              </a>
+              <a href="/models/character-templates.json" download>
+                Person & wardrobe templates
+              </a>
+              <button
+                onClick={() => {
+                  const url = URL.createObjectURL(
+                    new Blob([JSON.stringify(activityData, null, 2)], {
+                      type: 'application/json',
+                    }),
+                  );
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = 'care-day-tracks.json';
+                  a.click();
+                  setTimeout(() => URL.revokeObjectURL(url), 1000);
+                }}
+              >
+                Care-day tracks
+              </button>
+            </div>
           </details>
         </div>
       )}
-      <div className="activity-caption">
-        <span>
-          Continuous loop · {people} people · {activityData.roles.length} roles
-        </span>
-        <span>Representative care day · illustrative times</span>
-      </div>
     </section>
   );
 }
