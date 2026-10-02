@@ -722,10 +722,32 @@ export function buildAlhambraExterior(model: Facility) {
   // planter curbs are painted blue.
   const court2 = group(facade, 'rear-court-staff-entrance-and-loading');
   const BUMP_Z = -15.213;
+  // The wall reads as one flat face from the recess corner to the wing's east end (the dispatcher's annotation and the
+  // photos): the east part is brought forward flush with the stair bump, with its parapet cap.
+  box(
+    court2,
+    13.51,
+    -0.23,
+    (BUMP_Z - 12.465) / 2,
+    3.52,
+    6.5 + 0.23,
+    -12.465 - BUMP_Z,
+    stone,
+  );
+  box(
+    court2,
+    13.51,
+    6.5,
+    (BUMP_Z - 12.465) / 2,
+    3.52 + 0.24,
+    0.6,
+    -12.465 - BUMP_Z + 0.24,
+    stone,
+  );
   const pergBlue = '#6b8bb4',
     pergFrame = '#587aa4';
-  const px0 = 5.4,
-    px1 = 11.55,
+  const px0 = 6.1,
+    px1 = 13.9,
     pxc = (px0 + px1) / 2,
     pwx = px1 - px0,
     pdepth = 1.6,
@@ -762,8 +784,8 @@ export function buildAlhambraExterior(model: Facility) {
   box(court2, doorX2, 0.05, BUMP_Z - 0.07, 1.9, 2.3, 0.04, '#7f9aa8');
   box(court2, doorX2, 0.05, BUMP_Z - 0.09, 0.05, 2.3, 0.02, '#3a4448');
   // Dark square window east of the door.
-  box(court2, px0 + 4.6, 1.25, BUMP_Z - 0.04, 1.35, 1.35, 0.07, pergFrame);
-  box(court2, px0 + 4.6, 1.33, BUMP_Z - 0.06, 1.2, 1.2, 0.04, '#1e2a30');
+  box(court2, px0 + 5.3, 1.25, BUMP_Z - 0.04, 1.35, 1.35, 0.07, pergFrame);
+  box(court2, px0 + 5.3, 1.33, BUMP_Z - 0.06, 1.2, 1.2, 0.04, '#1e2a30');
   // Bronze pipe rails along the landing's edge and a return to the wall at the east end.
   const railZ2 = BUMP_Z - 1.95;
   for (const sx of [px0 - 0.1, px0 + 1.2, px0 + 2.5, px0 + 3.8])
