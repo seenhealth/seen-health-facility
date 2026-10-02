@@ -1,0 +1,308 @@
+{
+  "version": 1,
+  "setting": "home-lin",
+  "facility": "seen-home-wong",
+  "notes": [
+    "Mrs. Lin's day at home with her daughter, inside the same senior-friendly bungalow as the Wongs' (seen-home-wong, stamped on the home-lin pad), for scripts/build-community-tracks.mjs (schema: docs/COMMUNITY.md, Cast files). Loop seconds (720 s = 8 AM-4 PM).",
+    "Positions are facility-local (plan frame P, +x east, +z north, metres); headings follow three.js (heading h faces (sin h, cos h)). `at` is a seat object (chairs and benches: seatPose) or a point with `heading`; `seat` names the furniture a seated point sits on.",
+    "Mrs. Lin is the story's participant (the center's hero-lin / arrival-cane): `profileId` arrival-cane gives her the same look. She wakes at 0.5 s (the loop seam out of sight: tea on the sofa at 4 PM, her bed at 8 AM), breakfasts with her daughter, puts her shoes and cardigan on at the entry bench and leaves by the front door at 23 s; her time outside (the Seen van there and back, her day at the center) is the away hole 23-659 that HOLE_LEGS fills in community-people.ts. Home at 659 s, tea on the sofa to the end of the day.",
+    "Her daughter (role family, neither staff nor participant) works from home. Front-door passes: out 21 and in 57 (seeing her mother onto the van and back by the porch step), out 614 and in 661 (watching for the van on the porch, meeting it at the ramp foot and up the ramp behind her mother). Door passes are at least 2 s apart.",
+    "lin-van-pickup (19-49) and lin-van-dropoff (630-661) are outdoors in community-people.ts, with the van driver (lin-van-driver). Ids kept stable: lin-at-home, lin-daughter, lin-breakfast, lin-evening (lin-evening covers 700-720: the story closes on it)."
+  ],
+  "people": [
+    {
+      "id": "lin-at-home",
+      "role": "participant",
+      "variant": 11,
+      "profileId": "arrival-cane",
+      "label": "Mrs. Lin · at home",
+      "mobility": "cane",
+      "gait": 1.35,
+      "arrive": {
+        "t": 0.5,
+        "anchor": [
+          -4.6,
+          3.3
+        ]
+      },
+      "leave": {
+        "t": 720,
+        "anchor": "door"
+      },
+      "away": [
+        [
+          24.1,
+          659
+        ]
+      ],
+      "stops": [
+        {
+          "window": [
+            0.5,
+            1.5
+          ],
+          "roomId": "home-primary",
+          "at": [
+            -4.6,
+            3.3
+          ],
+          "heading": 3.142,
+          "seat": "home-primary-bed",
+          "action": "seated",
+          "seated": true,
+          "title": "Awake on the edge of her bed, cane at hand"
+        },
+        {
+          "window": [
+            10,
+            15.8
+          ],
+          "roomId": "home-dining",
+          "at": "home-dining-chair-n",
+          "action": "tabletop",
+          "seated": true,
+          "title": "Breakfast with her daughter: rice porridge, an egg and jasmine tea",
+          "with": [
+            "lin-daughter"
+          ],
+          "interaction": {
+            "id": "lin-breakfast",
+            "category": "home",
+            "label": "Mrs. Lin · breakfast with her daughter",
+            "description": "Her daughter has the rice porridge on before Mrs. Lin is up; they eat together at the dining table and she takes her morning pills from the weekly pack before the Seen van comes.",
+            "window": [
+              1.5,
+              15.8
+            ]
+          }
+        },
+        {
+          "window": [
+            19,
+            21.8
+          ],
+          "roomId": "home-living",
+          "at": "home-living-entry-bench",
+          "action": "seated",
+          "seated": true,
+          "title": "Shoes and a cardigan on at the entry bench"
+        },
+        {
+          "window": [
+            662,
+            680
+          ],
+          "roomId": "home-living",
+          "at": [
+            1.7,
+            0.78
+          ],
+          "heading": -0.3,
+          "seat": "home-living-sofa",
+          "action": "seated",
+          "seated": true,
+          "title": "Home: settling on the sofa"
+        },
+        {
+          "window": [
+            680,
+            720
+          ],
+          "roomId": "home-living",
+          "at": [
+            1.7,
+            0.78
+          ],
+          "heading": -0.3,
+          "seat": "home-living-sofa",
+          "action": "conversation",
+          "seated": true,
+          "title": "Tea with her daughter: karaoke, the clinic, the care plan",
+          "with": [
+            "lin-daughter"
+          ],
+          "interaction": {
+            "id": "lin-evening",
+            "category": "home",
+            "label": "Mrs. Lin · home with her daughter",
+            "description": "Home from the center, Mrs. Lin settles on the sofa; her daughter brings jasmine tea and they talk over her day: the clinic check, therapy, lunch and karaoke, and what the care team planned.",
+            "window": [
+              662,
+              720
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "lin-daughter",
+      "role": "family",
+      "variant": 15,
+      "label": "Mrs. Lin's daughter",
+      "gait": 1.45,
+      "arrive": {
+        "t": 0.5,
+        "anchor": [
+          -4.55,
+          -5.085
+        ]
+      },
+      "leave": {
+        "t": 720,
+        "anchor": "door"
+      },
+      "away": [
+        [
+          22.9,
+          57
+        ],
+        [
+          614,
+          661
+        ]
+      ],
+      "stops": [
+        {
+          "window": [
+            0.5,
+            7
+          ],
+          "roomId": "home-kitchen",
+          "at": [
+            -4.55,
+            -5.085
+          ],
+          "heading": -1.571,
+          "action": "serve",
+          "title": "Rice porridge on the stove, the kettle on"
+        },
+        {
+          "window": [
+            10,
+            13.5
+          ],
+          "roomId": "home-dining",
+          "at": "home-dining-chair-w",
+          "action": "tabletop",
+          "seated": true,
+          "title": "Breakfast with her mother; this morning's pills from the weekly pack"
+        },
+        {
+          "window": [
+            17.7,
+            20.2
+          ],
+          "roomId": "home-living",
+          "at": [
+            2.66,
+            -3
+          ],
+          "heading": 0,
+          "action": "treat",
+          "title": "Helps with her shoes and cardigan"
+        },
+        {
+          "window": [
+            65,
+            330
+          ],
+          "roomId": "home-bedroom-2",
+          "at": "home-bed2-chair",
+          "action": "document",
+          "seated": true,
+          "title": "Working from home at her desk"
+        },
+        {
+          "window": [
+            340,
+            347
+          ],
+          "roomId": "home-laundry",
+          "at": [
+            -4,
+            -2.2
+          ],
+          "heading": 0,
+          "action": "serve",
+          "title": "Loads the washer"
+        },
+        {
+          "window": [
+            353.5,
+            378
+          ],
+          "roomId": "home-kitchen",
+          "at": "home-kitchen-chair",
+          "action": "tabletop",
+          "seated": true,
+          "title": "Lunch at the kitchen worktop"
+        },
+        {
+          "window": [
+            390,
+            588
+          ],
+          "roomId": "home-bedroom-2",
+          "at": "home-bed2-chair",
+          "action": "document",
+          "seated": true,
+          "title": "An afternoon at her desk"
+        },
+        {
+          "window": [
+            598,
+            606
+          ],
+          "roomId": "home-kitchen",
+          "at": [
+            -3.89,
+            -5.3
+          ],
+          "heading": 3.142,
+          "action": "serve",
+          "title": "Rice washed, soup on low for dinner"
+        },
+        {
+          "window": [
+            669,
+            674
+          ],
+          "roomId": "home-kitchen",
+          "at": [
+            -4.55,
+            -5.085
+          ],
+          "heading": -1.571,
+          "action": "serve",
+          "title": "Jasmine tea for two"
+        },
+        {
+          "window": [
+            681,
+            720
+          ],
+          "roomId": "home-living",
+          "at": [
+            0.6,
+            0.78
+          ],
+          "heading": 0.3,
+          "seat": "home-living-sofa",
+          "action": "conversation",
+          "seated": true,
+          "title": "Tea on the sofa with her mother"
+        }
+      ]
+    }
+  ],
+  "keep": {
+    "actors": [
+      "lin-at-home",
+      "lin-daughter"
+    ],
+    "interactions": [
+      "lin-breakfast",
+      "lin-evening"
+    ]
+  }
+}

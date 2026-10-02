@@ -2,6 +2,7 @@ import * as T from 'three';
 import source from '../data/activity-loop.json';
 import {
   createCharacter,
+  isStaffRole,
   type Action,
   type CharacterSpec,
   type CharacterRole,
@@ -620,11 +621,11 @@ export function createActivity(
     );
     p.rotation.y = i * 0.4;
   }
-  function visibleRole(role: string) {
+  function visibleRole(role: CharacterRole) {
     return (
       options.filter === 'all' ||
       options.filter === role ||
-      (options.filter === 'staff' && role !== 'participant')
+      (options.filter === 'staff' && isStaffRole(role))
     );
   }
   function getState(): ActivitySnapshot {

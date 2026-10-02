@@ -86,6 +86,12 @@
       "color": "#1F4D3A",
       "detail": "Long-sleeve uniform with lanyard",
       "skeleton": "seen-clay-16"
+    },
+    "family": {
+      "wardrobe": "casual",
+      "color": "#8E4A57",
+      "detail": "Everyday clothes: cardigan, sweater or shirt",
+      "skeleton": "seen-clay-16"
     }
   },
   "people": [
@@ -2004,7 +2010,20 @@
       "glasses": false,
       "accent": "#b48b60",
       "height": 1.02
+    },
+    {
+      "id": "lin-daughter",
+      "role": "family",
+      "variant": 15,
+      "skin": "#7a523b",
+      "hair": "#3b2a21",
+      "hairStyle": 1,
+      "glasses": false,
+      "accent": "#8E4A57",
+      "height": 1.0,
+      "figure": "f",
+      "cut": "cardigan"
     }
   ],
-  "colorSource": "Role colours come from app/data/care-team.json (members[].color by characterRole). Front desk and food service sit outside the IDT and use the neutral colours below; participant tops use palette.participantWardrobe."
+  "colorSource": "Role colours come from app/data/care-team.json (members[].color by characterRole). Front desk and food service sit outside the IDT and use the neutral colours below; participant tops use palette.participantWardrobe; family wear everyday clothes in the family colour."
 }

@@ -18,6 +18,7 @@ import {
 import {
   CENTER_LOT,
   carDoorWorld,
+  communityVehicleById,
   sampleCommunityVehicle,
   vanRampWorld,
 } from './community-vehicles';
@@ -90,9 +91,9 @@ const carDoor = (vehicleId: string, time: number) =>
  */
 const NURSE_LINE_DESK = { zoneId: 'upper-office', assetId: 'upperfit-chair' };
 
-/** Points around the Seen van at a stop: door sill, ramp foot, the driver's places. */
-function vanStop(time: number) {
-  const pose = sampleCommunityVehicle(VAN, time),
+/** Points around a Seen van at a stop: door sill, ramp foot, the driver's places. */
+function vanStop(time: number, vehicleId = VAN) {
+  const pose = sampleCommunityVehicle(vehicleId, time),
     { sill, foot } = vanRampWorld(pose),
     c = Math.cos(pose.heading),
     sn = Math.sin(pose.heading),
@@ -110,12 +111,14 @@ function vanStop(time: number) {
     driverDoor: at(-1.1, -1.9),
     nose: at(-0.6, -3.5),
     noseRight: at(2.6, -3.5),
+    /** On the floor just inside the sliding door, a step from the driver's seat. */
+    inside: at(0.4, -0.6),
   };
 }
 
 /** Van ramp foot → the home's porch ramp foot: along the drive edge, then a short loop round onto the ramp. */
-function homeCrossing(foot: Vec2): Vec2[] {
-  const h = careSettingById('home-wong')!.anchors;
+function homeCrossing(foot: Vec2, settingId = 'home-wong'): Vec2[] {
+  const h = careSettingById(settingId)!.anchors;
   return [foot, h.crossA, h.crossB, h.crossC, h.crossD, h.rampFoot];
 }
 /** The point `m` metres from `a` toward `b`. */
@@ -508,6 +511,240 @@ function mrWongHospitalDay(hole: InstanceHole, s: CareSetting): Segment[] {
     .segmentsTo(hole.end);
   return [...ward, ...home];
 }
+
+// --- Mrs. Lin's home -------------------------------------------------------------
+// Mrs. Lin (the story's participant) and her daughter live in the Wongs' plan
+// on the home-lin pad (app/data/community/home-lin.cast.json); these legs are
+// their times outside it. Her Seen van (`van-lin`, community-vehicles.ts)
+// fixes the times: at the apex 22.5–50 s (ramp down 26.5–47.2 s) and
+// 630–667.5 s (ramp down 634–643 s), off the map 62–620 s. Outdoors she
+// walks at 1.45 m per loop second with her cane, her daughter 0.9 m behind.
+const LIN_VAN = 'van-lin';
+/** Her daughter falls in behind her here on the porch, 0.9 m back from where she then is. */
+const LIN_JOIN = 1.2;
+/**
+ * A seat of her van at `time` on the ground plane (off the map at either end
+ * of a run): where its riders wait out of sight between rides.
+ */
+function linVanSeat(time: number, seat: 'driver' | 'participant'): Vec2 {
+  const pose = sampleCommunityVehicle(LIN_VAN, time),
+    [x, , z] = communityVehicleById(LIN_VAN)!.seats[seat],
+    c = Math.cos(pose.heading),
+    sn = Math.sin(pose.heading);
+  return [pose.position.x + x * c + z * sn, pose.position.z - x * sn + z * c];
+}
+/**
+ * Mrs. Lin's day away from home, the `away` hole of her generated track
+ * (24.1–659 s): out of the front door and down the porch ramp with her
+ * daughter, along the drive and up the van ramp ahead of the driver (on
+ * board 43.7 s), the ride off the map, her day at the center (the story's
+ * hero-lin there), and home on the same van: down its ramp, along the drive
+ * with the driver behind her, met by her daughter at the porch ramp and in
+ * at the front door by `hole.end`.
+ */
+function linDayLeg(hole: InstanceHole, s: CareSetting): Segment[] {
+  const h = s.anchors,
+    am = vanStop(30, LIN_VAN),
+    pm = vanStop(640, LIN_VAN);
+  return legTrack('lin-at-home', 'participant', hole, s)
+    .walk(25, [h.porch], { title: 'Out of the front door', ys: [PORCH_Y] })
+    .walk(27.07, [h.rampTop], {
+      title: 'Across the porch, her daughter behind her',
+      ys: [PORCH_Y],
+    })
+    .walk(31.55, [h.rampFoot], { title: 'Down the porch ramp', ys: [PAD_Y] })
+    .walk(41.27, [...homeCrossing(am.foot, s.id)].reverse().slice(1), {
+      title: 'Along the drive to the Seen van',
+    })
+    .walk(43.7, [am.sill], {
+      title: 'Up the van ramp, the driver behind her',
+      ys: [VAN_FLOOR],
+    })
+    .ride(62, LIN_VAN, 'participant', 'Riding to the Seen center')
+    .hidden(620, 'Her day at the Seen center', linVanSeat(62, 'participant'))
+    .ride(637, LIN_VAN, 'participant', 'Riding home')
+    .walk(639.5, [pm.foot], {
+      title: 'Down the van ramp',
+      from: pm.sill,
+      fromY: VAN_FLOOR,
+    })
+    .walk(649.5, homeCrossing(pm.foot, s.id).slice(1), {
+      title: 'Along the drive, the driver behind her',
+    })
+    .hold(650.5, 'greet', {
+      title: 'Her daughter meets her at the ramp',
+      face: h.rampFootSouth,
+    })
+    .walk(655.5, [h.rampTop], {
+      title: 'Up the porch ramp, her daughter behind her',
+      ys: [PORCH_Y],
+    })
+    .walk(hole.end, [h.porch, hole.to], {
+      title: 'Home: in at the front door',
+      ys: [PORCH_Y, PORCH_Y],
+    })
+    .segmentsTo(hole.end);
+}
+const linLegs: Record<string, Leg> = {
+  // Hidden on her bed for the first half second, so the loop seam (the sofa
+  // at 4 PM, her bed at 8 AM) is out of sight.
+  'before 0–0.5': () => undefined,
+  'away 24.1–659': linDayLeg,
+};
+/**
+ * Her daughter outside: out ahead of her mother at 22.9 s, then behind her
+ * down the porch ramp and along the drive to the van, seeing her off and
+ * back in by the porch step; out on the porch at 614 s to watch for the van,
+ * down the ramp to meet her at its foot and up it behind her.
+ */
+const daughterLegs: Record<string, Leg> = {
+  'before 0–0.5': () => undefined,
+  'away 22.9–57': (hole, s) => {
+    const h = s.anchors,
+      am = vanStop(30, LIN_VAN);
+    return legTrack('lin-daughter', 'family', hole, s)
+      .walk(24.6, [h.doorStep, h.porchGreet], {
+        title: 'Out ahead of her mother',
+        ys: [PORCH_Y, PORCH_Y],
+      })
+      .hold(25.9, 'greet', {
+        title: 'Waiting for her on the porch',
+        face: hole.from,
+      })
+      .walk(26.45, [toward(h.porch, h.rampTop, LIN_JOIN)], {
+        title: 'Falling in behind her',
+        ys: [PORCH_Y],
+      })
+      .walk(27.69, [h.rampTop], {
+        title: 'Across the porch behind her mother',
+        ys: [PORCH_Y],
+      })
+      .walk(32.17, [h.rampFoot], {
+        title: 'Down the porch ramp behind her',
+        ys: [PAD_Y],
+      })
+      .walk(
+        41.27,
+        [
+          h.crossD,
+          h.crossC,
+          h.crossB,
+          h.crossA,
+          toward(am.foot, h.crossA, 0.9),
+        ],
+        { title: 'Walking her to the Seen van' },
+      )
+      .hold(50.5, 'greet', { title: 'Seeing her off', face: am.sill })
+      .walk(hole.end, [h.porchStepFoot, h.porchStep, h.doorStep, hole.to], {
+        title: 'Back in by the porch step',
+        ys: [undefined, PORCH_Y, PORCH_Y, PORCH_Y],
+      })
+      .segmentsTo(hole.end);
+  },
+  'away 614–661': (hole, s) => {
+    const h = s.anchors,
+      pm = vanStop(640, LIN_VAN);
+    return legTrack('lin-daughter', 'family', hole, s)
+      .walk(616, [h.doorStep, h.porchWait], {
+        title: 'Out on the porch',
+        ys: [PORCH_Y, PORCH_Y],
+      })
+      .hold(630, 'idle', { title: 'Watching for the van', face: pm.sill })
+      .hold(641, 'greet', { title: 'The van is here', face: pm.foot })
+      .walk(647, [h.rampTop, h.rampFoot, h.rampFootSouth], {
+        title: 'Down the ramp to meet her',
+        ys: [PORCH_Y, PAD_Y],
+      })
+      .hold(650.6, 'greet', {
+        title: 'Meeting her mother at the ramp',
+        face: h.rampFoot,
+      })
+      .walk(651.2, [h.rampFoot], { title: 'Behind her up the ramp' })
+      .walk(656.2, [h.rampTop], {
+        title: 'Up the porch ramp behind her',
+        ys: [PORCH_Y],
+      })
+      .walk(659, [h.porch, toward(hole.to, h.porch, 0.9)], {
+        title: 'Across the porch',
+        ys: [PORCH_Y, PORCH_Y],
+      })
+      .walk(660.2, [hole.to], { title: 'In behind her', ys: [PORCH_Y] })
+      .hold(hole.end, 'idle', { title: 'Closing the front door' })
+      .segmentsTo(hole.end);
+  },
+};
+/**
+ * The driver of Mrs. Lin's van: at the wheel while it is on the map; round to
+ * the ramp at each stop, up it behind her in the morning and into the van by
+ * the sliding door to the driver's seat, and in the afternoon behind her along
+ * the drive to the porch ramp, where he hands over to her daughter and walks
+ * back.
+ */
+function linVanDriver(): Track {
+  const s = careSettingById('home-lin')!,
+    h = s.anchors,
+    am = vanStop(30, LIN_VAN),
+    pm = vanStop(640, LIN_VAN);
+  return new Track(
+    'lin-van-driver',
+    'driver',
+    {
+      zoneId: settingZone(s.id),
+      label: 'Seen driver · door to door',
+      variant: 13,
+    },
+    linVanSeat(12.5, 'driver'),
+  )
+    .hidden(12.5, 'Driving other runs')
+    .ride(23.5, LIN_VAN, 'driver', 'At the wheel')
+    .walk(28.6, [am.nose, am.noseRight, am.aside], {
+      title: 'Round to the ramp',
+      from: am.driverDoor,
+    })
+    .hold(41.3, 'greet', {
+      title: 'Ramp down; waiting for Mrs. Lin and her daughter',
+      face: am.foot,
+    })
+    .walk(42.2, [am.foot], { title: 'To the foot of the ramp' })
+    .walk(44.4, [am.sill], {
+      action: 'escort',
+      title: 'Up the ramp behind her',
+      ys: [VAN_FLOOR],
+    })
+    .walk(45, [am.inside], { title: 'Seeing her seated', ys: [VAN_FLOOR] })
+    .ride(62, LIN_VAN, 'driver', 'Driving Mrs. Lin to the center')
+    .hidden(620, 'Other runs', linVanSeat(62, 'driver'))
+    .ride(631, LIN_VAN, 'driver', 'Bringing Mrs. Lin home')
+    .walk(636.4, [pm.nose, pm.noseRight, pm.aside], {
+      title: 'Round to the ramp',
+      from: pm.driverDoor,
+    })
+    .hold(639.6, 'greet', { title: 'Helping her down the ramp', face: pm.foot })
+    .walk(640.5, [pm.foot], { title: 'To the foot of the ramp' })
+    .walk(649.5, offsetBehind(homeCrossing(pm.foot, s.id), 0.9).slice(2), {
+      action: 'escort',
+      title: 'Walking her to the porch ramp',
+    })
+    .hold(651.5, 'greet', {
+      title: 'Handing over to her daughter',
+      face: h.rampFoot,
+    })
+    .walk(
+      666.3,
+      [
+        h.crossC,
+        h.crossB,
+        h.crossA,
+        pm.aside,
+        pm.noseRight,
+        pm.nose,
+        pm.driverDoor,
+      ],
+      { title: 'Back to the van' },
+    )
+    .ride(679.5, LIN_VAN, 'driver', 'At the wheel')
+    .hidden(CLOCK_END, 'Other runs', linVanSeat(679.5, 'driver'));
+}
 /** A setting's hand-authored legs, by `<kind> <start>–<end>` of the hole they fill. */
 type Leg = (hole: InstanceHole, setting: CareSetting) => Segment[] | undefined;
 const holeKey = (hole: InstanceHole) =>
@@ -533,7 +770,8 @@ const byWindow =
  * `hole.start` to `hole.to` at `hole.end` (instance-cast.ts `fillHoles`), or
  * nothing to keep the person out of sight. The Wongs' home: everyone inside
  * the house comes from its cast (app/data/community/home-wong.cast.json);
- * these are their times outside it.
+ * these are their times outside it. Mrs. Lin's home likewise
+ * (home-lin.cast.json).
  */
 const HOLE_LEGS: Record<string, Leg> = {
   'home-participant': byWindow('home-participant', {
@@ -549,6 +787,9 @@ const HOLE_LEGS: Record<string, Leg> = {
   'hospital-participant': byWindow('hospital-participant', {
     'before 0–672': mrWongHospitalDay,
   }),
+  // Mrs. Lin's home (app/data/community/home-lin.cast.json).
+  'lin-at-home': byWindow('lin-at-home', linLegs),
+  'lin-daughter': byWindow('lin-daughter', daughterLegs),
 };
 const instanceCasts = castFile as unknown as InstanceCasts;
 
@@ -1178,6 +1419,34 @@ export function communitySource(model: Facility): SourceExtension {
       .hold(708, 'conversation', { title: 'Call with Mrs. Wong', heading: 0 })
       .hold(CLOCK_END, 'document', { title: 'Logging the call', heading: 0 });
     add(nurseLine);
+  }
+
+  // --- Mrs. Lin's home ---------------------------------------------------------
+  // She and her daughter come from the home's generated cast (below, with
+  // `HOLE_LEGS`); here are her van's driver and the two van touchpoints.
+  {
+    const zone = settingZone('home-lin');
+    add(linVanDriver());
+    interact(
+      'lin-van-pickup',
+      'home',
+      zone,
+      ['lin-at-home', 'lin-daughter', 'lin-van-driver'],
+      22.5,
+      50,
+      'Mrs. Lin · picked up by the Seen van',
+      'Her daughter walks her out of the front door, down the porch ramp and along the drive; the driver meets them at the van ramp, follows her up it and sees her into her seat for the ride to the Seen center.',
+    );
+    interact(
+      'lin-van-dropoff',
+      'home',
+      zone,
+      ['lin-at-home', 'lin-daughter', 'lin-van-driver'],
+      630,
+      661,
+      'Mrs. Lin · home on the Seen van',
+      'The van brings her home at 3:00: the driver sees her down the van ramp and walks behind her along the drive to the porch ramp, where her daughter meets her and they go in together.',
+    );
   }
 
   // --- People inside facility instances (generated casts) --------------------

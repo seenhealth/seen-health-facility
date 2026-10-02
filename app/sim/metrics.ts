@@ -16,7 +16,7 @@ import {
   type ActorSpec,
   type VehicleLookup,
 } from '../model/activity';
-import type { CharacterRole } from '../model/characters';
+import { isStaffRole, type CharacterRole } from '../model/characters';
 import type { Facility, Vec2 } from '../model/schema';
 import { COMMUNITY_CATEGORIES } from '../model/community-settings';
 import careTeam from '../data/care-team.json';
@@ -210,9 +210,12 @@ export type SimMetrics = {
   hero: HeroMetrics | null;
   handoffs: HandoffMetrics | null;
   headline: {
+    /** Participants, staff (as people) and family members. */
     people: number;
     participants: number;
     staff: number;
+    /** Family members (a daughter at home): neither staff nor participants. */
+    family: number;
     peakParticipantsOnSite: number;
     peakStaffOnFloor: number;
     staffCareShare: number;
@@ -353,8 +356,11 @@ export function computeMetrics(
   ]);
   for (const z of [...model.zones, ...(source.zones || [])])
     zoneInfo.set(z.id, { name: z.name, levelId: z.levelId });
-  const staff = source.actors.filter((a) => a.role !== 'participant'),
-    participants = source.actors.filter((a) => a.role === 'participant');
+  // Family members (a daughter at home) are neither staff nor participants:
+  // they count among the people measured, not in occupancy or staff time.
+  const staff = source.actors.filter((a) => isStaffRole(a.role)),
+    participants = source.actors.filter((a) => a.role === 'participant'),
+    family = source.actors.filter((a) => a.role === 'family');
   const zoneSeries = new Map<string, { participants: number[]; staff: number[] }>();
   const series = (id: string) => {
     let s = zoneSeries.get(id);
@@ -405,7 +411,8 @@ export function computeMetrics(
     const active = interactionsAt(t);
     for (const a of source.actors) {
       const f = frame.get(a.id)!;
-      if (f.visible) {
+      // Occupancy counts participants and staff; family members are neither.
+      if (f.visible && a.role !== 'family') {
         const s = series(f.zoneId),
           staffMember = a.role !== 'participant';
         if (staffMember) s.staff[k]++;
@@ -652,9 +659,10 @@ export function computeMetrics(
     hero: heroMetrics,
     handoffs,
     headline: {
-      people: participants.length + staffPeople.size,
+      people: participants.length + staffPeople.size + family.length,
       participants: participants.length,
       staff: staffPeople.size,
+      family: family.length,
       peakParticipantsOnSite: Math.max(...onSite.participants),
       peakStaffOnFloor: Math.max(...onSite.staff),
       staffCareShare: staffOnFloor ? careSeconds / staffOnFloor : 0,

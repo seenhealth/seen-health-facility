@@ -21,7 +21,8 @@ export type CharacterRole =
   | 'activities'
   | 'nutrition'
   | 'dietitian'
-  | 'center-manager';
+  | 'center-manager'
+  | 'family';
 export type Action =
   | 'ping-pong'
   | 'billiards'
@@ -77,14 +78,23 @@ export const roleNames: Record<CharacterRole, string> = {
   nutrition: 'Food service',
   dietitian: 'Dietitian',
   'center-manager': 'Center manager',
+  family: 'Family',
 };
+/**
+ * Staff are the people who work the care day; participants and family (a
+ * daughter at home) are not. Measure, the trace and the "Staff only" filter
+ * count staff with this; family members are neither staff nor participants.
+ */
+export const isStaffRole = (role: CharacterRole) =>
+  role !== 'participant' && role !== 'family';
 export const characterLibrary = templates;
 const roles = templates.roles as Record<
   string,
   { wardrobe: string; color: string; detail?: string }
 >;
 // One palette for the figures and the story overlay: IDT colours come from the
-// care-team roster; front desk and food service (outside the IDT) from the templates.
+// care-team roster; front desk, food service and family (outside the IDT) from
+// the templates.
 const teamColors: Record<string, string> = Object.fromEntries(
   careTeam.members.map((m) => [m.characterRole, m.color]),
 );
@@ -582,6 +592,9 @@ export function createCharacter(spec: CharacterSpec) {
   const profile = characterProfile(spec),
     senior = spec.role === 'participant',
     wardrobe = roles[spec.role]?.wardrobe ?? 'uniform',
+    // Everyday clothes (participants and family): a sweater, cardigan or shirt
+    // over warm trousers; family keep an adult's hair, height and posture.
+    everyday = senior || wardrobe === 'casual',
     F = profile.figure === 'f',
     fig = profile.figure,
     h = hash(profile.id);
@@ -595,7 +608,7 @@ export function createCharacter(spec: CharacterSpec) {
     scrubs = wardrobe === 'scrubs',
     apron = spec.role === 'nutrition',
     cap = spec.role === 'driver',
-    cardigan = senior && profile.cut === 'cardigan',
+    cardigan = everyday && profile.cut === 'cardigan',
     lanyard = [
       'reception',
       'coordinator',
@@ -603,9 +616,9 @@ export function createCharacter(spec: CharacterSpec) {
       'social-worker',
       'activities',
     ].includes(spec.role),
-    cut = senior ? profile.cut : scrubs || coat ? 'scrubs' : 'polo';
+    cut = everyday ? profile.cut : scrubs || coat ? 'scrubs' : 'polo';
   const warmTrousers = ['#5f5850', '#7a7063', '#4b4743', '#8d8373', '#6a625a'],
-    trouser = senior
+    trouser = everyday
       ? warmTrousers[(h >>> 5) % warmTrousers.length]
       : scrubs
         ? shadeOf(roleColor, 0.9)
@@ -615,7 +628,7 @@ export function createCharacter(spec: CharacterSpec) {
             ? '#5d5249'
             : '#3f3d3b',
     coatWhite = '#f1eee7',
-    shoe = senior
+    shoe = everyday
       ? ['#4b4038', '#2f2d2b', '#8a7662', '#5a5550'][(h >>> 7) % 4]
       : scrubs
         ? '#dcd9d2'
@@ -624,7 +637,7 @@ export function createCharacter(spec: CharacterSpec) {
       coat ||
       cap ||
       spec.role === 'center-manager' ||
-      (senior && (profile.cut !== 'shirt' || (h >>> 9) % 2 === 0)),
+      (everyday && (profile.cut !== 'shirt' || (h >>> 9) % 2 === 0)),
     sleeveColor = coat ? coatWhite : roleColor,
     innerTop = cardigan ? mixHex(roleColor, '#f3efe6', 0.72) : roleColor;
 
@@ -636,7 +649,7 @@ export function createCharacter(spec: CharacterSpec) {
     template: wardrobe,
     style: 'architectural clay figure',
     clothing:
-      'White coats / V-neck scrubs / polos with lanyard / apron / driver cap; participants in warm casual wear',
+      'White coats / V-neck scrubs / polos with lanyard / apron / driver cap; participants and family in warm casual wear',
   };
   // Skeleton: the same 16 joints and hierarchy as earlier Seen rigs.
   const bones: T.Bone[] = [],
@@ -790,7 +803,7 @@ export function createCharacter(spec: CharacterSpec) {
         : 0.5 + 0.5 * Math.cos((Math.PI * a) / width);
       return neckTop - depth * f;
     };
-  const hem = senior ? 0.845 : scrubs ? 0.83 : 0.855;
+  const hem = everyday ? 0.845 : scrubs ? 0.83 : 0.855;
   part(
     loft({
       keys: tk,

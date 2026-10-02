@@ -582,6 +582,73 @@ export const careSettings: CareSetting[] = [
       loadingCar: [0, -1.2],
     },
   }),
+  // --- Mrs. Lin's home ---------------------------------------------------------
+  // The story's participant lives here with her daughter; a Seen van takes
+  // her to the center in the morning and brings her home in the afternoon
+  // (docs/COMMUNITY.md, "Mrs. Lin's home"). South of the pharmacy, its stub
+  // on the west street's southern reach, which only the fleet's off-site runs
+  // share. The same senior-friendly bungalow as the Wongs',
+  // stamped with the same plan, frame and exclusions (validate-home.mjs), so
+  // the porch, ramp and crossing anchors below are theirs.
+  define({
+    id: 'home-lin',
+    kind: 'home',
+    name: "Mrs. Lin's home",
+    short: 'Lin home',
+    subtitle: 'Lives with her daughter · Seen van door to door',
+    position: [-84, -56],
+    heading: Math.PI / 2,
+    pad: { w: 30, d: 28, back: 8 },
+    road: { from: [-48.4, -56], to: [-70, -56] },
+    drive: { depth: 7, radius: 6.2, lanes: 2 },
+    apron: { w: 0, d: 0 },
+    services: ['transport'],
+    accent: '#9b7a96',
+    // The Wongs' plan (public/models/seen-home-wong.json): world = P + (−94.8, −56).
+    facility: {
+      id: 'seen-home-wong',
+      url: '/models/seen-home-wong.json',
+      frame: { position: [0, -10.8], heading: -Math.PI / 2 },
+      levelIds: ['ground'],
+      excludeZoneIds: ['home-zone-porch'],
+      cutaway: true,
+      floorY: PORCH_Y,
+      labels: {
+        'home-living': 'Living room',
+        'home-kitchen': 'Kitchen',
+        'home-bath': 'Bath',
+      },
+      margin: 1.6,
+    },
+    local: {
+      kerb: [0.2, -4.4],
+      rampFoot: [9.9, -6.3],
+      rampMid: [6.6, -6.3],
+      rampTop: [3.4, -6.3],
+      rampTopAside: [3.2, -5.5],
+      porch: [0.4, -6.3],
+      porchSeat: [-4.0, -7.0],
+      porchAside: [2.6, -6.0],
+      porchGreet: [1.6, -5.5],
+      porchStep: [-3.4, -5.6],
+      porchStepFoot: [-3.4, -4.5],
+      door: [0.4, -7.6],
+      doorStep: [0.4, -6.9],
+      inside: [0.4, -9.6],
+      // Van ramp foot → porch ramp, as at the Wongs' (crossA–D).
+      crossA: [6.0, -4.0],
+      crossB: [10.8, -4.7],
+      crossC: [11.5, -5.6],
+      crossD: [10.7, -6.3],
+      // Her daughter: watching for the van on the porch, and meeting it
+      // beside the ramp foot, off the crossing.
+      porchWait: [2.0, -5.6],
+      rampFootSouth: [10.4, -7.0],
+      sidewalkEnd: [12.5, 35],
+      sidewalkPad: [12.5, 13.5],
+      padCorner: [12.4, -2],
+    },
+  }),
   define({
     id: 'hospital',
     kind: 'hospital',
@@ -753,6 +820,7 @@ export const serviceLabels: Record<string, string> = {
   ed: 'Emergency care',
   discharge: 'Discharge coordination',
   'day-program': 'Partner day program',
+  transport: 'Door-to-door transport',
 };
 /** Interaction categories contributed by the community layer (id, panel label). */
 export const COMMUNITY_CATEGORIES: [string, string][] = [

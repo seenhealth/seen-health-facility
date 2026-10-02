@@ -55,9 +55,9 @@ const PALETTE = {
   text: '#2f3a38',
 };
 /**
- * The Wongs' porch slab in the home pad's local frame (centre and size): the
- * house's front wall stands on its back edge (z = −7.6), where the `door`
- * anchor is.
+ * A home pad's porch slab in its local frame (centre and size): the house's
+ * front wall stands on its back edge (z = −7.6), where the `door` anchor is.
+ * The Wongs' and Mrs. Lin's homes stamp the same plan, so share it.
  */
 export const HOME_PORCH = { x: -0.6, z: -6.3, w: 8.0, d: 2.6 };
 type Mat = (id: string) => T.MeshStandardMaterial;
@@ -483,8 +483,22 @@ function buildHomeSite(s: CareSetting, h: Ctx) {
       h.box(x, y, foot[1] + dz, 0.035, 0.9, 0.035, PALETTE.rail);
     }
   }
-  // Home-modification kit: a grab-bar crate, a toolbox and two bars leaning on it.
-  const crate = a('crate');
+  // Home-modification kit, where a home has a `crate` anchor (the Wongs'):
+  // a grab-bar crate, a toolbox and two bars leaning on it.
+  if (s.anchors.crate) homeModsKit(h, a('crate'));
+  // Garden beds and trees at the pad corners.
+  h.box(-11, PAD_Y, -10.5, 6, 0.08, 5, PALETTE.planting);
+  h.box(11.5, PAD_Y, -11.5, 5, 0.08, 3.5, PALETTE.planting);
+  h.tree(-12.4, -11.6, 1.7, 3.2, 0);
+  h.tree(12.6, -12.2, 1.4, 2.8, 1);
+  h.tree(-13.2, 9.8, 1.2, 2.6, 2);
+  // A visitor's parking stall, where a home has one (the Wongs' aide).
+  if (s.anchors.stall) {
+    const st = toLocal(s, s.anchors.stall);
+    stall(h, st[0], st[1]);
+  }
+}
+function homeModsKit(h: Ctx, crate: Vec2) {
   h.box(crate[0], PAD_Y, crate[1], 0.9, 0.5, 0.6, PALETTE.wood);
   h.box(crate[0] + 0.85, PAD_Y, crate[1] + 0.1, 0.5, 0.28, 0.32, PALETTE.dark);
   for (const [dx, dz] of [
@@ -502,14 +516,6 @@ function buildHomeSite(s: CareSetting, h: Ctx) {
     bar.rotation.x = 0.45;
     bar.position.y = PAD_Y + 0.36;
   }
-  // Garden beds and trees at the pad corners.
-  h.box(-11, PAD_Y, -10.5, 6, 0.08, 5, PALETTE.planting);
-  h.box(11.5, PAD_Y, -11.5, 5, 0.08, 3.5, PALETTE.planting);
-  h.tree(-12.4, -11.6, 1.7, 3.2, 0);
-  h.tree(12.6, -12.2, 1.4, 2.8, 1);
-  h.tree(-13.2, 9.8, 1.2, 2.6, 2);
-  const st = toLocal(s, s.anchors.stall);
-  stall(h, st[0], st[1]);
 }
 function buildPharmacy(s: CareSetting, h: Ctx) {
   // Storefront: floor, back and side walls, roof with fascia; open glazed front.

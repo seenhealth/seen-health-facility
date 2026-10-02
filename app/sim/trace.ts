@@ -17,7 +17,11 @@ import type {
   VehicleLookup,
 } from '../model/activity';
 import { COMMUNITY_CATEGORIES } from '../model/community-settings';
-import { roleNames, type CharacterRole } from '../model/characters';
+import {
+  isStaffRole,
+  roleNames,
+  type CharacterRole,
+} from '../model/characters';
 import type { Facility, Vec2 } from '../model/schema';
 import { clockLabel } from './clock';
 import {
@@ -270,11 +274,11 @@ export function traceTouchpoints(
 
   // Handoffs: the staff attending each participant (shared interaction,
   // escort or paired partner) and who most recently started attending.
+  // Family members share interactions with a participant but are not staff.
   const participants = actors.filter((a) => a.role === 'participant'),
     attendants = new Map<string, ActorSpec[]>();
   for (const a of actors) {
-    const p =
-      a.escortFor || (a.role !== 'participant' ? a.pairedWith : undefined);
+    const p = a.escortFor || (isStaffRole(a.role) ? a.pairedWith : undefined);
     if (p) attendants.set(p, [...(attendants.get(p) || []), a]);
   }
   const attending = new Map<string, Set<string>>(),
@@ -413,9 +417,10 @@ export function traceTouchpoints(
       const now = new Set<string>();
       for (const i of active)
         if (i.actorIds.includes(p.id))
-          for (const id of i.actorIds)
-            if (id !== p.id && byId.get(id)?.role !== 'participant')
-              now.add(id);
+          for (const id of i.actorIds) {
+            const role = byId.get(id)?.role;
+            if (id !== p.id && role && isStaffRole(role)) now.add(id);
+          }
       for (const s of attendants.get(p.id) || [])
         if (fp.visible && frame[indexOf.get(s.id)!].visible) now.add(s.id);
       const before = attending.get(p.id) || new Set<string>();

@@ -57,7 +57,7 @@ if (!traceOnly) {
   ]) {
     const h = m.headline;
     line(
-      `${name.padEnd(14)} ${h.people} people (${h.participants} participants, ${h.staff} staff) · peak on site ${h.peakParticipantsOnSite} participants at ${at(m.onSite.participants, h.peakParticipantsOnSite)}, ${h.peakStaffOnFloor} staff at ${at(m.onSite.staff, h.peakStaffOnFloor)} · staff time: ${pct(h.staffCareShare)} care, ${pct(h.staffWalkingShare)} walking · participants active ${pct(h.meanParticipantActiveShare)} of time on site`,
+      `${name.padEnd(14)} ${h.people} people (${h.participants} participants, ${h.staff} staff${h.family ? `, ${h.family} family` : ''}) · peak on site ${h.peakParticipantsOnSite} participants at ${at(m.onSite.participants, h.peakParticipantsOnSite)}, ${h.peakStaffOnFloor} staff at ${at(m.onSite.staff, h.peakStaffOnFloor)} · staff time: ${pct(h.staffCareShare)} care, ${pct(h.staffWalkingShare)} walking · participants active ${pct(h.meanParticipantActiveShare)} of time on site`,
     );
   }
   line();
