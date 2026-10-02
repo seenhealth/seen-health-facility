@@ -551,6 +551,21 @@ const HOLE_LEGS: Record<string, Leg> = {
   }),
 };
 const instanceCasts = castFile as unknown as InstanceCasts;
+/**
+ * A call that a setting's generated cast places (its other end is authored
+ * here, e.g. the nurse line), so both ends keep in step when the cast is
+ * re-timed.
+ */
+function castCall(settingId: string, id: string) {
+  const call = instanceCasts.casts[settingId]?.interactions.find(
+    (i) => i.id === id,
+  );
+  if (!call)
+    throw new Error(
+      `${id} is not in the generated ${settingId} cast (npm run build:community)`,
+    );
+  return call;
+}
 
 export function communitySource(model: Facility): SourceExtension {
   const home = careSettingById('home-wong')!,
@@ -1157,6 +1172,10 @@ export function communitySource(model: Facility): SourceExtension {
         `No ${NURSE_LINE_DESK.assetId} in ${NURSE_LINE_DESK.zoneId} for the nurse line`,
       );
     const deskAt: Vec2 = [desk.position[0], desk.position[2]];
+    // The nurse line takes the Wongs' calls when their generated cast places
+    // them: the PERS call in the morning and the evening plan.
+    const pers = castCall(home.id, 'home-pers-call'),
+      evening = castCall(home.id, 'after-hours-call');
     const nurseLine = new Track(
       'nurse-line-rn',
       'nurse',
@@ -1171,11 +1190,19 @@ export function communitySource(model: Facility): SourceExtension {
       },
       deskAt,
     )
-      .hold(690, 'document', {
+      .hold(pers.start, 'document', {
         title: 'Nurse line & on-call coordination',
         heading: 0,
       })
-      .hold(708, 'conversation', { title: 'Call with Mrs. Wong', heading: 0 })
+      .hold(pers.end, 'phone', {
+        title: 'PERS call: Mrs. Wong, light-headed at home',
+        heading: 0,
+      })
+      .hold(evening.start, 'document', {
+        title: 'Nurse line & on-call coordination',
+        heading: 0,
+      })
+      .hold(evening.end, 'phone', { title: 'Call with the Wongs', heading: 0 })
       .hold(CLOCK_END, 'document', { title: 'Logging the call', heading: 0 });
     add(nurseLine);
   }

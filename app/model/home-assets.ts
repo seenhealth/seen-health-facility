@@ -13,7 +13,22 @@ export const HOME_ASSET_KINDS = [
   'bed-rail',
   'hospital-bed',
   'ramp',
+  'pers-console',
 ];
+/** Height of the bedside lamp that a `nightstand` with `lamp` carries on its top. */
+const NIGHTSTAND_LAMP = 0.36;
+/**
+ * Height above a home asset's base where things stand on it: its declared
+ * height, or a nightstand's top beside its lamp (the declared height
+ * includes the lamp). Undefined for kinds this module does not draw.
+ */
+export function homeAssetSurface(spec: Asset): number | undefined {
+  if (!HOME_ASSET_KINDS.includes(spec.kind)) return undefined;
+  const h = spec.dimensions[1];
+  return spec.kind === 'nightstand' && spec.parameters?.lamp === true
+    ? h - NIGHTSTAND_LAMP
+    : h;
+}
 
 /**
  * Home furniture and accessibility fittings (the Wongs' home,
@@ -38,6 +53,8 @@ export const HOME_ASSET_KINDS = [
  *   slides under a mattress.
  * - `ramp`: high end at −z, foot at +z, handrails on both sides; `rise` is
  *   the height difference (the declared height adds the 0.9 m rails).
+ * - `pers-console`: a PERS base unit; its speaker grille and status light
+ *   face +z, the help button is on top.
  */
 export function buildHomeAsset(
   spec: Asset,
@@ -200,7 +217,7 @@ export function buildHomeAsset(
     // Two-drawer carcass on a recessed plinth; optional bedside lamp on top
     // (the declared height includes the lamp).
     const lamp = p.lamp === true,
-      body = h - (lamp ? 0.36 : 0);
+      body = h - (lamp ? NIGHTSTAND_LAMP : 0);
     box(0, 0, -0.01, w - 0.06, 0.05, d - 0.06, slot('plinth', spec.material));
     box(0, 0.05, -0.01, w - 0.02, body - 0.08, d - 0.02, spec.material, 0.006);
     box(0, body - 0.03, 0, w, 0.03, d, spec.material, 0.008);
@@ -430,6 +447,22 @@ export function buildHomeAsset(
         rod([x, surface(z) - 0.02, z], [x, surface(z) + railH, z], 0.018, rail);
       }
     }
+  } else if (spec.kind === 'pers-console') {
+    // A personal emergency response (PERS) base unit: the pendant's alarm
+    // calls the response center through it, which talks back through its
+    // speaker. Low shell, dark top panel with the large help button and a
+    // reset key, speaker grille and a status light on the front.
+    const panel = slot('panel', 'photo-black'),
+      button = slot('button', 'photo-teal'),
+      light = slot('light', 'photo-teal'),
+      top = h - 0.012,
+      front = d / 2 - 0.002;
+    box(0, 0, 0, w, top, d, spec.material, 0.01);
+    box(0, top - 0.002, -0.004, w - 0.024, 0.004, d - 0.03, panel, 0.001);
+    cyl(w * 0.2, top, -0.006, Math.min(w, d) * 0.24, 0.012, button);
+    cyl(-w * 0.28, top, -0.012, 0.011, 0.007, slot('key', 'photo-silver'));
+    box(-w * 0.14, top * 0.2, front, w * 0.48, top * 0.5, 0.004, panel, 0.001);
+    box(w * 0.3, top * 0.4, front, 0.014, 0.008, 0.004, light);
   }
   const bounds = new T.Box3().setFromObject(g),
     size = bounds.getSize(new T.Vector3()),
