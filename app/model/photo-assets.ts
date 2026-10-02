@@ -380,7 +380,17 @@ export function buildPhotoAsset(
         ],
         body,
       );
-      box(side * sideX, belt, -1.15, skin, windowTop - belt, 0.14, body);
+      // B-pillar; on +x it runs on to the sliding door's opening.
+      const pillarRear = side > 0 ? opening.front : -1.08;
+      box(
+        side * sideX,
+        belt,
+        (pillarRear - 1.22) / 2,
+        skin,
+        windowTop - belt,
+        pillarRear + 1.22,
+        body,
+      );
       box(side * sideX, belt, 0.55, skin, windowTop - belt, 0.26, body);
       box(side * sideX, belt, 3.0, skin, windowTop - belt, 0.2, body);
       pane(side * sideX, belt, 1.79, 0.03, windowTop - belt, 2.22);
@@ -401,8 +411,9 @@ export function buildPhotoAsset(
       windowTop - belt,
       -1.22 - glassFront,
     );
-    // Driver's door: lower panel, cab window and handle on one front-hinged
-    // leaf (`driver-door`; fleet vans swing it open as the driver gets out).
+    // Driver's door: lower panel, cab window in its frame and handle on one
+    // front-hinged leaf (`driver-door`; fleet vans swing it open as the
+    // driver gets out).
     const leafLength = cab.rear - cab.hinge,
       leafMid = (cab.hinge + cab.rear) / 2,
       glassRear = cab.rear - 0.06;
@@ -416,6 +427,15 @@ export function buildPhotoAsset(
         0.03,
         windowTop - belt,
         glassRear - glassFront,
+      ),
+      box(
+        -sideX,
+        belt,
+        (glassRear + cab.rear) / 2,
+        skin,
+        windowTop - belt,
+        cab.rear - glassRear,
+        body,
       ),
       box(
         -sideX,
