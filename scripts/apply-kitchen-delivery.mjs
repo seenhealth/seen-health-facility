@@ -37,13 +37,21 @@ const { nav, deliveries, activity } = await loadSim(
 const DELIVERY = 'delivery-food',
   KITCHEN_STAFF = 'food-service-02',
   INTERACTION = 'kitchen-lunch-delivery';
-/** Loop seconds: the trolley stops at the island, the kitchen starts unloading, done. */
-const HANDOVER = { arrive: 285, unload: 297, done: 309 };
+/**
+ * Loop seconds: the trolley stops at the island, the kitchen starts unloading
+ * (when the carriers appear on the island, `KITCHEN_LUNCH` in deliveries.ts),
+ * done.
+ */
+const HANDOVER = {
+  arrive: 285,
+  unload: deliveries.KITCHEN_LUNCH.from,
+  done: 309,
+};
 /** The delivery person behind the trolley, facing the island's south end. */
 const TROLLEY_STOP = [10.45, 1.25];
-/** The kitchen staff member beside the trolley, and the island counter it is unloaded onto. */
+/** The kitchen staff member beside the trolley, and where the carriers go on the island. */
 const RECEIVE_AT = [9.75, 2.05],
-  ISLAND = [10.79, 2.9];
+  ISLAND = deliveries.KITCHEN_LUNCH.at;
 /** From the kitchen station down the west aisle to the trolley. */
 const AISLE = [9.75, 4.55];
 /**

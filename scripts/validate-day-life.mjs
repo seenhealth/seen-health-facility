@@ -10,6 +10,7 @@ import { fleetParking } from '../work/validation/alhambra-fleet.mjs';
 import {
   deliveryRuns,
   deliveryStops,
+  KITCHEN_LUNCH,
   sampleDelivery,
 } from '../work/validation/deliveries.mjs';
 import { showcaseFrame } from '../work/validation/showcase.mjs';
@@ -212,6 +213,48 @@ for (const [t, loaded] of [
     'Unloading',
     'The truck waits at receiving',
   );
+}
+// The carriers move from the trolley onto the island counter as unloading
+// starts and stay there until lunch service ends.
+const { at, from, to } = KITCHEN_LUNCH,
+  service = JSON.parse(fs.readFileSync('app/data/day-program.json')).lunch
+    .service;
+assert(
+  handover.start < from && from < handover.end && to === service[1],
+  'Lunch is unloaded during the hand-over and left out through service',
+);
+assert(
+  m.objects.some((o) => {
+    const [w, , d] = m.assets[o.assetId].dimensions.map(
+      (v, i) => v * o.scale[i],
+    );
+    return (
+      o.zoneId === 'kitchen' &&
+      m.assets[o.assetId].kind === 'counter' &&
+      Math.abs(at[0] - o.position[0]) < w / 2 &&
+      Math.abs(at[1] - o.position[2]) < d / 2
+    );
+  }),
+  'Lunch carriers rest on a kitchen counter',
+);
+for (const [t, onCounter] of [
+  [from - 0.25, false],
+  [from + 0.25, true],
+  [to - 0.25, true],
+  [to + 0.25, false],
+]) {
+  activity.setOptions({ time: t });
+  assert.equal(
+    activity.deliveries.lunch.visible,
+    onCounter,
+    `Lunch carriers on the island at ${t}`,
+  );
+  if (t < handover.end)
+    assert.equal(
+      courier.root.getObjectByName('delivery-cargo').visible,
+      !onCounter,
+      `Lunch on the trolley or the island at ${t}, not both`,
+    );
 }
 activity.dispose();
 for (const mode of ['tiltshift', 'day', 'logistics'])
