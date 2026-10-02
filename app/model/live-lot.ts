@@ -48,7 +48,13 @@ export type LivePerson = {
   risk?: 'high' | 'assisted' | 'standard';
   wheelchair?: boolean;
   boarding?: boolean;
+  /** Full name, a second line (native name) and detail lines for the card shown when the avatar is hovered in an opened bubble. */
+  fullName?: string;
+  subtitle?: string;
+  lines?: string[];
 };
+/** Where an avatar was painted on a plate's canvas, so a hover over the plate can find the person. */
+type AvatarRect = { x: number; y: number; w: number; h: number; p: LivePerson };
 export type LiveVehicle = {
   id: string;
   kind: LiveKind;
@@ -471,6 +477,7 @@ function paintLabel(
   uploadLabel(sprite);
   sprite.userData.widthM = width / LABEL_PX;
   sprite.userData.heightM = LABEL_H;
+  sprite.userData.avatars = [] as AvatarRect[];
 }
 /** The opened bubble: title line, crew row with names, then each detail line; a brighter rim marks it as the one picked. */
 function paintExpanded(sprite: T.Sprite, v: LiveVehicle, repaint: () => void) {
@@ -536,6 +543,7 @@ function paintExpanded(sprite: T.Sprite, v: LiveVehicle, repaint: () => void) {
   g.textBaseline = 'middle';
   g.fillText(title, PAD, yTitle, width - PAD * 2);
   let x = PAD;
+  const avatars: AvatarRect[] = [];
   for (const { p, square } of people) {
     const w = square ? AV : nameW(p);
     drawAvatar(g, p, x + (w - AV) / 2, yAv, AV, square, repaint);
@@ -546,9 +554,11 @@ function paintExpanded(sprite: T.Sprite, v: LiveVehicle, repaint: () => void) {
       g.textBaseline = 'middle';
       g.fillText(p.name, x + w / 2, yAv + AV + 46, w + 10);
       g.textAlign = 'left';
+      avatars.push({ x, y: yAv - 10, w, h: AV + 80, p });
     }
     x += w + GAP;
   }
+  sprite.userData.avatars = avatars;
   if (more) {
     g.fillStyle = '#cbedd9';
     g.font = '600 56px system-ui, sans-serif';
@@ -574,6 +584,83 @@ function paintExpanded(sprite: T.Sprite, v: LiveVehicle, repaint: () => void) {
         ? '#cbedd9'
         : '#e9f6ef';
     g.fillText(t, PAD, yLines + LINE * i + LINE / 2 - 8, width - PAD * 2);
+  });
+  uploadLabel(sprite);
+  sprite.userData.widthM = width / LABEL_PX;
+  sprite.userData.heightM = height / LABEL_PX;
+}
+
+/** The card for a hovered rider: large avatar, full name, native name, then the detail lines. Light, like the board's hover cards. */
+function paintPersonCard(sprite: T.Sprite, p: LivePerson, repaint: () => void) {
+  const canvas = sprite.userData.canvas as HTMLCanvasElement;
+  const AV = 180,
+    PAD = 44,
+    LINE = 66;
+  const lines = (p.lines ?? []).slice(0, 8);
+  const probe = canvas.getContext('2d')!;
+  const measure = (font: string, text: string) => {
+    probe.font = font;
+    return probe.measureText(text).width;
+  };
+  const NAMEF = '700 60px system-ui, sans-serif',
+    SUBF = '500 46px system-ui, sans-serif',
+    LINEF = '500 46px system-ui, sans-serif';
+  const headW =
+    AV +
+    28 +
+    Math.max(
+      measure(NAMEF, p.fullName ?? p.name),
+      p.subtitle ? measure(SUBF, p.subtitle) : 0,
+    );
+  const width = Math.min(
+    3400,
+    Math.round(
+      PAD * 2 + Math.max(headW, ...lines.map((t) => measure(LINEF, t)), 600),
+    ),
+  );
+  const yLines = PAD + AV + 36;
+  const height = Math.round(
+    yLines + lines.length * LINE + (lines.length ? 30 : 0),
+  );
+  canvas.width = width;
+  canvas.height = height;
+  const g = canvas.getContext('2d')!;
+  g.clearRect(0, 0, width, height);
+  g.fillStyle = 'rgba(243,239,228,0.98)';
+  g.beginPath();
+  g.roundRect(8, 8, width - 16, height - 16, 56);
+  g.fill();
+  g.lineWidth = 6;
+  g.strokeStyle = '#2f6b62';
+  g.stroke();
+  drawAvatar(g, p, PAD, PAD, AV, false, repaint);
+  g.fillStyle = '#1b3a36';
+  g.font = NAMEF;
+  g.textAlign = 'left';
+  g.textBaseline = 'middle';
+  g.fillText(
+    p.fullName ?? p.name,
+    PAD + AV + 28,
+    PAD + (p.subtitle ? 58 : 90),
+    width - PAD * 2 - AV - 28,
+  );
+  if (p.subtitle) {
+    g.fillStyle = '#5b6b66';
+    g.font = SUBF;
+    g.fillText(p.subtitle, PAD + AV + 28, PAD + 124, width - PAD * 2 - AV - 28);
+  }
+  if (lines.length) {
+    g.strokeStyle = 'rgba(27,58,54,0.18)';
+    g.lineWidth = 3;
+    g.beginPath();
+    g.moveTo(PAD, yLines - 22);
+    g.lineTo(width - PAD, yLines - 22);
+    g.stroke();
+  }
+  g.font = LINEF;
+  lines.forEach((t, i) => {
+    g.fillStyle = i === 0 || i === lines.length - 1 ? '#5b6b66' : '#1b3a36';
+    g.fillText(t, PAD, yLines + LINE * i + LINE / 2 - 6, width - PAD * 2);
   });
   uploadLabel(sprite);
   sprite.userData.widthM = width / LABEL_PX;
@@ -630,6 +717,13 @@ export function createLiveLot(ctx: {
   /** The vehicle under the pointer (every other one is dimmed) and the one whose plate is opened. */
   let hoverId: string | null = null,
     expandedId: string | null = null;
+  /** The rider whose avatar the pointer is over in the opened bubble, and the card drawn for them. */
+  let hoverPerson: { l: Live; rect: AvatarRect } | null = null;
+  const personCard = makeLabel();
+  personCard.visible = false;
+  personCard.renderOrder = 12;
+  let personCardKey = '';
+  root.add(personCard);
   /** The lobby's sliding leaves (arrival.ts), opened for walkers; found once the scene has them. */
   let leaves: T.Object3D[] | null = null;
   let entryOpen = 0;
@@ -1207,6 +1301,41 @@ export function createLiveLot(ctx: {
       (l.label.material as T.SpriteMaterial).opacity = shown * l.plateFade;
     }
     placeLabels();
+    // The hovered rider's card floats above their avatar, offset across the screen to sit over that avatar's column.
+    if (
+      hoverPerson &&
+      hoverPerson.l.v.id === expandedId &&
+      hoverPerson.l.label.visible
+    ) {
+      const { l, rect } = hoverPerson;
+      const key = JSON.stringify(rect.p);
+      if (key !== personCardKey) {
+        personCardKey = key;
+        paintPersonCard(personCard, rect.p, () => {
+          personCardKey = '';
+        });
+      }
+      const k = labelScale * EXPAND_BOOST;
+      personCard.scale.set(
+        (personCard.userData.widthM as number) * k,
+        (personCard.userData.heightM as number) * k,
+        1,
+      );
+      const canvas = l.label.userData.canvas as HTMLCanvasElement;
+      const dx =
+        ((rect.x + rect.w / 2 - canvas.width / 2) / canvas.width) *
+        l.label.scale.x;
+      const dy = l.label.scale.y / 2 + personCard.scale.y / 2 + 0.2;
+      const rx = Math.cos(viewAz),
+        rz = -Math.sin(viewAz);
+      personCard.position.set(
+        l.label.position.x + rx * dx,
+        l.label.position.y + dy,
+        l.label.position.z + rz * dx,
+      );
+      (personCard.material as T.SpriteMaterial).opacity = 1;
+      personCard.visible = true;
+    } else personCard.visible = false;
     walkers.tick(dt);
     // The lobby's sliding doors part for anyone on foot coming up to them (the care-day's door logic is idle on this page).
     if (walkers.count > 0 || entryOpen > 0) {
@@ -1258,6 +1387,48 @@ export function createLiveLot(ctx: {
     /** The vehicle under the pointer: every other vehicle and plate is drawn at half opacity while one is set. */
     setHover(id: string | null) {
       hoverId = id && live.has(id) ? id : null;
+      hoverPerson = null;
+    },
+    /**
+     * Pointer hover: the vehicle under `ray` (null clears), and when the pointer is over a rider's avatar in the opened
+     * bubble, that rider's card is shown. Returns the hovered vehicle id, or 'person' over an avatar.
+     */
+    hover(ray: T.Raycaster | null): string | null {
+      hoverPerson = null;
+      if (!ray) {
+        hoverId = null;
+        return null;
+      }
+      let best: { l: Live; hit: T.Intersection } | null = null;
+      for (const l of live.values()) {
+        if (l.mode === 'gone' || l.opacity <= 0.3) continue;
+        const targets =
+          l.plateFade > 0.3 ? [l.body.object, l.label] : [l.body.object];
+        const hit = ray.intersectObjects(targets, true)[0];
+        if (hit && (!best || hit.distance < best.hit.distance))
+          best = { l, hit };
+      }
+      hoverId = best?.l.v.id ?? null;
+      if (
+        best &&
+        best.l.v.id === expandedId &&
+        best.hit.object === best.l.label &&
+        best.hit.uv
+      ) {
+        const canvas = best.l.label.userData.canvas as HTMLCanvasElement;
+        const px = best.hit.uv.x * canvas.width,
+          py = (1 - best.hit.uv.y) * canvas.height;
+        const rect = (
+          (best.l.label.userData.avatars as AvatarRect[]) ?? []
+        ).find(
+          (r) => px >= r.x && px <= r.x + r.w && py >= r.y && py <= r.y + r.h,
+        );
+        if (rect) {
+          hoverPerson = { l: best.l, rect };
+          return 'person';
+        }
+      }
+      return hoverId;
     },
     /** Open one vehicle's plate into its details bubble (null closes it). */
     setExpanded(id: string | null) {

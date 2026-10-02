@@ -48,8 +48,7 @@ async function main() {
       return true;
     },
     hover: (ray) => {
-      const id = ray ? (lot?.pick(ray) ?? null) : null;
-      lot?.setHover(id);
+      const id = lot?.hover(ray) ?? null;
       host.style.cursor = id ? 'pointer' : '';
     },
     layer: (ctx) => {
@@ -327,9 +326,48 @@ async function main() {
           etaMinutes: eta,
           driver: { name: 'Linda', initials: 'LL' },
           riders: [
-            { name: 'May', initials: 'MC', risk: 'high' },
-            { name: 'Ray', initials: 'RT', risk: 'assisted', wheelchair: true },
-            { name: 'Jun', initials: 'JW', risk: 'standard' },
+            {
+              name: 'May',
+              initials: 'MC',
+              risk: 'high',
+              fullName: 'May Chen',
+              subtitle: '陈美',
+              lines: [
+                'High risk · Fall risk · Wandering',
+                'Appointment 2:30 PM · Day Center',
+                'Picked up 1:35 PM · ETA 1:41 PM',
+                'From 123 N Garfield Ave, Alhambra',
+                'Phone (626) 555-0101',
+                'Ride back 4:00 PM · 11825 · Lim, Linda',
+                'Not checked in today',
+              ],
+            },
+            {
+              name: 'Ray',
+              initials: 'RT',
+              risk: 'assisted',
+              wheelchair: true,
+              fullName: 'Ray Tan',
+              lines: [
+                'Needs assistance · Wheelchair',
+                'Picked up 1:50 PM · ETA 1:52 PM',
+                'From 400 S Atlantic Blvd, Monterey Park',
+                'Ride back 4:00 PM · no car yet',
+                'Not checked in today',
+              ],
+            },
+            {
+              name: 'Jun',
+              initials: 'JW',
+              risk: 'standard',
+              fullName: 'Jun Wang',
+              lines: [
+                'Standard risk',
+                'Picked up 2:05 PM',
+                'From 15 N 3rd St, Alhambra',
+                'In the building (check-in)',
+              ],
+            },
           ],
         },
         {
