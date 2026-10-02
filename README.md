@@ -2,17 +2,17 @@
 
 Interactive planning models of **Alhambra (1839 W Valley), 1630 Olympic and Alveare Terrace**, with animated participants, staff, accessible vans and daily workflows.
 
-[GitHub repository](https://github.com/seenhealth/seen-health-facility) · [Live model](https://seen-health-facility.xingpersonal.chatgpt.site/)
+[GitHub repository](https://github.com/seenhealth/seen-health-facility) · [Live model](https://seen-health-facility.xingpersonal.chatgpt.site/) · [A day at Seen Health](https://seen-health-facility.xingpersonal.chatgpt.site/story)
 
 ## Outputs
 
-Everything the repository produces, in one place. The viewer and story previews are static builds of `main` after [pull request #7](https://github.com/seenhealth/seen-health-facility/pull/7) (`npm run build:viewer`, `npm run build:story`); the storyboard was recorded after [pull request #5](https://github.com/seenhealth/seen-health-facility/pull/5). The claude.ai previews are private to the publishing account until shared.
+Everything the repository produces, in one place. The live viewer and story are published from GitHub `main`, refreshed on October 2, 2026 through [pull request #10](https://github.com/seenhealth/seen-health-facility/pull/10). Standalone static builds remain available with `npm run build:viewer` and `npm run build:story`. The historical storyboard was recorded after [pull request #5](https://github.com/seenhealth/seen-health-facility/pull/5); that claude.ai artifact is private to the publishing account until shared.
 
 | Interactive | Where |
 | --- | --- |
-| Live 3D model, all three sites | [seen-health-facility.xingpersonal.chatgpt.site](https://seen-health-facility.xingpersonal.chatgpt.site/). Deployed separately from GitHub, so it can lag `main` |
-| 3D viewer, static build of `main` (cultural day room with guest instructors and the weekly repertoire, vans, drivers, community layer, Measure and Trace) | [Preview](https://claude.ai/artifact/ENDpmBX2GKSLtMz6YuQCbh). **Care day → Day activities** frames the day room; pick a weekday beside the program picker |
-| "A day at Seen Health" scroll story with the six network cutaways | [Preview](https://claude.ai/artifact/Sa8vEJrsRbJA45BoaTeWy4) · `/story` locally |
+| Live 3D model, all three sites | [seen-health-facility.xingpersonal.chatgpt.site](https://seen-health-facility.xingpersonal.chatgpt.site/). Published from `main`; GitHub pushes still require a separate site refresh |
+| 3D viewer (cultural day room with guest instructors and the weekly repertoire, vans, drivers, community layer, Measure and Trace) | [Live 3D viewer](https://seen-health-facility.xingpersonal.chatgpt.site/). **Care day → Day activities** frames the day room; pick a weekday beside the program picker |
+| "A day at Seen Health" scroll story with the six network cutaways | [Live story](https://seen-health-facility.xingpersonal.chatgpt.site/story) · `/story` locally |
 | Clips and stills of the care day: dock choreography, the Wongs' home, the partner day center | [Storyboard](https://claude.ai/artifact/CfrUyccAgz9LDi3msDdkTx) |
 
 | Documents | Where |
@@ -48,7 +48,7 @@ Everything the repository produces, in one place. The viewer and story previews 
 
 ## A day at Seen Health
 
-`/story` follows Mrs. Lin, a composite participant, through a care day with the eleven-discipline team, and cuts away six times to the homes, partner sites and hospital the same team serves. Scrolling controls the camera and simulation clock. Its itinerary uses the reviewed room layout: social work in the side office, table tennis in the games lounge and karaoke in the rear corner room.
+[The live story](https://seen-health-facility.xingpersonal.chatgpt.site/story) (`/story` locally) follows Mrs. Lin, a composite participant, through a care day with the eleven-discipline team, and cuts away six times to the homes, partner sites and hospital the same team serves. Scrolling controls the camera and simulation clock. Its itinerary uses the reviewed room layout: social work in the side office, table tennis in the games lounge and karaoke in the rear corner room.
 
 ```bash
 npm run build:scenario   # compile and validate the story tracks

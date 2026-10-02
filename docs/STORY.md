@@ -4,7 +4,7 @@ A scroll-driven walkthrough of one participant’s day (Mrs. Lin, 84) at the Alh
 
 | Where | Entry | Use |
 | --- | --- | --- |
-| Main app route | `app/story/page.tsx` → **`/story`** | Part of the 3D center site (`npm run dev`, then open `/story`). |
+| Main app route | `app/story/page.tsx` → [**Live story**](https://seen-health-facility.xingpersonal.chatgpt.site/story) | Part of the [live 3D center site](https://seen-health-facility.xingpersonal.chatgpt.site/) (`npm run dev`, then open `/story` locally). |
 | Standalone static site | `story/site/index.html` + `story/site/main.tsx`, built by `vite.story.config.ts` | For seenhealth.org or any static host, including iframe embedding. |
 
 Both render the same component, `StoryExperience` (`app/story/story-experience.tsx`).
@@ -32,7 +32,7 @@ No GLB files, source drawings or photo archives are copied. The source-plan imag
 | Variable | Default | Effect |
 | --- | --- | --- |
 | `STORY_BASE` | `./` | Public base path. The default relative base works from any folder **when the page URL ends in `/`** (e.g. `https://seenhealth.org/day/`). Set an absolute base such as `/day-at-seen/` if the host may serve the page without a trailing slash. |
-| `VITE_STORY_EXPLORE_URL` | the live 3D model | Target of “Explore the 3D center”. |
+| `VITE_STORY_EXPLORE_URL` | [the live 3D model](https://seen-health-facility.xingpersonal.chatgpt.site/) | Target of “Explore the 3D center”. |
 | `VITE_STORY_LEARN_MORE_URL` | `https://seenhealth.org/` | Target of the logo and “Learn more about Seen Health” (placeholder; confirm the page). |
 
 ```bash
@@ -54,7 +54,7 @@ Add `?embed=1` to hide the story’s own header (logo and 3D link) so it sits in
 
 ```html
 <iframe
-  src="https://seenhealth.org/day-at-seen/?embed=1"
+  src="https://seen-health-facility.xingpersonal.chatgpt.site/story?embed=1"
   title="A day at Seen Health: one participant and her care team"
   style="display:block;width:100%;height:100vh;height:100svh;border:0"
   loading="lazy"
