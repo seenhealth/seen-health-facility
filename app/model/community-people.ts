@@ -18,6 +18,7 @@ import {
 import {
   CENTER_LOT,
   carDoorWorld,
+  communityVehicleById,
   sampleCommunityVehicle,
   vanRampWorld,
 } from './community-vehicles';
@@ -33,9 +34,10 @@ import {
 /**
  * People and touchpoints in the distributed-care settings, on the same 720 s
  * clock as the center. Every actor lives on `levelId: 'site'` in the zone
- * `community:<settingId>` (the nurse line sits upstairs in the center), and
- * every track covers 0–720 contiguously: short straight walks on the pads,
- * static poses otherwise, and seats in the community vehicles while riding.
+ * `community:<settingId>` (Seen's nurses on the phone sit upstairs in the
+ * center), and every track covers 0–720 contiguously: short straight walks
+ * on the pads, static poses otherwise, and seats in the community vehicles
+ * while riding.
  * Loop seconds throughout: 1 s = 40 clock seconds, 8 AM = 0, 4 PM = 720.
  *
  * People inside a facility stamped on a pad come from its generated cast
@@ -85,10 +87,15 @@ const rel = (s: Pick<CareSetting, 'heading'>, local = 0) => s.heading + local;
 const carDoor = (vehicleId: string, time: number) =>
   carDoorWorld(sampleCommunityVehicle(vehicleId, time));
 /**
- * The 24/7 nurse line works from the corner desk of the upstairs open office:
- * the office chair furthest along the perimeter (largest z, then x).
+ * Seen's nurses on the phone work from the perimeter desks of the upstairs
+ * open office, taken in order along it (largest z, then x): the 24/7 nurse
+ * line at the corner desk, the care-transitions nurse at the next one.
  */
-const NURSE_LINE_DESK = { zoneId: 'upper-office', assetId: 'upperfit-chair' };
+const SEEN_DESKS = { zoneId: 'upper-office', assetId: 'upperfit-chair' };
+/** The hospital discharge nurse's call to Seen's care-transitions nurse. */
+const DISCHARGE_CALL = [495, 525] as const;
+/** The hospitalist's call to Seen's on-call nurse after the ambulance handoff. */
+const ED_CALL = [95, 107] as const;
 
 /** Points around the Seen van at a stop: door sill, ramp foot, the driver's places. */
 function vanStop(time: number) {
@@ -127,6 +134,46 @@ function toward(a: Vec2, b: Vec2, m: number): Vec2 {
 function hospitalRollPath(): Vec2[] {
   const q = careSettingById('hospital')!.anchors;
   return [q.patient, q.bayFront, q.walkway, q.kerbStep, vanStop(560).foot];
+}
+const AMBULANCE = 'ambulance';
+/**
+ * Places around the ambulance parked at the ED (75–98 s), in its frame (x to
+ * its right, z back from the nose): each crew member's cab door, a way down
+ * that side and a place at the rear doors, and the hospitalist's place
+ * facing them for the handoff.
+ */
+function ambulanceBay() {
+  const frame = (t: number) => {
+    const pose = sampleCommunityVehicle(AMBULANCE, t),
+      c = Math.cos(pose.heading),
+      sn = Math.sin(pose.heading);
+    return (x: number, z: number): Vec2 => [
+      pose.position.x + x * c + z * sn,
+      pose.position.z - x * sn + z * c,
+    ];
+  };
+  const at = frame(86);
+  return {
+    /** A crew seat at time t, where the crew joins the cab out of sight. */
+    cab: (seat: 'driver' | 'attendant', t: number) => {
+      const [x, , z] = communityVehicleById(AMBULANCE)!.seats[seat];
+      return frame(t)(x, z);
+    },
+    doors: at(0, 3.2),
+    handoff: at(0.15, 5.0),
+    crew: {
+      driver: {
+        door: at(-1.45, -1.4),
+        side: at(-1.55, 1.3),
+        rear: at(-0.7, 3.9),
+      },
+      attendant: {
+        door: at(1.45, -1.4),
+        side: at(1.55, 1.3),
+        rear: at(0.7, 3.9),
+      },
+    },
+  };
 }
 /**
  * A hand-authored leg filling `hole` of a generated person: a `Track` in the
@@ -424,10 +471,10 @@ const nurseLegs: Record<string, Leg> = {
 };
 /**
  * Mr. Wong's day before he rolls in at his front door (672 s): on the
- * hospital ward (rounds, the discharge huddle and instructions), wheeled to
- * the Seen van by the liaison nurse, the ride home, and pushed by the driver
- * across the pad and up the porch ramp to the door. The hospital part is in
- * the hospital's zone, the rest in the home's.
+ * hospital ward (rounds, the wait while the discharge nurse phones Seen, his
+ * instructions), wheeled to the Seen van by the discharge nurse, the ride
+ * home, and pushed by the driver across the pad and up the porch ramp to the
+ * door. The hospital part is in the hospital's zone, the rest in the home's.
  */
 function mrWongHospitalDay(hole: InstanceHole, s: CareSetting): Segment[] {
   const hospital = careSettingById('hospital')!,
@@ -458,8 +505,8 @@ function mrWongHospitalDay(hole: InstanceHole, s: CareSetting): Segment[] {
       title: 'Ready for discharge',
       heading: rel(hospital),
     })
-    .hold(525, 'listen', {
-      title: 'Discharge huddle at the bedside',
+    .hold(525, 'seated', {
+      title: 'Waiting while the nurse calls Seen',
       heading: rel(hospital),
     })
     .hold(556, 'conversation', {
@@ -585,6 +632,7 @@ export function communitySource(model: Facility): SourceExtension {
     end: number,
     label: string,
     description: string,
+    channel?: Interaction['channel'],
   ) =>
     interactions.push({
       id,
@@ -595,6 +643,7 @@ export function communitySource(model: Facility): SourceExtension {
       end,
       label,
       description,
+      ...(channel ? { channel } : {}),
     });
   const h = A(home),
     p = A(pharmacy),
@@ -796,7 +845,32 @@ export function communitySource(model: Facility): SourceExtension {
   {
     const zone = settingZone(hospital.id),
       opts = { zoneId: zone };
-    const rollPath = hospitalRollPath();
+    const rollPath = hospitalRollPath(),
+      bay = ambulanceBay();
+    // The ambulance crew rides in the cab, hands over at the rear doors and
+    // drives off; out of sight while the ambulance is off the map.
+    for (const [id, seat, label, variant] of [
+      ['ems-driver', 'driver', 'Ambulance crew · EMT', 16],
+      ['ems-medic', 'attendant', 'Ambulance crew · paramedic', 19],
+    ] as const) {
+      const p = bay.crew[seat];
+      add(
+        new Track(id, 'driver', { ...opts, label, variant }, bay.cab(seat, 58))
+          .hidden(58, 'On another call')
+          .ride(75, AMBULANCE, seat, 'Arriving at the ED')
+          .walk(79, [p.side, p.rear], {
+            title: 'To the rear doors',
+            from: p.door,
+          })
+          .hold(92, 'consult', {
+            title: 'Handoff at the rear doors',
+            face: bay.handoff,
+          })
+          .walk(96, [p.side, p.door], { title: 'Back to the cab' })
+          .ride(111, AMBULANCE, seat, 'Back in service')
+          .hidden(CLOCK_END, 'The next call', bay.cab(seat, 111)),
+      );
+    }
     const hospitalist = new Track(
       'hospitalist',
       'doctor',
@@ -804,11 +878,19 @@ export function communitySource(model: Facility): SourceExtension {
       q.huddleA,
     )
       .hold(62, 'document', { title: 'Morning charting', face: q.patient })
-      .walk(75, [q.bayFront, q.sidewalkIn, q.edBay], {
-        title: 'Meeting an ambulance',
+      .walk(77, [q.sidewalkIn, bay.handoff], {
+        title: 'Meeting the ambulance',
       })
-      .hold(98, 'consult', { title: 'ED handoff', face: q.edBayVan })
-      .walk(112, [q.sidewalkIn, q.bayFront, q.mdBedside], {
+      .hold(92, 'consult', {
+        title: 'ED handoff from the crew',
+        face: bay.doors,
+      })
+      .walk(ED_CALL[0], [q.edPhone], { title: 'Stepping aside to call Seen' })
+      .hold(ED_CALL[1], 'phone', {
+        title: 'Calling Seen’s on-call nurse',
+        heading: rel(hospital, 0.6),
+      })
+      .walk(120, [q.sidewalkIn, q.bayFront, q.mdBedside], {
         title: 'Back to the ward',
       })
       .hold(225, 'document', { title: 'Orders & notes', face: q.patient })
@@ -816,8 +898,10 @@ export function communitySource(model: Facility): SourceExtension {
       .walk(272, [q.mdOut, q.bayFrontL, q.bayFrontR, q.huddleA], {
         title: 'Between patients',
       })
-      .hold(495, 'document', { title: 'Discharge summary', face: q.patient })
-      .hold(525, 'consult', { title: 'Discharge huddle', face: q.huddleB })
+      .hold(525, 'document', {
+        title: 'Discharge summary and orders',
+        face: q.patient,
+      })
       .hold(CLOCK_END, 'document', {
         title: 'Afternoon rounds',
         face: q.patient,
@@ -840,8 +924,10 @@ export function communitySource(model: Facility): SourceExtension {
         title: 'Confirming the ride and home services',
         face: q.huddleC,
       })
-      .hold(495, 'document', { title: 'Discharge paperwork', face: q.patient })
-      .hold(525, 'consult', { title: 'Discharge huddle', face: q.huddleC })
+      .hold(525, 'document', {
+        title: 'Discharge paperwork; the Seen van booked',
+        face: q.patient,
+      })
       .walk(528, [q.cmBedside], { title: 'To the bedside' })
       .hold(556, 'conversation', {
         title: 'Discharge instructions with Mr. Wong',
@@ -855,27 +941,35 @@ export function communitySource(model: Facility): SourceExtension {
       });
     add(cm);
     const push = offsetBehind(rollPath, 0.9);
-    const liaison = new Track(
-      'seen-liaison-rn',
+    // The hospital's own discharge nurse does the bedside work and
+    // coordinates with Seen by phone: out from under the ward bay's roof to
+    // call Seen's care-transitions nurse at the center (the call arc rises
+    // clear of it), then the teach-back and the wheelchair to the van.
+    const rn = new Track(
+      'hospital-rn',
       'nurse',
-      { ...opts, label: 'Seen liaison nurse', variant: 6 },
-      q.sidewalkEnd,
+      { ...opts, label: 'Hospital discharge nurse', variant: 15 },
+      q.huddleC,
     )
-      .hidden(180, 'At the center')
-      .walk(225, [q.sidewalkPad, q.sidewalkIn, q.bayFront, q.rnBedside], {
-        title: 'Arriving for rounds',
-      })
-      .hold(262, 'consult', {
-        title: 'Rounds with the hospital team',
+      .hold(221, 'document', {
+        title: 'Discharge checklist: medicines, equipment, follow-up',
         face: q.patient,
       })
-      .hold(492, 'document', {
-        title: 'Coordinating the discharge with the center',
+      .walk(225, [q.rnBedside], { title: 'Joining rounds' })
+      .hold(262, 'consult', { title: 'Rounds', face: q.patient })
+      .walk(265, [q.huddleC], { title: 'Back to the station' })
+      .hold(491, 'document', {
+        title: 'Discharge medication list and teaching plan',
         face: q.patient,
       })
-      .walk(495, [q.huddleC], { title: 'Discharge huddle' })
-      .hold(525, 'consult', { title: 'Discharge huddle', face: q.huddleA })
-      .walk(528, [q.rnBedside], { title: 'To the bedside' })
+      .walk(DISCHARGE_CALL[0], [q.rnVia, q.rnPhone], {
+        title: 'Stepping out to call Seen',
+      })
+      .hold(DISCHARGE_CALL[1], 'phone', {
+        title: 'Discharge call with Seen’s nurse',
+        heading: rel(hospital, 0.55),
+      })
+      .walk(528, [q.rnBedside], { title: 'Back to the bedside' })
       .hold(551, 'conversation', {
         title: 'Medication teach-back',
         face: q.patient,
@@ -895,49 +989,59 @@ export function communitySource(model: Facility): SourceExtension {
         title: 'Back to the ward',
       })
       .hold(CLOCK_END, 'document', {
-        title: 'Closing the admission',
+        title: 'Closing the discharge; summary to Seen',
         face: q.patient,
       });
-    add(liaison);
+    add(rn);
     interact(
       'hospital-ed-arrival',
       'hospital',
       zone,
-      ['hospitalist'],
+      ['hospitalist', 'ems-driver', 'ems-medic'],
       62,
       98,
       'Ambulance arrival at the ED',
-      'A participant arrives by ambulance; the hospitalist takes the handoff and the Seen on-call line is notified.',
+      'A participant arrives by ambulance; the crew hands over to the hospitalist at the rear doors, and the Seen on-call nurse is called.',
+    );
+    interact(
+      'hospital-ed-call',
+      'after-hours',
+      zone,
+      ['hospitalist', 'nurse-line-rn'],
+      ...ED_CALL,
+      'ED call to Seen’s on-call nurse',
+      'Once the crew has handed over, the hospitalist calls Seen’s 24/7 on-call nurse: the participant is here, what happened and what they take; Seen sends the medication list and care plan and will follow the admission.',
+      'phone',
     );
     interact(
       'hospital-rounds',
       'hospital',
       zone,
-      ['hospitalist', 'hospital-cm', 'seen-liaison-rn', 'hospital-participant'],
+      ['hospitalist', 'hospital-cm', 'hospital-rn', 'hospital-participant'],
       225,
       262,
-      'Rounds with the Seen liaison nurse',
-      'Hospitalist, hospital case manager and the Seen liaison nurse round together so the discharge plan matches home services.',
+      'Rounds and discharge planning',
+      'Hospitalist, case manager and discharge nurse round at Mr. Wong’s bedside and plan his discharge home today, to the services Seen will start.',
     );
     interact(
-      'hospital-discharge-huddle',
+      'hospital-discharge-call',
       'hospital',
       zone,
-      ['hospitalist', 'hospital-cm', 'seen-liaison-rn'],
-      495,
-      525,
-      'Discharge huddle',
-      'Three-way huddle: medicines, home health start, meals and the Seen van pickup time.',
+      ['hospital-rn', 'seen-transitions-rn'],
+      ...DISCHARGE_CALL,
+      'Discharge call with Seen’s nurse',
+      'The hospital’s discharge nurse phones Seen’s care-transitions nurse at the center: his medicines and what changed, the home health visit this afternoon, meals and the Seen van at 2:10.',
+      'phone',
     );
     interact(
       'hospital-discharge',
       'hospital',
       zone,
-      ['seen-liaison-rn', 'hospital-participant', 'community-driver'],
+      ['hospital-rn', 'hospital-participant', 'community-driver'],
       551,
       575,
       'Mr. Wong · discharged to the Seen van',
-      'The liaison nurse wheels Mr. Wong under the canopy and up the van ramp; the driver secures the chair.',
+      'The discharge nurse wheels Mr. Wong under the canopy and up the van ramp; the driver secures the chair.',
     );
   }
 
@@ -1053,7 +1157,7 @@ export function communitySource(model: Facility): SourceExtension {
     );
   }
 
-  // --- The Seen van's driver and the after-hours nurse line -----------------
+  // --- The Seen van's driver and Seen's nurses on the phone ----------------
   {
     const around = (s: ReturnType<typeof vanStop>): Vec2[] => [
       s.nose,
@@ -1157,38 +1261,50 @@ export function communitySource(model: Facility): SourceExtension {
       )
       .ride(CLOCK_END, VAN, 'driver', 'At the wheel');
     add(driver);
-    const desk = model.objects
+    const desks = model.objects
       .filter(
         (o) =>
-          o.zoneId === NURSE_LINE_DESK.zoneId &&
-          o.assetId === NURSE_LINE_DESK.assetId,
+          o.zoneId === SEEN_DESKS.zoneId && o.assetId === SEEN_DESKS.assetId,
       )
       .sort(
         (a, b) =>
           b.position[2] - a.position[2] || b.position[0] - a.position[0],
-      )[0];
-    if (!desk)
-      throw new Error(
-        `No ${NURSE_LINE_DESK.assetId} in ${NURSE_LINE_DESK.zoneId} for the nurse line`,
       );
-    const deskAt: Vec2 = [desk.position[0], desk.position[2]];
+    if (desks.length < 2)
+      throw new Error(
+        `Need two ${SEEN_DESKS.assetId} in ${SEEN_DESKS.zoneId} for the nurse line and care transitions`,
+      );
+    /** A Seen nurse seated at an upstairs desk all day, facing it. */
+    const atDesk = (
+      desk: (typeof desks)[number],
+      id: string,
+      label: string,
+      variant: number,
+    ) =>
+      new Track(
+        id,
+        'nurse',
+        {
+          zoneId: 'upper-office',
+          levelId: 'upper',
+          ground: false,
+          label,
+          variant,
+          seated: true,
+          seatId: desk.id,
+        },
+        [desk.position[0], desk.position[2]],
+      );
     // The nurse line takes the Wongs' calls when their generated cast places
-    // them: the PERS call in the morning and the evening plan.
+    // them (the PERS call in the morning, the evening plan) and the ED's call
+    // after the ambulance handoff.
     const pers = castCall(home.id, 'home-pers-call'),
       evening = castCall(home.id, 'after-hours-call');
-    const nurseLine = new Track(
+    const nurseLine = atDesk(
+      desks[0],
       'nurse-line-rn',
-      'nurse',
-      {
-        zoneId: 'upper-office',
-        levelId: 'upper',
-        ground: false,
-        label: '24/7 nurse line RN',
-        variant: 12,
-        seated: true,
-        seatId: desk.id,
-      },
-      deskAt,
+      '24/7 nurse line RN',
+      12,
     )
       .hold(pers.start, 'document', {
         title: 'Nurse line & on-call coordination',
@@ -1198,6 +1314,14 @@ export function communitySource(model: Facility): SourceExtension {
         title: 'PERS call: Mrs. Wong, light-headed at home',
         heading: 0,
       })
+      .hold(ED_CALL[0], 'document', {
+        title: 'Nurse line & on-call coordination',
+        heading: 0,
+      })
+      .hold(ED_CALL[1], 'phone', {
+        title: 'On-call: the ED reports an ambulance arrival',
+        heading: 0,
+      })
       .hold(evening.start, 'document', {
         title: 'Nurse line & on-call coordination',
         heading: 0,
@@ -1205,6 +1329,25 @@ export function communitySource(model: Facility): SourceExtension {
       .hold(evening.end, 'phone', { title: 'Call with the Wongs', heading: 0 })
       .hold(CLOCK_END, 'document', { title: 'Logging the call', heading: 0 });
     add(nurseLine);
+    const transitions = atDesk(
+      desks[1],
+      'seen-transitions-rn',
+      'Seen RN · care transitions',
+      14,
+    )
+      .hold(DISCHARGE_CALL[0], 'document', {
+        title: 'Care transitions: admissions, discharges, follow-up calls',
+        heading: 0,
+      })
+      .hold(DISCHARGE_CALL[1], 'phone', {
+        title: 'Discharge call with the hospital’s nurse',
+        heading: 0,
+      })
+      .hold(CLOCK_END, 'document', {
+        title: 'Home health referral, meals and the care-plan update',
+        heading: 0,
+      });
+    add(transitions);
   }
 
   // --- People inside facility instances (generated casts) --------------------

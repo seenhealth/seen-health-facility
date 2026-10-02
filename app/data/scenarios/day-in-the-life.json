@@ -891,7 +891,7 @@
       "roomId": null,
       "settingId": "hospital",
       "interactionIds": [
-        "hospital-discharge-huddle"
+        "hospital-discharge-call"
       ],
       "title": "Planning the trip home",
       "kicker": "1:35 PM \u00b7 Community hospital",
