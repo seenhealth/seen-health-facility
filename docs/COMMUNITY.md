@@ -33,19 +33,20 @@ clock; no participant records are used.
 | `app/model/community-layer.ts` | `buildCommunityLayer(model, mat, { loadFacility, materialFor })`: pads, facility instances (`instance(id)`, `ready`) and vehicle bodies, `tick(time)`, `frame(settingId?)` camera framings, the network `bounds` / `shadowExtent` and `dispose()`. |
 | `app/model/alhambra-source.ts` | `alhambraSource(model, base)`: the care day exactly as the viewer plays it (base loop + community layer + fleet crew), and `alhambraVehicles()`, pure samplers under the engine's vehicle ids. |
 | `scripts/validate-community-traffic.mjs` | `npm run validate:community`: clearance, driving and cast checks (below). |
-| `public/models/seen-home-wong.json` | The Wongs' home as a schema 2.0 facility specification (below), for the `home-wong` pad. |
+| `public/models/seen-home-wong.json` | The Wongs' home as a schema 2.0 facility specification (below), for the `home-wong` pad; Mrs. Lin's `home-lin` pad stamps the same plan. |
 | `app/model/home-assets.ts` | `buildHomeAsset(spec, material)`: bed, nightstand, wardrobe, kitchen range, grab bars, swing-up bar, bed rail, hospital bed and ramp kinds, called first by `buildAsset`. |
 | `app/data/community/home-wong.cast.json` | The Wongs' ADL day inside the home, the input of the instance cast pipeline (below). |
-| `scripts/validate-home.mjs` | `npm run validate:home`: the home's plan, assets, registry frame and cast. |
+| `app/data/community/home-lin.cast.json` | Mrs. Lin's day at home with her daughter (below, "Mrs. Lin's home"). |
+| `scripts/validate-home.mjs` | `npm run validate:home`: the home's plan, assets, registry frame and both homes' casts. |
 
 Wiring: `alhambraSource(model, base)` composes the Alhambra care day once,
 `withFleetCrew(composeSources(base, communitySource(model)))`, memoised per base
 loop. The renderer, the Measure panel (metrics and trace), the story scenario
 (`composedStorySource`), `scripts/sim-report.mjs` and `scripts/validate-trace.mjs`
 all read it, so every count, trace and report describes the people the scene
-animates (220 in the base loop: the center's 167, the fleet crew's 10 and the
-community's 43, of whom 31 are generated inside facility instances: 25 in the
-partner day center and 6 in the Wongs' home). When
+animates (223 in the base loop: the center's 167, the fleet crew's 10 and the
+community's 46, of whom 33 are generated inside facility instances: 25 in the
+partner day center, 6 in the Wongs' home and 2 in Mrs. Lin's). When
 the played source carries the `community` view, `renderer.ts` passes
 `registerCommunityVehicles` to `createActivity` (which rejects a seat in an
 unregistered vehicle), builds the layer, ticks it, sizes the sun's shadow
@@ -57,7 +58,7 @@ Layers) shows or hides the layer. The pads live in the site context, so they
 also hide with **Street & parking context** and stay out of Plan. The engine
 hides the layer's people through its view (`hiddenSources`, matched against
 `ActorSpec.sourceId`), so the activity panel's people count (the snapshot's
-`people`: 220 with the layer, 177 without), walking-path lines and follow
+`people`: 223 with the layer, 177 without), walking-path lines and follow
 targets follow the toggle; site-level people (the community cast and the fleet
 drivers) show only with the site context, at every level.
 
@@ -69,7 +70,12 @@ with a community touchpoint. The settings are zones of the composed source
 (a setting with a facility by its `traceName`, e.g. "Partner ADC · Seen
 layout"); the zone carries the instance's rooms (`SourceZone.rooms`), so trace
 `enter` events read "Partner ADC · Day room" inside them. On-site counts and
-staff time by role cover the center.
+staff time by role cover the center. Family members (role `family`: Mrs. Lin's
+daughter) are neither staff nor participants (`isStaffRole`,
+`characters.ts`): Measure counts them among the people (`headline.family`) but
+not in occupancy or staff time, the trace never makes one a handoff's
+attending staff, the Trace tab lists them under Family and the "Staff only"
+filter leaves them out.
 
 ## The registry
 
@@ -97,7 +103,7 @@ Anchors are authored in that frame (`define({ local: {…} })`) and stored in
 world coordinates, so people and vehicles never depend on the pad's placement.
 
 Fronts face +x or +z, the sides the default and Community cameras see
-(azimuth ≈ 0.58): the home and pharmacy sit west of the west street, the
+(azimuth ≈ 0.58): the two homes and the pharmacy sit west of the west street, the
 partner day center south of the south street, the hospital east of the east
 street with its stub on the north street, and the specialist clinic south of
 the south street east of the center. Drop-offs, the hospital's ED canopy and
@@ -108,9 +114,9 @@ a pad's back, orbits round to its front first.
 Every pad has the same drive: an entry leg, a half circle whose centre sits
 `drive.depth` m behind the front edge and an exit leg, travelled clockwise so a
 vehicle's passenger side faces the building at the apex. Nothing has to reverse
-or turn on the spot; radii are 6.2–7 m (lane spacing `LANE = 3.4`). The home has
-two lanes: the Seen van waits at the inner apex by the porch, cars pass and stop
-on the outer lane, and the aide's car parks on the outer exit leg.
+or turn on the spot; radii are 6.2–7 m (lane spacing `LANE = 3.4`). The homes have
+two lanes: a Seen van waits at the inner apex by the porch; at the Wongs', cars
+pass and stop on the outer lane and the aide's car parks on the outer exit leg.
 
 Heights: pavement at street level (`STREET_Y = -0.23`), the pad plinth at
 sidewalk level (`PAD_Y = -0.05`), the porch at `PORCH_Y = 0.3` with the new
@@ -122,6 +128,7 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 | --- | --- | --- | --- |
 | `home-wong` | home | The Wongs' home (`home-lin` until October 2026): (−84, 12), two-lane drive; the aide's car uses the north street's western reach; `facility` seen-home-wong (below), `pad.back` 8 | home-care, home-health, pill-packs, meals, home-mods, after-hours |
 | `pharmacy` | pharmacy | (−84, −22) | pill-packs |
+| `home-lin` | home | Mrs. Lin's home, "Lives with her daughter · Seen van door to door" (short "Lin home"): (−84, −56), heading π/2, stub from the west street's southern reach; the Wongs' pad, drive, porch anchors and `facility` (seen-home-wong) | transport |
 | `hospital` | hospital | (94, 14), stub from the north street | ed, discharge |
 | `specialist` | specialist | (84, −56), stub from the south street | specialist |
 | `partner-adc` | partner-adc | Partner adult day center, "Seen Health floor plan": (4, −68), Seen's Alhambra ground floor stamped on a 62 × 50 m pad | day-program |
@@ -132,6 +139,9 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 | --- | --- | --- |
 | 8:00–8:55 | Pharmacy | Pharmacist and technician pack and check blister packs; courier loads at 8:52, leaves 9:01. |
 | 8:00–8:49 | Home | Mrs. Wong wakes, toilets, washes and dresses her top half on her own; the personal care aide parks at 8:19 (in along the north street's western reach) and is at the front door at 8:29: breakfast and the morning pills at the seated kitchen worktop 8:35–8:43, stockings and shoes on the entry bench. |
+| 8:00–8:11 | Lin home | Mrs. Lin wakes (in sight from 8:00:20, past the loop seam) and comes through to breakfast with her daughter at the dining table, 8:07–8:11; her daughter has had the rice porridge on since 8:00. |
+| 8:13–8:41 | Lin home | Shoes and cardigan on the entry bench, her daughter helping; the Seen van (livery J) in from the south end of the west street to the apex at 8:15; her daughter out at 8:15, Mrs. Lin at 8:16, down the porch ramp and along the drive; the driver follows her up the van ramp (on board 8:29) and the van leaves at 8:33, south and off the map by 8:41. |
+| 8:38 | Lin home | Her daughter back in by the porch step; she works from home at the bedroom-2 desk (to 11:40 and 12:20–14:32), loads the washer (11:47) and has lunch at the kitchen worktop (11:56–12:12). |
 | 8:38–9:14 | Hospital | Ambulance in along the north street's eastern reach to the ED; hospitalist takes the handoff (8:41–9:05). |
 | 8:54–9:15 | Home | Mrs. Wong (walker) out of the front door behind her aide, down the new ramp and up the van ramp; the Seen van leaves at 9:15 with the escort aide and driver. |
 | 9:27 | Home | Courier hands the pill packs to the aide; then to the center's rear receiving (10:04–11:28) and back to the pharmacy by 12:40. |
@@ -148,7 +158,9 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 | 12:14 | Home | Home-delivered lunch handed to the aide at the front door, a wellness check with Mrs. Wong on the entry bench (meals car on the outer lane; it leaves by the inner lane's exit, round the aide's parked car; back at the center by 13:00). |
 | 13:02–14:28 | Home | OT and installer: dry-run toilet and shower transfers with Mrs. Wong, Mr. Wong's side of the bed, the swing-up grab bar fitted (13:48–14:00) while the OT checks the porch ramp, then the sign-off. |
 | 13:30–13:50 | Hospital | Discharge huddle; 14:10–14:16 Mr. Wong wheeled to the Seen van; van leaves 14:23. |
+| 14:39–15:25 | Lin home | Her daughter puts dinner on (14:39), then watches for the van on the porch from 14:49; the van back from the south end (on the map 14:53, apex 15:00); the driver sees Mrs. Lin down its ramp (15:05) and walks behind her along the drive; her daughter meets her at the porch-ramp foot (15:13) and follows her up; in at 15:19 and 15:21; the van leaves at 15:25. |
 | 15:08–15:52 | Home | Mr. Wong home: the driver wheels him up the porch ramp to the front door (15:28) and he rolls in beside his armchair; the home health nurse (in at 15:08 from the road end) checks his transfer, vitals and medicines and leaves at 15:52. |
+| 15:21–16:00 | Lin home | Tea together on the sofa: her daughter makes jasmine tea (15:26–15:29) and sits with her from 15:34 to the end of the day. |
 | 15:40–15:52 | Home ↔ center | 24/7 nurse line call between the upstairs RN and Mrs. Wong. |
 
 ## Facility instances
@@ -277,6 +289,7 @@ type CastFile = {
 };
 type Person = {
   id: string; role: CharacterRole; label: string; variant: number;
+  profileId?: string;                                // a stored profile: the same person and look as another actor
   mobility?: 'cane' | 'walker' | 'wheelchair';       // routing clearance 0.26 / 0.33 / 0.37 m (else 0.21)
   gait?: number;                                     // m per loop second; staff 1.0, participant 0.75, cane 0.65,
 };                                                   // walker 0.5, wheelchair 0.6 by default; ≤ 1.65
@@ -471,7 +484,7 @@ const HOLE_LEGS: Record<string, Leg> = {
     'away 80.5–370': (hole, s) => wongClinicLeg(hole, settingZone(s.id)),
   }),
   'home-pca': byWindow('home-pca', aideLegs),  // 'before 0–44', 'away 77–152.5', …
-  // home-ot, home-installer, home-rn, hospital-participant
+  // home-ot, home-installer, home-rn, hospital-participant; lin-at-home, lin-daughter
 };
 ```
 
@@ -661,6 +674,95 @@ U.S. Access Board guides; ICC A117.1 Type A dwelling units; HUD aging in place
 and visitability; wheelchair, walker and hospital-bed clearance guides; CDC
 STEADI *Check for Safety*; PACE (42 CFR 460) and CAPABLE.
 
+### Mrs. Lin's home
+
+Mrs. Lin, the story's participant, lives here with her daughter; a Seen van
+takes her to the center and brings her home. The `home-lin` pad sits south of
+the pharmacy at (−84, −56), heading π/2 (front to the west street), its stub
+on the west street's southern reach, which only the fleet's off-site runs
+share. It is the Wongs' bungalow again: the registry entry repeats home-wong's
+`facility` exactly (seen-home-wong, frame `{ position: [0, −10.8], heading:
+−π/2 }`, ground level, porch zone excluded, floor at `PORCH_Y`, the three
+plates, margin 1.6 m) on the same 30 × 28 m pad (`back` 8) and two-lane drive
+with the same porch, ramp and crossing anchors, so the site builder draws the
+same porch, ramp and garden (the home-mods crate and the visitor's stall only
+where a home has `crate` and `stall` anchors) and `validate-home.mjs` carries
+the registry checks over. Plan frame P → world: world = P + (−94.8, −56). The
+plan's own name never surfaces: the zone is "Mrs. Lin's home", rooms read
+"Lin home · Kitchen", "Lin home · Second bedroom (family)", plates "Living
+room", "Kitchen", "Bath".
+
+Its cast, `app/data/community/home-lin.cast.json`, has two scheduled people:
+Mrs. Lin (`lin-at-home`, participant, cane, gait 1.35; `profileId`
+arrival-cane and variant 11, the story hero's look) and her daughter
+(`lin-daughter`, role `family`: an adult in her fifties in everyday clothes, a
+stored profile with her mother's skin tone; gait 1.45). Both come into sight at
+0.5 s (her bed and the stove at 8 AM, the sofa at 4 PM: the loop seam stays
+hidden), so a shot of the house should start at 0.5 s or later.
+
+| Loop s | Who | Where | What |
+| --- | --- | --- | --- |
+| 0.5–10 | Mrs. Lin | bedroom, en-suite, hall | Awake on the edge of her bed, then through to the dining nook |
+| 0.5–7 | Daughter | kitchen | Rice porridge on the stove, the kettle on |
+| 10–15.8 | both | dining table | Breakfast: Mrs. Lin at the north chair, her daughter at the west chair (to 13.5) |
+| 17.7–21.8 | both | entry bench | Shoes and cardigan (Mrs. Lin 19–21.8), her daughter at the bench's south end |
+| 22.9, 24.1 | both | front door | Out: her daughter first, holding the door, then Mrs. Lin |
+| 57–606 | Daughter | bedroom 2, laundry, kitchen | Back in at 57; desk 65–330 and 390–588; washer 340–347; lunch at the kitchen worktop 353.5–378; dinner on 598–606 |
+| 614, 659, 661 | both | front door | Her daughter out to watch for the van; Mrs. Lin in, her daughter behind her |
+| 660.8–720 | Mrs. Lin | sofa | Home on the sofa; tea with her daughter from 680 |
+| 669–720 | Daughter | kitchen, sofa | Jasmine tea for two (669–674), on the sofa beside her from 681 |
+
+Interactions (id · window in loop s · members): `lin-breakfast` 1.5–15.8
+(Mrs. Lin, daughter) and `lin-evening` 662–720 (Mrs. Lin, daughter; the story
+closes on it near 719.5) in the cast; `lin-van-pickup` 22.5–50 and
+`lin-van-dropoff` 630–661 (Mrs. Lin, daughter, `lin-van-driver`) in
+`community-people.ts`. Category `home`. The cast keeps `lin-at-home`,
+`lin-daughter`, `lin-breakfast` and `lin-evening`.
+
+Door passes and the legs that fill the holes (`HOLE_LEGS`):
+
+| Who | In / out at the front door (s) | Outside (hole legs) |
+| --- | --- | --- |
+| Mrs. Lin | out 24.1, in 659 | `linDayLeg`: across the porch and down the ramp, her daughter 0.9 m behind, and along the drive (1.45 m/s) to the van ramp at 41.3; up it ahead of the driver, on board 43.7–62 (out of sight at her seat while the van is off the map: "Her day at the Seen center"), on board again 620–637; down the van ramp, along the drive with the driver behind her, met by her daughter at the porch-ramp foot (649.5–650.5), up the ramp and in |
+| Daughter | out 22.9, in 57; out 614, in 661 | Out ahead to the porch, falling in behind her mother there and walking her to the van, seeing her off and back in by the porch step; out on the porch watching for the van, down the ramp to `rampFootSouth`, up it behind her mother and in |
+
+Both have a `before 0–0.5` hole with no leg (the placeholder stays hidden).
+The driver, `lin-van-driver` (hand-authored), is at the wheel while the van is
+on the map and out of sight at his seat while it is off it; at the pickup he
+walks round the nose to the ramp (28.6), follows her up it and steps through
+the sliding door to his seat (45); at the drop-off he waits by the ramp,
+walks 0.9 m behind her to the porch ramp, hands over to her daughter (651.5)
+and walks back (666.3).
+
+The van is `van-lin`, "Seen van · door to door", on the fleet body in livery J
+(the Wongs' is I; the fleet's A–H). It comes in from the south end of the west
+street on its inner lane (fading in from 12.5 s), round the drive to the inner
+apex (22.5–50: door 24.5–47.7, ramp 26.5–47.2) and out along the outer lane,
+off the map by 62; back 620–630, at the apex 630–667.5 (door 632–644, ramp
+634–643), off the map by 679.5. On that reach it follows Van A's first arrival
+in (Van A there 11–18 s; nearest fleet van 1.04 m, Van B on the other lane at
+15 s), and in the afternoon it comes back on as Van A leaves the map with the
+center's Mrs. Lin (622.5 s) and turns into the drive before Van B comes in
+(631 s); street cars never use the reach.
+
+Two actors represent Mrs. Lin in the composed day: the center's
+(`arrival-cane` in the base loop, `hero-lin` in the story) and the network's
+`lin-at-home`. They share the profile, so she is drawn the same, but Measure
+and the trace count them as two participants: from 11.5 s (Van A brings the
+center's Mrs. Lin in from off site) to 62 s (her own van leaves the map) both
+are in sight, so one merged timeline would put her in two places at once. In
+the afternoon the hand-over is already clean: Van A leaves the map with her at
+622 s as her own van comes back on at 620–622 s.
+
+Places for framing her home (world x, z): pad centre (−88, −56); front door
+(−91.6, −56.4), porch (−90.3, −56.4), porch ramp top (−90.3, −59.4) and foot
+(−90.3, −65.9); the van at the apex (−83.2, −56) with its ramp foot (−87.1,
+−55.8); dining table (−94.7, −60.9); the sofa, Mrs. Lin (−93.1, −55.2) and her
+daughter (−94.2, −55.2); bed (−99.4, −52.7). Through the layer:
+`frame('home-lin')` and `instance('home-lin').roomCenter('home-living' |
+'home-dining' | 'home-kitchen' | 'home-primary' | 'home-bedroom-2')`, or the
+registry anchors `door`, `porch`, `rampTop`, `rampFoot`.
+
 ## In the story
 
 The scroll story (docs/STORY.md) pulls out to the whole network in its network
@@ -782,7 +884,11 @@ cast names community actors and keeps the contract windows, clears furniture
 and walls at every stop, routes every walk on the instance grid in the time its
 gap allows (door passes at the door, a resident's arrival at a point at her
 first stop), and its generated tracks (`community-casts.json`) keep people
-≥ 0.6 m apart on foot (0.55 m seated).
+≥ 0.6 m apart on foot (0.55 m seated). Mrs. Lin's home must stamp the plan
+exactly as the Wongs' does, on the same pad, drive and porch anchors (so the
+registry checks hold for it); its cast gets the same checks (a cane walks at
+up to 1.45 m/s, the story's limit for her), and `lin-evening` must cover
+700–720 s.
 
 ## Roadmap hooks
 
@@ -791,8 +897,14 @@ first stop), and its generated tracks (`community-casts.json`) keep people
   more `van-…` itinerary plus riders arriving through the `front` entrance.
 - **Replicate a building.** Any facility specification can be stamped on a
   pad (`facility`): the partner day center and the Wongs' home are, with their
-  people generated inside (`HOLE_LEGS` for the home's outdoor parts). A second
-  Seen center is another entry with a `seen-center` kind.
+  people generated inside (`HOLE_LEGS` for the home's outdoor parts), and Mrs.
+  Lin's home stamps the Wongs' plan a second time. A second Seen center is
+  another entry with a `seen-center` kind.
+- **One Mrs. Lin.** Her network and center tracks share a profile. Once her
+  morning no longer overlaps (Van A bringing the center's Mrs. Lin in only
+  after her own van has left the map), Measure can group participants by
+  profile as it already groups staff, and the trace's person view can merge
+  the two into one timeline: home, van, center, van, home.
 - **Network of centers.** The camera framing (`frame()`), the zone naming
   (`community:<id>`) and the view (`community`) already treat settings as a
   set; a hub-and-spoke network is more settings plus vehicles whose legs join
