@@ -130,7 +130,7 @@ npm run build:viewer
 | `npm run validate:trace` | Touchpoint trace of the composed source the viewer plays: structure, coverage, determinism and file freshness |
 | `npm run validate:renderer` | Headless viewer per site: 10 frames through every render mode, then disposal leaves no geometry, material, listener, element or frame behind |
 | `npm run validate:public` | No architectural PDFs, drawings or source text in `public/` (also runs before `npm run build`) |
-| `npm run test:unit` | `node --test` suite in `test/`: clock labels, source composition, vehicle seat frames, driveway reservations, the stitch between a generated instance cast and hand-authored legs, scheduled people's stops, seats and outside members |
+| `npm run test:unit` | `node --test` suite in `test/`: clock labels, source composition, vehicle seat frames, the fleet van body (sides flush with roof, nose and rear), driveway reservations, the stitch between a generated instance cast and hand-authored legs, scheduled people's stops, seats and outside members |
 
 Validators only write to `work/` (gitignored). The renderer, story, trace, fleet and Olympic checks, the GLB exporters and the unit tests bundle app TypeScript with Rolldown (`loadSim` in `scripts/build-scenario.mjs`); the other validators read the modules transpiled by `scripts/compile-model-modules.mjs`, which their npm scripts run first.
 
