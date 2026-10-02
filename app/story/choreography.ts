@@ -140,7 +140,17 @@ export const CHAPTER_SHOTS: Record<string, ShotSpec> = {
     push: 1.1,
     drift: 0.12,
   },
-  kitchen: { zoom: 4.4, azimuth: 0.62, elevation: 0.7, follow: 0.4, radius: 9, push: 1.08, drift: 0.1 },
+  // The hand-over at the kitchen's delivery door (trolley, then the island).
+  kitchen: {
+    anchor: [10.2, 0.8, 2.4],
+    zoom: 6.2,
+    azimuth: 0.55,
+    elevation: 0.85,
+    follow: 0.4,
+    radius: 4,
+    push: 1.1,
+    drift: 0.1,
+  },
   'home-pm': {
     place: { setting: 'home-lin', anchor: 'porch' },
     zoom: 3.3,

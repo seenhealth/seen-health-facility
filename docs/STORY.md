@@ -139,7 +139,7 @@ Chapters come straight from `steps` in `app/data/scenarios/day-in-the-life.json`
 | 5 | `clinic` | 140–178 | 140–178 | 9:33 AM–9:58 AM | `clinic-nurse` | 4.40 · 0.28 · 0.68 | yes |
 | 6 | `therapy` | 178–240 | 178–240 | 9:58 AM–10:40 AM | `rehab-open` | 2.90 · −0.50 · 0.62 | yes |
 | 7 | `program` | 240–290 | 240–289 | 10:40 AM–11:12 AM | `day-open` | 2.60 · 0.30 · 0.66 | yes |
-| 8 | `kitchen` (cutaway) | 289–304 | 289–304 | 11:12 AM–11:22 AM | `kitchen-prep` | 4.40 · 0.62 · 0.70 | `kitchen-lunch-delivery` |
+| 8 | `kitchen` (cutaway) | 289–304 | 289–304 | 11:12 AM–11:22 AM | `kitchen-prep` · hand-over (10.2, 2.4) | 6.20 · 0.55 · 0.85 | `kitchen-lunch-delivery` |
 | 9 | `lunch` | 290–350 | 304–350 | 11:22 AM–11:53 AM | `dining-1421` | 4.20 · 0.62 · 0.66 | yes |
 | 10 | `social-work` | 350–392 | 350–392 | 11:53 AM–12:21 PM | `admin-side-office` | 5.20 · 0.85 · 0.72 | yes |
 | 11 | `personal-care` | 392–440 | 392–440 | 12:21 PM–12:53 PM | `rear-wc-east` | 5.20 · 0.50 · 0.92 | yes |
