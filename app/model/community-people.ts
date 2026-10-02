@@ -563,7 +563,7 @@ function mrWongHospitalDay(hole: InstanceHole, s: CareSetting): Segment[] {
 // on the home-lin pad (app/data/community/home-lin.cast.json); these legs are
 // their times outside it. Her Seen van (`van-lin`, community-vehicles.ts)
 // fixes the times: at the apex 22.5–50 s (ramp down 26.5–47.2 s) and
-// 630–667.5 s (ramp down 634–643 s), off the map 62–620 s. Outdoors she
+// 631–667.5 s (ramp down 634–643 s), off the map 62–624 s. Outdoors she
 // walks at 1.45 m per loop second with her cane, her daughter 0.9 m behind.
 const LIN_VAN = 'van-lin';
 /** Her daughter falls in behind her here on the porch, 0.9 m back from where she then is. */
@@ -607,7 +607,7 @@ function linDayLeg(hole: InstanceHole, s: CareSetting): Segment[] {
       ys: [VAN_FLOOR],
     })
     .ride(62, LIN_VAN, 'participant', 'Riding to the Seen center')
-    .hidden(620, 'Her day at the Seen center', linVanSeat(62, 'participant'))
+    .hidden(624, 'Her day at the Seen center', linVanSeat(62, 'participant'))
     .ride(637, LIN_VAN, 'participant', 'Riding home')
     .walk(639.5, [pm.foot], {
       title: 'Down the van ramp',
@@ -759,7 +759,7 @@ function linVanDriver(): Track {
     })
     .walk(45, [am.inside], { title: 'Seeing her seated', ys: [VAN_FLOOR] })
     .ride(62, LIN_VAN, 'driver', 'Driving Mrs. Lin to the center')
-    .hidden(620, 'Other runs', linVanSeat(62, 'driver'))
+    .hidden(624, 'Other runs', linVanSeat(62, 'driver'))
     .ride(631, LIN_VAN, 'driver', 'Bringing Mrs. Lin home')
     .walk(636.4, [pm.nose, pm.noseRight, pm.aside], {
       title: 'Round to the ramp',

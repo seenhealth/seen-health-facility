@@ -428,10 +428,13 @@ const homeExitTurn = turnOutOf(
  * Lin's drive to the inner apex by the porch; out by the exit leg and south
  * on the outer lane, off the map. The west street's southern reach carries
  * only the fleet's off-site runs, so the van keeps to their gaps: in ahead of
- * Van A's first arrival (on that reach from 16 s) and across the outer lane
+ * Van A's first arrival (on that reach from 15.8 s) and across the outer lane
  * into her drive before Van B, out of the lot's exit, comes south past it
- * (16.7 s); back in as Van A leaves it with the center's Mrs. Lin (622.5 s)
- * and into the drive before Van B comes in (631 s).
+ * (16.7 s). In the afternoon it comes back on only once Van A has left the
+ * map with the center's Mrs. Lin (faded out by 624 s), so she is never on
+ * screen in both vans: 7 s for the 69 m in (the morning's 11.5 s), at most
+ * 11.3 m/s (the fleet vans reach 9.6 m/s on this street), and at the apex
+ * by 631 s, before Van B comes back on (635.8 s).
  */
 const linIn: Vec2[] = [
     ...zRun(W.in, OFF_MAP.south, legAt(homeLin, 0, 'entry')[1] - R - 2),
@@ -476,14 +479,14 @@ const linVan: CommunityVehicle = {
       fade: 'out',
       pre: beyond(homeLin, 0, 0, 10),
     }),
-    drive(620, 630, linIn, 'Bringing Mrs. Lin home', {
+    drive(624, 631, linIn, 'Bringing Mrs. Lin home', {
       easeIn: false,
       fade: 'in',
       post: beyond(homeLin, 0, 0, -10),
     }),
     // She is down the ramp by 639.5 s; the van waits, shut, while the driver
     // walks her to the porch ramp and comes back.
-    dwell(630, 667.5, stop(homeLin, 0), 'Dropping Mrs. Lin off', {
+    dwell(631, 667.5, stop(homeLin, 0), 'Dropping Mrs. Lin off', {
       door: [[632, 644]],
       ramp: [[634, 643]],
     }),

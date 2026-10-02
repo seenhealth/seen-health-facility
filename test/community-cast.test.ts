@@ -392,7 +392,7 @@ void test("Mrs. Lin's home: at home with her daughter, on her Seen van there and
     lin.segments.filter((s) => s.vehicleId).map((s) => [s.vehicleId, s.start, s.end]),
     [
       ['van-lin', 43.7, 62],
-      ['van-lin', 620, 637],
+      ['van-lin', 624, 637],
     ],
   );
   const van = (t: number) => sampleCommunityVehicle('van-lin', t);

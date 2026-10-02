@@ -982,7 +982,7 @@ Door passes and the legs that fill the holes (`HOLE_LEGS`):
 
 | Who | In / out at the front door (s) | Outside (hole legs) |
 | --- | --- | --- |
-| Mrs. Lin | out 24.1, in 659 | `linDayLeg`: across the porch and down the ramp, her daughter 0.9 m behind, and along the drive (1.45 m/s) to the van ramp at 41.3; up it ahead of the driver, on board 43.7–62 (out of sight at her seat while the van is off the map: "Her day at the Seen center"), on board again 620–637; down the van ramp, along the drive with the driver behind her, met by her daughter at the porch-ramp foot (649.5–650.5), up the ramp and in |
+| Mrs. Lin | out 24.1, in 659 | `linDayLeg`: across the porch and down the ramp, her daughter 0.9 m behind, and along the drive (1.45 m/s) to the van ramp at 41.3; up it ahead of the driver, on board 43.7–62 (out of sight at her seat while the van is off the map: "Her day at the Seen center"), on board again 624–637; down the van ramp, along the drive with the driver behind her, met by her daughter at the porch-ramp foot (649.5–650.5), up the ramp and in |
 | Daughter | out 22.9, in 57; out 614, in 661 | Out ahead to the porch, falling in behind her mother there and walking her to the van, seeing her off and back in by the porch step; out on the porch watching for the van, down the ramp to `rampFootSouth`, up it behind her mother and in |
 
 Both have a `before 0–0.5` hole with no leg (the placeholder stays hidden).
@@ -995,23 +995,26 @@ and walks back (666.3).
 
 The van is `van-lin`, "Seen van · door to door", on the fleet body in livery J
 (the Wongs' is I; the fleet's A–H). It comes in from the south end of the west
-street on its inner lane (fading in from 12.5 s), round the drive to the inner
+street on its inner lane (fading in from 11 s), round the drive to the inner
 apex (22.5–50: door 24.5–47.7, ramp 26.5–47.2) and out along the outer lane,
-off the map by 62; back 620–630, at the apex 630–667.5 (door 632–644, ramp
-634–643), off the map by 679.5. On that reach it follows Van A's first arrival
-in (Van A there 11–18 s; nearest fleet van 1.04 m, Van B on the other lane at
-15 s), and in the afternoon it comes back on as Van A leaves the map with the
-center's Mrs. Lin (622.5 s) and turns into the drive before Van B comes in
-(631 s); street cars never use the reach.
+off the map by 62; back 624–631, at the apex 631–667.5 (door 632–644, ramp
+634–643), off the map by 679.5. On that reach it comes in ahead of Van A's
+first arrival (on the reach from 15.8 s) and crosses the outer lane into the
+drive before Van B, out of the lot's exit, comes south past it (16.7 s). In
+the afternoon it comes back on only once Van A has left the map with the
+center's Mrs. Lin (faded out by 624 s), so the 69 m in take 7 s instead of
+the morning's 11.5 (at most 11.3 m/s; the fleet vans reach 9.6 m/s on that
+street), and it is at the apex before Van B comes back on (635.8 s); street
+cars never use the reach.
 
 Two actors represent Mrs. Lin in the composed day: the center's
 (`arrival-cane` in the base loop, `hero-lin` in the story) and the network's
 `lin-at-home`. They share the profile, so she is drawn the same, but Measure
-and the trace count them as two participants: from 11.5 s (Van A brings the
+and the trace count them as two participants: from 15.8 s (Van A brings the
 center's Mrs. Lin in from off site) to 62 s (her own van leaves the map) both
 are in sight, so one merged timeline would put her in two places at once. In
-the afternoon the hand-over is already clean: Van A leaves the map with her at
-622 s as her own van comes back on at 620–622 s.
+the afternoon the hand-over is clean: Van A has left the map with her by 624 s,
+when her own van starts back on.
 
 Places for framing her home (world x, z): pad centre (−88, −56); front door
 (−91.6, −56.4), porch (−90.3, −56.4), porch ramp top (−90.3, −59.4) and foot
