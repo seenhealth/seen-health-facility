@@ -172,6 +172,79 @@ export function instanceSelection(
     ),
   };
 }
+/** A surface people stand on above the instance floor: a stage deck, a riser tier, a ramp landing. */
+export type StandingSurface = { polygon: Vec2[]; y: number };
+/**
+ * The surfaces people stand on above the floor, from drawn objects whose
+ * asset declares `parameters.standing` (adhc-assets.ts): 'deck' (a flat top
+ * `deck` m up over the footprint), 'tiers' (`tiers` steps of `tierRise`, the
+ * front tier at local +z), 'ramp' (rising toward local −z to `rise`, with a
+ * flat `landing` m long at the top; the slope in strips of at most 0.6 m at
+ * their mid heights) and 'steps' (`risers` treads up to `rise` toward −z,
+ * behind an optional `platform` m top). Polygons are in the facility frame;
+ * `y` is above the instance floor (level, zone offset and the object's own
+ * height included). Pure; shared by the build-time summary that gives people
+ * their heights (`groundYAt`).
+ */
+export function standingSurfaces(
+  facility: Facility,
+  sel: Pick<InstanceSelection, 'objects' | 'zones' | 'baseElevation'>,
+): StandingSurface[] {
+  const out: StandingSurface[] = [];
+  for (const o of sel.objects) {
+    const a = facility.assets[o.assetId],
+      p = a?.parameters;
+    if (!p?.standing) continue;
+    const w = a.dimensions[0] * o.scale[0],
+      d = a.dimensions[2] * o.scale[2],
+      sy = o.scale[1],
+      zone = sel.zones.find((z) => z.id === o.zoneId),
+      base =
+        (facility.levels.find((l) => l.id === o.levelId)?.elevation ?? 0) -
+        sel.baseElevation +
+        (zone?.elevationOffset || 0) +
+        o.position[1];
+    // Strips across the object's width: [z0, z1, height] in local z.
+    const strips: [number, number, number][] = [];
+    if (p.standing === 'deck') strips.push([-d / 2, d / 2, Number(p.deck)]);
+    else if (p.standing === 'tiers') {
+      const n = Math.max(1, Math.round(Number(p.tiers))),
+        rise = Number(p.tierRise);
+      for (let k = 0; k < n; k++)
+        strips.push([d / 2 - ((k + 1) * d) / n, d / 2 - (k * d) / n, (k + 1) * rise]);
+    } else if (p.standing === 'ramp') {
+      const rise = Number(p.rise),
+        landing = Number(p.landing ?? 0),
+        run = d - landing,
+        m = Math.max(1, Math.ceil(run / 0.6));
+      if (landing > 0) strips.push([-d / 2, -d / 2 + landing, rise]);
+      for (let i = 0; i < m; i++) {
+        const z0 = -d / 2 + landing + (i * run) / m;
+        strips.push([z0, z0 + run / m, rise * (1 - (i + 0.5) / m)]);
+      }
+    } else if (p.standing === 'steps') {
+      const rise = Number(p.rise),
+        n = Math.max(1, Math.round(Number(p.risers))),
+        platform = Number(p.platform ?? 0),
+        tread = (d - platform) / n;
+      if (platform > 0) strips.push([-d / 2, -d / 2 + platform, rise]);
+      for (let k = 0; k < n; k++)
+        strips.push([d / 2 - (k + 1) * tread, d / 2 - k * tread, ((k + 1) * rise) / n]);
+    }
+    const frame = { position: [o.position[0], o.position[2]] as Vec2, heading: o.rotation };
+    for (const [z0, z1, h] of strips)
+      out.push({
+        polygon: transformPolygon(frame, [
+          [-w / 2, z0],
+          [w / 2, z0],
+          [w / 2, z1],
+          [-w / 2, z1],
+        ]),
+        y: base + h * sy,
+      });
+  }
+  return out;
+}
 /** Rooms that get a name plate, with the name shown. */
 export function labelledRooms(
   rooms: Room[],

@@ -679,8 +679,8 @@ async function smokeTest() {
     harness.observers.length = harness.renderers.length = 0;
     const s = beginSession();
     const host = viewer.host();
-    // Community facilities resolve from public/ (the partner day center is
-    // Alhambra's own model; another facility would load here).
+    // Community facilities (the Wongs' home, the partner day center) resolve
+    // from public/.
     const api = createViewer(host, model, () => {}, {
       loadFacility: async (url) =>
         viewer.schema.validateFacility(
