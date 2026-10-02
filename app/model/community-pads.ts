@@ -53,6 +53,16 @@ const PALETTE = {
   metal: '#c2c2bc',
   plate: '#f6f4ee',
   text: '#2f3a38',
+  // Clinic equipment: instrument housings, the dark optics and carbon table
+  // top, the exam chair's upholstery, the acuity screen and lead aprons.
+  device: '#ebe9e3',
+  deviceTrim: '#c3c9c8',
+  optics: '#2f3639',
+  upholstery: '#41606c',
+  chart: '#f8f7f2',
+  shield: '#e5e1d8',
+  beam: '#f1e3a2',
+  aprons: ['#4f6f96', '#7d5f80', '#3f7c78'],
 };
 /**
  * A home pad's porch slab in its local frame (centre and size): the house's
@@ -610,37 +620,390 @@ function buildHospital(s: CareSetting, h: Ctx) {
 /** A world direction in the pad's frame (no translation). */
 const toLocalDir = (s: CareSetting, d: Vec2): Vec2 =>
   toLocal({ position: [0, 0], heading: s.heading }, d);
+/** A horizontal bar of square section `size` from `a` to `b` (local x/z), centred at height `y`. */
+function bar(h: Ctx, a: Vec2, b: Vec2, y: number, size: number, color: string) {
+  const dx = b[0] - a[0],
+    dz = b[1] - a[1];
+  const m = h.add(
+    new T.BoxGeometry(Math.hypot(dx, dz), size, size),
+    color,
+    (a[0] + b[0]) / 2,
+    y,
+    (a[1] + b[1]) / 2,
+  );
+  m.rotation.y = Math.atan2(-dz, dx);
+  return m;
+}
+/** Outline of a band `width` wide along a polyline (local x/z), for `patch`. */
+function ribbon(points: Vec2[], width: number): Vec2[] {
+  const side = points.map((p, i) => {
+    const a = points[Math.max(0, i - 1)],
+      b = points[Math.min(points.length - 1, i + 1)],
+      len = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+    return [
+      ((a[1] - b[1]) / len) * (width / 2),
+      ((b[0] - a[0]) / len) * (width / 2),
+    ];
+  });
+  return [
+    ...points.map((p, i): Vec2 => [p[0] + side[i][0], p[1] + side[i][1]]),
+    ...points
+      .map((p, i): Vec2 => [p[0] - side[i][0], p[1] - side[i][1]])
+      .reverse(),
+  ];
+}
+/** A cylinder lying along local x (`axis` 'x') or z, centred at (x, y, z). */
+function lying(
+  h: Ctx,
+  axis: 'x' | 'z',
+  x: number,
+  y: number,
+  z: number,
+  r: number,
+  length: number,
+  color: string,
+) {
+  const m = h.cylinder(x, y - length / 2, z, r, length, color);
+  if (axis === 'x') m.rotation.z = Math.PI / 2;
+  else m.rotation.x = Math.PI / 2;
+  return m;
+}
+/**
+ * The specialty clinic in its local frame: storey heights, the building's
+ * x extent and the partitions between its ground-floor rooms (cardiology |
+ * lobby | optometry | imaging). The ground floor is tall enough for the X-ray
+ * tube's ceiling rails and for the oblique cameras (elevation up to ≈ 0.6) to
+ * see the equipment under the solid upper storey.
+ */
+const CLINIC = {
+  floor: 3.9,
+  upper: 3.6,
+  x0: -11,
+  x1: 18.6,
+  partitions: [-2.2, 5.3, 10.5],
+};
+/**
+ * A room's name on the upper storey's front above it: white type on an
+ * accent panel (the type needs a DOM canvas; headless builds keep the panel).
+ */
+function roomSign(h: Ctx, s: CareSetting, text: string, x: number) {
+  const w = 2.4,
+    tall = 0.42,
+    panel = h.box(
+      x,
+      PAD_Y + CLINIC.floor + 0.3,
+      -5.075,
+      w,
+      tall,
+      0.05,
+      s.accent,
+    );
+  if (typeof document === 'undefined') return;
+  const c = document.createElement('canvas');
+  c.width = 512;
+  c.height = 90;
+  const g = c.getContext('2d')!;
+  g.fillStyle = '#ffffff';
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  let px = 56;
+  g.font = `600 ${px}px Arial`;
+  while (px > 24 && g.measureText(text.toUpperCase()).width > 460)
+    g.font = `600 ${(px -= 2)}px Arial`;
+  g.fillText(text.toUpperCase(), 256, 47);
+  const tex = new T.CanvasTexture(c);
+  tex.colorSpace = T.SRGBColorSpace;
+  tex.anisotropy = 4;
+  const type = new T.Mesh(
+    new T.PlaneGeometry(w, tall),
+    new T.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false }),
+  );
+  type.position.z = 0.026;
+  panel.add(type);
+}
 function buildSpecialist(s: CareSetting, h: Ctx) {
-  // Ground floor: glazed lobby and exam room under a solid upper storey.
-  h.box(0, PAD_Y, -9.0, 22, 0.06, 7.2, PALETTE.paver);
-  h.box(0, PAD_Y, -12.1, 22, 3.3, 1.0, PALETTE.wall);
-  for (const x of [-10.5, 10.5])
-    h.box(x, PAD_Y, -9.0, 1.0, 3.3, 7.2, PALETTE.wall);
-  for (const x of [-3.9, 3.9, -7.6, 7.6])
-    h.box(x, PAD_Y, -5.7, 0.26, 3.3, 0.26, PALETTE.metal);
-  h.box(0, PAD_Y + 3.3, -9.0, 22.6, 3.6, 7.8, PALETTE.wall);
-  h.windows(-11.0, 11.0, PAD_Y + 4.3, -5.06, 1.6, 2.2, 1.5);
-  h.windowsZ(-12.6, -5.4, PAD_Y + 4.3, -11.34, 1.6, 2.2, 1.5);
-  h.windowsZ(-12.6, -5.4, PAD_Y + 4.3, 11.34, 1.6, 2.2, 1.5);
-  h.box(0, PAD_Y + 6.9, -9.0, 23.0, 0.3, 8.2, PALETTE.roof);
-  h.box(0, PAD_Y + 3.05, -3.9, 6.4, 0.24, 3.2, PALETTE.roof);
-  h.box(0, PAD_Y + 3.3, -2.35, 6.4, 0.5, 0.14, s.accent);
-  // Partition between lobby and exam room; reception desk, waiting chairs, exam chair, desk.
-  h.box(-2.2, PAD_Y, -9.3, 0.2, 3.3, 4.6, PALETTE.wall);
+  const { floor: gf, upper, x0, x1 } = CLINIC,
+    cx = (x0 + x1) / 2,
+    w = x1 - x0;
+  // Ground floor: an open front under a solid upper storey, the rooms in a
+  // row behind it.
+  h.box(cx, PAD_Y, -9.0, w, 0.06, 7.2, PALETTE.paver);
+  h.box(cx, PAD_Y, -12.1, w, gf, 1.0, PALETTE.wall);
+  h.box(x0 + 0.5, PAD_Y, -9.0, 1.0, gf, 7.2, PALETTE.wall);
+  // The east end is glazed at the front, without a corner column, so the
+  // cameras east of north (azimuth ≈ 0.4–0.6) still see the X-ray patient
+  // past the end wall.
+  h.box(x1 - 0.5, PAD_Y, -10.9, 1.0, gf, 3.4, PALETTE.wall);
+  h.box(x1 - 0.5, PAD_Y, -7.4, 0.06, gf, 3.6, 'glass').castShadow = false;
+  // Front columns stay off the oblique cameras' sight lines into the rooms:
+  // none in front of the optometry chair or the X-ray table.
+  for (const x of [-7.6, -3.9, 3.9, CLINIC.partitions[2]])
+    h.box(x, PAD_Y, -5.7, 0.26, gf, 0.26, PALETTE.metal);
+  h.box(cx, PAD_Y + gf, -9.0, w + 0.6, upper, 7.8, PALETTE.wall);
+  h.windows(x0, x1, PAD_Y + gf + 1.0, -5.06, 1.6, 2.2, 1.5);
+  h.windowsZ(-12.6, -5.4, PAD_Y + gf + 1.0, x0 - 0.34, 1.6, 2.2, 1.5);
+  h.windowsZ(-12.6, -5.4, PAD_Y + gf + 1.0, x1 + 0.34, 1.6, 2.2, 1.5);
+  h.box(cx, PAD_Y + gf + upper, -9.0, w + 1.0, 0.3, 8.2, PALETTE.roof);
+  // Drop-off canopy over the entrance, hung from the upper storey's edge.
+  h.box(0, PAD_Y + gf - 0.25, -3.9, 6.4, 0.24, 3.2, PALETTE.roof);
+  h.box(0, PAD_Y + gf, -2.35, 6.4, 0.5, 0.14, s.accent);
+  // Room signs on the band between the open front and the upper windows.
+  roomSign(h, s, 'Cardiology', -6.15);
+  roomSign(h, s, 'Optometry', 7.9);
+  roomSign(h, s, 'Imaging', 14.1);
+  // Partitions stop 1.6 m short of the front, leaving a gallery from the
+  // lobby to the rooms east of it.
+  for (const x of CLINIC.partitions)
+    h.box(x, PAD_Y, -9.3, 0.2, gf, 4.6, PALETTE.wall);
+  // Lobby: reception desk and waiting chairs facing the front.
   h.box(3.2, PAD_Y, -8.6, 1.8, 1.05, 0.7, PALETTE.wood);
   for (const k of ['waitA', 'waitB']) {
     const p = toLocal(s, s.anchors[k]);
     h.box(p[0], PAD_Y, p[1] + 0.1, 0.5, 0.45, 0.5, PALETTE.blanket);
-    h.box(p[0], PAD_Y + 0.45, p[1] + 0.32, 0.5, 0.45, 0.06, PALETTE.blanket);
+    h.box(p[0], PAD_Y + 0.45, p[1] - 0.18, 0.5, 0.45, 0.06, PALETTE.blanket);
   }
+  // Cardiology: exam chair and the cardiologist's desk.
   const exam = toLocal(s, s.anchors.examSeat);
   h.box(exam[0], PAD_Y, exam[1], 0.7, 0.5, 0.7, PALETTE.blanket);
   h.box(exam[0], PAD_Y + 0.5, exam[1] - 0.32, 0.7, 0.7, 0.08, PALETTE.blanket);
   const desk = toLocal(s, s.anchors.mdDesk);
   h.box(desk[0], PAD_Y, desk[1] - 0.85, 1.4, 0.75, 0.6, PALETTE.wood);
+  buildOptometry(s, h);
+  buildImaging(s, h);
+  // Footpath from the street sidewalk to the open front east of the canopy,
+  // wide enough for walk-ins in and out (the anchors' two lanes).
+  const lane = (a: string, b: string): Vec2 => {
+    const [p, q] = [toLocal(s, s.anchors[a]), toLocal(s, s.anchors[b])];
+    return [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+  };
+  const walk: Vec2[] = [
+    [lane('sidewalkPad', 'sidewalkPadOut')[0], frontZ(s)],
+    lane('approachA', 'approachAOut'),
+    lane('approachB', 'approachBOut'),
+    lane('approachC', 'approachCOut'),
+    [4.9, -5.3],
+  ];
+  h.patch(ribbon(walk, 1.6), PAD_Y, 0.015, PALETTE.paver);
   h.tree(-13.0, 11.6, 1.5, 3.0, 0);
   h.tree(13.0, 11.2, 1.3, 2.8, 1);
-  h.tree(13.2, -11.8, 1.2, 2.6, 2);
+  h.tree(20.6, -11.2, 1.1, 2.6, 2);
+  h.tree(-17.0, -9.5, 1.6, 3.1, 0);
+  h.tree(-19.0, 1.0, 1.3, 2.7, 1);
+  h.tree(16.8, 7.0, 1.3, 2.8, 2);
+}
+/**
+ * Optometry, a mirrored lane: the exam chair faces +x toward the mirror on
+ * the imaging partition, the visual acuity screen behind it on the lobby
+ * partition, and the phoropter hangs on its arm in front of the patient's
+ * eyes, its lens side toward the oblique cameras. The slit lamp's instrument
+ * table stands at the chair's right with the optometrist's stool beside it;
+ * the technician's counter (autorefractor, lensometer) and the optometrist's
+ * desk run along the back wall. Furniture stands on the floor slab (`fl`);
+ * what lines up with a seated patient's eyes is measured from the ground
+ * people stand on (`PAD_Y`).
+ */
+function buildOptometry(s: CareSetting, h: Ctx) {
+  const a = (k: string) => toLocal(s, s.anchors[k]),
+    fl = PAD_Y + 0.06;
+  // Exam chair on its pedestal, the back reclined, the headrest up.
+  const [sx, sz] = a('optoSeat');
+  h.cylinder(sx - 0.05, fl, sz, 0.26, 0.04, PALETTE.optics);
+  h.cylinder(sx - 0.05, fl + 0.04, sz, 0.09, 0.28, PALETTE.deviceTrim);
+  h.box(sx + 0.06, fl + 0.32, sz, 0.58, 0.14, 0.62, PALETTE.upholstery);
+  const back = h.box(
+    sx - 0.27,
+    fl + 0.44,
+    sz,
+    0.13,
+    0.8,
+    0.58,
+    PALETTE.upholstery,
+  );
+  back.rotation.z = 0.16;
+  h.box(sx - 0.37, fl + 1.2, sz, 0.11, 0.2, 0.3, PALETTE.upholstery);
+  for (const dz of [-0.35, 0.35]) {
+    h.box(sx + 0.04, fl + 0.6, sz + dz, 0.48, 0.06, 0.09, PALETTE.optics);
+    h.box(sx - 0.12, fl + 0.46, sz + dz, 0.06, 0.14, 0.06, PALETTE.optics);
+  }
+  h.box(sx + 0.5, fl, sz, 0.32, 0.04, 0.48, PALETTE.optics);
+  // Instrument stand behind the chair's left; its arm holds the phoropter
+  // at the patient's eye height (seated, about 1.1 m): two lens wheels
+  // either side of the sight line, their apertures toward the mirror.
+  const [tx, tz] = a('optoStand'),
+    px = sx + 0.36,
+    py = PAD_Y + 1.13;
+  h.box(tx, fl, tz, 0.5, 0.05, 0.5, PALETTE.deviceTrim);
+  h.box(tx, fl + 0.05, tz, 0.16, 1.55, 0.16, PALETTE.device);
+  h.box(tx, fl + 1.6, tz, 0.24, 0.12, 0.24, PALETTE.device);
+  bar(h, [tx, tz], [px - 0.02, sz], py + 0.47, 0.06, PALETTE.device);
+  h.box(px - 0.02, py + 0.12, sz, 0.04, 0.33, 0.04, PALETTE.optics);
+  h.box(px, py - 0.1, sz, 0.1, 0.2, 0.13, PALETTE.optics);
+  h.box(px, py + 0.1, sz, 0.05, 0.035, 0.44, PALETTE.optics);
+  for (const dz of [-0.14, 0.14]) {
+    lying(h, 'x', px, py, sz + dz, 0.115, 0.09, PALETTE.optics);
+    lying(h, 'x', px + 0.05, py, sz + dz, 0.06, 0.02, PALETTE.deviceTrim);
+  }
+  // Visual acuity screen behind the patient, read in the mirror: a dark
+  // bezel, a bright face and rows of letters shrinking from the big E.
+  const [cx, cz] = a('optoChart'),
+    [mx, mz] = a('optoMirror');
+  h.box(cx + 0.02, PAD_Y + 1.3, cz, 0.04, 0.58, 0.86, 'screen');
+  h.box(cx + 0.045, PAD_Y + 1.34, cz, 0.01, 0.5, 0.78, PALETTE.chart);
+  for (const [y, tall, wide] of [
+    [1.69, 0.1, 0.09],
+    [1.6, 0.06, 0.24],
+    [1.535, 0.045, 0.34],
+    [1.48, 0.034, 0.44],
+    [1.435, 0.026, 0.52],
+    [1.4, 0.02, 0.58],
+  ])
+    h.box(cx + 0.052, PAD_Y + y, cz, 0.008, tall, wide, PALETTE.optics);
+  h.box(mx - 0.015, PAD_Y + 0.95, mz, 0.03, 0.8, 1.0, PALETTE.deviceTrim);
+  h.box(mx - 0.035, PAD_Y + 0.99, mz, 0.01, 0.72, 0.92, PALETTE.glass);
+  // Slit lamp on its instrument table: chin rest and forehead band toward
+  // the chair (−x), the illumination tower, the microscope and its oculars
+  // toward the optometrist's stool (+x).
+  const [lx, lz] = a('optoSlit'),
+    top = fl + 0.72;
+  h.box(lx, fl, lz, 0.46, 0.04, 0.46, PALETTE.optics);
+  h.box(lx, fl + 0.04, lz, 0.12, 0.64, 0.12, PALETTE.deviceTrim);
+  h.box(lx, top - 0.04, lz, 0.46, 0.04, 0.64, PALETTE.deviceTrim);
+  h.box(lx, top, lz, 0.32, 0.06, 0.36, PALETTE.device);
+  for (const dz of [-0.13, 0.13])
+    h.box(lx - 0.15, top + 0.06, lz + dz, 0.025, 0.46, 0.025, PALETTE.optics);
+  h.box(lx - 0.15, top + 0.5, lz, 0.03, 0.03, 0.28, PALETTE.optics);
+  h.box(lx - 0.15, top + 0.22, lz, 0.06, 0.03, 0.09, PALETTE.device);
+  h.cylinder(lx - 0.03, top + 0.06, lz, 0.022, 0.3, PALETTE.device);
+  h.box(lx - 0.03, top + 0.34, lz, 0.08, 0.1, 0.08, PALETTE.device);
+  h.box(lx + 0.06, top + 0.18, lz, 0.16, 0.09, 0.11, PALETTE.optics);
+  for (const dz of [-0.033, 0.033])
+    lying(h, 'x', lx + 0.19, top + 0.25, lz + dz, 0.018, 0.12, PALETTE.optics);
+  h.cylinder(lx + 0.12, top + 0.06, lz + 0.11, 0.012, 0.08, PALETTE.optics);
+  // The optometrist's stool: five-star base, gas column, round seat.
+  const [ox, oz] = a('optoStool');
+  h.cylinder(ox, fl, oz, 0.24, 0.03, PALETTE.optics);
+  h.cylinder(ox, fl + 0.03, oz, 0.03, 0.38, PALETTE.deviceTrim);
+  h.cylinder(ox, fl + 0.41, oz, 0.19, 0.07, PALETTE.optics);
+  // Back wall: the technician's counter with the autorefractor and the
+  // lensometer; the optometrist's desk, screen and chair.
+  const [kx] = a('optoCounter');
+  h.box(kx, fl, -11.28, 1.8, 0.86, 0.6, PALETTE.wallWarm);
+  h.box(kx, fl + 0.86, -11.28, 1.84, 0.04, 0.64, PALETTE.wood);
+  h.box(kx - 0.45, fl + 0.9, -11.32, 0.32, 0.28, 0.42, PALETTE.device);
+  h.box(kx - 0.45, fl + 0.98, -11.105, 0.2, 0.14, 0.01, 'screen');
+  h.box(kx + 0.45, fl + 0.9, -11.3, 0.16, 0.05, 0.18, PALETTE.device);
+  h.box(kx + 0.45, fl + 0.95, -11.32, 0.07, 0.26, 0.07, PALETTE.device);
+  h.box(kx + 0.45, fl + 1.21, -11.28, 0.12, 0.1, 0.16, PALETTE.optics);
+  const [dx, dz] = a('optoDesk');
+  h.box(dx, fl, -11.28, 1.4, 0.74, 0.6, PALETTE.wood);
+  h.box(dx, fl + 0.74, -11.42, 0.12, 0.08, 0.12, PALETTE.optics);
+  h.box(dx, fl + 0.82, -11.42, 0.52, 0.32, 0.04, 'screen');
+  h.box(dx, fl + 0.37, dz, 0.46, 0.08, 0.46, PALETTE.optics);
+  h.box(dx, fl + 0.45, dz + 0.22, 0.44, 0.46, 0.05, PALETTE.optics);
+}
+/**
+ * Imaging: a digital X-ray room. The table runs along the front with the
+ * patient's chair at its east end; the tube hangs from a telescoping column
+ * on a bridge riding two ceiling rails, its collimator over the table. The
+ * shielded control alcove sits in the front corner by the optometry
+ * partition, its lead-glass window toward the table and the lead aprons on
+ * its outer face; the upright detector stands against the back wall.
+ */
+function buildImaging(s: CareSetting, h: Ctx) {
+  const a = (k: string) => toLocal(s, s.anchors[k]),
+    fl = PAD_Y + 0.06,
+    ceiling = PAD_Y + CLINIC.floor,
+    [tx, tz] = a('imagingTable'),
+    [px, pz] = a('imagingSeat'),
+    [cx, cz] = a('imagingConsole');
+  // Table: base, pedestal, detector housing with an accent stripe, carbon
+  // top (0.8 m), its east end clear for the knees of a seated patient.
+  h.box(tx - 0.35, fl, tz, 1.1, 0.04, 0.62, PALETTE.deviceTrim);
+  h.box(tx - 0.35, fl + 0.04, tz, 0.62, 0.52, 0.42, PALETTE.device);
+  h.box(tx - 0.2, fl + 0.56, tz, 2.0, 0.17, 0.7, PALETTE.device);
+  h.box(tx - 0.2, fl + 0.63, tz + 0.352, 2.0, 0.04, 0.01, s.accent);
+  h.box(tx, fl + 0.73, tz, 2.4, 0.06, 0.8, PALETTE.optics);
+  // Patient's chair at the table's east end, facing it.
+  h.box(px - 0.08, fl, pz, 0.46, 0.44, 0.46, PALETTE.blanket);
+  h.box(px + 0.18, fl + 0.44, pz, 0.06, 0.46, 0.46, PALETTE.blanket);
+  // Overhead tube over the table's east end, where the forearm lies: two
+  // ceiling rails, the bridge, a telescoping column, the tube housing and
+  // the collimator with its light field, handles and display.
+  const ux = px - 0.6;
+  for (const dz of [-0.62, 0.62])
+    h.box(
+      tx + 0.1,
+      ceiling - 0.08,
+      tz + dz,
+      4.2,
+      0.07,
+      0.09,
+      PALETTE.deviceTrim,
+    );
+  h.box(ux, ceiling - 0.21, tz, 0.32, 0.13, 1.5, PALETTE.device);
+  h.box(
+    ux,
+    PAD_Y + 2.6,
+    tz,
+    0.22,
+    ceiling - 0.21 - (PAD_Y + 2.6),
+    0.22,
+    PALETTE.device,
+  );
+  h.box(ux, PAD_Y + 2.0, tz, 0.17, 0.6, 0.17, PALETTE.deviceTrim);
+  lying(h, 'z', ux, PAD_Y + 1.86, tz, 0.15, 0.56, PALETTE.device);
+  for (const dz of [-0.3, 0.3])
+    lying(h, 'z', ux, PAD_Y + 1.86, tz + dz, 0.165, 0.05, s.accent);
+  h.box(ux, PAD_Y + 1.5, tz, 0.28, 0.21, 0.28, PALETTE.deviceTrim);
+  h.box(ux, PAD_Y + 1.49, tz, 0.18, 0.01, 0.18, PALETTE.beam);
+  h.box(ux, PAD_Y + 1.55, tz + 0.15, 0.2, 0.12, 0.02, 'screen');
+  for (const dx of [-0.17, 0.17])
+    h.box(ux + dx, PAD_Y + 1.58, tz, 0.03, 0.03, 0.24, PALETTE.optics);
+  // Control alcove: lead-lined walls 2.4 m high, the window over the
+  // console toward the table, the technologist's chair.
+  const wx = 12.85,
+    west = CLINIC.partitions[2] + 0.1;
+  h.box(wx, PAD_Y, -8.25, 0.2, 1.15, 2.5, PALETTE.shield);
+  h.box(wx, PAD_Y + 2.0, -8.25, 0.2, 0.4, 2.5, PALETTE.shield);
+  h.box(wx, PAD_Y + 1.15, -9.3, 0.2, 0.85, 0.4, PALETTE.shield);
+  h.box(wx, PAD_Y + 1.15, -7.425, 0.2, 0.85, 0.85, PALETTE.shield);
+  h.box(wx, PAD_Y + 1.15, -8.475, 0.04, 0.85, 1.25, 'glass');
+  for (const y of [1.13, 1.98])
+    h.box(wx, PAD_Y + y, -8.475, 0.24, 0.04, 1.29, PALETTE.optics);
+  h.box(
+    (west + wx + 0.1) / 2,
+    PAD_Y,
+    -9.4,
+    wx + 0.1 - west,
+    2.4,
+    0.2,
+    PALETTE.shield,
+  );
+  h.box(12.45, fl, -8.45, 0.5, 0.7, 1.5, PALETTE.wallWarm);
+  h.box(12.45, fl + 0.7, -8.45, 0.54, 0.03, 1.54, PALETTE.wood);
+  for (const dz of [-0.3, 0.3])
+    h.box(12.6, fl + 0.75, -8.45 + dz, 0.04, 0.3, 0.46, 'screen');
+  h.box(12.32, fl + 0.73, -8.45, 0.16, 0.02, 0.42, PALETTE.optics);
+  h.box(cx, fl + 0.37, cz, 0.46, 0.08, 0.46, PALETTE.optics);
+  h.box(cx - 0.22, fl + 0.45, cz, 0.05, 0.46, 0.44, PALETTE.optics);
+  // Lead aprons on pegs along the alcove's outer face, turned to the room.
+  h.box(wx + 0.12, PAD_Y + 1.74, -7.42, 0.04, 0.04, 0.72, PALETTE.deviceTrim);
+  PALETTE.aprons.forEach((color, i) => {
+    const apron = h.box(
+      wx + 0.17 + i * 0.03,
+      PAD_Y + 0.9,
+      -7.66 + i * 0.24,
+      0.04,
+      0.82,
+      0.34,
+      color,
+    );
+    apron.rotation.y = -0.5;
+  });
+  // Upright detector against the back wall.
+  h.box(tx, fl, -11.48, 0.2, 2.2, 0.14, PALETTE.device);
+  h.box(tx, fl + 1.0, -11.36, 0.6, 0.6, 0.12, PALETTE.device);
+  h.box(tx, fl + 1.08, -11.295, 0.42, 0.42, 0.01, PALETTE.optics);
 }
 /**
  * The partner's own single-storey hall: the massing shown when no facility

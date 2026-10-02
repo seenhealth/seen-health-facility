@@ -693,16 +693,19 @@ export const careSettings: CareSetting[] = [
   define({
     id: 'specialist',
     kind: 'specialist',
-    name: 'Cardiology & specialty clinic',
-    short: 'Cardiology',
-    subtitle: 'Contracted specialist visits with a Seen escort',
+    name: 'Specialty clinic · cardiology, optometry & imaging',
+    short: 'Specialty clinic',
+    subtitle: 'Specialist visits, eye exams and X-rays with a Seen escort',
     position: [84, -56],
     heading: 0,
-    pad: { w: 28, d: 26 },
+    // Wide for the ground floor's row of rooms behind the open front, from
+    // west to east: cardiology exam room, lobby (the entrance faces the
+    // drive), optometry and imaging (community-pads.ts `buildSpecialist`).
+    pad: { w: 44, d: 26 },
     road: { from: [84, -35.8], to: [84, -43] },
     drive: { depth: 6, radius: 6.2, lanes: 1 },
     apron: { w: 10, d: 4.6 },
-    services: ['specialist'],
+    services: ['specialist', 'optometry', 'imaging'],
     accent: '#6d8fb3',
     local: {
       kerb: [-0.4, -4.3],
@@ -710,8 +713,8 @@ export const careSettings: CareSetting[] = [
       doorway: [-2.2, -6.2],
       checkIn: [3.2, -7.5],
       checkInB: [2.4, -6.9],
-      deskEnd: [4.8, -9.2],
-      lobbyMid: [4.6, -7.4],
+      deskEnd: [4.7, -9.2],
+      lobbyMid: [4.5, -7.4],
       receptionMa: [3.2, -9.6],
       examSeat: [-6.4, -8.8],
       examMd: [-4.8, -8.5],
@@ -721,6 +724,60 @@ export const careSettings: CareSetting[] = [
       waitB: [1.7, -7.8],
       waitFront: [1.2, -6.4],
       mdDesk: [-6.4, -10.3],
+      // Walk-ins from a Seen ride at the street kerb: up the sidewalk stub
+      // (in on its west half, out on its east half), along the plinth
+      // outside the drive and in through the open front east of the canopy.
+      sidewalkEnd: [8.55, 19.5],
+      sidewalkPad: [8.55, 12.4],
+      sidewalkEndOut: [9.25, 19.5],
+      sidewalkPadOut: [9.25, 12.4],
+      approachA: [8.85, 5.0],
+      approachB: [7.6, -1.4],
+      approachC: [5.2, -4.6],
+      approachAOut: [9.6, 5.0],
+      approachBOut: [8.3, -1.1],
+      approachCOut: [5.9, -4.2],
+      // The lobby's front: where staff call a patient in, where an escort
+      // meets her (clear of the way in from the gallery), and the gallery
+      // along the open front to the rooms east of the lobby (each partition
+      // stops 1.6 m short of the front).
+      lobbyCall: [2.0, -6.45],
+      escortMeet: [2.0, -7.15],
+      galleryA: [5.3, -6.25],
+      galleryB: [10.5, -6.35],
+      // Optometry (x 5.4–10.4): a mirrored lane, the exam chair facing the
+      // mirror on the imaging partition with the acuity screen behind it on
+      // the lobby partition (about 7.8 m by way of the mirror); the slit
+      // lamp's instrument table at the chair's right, the optometrist's
+      // stool beside it, the instrument stand behind the chair's left; the
+      // technician's counter and the optometrist's desk at the back. The
+      // patient sits down from the chair's left side.
+      optoIn: [9.0, -6.65],
+      optoAside: [9.75, -7.6],
+      optoWest: [6.1, -7.1],
+      optoSeat: [7.4, -8.3],
+      optoChart: [5.4, -8.3],
+      optoMirror: [10.4, -8.3],
+      optoSlit: [7.55, -7.35],
+      optoStool: [8.25, -7.4],
+      optoStand: [7.15, -9.1],
+      optoTech: [8.05, -8.95],
+      optoApproach: [8.6, -8.8],
+      optoSide: [7.45, -8.85],
+      optoCounter: [6.3, -10.65],
+      optoDesk: [9.3, -10.6],
+      // Imaging (x 10.6–17.6): the shielded control alcove in the front
+      // corner by the optometry partition, its lead-glass window facing the
+      // X-ray table; the patient's chair at the table's east end, under the
+      // overhead tube.
+      imagingIn: [16.5, -6.35],
+      imagingTable: [15.2, -7.35],
+      imagingSeat: [16.85, -7.35],
+      imagingTech: [15.55, -8.2],
+      imagingAround: [13.5, -8.3],
+      alcoveGate: [13.5, -6.6],
+      alcoveIn: [11.8, -6.65],
+      imagingConsole: [11.9, -8.45],
     },
   }),
   define({
@@ -817,6 +874,8 @@ export const serviceLabels: Record<string, string> = {
   'home-mods': 'Home modifications',
   'after-hours': '24/7 nurse line',
   specialist: 'Specialist visits',
+  optometry: 'Eye exams',
+  imaging: 'X-ray & imaging',
   ed: 'Emergency care',
   discharge: 'Discharge coordination',
   'day-program': 'Partner day program',

@@ -1167,7 +1167,13 @@ export function communitySource(model: Facility): SourceExtension {
     );
   }
 
-  // --- Cardiology & specialty clinic ---------------------------------------
+  // --- Specialty clinic: cardiology, optometry & imaging --------------------
+  // Mrs. Wong's cardiology follow-up comes by the Seen van; after it two more
+  // participants walk in from a Seen ride at the street kerb with an escort
+  // aide, one at a time through the front desk: a diabetic eye exam (the
+  // optometry exam 321–364 s) and a wrist X-ray after a fall (the scan
+  // 452–495 s). The optometry pair walks out on the sidewalk's east half
+  // while the imaging pair walks in on its west half.
   {
     const zone = settingZone(specialist.id),
       opts = { zoneId: zone };
@@ -1242,8 +1248,21 @@ export function communitySource(model: Facility): SourceExtension {
       .walk(239, [c.examIn, c.doorway, c.lobbyMid, c.deskEnd, c.receptionMa], {
         title: 'Back to the desk',
       })
-      .hold(CLOCK_END, 'document', {
+      .hold(288, 'document', {
         title: 'Scheduling the next visit',
+        heading: rel(specialist),
+      })
+      .hold(294, 'greet', {
+        title: 'Checking in the eye exam',
+        face: c.checkIn,
+      })
+      .hold(410, 'document', {
+        title: 'Referrals and scheduling',
+        heading: rel(specialist),
+      })
+      .hold(416, 'greet', { title: 'Checking in the X-ray', face: c.checkIn })
+      .hold(CLOCK_END, 'document', {
+        title: 'Visit summaries to the Seen PCP',
         heading: rel(specialist),
       });
     add(ma);
@@ -1276,6 +1295,301 @@ export function communitySource(model: Facility): SourceExtension {
       268,
       'Back to the van',
       'The escort aide meets her at the door and they board for home.',
+    );
+
+    // Optometry: a diabetic eye exam and glasses check. The escort leads
+    // her up from the kerb and waits in the lobby; the technician calls her
+    // in, steps aside while she sits down and does the pre-test; the
+    // optometrist examines her at the slit lamp and refracts.
+    const east = rel(specialist, Math.PI / 2),
+      west = rel(specialist, -Math.PI / 2),
+      back = rel(specialist, Math.PI);
+    const kerbIn = [c.sidewalkPad, c.approachA, c.approachB, c.approachC],
+      kerbOut = [
+        c.approachCOut,
+        c.approachBOut,
+        c.approachAOut,
+        c.sidewalkPadOut,
+        c.sidewalkEndOut,
+      ];
+    const optoEscort = new Track(
+      'optometry-escort',
+      'aide',
+      { ...opts, label: 'Seen escort aide · eye exam', variant: 4 },
+      c.sidewalkEnd,
+    )
+      .hidden(250, 'Seen ride to the clinic')
+      .walk(288, [...kerbIn, c.checkIn], { title: 'In from the kerb' })
+      .hold(294, 'greet', {
+        title: 'Checking her in for the eye exam',
+        face: c.receptionMa,
+      })
+      .walk(297, [c.waitB], { title: 'To the waiting area' })
+      .hold(377, 'seated', {
+        title: 'Waiting; updating the Seen care team',
+        heading: rel(specialist),
+      })
+      .walk(379, [c.escortMeet], { title: 'Meeting her' })
+      .hold(381, 'greet', { title: 'All done?', face: c.waitFront })
+      .walk(418, kerbOut, { title: 'Out to the Seen ride' })
+      .hidden(CLOCK_END, 'Seen ride back to the center');
+    add(optoEscort);
+    const optoParticipant = new Track(
+      'optometry-participant',
+      'participant',
+      {
+        ...opts,
+        label: 'Seen participant · eye exam',
+        variant: 5,
+        mobility: 'cane',
+      },
+      c.sidewalkEnd,
+    )
+      .hidden(251.5, 'Seen ride to the clinic')
+      .walk(289.5, [...kerbIn, c.checkInB], {
+        title: 'In from the kerb with her escort',
+      })
+      .hold(294, 'greet', { title: 'Checking in', face: c.receptionMa })
+      .walk(297.5, [c.waitA], { title: 'To the waiting area' })
+      .hold(303, 'seated', { title: 'Waiting', heading: rel(specialist) })
+      .walk(
+        321,
+        [
+          c.waitFront,
+          c.galleryA,
+          c.optoIn,
+          c.optoApproach,
+          c.optoSide,
+          c.optoSeat,
+        ],
+        { title: 'Into the eye room' },
+      )
+      .hold(336, 'seated', {
+        title: 'Acuity, eye pressure and dilating drops',
+        heading: east,
+      })
+      .hold(364, 'seated', {
+        title: 'Retina exam at the slit lamp; new glasses',
+        heading: east,
+      })
+      .walk(
+        380,
+        [c.optoSide, c.optoApproach, c.optoIn, c.galleryA, c.waitFront],
+        { title: 'Back to the lobby' },
+      )
+      .hold(382.5, 'greet', { title: 'All done', face: c.escortMeet })
+      .walk(419.5, kerbOut, { title: 'Out to the Seen ride' })
+      .hidden(CLOCK_END, 'Seen ride home');
+    add(optoParticipant);
+    const optoTech = new Track(
+      'optometry-tech',
+      'nurse',
+      { ...opts, label: 'Optometric technician', variant: 11 },
+      c.optoCounter,
+    )
+      .hold(296, 'tabletop', {
+        title: 'Calibrating the autorefractor',
+        heading: back,
+      })
+      .walk(303, [c.optoWest, c.galleryA, c.lobbyCall], {
+        title: 'Calling her in',
+      })
+      .hold(305, 'greet', { title: 'Calling her in', face: c.waitA })
+      .walk(314, [c.galleryA, c.optoIn, c.optoAside], {
+        title: 'Leading the way to the eye room',
+      })
+      .hold(322, 'greet', { title: 'Have a seat', face: c.optoSeat })
+      .walk(324.5, [c.optoTech], { title: 'To her side' })
+      .hold(334, 'treat', {
+        title: 'Acuity, eye pressure and dilating drops',
+        face: c.optoSeat,
+      })
+      .walk(337, [c.optoCounter], { title: 'Her glasses to the lensometer' })
+      .hold(348, 'tabletop', {
+        title: 'Reading her glasses on the lensometer',
+        heading: back,
+      })
+      .hold(CLOCK_END, 'document', {
+        title: 'Booking her yearly eye exam',
+        heading: back,
+      });
+    add(optoTech);
+    const optometrist = new Track(
+      'optometrist',
+      'doctor',
+      { ...opts, label: 'Optometrist', variant: 3 },
+      c.optoDesk,
+    )
+      .hold(334, 'document', {
+        title: 'Reading her diabetes referral',
+        heading: back,
+        seated: true,
+      })
+      .walk(338, [c.optoStool], { title: 'To the slit lamp' })
+      .hold(350, 'treat', {
+        title: 'Dilated retina exam at the slit lamp',
+        heading: west,
+        seated: true,
+      })
+      .hold(361, 'consult', {
+        title: 'Refraction for new glasses; results explained',
+        face: c.optoSeat,
+        seated: true,
+      })
+      .walk(365, [c.optoDesk], { title: 'Back to the desk' })
+      .hold(CLOCK_END, 'document', {
+        title: 'Eye exam report to the Seen PCP',
+        heading: back,
+        seated: true,
+      });
+    add(optometrist);
+    interact(
+      'optometry-checkin',
+      'specialist',
+      zone,
+      ['optometry-escort', 'optometry-participant', 'clinic-ma'],
+      288,
+      297,
+      'Eye exam · walk-in and check-in',
+      'A Seen ride drops her at the kerb; her escort aide walks her up from the street and checks her in for the diabetic eye exam.',
+    );
+    interact(
+      'optometry-exam',
+      'specialist',
+      zone,
+      ['optometry-participant', 'optometry-tech', 'optometrist'],
+      321,
+      364,
+      'Diabetic eye exam · optometry',
+      'The technician checks acuity and eye pressure, dilates her eyes and reads her glasses on the lensometer; the optometrist examines the retina at the slit lamp and refracts for new glasses. The report goes back to the Seen primary care provider for her diabetes plan.',
+    );
+
+    // Imaging: a wrist X-ray six weeks after a fall. The radiologic
+    // technologist calls her in from the lobby, seats her at the table's end
+    // with her forearm under the tube, takes the views from the console
+    // behind the shielded window and checks them with her.
+    const imagingEscort = new Track(
+      'imaging-escort',
+      'aide',
+      { ...opts, label: 'Seen escort aide · X-ray', variant: 7 },
+      c.sidewalkEnd,
+    )
+      .hidden(372, 'Seen ride to the clinic')
+      .walk(410, [...kerbIn, c.checkIn], { title: 'In from the kerb' })
+      .hold(416, 'greet', {
+        title: 'Checking her in for the X-ray',
+        face: c.receptionMa,
+      })
+      .walk(419, [c.waitB], { title: 'To the waiting area' })
+      .hold(515, 'seated', {
+        title: 'Waiting; confirming the ride home',
+        heading: rel(specialist),
+      })
+      .walk(517, [c.escortMeet], { title: 'Meeting her' })
+      .hold(518, 'greet', { title: 'How did it go?', face: c.waitFront })
+      .walk(555, kerbOut, { title: 'Out to the Seen ride' })
+      .hidden(CLOCK_END, 'Seen ride back to the center');
+    add(imagingEscort);
+    const imagingParticipant = new Track(
+      'imaging-participant',
+      'participant',
+      { ...opts, label: 'Seen participant · X-ray', variant: 9 },
+      c.sidewalkEnd,
+    )
+      .hidden(373.5, 'Seen ride to the clinic')
+      .walk(411.5, [...kerbIn, c.checkInB], {
+        title: 'In from the kerb with her escort',
+      })
+      .hold(416, 'greet', { title: 'Checking in', face: c.receptionMa })
+      .walk(419.5, [c.waitA], { title: 'To the waiting area' })
+      .hold(429, 'seated', { title: 'Waiting', heading: rel(specialist) })
+      .walk(
+        452,
+        [c.waitFront, c.galleryA, c.galleryB, c.imagingIn, c.imagingSeat],
+        { title: 'Into the X-ray room' },
+      )
+      .hold(495, 'tabletop', {
+        title: 'Wrist X-ray: forearm on the table, under the tube',
+        heading: west,
+        seated: true,
+      })
+      .walk(517, [c.imagingIn, c.galleryB, c.galleryA, c.waitFront], {
+        title: 'Back to the lobby',
+      })
+      .hold(519.5, 'greet', { title: 'All done', face: c.escortMeet })
+      .walk(556.5, kerbOut, { title: 'Out to the Seen ride' })
+      .hidden(CLOCK_END, 'Seen ride home');
+    add(imagingParticipant);
+    const toConsole = [c.imagingAround, c.alcoveGate, c.alcoveIn],
+      toTable = [c.alcoveIn, c.alcoveGate, c.imagingAround, c.imagingTech];
+    const imagingTech = new Track(
+      'imaging-tech',
+      'nurse',
+      { ...opts, label: 'Radiologic technologist', variant: 10 },
+      c.imagingConsole,
+    )
+      .hold(416, 'document', {
+        title: 'Morning quality checks and the worklist',
+        heading: east,
+        seated: true,
+      })
+      .walk(427, [c.alcoveIn, c.galleryB, c.galleryA, c.lobbyCall], {
+        title: 'Calling her in',
+      })
+      .hold(429, 'greet', { title: 'Calling her in', face: c.waitA })
+      .walk(
+        444,
+        [c.galleryA, c.galleryB, c.alcoveGate, c.imagingAround, c.imagingTech],
+        { title: 'Leading the way to X-ray' },
+      )
+      .hold(452, 'treat', {
+        title: 'Setting up the table and the tube',
+        face: c.imagingSeat,
+      })
+      .hold(461, 'treat', {
+        title: 'Positioning her wrist under the collimator light',
+        face: c.imagingSeat,
+      })
+      .walk(469, [...toConsole, c.imagingConsole], {
+        title: 'Behind the shielded window',
+      })
+      .hold(481, 'document', {
+        title: 'Taking three views of the wrist',
+        heading: east,
+        seated: true,
+      })
+      .walk(489, toTable, { title: 'Back to the table' })
+      .hold(495, 'consult', {
+        title: 'The images look clear; the radiologist reads them today',
+        face: c.imagingSeat,
+      })
+      .hold(499, 'greet', { title: 'Seeing her out', face: c.imagingIn })
+      .walk(507, [...toConsole, c.imagingConsole], { title: 'To the console' })
+      .hold(CLOCK_END, 'document', {
+        title: 'Images to the radiologist; the read to the Seen PCP',
+        heading: east,
+        seated: true,
+      });
+    add(imagingTech);
+    interact(
+      'imaging-checkin',
+      'specialist',
+      zone,
+      ['imaging-escort', 'imaging-participant', 'clinic-ma'],
+      410,
+      419,
+      'X-ray · walk-in and check-in',
+      'A Seen ride drops her at the kerb; her escort aide walks her up from the street and checks her in for the X-ray her primary care provider ordered.',
+    );
+    interact(
+      'imaging-scan',
+      'specialist',
+      zone,
+      ['imaging-participant', 'imaging-tech'],
+      452,
+      495,
+      'Wrist X-ray after a fall · imaging',
+      'Six weeks after a fall onto her hand, the radiologic technologist positions her forearm under the overhead tube and takes three views from behind the shielded window. The radiologist’s read goes back to the Seen primary care provider, who plans her hand therapy and a bone-density scan.',
     );
   }
 
