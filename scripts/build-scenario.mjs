@@ -219,11 +219,12 @@ export function validateTracks(sim, model, scenario, result) {
       });
     }
   // Van boarding: the hero is on the van ramp only with a parked van, open doors and ramp.
+  const { sill, foot } = sim.ARRIVAL;
   let boarding = 0;
   for (let t = 0; t < duration; t += 0.25) {
     const p = sim.sampleActor(hero, t);
     if (p.visible === false) continue;
-    if (Math.abs(p.x + 20.31) < 0.025 && p.z > 2.53 && p.z < 5.44) {
+    if (Math.abs(p.x - sill[0]) < 0.025 && p.z > sill[1] - 0.005 && p.z < foot[1] + 0.005) {
       const van = sim.sampleVan(p.vehicleId === 'van-b' ? 1 : 0, t);
       assert.ok(van.visible && van.ramp > 0.999 && van.door > 0.999, `Hero boards a parked van at ${t}`);
       boarding++;

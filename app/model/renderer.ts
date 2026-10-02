@@ -1190,7 +1190,6 @@ export function createViewer(
   }
 
   model.details.forEach((d) => {
-    if (d.id === 'west-entry-ramp') return;
     let detailParent: T.Object3D | undefined;
     if (d.zoneId) {
       const zone = groups.get(d.zoneId)!;

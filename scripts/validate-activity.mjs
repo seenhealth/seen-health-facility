@@ -295,18 +295,9 @@ for (const a of activityData.actors) {
   );
   assert.equal(a.profileId, a.id, 'Identity remains stable across every stage');
 }
-activity.arrival.entry.updateMatrixWorld(true);
-const rightTurnRay = new T.Raycaster(
-  new T.Vector3(-15.518, 0.7, -0.992),
-  new T.Vector3(1, 0, 0),
-  0,
-  0.72,
-);
-assert.equal(
-  rightTurnRay.intersectObject(activity.arrival.entry, true).length,
-  0,
-  'Right turn stays clear of handrail posts',
-);
+// The drop-off's landing, switchback ramp and rails are the exterior's; who
+// walks them, at what height and clear of which rail is checked with the
+// fleet crew in validate-fleet-crew.mjs (npm run validate:fleet).
 let boardingSamples = 0,
   entranceSamples = 0;
 for (let t = 0; t < activityData.duration; t += 0.25) {
@@ -338,7 +329,11 @@ for (let t = 0; t < activityData.duration; t += 0.25) {
   )) {
     const p = sampleActor(a, t);
     if (p.visible === false) continue;
-    if (Math.abs(p.x + 20.31) < 0.025 && p.z > 2.53 && p.z < 5.44) {
+    if (
+      Math.abs(p.x - ARRIVAL.sill[0]) < 0.025 &&
+      p.z > ARRIVAL.sill[1] - 0.005 &&
+      p.z < ARRIVAL.foot[1] + 0.005
+    ) {
       const van = sampleVan(p.vehicleId === 'van-a' ? 0 : 1, t);
       assert.ok(
         van.visible && van.ramp > 0.999 && van.door > 0.999,
@@ -347,20 +342,6 @@ for (let t = 0; t < activityData.duration; t += 0.25) {
       assert.ok(Math.abs(van.position.x - ARRIVAL.dock[0]) < 0.01);
       boardingSamples++;
     }
-    if (
-      Math.abs(p.x - ARRIVAL.rampX) < 0.01 &&
-      p.z >= ARRIVAL.rampTopZ &&
-      p.z <= ARRIVAL.rampBottomZ
-    )
-      assert.ok(
-        Math.abs(
-          p.y -
-            (-0.23 +
-              (0.23 * (ARRIVAL.rampBottomZ - p.z)) /
-                (ARRIVAL.rampBottomZ - ARRIVAL.rampTopZ)),
-        ) < 0.001,
-        'Feet and wheels stay on the sloped ramp',
-      );
     if (Math.hypot(p.x - ARRIVAL.door[0], p.z - ARRIVAL.door[1]) < 0.35) {
       activity.setOptions({ time: t });
       assert.ok(
