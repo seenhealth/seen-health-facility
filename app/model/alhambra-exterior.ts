@@ -709,21 +709,23 @@ export function buildAlhambraExterior(model: Facility) {
     }
   }
   // Rear court (photos and the dispatcher's annotated screenshots, 2026-10-02).
-  // The staff entrance is on the SOUTH face of the stair bump (x 5.2–11.75 at
-  // z −15.2, the block that steps out between the recess and the east part),
-  // at the rear stair's door: a cable-hung pergola of powder-blue slats on a
-  // steel-blue frame over the glass double door at its west end, a dark square
-  // window east of the door and bronze pipe rails on the landing. The recess
-  // face west of it (z −12.5, x 0–5.2) holds the rolling door under its grey
-  // hooded canopy and the gated electricity room, and is the way down to the
-  // underground garage (the ramp is not cut into the ground). A wall light
-  // sits high on the central block's east wall facing the court, the utility
-  // pole with its yellow guard stands in front of the junction, and the
-  // planter curbs are painted blue.
+  // Note the model's +x runs toward the lot (screen-left in the lot shot), so
+  // "west" below means larger x. The staff entrance is on the wing's EAST
+  // face (x 15.26, the long wall between the garage corner at z −12.5 and the
+  // adjacent block at z 3.5): a cable-hung pergola of powder-blue slats on a
+  // steel-blue frame over the glass double door at its north end, a dark
+  // square window south of the door, bronze pipe rails on the landing and a
+  // wall light high on the face. The wing's court face (x 5.2–15.26 at
+  // z −15.2, drawn as one flat wall) is the UNDERGROUND GARAGE's wall: its
+  // rolling door under the grey hooded canopy, the gated electricity room and
+  // the louvre and meter panel sit there (the ramp is not cut into the ground).
+  // The utility pole with its yellow guard stands in front of the junction;
+  // the planter curbs are painted blue.
   const court2 = group(facade, 'rear-court-staff-entrance-and-loading');
-  const BUMP_Z = -15.213;
-  // The wall reads as one flat face from the recess corner to the wing's east end (the dispatcher's annotation and the
-  // photos): the east part is brought forward flush with the stair bump, with its parapet cap.
+  const SOUTH_Z = -22.463,
+    BUMP_Z = -15.213;
+  // The wing's court face reads as one flat wall from the recess corner to its end: the far part is brought flush with
+  // the stair bump, with its parapet cap.
   box(
     court2,
     13.51,
@@ -746,97 +748,111 @@ export function buildAlhambraExterior(model: Facility) {
   );
   const pergBlue = '#6b8bb4',
     pergFrame = '#587aa4';
-  const px0 = 6.1,
-    px1 = 13.9,
-    pxc = (px0 + px1) / 2,
-    pwx = px1 - px0,
+  // The entrance is on the wing's EAST face (x 15.26, z −12.5 → 3.5, the long wall the dispatcher shaded), elements
+  // protruding +x; the pergola spans the wall's middle, door at its north end, window south of it.
+  const FACE_X = 15.264;
+  const pz0 = -9.4,
+    pz1 = -1.8,
+    pzc = (pz0 + pz1) / 2,
+    pwz = pz1 - pz0,
     pdepth = 1.6,
     py = 3.05;
-  box(court2, pxc, py, BUMP_Z - pdepth + 0.08, pwx, 0.22, 0.16, pergFrame);
-  box(court2, pxc, py + 0.06, BUMP_Z - 0.06, pwx, 0.1, 0.12, pergFrame);
-  for (const sx of [px0 + 0.06, px1 - 0.06])
-    box(court2, sx, py, BUMP_Z - pdepth / 2, 0.12, 0.2, pdepth, pergFrame);
-  for (let sx = px0 + 0.25; sx < px1 - 0.1; sx += 0.27)
+  box(court2, FACE_X + pdepth - 0.08, py, pzc, 0.16, 0.22, pwz, pergFrame);
+  box(court2, FACE_X + 0.06, py + 0.06, pzc, 0.12, 0.1, pwz, pergFrame);
+  for (const sz of [pz0 + 0.06, pz1 - 0.06])
+    box(court2, FACE_X + pdepth / 2, py, sz, pdepth, 0.2, 0.12, pergFrame);
+  for (let sz = pz0 + 0.25; sz < pz1 - 0.1; sz += 0.27)
     box(
       court2,
-      sx,
+      FACE_X + pdepth / 2 + 0.05,
       py + 0.02,
-      BUMP_Z - pdepth / 2 - 0.05,
-      0.07,
-      0.14,
+      sz,
       pdepth - 0.25,
+      0.14,
+      0.07,
       pergBlue,
     );
-  for (const sx of [px0 + 0.3, pxc, px1 - 0.3]) {
+  for (const sz of [pz0 + 0.3, pzc, pz1 - 0.3]) {
     beam(
       court2,
-      [sx, py + 0.2, BUMP_Z - pdepth + 0.08],
-      [sx, py + 1.35, BUMP_Z - 0.03],
+      [FACE_X + pdepth - 0.08, py + 0.2, sz],
+      [FACE_X + 0.03, py + 1.35, sz],
       0.025,
       0.025,
       steel,
     );
-    box(court2, sx, py + 1.3, BUMP_Z - 0.05, 0.12, 0.12, 0.08, steel);
+    box(court2, FACE_X + 0.05, py + 1.3, sz, 0.08, 0.12, 0.12, steel);
   }
-  // Glass double door (1839 W Valley Blvd, staff entrance) at the pergola's west end, with its dark frame.
-  const doorX2 = px0 + 1.15;
-  box(court2, doorX2, 0, BUMP_Z - 0.04, 2.1, 2.4, 0.08, '#3a4448');
-  box(court2, doorX2, 0.05, BUMP_Z - 0.07, 1.9, 2.3, 0.04, '#7f9aa8');
-  box(court2, doorX2, 0.05, BUMP_Z - 0.09, 0.05, 2.3, 0.02, '#3a4448');
-  // Dark square window east of the door.
-  box(court2, px0 + 5.3, 1.25, BUMP_Z - 0.04, 1.35, 1.35, 0.07, pergFrame);
-  box(court2, px0 + 5.3, 1.33, BUMP_Z - 0.06, 1.2, 1.2, 0.04, '#1e2a30');
-  // Bronze pipe rails along the landing's edge and a return to the wall at the east end.
-  const railZ2 = BUMP_Z - 1.95;
-  for (const sx of [px0 - 0.1, px0 + 1.2, px0 + 2.5, px0 + 3.8])
-    box(court2, sx, 0, railZ2, 0.04, 0.95, 0.04, bronze);
+  // Glass double door (1839 W Valley Blvd, staff entrance) at the pergola's north end, with its dark frame.
+  const doorZ2 = pz1 - 1.15;
+  box(court2, FACE_X + 0.04, 0, doorZ2, 0.08, 2.4, 2.1, '#3a4448');
+  box(court2, FACE_X + 0.07, 0.05, doorZ2, 0.04, 2.3, 1.9, '#7f9aa8');
+  box(court2, FACE_X + 0.09, 0.05, doorZ2, 0.02, 2.3, 0.05, '#3a4448');
+  // Dark square window south of the door.
+  box(court2, FACE_X + 0.04, 1.25, pz0 + 2.6, 0.07, 1.35, 1.35, pergFrame);
+  box(court2, FACE_X + 0.06, 1.33, pz0 + 2.6, 0.04, 1.2, 1.2, '#1e2a30');
+  // Bronze pipe rails along the landing's edge in front of the door, a return to the wall at the south end.
+  const railX2 = FACE_X + 1.95;
+  for (const sz of [pz1 + 0.1, pz1 - 1.2, pz1 - 2.5, pz1 - 3.8])
+    box(court2, railX2, 0, sz, 0.04, 0.95, 0.04, bronze);
   beam(
     court2,
-    [px0 - 0.1, 0.95, railZ2],
-    [px0 + 3.8, 0.95, railZ2],
+    [railX2, 0.95, pz1 + 0.1],
+    [railX2, 0.95, pz1 - 3.8],
     0.04,
     0.04,
     bronze,
   );
   beam(
     court2,
-    [px0 - 0.1, 0.62, railZ2],
-    [px0 + 3.8, 0.62, railZ2],
+    [railX2, 0.62, pz1 + 0.1],
+    [railX2, 0.62, pz1 - 3.8],
     0.03,
     0.03,
     bronze,
   );
   beam(
     court2,
-    [px0 + 3.8, 0.95, railZ2],
-    [px0 + 3.8, 0.95, BUMP_Z - 0.1],
+    [railX2, 0.95, pz1 - 3.8],
+    [FACE_X + 0.1, 0.95, pz1 - 3.8],
     0.04,
     0.04,
     bronze,
   );
-  // The recess face (z −12.47, x 0–5.19): rolling door under the grey hood, the electricity-room gate beside it.
-  const rz = -12.465,
-    rFace = rz - 0.03;
-  box(court2, 2.0, 0, rFace, 2.4, 2.5, 0.06, '#e8e6df');
+  // Wall light high on the face south of the pergola.
+  beam(
+    court2,
+    [FACE_X + 0.02, 3.9, -11.2],
+    [FACE_X + 1.2, 4.15, -11.2],
+    0.06,
+    0.06,
+    '#6f7577',
+  );
+  box(court2, FACE_X + 1.3, 4.08, -11.2, 0.55, 0.16, 0.3, '#7d8284');
+  // The garage wall (the wing's court face): rolling door under the grey hood, the electricity-room gate beside it,
+  // the louvred vent and the meter panel.
+  const gFace = BUMP_Z - 0.03;
+  box(court2, 9.3, 0, gFace, 2.6, 2.5, 0.06, '#e8e6df');
   for (let y = 0.25; y < 2.5; y += 0.25)
-    box(court2, 2.0, y, rFace - 0.02, 2.4, 0.02, 0.02, '#cfcdc5');
-  const hood = mesh(court2, new T.BoxGeometry(3.2, 0.5, 1.5), '#9a9fa0');
-  hood.position.set(2.0, 3.3, rz - 0.75);
+    box(court2, 9.3, y, gFace - 0.02, 2.6, 0.02, 0.02, '#cfcdc5');
+  const hood = mesh(court2, new T.BoxGeometry(3.4, 0.5, 1.5), '#9a9fa0');
+  hood.position.set(9.3, 3.3, BUMP_Z - 0.75);
   hood.rotation.x = -0.22;
-  box(court2, 2.0, 2.85, rz - 0.04, 3.2, 0.6, 0.08, '#8d9294');
-  for (const gx of [3.85, 4.95])
-    box(court2, gx, 0, rFace, 0.06, 2.2, 0.06, '#8f9496');
-  for (let gx = 3.95; gx < 4.95; gx += 0.12)
-    box(court2, gx, 0.05, rFace, 0.025, 2.05, 0.025, '#8f9496');
-  beam(court2, [3.85, 2.15, rFace], [4.95, 2.15, rFace], 0.04, 0.04, '#8f9496');
-  beam(court2, [3.85, 0.12, rFace], [4.95, 0.12, rFace], 0.04, 0.04, '#8f9496');
-  box(court2, 4.4, 2.4, rFace, 0.9, 0.5, 0.05, '#9a9fa0');
+  box(court2, 9.3, 2.85, BUMP_Z - 0.04, 3.4, 0.6, 0.08, '#8d9294');
+  for (const gx of [11.3, 12.4])
+    box(court2, gx, 0, gFace, 0.06, 2.2, 0.06, '#8f9496');
+  for (let gx = 11.4; gx < 12.4; gx += 0.12)
+    box(court2, gx, 0.05, gFace, 0.025, 2.05, 0.025, '#8f9496');
+  beam(court2, [11.3, 2.15, gFace], [12.4, 2.15, gFace], 0.04, 0.04, '#8f9496');
+  beam(court2, [11.3, 0.12, gFace], [12.4, 0.12, gFace], 0.04, 0.04, '#8f9496');
+  box(court2, 11.85, 2.4, gFace, 0.9, 0.5, 0.05, '#9a9fa0');
   for (let y = 2.45; y < 2.85; y += 0.1)
-    box(court2, 4.4, y, rFace - 0.02, 0.8, 0.03, 0.02, '#6f7577');
-  // Wall light high on the central block's east wall, facing the court.
-  beam(court2, [0.02, 3.6, -18.5], [1.22, 3.85, -18.5], 0.06, 0.06, '#6f7577');
-  box(court2, 1.32, 3.78, -18.5, 0.55, 0.16, 0.3, '#7d8284');
-  // Utility pole with its yellow guard in front of the junction of recess and bump.
+    box(court2, 11.85, y, gFace - 0.02, 0.8, 0.03, 0.02, '#6f7577');
+  box(court2, 13.6, 2.6, gFace, 0.9, 0.7, 0.05, '#9a9fa0');
+  for (let y = 2.65; y < 3.25; y += 0.1)
+    box(court2, 13.6, y, gFace - 0.02, 0.8, 0.03, 0.02, '#6f7577');
+  box(court2, 14.0, 1.0, gFace, 0.7, 1.1, 0.12, '#8f9496');
+  // Utility pole with its yellow guard in front of the junction of the two faces.
   const poleX = 4.6,
     poleZ = -17.6;
   mesh(
