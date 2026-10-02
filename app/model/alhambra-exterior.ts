@@ -708,6 +708,106 @@ export function buildAlhambraExterior(model: Facility) {
       lobe.scale.y = 0.85;
     }
   }
+  // Rear court, staff entrance and the stair bump (photos, 2026-10-02): over the
+  // glass door in the recess a cable-hung pergola of powder-blue slats on a
+  // steel-blue frame, a dark square window beside the door and bronze pipe rails
+  // on the landing; on the bump's south face a white roll-up under a grey hooded
+  // canopy with a louvred steel door beside it and a vent panel above; a wall
+  // light on the central block's east wall and a wall pack by the staff door; a
+  // utility pole with its yellow guard in the court; blue-painted planter curbs;
+  // and the tan tubular rail fence along the court's south edge.
+  const court2 = group(facade, 'rear-court-staff-entrance-and-loading');
+  const RECESS = { x0: 0, x1: 5.19, z: -12.465 };
+  const pergBlue = '#6b8bb4',
+    pergFrame = '#587aa4';
+  const pw = RECESS.x1 - RECESS.x0 - 0.3,
+    px = (RECESS.x0 + RECESS.x1) / 2,
+    pz0 = RECESS.z,
+    pdepth = 1.6,
+    py = 3.05;
+  box(court2, px, py, pz0 - pdepth + 0.08, pw, 0.22, 0.16, pergFrame);
+  box(court2, px, py + 0.06, pz0 - 0.06, pw, 0.1, 0.12, pergFrame);
+  for (const sx of [px - pw / 2 + 0.06, px + pw / 2 - 0.06])
+    box(court2, sx, py, pz0 - pdepth / 2, 0.12, 0.2, pdepth, pergFrame);
+  for (let sx = px - pw / 2 + 0.25; sx < px + pw / 2 - 0.1; sx += 0.27)
+    box(
+      court2,
+      sx,
+      py + 0.02,
+      pz0 - pdepth / 2 - 0.05,
+      0.07,
+      0.14,
+      pdepth - 0.25,
+      pergBlue,
+    );
+  for (const sx of [px - pw / 2 + 0.3, px, px + pw / 2 - 0.3]) {
+    beam(
+      court2,
+      [sx, py + 0.2, pz0 - pdepth + 0.08],
+      [sx, py + 1.35, pz0 - 0.03],
+      0.025,
+      0.025,
+      steel,
+    );
+    box(court2, sx, py + 1.3, pz0 - 0.05, 0.12, 0.12, 0.08, steel);
+  }
+  // The glass door sits at the recess's east end; the window is west of it.
+  box(court2, 2.3, 1.25, pz0 - 0.04, 1.35, 1.35, 0.07, pergFrame);
+  box(court2, 2.3, 1.33, pz0 - 0.06, 1.2, 1.2, 0.04, '#1e2a30');
+  const railZ = pz0 - 1.95;
+  for (const sx of [0.4, 2.0, 3.6, 4.9])
+    box(court2, sx, 0, railZ, 0.04, 0.95, 0.04, bronze);
+  beam(court2, [0.4, 0.95, railZ], [4.9, 0.95, railZ], 0.04, 0.04, bronze);
+  beam(court2, [0.4, 0.62, railZ], [4.9, 0.62, railZ], 0.03, 0.03, bronze);
+  const bz = -15.213,
+    bumpFace = bz - 0.02;
+  box(court2, 7.4, 0, bumpFace, 2.7, 2.6, 0.06, '#e8e6df');
+  for (let y = 0.25; y < 2.6; y += 0.25)
+    box(court2, 7.4, y, bumpFace - 0.02, 2.7, 0.02, 0.02, '#cfcdc5');
+  const hood = mesh(court2, new T.BoxGeometry(3.4, 0.5, 1.5), '#9a9fa0');
+  hood.position.set(7.9, 3.35, bz - 0.75);
+  hood.rotation.x = -0.22;
+  box(court2, 7.9, 2.9, bz - 0.04, 3.4, 0.6, 0.08, '#8d9294');
+  box(court2, 10.3, 0, bumpFace, 0.95, 2.15, 0.06, '#8f9496');
+  for (let y = 1.2; y < 2.0; y += 0.1)
+    box(court2, 10.3, y, bumpFace - 0.02, 0.7, 0.03, 0.02, '#6f7577');
+  box(court2, 6.0, 3.3, bumpFace, 0.9, 0.7, 0.05, '#9a9fa0');
+  for (let y = 3.35; y < 3.95; y += 0.1)
+    box(court2, 6.0, y, bumpFace - 0.02, 0.8, 0.03, 0.02, '#6f7577');
+  beam(court2, [0.02, 3.6, -18.5], [1.22, 3.85, -18.5], 0.06, 0.06, '#6f7577');
+  box(court2, 1.32, 3.78, -18.5, 0.55, 0.16, 0.3, '#7d8284');
+  box(court2, 1.0, 3.6, pz0 - 0.1, 0.3, 0.2, 0.2, '#6f7577');
+  const poleX = 6.9,
+    poleZ = -19.6;
+  mesh(
+    court2,
+    new T.CylinderGeometry(0.16, 0.19, 9.5, 10),
+    '#7a6650',
+  ).position.set(poleX, 4.5, poleZ);
+  for (const y of [1.4, 1.9, 2.4])
+    mesh(
+      court2,
+      new T.CylinderGeometry(0.2, 0.2, 0.12, 10),
+      '#e4c23a',
+    ).position.set(poleX, y, poleZ);
+  box(court2, poleX, 8.6, poleZ, 1.8, 0.1, 0.1, '#7d6a55');
+  for (const [x0, z0, x1, z1] of [
+    [1.0, -21.4, 4.0, -18.2],
+    [13.2, -24.0, 16.4, -20.4],
+  ]) {
+    const cx = (x0 + x1) / 2,
+      cz = (z0 + z1) / 2;
+    box(court2, cx, -0.05, z0 + 0.08, x1 - x0, 0.015, 0.16, '#2d5aa6');
+    box(court2, cx, -0.05, z1 - 0.08, x1 - x0, 0.015, 0.16, '#2d5aa6');
+    box(court2, x0 + 0.08, -0.05, cz, 0.16, 0.015, z1 - z0, '#2d5aa6');
+    box(court2, x1 - 0.08, -0.05, cz, 0.16, 0.015, z1 - z0, '#2d5aa6');
+  }
+  const fenceZ = -26.0,
+    fence = '#c9b58f';
+  for (let x = 4.5; x <= 16.5; x += 2.4)
+    box(court2, x, -0.23, fenceZ, 0.06, 1.35, 0.06, fence);
+  for (let y = 0.1; y <= 1.1; y += 0.2)
+    beam(court2, [4.5, y, fenceZ], [16.5, y, fenceZ], 0.04, 0.04, fence);
   for (const g of [facade, roof, site]) batch(g);
   return { facade, roof, site };
 }
