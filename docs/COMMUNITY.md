@@ -915,27 +915,41 @@ registry anchors `door`, `porch`, `rampTop`, `rampFoot`.
 
 ## In the story
 
-The scroll story (docs/STORY.md) pulls out to the whole network in its network
-beat (`frame()`) and has six cutaway chapters that feature these interactions,
-a public contract that `node scripts/build-scenario.mjs --check` checks (each
+The scroll story (docs/STORY.md) features these interactions in two ways, a
+public contract that `node scripts/build-scenario.mjs --check` checks (each
 must exist in the composed story source, at its setting, overlapping its
-chapter's window):
+window by at least 4 s, the featured ones together covering 60 % of it).
 
-| Cutaway | Setting | Featured interactions | Camera anchor |
+**Mrs. Lin's day** visits her own home twice as cutaway chapters, following
+her stand-in `lin-at-home` (`heroAlias`):
+
+| Chapter | Setting | Featured interactions | Camera anchor |
 | --- | --- | --- | --- |
-| `network-pharmacy` | `pharmacy` | `pharmacy-packing` | `counterBack` |
-| `network-home-am` | `home-wong` | `home-meal-meds` | instance room `home-kitchen` (`door` until stamped) |
-| `network-specialist` | `specialist` | `specialist-visit` | `examSeat` |
-| `network-partner` | `partner-adc` | `partner-pt`, `partner-rn-review` | instance room `rehab-open` (`ptStand` until stamped) |
-| `network-hospital` | `hospital` | `hospital-discharge-call` | `huddleA` |
-| `network-home-pm` | `home-wong` | `home-health-visit`, `after-hours-call` | instance room `home-living` (`door` until stamped) |
+| `home-am` | `home-lin` | `lin-van-pickup` | `porch` |
+| `home-pm` | `home-lin` | `lin-van-dropoff`, `lin-evening` | `porch` |
 
-The specialty clinic also exposes `optoSeat` and `imagingTable` for shots of
-its eye room and X-ray room, with `optometry-exam` and `imaging-scan` to
-feature (see The specialty clinic). Keep those interaction ids, room ids and
-anchor names stable when re-timing a cast or rebuilding a pad; the story reads anchors through the layer
+and closes in her living room on `lin-evening` (instance room `home-living`).
+
+**The closing highlights** (`highlights` in the scenario) look in on one
+service each, on its own clock:
+
+| Highlight | Setting | Featured interactions | Camera anchor |
+| --- | --- | --- | --- |
+| `medication` | `pharmacy` | `pharmacy-packing` | `counterBack` |
+| `day-center` | `partner-adc` | `partner-line-dance` | the pad (instance) |
+| `specialists` | `specialist` | `specialist-visit` | `examSeat` |
+| `optometry` | `specialist` | `optometry-exam` | `optoSeat` |
+| `imaging` | `specialist` | `imaging-scan` | `imagingTable` |
+| `discharge` | `hospital` | `hospital-discharge-call` | `rnPhone`, revealing the call |
+| `home-mods` | `home-wong` | `home-grab-bar` | instance room `home-bath` |
+| `after-hours` | `hospital` | `hospital-ed-arrival`, `hospital-ed-call` | `edPhone` |
+| `pers` | `home-wong` | `home-pers-call` | instance room `home-primary`, revealing the call |
+
+Keep those interaction ids, room ids and anchor names stable when re-timing a
+cast or rebuilding a pad; the story reads anchors through the layer
 (`settings`, `frame(id)`, `instance(id).roomCenter(room)`), never through world
-coordinates, and falls back to the pad centre when an anchor disappears.
+coordinates, and falls back to the pad centre when an anchor disappears. A
+call reveal reads the call's two ends from its members' sampled positions.
 
 ## Adding things
 
