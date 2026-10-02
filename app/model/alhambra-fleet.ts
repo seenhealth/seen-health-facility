@@ -122,7 +122,13 @@ export const FLEET_LOOP = 720;
 // Lot geometry (metres, street level)
 // ---------------------------------------------------------------------------
 export const FLEET_LOT = {
-  dock: [-20.5, 1.5] as Vec2,
+  /**
+   * The docked van's centre. Its nose stops 0.9 m short of the switchback's
+   * lower run (its west rail at x −17.85, `DROP_OFF` in alhambra-exterior.ts):
+   * the way from the van's ramp to the ramp's toe passes in front of the nose,
+   * wide enough for a wheelchair and its escort.
+   */
+  dock: [-21.925, 1.5] as Vec2,
   dockHeading: -Math.PI / 2,
   /**
    * The lot entrance: the curb cut on the west street beside the two-storey
@@ -160,8 +166,8 @@ export const FLEET_LOT = {
   driftRadius: 20,
   curbRadius: 10,
   streetRadius: STREET_CORNER_RADIUS,
-  /** A departing van backs straight out of the drop-off to here before pulling away. */
-  dockBackTo: -23.5,
+  /** A departing van backs straight out of the drop-off, 3 m, to here before pulling away. */
+  dockBackTo: -24.925,
   /** Straight run before a forward arc that starts from standstill. */
   lead: 0.6,
   /**
