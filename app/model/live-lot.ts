@@ -265,6 +265,8 @@ export function createLiveLot(ctx: { scene: T.Scene; model: Facility; material: 
     if (!hidStaticVans) {
       // The renderer shows the model's display vans whenever the care-day cast is off; take them out of the scene instead.
       for (const o of ctx.model.objects) if (o.assetId.startsWith('fleet-van')) ctx.scene.getObjectByName(o.id)?.removeFromParent();
+      // No street cars on the live lot either: it shows Seen's vehicles only.
+      for (const name of ['street-car-1', 'street-car-2']) ctx.scene.getObjectByName(name)?.removeFromParent();
       hidStaticVans = true;
     }
     for (const l of [...live.values()]) {

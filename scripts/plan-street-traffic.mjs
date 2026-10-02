@@ -4,6 +4,10 @@ import fs from 'node:fs';
 import { sampleVan } from '../work/validation/arrival.mjs';
 import { sampleDelivery } from '../work/validation/deliveries.mjs';
 import {
+  communityVehicles,
+  sampleCommunityVehicle,
+} from '../work/validation/community-vehicles.mjs';
+import {
   streetRoute,
   streetTripProgress,
 } from '../work/validation/traffic-routes.mjs';
@@ -13,17 +17,27 @@ const step = 0.02,
   duration = 720,
   tripDuration = 120,
   margin = 0.85;
+const SIZE = {
+  van: [1.125, 3.175],
+  truck: [1.15, 2.36],
+  car: [0.96, 1.98],
+  ambulance: [1.15, 2.7],
+};
 const body = (p, kind) => ({
   ...p,
-  halfWidth: kind === 'van' ? 1.125 : kind === 'truck' ? 1.15 : 0.96,
-  halfLength: kind === 'van' ? 3.175 : kind === 'truck' ? 2.36 : 1.98,
+  halfWidth: (SIZE[kind] ?? SIZE.car)[0],
+  halfLength: (SIZE[kind] ?? SIZE.car)[1],
 });
 const conflict = (a, b) =>
   b.visible !== false &&
   Math.abs(a.position.x - b.position.x) < 12 &&
   Math.abs(a.position.z - b.position.z) < 12 &&
   vehicleGap(a, b) < margin;
-const fixed = Array.from({ length: Math.round(duration / step) + 1 }, (_, frame) => [
+// Holds must be clear of the fleet and the deliveries at every instant; the
+// community vehicles share the ring lanes and pass a hold for a moment, so
+// they constrain only the trips.
+const frames = Math.round(duration / step) + 1;
+const fixedHold = Array.from({ length: frames }, (_, frame) => [
   ...Array.from({ length: 8 }, (_, i) =>
     body(sampleVan(i, frame * step), 'van'),
   ),
@@ -31,11 +45,17 @@ const fixed = Array.from({ length: Math.round(duration / step) + 1 }, (_, frame)
     body(sampleDelivery(i, frame * step), 'truck'),
   ),
 ]);
+const fixed = fixedHold.map((list, frame) => [
+  ...list,
+  ...communityVehicles.map((v) =>
+    body(sampleCommunityVehicle(v.id, frame * step), v.kind),
+  ),
+]);
 const trips = [[], []];
 const hold = [0, 1].map((i) => body(streetRoute(i, 0), 'car'));
 for (let i = 0; i < 2; i++) {
-  for (let frame = 0; frame < fixed.length; frame++)
-    if (fixed[frame].some((p) => conflict(hold[i], p)))
+  for (let frame = 0; frame < fixedHold.length; frame++)
+    if (fixedHold[frame].some((p) => conflict(hold[i], p)))
       throw Error(`Unsafe holding point ${i} at ${frame * step}`);
   const samples = Array.from({ length: Math.round(tripDuration / step) + 1 }, (_, j) =>
     body(streetRoute(i, streetTripProgress(j * step, tripDuration)), 'car'),

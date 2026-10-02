@@ -38,8 +38,8 @@ import { vehicleGap } from './vehicle-clearance';
 // ---------------------------------------------------------------------------
 // Parking
 // ---------------------------------------------------------------------------
-const BAY = { x: -28.1, firstZ: -21.65, pitch: 2.8 },
-  CURB_X = -39.1,
+const BAY = { x: -27.4, firstZ: -21.65, pitch: 2.8 },
+  CURB_X = -37.1,
   AISLE_X = -20.8,
   DRIVEWAY_X = -22.5;
 /**
@@ -146,16 +146,8 @@ export const FLEET_LOT = {
    * 0.3 m.
    */
   exitLane: DRIVEWAY_X - 0.5,
-  /**
-   * The lot's exit lane west to Ethel runs along the lot's north edge inside
-   * its own paving (STOP is painted there before the sidewalk), not on the
-   * alley's lane further north (Street View, May 2025).
-   */
-  exitZ: -28.8,
-  /** Where the turn west begins: far enough south that the tail has passed the curb island at the driveway before it swings. */
-  exitTurnZ: -28.0,
-  /** The drift back north onto the exit lane ends with the van's nose at the STOP bar before Ethel. */
-  exitDriftRadius: 6,
+  /** A departing van stops with its nose at the STOP bar across the driveway's mouth (aerial), centre here. */
+  exitStopZ: -24.5 + 3.2,
   /** Seconds a departing van stands at the STOP bar. */
   exitStop: 2,
   /**
@@ -166,7 +158,7 @@ export const FLEET_LOT = {
   turnRadius: 4,
   laneChangeRadius: 8,
   driftRadius: 20,
-  curbRadius: 6,
+  curbRadius: 10,
   streetRadius: STREET_CORNER_RADIUS,
   /** A departing van backs straight out of the drop-off to here before pulling away. */
   dockBackTo: -23.5,
@@ -339,13 +331,17 @@ export const fleetRoutes = {
 /** Southbound on the exit lane, out onto the street and off site to the south. */
 function drivewayToAway(pen: Pen): FleetLeg[] {
   return [
-    leg(pen, 'aisle-south', 'Driving to the exit', LOT, (p) =>
-      p.lineToZ(L.exitTurnZ),
+    // A van whose lane change already carried it past the bar stops where it is.
+    leg(pen, 'to-stop', 'Driving to the exit', LOT, (p) =>
+      p.lineToZ(Math.min(p.z, L.exitStopZ)),
     ),
-    leg(pen, 'driveway-out', 'Turning onto the exit lane', LOT, (p) =>
-      p.arc(R, Math.PI / 2).jog(L.exitZ - (L.exitTurnZ - R), L.exitDriftRadius),
+    leg(pen, 'aisle-south', 'Leaving the lot', LOT, (p) =>
+      p.lineToZ(L.westbound + R),
     ),
-    leg(pen, 'street-west', 'Out to the west street', LOT, (p) =>
+    leg(pen, 'driveway-out', 'Turning onto the alley', LOT, (p) =>
+      p.arc(R, Math.PI / 2),
+    ),
+    leg(pen, 'street-west', 'Westbound on the alley', STREET, (p) =>
       p.lineToX(L.southbound + L.streetRadius),
     ),
     // The corner onto the west street counts as lot time, so the next
@@ -574,9 +570,9 @@ const pause = (seconds: number, phase: string, visible = true): Move => ({
   visible,
 });
 const r = fleetRoutes;
-/** A departure stops at the STOP bar at the lot's mouth before pulling out onto the street. */
+/** A departure stops at the STOP bar across the driveway's mouth before pulling out. */
 function withExitStop(legs: FleetLeg[]): Move[] {
-  const i = legs.findIndex((l) => l.id === 'street-west');
+  const i = legs.findIndex((l) => l.id === 'aisle-south');
   if (i < 0) return [drive(legs, true, false)];
   return [
     drive(legs.slice(0, i), true, true),

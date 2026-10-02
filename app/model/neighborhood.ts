@@ -29,58 +29,66 @@ const SITE = {
 // Raised sidewalks and curb islands, traced on the supplied plan (source pixels).
 // The west strip is cut at the lot entrance (the curb cut beside the two-storey
 // wing, Street View May 2025), so the apron there sits at lot level.
+// Sidewalks from the high-resolution aerial (2026-10-02): the Ethel Avenue
+// strip (lawn and walk, cut at the lot entrance), Valley Blvd's walk with
+// rounded curb returns at Ethel and Campbell, and Campbell's walk.
 const SIDEWALKS_PX = [
   [
-    [180, 260],
-    [180, 1276],
-    [350, 1276],
-    [350, 210],
-  ],
-  [
-    [180, 1441],
-    [180, 2390],
-    [240, 2535],
-    [500, 2535],
-    [3564, 2365],
-    [3564, 2195],
-    [2788, 2250],
-    [1610, 2315],
-    [1050, 2335],
-    [1050, 2260],
-    [350, 2260],
+    [244, 1441],
+    [244, 2173],
+    [249, 2219],
+    [262, 2263],
+    [284, 2304],
+    [313, 2339],
+    [349, 2369],
+    [390, 2390],
+    [434, 2404],
+    [480, 2408],
+    [3947, 2408],
+    [3947, 2408],
+    [3993, 2404],
+    [4037, 2390],
+    [4078, 2369],
+    [4114, 2339],
+    [4143, 2304],
+    [4165, 2263],
+    [4179, 2219],
+    [4183, 2173],
+    [4183, 144],
+    [4116, 144],
+    [4116, 2294],
+    [350, 2294],
     [350, 1441],
   ],
   [
-    [180, 260],
-    [210, 180],
-    [270, 145],
-    [3564, 145],
-    [3564, 197],
-    [350, 197],
-    [350, 260],
+    [244, 219],
+    [244, 1276],
+    [350, 1276],
+    [350, 219],
   ],
 ] as Vec2[][];
 const CURB_ISLANDS_PX = [
   [
-    [350, 210],
-    [550, 210],
-    [550, 229],
-    [378, 229],
-    [378, 898],
-    [350, 898],
+    [366, 219],
+    [567, 219],
+    [567, 258],
+    [409, 258],
+    [409, 1021],
+    [366, 1021],
   ],
   [
-    [350, 1470],
-    [478, 1470],
-    [478, 1517],
-    [390, 1517],
+    [350, 1469],
+    [476, 1469],
+    [476, 1516],
+    [390, 1516],
     [390, 2255],
     [350, 2255],
   ],
   [
-    [804, 210],
-    [990, 210],
-    [804, 309],
+    [834, 140],
+    [928, 140],
+    [928, 294],
+    [834, 294],
   ],
   [
     [2720, 209],
@@ -124,7 +132,7 @@ export function siteCurbs(model: Pick<Facility, 'calibration'>) {
  * pads, so vehicles leave and enter the map off screen. The south street stops
  * at the west street because the partner pharmacy's pad sits on its line.
  */
-export const STREET_EXTENT = { x: 130, z: 95 };
+export const STREET_EXTENT = { x: 150, z: 95 };
 
 /** Owned plan-derived ground geometry; surrounding building heights are illustrative. */
 export function buildNeighborhood(model: Facility) {
@@ -218,10 +226,10 @@ export function buildNeighborhood(model: Facility) {
     model.site.buildingOutline,
   );
   // Streets continue beyond the crop; their length is presentation context, not a site survey.
-  box(4, -0.43, 41.3, 105, 0.2, 10, SITE.street);
-  box(-44.4, -0.43, 5, 8, 0.2, 82, SITE.street);
-  box(3, -0.43, -32.3, 105, 0.2, 7, SITE.street);
-  box(54, -0.43, 5, 8, 0.2, 82, SITE.street);
+  box(13.45, -0.43, 36.2, 119.3, 0.2, 10, SITE.street);
+  box(-40.7, -0.43, 5, 11, 0.2, 82, SITE.street);
+  box(13.45, -0.43, -32.3, 119.3, 0.2, 7, SITE.street);
+  box(69.1, -0.43, 5, 8, 0.2, 82, SITE.street);
   // Extensions out to STREET_EXTENT, 2 mm lower so they never fight with the
   // slabs above or with a pad's own street stub.
   const { x: farX, z: farZ } = STREET_EXTENT;
@@ -235,12 +243,15 @@ export function buildNeighborhood(model: Facility) {
       z1 - z0,
       SITE.street,
     );
-  slab(-farX, -48.5, 36.3, 46.3);
-  slab(56.5, farX, 36.3, 46.3);
-  slab(55.5, farX, -35.8, -28.8);
-  for (const x of [-44.4, 54]) {
-    slab(x - 4, x + 4, -farZ, -36);
-    slab(x - 4, x + 4, 46, farZ);
+  slab(-farX, -46.2, 31.2, 41.2);
+  slab(73.1, farX, 31.2, 41.2);
+  slab(73.1, farX, -35.8, -28.8);
+  for (const [x, half] of [
+    [-40.7, 5.5],
+    [69.1, 4],
+  ]) {
+    slab(x - half, x + half, -farZ, -36);
+    slab(x - half, x + half, 41.2, farZ);
   }
   const curbs = siteCurbs(model);
   curbs.sidewalks.forEach((p, i) =>
@@ -293,19 +304,19 @@ export function buildNeighborhood(model: Facility) {
     }
   };
   const northLine = (x: number): [Vec2, Vec2] => [
-      [x, 41.4],
-      [x + 3, 41.4],
+      [x, 36.3],
+      [x + 3, 36.3],
     ],
     westLine = (z: number): [Vec2, Vec2] => [
-      [-44.4, z],
-      [-44.4, z + 3],
+      [-40.7, z],
+      [-40.7, z + 3],
     ];
-  dashes(-40, 55, 6, 3, northLine, 0.12);
-  dashes(-farX, -49, 6, 3, northLine, 0.12);
-  dashes(56.5, farX, 6, 3, northLine, 0.12);
-  dashes(-26, 40, 6, 3, westLine, 0.12);
+  dashes(-38, 68, 6, 3, northLine, 0.12);
+  dashes(-farX, -47, 6, 3, northLine, 0.12);
+  dashes(74, farX, 6, 3, northLine, 0.12);
+  dashes(-26, 30, 6, 3, westLine, 0.12);
   dashes(-farZ, -37, 6, 3, westLine, 0.12);
-  dashes(47, farZ, 6, 3, westLine, 0.12);
+  dashes(42, farZ, 6, 3, westLine, 0.12);
   // The alley (south street) is an unmarked driveway: no centre dashes.
   // STOP is painted across the exit lane where it meets the west street.
   const roadText = (text: string, x0: number, z0: number, h: number) => {
@@ -362,11 +373,13 @@ export function buildNeighborhood(model: Facility) {
       }
     });
   };
-  // STOP on the lot's exit lane just before the sidewalk, with its stop bar ahead of it.
-  roadText('STOP', -36.4, -28.8, -Math.PI / 2);
-  box(-38.6, -0.206, -28.8, 0.45, 0.012, 3.4, SITE.marking);
+  // STOP at the driveway's mouth onto the north strip (aerial), read by a van
+  // heading north, with its stop bar across the driveway ahead of it and the
+  // one-way arrow behind it.
+  roadText('STOP', -23.0, -22.6, Math.PI);
+  box(-23.0, -0.206, -24.5, 3.4, 0.012, 0.45, SITE.marking);
   dashes(
-    59,
+    74,
     farX,
     5,
     2.5,
@@ -378,7 +391,7 @@ export function buildNeighborhood(model: Facility) {
   );
   // The entrance apron: a concrete slab at lot level where the west sidewalk is cut, with a one-way arrow in.
   patch(
-    [px(180, 1276), px(350, 1276), px(350, 1441), px(180, 1441)],
+    [px(244, 1276), px(350, 1276), px(350, 1441), px(244, 1441)],
     -0.235,
     0.03,
     SITE.curb,
@@ -400,33 +413,70 @@ export function buildNeighborhood(model: Facility) {
     tip.rotation.x = -Math.PI / 2;
     root.add(g);
   };
-  arrow(-34.5, 4.3, Math.PI / 2);
+  arrow(-33.6, 4.3, Math.PI / 2);
   arrow(-22.5, -6, Math.PI);
   arrow(-22.5, -16, Math.PI);
+  arrow(37.7, -16.7, Math.PI);
+  arrow(37.7, 12.1, Math.PI);
   // Crosswalks, blue loading access and parking bays are geometry rather than a photograph.
-  for (let z = 38; z < 45; z += 0.85)
-    box(-36, -0.208, z, 3.2, 0.012, 0.4, SITE.marking);
-  // Accessible parking on the Ethel side of the lot (plan, confirmed by Street
-  // View): two stalls with the hatched access aisle between them.
-  for (let i = 0; i < 10; i++)
+  for (let z = 32.4; z < 40.6; z += 0.85)
+    box(-37.4, -0.208, z, 3.2, 0.012, 0.4, SITE.marking);
+  // Our lot, from the aerial: a west row of head-in stalls behind the palm
+  // planter (the fleet's bays, at their pitch), the hatched accessible aisle
+  // and stall at its south end, and a row of slightly angled stalls along the
+  // building north of the drop-off.
+  for (let k = 0; k < 8; k++)
     strip(
-      px(351 + i * 42, 1010),
-      px(393 + i * 42, 1060),
-      0.07,
-      SITE.accessible,
-    );
-  for (const y of [936, 1160]) {
-    const [x, z] = px(530, y);
-    box(x, -0.208, z, 1.2, 0.012, 1.2, SITE.accessible);
-    const ring = add(
-      new T.TorusGeometry(0.31, 0.035, 6, 32),
+      [-31.0, -23.05 + 2.8 * k],
+      [-24.9, -23.05 + 2.8 * k],
+      0.1,
       SITE.marking,
-      x,
-      -0.191,
-      z,
     );
-    ring.rotation.x = -Math.PI / 2;
+  for (let x = -30.6; x < -26.6; x += 0.9)
+    strip([x, -3.3], [x + 1.6, -1.2], 0.08, SITE.accessible);
+  for (const z of [-3.45, -1.05, 1.45])
+    strip([-31.0, z], [-26.5, z], 0.1, SITE.accessible);
+  box(-27.9, -0.208, 0.2, 1.1, 0.012, 1.1, SITE.accessible);
+  const isaRing = add(
+    new T.TorusGeometry(0.28, 0.035, 6, 32),
+    SITE.marking,
+    -27.9,
+    -0.191,
+    0.2,
+  );
+  isaRing.rotation.x = -Math.PI / 2;
+  for (let k = 0; k < 6; k++)
+    strip(
+      [-20.4, -19.5 + 2.7 * k],
+      [-15.0, -21.5 + 2.7 * k],
+      0.1,
+      SITE.marking,
+    );
+  // The rear court behind the east block (Street View and Google Earth): a
+  // row of stalls nosed into the building's north faces, and perpendicular
+  // stalls along the north edge of the strip in front of the 1300 building.
+  for (let k = 0; k <= 6; k++) {
+    const x = 0.4 + 2.45 * k,
+      face = x > 5.2 && x < 11.8 ? -15.2 : -12.5;
+    strip([x, face], [x, face - 5.0], 0.1, SITE.marking);
   }
+  for (let k = 0; k <= 15; k++)
+    strip(
+      [-30.5 + 2.5 * k, -35.8],
+      [-30.5 + 2.5 * k, -31.5],
+      0.1,
+      SITE.marking,
+    );
+  // The neighbour's lot: angled stalls along the dialysis center and along our
+  // east wall, one-way north up the aisle (arrows), the hatched accessible
+  // stall at the Valley end.
+  for (let z = -17; z <= 12; z += 3)
+    strip([45.1, z], [39.7, z + 2.4], 0.1, SITE.marking);
+  for (let z = -6; z <= 15; z += 3)
+    strip([30.3, z], [35.5, z - 2.4], 0.1, SITE.marking);
+  for (let x = 30.6; x < 35.2; x += 0.9)
+    strip([x, 15.4], [x + 1.4, 17.4], 0.08, SITE.accessible);
+  box(34.6, -0.208, 14.2, 1.0, 0.012, 1.0, SITE.accessible);
   // Abstract model trees: a slender trunk under soft, smooth canopy volumes.
   const canopyGeometry = new T.SphereGeometry(1, 28, 18);
   function tree(x: number, z: number, r: number, h: number, i: number) {
@@ -466,48 +516,96 @@ export function buildNeighborhood(model: Facility) {
     }
   }
   [
-    [212, 811, 2.3, 4.0],
-    [225, 2090, 1.9, 3.4],
-    [3230, 240, 2.7, 5.1],
-    [2815, 610, 2.6, 4.1],
-    [2930, 1030, 1.3, 2.9],
-    [3250, 2120, 1, 2.5],
-    [464, 2325, 0.55, 1.6],
-    [551, 2325, 0.55, 1.6],
+    [276, 573, 2.2, 4.2],
+    [276, 809, 2.0, 4.0],
+    [276, 1025, 2.4, 4.4],
+    [276, 1496, 2.6, 4.6],
+    [276, 1988, 2.1, 4.0],
+    [2945, 376, 3.4, 5.2],
+    [3153, 632, 2.8, 4.6],
+    [2858, 946, 1.0, 1.8],
+    [2858, 1064, 1.0, 1.8],
+    [2917, 2047, 1.1, 2.0],
+    [3334, 2007, 1.1, 2.0],
+    [4152, 278, 2.4, 4.5],
+    [4152, 671, 2.6, 4.8],
+    [4152, 1064, 2.3, 4.4],
+    [4152, 1693, 2.5, 4.6],
+    [464, 2334, 0.55, 1.6],
+    [551, 2334, 0.55, 1.6],
   ].forEach((p, i) => tree(p[0], p[1], p[2], p[3], i));
   for (const [x, z] of [
-    [-34, 30],
+    [-33.8, 29.6],
     [-4, 31],
     [30, 29],
-    [44, -24],
-    [-36, -23],
+    [63.6, -24],
+    [-34.4, -21.4],
   ]) {
     add(new T.CylinderGeometry(0.045, 0.065, 5.2, 10), SITE.pole, x, 2.4, z);
     box(x + 0.42, 4.98, z, 0.9, 0.07, 0.2, SITE.lamp);
   }
-  // Partial neighboring footprint visible along the right-hand boundary of the supplied plan.
-  const a = px(3430, 310),
-    b = px(3564, 2170);
+  // The neighbour to the east, from the aerial (2026-10-01): the two-storey
+  // dialysis center along S Campbell Ave (x 47-67, z -27.5..22.6) with its
+  // angled-stall lot between it and this building, entered from Valley Blvd.
+  const NB = { x0: 45.5, x1: 63.3, z0: -26.6, z1: 23.5, h: 7.6 };
   box(
-    (a[0] + b[0]) / 2,
+    (NB.x0 + NB.x1) / 2,
     -0.2,
-    (a[1] + b[1]) / 2,
-    b[0] - a[0],
-    5.5,
-    b[1] - a[1],
+    (NB.z0 + NB.z1) / 2,
+    NB.x1 - NB.x0,
+    NB.h,
+    NB.z1 - NB.z0,
     SITE.neighbor,
   ).name = 'neighbor-east-estimated-height';
   box(
-    (a[0] + b[0]) / 2,
-    5.3,
-    (a[1] + b[1]) / 2,
-    b[0] - a[0] + 0.16,
+    (NB.x0 + NB.x1) / 2,
+    NB.h - 0.2,
+    (NB.z0 + NB.z1) / 2,
+    NB.x1 - NB.x0 + 0.16,
     0.16,
-    b[1] - a[1] + 0.16,
+    NB.z1 - NB.z0 + 0.16,
     SITE.coping,
   );
-  for (let z = a[1] + 2; z < b[1] - 1; z += 3.2)
-    box(a[0] - 0.015, 0.65, z, 0.025, 2, 1.7, SITE.neighborGlass);
+  for (const y of [1.1, 4.9])
+    for (let z = NB.z0 + 2; z < NB.z1 - 1; z += 3.2)
+      box(NB.x0 - 0.015, y, z, 0.025, 1.6, 1.7, SITE.neighborGlass);
+  for (let i = 0; i < 9; i++) {
+    const x = NB.x0 + 3 + (i % 3) * 6.5,
+      z = NB.z0 + 5 + Math.floor(i / 3) * 15;
+    box(x, NB.h - 0.2, z, 1.6, 0.9, 1.3, '#b0b2a8');
+  }
+  // Planters in the neighbour's lot: along our east wall, and either side of
+  // its Valley Blvd entrance.
+  for (const [x0, z0, x1, z1] of [
+    [30.0, -10.3, 32.6, -6.8],
+    [30.0, 19.0, 35.5, 24.6],
+    [41.6, 19.0, 45.1, 23.0],
+  ]) {
+    patch(
+      [
+        [x0, z0],
+        [x1, z0],
+        [x1, z1],
+        [x0, z1],
+      ],
+      -0.23,
+      0.2,
+      SITE.curb,
+      'neighbor-planter',
+    );
+    patch(
+      [
+        [x0 + 0.25, z0 + 0.25],
+        [x1 - 0.25, z0 + 0.25],
+        [x1 - 0.25, z1 - 0.25],
+        [x0 + 0.25, z1 - 0.25],
+      ],
+      -0.025,
+      0.015,
+      SITE.planting,
+      'neighbor-planting',
+    );
+  }
   // Simplified, softly rounded vehicles: stone bodies with dark glazing.
   function car(id: string, x: number, z: number, angle: number, color: string) {
     const g = new T.Group();
@@ -543,10 +641,8 @@ export function buildNeighborhood(model: Facility) {
       box(sx, 0.62, 1.955, 0.32, 0.1, 0.03, SITE.headlight, g);
     return g;
   }
-  [
-    [3240, 857, 0.78],
-    [3290, 1520, 0.78],
-  ].forEach((p, i) => {
+  // No parked cars: the lots read by their striping and planters.
+  ([] as number[][]).forEach((p, i) => {
     const [x, z] = px(p[0], p[1]);
     car(`parked-car-${i}`, x, z, p[2], SITE.cars[i]);
   });

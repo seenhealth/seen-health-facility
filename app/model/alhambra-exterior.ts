@@ -392,22 +392,21 @@ export function buildAlhambraExterior(model: Facility) {
     for (let xx = wallX0 + 0.3; xx < wallX1; xx += 0.4)
       box(lotDoor, xx, -0.23, zz, 0.01, 1.5, 0.01, brickJoint);
   }
-  // Low curbed planter just inside the lot entrance, on its north side: short
-  // pygmy palms and shrubs, the entry lane between it and the wing.
-  const island = group(site, 'entrance-palm-planter');
-  box(island, -29.9, -0.23, 1.95, 4.2, 0.18, 2.1, '#dcd7cd');
-  box(island, -29.9, -0.23, 3.0, 4.2, 0.2, 0.07, red);
-  box(island, -27.8, -0.23, 1.95, 0.07, 0.2, 2.1, red);
-  box(island, -29.9, -0.05, 1.95, 3.9, 0.02, 1.8, '#8c7a5c');
+  // Low curbed planter against the lobby wall just north of the drop-off
+  // landing (aerial): short pygmy palms and shrubs.
+  const island = group(site, 'lobby-wall-palm-planter');
+  box(island, -16.35, -0.23, -4.7, 2.3, 0.18, 3.4, '#dcd7cd');
+  box(island, -17.5, -0.23, -4.7, 0.07, 0.2, 3.4, red);
+  box(island, -16.35, -0.05, -4.7, 2.0, 0.02, 3.1, '#8c7a5c');
   for (const [x, z, h] of [
-    [-31.2, 1.5, 1.3],
-    [-29.8, 2.4, 1.6],
-    [-28.5, 1.6, 1.2],
+    [-16.9, -5.9, 1.3],
+    [-15.9, -4.6, 1.6],
+    [-16.7, -3.5, 1.2],
   ])
     palm(x, z, h, 1.0);
-  for (let xx = -31.6; xx < -28.0; xx += 0.75) {
+  for (let z = -6.0; z < -3.2; z += 0.75) {
     const tuft = mesh(island, new T.IcosahedronGeometry(0.28, 1), '#7f9a5f');
-    tuft.position.set(xx, 0.12, 1.95 + (xx % 1.5 > 0.75 ? 0.55 : -0.55));
+    tuft.position.set(-16.35 + (z % 1.5 > 0.75 ? 0.6 : -0.6), 0.12, z);
     tuft.scale.set(1, 0.7, 1);
   }
   // Drop-off landing along the lobby wall across the glass door, window and
@@ -536,6 +535,37 @@ export function buildAlhambraExterior(model: Facility) {
     0.035,
     bronze,
   );
+  // Rear court planters (Street View, Google Earth): a curbed island with a
+  // tall fan palm west of the stall row, and a palm cluster at its east end.
+  const court = group(site, 'rear-court-planters');
+  for (const [x0, z0, x1, z1] of [
+    [-3.4, -21.2, -0.4, -18.0],
+    [13.2, -24.0, 16.4, -20.4],
+  ]) {
+    box(
+      court,
+      (x0 + x1) / 2,
+      -0.23,
+      (z0 + z1) / 2,
+      x1 - x0,
+      0.18,
+      z1 - z0,
+      '#dcd7cd',
+    );
+    box(
+      court,
+      (x0 + x1) / 2,
+      -0.05,
+      (z0 + z1) / 2,
+      x1 - x0 - 0.3,
+      0.02,
+      z1 - z0 - 0.3,
+      '#8c7a5c',
+    );
+  }
+  palm(-1.9, -19.6, 5.0, 1.9);
+  palm(14.2, -22.9, 2.2, 1.3);
+  palm(15.4, -21.4, 1.6, 1.1);
   // Rear loading door on the alley: flat canopy over the roll-up and a gated enclosure beside it.
   const rear = group(facade, 'clinic-rear-loading-canopy-and-gate');
   box(rear, -5.6, 3.15, -23.1, 4.2, 0.16, 1.2, '#b7b9b2');
@@ -548,10 +578,10 @@ export function buildAlhambraExterior(model: Facility) {
   // corner, the utility pole with its transformers, bottlebrush trees and a
   // hydrant on the Valley Blvd frontage.
   for (const [z0, z1] of [
-    [-23.5, 2.4],
-    [6.6, 27.4],
+    [-24.5, 2.4],
+    [6.6, 25.2],
   ])
-    box(street, -36.0, -0.05, (z0 + z1) / 2, 1.6, 0.012, z1 - z0, lawn);
+    box(street, -34.45, -0.05, (z0 + z1) / 2, 1.5, 0.012, z1 - z0, lawn);
   function hydrant(x: number, z: number) {
     const g = group(street, 'fire-hydrant');
     mesh(g, new T.CylinderGeometry(0.15, 0.17, 0.72, 12), yellow).position.set(
@@ -570,8 +600,8 @@ export function buildAlhambraExterior(model: Facility) {
         .rotateZ(Math.PI / 2)
         .position.set(x + dx, 0.4, z);
   }
-  hydrant(-36.3, -23.0);
-  hydrant(-35.6, 31.6);
+  hydrant(-34.5, -23.2);
+  hydrant(-33.9, 30.4);
   function palm(x: number, z: number, h: number, crown: number) {
     const g = group(street, 'fan-palm');
     const trunk = mesh(g, new T.CylinderGeometry(0.11, 0.17, h, 10), '#8a7254');
@@ -596,12 +626,12 @@ export function buildAlhambraExterior(model: Facility) {
       z,
     );
   }
-  for (const z of [-21, -16.5, -12]) palm(-32.1, z, 2.2, 1.3);
+  for (let z = -22.6; z < -5; z += 2.47) palm(-31.55, z, 1.4, 1.0);
   for (const z of [9.6, 13.8]) palm(-32.0, z, 2.5, 1.4);
   palm(-19.6, -23.9, 5.2, 1.9);
   // Low grasses in the planters, and the red-painted curbs facing the lot.
   for (const [x, z0, z1] of [
-    [-32.15, -24.2, -7.8],
+    [-31.55, -23.3, -4.6],
     [-32.0, 7.8, 26.8],
   ])
     for (let z = z0 + 0.6; z < z1; z += 1.1) {
@@ -609,7 +639,7 @@ export function buildAlhambraExterior(model: Facility) {
       tuft.position.set(x, 0.18, z);
       tuft.scale.set(1, 0.7, 1);
     }
-  box(street, -31.78, -0.23, -15.95, 0.07, 0.2, 17.5, red);
+  box(street, -30.95, -0.23, -13.8, 0.07, 0.2, 19.4, red);
   box(street, -31.48, -0.23, 17.3, 0.07, 0.2, 20, red);
   for (const [[ax, az], [bx, bz]] of [
     [
@@ -648,14 +678,14 @@ export function buildAlhambraExterior(model: Facility) {
     pole,
     new T.CylinderGeometry(0.13, 0.17, 9.5, 10),
     '#7d6a55',
-  ).position.set(-37.6, 4.5, -36.5);
-  box(pole, -37.6, 8.4, -36.5, 2.2, 0.1, 0.1, '#7d6a55');
+  ).position.set(-34.6, 4.5, -36.3);
+  box(pole, -34.6, 8.4, -36.3, 2.2, 0.1, 0.1, '#7d6a55');
   for (const dx of [-0.45, 0.45])
     mesh(
       pole,
       new T.CylinderGeometry(0.28, 0.28, 0.75, 12),
       '#9a9c98',
-    ).position.set(-37.6 + dx, 7.5, -36.5);
+    ).position.set(-34.6 + dx, 7.5, -36.3);
   // Bottlebrush street trees on Valley Blvd, drawn green like the rest of the trees.
   for (const [x, z] of [
     [-11, 30.2],
