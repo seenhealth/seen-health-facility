@@ -5,8 +5,8 @@ import { Vector3 } from 'three';
 import {
   sampleVan,
   alhambraVanWindows,
-  ARRIVAL,
 } from '../work/validation/arrival.mjs';
+import { DROP_OFF } from '../work/validation/alhambra-exterior.mjs';
 import {
   FLEET_LOT,
   fleetParking,
@@ -92,23 +92,16 @@ for (let i = 0; i < VANS; i++)
     if (s.kind === 'parked') assert(v.phase.startsWith('Parked'), `${fleetVanLabel(i)} parked at ${(s.start + s.end) / 2}`);
   }
 
-// Lot obstacles a van must keep clear of: the building, the entrance ramp and
-// its landing, the curb islands and the west sidewalk (vans cross the south
-// sidewalk only at the driveway).
-const rect = (x0, z0, x1, z1) => [
-  [x0, z0],
-  [x1, z0],
-  [x1, z1],
-  [x0, z1],
-];
+// Lot obstacles a van must keep clear of: the building, the drop-off's
+// landing, switchback ramp, their rails and the palm planter at the foot of
+// its steps (alhambra-exterior.ts DROP_OFF), the curb islands and the west
+// sidewalk (vans cross the south sidewalk only at the driveway).
 const curbs = siteCurbs(m);
 const obstacles = [
   ['building', m.site.buildingOutline],
-  [
-    'entrance ramp',
-    rect(ARRIVAL.rampX - 0.64, ARRIVAL.rampTopZ, ARRIVAL.rampX + 0.64, ARRIVAL.rampBottomZ),
-  ],
-  ['ramp landing', rect(-16.16, -1.632, -14.1, -0.352)],
+  ...['drop-off landing and upper run', 'ramp turn landing', 'ramp lower run'].map((name, i) => [name, DROP_OFF.outlines[i]]),
+  ...Object.entries(DROP_OFF.rails).map(([id, r]) => [`drop-off ${id} rail`, [[r.x, r.z0], [r.x, r.z1]]]),
+  ['lobby palm planter', DROP_OFF.planterOutline],
   ['west sidewalk', curbs.sidewalks[0]],
   ...curbs.islands.map((p, i) => [`curb island ${i}`, p]),
 ];

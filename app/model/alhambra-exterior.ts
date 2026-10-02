@@ -1,5 +1,5 @@
 import * as T from 'three';
-import type { Facility } from './schema';
+import type { Facility, Vec2 } from './schema';
 import { exteriorPrimitives } from './exterior-primitives';
 
 /**
@@ -12,6 +12,138 @@ export const REAR_COURT_PLANTERS = [
   [1.0, -21.4, 4.0, -18.2],
   [13.2, -24.0, 16.4, -20.4],
 ] as const;
+
+/**
+ * The drop-off at the lobby's sliding entrance (Street View, May 2025), in
+ * plan (x, z) with the heights people walk at. A landing runs along the lobby
+ * wall across the glass door, window and side door at floor level, with two
+ * short steps down at its −z end. The accessible ramp is a switchback: the
+ * upper run descends from the landing along the wall toward the wing, turns
+ * on a landing beside the block wall, and the lower run comes back in front
+ * of it down to the lot. Bronze rails line the lot side of the landing and
+ * the upper run, both sides of the lower run and the turn landing's west
+ * edge. A low curbed palm planter stands just beyond the foot of the steps.
+ *
+ * `buildAlhambraExterior` draws the drop-off from these numbers; the routes
+ * people take over it (scripts/apply-drop-off-route.mjs, fleet-crew.ts) and
+ * the validators that keep vans and people off its rails read them too.
+ */
+export const DROP_OFF = (() => {
+  const street = -0.23,
+    top = 0,
+    rise = top - street,
+    midTop = top - rise / 2,
+    width = 1.3;
+  const landing = { x: -15.5, z0: -2.0, z1: 3.6 },
+    upper = { x: landing.x, z0: landing.z1, z1: 7.6 },
+    turn = { x0: -17.95, x1: -14.85, z0: 7.6, z1: 8.75 },
+    lower = { x: -17.15, z0: 2.9, z1: 7.6 };
+  /** Steps down from the landing's −z end to `z0`: `count` treads `depth` deep, equal risers to the lot. */
+  const count = 2,
+    depth = 0.4,
+    steps = { count, depth, z0: landing.z0 - count * depth };
+  const riser = rise / (steps.count + 1);
+  const upperY = (z: number) =>
+    top - ((rise / 2) * (z - upper.z0)) / (upper.z1 - upper.z0);
+  const lowerY = (z: number) =>
+    midTop - ((rise / 2) * (lower.z1 - z)) / (lower.z1 - lower.z0);
+  const lotSide = landing.x - width / 2 - 0.05;
+  /** Rail lines at constant x from z0 to z1, standing on the surface at height y(z). */
+  const rails = {
+    landing: { x: lotSide, z0: steps.z0, z1: landing.z1, y: () => top },
+    upper: { x: lotSide, z0: upper.z0, z1: upper.z1, y: upperY },
+    lowerEast: {
+      x: lower.x + width / 2 + 0.05,
+      z0: lower.z0,
+      z1: lower.z1,
+      y: lowerY,
+    },
+    lowerWest: {
+      x: lower.x - width / 2 - 0.05,
+      z0: lower.z0,
+      z1: lower.z1,
+      y: lowerY,
+    },
+    turn: {
+      x: turn.x0 + 0.05,
+      z0: turn.z0,
+      z1: turn.z1 - 0.05,
+      y: () => midTop,
+    },
+  };
+  /** Planter centre and size; its curb faces the lot. */
+  const planter = { x: -16.35, z: -4.7, w: 2.3, d: 3.4 };
+  const rect = (x0: number, z0: number, x1: number, z1: number): Vec2[] => [
+    [x0, z0],
+    [x1, z0],
+    [x1, z1],
+    [x0, z1],
+  ];
+  const within = (x: number, centre: number) =>
+    Math.abs(x - centre) <= width / 2 + 1e-9;
+  /** Height of the walking surface at (x, z) on the landing, its steps, the runs or the turn landing; null elsewhere. */
+  function surface(x: number, z: number): number | null {
+    if (within(x, landing.x) && z >= steps.z0 && z <= upper.z1) {
+      if (z > landing.z1) return upperY(z);
+      if (z >= landing.z0) return top;
+      return top - riser * Math.ceil((landing.z0 - z) / steps.depth - 1e-9);
+    }
+    if (x >= turn.x0 && x <= turn.x1 && z >= turn.z0 && z <= turn.z1)
+      return midTop;
+    if (within(x, lower.x) && z >= lower.z0 && z <= lower.z1) return lowerY(z);
+    return null;
+  }
+  /**
+   * The accessible way up, along the middle of each run and round the turn
+   * landing (its corners cut at 45°): from the lower run's toe to the landing
+   * abreast of the sliding entrance at `doorZ`, every corner at its surface
+   * height. The runs slope evenly, so heights between corners are linear.
+   */
+  function ascent(doorZ: number): { at: Vec2; y: number }[] {
+    const mid = (turn.z0 + turn.z1) / 2,
+      cut = 0.4;
+    const corners: Vec2[] = [
+      [lower.x, lower.z0],
+      [lower.x, lower.z1],
+      [lower.x, mid - cut],
+      [lower.x + cut, mid],
+      [upper.x - cut, mid],
+      [upper.x, mid - cut],
+      [upper.x, upper.z1],
+      [upper.x, upper.z0],
+      [landing.x, doorZ],
+    ];
+    return corners.map((at) => ({ at, y: surface(at[0], at[1])! }));
+  }
+  return {
+    street,
+    top,
+    midTop,
+    width,
+    landing,
+    steps,
+    upper,
+    turn,
+    lower,
+    rails,
+    planter,
+    surface,
+    ascent,
+    /** Plan outlines: the landing with its steps and the upper run, the turn landing, the lower run. */
+    outlines: [
+      rect(landing.x - width / 2, steps.z0, landing.x + width / 2, upper.z1),
+      rect(turn.x0, turn.z0, turn.x1, turn.z1),
+      rect(lower.x - width / 2, lower.z0, lower.x + width / 2, lower.z1),
+    ],
+    /** The planter's footprint. */
+    planterOutline: rect(
+      planter.x - planter.w / 2,
+      planter.z - planter.d / 2,
+      planter.x + planter.w / 2,
+      planter.z + planter.d / 2,
+    ),
+  };
+})();
 
 /** 2022 offering brochure exterior photographs, fitted to the existing plan footprint. */
 export function buildAlhambraExterior(model: Facility) {
@@ -405,10 +537,11 @@ export function buildAlhambraExterior(model: Facility) {
   }
   // Low curbed planter against the lobby wall just north of the drop-off
   // landing (aerial): short pygmy palms and shrubs.
-  const island = group(site, 'lobby-wall-palm-planter');
-  box(island, -16.35, -0.23, -4.7, 2.3, 0.18, 3.4, '#dcd7cd');
-  box(island, -17.5, -0.23, -4.7, 0.07, 0.2, 3.4, red);
-  box(island, -16.35, -0.05, -4.7, 2.0, 0.02, 3.1, '#8c7a5c');
+  const island = group(site, 'lobby-wall-palm-planter'),
+    bed = DROP_OFF.planter;
+  box(island, bed.x, -0.23, bed.z, bed.w, 0.18, bed.d, '#dcd7cd');
+  box(island, bed.x - bed.w / 2, -0.23, bed.z, 0.07, 0.2, bed.d, red);
+  box(island, bed.x, -0.05, bed.z, bed.w - 0.3, 0.02, bed.d - 0.3, '#8c7a5c');
   for (const [x, z, h] of [
     [-16.9, -5.9, 1.3],
     [-15.9, -4.6, 1.6],
@@ -417,24 +550,17 @@ export function buildAlhambraExterior(model: Facility) {
     palm(x, z, h, 1.0);
   for (let z = -6.0; z < -3.2; z += 0.75) {
     const tuft = mesh(island, new T.IcosahedronGeometry(0.28, 1), '#7f9a5f');
-    tuft.position.set(-16.35 + (z % 1.5 > 0.75 ? 0.6 : -0.6), 0.12, z);
+    tuft.position.set(bed.x + (z % 1.5 > 0.75 ? 0.6 : -0.6), 0.12, z);
     tuft.scale.set(1, 0.7, 1);
   }
-  // Drop-off landing along the lobby wall across the glass door, window and
-  // side door at floor level, with short steps at its north end. The
-  // accessible ramp is a switchback: an upper run descends along the wall
-  // toward the wing, turns on a landing beside the block wall, and the lower
-  // run comes back in front of it down to the lot. Bronze rails throughout
-  // (Street View, May 2025).
+  // Drop-off landing along the lobby wall, its steps and the switchback ramp
+  // (`DROP_OFF`).
   const landing = group(site, 'lobby-landing-and-ramp');
-  const LAND = { x: -15.5, w: 1.3, z0: -2.0, z1: 3.6, top: 0 };
+  const { upper, turn, lower, steps, rails, midTop } = DROP_OFF,
+    LAND = { ...DROP_OFF.landing, w: DROP_OFF.width, top: DROP_OFF.top };
   const bronze = '#6b5845',
     paving = '#c5c8c2';
-  const rise = LAND.top - L_STREET,
-    midTop = LAND.top - rise / 2;
-  const upper = { z0: LAND.z1, z1: 7.6 },
-    turn = { x0: -17.95, x1: -14.85, z0: 7.6, z1: 8.75 },
-    lower = { x: -17.15, z0: 2.9, z1: 7.6 };
+  const rise = LAND.top - L_STREET;
   box(
     landing,
     LAND.x,
@@ -445,15 +571,15 @@ export function buildAlhambraExterior(model: Facility) {
     LAND.z1 - LAND.z0,
     paving,
   );
-  for (let i = 0; i < 2; i++)
+  for (let i = 0; i < steps.count; i++)
     box(
       landing,
       LAND.x,
       L_STREET,
-      LAND.z0 - 0.2 - 0.4 * i,
+      LAND.z0 - steps.depth / 2 - steps.depth * i,
       LAND.w,
-      rise - (rise / 3) * (i + 1),
-      0.4,
+      rise - (rise / (steps.count + 1)) * (i + 1),
+      steps.depth,
       paving,
     );
   const upperLen = upper.z1 - upper.z0,
@@ -490,16 +616,17 @@ export function buildAlhambraExterior(model: Facility) {
     paving,
   );
   lowerSlab.rotation.x = Math.atan2(rise / 2, lowerLen);
-  const upperY = (z: number) =>
-    LAND.top - ((rise / 2) * (z - upper.z0)) / upperLen;
-  const lowerY = (z: number) =>
-    midTop - ((rise / 2) * (lower.z1 - z)) / lowerLen;
-  const railRun = (
-    x: number,
-    z0: number,
-    z1: number,
-    y: (z: number) => number,
-  ) => {
+  const railRun = ({
+    x,
+    z0,
+    z1,
+    y,
+  }: {
+    x: number;
+    z0: number;
+    z1: number;
+    y: (z: number) => number;
+  }) => {
     for (let z = z0; z <= z1 + 0.01; z += 1.4)
       box(
         landing,
@@ -522,30 +649,21 @@ export function buildAlhambraExterior(model: Facility) {
         bronze,
       );
   };
-  const lotSide = LAND.x - LAND.w / 2 - 0.05;
-  railRun(lotSide, LAND.z0 - 0.8, LAND.z1, () => LAND.top);
-  railRun(lotSide, upper.z0, upper.z1, upperY);
-  railRun(lower.x + LAND.w / 2 + 0.05, lower.z0, lower.z1, lowerY);
-  railRun(lower.x - LAND.w / 2 - 0.05, lower.z0, lower.z1, lowerY);
+  railRun(rails.landing);
+  railRun(rails.upper);
+  railRun(rails.lowerEast);
+  railRun(rails.lowerWest);
+  // The turn landing's rail runs on from the lower run's west rail: no post at its start.
   for (const dy of [0.45, 0.65, 0.85, 1.0])
     beam(
       landing,
-      [turn.x0 + 0.05, midTop + dy, turn.z0],
-      [turn.x0 + 0.05, midTop + dy, turn.z1 - 0.05],
+      [rails.turn.x, midTop + dy, rails.turn.z0],
+      [rails.turn.x, midTop + dy, rails.turn.z1],
       0.03,
       0.03,
       bronze,
     );
-  box(
-    landing,
-    turn.x0 + 0.05,
-    midTop,
-    turn.z1 - 0.05,
-    0.035,
-    0.95,
-    0.035,
-    bronze,
-  );
+  box(landing, rails.turn.x, midTop, rails.turn.z1, 0.035, 0.95, 0.035, bronze);
   // Rear court planters (REAR_COURT_PLANTERS).
   const court = group(site, 'rear-court-planters');
   for (const [x0, z0, x1, z1] of REAR_COURT_PLANTERS) {
