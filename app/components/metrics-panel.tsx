@@ -1,7 +1,7 @@
 'use client';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Area, ComposedChart, Line, Tooltip, XAxis, YAxis } from 'recharts';
-import { Download, Pause, Play, X } from 'lucide-react';
+import { Download, Pause, Play } from 'lucide-react';
 import {
   activityData,
   type ActivitySnapshot,
@@ -486,12 +486,10 @@ export default function MetricsPanel({
   model,
   ready,
   getViewer,
-  onClose,
 }: {
   model: Facility;
   ready: boolean;
   getViewer: () => Viewer | null;
-  onClose: () => void;
 }) {
   const [snap, setSnap] = useState<ActivitySnapshot | null>(null),
     [scenario, setScenario] = useState<Scenario>('base'),
@@ -566,15 +564,6 @@ export default function MetricsPanel({
   const hero = metrics?.hero;
   return (
     <section className="metrics-panel" aria-label="Measure the care day">
-      <header className="mp-head">
-        <div>
-          <span className="overline">MEASURE</span>
-          <strong>{tab === 'trace' ? 'Touchpoint trace' : 'Care-day metrics'}</strong>
-        </div>
-        <button aria-label="Close measurements" onClick={onClose}>
-          <X size={17} />
-        </button>
-      </header>
       <div className="mp-tabs">
         <fieldset className="mp-segment">
           <legend>Panel</legend>

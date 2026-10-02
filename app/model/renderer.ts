@@ -1929,7 +1929,7 @@ export function createViewer(
    * Zone labels appear from the "Day activities" zoom (about 1.39) inward and
    * stay hidden in the whole-building overviews (1.3 and below); hosts are
    * named once the room is large enough to read (px/m). Table labels join
-   * from the day-program framing (zoom 2.4) inward.
+   * from the day-program framing (zoom 2.6) inward.
    */
   const HIGHLIGHT_MIN_ZOOM = 1.35,
     HIGHLIGHT_TABLE_ZOOM = 2.3,
@@ -2198,17 +2198,16 @@ export function createViewer(
       zoomTarget = model.contextStyle ? 3.3 : 2.3;
       finishFocus(false);
     },
-    /** Frame the concurrent day-room activity zones above the care-day controls. */
+    /** Frame the concurrent day-room activity zones beside the care-day panel. */
     focusDayProgram: () => {
       const xs = dayProgram.zones.map((z) => z.anchor[0]),
         zs = dayProgram.zones.map((z) => z.anchor[1]);
-      // A lowered target lifts the zones above the activity panel on screen.
       focusTarget = new T.Vector3(
         (Math.min(...xs) + Math.max(...xs)) / 2,
-        -8,
+        0,
         (Math.min(...zs) + Math.max(...zs)) / 2,
       ).add(basePosition('day'));
-      zoomTarget = 2.4;
+      zoomTarget = 2.6;
       finishFocus(false);
     },
     activity,

@@ -4,6 +4,36 @@ Interactive planning models of **Alhambra (1839 W Valley), 1630 Olympic and Alve
 
 [GitHub repository](https://github.com/seenhealth/seen-health-facility) · [Live model](https://seen-health-facility.xingpersonal.chatgpt.site/)
 
+## Outputs
+
+Everything the repository produces, in one place. The claude.ai previews were built from the merge of [pull request #5](https://github.com/seenhealth/seen-health-facility/pull/5) and are private to the publishing account until shared.
+
+| Interactive | Where |
+| --- | --- |
+| Live 3D model, all three sites | [seen-health-facility.xingpersonal.chatgpt.site](https://seen-health-facility.xingpersonal.chatgpt.site/). Deployed separately from GitHub, so it can lag `main` |
+| 3D viewer, static build of `main` (vans, drivers, community layer, Measure and Trace) | [Preview](https://claude.ai/artifact/ENDpmBX2GKSLtMz6YuQCbh) |
+| "A day at Seen Health" scroll story with the six network cutaways | [Preview](https://claude.ai/artifact/Sa8vEJrsRbJA45BoaTeWy4) · `/story` locally |
+| Clips and stills of the care day: dock choreography, the Wongs' home, the partner day center | [Storyboard](https://claude.ai/artifact/CfrUyccAgz9LDi3msDdkTx) |
+
+| Documents | Where |
+| --- | --- |
+| Roadmap: simulation chassis, scenario library, digital twin, open decisions | [docs/PLAN.md](docs/PLAN.md) |
+| Architecture review with the status of each finding | [docs/CODE-REVIEW.md](docs/CODE-REVIEW.md) |
+| Distributed-care layer: settings registry, facility instances, generated casts | [docs/COMMUNITY.md](docs/COMMUNITY.md) |
+| Simulation engine, metrics and the touchpoint trace schema | [docs/SIMULATION.md](docs/SIMULATION.md) |
+| Story build, configuration, deploy and embed | [docs/STORY.md](docs/STORY.md) |
+| Modeling decisions and accuracy | [MODEL_NOTES.md](MODEL_NOTES.md), [accuracy register](public/models/accuracy-register.md), [additional sites](public/models/additional-sites-accuracy.md), [room review](public/models/room-review.md), [layout corrections](public/models/layout-corrections.md), [interior photo review](public/models/interior-photo-review.md), [source document audit](public/models/source-document-audit.md) |
+| Update notes | [planning](public/models/planning-update.md), [photos](public/models/photo-update.md), [animation](public/models/animation-update.md), [upstairs and fleet](public/models/upstairs-fleet-update.md) |
+
+| Data and model files | Where |
+| --- | --- |
+| Facility specifications (schema 2.0) | [Alhambra](public/models/seen-alhambra-planning.json), [Olympic](public/models/seen-olympic.json), [Olympic option](public/models/seen-olympic-option.json), [Alveare](public/models/seen-alveare.json), [the Wongs' home](public/models/seen-home-wong.json); earlier Alhambra: [2024](public/models/seen-alhambra-2024.json), [planning base](public/models/seen-alhambra-planning-base.json) |
+| Specification format | [facility-format.md](public/models/facility-format.md), [facility.schema.json](public/models/facility.schema.json) |
+| GLB exports (9 to 24 MB each) | [Alhambra](public/models/seen-alhambra-planning.glb), [Olympic](public/models/seen-olympic.glb), [Olympic option](public/models/seen-olympic-option.glb), [Alveare](public/models/seen-alveare.glb), [animated cast](public/models/seen-health-animated-cast.glb) |
+| Simulation outputs | [simulation report](public/models/sim-report.json), [touchpoint trace](public/models/touchpoint-trace.json) |
+| Activity and program data | [activity loop](public/models/activity-loop.json), [care journeys](public/models/care-journeys.json), [character templates](public/models/character-templates.json), [day program](public/models/day-program.json) |
+| Story and community tracks | [story scenario](app/data/scenarios/day-in-the-life.json), [compiled story tracks](app/data/scenarios/day-in-the-life.tracks.json), [the Wongs' home cast](app/data/community/home-lin.cast.json), [partner day center cast](app/data/community/partner-adc.cast.json) |
+
 ## Explore
 
 - Switch between sites or see their locations together on the map. Olympic includes both floors and its upstairs option. Room labels are off by default and can be enabled for design review.
