@@ -14297,8 +14297,8 @@
     "photo-dropoff-sign": {
       "kind": "sign",
       "dimensions": [
-        5.3,
-        0.7,
+        4.4,
+        0.5,
         0.18
       ],
       "material": "photo-sign-dropoff",
@@ -20686,8 +20686,8 @@
       "zoneId": "lobby",
       "levelId": "ground",
       "position": [
-        -14.86,
-        3.5,
+        -16.37,
+        2.33,
         0.8
       ],
       "rotation": -1.5707963267948966,
@@ -20701,7 +20701,7 @@
         109
       ],
       "status": "photo-informed / dimensions-estimated",
-      "notes": "Current sign over the drop-off door (2026): ginkgo mark then dark SEEN HEALTH 见心颐养 lettering on the wall above the canopy. Placement is registered to the plan; dimensions estimated without a measured drawing.",
+      "notes": "Current sign over the drop-off door (photo 2026-10-02): white SEEN HEALTH 见心颐养 channel letters, no mark, on the front fascia of the bronze canopy over the sliding door. Placement is registered to the plan; dimensions estimated without a measured drawing.",
       "layer": "exterior"
     },
     {
@@ -33175,6 +33175,31 @@
       "referencePages": [
         109,
         92
+      ]
+    },
+    {
+      "id": "west-entry-canopy-fascia",
+      "position": [
+        -16.3,
+        2.24,
+        0.8
+      ],
+      "dimensions": [
+        0.14,
+        0.72,
+        5.6
+      ],
+      "material": "photo-bronze",
+      "surface": "exterior",
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "zoneId": null,
+      "status": "photo-informed",
+      "referencePages": [
+        109
       ]
     },
     {

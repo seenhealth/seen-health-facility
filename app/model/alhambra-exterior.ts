@@ -833,6 +833,177 @@ export function buildAlhambraExterior(model: Facility) {
       lobe.scale.y = 0.85;
     }
   }
+  // Rear court (photos and the dispatcher's annotated screenshots, 2026-10-02).
+  // Note the model's +x runs toward the lot (screen-left in the lot shot), so
+  // "west" below means larger x. The staff entrance is on the wing's EAST
+  // face (x 15.26, the long wall between the garage corner at z −12.5 and the
+  // adjacent block at z 3.5): a cable-hung pergola of powder-blue slats on a
+  // steel-blue frame over the glass double door at its north end, a dark
+  // square window south of the door, bronze pipe rails on the landing and a
+  // wall light high on the face. The wing's court face (x 5.2–15.26 at
+  // z −15.2, drawn as one flat wall) is the UNDERGROUND GARAGE's wall: its
+  // rolling door under the grey hooded canopy, the gated electricity room and
+  // the louvre and meter panel sit there (the ramp is not cut into the ground).
+  // The utility pole with its yellow guard stands in front of the junction;
+  // the planter curbs are painted blue.
+  const court2 = group(facade, 'rear-court-staff-entrance-and-loading');
+  const SOUTH_Z = -22.463,
+    BUMP_Z = -15.213;
+  // The wing's court face reads as one flat wall from the recess corner to its end: the far part is brought flush with
+  // the stair bump, with its parapet cap.
+  box(
+    court2,
+    13.51,
+    -0.23,
+    (BUMP_Z - 12.465) / 2,
+    3.52,
+    6.5 + 0.23,
+    -12.465 - BUMP_Z,
+    stone,
+  );
+  box(
+    court2,
+    13.51,
+    6.5,
+    (BUMP_Z - 12.465) / 2,
+    3.52 + 0.24,
+    0.6,
+    -12.465 - BUMP_Z + 0.24,
+    stone,
+  );
+  const pergBlue = '#6b8bb4',
+    pergFrame = '#587aa4';
+  // The entrance is on the wing's EAST face (x 15.26, z −12.5 → 3.5, the long wall the dispatcher shaded), elements
+  // protruding +x; the pergola spans the wall's middle, door at its north end, window south of it.
+  const FACE_X = 15.264;
+  const pz0 = -9.4,
+    pz1 = -1.8,
+    pzc = (pz0 + pz1) / 2,
+    pwz = pz1 - pz0,
+    pdepth = 1.6,
+    py = 3.05;
+  box(court2, FACE_X + pdepth - 0.08, py, pzc, 0.16, 0.22, pwz, pergFrame);
+  box(court2, FACE_X + 0.06, py + 0.06, pzc, 0.12, 0.1, pwz, pergFrame);
+  for (const sz of [pz0 + 0.06, pz1 - 0.06])
+    box(court2, FACE_X + pdepth / 2, py, sz, pdepth, 0.2, 0.12, pergFrame);
+  for (let sz = pz0 + 0.25; sz < pz1 - 0.1; sz += 0.27)
+    box(
+      court2,
+      FACE_X + pdepth / 2 + 0.05,
+      py + 0.02,
+      sz,
+      pdepth - 0.25,
+      0.14,
+      0.07,
+      pergBlue,
+    );
+  for (const sz of [pz0 + 0.3, pzc, pz1 - 0.3]) {
+    beam(
+      court2,
+      [FACE_X + pdepth - 0.08, py + 0.2, sz],
+      [FACE_X + 0.03, py + 1.35, sz],
+      0.025,
+      0.025,
+      steel,
+    );
+    box(court2, FACE_X + 0.05, py + 1.3, sz, 0.08, 0.12, 0.12, steel);
+  }
+  // Glass double door (1839 W Valley Blvd, staff entrance) at the pergola's north end, with its dark frame.
+  const doorZ2 = pz1 - 1.15;
+  box(court2, FACE_X + 0.04, 0, doorZ2, 0.08, 2.4, 2.1, '#3a4448');
+  box(court2, FACE_X + 0.07, 0.05, doorZ2, 0.04, 2.3, 1.9, '#7f9aa8');
+  box(court2, FACE_X + 0.09, 0.05, doorZ2, 0.02, 2.3, 0.05, '#3a4448');
+  // Dark square window south of the door.
+  box(court2, FACE_X + 0.04, 1.25, pz0 + 2.6, 0.07, 1.35, 1.35, pergFrame);
+  box(court2, FACE_X + 0.06, 1.33, pz0 + 2.6, 0.04, 1.2, 1.2, '#1e2a30');
+  // Bronze pipe rails along the landing's edge in front of the door, a return to the wall at the south end.
+  const railX2 = FACE_X + 1.95;
+  for (const sz of [pz1 + 0.1, pz1 - 1.2, pz1 - 2.5, pz1 - 3.8])
+    box(court2, railX2, 0, sz, 0.04, 0.95, 0.04, bronze);
+  beam(
+    court2,
+    [railX2, 0.95, pz1 + 0.1],
+    [railX2, 0.95, pz1 - 3.8],
+    0.04,
+    0.04,
+    bronze,
+  );
+  beam(
+    court2,
+    [railX2, 0.62, pz1 + 0.1],
+    [railX2, 0.62, pz1 - 3.8],
+    0.03,
+    0.03,
+    bronze,
+  );
+  beam(
+    court2,
+    [railX2, 0.95, pz1 - 3.8],
+    [FACE_X + 0.1, 0.95, pz1 - 3.8],
+    0.04,
+    0.04,
+    bronze,
+  );
+  // Wall light high on the face south of the pergola.
+  beam(
+    court2,
+    [FACE_X + 0.02, 3.9, -11.2],
+    [FACE_X + 1.2, 4.15, -11.2],
+    0.06,
+    0.06,
+    '#6f7577',
+  );
+  box(court2, FACE_X + 1.3, 4.08, -11.2, 0.55, 0.16, 0.3, '#7d8284');
+  // The garage wall (the wing's court face): rolling door under the grey hood, the electricity-room gate beside it,
+  // the louvred vent and the meter panel.
+  const gFace = BUMP_Z - 0.03;
+  box(court2, 9.3, 0, gFace, 2.6, 2.5, 0.06, '#e8e6df');
+  for (let y = 0.25; y < 2.5; y += 0.25)
+    box(court2, 9.3, y, gFace - 0.02, 2.6, 0.02, 0.02, '#cfcdc5');
+  const hood = mesh(court2, new T.BoxGeometry(3.4, 0.5, 1.5), '#9a9fa0');
+  hood.position.set(9.3, 3.3, BUMP_Z - 0.75);
+  hood.rotation.x = -0.22;
+  box(court2, 9.3, 2.85, BUMP_Z - 0.04, 3.4, 0.6, 0.08, '#8d9294');
+  for (const gx of [11.3, 12.4])
+    box(court2, gx, 0, gFace, 0.06, 2.2, 0.06, '#8f9496');
+  for (let gx = 11.4; gx < 12.4; gx += 0.12)
+    box(court2, gx, 0.05, gFace, 0.025, 2.05, 0.025, '#8f9496');
+  beam(court2, [11.3, 2.15, gFace], [12.4, 2.15, gFace], 0.04, 0.04, '#8f9496');
+  beam(court2, [11.3, 0.12, gFace], [12.4, 0.12, gFace], 0.04, 0.04, '#8f9496');
+  box(court2, 11.85, 2.4, gFace, 0.9, 0.5, 0.05, '#9a9fa0');
+  for (let y = 2.45; y < 2.85; y += 0.1)
+    box(court2, 11.85, y, gFace - 0.02, 0.8, 0.03, 0.02, '#6f7577');
+  box(court2, 13.6, 2.6, gFace, 0.9, 0.7, 0.05, '#9a9fa0');
+  for (let y = 2.65; y < 3.25; y += 0.1)
+    box(court2, 13.6, y, gFace - 0.02, 0.8, 0.03, 0.02, '#6f7577');
+  box(court2, 14.0, 1.0, gFace, 0.7, 1.1, 0.12, '#8f9496');
+  // Utility pole with its yellow guard in front of the junction of the two faces.
+  const poleX = 4.6,
+    poleZ = -17.6;
+  mesh(
+    court2,
+    new T.CylinderGeometry(0.16, 0.19, 9.5, 10),
+    '#7a6650',
+  ).position.set(poleX, 4.5, poleZ);
+  for (const y of [1.4, 1.9, 2.4])
+    mesh(
+      court2,
+      new T.CylinderGeometry(0.2, 0.2, 0.12, 10),
+      '#e4c23a',
+    ).position.set(poleX, y, poleZ);
+  box(court2, poleX, 8.6, poleZ, 1.8, 0.1, 0.1, '#7d6a55');
+  // Blue-painted curbs on the court's planter islands.
+  for (const [x0, z0, x1, z1] of [
+    [1.0, -21.4, 4.0, -18.2],
+    [13.2, -24.0, 16.4, -20.4],
+  ]) {
+    const cx = (x0 + x1) / 2,
+      cz = (z0 + z1) / 2;
+    box(court2, cx, -0.05, z0 + 0.08, x1 - x0, 0.015, 0.16, '#2d5aa6');
+    box(court2, cx, -0.05, z1 - 0.08, x1 - x0, 0.015, 0.16, '#2d5aa6');
+    box(court2, x0 + 0.08, -0.05, cz, 0.16, 0.015, z1 - z0, '#2d5aa6');
+    box(court2, x1 - 0.08, -0.05, cz, 0.16, 0.015, z1 - z0, '#2d5aa6');
+  }
   for (const g of [facade, roof, site]) batch(g);
   return { facade, roof, site };
 }

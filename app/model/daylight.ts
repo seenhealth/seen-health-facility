@@ -3,6 +3,8 @@ import * as T from 'three';
 /**
  * Real daylight for the live lot: the sun's actual direction and height over
  * the center, and the sky's brightness through dawn, day, dusk and night.
+ * `apply` returns the moment's `night` factor (0 by day, 1 past civil dusk)
+ * for the night lights (night-lights.ts) and the vehicles' lamps.
  * World axes: +x east, +z north (Valley Blvd is the north street, Ethel
  * Avenue the west street, the alley the south street; the fleet code's
  * NORTH heading is 0 = +z).
@@ -29,7 +31,8 @@ export function solarPosition(
   const omega = 125.04 - 1934.136 * t;
   const lambda = trueLng - 0.00569 - 0.00478 * Math.sin(omega * rad);
   const eps0 =
-    23 + (26 + (21.448 - t * (46.815 + t * (0.00059 - t * 0.001813))) / 60) / 60;
+    23 +
+    (26 + (21.448 - t * (46.815 + t * (0.00059 - t * 0.001813))) / 60) / 60;
   const eps = eps0 + 0.00256 * Math.cos(omega * rad);
   const decl = Math.asin(Math.sin(eps * rad) * Math.sin(lambda * rad));
   const y = Math.tan((eps / 2) * rad) ** 2;
@@ -44,10 +47,12 @@ export function solarPosition(
   const minutesUtc =
     date.getUTCHours() * 60 + date.getUTCMinutes() + date.getUTCSeconds() / 60;
   const trueSolar = (minutesUtc + eqTime + 4 * lng + 1440) % 1440;
-  const ha = (trueSolar / 4 < 0 ? trueSolar / 4 + 180 : trueSolar / 4 - 180) * rad;
+  const ha =
+    (trueSolar / 4 < 0 ? trueSolar / 4 + 180 : trueSolar / 4 - 180) * rad;
   const phi = lat * rad;
   const cosZen =
-    Math.sin(phi) * Math.sin(decl) + Math.cos(phi) * Math.cos(decl) * Math.cos(ha);
+    Math.sin(phi) * Math.sin(decl) +
+    Math.cos(phi) * Math.cos(decl) * Math.cos(ha);
   const zen = Math.acos(Math.min(1, Math.max(-1, cosZen)));
   let az =
     Math.acos(
@@ -75,29 +80,57 @@ export function solarPosition(
   return { azimuth: az, elevation: el };
 }
 
-const DAY = { sky: '#fbfaf6', ground: '#d8d4cc', hemi: 1.1, sun: 2.45, env: 0.45, bg: '#f3efe4' };
-const NIGHT = { sky: '#6f7f94', ground: '#1d2226', hemi: 0.42, sun: 0, env: 0.12, bg: '#1b2126' };
+const DAY = {
+  sky: '#fbfaf6',
+  ground: '#d8d4cc',
+  hemi: 1.1,
+  sun: 2.45,
+  env: 0.45,
+  bg: '#f3efe4',
+};
+const NIGHT = {
+  sky: '#6f7f94',
+  ground: '#1d2226',
+  hemi: 0.42,
+  sun: 0,
+  env: 0.12,
+  bg: '#1b2126',
+};
 const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
-const mix = (a: string, b: string, k: number) => new T.Color(a).lerp(new T.Color(b), k);
+const mix = (a: string, b: string, k: number) =>
+  new T.Color(a).lerp(new T.Color(b), k);
 
 /** Finds the viewer's key light and sky fill once, then sets them for a moment in time. */
 export function createDaylight(scene: T.Scene) {
   const lights: T.Object3D[] = [];
   scene.traverse((o) => {
-    if (o instanceof T.DirectionalLight || o instanceof T.HemisphereLight) lights.push(o);
+    if (o instanceof T.DirectionalLight || o instanceof T.HemisphereLight)
+      lights.push(o);
   });
-  const sun = lights.find((o): o is T.DirectionalLight => o instanceof T.DirectionalLight) ?? null;
-  const hemi = lights.find((o): o is T.HemisphereLight => o instanceof T.HemisphereLight) ?? null;
+  const sun =
+    lights.find(
+      (o): o is T.DirectionalLight => o instanceof T.DirectionalLight,
+    ) ?? null;
+  const hemi =
+    lights.find(
+      (o): o is T.HemisphereLight => o instanceof T.HemisphereLight,
+    ) ?? null;
   const sunDistance = sun ? sun.position.length() : 108;
   const sunColor = new T.Color('#fff5ea');
-  let last = { azimuth: 0, elevation: 0, phase: 'day' as 'day' | 'twilight' | 'night' };
+  let last = {
+    azimuth: 0,
+    elevation: 0,
+    phase: 'day' as 'day' | 'twilight' | 'night',
+    night: 0,
+  };
   return {
     apply(date: Date) {
       const { azimuth, elevation } = solarPosition(date);
       // Night blends in from the horizon down to civil dusk (−6°); the key light fades over its last 8° of height.
       const night = Math.min(1, Math.max(0, -elevation / 6));
       const key = Math.min(1, Math.max(0, elevation / 8));
-      const phase = elevation > 0 ? 'day' : elevation > -6 ? 'twilight' : 'night';
+      const phase =
+        elevation > 0 ? 'day' : elevation > -6 ? 'twilight' : 'night';
       if (sun) {
         const az = azimuth * (Math.PI / 180),
           el = Math.max(elevation, 2) * (Math.PI / 180);
@@ -108,7 +141,12 @@ export function createDaylight(scene: T.Scene) {
         );
         sun.intensity = DAY.sun * key;
         // Warmer and dimmer near the horizon, the usual low-sun look.
-        sun.color.copy(sunColor).lerp(new T.Color('#ffc78a'), 1 - Math.min(1, Math.max(0, elevation / 25)));
+        sun.color
+          .copy(sunColor)
+          .lerp(
+            new T.Color('#ffc78a'),
+            1 - Math.min(1, Math.max(0, elevation / 25)),
+          );
         sun.visible = sun.intensity > 0.01;
       }
       if (hemi) {
@@ -116,9 +154,10 @@ export function createDaylight(scene: T.Scene) {
         hemi.groundColor.copy(mix(DAY.ground, NIGHT.ground, night));
         hemi.intensity = lerp(DAY.hemi, NIGHT.hemi, night);
       }
-      if (scene.background instanceof T.Color) scene.background.copy(mix(DAY.bg, NIGHT.bg, night));
+      if (scene.background instanceof T.Color)
+        scene.background.copy(mix(DAY.bg, NIGHT.bg, night));
       scene.environmentIntensity = lerp(DAY.env, NIGHT.env, night);
-      last = { azimuth, elevation, phase };
+      last = { azimuth, elevation, phase, night };
       return last;
     },
     get state() {
