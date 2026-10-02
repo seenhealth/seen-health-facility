@@ -33,13 +33,38 @@ export type DayProgramSession = ProgramDefinition & {
   baseId: string;
   propsLike: string;
 };
+/** One weekday's lunch (day-program.json `lunch.menus`). */
+export type LunchMenu = {
+  title: string;
+  cultures: string[];
+  main: string;
+  /** The day's vegetarian main. */
+  vegetarian: string;
+  sides: string[];
+  soup?: string;
+  dessert?: string;
+  /** How the dietitian's plans adapt the day's dishes. */
+  adaptations: { lowSodium: string; texture: string; diabetes: string };
+};
+/**
+ * The weekly lunch: a culturally focused menu per weekday, delivered to the
+ * kitchen before service (`delivery`, an interaction id) and served in the
+ * `service` window (loop seconds).
+ */
+export type LunchProgram = {
+  source: string;
+  delivery: string;
+  service: [number, number];
+  menus: Record<RotationDay, LunchMenu>;
+};
 type DayProgramData = Omit<
   typeof program,
-  'programs' | 'repertoire' | 'rotations'
+  'programs' | 'repertoire' | 'rotations' | 'lunch'
 > & {
   programs: (ProgramDefinition & { start: number; end: number })[];
   repertoire: ProgramDefinition[];
   rotations: Record<RotationDay, string[]>;
+  lunch: LunchProgram;
 };
 const data = program as unknown as DayProgramData;
 const catalogue = new Map<string, ProgramDefinition>(
@@ -90,6 +115,11 @@ export function subscribeProgramRotation(listener: () => void) {
 export function programAt(time: number) {
   const t = ((time % 720) + 720) % 720;
   return dayProgram.programs.find((p) => t >= p.start && t < p.end)!;
+}
+export const lunch = data.lunch;
+/** The selected weekday's lunch menu (follows setProgramRotation). */
+export function todaysLunch() {
+  return lunch.menus[activeDay];
 }
 /** What a station does in a program, mirroring scripts/build-activity.py. */
 function stationAction(session: ProgramDefinition, mode: string | undefined) {

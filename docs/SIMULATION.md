@@ -125,6 +125,28 @@ arrival's ramp, entrance and lobby routes, check in behind the front-desk queue,
 wait in the lobby and ride home on Van A or Van B.
 `npm run validate:fleet` checks all of this as the viewer plays it.
 
+### Deliveries (`app/model/deliveries.ts`)
+
+The food and package trucks serve rear receiving on their `runs` ([start,
+dwell] in loop seconds; `deliveryRuns` gives each run's set-off, parking,
+backing-out and gone times). The food truck's morning run brings lunch: parked
+252–340 s (10:48–11:46 AM), its delivery person (`delivery-food`) wheels the
+loaded trolley up the receiving ramp, along the corridor east of the laundry
+and across the east hallway into the kitchen, where `food-service-02` checks
+the carriers against the diet plans and unloads them onto the island
+(`kitchen-lunch-delivery`, meals, 285–309 s). The carriers stay on the island
+until lunch service ends (`KITCHEN_LUNCH`, 297–405 s); the week's menus are
+`lunch` in `app/data/day-program.json`. The afternoon run stops just inside
+the receiving door.
+
+`scripts/apply-kitchen-delivery.mjs` writes the two tracks and the interaction
+into both copies of the base loop from the truck's run and `KITCHEN_LUNCH`,
+checks every trolley leg on the navigation grid at 0.45 m clearance (and the
+trolley's corners against walls and furniture), keeps the new tracks 0.5 m
+from the rest of the cast and leaves every other number in the file as
+written; `--check` fails when the loop is stale. Rerun it after changing the
+food truck's runs or the kitchen, then `npm run build:scenario`.
+
 ## Navigation (`app/sim/nav.ts`)
 
 A TypeScript port of the grid in `scripts/build-activity.py`, with identical
@@ -503,7 +525,7 @@ exist in this repository.
 | `enter` / `leave` | room-level location where it exists: scheduled room use, clinic room assignment, badge or indoor positioning if deployed |
 | `interaction` · `clinical` | clinic visit records: encounter open/close times, vitals feed timestamps, medication administration |
 | `interaction` · `rehab` | therapy session notes with start and end times |
-| `interaction` · `meals` | meal service: tray tickets, dietary orders, dining attendance |
+| `interaction` · `meals` | meal service: tray tickets, dietary orders, dining attendance; kitchen receiving logs (delivery time, food temperatures) |
 | `interaction` · `activities` | program attendance and engagement notes |
 | `interaction` · `coordination` / `arrivals` | social-work notes, care-coordination tasks, family phone calls and texts, front-desk registration |
 | `encounter` | no direct record; approximated by staff assignment and task logs, or by proximity devices where consented |

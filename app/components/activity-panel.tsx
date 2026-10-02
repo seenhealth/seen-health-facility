@@ -18,11 +18,13 @@ import { roleNames, roleColors, characterLibrary } from '../model/characters';
 import { alhambraVanWindows } from '../model/arrival';
 import {
   dayProgram,
+  lunch,
   programAt,
   programRotation,
   rotationDays,
   setProgramRotation,
   subscribeProgramRotation,
+  todaysLunch,
   type RotationDay,
 } from '../model/day-room';
 import { COMMUNITY_CATEGORIES } from '../model/community-settings';
@@ -60,6 +62,11 @@ const formatLabels = {
   'small-group': 'Small groups',
   'one-to-one': 'One-to-one',
 };
+const adaptationLabels = [
+  ['lowSodium', 'Low sodium'],
+  ['texture', 'Soft & minced'],
+  ['diabetes', 'Diabetes-friendly'],
+] as const;
 const palette: Record<string, string> = {
   walk: '#aec9bc',
   roll: '#aec9bc',
@@ -153,7 +160,8 @@ export function ActivityPanel({
     [category, setCategory] = useState('activities'),
     [horizon, setHorizon] = useState(180),
     [search, setSearch] = useState(''),
-    [activityView, setActivityView] = useState(!siteSpecific);
+    [activityView, setActivityView] = useState(!siteSpecific),
+    [mealView, setMealView] = useState(false);
   useEffect(() => viewer?.activity.subscribe(setState), [viewer]);
   // The cast in view: the community layer's people drop out with its toggle.
   const people = state?.people ?? activityData.actors.length;
@@ -180,9 +188,21 @@ export function ActivityPanel({
     window.history.replaceState(null, '', u);
     change({ enabled: true });
   };
+  // The selected weekday's lunch and the delivery that brings it to the kitchen.
+  const menu = todaysLunch(),
+    lunchDelivery = activityData.interactions.find(
+      (i) => i.id === lunch.delivery,
+    );
+  const watchDelivery = () => {
+    if (!lunchDelivery) return;
+    change({ time: lunchDelivery.start + 3, enabled: true, filter: 'all' });
+    setCategory('meals');
+    onScene(lunchDelivery.zoneId, 'interaction:' + lunchDelivery.id);
+  };
   const chooseScene = (id: string) => {
     onScene(id);
     setActivityView(id === dayRoomId);
+    setMealView(id === 'dining');
     if (siteSpecific) {
       setCategory(
         activityData.interactions.find((i) => i.zoneId === id)?.category ||
@@ -319,6 +339,7 @@ export function ActivityPanel({
     );
   const select = (track: Track, at?: number) => {
     setActivityView(track.zone === dayRoomId);
+    setMealView(track.zone === 'dining' || track.zone === 'kitchen');
     change({ filter: 'all' });
     if (at !== undefined) change({ time: at, playing: false });
     onScene(
@@ -355,6 +376,7 @@ export function ActivityPanel({
           onClick={() => {
             change({ time: 0 });
             setActivityView(false);
+            setMealView(false);
             setCategory('arrivals');
             onScene('site');
           }}
@@ -499,6 +521,73 @@ export function ActivityPanel({
               </div>
               <p>{session.culture}</p>
               <p className="day-program-access">{session.access}</p>
+            </div>
+          )}
+          {mealView && !siteSpecific && (
+            <div className="day-program lunch-menu">
+              <div className="day-program-week">
+                <span>Weekly menu</span>
+                <div className="track-tabs">
+                  {rotationDays.map((d) => (
+                    <button
+                      key={d}
+                      aria-pressed={rotation === d}
+                      onClick={() => chooseRotation(d)}
+                    >
+                      {dayLabels[d]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="day-program-head">
+                <span>Today’s lunch</span>
+                {lunchDelivery && (
+                  <button
+                    title="Watch lunch arrive in the kitchen"
+                    onClick={watchDelivery}
+                  >
+                    Delivery →
+                  </button>
+                )}
+              </div>
+              <strong>{menu.title}</strong>
+              <div className="day-program-tags day-program-chips">
+                {menu.cultures.map((c) => (
+                  <span key={c} title="Culture">
+                    {c}
+                  </span>
+                ))}
+              </div>
+              <p>
+                <b>Main</b> {menu.main}
+              </p>
+              <p>
+                <b>Vegetarian</b> {menu.vegetarian}
+              </p>
+              <p>
+                <b>Sides</b> {menu.sides.join(' · ')}
+              </p>
+              {menu.soup && (
+                <p>
+                  <b>Soup</b> {menu.soup}
+                </p>
+              )}
+              {menu.dessert && (
+                <p>
+                  <b>Dessert</b> {menu.dessert}
+                </p>
+              )}
+              {adaptationLabels.map(([key, label]) => (
+                <p key={key} className="day-program-access">
+                  <b>{label}</b> {menu.adaptations[key]}
+                </p>
+              ))}
+              {lunchDelivery && (
+                <p className="day-program-access">
+                  Delivered to the kitchen at {dayTime(lunchDelivery.start)} ·
+                  served {dayTime(lunch.service[0])}–{dayTime(lunch.service[1])}
+                </p>
+              )}
             </div>
           )}
         </>

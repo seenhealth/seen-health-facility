@@ -736,5 +736,117 @@
       "sing-along",
       "tcm"
     ]
+  },
+  "lunch": {
+    "source": "Illustrative weekly lunch menu planned with the dietitian, not a published menu or a nutrition analysis. Local San Gabriel Valley kitchens cook it; it reaches the center’s kitchen before service and is checked there against each participant’s diet order.",
+    "delivery": "kitchen-lunch-delivery",
+    "service": [
+      300,
+      405
+    ],
+    "menus": {
+      "mon": {
+        "title": "Cantonese home cooking",
+        "cultures": [
+          "Cantonese",
+          "Toisanese"
+        ],
+        "main": "Steamed rockfish with ginger and scallion",
+        "vegetarian": "Lo han jai · braised tofu, shiitake and napa cabbage",
+        "sides": [
+          "Jasmine or brown rice",
+          "Garlic choy sum"
+        ],
+        "soup": "Winter melon soup",
+        "dessert": "Sliced oranges",
+        "adaptations": {
+          "lowSodium": "Steamed rather than sauced; low-sodium soy and ginger-scallion oil come on the side.",
+          "texture": "Boneless fish that flakes for soft & bite-sized, minced with its sauce for minced & moist; congee instead of rice on request.",
+          "diabetes": "Half a scoop of brown rice with extra choy sum; fruit for dessert."
+        }
+      },
+      "tue": {
+        "title": "Shanghai & Taipei classics",
+        "cultures": [
+          "Shanghainese",
+          "Taiwanese"
+        ],
+        "main": "Lion’s head meatballs braised with napa cabbage",
+        "vegetarian": "Taiwanese braised tofu with shiitake and daikon",
+        "sides": [
+          "Steamed rice",
+          "Shanghai bok choy"
+        ],
+        "soup": "Tomato and egg drop soup",
+        "dessert": "Steamed Asian pear with goji berries",
+        "adaptations": {
+          "lowSodium": "Meatballs seasoned with ginger, scallion and half the soy; the cabbage carries the flavor.",
+          "texture": "Tender meatballs for soft & bite-sized, minced in their broth for minced & moist; the braised daikon mashes easily.",
+          "diabetes": "A small rice portion with extra bok choy; the pear is steamed without added sugar."
+        }
+      },
+      "wed": {
+        "title": "A Vietnamese family table",
+        "cultures": [
+          "Vietnamese",
+          "Chinese-Vietnamese"
+        ],
+        "main": "Gà kho gừng · ginger-braised chicken",
+        "vegetarian": "Đậu hũ sốt cà chua · tofu in fresh tomato sauce",
+        "sides": [
+          "Jasmine rice",
+          "Garlic chayote"
+        ],
+        "soup": "Canh chua · tamarind soup with pineapple and tomato",
+        "dessert": "Chè chuối · banana in warm coconut milk",
+        "adaptations": {
+          "lowSodium": "Half the usual fish sauce, balanced with lime and herbs; chili comes on the side.",
+          "texture": "Chicken braised until it shreds, minced in its sauce for minced & moist; no tapioca in the chè for texture diets.",
+          "diabetes": "Chè made with less sugar in a small cup; extra chayote in place of a second scoop of rice."
+        }
+      },
+      "thu": {
+        "title": "Cocina mexicana",
+        "cultures": [
+          "Mexican",
+          "Mexican American"
+        ],
+        "main": "Pollo guisado · chicken stewed with tomato, potato and carrot",
+        "vegetarian": "Enchiladas de frijol with salsa roja and queso fresco",
+        "sides": [
+          "Arroz rojo",
+          "Calabacitas",
+          "Warm corn tortillas"
+        ],
+        "soup": "Sopa de fideo",
+        "dessert": "Arroz con leche",
+        "adaptations": {
+          "lowSodium": "Beans cooked from dry without salt pork; salsa and lime on the table instead of extra salt.",
+          "texture": "Chicken that pulls apart for soft & bite-sized, minced in its broth for minced & moist; no tortillas on texture-modified plates.",
+          "diabetes": "Half a portion of rice with extra calabacitas; arroz con leche made with less sugar, or fresh papaya."
+        }
+      },
+      "fri": {
+        "title": "Korean & Filipino favorites",
+        "cultures": [
+          "Korean",
+          "Filipino"
+        ],
+        "main": "Chicken adobo, made with more vinegar than soy",
+        "vegetarian": "Dubu-jorim · Korean braised tofu",
+        "sides": [
+          "Barley rice",
+          "Sigeumchi-namul spinach",
+          "Mild cucumber salad"
+        ],
+        "soup": "Miyeok-guk · seaweed soup",
+        "dessert": "Fresh mango",
+        "adaptations": {
+          "lowSodium": "Adobo and dubu-jorim braised with half the soy; a mild cucumber salad stands in for kimchi.",
+          "texture": "Adobo simmered off the bone and shredded in its sauce; tofu is naturally soft; spinach chopped fine for minced & moist.",
+          "diabetes": "Barley rice in a half portion; mango in a small dish."
+        }
+      }
+    }
   }
 }
