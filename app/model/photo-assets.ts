@@ -259,13 +259,21 @@ export function buildPhotoAsset(
       dark = '#2b2f31',
       seat = '#3d4346',
       operable = p.operable === true;
+    // Side walls are `skin` thick on the planes x = ±sideX, so their outer
+    // faces lie on the envelope (±half); roof, cab, hood, nose and rear span
+    // the same width. Only trim (mirrors, handles, lamps, cladding, wheels)
+    // and the sliding door leaves stand proud of it.
     const half = w / 2,
       nose = -d / 2,
       rear = d / 2,
       sideX = half - 0.03,
+      skin = 2 * (half - sideX),
       belt = 1.55,
       windowTop = 2.1,
       roofY = 2.45;
+    /** Centre line of the raked windshield and A-pillars: its z at height y. */
+    const pillarZ = (y: number) => -2.235 + (y - 1.675) * Math.tan(0.52),
+      glassFront = pillarZ(windowTop);
     // See-through glazing so seated people read from outside. The palette's
     // glass finish is opaque, so the builder clones it into a transparent
     // material (opacity 0.34, roughness 0.12) instead of adding a schema entry.
@@ -312,6 +320,17 @@ export function buildPhotoAsset(
       g.add(m);
       return m;
     };
+    /** Side-wall piece on the plane x = `x`, `skin` thick, outlined by (z, y) points. */
+    const profile = (x: number, points: [number, number][], mat: string) => {
+      const geo = new T.ExtrudeGeometry(
+        new T.Shape(points.map(([z, y]) => new T.Vector2(z, y))),
+        { depth: skin, bevelEnabled: false },
+      );
+      // Outline x becomes van z and the extrusion runs along −x; centre it on x.
+      geo.rotateY(-Math.PI / 2);
+      geo.translate(skin / 2, 0, 0);
+      return add(geo, mat, x);
+    };
     // Underbody, interior floor and the black lower cladding band.
     box(0, 0.46, 0.35, w * 0.88, 0.1, d * 0.9, black);
     box(0, 0.52, 0.5, 1.98, 0.06, 5.1, dark);
@@ -324,7 +343,7 @@ export function buildPhotoAsset(
       -sideX,
       0.74,
       (cab.rear + 3.1) / 2,
-      0.07,
+      skin,
       belt - 0.74,
       3.1 - cab.rear,
       body,
@@ -334,7 +353,7 @@ export function buildPhotoAsset(
       sideX,
       0.74,
       (opening.front - 2.4) / 2,
-      0.07,
+      skin,
       belt - 0.74,
       opening.front + 2.4,
       body,
@@ -343,35 +362,90 @@ export function buildPhotoAsset(
       sideX,
       0.74,
       (opening.rear + 3.1) / 2,
-      0.07,
+      skin,
       belt - 0.74,
       3.1 - opening.rear,
       body,
     );
     // Window band: roof rail, pillars and see-through glazing on both sides.
+    // The rail starts under the sloped cab roof, not ahead of the windshield.
     for (const side of [-1, 1]) {
-      box(side * sideX, windowTop, 0.35, 0.09, roofY - windowTop, 5.5, body);
-      box(side * sideX, belt, -1.15, 0.08, windowTop - belt, 0.14, body);
-      box(side * sideX, belt, 0.55, 0.08, windowTop - belt, 0.26, body);
-      box(side * sideX, belt, 3.0, 0.08, windowTop - belt, 0.2, body);
-      if (side > 0) pane(sideX, belt, -1.72, 0.03, windowTop - belt, 1.0);
+      profile(
+        side * sideX,
+        [
+          [-1.97, windowTop],
+          [3.1, windowTop],
+          [3.1, roofY],
+          [-1.6, roofY],
+        ],
+        body,
+      );
+      // B-pillar; on +x it runs on to the sliding door's opening.
+      const pillarRear = side > 0 ? opening.front : -1.08;
+      box(
+        side * sideX,
+        belt,
+        (pillarRear - 1.22) / 2,
+        skin,
+        windowTop - belt,
+        pillarRear + 1.22,
+        body,
+      );
+      box(side * sideX, belt, 0.55, skin, windowTop - belt, 0.26, body);
+      box(side * sideX, belt, 3.0, skin, windowTop - belt, 0.2, body);
       pane(side * sideX, belt, 1.79, 0.03, windowTop - belt, 2.22);
     }
-    // Driver's door: lower panel, cab window and handle on one front-hinged
-    // leaf (`driver-door`; fleet vans swing it open as the driver gets out).
+    // Cab side windows start behind the A-pillar; a body-colour sail fills the
+    // corner between pillar and glass (on −x it rides on the driver's door).
+    const sail: [number, number][] = [
+      [pillarZ(belt), belt],
+      [glassFront, belt],
+      [glassFront, windowTop],
+    ];
+    profile(sideX, sail, body);
+    pane(
+      sideX,
+      belt,
+      (glassFront - 1.22) / 2,
+      0.03,
+      windowTop - belt,
+      -1.22 - glassFront,
+    );
+    // Driver's door: lower panel, cab window in its frame and handle on one
+    // front-hinged leaf (`driver-door`; fleet vans swing it open as the
+    // driver gets out).
     const leafLength = cab.rear - cab.hinge,
-      leafMid = (cab.hinge + cab.rear) / 2;
+      leafMid = (cab.hinge + cab.rear) / 2,
+      glassRear = cab.rear - 0.06;
     const leafParts: T.Object3D[] = [
-      box(-sideX, 0.74, leafMid, 0.07, belt - 0.74, leafLength, body),
+      box(-sideX, 0.74, leafMid, skin, belt - 0.74, leafLength, body),
+      profile(-sideX, sail, body),
       pane(
         -sideX,
         belt,
-        leafMid + 0.01,
+        (glassFront + glassRear) / 2,
         0.03,
         windowTop - belt,
-        leafLength - 0.14,
+        glassRear - glassFront,
       ),
-      box(-sideX, windowTop - 0.035, leafMid, 0.05, 0.035, leafLength, black),
+      box(
+        -sideX,
+        belt,
+        (glassRear + cab.rear) / 2,
+        skin,
+        windowTop - belt,
+        cab.rear - glassRear,
+        body,
+      ),
+      box(
+        -sideX,
+        windowTop - 0.035,
+        (glassFront + cab.rear) / 2,
+        0.05,
+        0.035,
+        cab.rear - glassFront,
+        black,
+      ),
       box(-sideX - 0.05, 1.2, cab.rear - 0.2, 0.02, 0.03, 0.14, black),
     ];
     if (operable) {
@@ -382,42 +456,80 @@ export function buildPhotoAsset(
       for (const part of leafParts) leaf.attach(part);
     }
     pane(-sideX, belt, -0.33, 0.03, windowTop - belt, 1.5);
-    // Tall rounded roof cap, header and the short sloped cab roof.
-    top(0, roofY, 0.75, 2.0, h - roofY, 4.7, 0.22, body);
-    box(0, 2.02, -2.02, 1.96, 0.12, 0.14, body);
-    pitched(0, 2.29, -1.81, 1.96, 0.1, 0.55, -0.67, body);
-    // Raked windshield between A-pillars, cowl, sloped hood and front fenders.
-    pitched(0, 1.675, -2.235, 1.86, 0.865, 0.04, 0.52, glazing);
-    for (const x of [-0.96, 0.96])
-      pitched(x, 1.675, -2.235, 0.1, 0.9, 0.12, 0.52, body);
-    box(0, 1.22, -2.5, 1.96, 0.08, 0.2, black);
-    pitched(0, 1.17, -2.79, 1.96, 0.06, 0.62, -0.362, body);
+    // Tall roof cap with rounded long edges, full width from the cab roof to
+    // the rear doors, then the header and the short sloped cab roof.
+    const roof = new T.Shape(),
+      edge = 0.14;
+    roof.moveTo(-half, roofY);
+    roof.lineTo(half, roofY);
+    roof.lineTo(half, h - edge);
+    roof.quadraticCurveTo(half, h, half - edge, h);
+    roof.lineTo(edge - half, h);
+    roof.quadraticCurveTo(-half, h, -half, h - edge);
+    roof.closePath();
+    add(
+      new T.ExtrudeGeometry(roof, {
+        depth: rear - 0.005 + 1.6,
+        bevelEnabled: false,
+        curveSegments: 12,
+      }),
+      body,
+      0,
+      0,
+      -1.6,
+    );
+    box(0, 2.02, -2.02, w, 0.12, 0.14, body);
+    pitched(0, 2.29, -1.81, w, 0.1, 0.55, -0.67, body);
+    // Raked windshield between A-pillars on the body sides, cowl, sloped hood
+    // and front fenders whose top edge runs on under the hood.
+    pitched(0, 1.675, -2.235, w - 0.19, 0.865, 0.04, 0.52, glazing);
     for (const side of [-1, 1])
-      box(side * (half - 0.06), 0.74, -2.8, 0.09, 0.4, 0.7, body);
+      pitched(side * (half - 0.05), 1.675, -2.235, 0.1, 0.9, 0.12, 0.52, body);
+    box(0, 1.22, -2.5, w - 0.19, 0.08, 0.2, black);
+    pitched(0, 1.17, -2.79, w, 0.06, 0.62, -0.362, body);
+    for (const side of [-1, 1])
+      profile(
+        side * sideX,
+        [
+          [nose + 0.01, 0.74],
+          [-2.4, 0.74],
+          [-2.4, 1.28],
+          [nose + 0.01, 1.0],
+        ],
+        body,
+      );
     // Nose: teal face with headlamps over a black bumper and grille.
-    box(0, 0.74, nose + 0.06, 2.0, 0.34, 0.1, body);
-    box(0, 0.3, nose + 0.05, 2.16, 0.44, 0.13, black);
+    box(0, 0.74, nose + 0.06, w, 0.34, 0.1, body);
+    box(0, 0.3, nose + 0.05, w, 0.44, 0.13, black);
     box(0, 0.42, nose - 0.01, 1.2, 0.26, 0.04, black);
     for (let i = 0; i < 4; i++)
       box(0, 0.44 + i * 0.065, nose - 0.02, 1.1, 0.012, 0.012, metal);
     for (const y of [0.4, 0.68])
       box(0, y, nose - 0.015, 1.26, 0.025, 0.02, metal);
     for (const side of [-1, 1]) {
-      box(side * 0.78, 0.8, nose + 0.02, 0.44, 0.22, 0.06, lamp);
-      box(side * 0.99, 0.8, nose + 0.05, 0.06, 0.22, 0.06, '#e0a24a');
+      box(side * (half - 0.25), 0.8, nose + 0.02, 0.44, 0.22, 0.06, lamp);
+      box(side * (half - 0.02), 0.8, nose + 0.04, 0.06, 0.22, 0.08, '#e0a24a');
       box(side * (half + 0.1), 1.5, -2.3, 0.1, 0.24, 0.16, black);
       box(side * (half + 0.02), 1.58, -2.3, 0.1, 0.04, 0.05, black);
     }
     // Rear: twin doors with high windows, tall tail lamps and a black bumper.
-    box(0, 0.76, rear - 0.045, 2.1, roofY - 0.76, 0.08, body);
+    box(0, 0.76, rear - 0.045, w, roofY - 0.76, 0.08, body);
     for (const side of [-1, 1]) {
       pane(side * 0.5, 1.8, rear + 0.01, 0.74, 0.4, 0.02);
-      box(side * 1.0, 0.78, rear - 0.005, 0.15, 0.95, 0.05, rearLamp);
+      box(
+        side * (half - 0.075),
+        0.78,
+        rear - 0.005,
+        0.15,
+        0.95,
+        0.05,
+        rearLamp,
+      );
     }
     box(0, 0.76, rear + 0.005, 0.025, roofY - 0.76, 0.02, black);
     box(0.12, 1.15, rear + 0.015, 0.03, 0.22, 0.02, black);
     box(0, 2.36, rear + 0.005, 0.3, 0.05, 0.02, rearLamp);
-    box(0, 0.3, rear - 0.035, 2.16, 0.42, 0.14, black);
+    box(0, 0.3, rear - 0.035, w, 0.42, 0.14, black);
     // Wheels: tyres proud of the cladding, hubs and black arch flares.
     for (const side of [-1, 1])
       for (const z of [-2.2, 1.75]) {
@@ -438,16 +550,17 @@ export function buildPhotoAsset(
       }
     // Passenger side: two sliding leaves that part along z (`passenger-door-0/1`
     // slide ±0.6 when open; the ramp hinges at the sill, local (1.035, 0.58, −0.19)).
+    // Closed, they sit 1 cm proud of the side, enough to pass over it when open.
     for (const [i, zc] of [-0.495, 0.114].entries()) {
       const leaf: T.Object3D[] = [
-        box(sideX + 0.02, 0.76, zc, 0.06, belt - 0.76, 0.6, body),
-        pane(sideX + 0.03, belt, zc, 0.02, windowTop - belt, 0.56),
-        box(sideX + 0.03, belt, zc, 0.05, 0.035, 0.6, black),
-        box(sideX + 0.03, windowTop - 0.035, zc, 0.05, 0.035, 0.6, black),
-        box(sideX + 0.03, belt, zc - 0.29, 0.05, windowTop - belt, 0.03, black),
-        box(sideX + 0.03, belt, zc + 0.29, 0.05, windowTop - belt, 0.03, black),
+        box(sideX + 0.01, 0.76, zc, 0.06, belt - 0.76, 0.6, body),
+        pane(sideX + 0.02, belt, zc, 0.02, windowTop - belt, 0.56),
+        box(sideX + 0.02, belt, zc, 0.05, 0.035, 0.6, black),
+        box(sideX + 0.02, windowTop - 0.035, zc, 0.05, 0.035, 0.6, black),
+        box(sideX + 0.02, belt, zc - 0.29, 0.05, windowTop - belt, 0.03, black),
+        box(sideX + 0.02, belt, zc + 0.29, 0.05, windowTop - belt, 0.03, black),
         box(
-          sideX + 0.07,
+          sideX + 0.06,
           1.2,
           zc + (i ? -0.22 : 0.22),
           0.02,

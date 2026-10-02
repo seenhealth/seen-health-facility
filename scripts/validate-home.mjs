@@ -13,24 +13,30 @@
 // size, from boxes, cylinders and rounded boxes that cast and receive
 // shadows, in materials the specification defines.
 //
-// The home-lin registry entry stands the house on its pad: the front door
+// The home-wong registry entry stands the house on its pad: the front door
 // within 0.3 m of the `door` anchor, the front wall on the porch slab's back
 // edge, the footprint ≥ 0.1 m from the porch slab and ramp and ≥ 1 m from the
 // drive, each room name readable on its plate at the label anchor, and the
 // derived pad within the authored size. The ADL cast (app/data/community/
-// home-lin.cast.json) keeps today's actor ids and the contract windows, puts
+// home-wong.cast.json) keeps today's actor ids and the contract windows, puts
 // every stop in a drawn room clear of furniture and walls, and routes every
 // walk on the instance grid at the person's clearance in the time the gaps
 // allow; the tracks generated from it (app/data/community-casts.json, `npm run
 // build:community`) keep people at least 0.6 m apart on foot (0.55 m when one
 // sits).
+//
+// Mrs. Lin's home (home-lin) stamps the same plan exactly as home-wong does,
+// on the same pad and drive with the same porch, ramp and crossing anchors, so
+// the registry checks carry over; its cast (app/data/community/home-lin.cast.
+// json) gets the same per-person and contact checks, and lin-evening must
+// cover 700–720 s, where the story closes.
 import assert from 'node:assert/strict';
 import { readFileSync, statSync } from 'node:fs';
 import * as T from 'three';
 import { loadSim } from './build-scenario.mjs';
 
 const FILE = process.argv[2] || 'public/models/seen-home-wong.json';
-const CAST = 'app/data/community/home-lin.cast.json';
+const CAST = 'app/data/community/home-wong.cast.json';
 const {
   schema,
   nav,
@@ -243,8 +249,12 @@ for (const o of floorItems) {
 }
 for (const o of stacked) {
   const base = floorItems.find((b) => {
-    const top =
-      b.position[1] + model.assets[b.assetId].dimensions[1] * b.scale[1];
+    // The surface things stand on: the declared height, or a nightstand's
+    // top beside its lamp.
+    const spec = model.assets[b.assetId],
+      top =
+        b.position[1] +
+        (home.homeAssetSurface(spec) ?? spec.dimensions[1]) * b.scale[1];
     return (
       Math.abs(top - o.position[1]) < 0.02 &&
       rectDistance([o.position[0], o.position[2]], objectRect(b)) === 0
@@ -453,11 +463,11 @@ for (const id of used)
   );
 
 // --- Registry: where the home stands on its pad (SPEC-facility-instance §11) --
-const setting = settings.careSettingById('home-lin');
+const setting = settings.careSettingById('home-wong');
 const cfg = setting.facility;
 assert(
   cfg && cfg.id === model.id,
-  'home-lin registry entry names this facility',
+  'home-wong registry entry names this facility',
 );
 assert.equal(cfg.url, '/' + FILE.replace(/^public\//, ''));
 assert.deepEqual(cfg.levelIds, ['ground']);
@@ -653,8 +663,54 @@ assert.equal(
   JSON.stringify(cast, null, 2) + '\n',
   `${CAST}: 2-space JSON`,
 );
-assert.equal(cast.setting, 'home-lin');
+assert.equal(cast.setting, 'home-wong');
 assert.equal(cast.facility, model.id);
+// Mrs. Lin's home stamps the same plan with the same frame and exclusions and
+// draws the same porch, ramp and crossing from the same local anchors on the
+// same pad and drive, so the registry checks above hold for it too; her and
+// her daughter's day (app/data/community/home-lin.cast.json) is checked with
+// the Wongs' below.
+const LIN_CAST = 'app/data/community/home-lin.cast.json';
+const linSetting = settings.careSettingById('home-lin');
+assert.deepEqual(
+  linSetting.facility,
+  cfg,
+  'home-lin stamps the plan exactly as home-wong does',
+);
+assert.deepEqual(
+  [linSetting.pad, linSetting.drive],
+  [setting.pad, setting.drive],
+  'home-lin has the Wongs’ pad and drive',
+);
+for (const k of [
+  'door',
+  'porch',
+  'porchStep',
+  'porchSeat',
+  'rampTop',
+  'rampFoot',
+  'kerb',
+  'crossA',
+  'crossB',
+  'crossC',
+  'crossD',
+])
+  check(
+    nav.distance(
+      settings.toLocal(linSetting, linSetting.anchors[k]),
+      settings.toLocal(setting, setting.anchors[k]),
+    ) < 1e-9,
+    `home-lin anchor ${k} is not where home-wong has it`,
+  );
+const linCastText = readFileSync(LIN_CAST, 'utf8');
+const linCast = JSON.parse(linCastText);
+assert.equal(
+  linCastText,
+  JSON.stringify(linCast, null, 2) + '\n',
+  `${LIN_CAST}: 2-space JSON`,
+);
+assert.equal(linCast.setting, 'home-lin');
+assert.equal(linCast.facility, model.id);
 // The instance view: excluded zones (with their rooms, walls and objects) and
 // objects removed, layers defaulted, as the build-time generator sees it.
 const removedIds = new Set(cfg.excludeObjectIds ?? []);
@@ -693,6 +749,7 @@ const ACTIONS = new Set([
   'write',
   'craft',
   'listen',
+  'phone',
 ]);
 const SEATS = new Set([
   'upholstered-chair',
@@ -702,7 +759,8 @@ const SEATS = new Set([
   'mesh-chair',
   'task-chair',
 ]);
-const LIMIT = { walker: 1.15, wheelchair: 1.45, none: 1.6 };
+// A cane: the story's own limit for Mrs. Lin (scenario heroGait.max).
+const LIMIT = { cane: 1.45, walker: 1.15, wheelchair: 1.45, none: 1.6 };
 const alhambra = JSON.parse(
   readFileSync('public/models/seen-alhambra-planning.json', 'utf8'),
 );
@@ -710,6 +768,11 @@ const communityIds = new Set(
   people.communitySource(alhambra).actors.map((a) => a.id),
 );
 const categories = new Set(settings.COMMUNITY_CATEGORIES.map(([id]) => id));
+const profiles = new Set(
+  JSON.parse(
+    readFileSync('app/data/character-templates.json', 'utf8'),
+  ).people.map((p) => p.id),
+);
 const interactions = new Map();
 const routes = new Map();
 const routeOf = (a, b, clearance) => {
@@ -737,7 +800,7 @@ const routeOf = (a, b, clearance) => {
 };
 let walks = 0,
   fastest = { ratio: 0, text: '' };
-for (const person of cast.people) {
+for (const person of [...cast.people, ...linCast.people]) {
   const who = person.id,
     mobility = person.mobility ?? 'none',
     clearance = nav.MOBILITY_CLEARANCE[mobility],
@@ -745,6 +808,11 @@ for (const person of cast.people) {
   check(
     communityIds.has(who),
     `${who}: not an actor of today's community cast`,
+  );
+  // A shared look (Mrs. Lin's, the story hero's) needs a stored profile.
+  check(
+    !person.profileId || profiles.has(person.profileId),
+    `${who}: profile ${person.profileId} is not in character-templates.json`,
   );
   check(
     gait > 0 && gait <= LIMIT[mobility],
@@ -892,6 +960,29 @@ check(
   care[0] <= 34 && care[1] >= 42 && care[0] >= 26 && care[1] <= 80.5,
   `home-personal-care ${care.join('–')} must cover the story cutaway 34–42 (≈ 30–72)`,
 );
+// Mrs. Lin's day at home frames the story: breakfast before the van, and tea
+// with her daughter through its closing shot (about 719.5 s).
+const breakfast = interactions.get('lin-breakfast')?.window ?? [0, 0],
+  evening = interactions.get('lin-evening')?.window ?? [0, 0];
+check(
+  breakfast[0] >= 0 && breakfast[1] > breakfast[0] && breakfast[1] <= 24,
+  `lin-breakfast ${breakfast.join('–')} must come before she leaves for the van`,
+);
+check(
+  evening[0] <= 700 && evening[1] === 720,
+  `lin-evening ${evening.join('–')} must cover 700–720 (the story closes on it)`,
+);
+// The PERS call: Mrs. Wong alone, before her aide is in, on the phone with
+// the nurse line for at least 15 s.
+const pers = interactions.get('home-pers-call'),
+  aideIn = cast.people.find((p) => p.id === 'home-pca')?.arrive.t ?? 0;
+check(
+  pers?.channel === 'phone' &&
+    pers.actorIds.join() === 'home-participant,nurse-line-rn' &&
+    pers.window[1] - pers.window[0] >= 15 &&
+    pers.window[1] <= aideIn,
+  `home-pers-call must be Mrs. Wong's phone call with the nurse line, at least 15 s long and over before her aide is in at ${aideIn} s`,
+);
 for (const i of interactions.values()) {
   check(categories.has(i.category), `${i.id}: category ${i.category}`);
   check(
@@ -901,14 +992,15 @@ for (const i of interactions.values()) {
   check(i.label && i.description, `${i.id}: label and description`);
 }
 // Contacts on the generated tracks (setting-local; walks at constant speed
-// along their paths), every 0.25 s.
-const generated = JSON.parse(
+// along their paths), every 0.25 s, in each home.
+const generatedCasts = JSON.parse(
   readFileSync('app/data/community-casts.json', 'utf8'),
-).casts['home-lin'];
-assert(
-  generated,
-  'app/data/community-casts.json has no home-lin cast: npm run build:community',
-);
+).casts;
+for (const home of ['home-wong', 'home-lin'])
+  assert(
+    generatedCasts[home],
+    `app/data/community-casts.json has no ${home} cast: npm run build:community`,
+  );
 const along = (path, f) => {
   const lengths = path.slice(1).map((q, i) => nav.distance(path[i], q)),
     total = lengths.reduce((n, l) => n + l, 0);
@@ -934,20 +1026,22 @@ const positionAt = (actor, t) => {
   };
 };
 let nearest = { d: Infinity, text: '' };
-for (let t = 0; t < 720; t += 0.25)
-  for (let i = 0; i < generated.actors.length; i++) {
-    const a = positionAt(generated.actors[i], t);
-    if (!a) continue;
-    for (let j = i + 1; j < generated.actors.length; j++) {
-      const b = positionAt(generated.actors[j], t);
-      if (!b) continue;
-      const d = nav.distance(a.p, b.p),
-        min = a.seated || b.seated ? 0.55 : 0.6,
-        pair = `${generated.actors[i].id} and ${generated.actors[j].id}`;
-      if (d < nearest.d) nearest = { d, text: `${pair} at ${t} s` };
-      check(d >= min, `${pair} are ${d.toFixed(2)} m apart at ${t} s`);
+const homes = ['home-wong', 'home-lin'].map((h) => generatedCasts[h].actors);
+for (const actors of homes)
+  for (let t = 0; t < 720; t += 0.25)
+    for (let i = 0; i < actors.length; i++) {
+      const a = positionAt(actors[i], t);
+      if (!a) continue;
+      for (let j = i + 1; j < actors.length; j++) {
+        const b = positionAt(actors[j], t);
+        if (!b) continue;
+        const d = nav.distance(a.p, b.p),
+          min = a.seated || b.seated ? 0.55 : 0.6,
+          pair = `${actors[i].id} and ${actors[j].id}`;
+        if (d < nearest.d) nearest = { d, text: `${pair} at ${t} s` };
+        check(d >= min, `${pair} are ${d.toFixed(2)} m apart at ${t} s`);
+      }
     }
-  }
 
 if (problems.length) {
   console.error(
@@ -967,5 +1061,5 @@ console.log(
     `(grid ${grid.nx}×${grid.nz}, ${grid.buildMs} ms). ` +
     `${Object.keys(model.assets).length} assets build; home kinds ${[...builtKinds].join(', ')} at their declared size; ${used.size} materials, all defined.\n` +
     `Registry: front door ${doorOffset.toFixed(2)} m from the door anchor, front wall on the porch's back edge, footprint ${porchGaps['porch slab'].toFixed(2)} m from the porch slab and ${porchGaps.ramp.toFixed(2)} m from the ramp, ${Number.isFinite(paving) ? paving.toFixed(2) + ' m' : 'over 3 m'} from the drive; plates clear ${plates.join(', ')}; derived pad ${need.w.toFixed(1)} m wide with back ${need.back.toFixed(2)} m (authored ${setting.pad.back}).\n` +
-    `Cast: ${cast.people.length} people, ${cast.people.reduce((n, p) => n + p.stops.length, 0)} stops, ${walks} walks routed at each person's clearance (fastest ${fastest.text}, ${(fastest.ratio * 100).toFixed(0)} % of its limit), ${interactions.size} interactions; generated tracks: nearest pair ${nearest.d.toFixed(2)} m (${nearest.text}).`,
+    `Cast: ${cast.people.length} people, ${cast.people.reduce((n, p) => n + p.stops.length, 0)} stops; Mrs. Lin's home (same plan, anchors, pad and drive): ${linCast.people.length} people, ${linCast.people.reduce((n, p) => n + p.stops.length, 0)} stops; ${walks} walks routed at each person's clearance (fastest ${fastest.text}, ${(fastest.ratio * 100).toFixed(0)} % of its limit), ${interactions.size} interactions; generated tracks: nearest pair ${nearest.d.toFixed(2)} m (${nearest.text}).`,
 );

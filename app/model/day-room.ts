@@ -16,12 +16,15 @@ import type { Facility } from './schema';
 export {
   dayProgram,
   isRotationDay,
+  lunch,
   programAt,
   programRotation,
   resolveRotation,
   rotationDays,
   setProgramRotation,
   subscribeProgramRotation,
+  todaysLunch,
+  type LunchMenu,
   type RotationDay,
 } from './day-program';
 type Person = ReturnType<typeof createCharacter> & {

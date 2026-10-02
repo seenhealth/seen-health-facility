@@ -57,7 +57,7 @@ if (!traceOnly) {
   ]) {
     const h = m.headline;
     line(
-      `${name.padEnd(14)} ${h.people} people (${h.participants} participants, ${h.staff} staff) · peak on site ${h.peakParticipantsOnSite} participants at ${at(m.onSite.participants, h.peakParticipantsOnSite)}, ${h.peakStaffOnFloor} staff at ${at(m.onSite.staff, h.peakStaffOnFloor)} · staff time: ${pct(h.staffCareShare)} care, ${pct(h.staffWalkingShare)} walking · participants active ${pct(h.meanParticipantActiveShare)} of time on site`,
+      `${name.padEnd(14)} ${h.people} people (${h.participants} participants, ${h.staff} staff${h.family ? `, ${h.family} family` : ''}) · peak on site ${h.peakParticipantsOnSite} participants at ${at(m.onSite.participants, h.peakParticipantsOnSite)}, ${h.peakStaffOnFloor} staff at ${at(m.onSite.staff, h.peakStaffOnFloor)} · staff time: ${pct(h.staffCareShare)} care, ${pct(h.staffWalkingShare)} walking · participants active ${pct(h.meanParticipantActiveShare)} of time on site`,
     );
   }
   line();
@@ -202,7 +202,7 @@ line(
   `  ${hero.label}: ${hero.events.length} events, ${hero.interactions} interactions, ${hero.encounters} encounters, on site ${sim.clockLabel(hero.firstOnSite)}–${sim.clockLabel(hero.lastOnSite)}; disciplines ${hero.disciplines.length} of ${claimed.length} claimed by the scenario steps${missing.length ? ` (missing ${missing.join(', ')})` : ''}.`,
 );
 line(`  Zones: ${hero.zones.map((z) => `${z.zoneId} ${Math.round(min(z.seconds))} min`).join(' · ')}`);
-line(`  Size: ${(text.length / 1024).toFixed(0)} KB (bound ${(TRACE_SIZE_LIMIT / 1e6).toFixed(0)} MB)`);
+line(`  Size: ${(text.length / 1024).toFixed(0)} KB (bound ${(TRACE_SIZE_LIMIT / 1e6).toFixed(1)} MB)`);
 if (write) {
   writeFileSync(tracePath, text);
   line(`Wrote ${tracePath.replace(root + '/', '')}`);

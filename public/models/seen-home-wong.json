@@ -4,7 +4,7 @@
   "name": "The Wongs' home · senior-friendly single-story bungalow",
   "address": "Illustrative home on the community pad near the Alhambra center (not a real address)",
   "units": "m",
-  "coordinateSystem": "Plan frame P: metres, origin at the centre of the 11.6 x 13.0 m footprint (house plus porch), +X east (the front door and the street), +Z north, Y up; y = 0 is the finished floor (PORCH_Y on the community pad). Placed on the home-lin pad with frame { position: [0, -10.8], heading: -pi/2 } (pad-local), i.e. world = P + (-94.8, 12.0).",
+  "coordinateSystem": "Plan frame P: metres, origin at the centre of the 11.6 x 13.0 m footprint (house plus porch), +X east (the front door and the street), +Z north, Y up; y = 0 is the finished floor (PORCH_Y on the community pad). Placed on the home-wong pad with frame { position: [0, -10.8], heading: -pi/2 } (pad-local), i.e. world = P + (-94.8, 12.0).",
   "revision": "2026-10-01 · Senior-friendly plan v1 (HOME-PLAN study, grid-aligned doors)",
   "source": {
     "title": "The Wongs' home: a senior-friendly floor plan and its ADL day (HOME-PLAN design study)",
@@ -253,7 +253,7 @@
         1
       ],
       "floorMaterial": "concrete",
-      "notes": "The existing 8.0 x 2.6 m porch, the front ramp's top landing. Kept for standalone viewing: the community pad already draws it, so the home-lin registry entry excludes this zone from the stamped instance.",
+      "notes": "The existing 8.0 x 2.6 m porch, the front ramp's top landing. Kept for standalone viewing: the community pad already draws it, so the home-wong registry entry excludes this zone from the stamped instance.",
       "publishedAreaSqFt": null,
       "tracedFootprintSqFt": 223.9,
       "programId": "home",
@@ -1937,7 +1937,31 @@
         1
       ],
       "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
-      "notes": "Mrs. Wong's side: lamp, phone, glasses. Bedside lamp on top (asset height includes the lamp).",
+      "notes": "Mrs. Wong's side: lamp, phone, glasses and the PERS base unit. Bedside lamp on top (asset height includes the lamp).",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-primary-pers-console",
+      "assetId": "home-pers-console",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -5.36,
+        0.59,
+        2.96
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-primary",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Personal emergency response (PERS) base unit beside the lamp on Mrs. Wong's nightstand, facing the bed: her pendant's alarm reaches the response center through it, which talks back through its speaker and conferences in Seen's 24/7 nurse line.",
       "layer": "furniture"
     },
     {
@@ -2761,6 +2785,24 @@
         "front": "drawer front at local +z (the bedside)"
       }
     },
+    "home-pers-console": {
+      "kind": "pers-console",
+      "dimensions": [
+        0.2,
+        0.05,
+        0.13
+      ],
+      "material": "photo-white",
+      "materials": {
+        "panel": "photo-black",
+        "button": "pers-help",
+        "key": "photo-silver",
+        "light": "pers-light"
+      },
+      "parameters": {
+        "front": "speaker grille and status light at local +z; the help button on top"
+      }
+    },
     "home-wardrobe": {
       "kind": "wardrobe",
       "dimensions": [
@@ -3118,6 +3160,16 @@
       "roughness": 0.75,
       "emissive": "#ffd8a3",
       "emissiveIntensity": 0.75
+    },
+    "pers-help": {
+      "color": "#c4553f",
+      "roughness": 0.45
+    },
+    "pers-light": {
+      "color": "#9ad4a2",
+      "roughness": 0.4,
+      "emissive": "#6fcf86",
+      "emissiveIntensity": 0.6
     }
   },
   "programs": [],
@@ -3373,7 +3425,7 @@
     "referencePages": [
       1
     ],
-    "notes": "Bounds are the home-lin pad extended 8 m west (pad-local x -15..15, z -22..14) expressed in P. The outline is the house, porch and back landing. The yard planting, garden beds, drive and the porch rails belong to the community pad (community-pads.ts), not to this specification."
+    "notes": "Bounds are the home-wong pad extended 8 m west (pad-local x -15..15, z -22..14) expressed in P. The outline is the house, porch and back landing. The yard planting, garden beds, drive and the porch rails belong to the community pad (community-pads.ts), not to this specification."
   },
   "roofSections": [],
   "details": [],

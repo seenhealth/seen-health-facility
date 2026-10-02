@@ -3,11 +3,15 @@ import type { Facility } from '../model/schema';
 import {
   BUILDING,
   CHAPTER_SHOTS,
+  CUT_SETTLE,
   DEFAULT_CHAPTER_SHOT,
   DEFAULT_CUTAWAY_SHOT,
+  DEFAULT_HIGHLIGHT_SHOT,
   FINALE_SHOT,
+  HIGHLIGHT_SHOTS,
   NETWORK_SHOT,
   OPENING_SHOT,
+  PEACE_SHOT,
   REVEAL_SHOT,
   TEAM_SHOT,
   clamp01,
@@ -21,11 +25,33 @@ import {
   type Shot,
   type ShotSpec,
 } from './choreography';
-import { clock, isCutaway, scrub, type Step } from './data';
+import { clock, homeAlias, isCutaway, scrub, type Highlight, type Step } from './data';
 
 export type Viewer = ReturnType<typeof createViewer>;
-export type BeatKind = 'opening' | 'reveal' | 'team' | 'network' | 'chapter' | 'finale' | 'cta';
-export type BeatDef = { kind: BeatKind; step?: Step; stepIndex?: number };
+export type BeatKind =
+  | 'opening'
+  | 'reveal'
+  | 'team'
+  | 'chapter'
+  | 'finale'
+  | 'network'
+  | 'highlight'
+  | 'peace'
+  | 'cta';
+export type BeatDef = {
+  kind: BeatKind;
+  step?: Step;
+  stepIndex?: number;
+  highlight?: Highlight;
+  highlightIndex?: number;
+};
+/**
+ * Beats the story cuts into and out of rather than flies to: each highlight
+ * sits on its own clock somewhere else in the network (so do the network
+ * aerial before them and the closing beat after them, back at Mrs. Lin's
+ * home at four).
+ */
+const isCutBeat = (b: BeatDef | undefined) => b?.kind === 'highlight';
 /**
  * Screen-space position of the subject, as a fraction of the stage size from
  * its centre, plus a zoom factor for the layout (small stages need more).
@@ -39,6 +65,13 @@ export type DirectorHooks = {
   onPhase(phase: number): void;
   /** Displayed sim time crossed a minute. */
   onClock(time: number): void;
+  /**
+   * A cut starts (into or out of a highlight): play the stage transition
+   * and return how long (ms) until it covers the
+   * stage. The director keeps the old picture until then and swaps camera,
+   * clock and view under the cover. 0 cuts at once.
+   */
+  onCut?(direction: 1 | -1): number;
 };
 
 type Range = { top: number; height: number; start: number; end: number };
@@ -74,8 +107,9 @@ const INTERIOR: ViewerState = {
   exterior: false,
 };
 /**
- * Cutaways: the community cast shows at `ground` (site-level people), while
- * the center's upper floor and roof stay hidden and no room is highlighted.
+ * Cutaways at a care setting, the highlights and the closing beat: the
+ * community cast shows at `ground` (site-level people), while the center's
+ * upper floor and roof stay hidden and no room is highlighted.
  */
 const CUTAWAY: ViewerState = { ...INTERIOR, level: 'ground', selected: null, room: null };
 /** Height of camera anchors above the floor (rooms, zones, pads). */
@@ -126,8 +160,16 @@ export function createDirector(opts: {
     lastGoalTime = 0;
   const vel = { x: 0, y: 0, z: 0, zoom: 0, az: 0, el: 0 };
   let viewKey = '';
+  /**
+   * A cut in progress: until `coverAt` (performance.now ms) the stage keeps
+   * the beat it is leaving (`heldBeat`); then camera, clock and view snap to
+   * the new beat under the transition's cover.
+   */
+  let coverAt = 0,
+    heldBeat = -1,
+    snapNext = false;
   const sectionVars = sections.map(() => ({ vis: -1, enter: 99, p: -1 }));
-  const rootVars = { ui: -1, rail: -1, veil: -1, day: -1, open: -1 };
+  const rootVars = { ui: -1, rail: -1, veil: -1, day: -1, open: -1, glow: -1, hl: -1 };
 
   function measure() {
     vh = window.innerHeight || 800;
@@ -161,7 +203,10 @@ export function createDirector(opts: {
     const b = beats[i];
     // Chapters scrub their scrub window (contiguous, so time never jumps).
     if (b.kind === 'chapter' && b.stepIndex !== undefined) return scrubTime(scrub[b.stepIndex], p);
-    if (b.kind === 'finale' || b.kind === 'cta') return LAST_TIME;
+    // Highlights scrub their own window, on their own clock.
+    if (b.kind === 'highlight' && b.highlight) return scrubTime(b.highlight.window, p);
+    if (b.kind === 'finale' || b.kind === 'network' || b.kind === 'peace' || b.kind === 'cta')
+      return LAST_TIME;
     return 0;
   }
 
@@ -184,12 +229,14 @@ export function createDirector(opts: {
         stack: Math.round((1 - settle) * 130) / 100,
       };
     }
-    // Team and network keep the whole building open, so nothing pops between
-    // them and the upstairs huddle.
-    if (b.kind === 'team' || b.kind === 'network') return INTERIOR;
-    if (b.kind === 'finale' || b.kind === 'cta') return EXTERIOR;
+    // The team keeps the whole building open, so nothing pops between it and
+    // the upstairs huddle. The finale and the network aerial keep the roof
+    // on: the center reads as one building among the places it serves.
+    if (b.kind === 'team') return INTERIOR;
+    if (b.kind === 'finale' || b.kind === 'network') return EXTERIOR;
+    if (b.kind === 'highlight' || b.kind === 'peace' || b.kind === 'cta') return CUTAWAY;
     const s = b.step!;
-    if (isCutaway(s)) return CUTAWAY;
+    if (isCutaway(s) && s.settingId) return CUTAWAY;
     const zone = model?.zones.find((z) => z.id === s.zoneId);
     const room = stepRoom(s, t);
     return {
@@ -212,8 +259,12 @@ export function createDirector(opts: {
     if (b.kind === 'network') return NETWORK_SHOT;
     if (b.kind === 'chapter' && b.step)
       return (
-        CHAPTER_SHOTS[b.step.id] || (isCutaway(b.step) ? DEFAULT_CUTAWAY_SHOT : DEFAULT_CHAPTER_SHOT)
+        CHAPTER_SHOTS[b.step.id] ||
+        (isCutaway(b.step) && b.step.settingId ? DEFAULT_CUTAWAY_SHOT : DEFAULT_CHAPTER_SHOT)
       );
+    if (b.kind === 'highlight' && b.highlight)
+      return HIGHLIGHT_SHOTS[b.highlight.id] || DEFAULT_HIGHLIGHT_SHOT;
+    if (b.kind === 'peace' || b.kind === 'cta') return PEACE_SHOT;
     return FINALE_SHOT;
   }
   /**
@@ -238,10 +289,11 @@ export function createDirector(opts: {
     const [x, z] = point || [frame.target[0], frame.target[2]];
     return { target: [x, ANCHOR_Y, z], zoom: frame.zoom };
   }
-  /** The anchor a shot reads from the layer: its own `place`, else a cutaway's setting. */
+  /** The anchor a shot reads from the layer: its own `place`, else the setting of a cutaway or highlight. */
   function placeOf(b: BeatDef, spec: ShotSpec): ShotSpec['place'] {
     if (spec.place) return spec.place;
-    return b.step?.settingId ? { setting: b.step.settingId } : undefined;
+    const setting = b.step?.settingId || b.highlight?.settingId;
+    return setting ? { setting } : undefined;
   }
   /** A fresh anchor array (callers adjust it in place). */
   function anchorFor(b: BeatDef, spec: ShotSpec, t: number): [number, number, number] {
@@ -267,31 +319,69 @@ export function createDirector(opts: {
     }
     return w ? [out[0] / w, out[1] / w, out[2] / w] : [0, 0, 0];
   }
-  /** Who the camera leans toward: the hero in her chapters, the first featured interaction in a cutaway. */
+  /** The actor who is Mrs. Lin in a beat: the compiled hero, or her stand-in at home. */
+  function heroIn(b: BeatDef): string | null {
+    if (b.kind === 'peace' || b.kind === 'cta') return homeAlias;
+    if (!b.step) return null;
+    if (b.step.heroAlias) return b.step.heroAlias;
+    return b.step.heroPresent ? heroId : null;
+  }
+  /**
+   * Who the camera leans toward: Mrs. Lin (or her stand-in at home), else the
+   * first featured interaction of a cutaway or highlight.
+   */
   function subjectOf(b: BeatDef) {
-    if (!viewer || !b.step) return null;
-    if (isCutaway(b.step)) {
-      const id = b.step.interactionIds?.[0];
-      return id ? viewer.activity.actorPosition(`interaction:${id}`) : null;
+    if (!viewer) return null;
+    const hero = heroIn(b);
+    if (hero) return viewer.activity.actorPosition(hero);
+    const id = b.step?.interactionIds?.[0] || b.highlight?.interactionIds[0];
+    return id ? viewer.activity.actorPosition(`interaction:${id}`) : null;
+  }
+  /**
+   * The middle of a phone call's span: the mean of its ends (members more
+   * than 8 m apart), from their sampled positions, so an end on a hidden
+   * upper floor still counts. Null if the interaction is not a live call.
+   */
+  function callMiddle(id: string | undefined): [number, number, number] | null {
+    if (!viewer || !id) return null;
+    const call = viewer.activity.data.interactions.find((i) => i.id === id);
+    if (call?.channel !== 'phone') return null;
+    const ends: [number, number][] = [];
+    for (const a of call.actorIds) {
+      const s = viewer.activity.actorSample(a);
+      if (!s || ends.some((e) => Math.hypot(e[0] - s.x, e[1] - s.z) < 8)) continue;
+      ends.push([s.x, s.z]);
     }
-    return heroId && b.step.heroPresent ? viewer.activity.actorPosition(heroId) : null;
+    if (ends.length < 2) return null;
+    const x = ends.reduce((v, e) => v + e[0], 0) / ends.length,
+      z = ends.reduce((v, e) => v + e[1], 0) / ends.length;
+    return [x, 2, z];
   }
   function shotFor(i: number, p: number, t: number): Shot {
     const b = beats[i],
       spec = specFor(i);
+    const pp = b.kind === 'cta' ? 1 : p;
     const target = anchorFor(b, spec, t);
+    // A call reveal: hold on the caller, then ease over to the call's middle.
+    let revealed = 0;
+    if (spec.reveal === 'call') {
+      const mid = callMiddle(b.highlight?.interactionIds[0] || b.step?.interactionIds?.[0]);
+      if (mid) {
+        revealed = easeInOut(clamp01((pp - 0.12) / 0.72));
+        for (let k = 0; k < 3; k++) target[k] += (mid[k] - target[k]) * revealed;
+      }
+    }
     const h = spec.follow ? subjectOf(b) : null;
     // Far-off subjects are ignored (the nurse line's call is split between
     // the center and the home, so its centroid sits between them).
     if (h && spec.follow) {
       const d = Math.hypot(h.x - target[0], h.z - target[2]),
         r = spec.radius || 8,
-        w = spec.follow * (1 - smoothstep(r * 0.7, r, d));
+        w = spec.follow * (1 - smoothstep(r * 0.7, r, d)) * (1 - revealed);
       target[0] += (h.x - target[0]) * w;
       target[1] += (h.y - target[1]) * w;
       target[2] += (h.z - target[2]) * w;
     }
-    const pp = b.kind === 'cta' ? 1 : p;
     // The network shot's zoom is a factor on the layer's own framing, so the
     // whole network stays in view as settings are added.
     const place = placeOf(b, spec),
@@ -329,11 +419,14 @@ export function createDirector(opts: {
     if (reduced) return here;
     const r = ranges[i],
       band = BLEND * vh;
-    if (i < beats.length - 1 && y > r.end - band) {
+    // Cuts are not flown: a beat next to a cut holds its own shot to the edge.
+    const cutNext = i < beats.length - 1 && (isCutBeat(beats[i]) || isCutBeat(beats[i + 1])),
+      cutPrev = i > 0 && (isCutBeat(beats[i]) || isCutBeat(beats[i - 1]));
+    if (i < beats.length - 1 && !cutNext && y > r.end - band) {
       const k = easeInOut(clamp01((y - (r.end - band)) / (2 * band)));
       return mixShots(here, shotFor(i + 1, 0, t), k);
     }
-    if (i > 0 && y < r.start + band) {
+    if (i > 0 && !cutPrev && y < r.start + band) {
       const k = easeInOut(clamp01((y - (r.start - band)) / (2 * band)));
       return mixShots(shotFor(i - 1, 1, t), here, k);
     }
@@ -349,9 +442,16 @@ export function createDirector(opts: {
       inv = 1 / (f + hhoo);
     return [(f * x + dt * v + hhoo * target) * inv, (v + hoo * (target - x)) * inv];
   }
-  function stepCamera(goal: Shot, dt: number, snap: boolean) {
+  function stepCamera(goal: Shot, dt: number, snap: boolean, settle = false) {
     if (!cam || snap || reduced) {
       cam = { ...goal, target: [...goal.target] };
+      // After a cut the camera lands a little wide and turned, and the spring
+      // carries it into the framing: every cut arrives in motion.
+      if (settle && !reduced) {
+        cam.zoom *= CUT_SETTLE.zoom;
+        cam.azimuth += CUT_SETTLE.azimuth;
+        cam.elevation += CUT_SETTLE.elevation;
+      }
       Object.assign(vel, { x: 0, y: 0, z: 0, zoom: 0, az: 0, el: 0 });
       return true;
     }
@@ -376,13 +476,15 @@ export function createDirector(opts: {
 
   // ---- hero name tag ---------------------------------------------------------
   let pinShown = false;
+  /** Tags Mrs. Lin on the stage in her chapters; `i` < 0 hides the tag (during a cut). */
   function placeHeroPin(i: number, t: number) {
     const pin = opts.heroPin;
     if (!pin) return;
     const b = beats[i];
     let show = false;
-    if (viewer && heroId && cam && stage && b.kind === 'chapter' && b.step?.heroPresent) {
-      const h = viewer.activity.actorPosition(heroId);
+    const who = b?.kind === 'chapter' ? heroIn(b) : null;
+    if (viewer && who && cam && stage) {
+      const h = viewer.activity.actorPosition(who);
       const spec = specFor(i),
         anchor = anchorFor(b, spec, t);
       // Only tag her when she is part of this chapter's picture.
@@ -448,18 +550,39 @@ export function createDirector(opts: {
     rootVars[name] = value;
     root.style.setProperty('--' + name, value.toFixed(4));
   }
-  function updateChrome(y: number) {
-    const team = beats.findIndex((b) => b.kind === 'team'),
-      first = beats.findIndex((b) => b.kind === 'chapter'),
-      finale = beats.findIndex((b) => b.kind === 'finale');
-    const at = (i: number) => (i >= 0 ? ranges[i].start : 1e9);
+  const beatOf = (kind: BeatKind) => beats.findIndex((b) => b.kind === kind);
+  const highlightCount = beats.filter((b) => b.kind === 'highlight').length,
+    lastHighlight = beats.findLastIndex((b) => b.kind === 'highlight');
+  function updateChrome(y: number, i: number, p: number) {
+    const team = beatOf('team'),
+      first = beatOf('chapter'),
+      finale = beatOf('finale'),
+      network = beatOf('network'),
+      peace = beatOf('peace');
+    const at = (k: number) => (k >= 0 ? ranges[k].start : 1e9);
     const out = 1 - smoothstep(at(finale) - 0.45 * vh, at(finale) + 0.05 * vh, y);
     setRootVar('ui', Math.min(smoothstep(at(team) - 0.35 * vh, at(team) + 0.15 * vh, y), out));
     setRootVar('rail', Math.min(smoothstep(at(first) - 0.3 * vh, at(first) + 0.1 * vh, y), out));
-    setRootVar('veil', smoothstep(at(finale) - 0.2 * vh, at(finale) + 0.5 * vh, y));
+    // The finale's swimlane sits on a veiled stage; the network aerial lifts it.
+    setRootVar(
+      'veil',
+      Math.min(
+        smoothstep(at(finale) - 0.2 * vh, at(finale) + 0.5 * vh, y),
+        1 - smoothstep(at(network) - 0.3 * vh, at(network) + 0.3 * vh, y),
+      ),
+    );
+    // Late-afternoon warmth over the closing beat.
+    setRootVar('glow', smoothstep(at(peace) - 0.2 * vh, at(peace) + 0.7 * vh, y));
     setRootVar('open', 1 - smoothstep(0.35 * vh, 1.1 * vh, y));
+    // Highlights progress, 0 to their count (fills the segmented bar).
+    const b = beats[i];
+    setRootVar(
+      'hl',
+      b.kind === 'highlight' ? (b.highlightIndex ?? 0) + p : i > lastHighlight ? highlightCount : 0,
+    );
     root.classList.toggle('story-ui-on', rootVars.ui > 0.02);
     root.classList.toggle('story-rail-on', rootVars.rail > 0.02);
+    root.classList.toggle('story-hl-on', b.kind === 'highlight');
   }
 
   // ---- loop ------------------------------------------------------------------
@@ -475,12 +598,25 @@ export function createDirector(opts: {
       p = progressAt(i, y);
     if (scrolled) {
       updateSections(y, i);
-      updateChrome(y);
+      updateChrome(y, i, p);
     }
     if (i !== beatIndex) {
+      const from = beatIndex;
       beatIndex = i;
       phase = -1;
       hooks.onBeat(i);
+      // A cut (into or out of a highlight): the transition covers the stage,
+      // then everything swaps under it.
+      if (from >= 0 && (isCutBeat(beats[from]) || isCutBeat(beats[i]))) {
+        const cover = viewer && !reduced ? hooks.onCut?.(i > from ? 1 : -1) || 0 : 0;
+        if (cover > 0) {
+          if (heldBeat < 0) heldBeat = from;
+          coverAt = now + cover;
+        } else {
+          heldBeat = -1;
+          snapNext = true;
+        }
+      }
     }
     const b = beats[i];
     const n = b.step?.handoffs.length || 0;
@@ -493,10 +629,25 @@ export function createDirector(opts: {
       phase = ph;
       hooks.onPhase(ph);
     }
-    // Sim clock eases toward the scroll-determined time.
+    // While a cut covers in, the stage holds the beat it is leaving; once
+    // covered, clock, view and camera jump to the new beat in one frame.
+    const covering = heldBeat >= 0 && now < coverAt;
+    if (heldBeat >= 0 && !covering) {
+      heldBeat = -1;
+      snapNext = true;
+    }
+    if (covering) {
+      placeHeroPin(-1, time);
+      idleFrames = 0;
+      if (running) frame = requestAnimationFrame(tick);
+      return;
+    }
+    const snapped = snapNext;
+    snapNext = false;
+    // Sim clock eases toward the scroll-determined time (it jumps on a cut).
     const goalTime = Math.min(LAST_TIME, timeAt(i, p));
     lastGoalTime = goalTime;
-    const k = reduced ? 1 : 1 - Math.exp(-dt * 7);
+    const k = reduced || snapped ? 1 : 1 - Math.exp(-dt * 7);
     time += (goalTime - time) * k;
     if (Math.abs(goalTime - time) < 0.01) time = goalTime;
     const m = Math.floor(time * (clock.dayDurationMinutes / clock.duration));
@@ -519,8 +670,7 @@ export function createDirector(opts: {
       }
       const goal = targetShot(i, y, time);
       lastGoal = goal;
-      const snap = !cam;
-      if (stepCamera(goal, dt, snap)) busy = true;
+      if (stepCamera(goal, dt, !cam || snapped, snapped)) busy = true;
       viewer.setShot(cam as CameraShot);
       placeHeroPin(i, time);
     }

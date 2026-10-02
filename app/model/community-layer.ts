@@ -21,6 +21,7 @@ import {
   sampleCommunityVehicle,
   VEHICLE_DECOR,
 } from './community-vehicles';
+import { buildCallArcs, type CallArcOptions } from './call-arcs';
 
 /**
  * Camera framing: orbit target and orthographic zoom, plus the azimuth from
@@ -41,6 +42,8 @@ export type CommunityLayerOptions = {
   loadFacility?: (url: string) => Promise<Facility>;
   /** Material resolver for another facility (default: the layer's `mat`). */
   materialFor?: (facility: Facility) => Mat;
+  /** Phone calls of the played source, drawn as arcs between the callers (call-arcs.ts). */
+  calls?: CallArcOptions;
 };
 /** The default loader, as app/page.tsx loads the viewer's own model. */
 const fetchFacility = (url: string) =>
@@ -146,7 +149,12 @@ export function buildCommunityLayer(
     root.add(body);
     return { v, van: null, object: body };
   });
+  // Calls between the layer's people and the center's nurses: arcs that
+  // hide with the layer.
+  const calls = options.calls ? buildCallArcs(options.calls) : null;
+  if (calls) root.add(calls.root);
   function tick(time: number) {
+    calls?.tick(time);
     for (const b of bodies) {
       const pose = sampleCommunityVehicle(b.v.id, time);
       if (b.van)
@@ -236,9 +244,12 @@ export function buildCommunityLayer(
       instances.get(settingId) ?? null,
     /** Resolves when every setting with a facility is stamped or has fallen back to its massing. */
     ready,
-    /** Stops late loads from adding to a disposed scene. */
+    /** The call arcs, when the layer draws them. */
+    calls,
+    /** Stops late loads from adding to a disposed scene; frees the call arcs. */
     dispose() {
       disposed = true;
+      calls?.dispose();
     },
   };
 }

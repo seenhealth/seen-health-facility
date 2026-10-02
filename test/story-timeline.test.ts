@@ -49,6 +49,14 @@ void test('hero windows are clipped by the cutaways on either side, never extend
   ]);
   assert.equal(isCutawayStep(cut(1, 2)), true);
   assert.equal(isCutawayStep(hero(1, 2)), false);
+  // A cutaway in the center (the kitchen) has no setting, only its placement.
+  const kitchen: TimedStep = { window: [289, 304], placement: { mode: 'cutaway' } };
+  assert.equal(isCutawayStep(kitchen), true);
+  assert.deepEqual(scrubWindows([hero(240, 290), kitchen, hero(290, 350)]), [
+    [240, 289],
+    [289, 304],
+    [304, 350],
+  ]);
 });
 
 void test('the scenario scrubs the day contiguously from 8 AM', () => {
@@ -60,7 +68,11 @@ void test('the scenario scrubs the day contiguously from 8 AM', () => {
       `${steps[i - 1].id} → ${steps[i].id}`,
     );
   assert.ok(scrub.at(-1)![1] <= scenario.clock.duration);
-  assert.equal(steps.filter(isCutawayStep).length, 6);
+  // Her mornings and afternoons at home, and lunch arriving in the kitchen.
+  assert.deepEqual(
+    steps.filter(isCutawayStep).map((s) => s.id),
+    ['home-am', 'kitchen', 'home-pm'],
+  );
 });
 
 void test('every hero focus time, stop start and kicker stays inside its scrub window', () => {
