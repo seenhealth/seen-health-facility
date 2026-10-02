@@ -3569,9 +3569,9 @@
      "peakParticipants": 6,
      "peakStaff": 7,
      "meanParticipants": 2.186111111111111,
-     "meanStaff": 2.876388888888889,
+     "meanStaff": 2.879166666666667,
      "participantMinutes": 1049.3333333333333,
-     "staffMinutes": 1380.6666666666665
+     "staffMinutes": 1382
     },
     {
      "zoneId": "upper-office",
@@ -4319,9 +4319,9 @@
      "peakParticipants": 1,
      "peakStaff": 5,
      "meanParticipants": 1,
-     "meanStaff": 3.1222222222222222,
+     "meanStaff": 3.120833333333333,
      "participantMinutes": 480,
-     "staffMinutes": 1498.6666666666665
+     "staffMinutes": 1498
     },
     {
      "zoneId": "community:hospital",
@@ -6944,9 +6944,9 @@
      "peakParticipants": 0,
      "peakStaff": 1,
      "meanParticipants": 0,
-     "meanStaff": 0.006944444444444444,
+     "meanStaff": 0.005555555555555556,
      "participantMinutes": 0,
-     "staffMinutes": 3.333333333333333
+     "staffMinutes": 2.6666666666666665
     }
    ],
    "onSite": {
@@ -7383,7 +7383,7 @@
       "offDuty": 0.26851851851851855
      },
      "onFloorSeconds": 1580,
-     "meanWalkMeters": 31.817454092414323
+     "meanWalkMeters": 32.55970947529952
     },
     {
      "role": "doctor",
@@ -7590,7 +7590,7 @@
       "offDuty": 0.4300925925925926
      },
      "onFloorSeconds": 4924,
-     "meanWalkMeters": 98.31134528671515
+     "meanWalkMeters": 98.7962943280507
     }
    ],
    "participants": [
@@ -14395,9 +14395,9 @@
      "peakParticipants": 6,
      "peakStaff": 7,
      "meanParticipants": 2.1638888888888888,
-     "meanStaff": 2.848611111111111,
+     "meanStaff": 2.8513888888888888,
      "participantMinutes": 1038.6666666666665,
-     "staffMinutes": 1367.3333333333333
+     "staffMinutes": 1368.6666666666665
     },
     {
      "zoneId": "ot",
@@ -14770,9 +14770,9 @@
      "peakParticipants": 2,
      "peakStaff": 5,
      "meanParticipants": 1.0263888888888888,
-     "meanStaff": 3.1875,
+     "meanStaff": 3.186111111111111,
      "participantMinutes": 492.66666666666663,
-     "staffMinutes": 1530
+     "staffMinutes": 1529.3333333333333
     },
     {
      "zoneId": "community:hospital",
@@ -17395,9 +17395,9 @@
      "peakParticipants": 1,
      "peakStaff": 2,
      "meanParticipants": 0.04027777777777778,
-     "meanStaff": 0.08055555555555556,
+     "meanStaff": 0.07916666666666666,
      "participantMinutes": 19.333333333333332,
-     "staffMinutes": 38.666666666666664
+     "staffMinutes": 38
     }
    ],
    "onSite": {
@@ -17834,7 +17834,7 @@
       "offDuty": 0.26851851851851855
      },
      "onFloorSeconds": 1580,
-     "meanWalkMeters": 31.817454092414323
+     "meanWalkMeters": 32.55970947529952
     },
     {
      "role": "doctor",
@@ -18064,7 +18064,7 @@
       "offDuty": 0.4305555555555556
      },
      "onFloorSeconds": 4920,
-     "meanWalkMeters": 101.39247413408499
+     "meanWalkMeters": 101.87742317542056
     },
     {
      "role": "dietitian",
