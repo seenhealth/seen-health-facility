@@ -1321,11 +1321,16 @@ export function createLiveLot(ctx: {
         (personCard.userData.heightM as number) * k,
         1,
       );
+      // Beside the bubble, on the side with more room (the bubble is usually centred, so the card goes to its right
+      // unless the avatar sits in the bubble's left half), level with the avatar row.
       const canvas = l.label.userData.canvas as HTMLCanvasElement;
-      const dx =
-        ((rect.x + rect.w / 2 - canvas.width / 2) / canvas.width) *
-        l.label.scale.x;
-      const dy = l.label.scale.y / 2 + personCard.scale.y / 2 + 0.2;
+      const side = rect.x + rect.w / 2 < canvas.width / 2 ? -1 : 1;
+      const dx = side * (l.label.scale.x / 2 + personCard.scale.x / 2 + 0.25);
+      // A world-height offset shows foreshortened by cos(elevation); the plates themselves do not.
+      const rowFromCentre =
+        (canvas.height / 2 - (rect.y + rect.h / 2)) / canvas.height;
+      const dy =
+        (rowFromCentre * l.label.scale.y) / Math.max(0.2, Math.cos(viewEl));
       const rx = Math.cos(viewAz),
         rz = -Math.sin(viewAz);
       personCard.position.set(
