@@ -34,6 +34,8 @@ export type LiveMessage = { type: 'seen-live-lot'; vehicles: LiveVehicle[]; capa
 const HORIZON_MIN = 12;
 const SPEED = { street: 9, lot: 3, reverse: 1.8 };
 const DOCK_SECONDS = 14;
+/** Label plate in metres at the default zoom; `setLabelScale` keeps it the same size on screen when the camera zooms. */
+const LABEL_W = 11, LABEL_H = 2.75;
 const L = FLEET_LOT;
 const R = L.turnRadius;
 const EAST = Math.PI / 2;
@@ -99,12 +101,12 @@ function dockToBay(index: number): FleetLeg[] | null {
 
 function makeLabel(): T.Sprite {
   const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 128;
+  canvas.width = 1024;
+  canvas.height = 256;
   const texture = new T.CanvasTexture(canvas);
   texture.colorSpace = T.SRGBColorSpace;
   const sprite = new T.Sprite(new T.SpriteMaterial({ map: texture, transparent: true, depthTest: false }));
-  sprite.scale.set(9, 2.25, 1);
+  sprite.scale.set(LABEL_W, LABEL_H, 1);
   sprite.renderOrder = 10;
   sprite.userData.canvas = canvas;
   return sprite;
@@ -114,18 +116,18 @@ function paintLabel(sprite: T.Sprite, title: string, detail: string, highlight: 
   const g = canvas.getContext('2d')!;
   g.clearRect(0, 0, canvas.width, canvas.height);
   g.fillStyle = highlight ? 'rgba(247,119,79,0.95)' : 'rgba(15,26,25,0.88)';
-  const r = 22;
+  const r = 44;
   g.beginPath();
-  g.roundRect(8, 8, canvas.width - 16, canvas.height - 16, r);
+  g.roundRect(16, 16, canvas.width - 32, canvas.height - 32, r);
   g.fill();
   g.fillStyle = '#ffffff';
-  g.font = '600 40px system-ui, sans-serif';
+  g.font = '600 84px system-ui, sans-serif';
   g.textBaseline = 'middle';
-  g.fillText(title, 28, detail ? 46 : 64, canvas.width - 56);
+  g.fillText(title, 56, detail ? 92 : 128, canvas.width - 112);
   if (detail) {
-    g.font = '400 32px system-ui, sans-serif';
+    g.font = '400 66px system-ui, sans-serif';
     g.fillStyle = highlight ? '#ffffff' : '#9fdcc9';
-    g.fillText(detail, 28, 90, canvas.width - 56);
+    g.fillText(detail, 56, 180, canvas.width - 112);
   }
   (sprite.material as T.SpriteMaterial).map!.needsUpdate = true;
 }
@@ -142,6 +144,7 @@ export function createLiveLot(ctx: { scene: T.Scene; model: Facility; material: 
   let hidStaticVans = false;
   let clock = '';
   let capacity = 0;
+  let labelScale = 1;
 
   function body(kind: LiveKind, index: number): Body {
     if (kind === 'van' || kind === 'wav') {
@@ -310,7 +313,8 @@ export function createLiveLot(ctx: { scene: T.Scene; model: Facility; material: 
       }
       const text = `${l.v.label}|${l.v.detail ?? ''}|${l.v.highlight ? 1 : 0}`;
       if (text !== l.labelText) { paintLabel(l.label, l.v.label, l.v.detail ?? '', !!l.v.highlight); l.labelText = text; }
-      l.label.position.set(l.body.object.position.x, 4.2, l.body.object.position.z);
+      l.label.position.set(l.body.object.position.x, 3.6 + 1.2 * labelScale, l.body.object.position.z);
+      l.label.scale.set(LABEL_W * labelScale, LABEL_H * labelScale, 1);
       l.label.visible = l.opacity > 0.3;
       (l.label.material as T.SpriteMaterial).opacity = l.opacity;
     }
@@ -321,6 +325,8 @@ export function createLiveLot(ctx: { scene: T.Scene; model: Facility; material: 
     get onLot() { return [...live.values()].filter((l) => l.mode === 'parked' || l.mode === 'docked' || l.mode === 'toBay').length; },
     get capacity() { return capacity; },
     get clock() { return clock; },
+    /** Multiplier on the label plates, so the parent can keep them readable as the camera zooms out. */
+    setLabelScale(k: number) { labelScale = Math.min(3, Math.max(0.5, k)); },
     dispose() { ctx.scene.remove(root); },
   };
 }

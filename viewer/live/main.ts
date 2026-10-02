@@ -2,7 +2,7 @@
 // Keep first: rebases the app's root-relative asset URLs before any app code runs.
 import '../site/asset-base';
 import { validateFacility } from '../../app/model/schema';
-import { createViewer } from '../../app/model/renderer';
+import { createViewer, defaultState } from '../../app/model/renderer';
 import { createLiveLot, type LiveMessage } from '../../app/model/live-lot';
 
 /**
@@ -21,9 +21,25 @@ async function main() {
     labels: false,
     layer: (ctx) => (lot = createLiveLot(ctx)),
   });
-  // No care-day cast: only the building, the streets and the live vehicles.
+  // No care-day cast and no community pads: only the center, its streets and the live vehicles.
   viewer.activity.setOptions({ enabled: false, playing: false, time: 180 });
-  viewer.setShot({ target: [-27, 0, -15], zoom: 2.05, azimuth: -2.35, elevation: 0.72 });
+  viewer.update({ ...defaultState, labels: false, community: false });
+  // The lot with the approach streets. The viewer re-frames the site once its textures load, so the shot is held for
+  // the first seconds unless the person has started orbiting or zooming themselves.
+  const SHOT = { target: [-30, 0, -19] as [number, number, number], zoom: 1.6, azimuth: -2.35, elevation: 0.72 };
+  viewer.setShot(SHOT);
+  let touched = false;
+  host.addEventListener('pointerdown', () => { touched = true; }, { once: true });
+  host.addEventListener('wheel', () => { touched = true; }, { once: true, passive: true });
+  const hold = setInterval(() => {
+    if (touched) return clearInterval(hold);
+    const s = viewer.getShot();
+    const off = Math.abs(s.zoom - SHOT.zoom) > 0.02 || Math.hypot(s.target[0] - SHOT.target[0], s.target[2] - SHOT.target[2]) > 0.5;
+    if (off) viewer.setShot(SHOT);
+  }, 250);
+  setTimeout(() => clearInterval(hold), 20_000);
+  // Labels keep their on-screen size whatever the zoom.
+  setInterval(() => lot?.setLabelScale(SHOT.zoom / Math.max(0.2, viewer.getShot().zoom)), 250);
   let pending: LiveMessage | null = null;
   const onMessage = (e: MessageEvent) => {
     const msg = e.data as LiveMessage | undefined;
