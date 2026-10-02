@@ -282,11 +282,13 @@ export function ActivityPanel({
             end: i.end,
             title: i.label,
             action:
-              i.category === 'arrivals'
-                ? 'greet'
-                : i.category === 'rehab'
-                  ? 'exercise'
-                  : 'consult',
+              i.channel === 'phone'
+                ? 'phone'
+                : i.category === 'arrivals'
+                  ? 'greet'
+                  : i.category === 'rehab'
+                    ? 'exercise'
+                    : 'consult',
           },
         ],
       })),

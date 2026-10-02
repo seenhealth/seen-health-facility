@@ -815,9 +815,13 @@ export function createActivity(
       const interaction = data.interactions.find(
         (i) => 'interaction:' + i.id === id,
       );
-      const people = (interaction?.actorIds || [id])
-        .map((id) => actorMap.get(id))
-        .filter((a) => a?.root.visible);
+      const ids = interaction?.actorIds || [id];
+      // A call is followed at its caller's end, not between the two places.
+      const caller =
+        interaction?.channel === 'phone' ? actorMap.get(ids[0]) : undefined;
+      const people = (
+        caller?.root.visible ? [caller] : ids.map((id) => actorMap.get(id))
+      ).filter((a) => a?.root.visible);
       if (people.length)
         return people
           .reduce((v, a) => v.add(a!.root.position), new T.Vector3())

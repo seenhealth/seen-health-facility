@@ -198,6 +198,9 @@ not (`level: 'ground'`: the viewer's default view, the story's cutaways), its
 far end marking where they sit; a wide shot that should show the nurse at her
 desk uses `level: 'all'` with the roof off. Arcs hide with the layer
 (Community sites, Street & parking context, Plan) and with the people.
+Following a call (`followActor('interaction:<id>')`, the activity panel, the
+story's cutaway subject) aims at its caller, not at the empty ground between
+the two places.
 
 Styling knobs (`CALL_ARC_STYLE`, overridden per layer with `calls.style`):
 `color`, `glow` and `pulse` (terracotta `#b0603a`, a soft `#e7b48c` halo and
