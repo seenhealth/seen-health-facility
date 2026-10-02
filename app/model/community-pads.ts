@@ -71,6 +71,12 @@ const PALETTE = {
  * The Wongs' and Mrs. Lin's homes stamp the same plan, so share it.
  */
 export const HOME_PORCH = { x: -0.6, z: -6.3, w: 8.0, d: 2.6 };
+/**
+ * The raised sidewalk beside a stub's entry leg, from the street to the pad
+ * edge: its centre-line `offset` m outside the outer lane's edge, `width` m
+ * wide. Walkers' `sidewalkEnd` anchors stand on it.
+ */
+export const STUB_SIDEWALK = { offset: 0.9, width: 1.5 };
 type Mat = (id: string) => T.MeshStandardMaterial;
 type Ctx = ReturnType<typeof helpers>;
 function helpers(setting: CareSetting, root: T.Group, mat: Mat) {
@@ -354,10 +360,10 @@ function buildGround(s: CareSetting, h: Ctx) {
   }
   // Sidewalk stub beside the entry leg, from the street to the pad edge.
   h.box(
-    rOut + 0.9,
+    rOut + STUB_SIDEWALK.offset,
     STREET_Y - 0.06,
     zF + stubLen / 2,
-    1.5,
+    STUB_SIDEWALK.width,
     PAD_Y - STREET_Y + 0.06,
     stubLen,
     PALETTE.sidewalk,

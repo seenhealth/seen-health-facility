@@ -1,7 +1,7 @@
 import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import type { Facility, Vec2 } from './schema';
-import { sampleStreetCar } from './traffic-routes';
+import { sampleStreetCar, type StreetSide } from './traffic-routes';
 
 // Presentation-model site palette: warm light asphalt, soft white markings,
 // pale concrete and muted sage planting.
@@ -132,6 +132,52 @@ export function siteCurbs(model: Pick<Facility, 'calibration'>) {
  * at the west street because the partner pharmacy's pad sits on its line.
  */
 export const STREET_EXTENT = { x: 150, z: 95 };
+/**
+ * Each ring street's drawn bed across its width, [min, max] in world metres:
+ * z for the north (Valley Blvd) and south (the alley) streets, x for the east
+ * (Campbell) and west (Ethel) ones. A community pad's access stub joins its
+ * street at the bed's near edge (validate-community-traffic.mjs).
+ */
+export const STREET_BEDS: Record<StreetSide, [number, number]> = {
+  north: [31.2, 41.2],
+  south: [-35.8, -28.8],
+  east: [65.1, 73.1],
+  west: [-46.2, -35.2],
+};
+/** z extent of the east and west streets' slabs along the block. */
+const BLOCK_Z = [-36, 46];
+/**
+ * Every street slab the scene draws, as world x/z rectangles: the four round
+ * the block, then (`extension`) their continuations out to `STREET_EXTENT`.
+ */
+export function streetSlabs() {
+  const { north: N, south: S, east: E, west: W } = STREET_BEDS,
+    { x: farX, z: farZ } = STREET_EXTENT,
+    slab = (
+      x0: number,
+      x1: number,
+      z0: number,
+      z1: number,
+      extension = true,
+    ) => ({
+      min: [x0, z0] as Vec2,
+      max: [x1, z1] as Vec2,
+      extension,
+    });
+  return [
+    slab(W[0], E[1], N[0], N[1], false),
+    slab(W[0], W[1], BLOCK_Z[0], BLOCK_Z[1], false),
+    slab(W[0], E[1], S[0], S[1], false),
+    slab(E[0], E[1], BLOCK_Z[0], BLOCK_Z[1], false),
+    slab(-farX, W[0], N[0], N[1]),
+    slab(E[1], farX, N[0], N[1]),
+    slab(E[1], farX, S[0], S[1]),
+    ...[W, E].flatMap(([x0, x1]) => [
+      slab(x0, x1, -farZ, BLOCK_Z[0]),
+      slab(x0, x1, N[1], farZ),
+    ]),
+  ];
+}
 
 /** Owned plan-derived ground geometry; surrounding building heights are illustrative. */
 export function buildNeighborhood(model: Facility) {
@@ -225,33 +271,19 @@ export function buildNeighborhood(model: Facility) {
     model.site.buildingOutline,
   );
   // Streets continue beyond the crop; their length is presentation context, not a site survey.
-  box(13.45, -0.43, 36.2, 119.3, 0.2, 10, SITE.street);
-  box(-40.7, -0.43, 5, 11, 0.2, 82, SITE.street);
-  box(13.45, -0.43, -32.3, 119.3, 0.2, 7, SITE.street);
-  box(69.1, -0.43, 5, 8, 0.2, 82, SITE.street);
-  // Extensions out to STREET_EXTENT, 2 mm lower so they never fight with the
-  // slabs above or with a pad's own street stub.
-  const { x: farX, z: farZ } = STREET_EXTENT;
-  const slab = (x0: number, x1: number, z0: number, z1: number) =>
+  // Extensions out to STREET_EXTENT sit 2 mm lower so they never fight with
+  // the slabs round the block or with a pad's own street stub.
+  for (const { min, max, extension } of streetSlabs())
     box(
-      (x0 + x1) / 2,
-      -0.432,
-      (z0 + z1) / 2,
-      x1 - x0,
+      (min[0] + max[0]) / 2,
+      extension ? -0.432 : -0.43,
+      (min[1] + max[1]) / 2,
+      max[0] - min[0],
       0.2,
-      z1 - z0,
+      max[1] - min[1],
       SITE.street,
     );
-  slab(-farX, -46.2, 31.2, 41.2);
-  slab(73.1, farX, 31.2, 41.2);
-  slab(73.1, farX, -35.8, -28.8);
-  for (const [x, half] of [
-    [-40.7, 5.5],
-    [69.1, 4],
-  ]) {
-    slab(x - half, x + half, -farZ, -36);
-    slab(x - half, x + half, 41.2, farZ);
-  }
+  const { x: farX, z: farZ } = STREET_EXTENT;
   const curbs = siteCurbs(model);
   curbs.sidewalks.forEach((p, i) =>
     patch(p, -0.23, 0.18, SITE.sidewalk, `raised-sidewalk-${i}`),
