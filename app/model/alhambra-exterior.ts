@@ -168,7 +168,7 @@ export function buildAlhambraExterior(model: Facility) {
     blue = '#3f6d7e',
     dark = '#34474e';
 
-  // The street entry is a folded standing-seam canopy; the barrel roof stays behind it.
+  // The street entry is a folded standing-seam canopy in front of the flat roof.
   const canopy = group(facade, 'valley-folded-blue-canopy');
   const ridge = [
     [-14.7, 5.85],
