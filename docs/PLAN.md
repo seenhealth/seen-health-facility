@@ -102,12 +102,13 @@ trace showing which disciplines touched each participant at the partner site. Me
 road and on-site, participant activity minutes by setting, van utilisation. Missing pieces today: person
 identity across settings and a setting that can be either a pad or a full facility.
 
-Status: the layout and the day are built. The partner pad carries Seen's own Alhambra ground floor ("Seen
-Health floor plan", trace zone "Partner ADC · Seen layout") with twenty participants, the partner's
-activities lead, aide and nurse and a visiting Seen PT and RN, generated from
-`app/data/community/partner-adc.cast.json`: morning in the day room, tai chi on the patio, PT and medication
-reviews, tabletop games, lunch, music and afternoon conversation; the trace names its rooms. Still missing:
-the van drop-off and pickup, a meal delivery, the IDT huddle and person identity across settings.
+Status: the layout and the day are built. The partner pad carries the partner's own adult day health care
+center (`seen-partner-adhc`, trace zone "Partner ADC") with twenty-six participants, the partner's activities
+lead, activity aide, music and choir leader, social worker, rehab aide and receptionist and a visiting Seen PT,
+generated from `app/data/community/partner-adc.cast.json`: coffee at the long tables, calligraphy, a class and
+a support group, painting, the line dance and PT, lunch, the choir, bingo, an afternoon studio and the fan
+dance; the trace names its rooms. Still missing: the van drop-off and pickup, a meal delivery, the IDT huddle
+and person identity across settings.
 
 ### 4.2 Replicating another building quickly
 
