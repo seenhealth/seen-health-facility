@@ -14283,11 +14283,15 @@
       "dimensions": [
         8.8,
         1.05,
-        0.02
+        0.18
       ],
       "material": "photo-sign-front",
       "materials": {
-        "backing": "om-stone"
+        "backing": "om-stone",
+        "shadow": "photo-sign-front-shadow"
+      },
+      "parameters": {
+        "relief": 0.1
       }
     },
     "photo-dropoff-sign": {
@@ -14295,11 +14299,15 @@
       "dimensions": [
         5.3,
         0.7,
-        0.025
+        0.18
       ],
       "material": "photo-sign-dropoff",
       "materials": {
-        "backing": "om-stone"
+        "backing": "om-stone",
+        "shadow": "photo-sign-dropoff-shadow"
+      },
+      "parameters": {
+        "relief": 0.1
       }
     },
     "photo-clinic-sign": {
@@ -31484,6 +31492,18 @@
       "color": "#b9aa89",
       "roughness": 0.7,
       "metalness": 0.2
+    },
+    "photo-sign-front-shadow": {
+      "color": "#ffffff",
+      "roughness": 1,
+      "opacity": 0.6,
+      "textureUrl": "/reference/photos/front-sign-shadow.png"
+    },
+    "photo-sign-dropoff-shadow": {
+      "color": "#ffffff",
+      "roughness": 1,
+      "opacity": 0.6,
+      "textureUrl": "/reference/photos/dropoff-sign-shadow.png"
     }
   },
   "programs": [
