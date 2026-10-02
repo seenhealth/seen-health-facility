@@ -103,6 +103,7 @@ const CARE_ACTIONS = new Set([
   'craft',
   'music',
   'escort',
+  'phone',
 ]);
 const CATEGORY_PRIORITY: ParticipantActivity[] = [
   'clinical',
@@ -329,6 +330,8 @@ function staffActivity(a: ActorSpec, f: Frame, moved: boolean): StaffActivity {
   if (s.action === 'ride') return 'driving';
   if (s.action === 'walk' || s.action === 'roll' || (a.escortFor && moved))
     return 'walking';
+  // A call is care coordination, also from a desk upstairs (the nurse line).
+  if (s.action === 'phone') return 'care';
   if (a.levelId === 'upper' && s.seated) return 'meeting';
   if (a.levelId === 'upper' && ['present', 'listen'].includes(s.action))
     return 'meeting';

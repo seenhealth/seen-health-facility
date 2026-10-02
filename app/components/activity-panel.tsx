@@ -78,6 +78,7 @@ const palette: Record<string, string> = {
   clap: '#cb9771',
   present: '#82a8a0',
   conversation: '#82a8a0',
+  phone: '#c99a6b',
   listen: '#aab794',
   tabletop: '#b4a2c5',
   seated: '#d4b490',

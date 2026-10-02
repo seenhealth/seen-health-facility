@@ -693,6 +693,7 @@ const ACTIONS = new Set([
   'write',
   'craft',
   'listen',
+  'phone',
 ]);
 const SEATS = new Set([
   'upholstered-chair',
