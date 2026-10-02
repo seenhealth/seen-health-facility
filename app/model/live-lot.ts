@@ -2,8 +2,9 @@
  * Live lot: Seen's real vehicles on the Alhambra lot, driven by messages from
  * a parent page (the dispatch app's VTC view). Each vehicle is a fleet van,
  * a lift van, an SUV or a sedan body; it drives in from the south end of the
- * west street as its ETA counts down, unloads at the drop-off, backs into a
- * bay, waits, and pulls out and fades when the dispatch app says it is gone.
+ * west street as its ETA counts down, turns in through the Ethel Avenue curb
+ * cut, unloads at the drop-off, backs into a bay, waits, and pulls out by the
+ * alley driveway and fades when the dispatch app says it is gone.
  * Positions come from the fleet's own route pieces, so the manoeuvres are the
  * reviewed ones (4 m arcs, back-in stalls, one driveway).
  */
@@ -74,12 +75,12 @@ function drive(legs: FleetLeg[]): Drive {
 const reverseLeg = (leg: FleetLeg) => leg.id === 'dock-reverse' || leg.id === 'back-in';
 const legAt = (d: Drive, s: number) => d.legs.find((l) => s <= l.end) ?? d.legs.at(-1)!;
 
-/** Drop-off → bay: back out, swing right onto the aisle, down past the bay, reverse in. Null when the bay sits too far north for the swing. */
+/** Drop-off → bay: back out, swing right onto the aisle, south past the bay, reverse in. Null when the bay sits too far north for the swing. */
 function dockToBay(index: number): FleetLeg[] | null {
   try {
     const bay = fleetParking[index];
     const aisleX = bay.aisleX ?? L.aisle;
-    const stop = bay.z + R;
+    const stop = bay.z - R;
     const pen = new Pen(L.dockBackTo, L.dock[1], EAST);
     pen.line(L.lead).arc(R, Math.PI / 2);
     const lateral = pen.x - aisleX;

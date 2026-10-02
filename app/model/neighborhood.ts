@@ -27,9 +27,17 @@ const SITE = {
 };
 
 // Raised sidewalks and curb islands, traced on the supplied plan (source pixels).
+// The west strip is cut at the lot entrance (the curb cut beside the two-storey
+// wing, Street View May 2025), so the apron there sits at lot level.
 const SIDEWALKS_PX = [
   [
     [180, 260],
+    [180, 1135],
+    [350, 1135],
+    [350, 210],
+  ],
+  [
+    [180, 1359],
     [180, 2390],
     [240, 2535],
     [500, 2535],
@@ -40,7 +48,7 @@ const SIDEWALKS_PX = [
     [1050, 2335],
     [1050, 2260],
     [350, 2260],
-    [350, 210],
+    [350, 1359],
   ],
   [
     [180, 260],
@@ -320,6 +328,30 @@ export function buildNeighborhood(model: Facility) {
     ],
     0.1,
   );
+  // The entrance apron: a concrete slab at lot level where the west sidewalk is cut, with a one-way arrow in.
+  patch(
+    [px(180, 1135), px(350, 1135), px(350, 1359), px(180, 1359)],
+    -0.235,
+    0.03,
+    SITE.curb,
+    'entrance-apron',
+  );
+  // One-way lot: in from the west street, south down the aisle, out by the driveway.
+  const arrow = (x: number, z: number, dir: number) => {
+    const g = new T.Group();
+    g.name = 'one-way-arrow';
+    g.position.set(x, -0.206, z);
+    g.rotation.y = dir;
+    box(0, 0, -0.5, 0.26, 0.012, 2.0, SITE.marking, g);
+    for (const s of [-1, 1]) {
+      const head = box(s * 0.33, 0, 0.42, 0.22, 0.012, 1.1, SITE.marking, g);
+      head.rotation.y = s * 0.75;
+    }
+    root.add(g);
+  };
+  arrow(-34.5, 1.5, Math.PI / 2);
+  arrow(-22.5, -6, Math.PI);
+  arrow(-22.5, -16, Math.PI);
   // Crosswalks, blue loading access and parking bays are geometry rather than a photograph.
   for (let z = 38; z < 45; z += 0.85)
     box(-36, -0.208, z, 3.2, 0.012, 0.4, SITE.marking);
