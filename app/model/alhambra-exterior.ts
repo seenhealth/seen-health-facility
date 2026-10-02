@@ -318,50 +318,84 @@ export function buildAlhambraExterior(model: Facility) {
   // Lot-side door of the two-storey wing: navy awning, three steps down to the lot
   // and a block planter wall beside them (Street View, May 2025).
   const lotDoor = group(facade, 'therapy-lot-door-awning-and-steps');
-  const doorX = -31.18 + 5.0 + 0.55;
+  // Street View (May 2025, camera calibrated against the front pano): the
+  // awning door sits at x ≈ -27.4 on the wing's lot face; a split-face block
+  // wall runs east of it along the face to the lobby corner, and four steps
+  // descend westward from the door landing, parallel to the wall, with a pipe
+  // handrail on the lot side.
+  const doorX = -31.18 + 3.25 + 0.55;
   const brick = '#c49a6c',
     brickJoint = '#b58a5e';
   box(lotDoor, doorX, 2.32, 8.35, 2.7, 0.14, 1.1, '#2d4a74');
   box(lotDoor, doorX, 2.28, 8.35, 2.6, 0.05, 1.0, '#eeeee7');
-  // Raised landing at the door, four steps down toward the lot with a pipe handrail.
-  box(lotDoor, doorX, -0.23, 8.4, 2.4, 0.73, 1.0, '#c5c8c2');
+  const landTop = 0.5;
+  box(lotDoor, doorX, -0.23, 8.3, 2.4, landTop + 0.23, 1.2, '#c5c8c2');
+  const stepRun = 0.36,
+    stepRise = (landTop + 0.23) / 4;
   for (let i = 0; i < 4; i++)
     box(
       lotDoor,
-      doorX,
+      doorX - 1.2 - stepRun / 2 - stepRun * i,
       -0.23,
-      7.9 - 0.18 - 0.36 * i,
-      1.6,
-      0.73 - 0.1825 * (i + 1),
-      0.36,
+      8.3,
+      stepRun,
+      landTop + 0.23 - stepRise * (i + 1),
+      1.2,
       '#c5c8c2',
     );
-  for (const s of [-1, 1]) {
-    const xx = doorX + s * 0.78;
-    box(lotDoor, xx, 0.5, 7.75, 0.035, 0.95, 0.035, steel);
-    box(lotDoor, xx, -0.23, 6.55, 0.035, 0.95, 0.035, steel);
-    beam(lotDoor, [xx, 1.42, 7.75], [xx, 0.7, 6.55], 0.035, 0.035, steel);
-  }
-  // Split-face block wall from the landing east along the wing, as in the photo.
-  box(lotDoor, doorX + 3.9, -0.23, 8.5, 5.4, 1.35, 0.3, brick);
+  const stairFoot = doorX - 1.2 - stepRun * 4;
+  for (const [x, base] of [
+    [doorX - 1.1, landTop],
+    [stairFoot + 0.1, -0.23],
+  ])
+    box(lotDoor, x, base, 7.65, 0.035, 0.95, 0.035, steel);
+  beam(
+    lotDoor,
+    [doorX - 1.1, landTop + 0.95, 7.65],
+    [stairFoot + 0.1, -0.23 + 0.95, 7.65],
+    0.035,
+    0.035,
+    steel,
+  );
+  const wallX0 = doorX + 1.3,
+    wallX1 = -14.75;
+  box(
+    lotDoor,
+    (wallX0 + wallX1) / 2,
+    -0.23,
+    8.55,
+    wallX1 - wallX0,
+    1.35,
+    0.3,
+    brick,
+  );
   for (let y = 0.05; y < 1.3; y += 0.2)
-    box(lotDoor, doorX + 3.9, y, 8.34, 5.4, 0.012, 0.01, brickJoint);
-  for (let xx = doorX + 1.6; xx < doorX + 6.6; xx += 0.4)
-    box(lotDoor, xx, -0.23, 8.34, 0.01, 1.35, 0.01, brickJoint);
-  // Curbed palm island in front of the wall.
+    box(
+      lotDoor,
+      (wallX0 + wallX1) / 2,
+      y,
+      8.39,
+      wallX1 - wallX0,
+      0.012,
+      0.01,
+      brickJoint,
+    );
+  for (let xx = wallX0 + 0.3; xx < wallX1; xx += 0.4)
+    box(lotDoor, xx, -0.23, 8.39, 0.01, 1.35, 0.01, brickJoint);
+  // Low curbed planter left of the drop-off door: short pygmy palms and shrubs.
   const island = group(site, 'wing-palm-island');
   box(island, -21.2, -0.23, 6.45, 4.6, 0.18, 2.3, '#dcd7cd');
   box(island, -21.2, -0.23, 5.3, 4.6, 0.2, 0.07, red);
   box(island, -21.2, -0.05, 6.45, 4.3, 0.02, 2.0, '#8c7a5c');
   for (const [x, z, h] of [
-    [-22.6, 6.0, 2.4],
-    [-21.0, 7.0, 2.9],
-    [-19.6, 6.1, 2.2],
+    [-22.6, 6.0, 1.3],
+    [-21.0, 7.0, 1.6],
+    [-19.6, 6.1, 1.2],
   ])
-    palm(x, z, h, 1.3);
+    palm(x, z, h, 1.0);
   for (let xx = -23.1; xx < -19.2; xx += 0.75) {
-    const tuft = mesh(island, new T.IcosahedronGeometry(0.28, 1), '#7f9a5f');
-    tuft.position.set(xx, 0.14, 6.45 + (xx % 1.5 > 0.75 ? 0.6 : -0.6));
+    const tuft = mesh(island, new T.IcosahedronGeometry(0.3, 1), '#7f9a5f');
+    tuft.position.set(xx, 0.12, 6.45 + (xx % 1.5 > 0.75 ? 0.6 : -0.6));
     tuft.scale.set(1, 0.7, 1);
   }
   // Drop-off landing along the lobby wall across the glass door, window and

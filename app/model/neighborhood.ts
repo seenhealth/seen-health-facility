@@ -346,7 +346,7 @@ export function buildNeighborhood(model: Facility) {
     const head = new T.Shape();
     head.moveTo(-0.75, 0);
     head.lineTo(0.75, 0);
-    head.lineTo(0, 1.3);
+    head.lineTo(0, -1.3);
     head.closePath();
     const tip = add(new T.ShapeGeometry(head), SITE.marking, 0, 0.006, 0.5, g);
     tip.rotation.x = -Math.PI / 2;
@@ -358,52 +358,27 @@ export function buildNeighborhood(model: Facility) {
   // Crosswalks, blue loading access and parking bays are geometry rather than a photograph.
   for (let z = 38; z < 45; z += 0.85)
     box(-36, -0.208, z, 3.2, 0.012, 0.4, SITE.marking);
-  // Accessible parking in front of the drop-off: the van stall, a hatched access
-  // aisle and a second stall south of it, each stall with its symbol (Street View).
-  const stallW = 2.5,
-    aisleW = 2.4,
-    stallX0 = -24.6,
-    stallX1 = -17.2;
-  const stallZ = [1.5, 1.5 - stallW / 2 - aisleW - stallW / 2];
-  for (const z of stallZ) {
-    for (const edge of [-1, 1])
-      box(
-        (stallX0 + stallX1) / 2,
-        -0.208,
-        z + (edge * stallW) / 2,
-        stallX1 - stallX0,
-        0.012,
-        0.1,
-        SITE.accessible,
-      );
-    box(-20.9, -0.208, z, 1.1, 0.012, 1.1, SITE.accessible);
+  // Accessible parking on the Ethel side of the lot (plan, confirmed by Street
+  // View): two stalls with the hatched access aisle between them.
+  for (let i = 0; i < 10; i++)
+    strip(
+      px(351 + i * 42, 1010),
+      px(393 + i * 42, 1060),
+      0.07,
+      SITE.accessible,
+    );
+  for (const y of [936, 1160]) {
+    const [x, z] = px(530, y);
+    box(x, -0.208, z, 1.2, 0.012, 1.2, SITE.accessible);
     const ring = add(
-      new T.TorusGeometry(0.28, 0.035, 6, 32),
+      new T.TorusGeometry(0.31, 0.035, 6, 32),
       SITE.marking,
-      -20.9,
+      x,
       -0.191,
       z,
     );
     ring.rotation.x = -Math.PI / 2;
   }
-  const aisleZ = (stallZ[0] + stallZ[1]) / 2;
-  for (let x = stallX0 + 0.4; x < stallX1; x += 1.0)
-    strip(
-      [x, aisleZ - aisleW / 2 + 0.1],
-      [x + 1.2, aisleZ + aisleW / 2 - 0.1],
-      0.08,
-      SITE.accessible,
-    );
-  for (const edge of [-1, 1])
-    box(
-      (stallX0 + stallX1) / 2,
-      -0.208,
-      aisleZ + (edge * aisleW) / 2,
-      stallX1 - stallX0,
-      0.012,
-      0.1,
-      SITE.accessible,
-    );
   // Abstract model trees: a slender trunk under soft, smooth canopy volumes.
   const canopyGeometry = new T.SphereGeometry(1, 28, 18);
   function tree(x: number, z: number, r: number, h: number, i: number) {
