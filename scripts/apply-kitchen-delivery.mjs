@@ -129,7 +129,7 @@ const checkTrolley = (x, z, heading, where) => {
     trolleyGap = Math.min(trolleyGap, gap);
     assert.ok(
       gap >= TROLLEY_MARGIN,
-      `trolley corner ${corner.map((v) => v.toFixed(2))} ${where} is ${gap.toFixed(2)} m from a wall or furniture`,
+      `trolley corner (${corner.map((v) => v.toFixed(2)).join(', ')}) ${where} is ${gap.toFixed(2)} m from a wall or furniture`,
     );
   }
 };
@@ -424,10 +424,11 @@ assert.ok(
   `${nearest.id} passes ${nearest.gap.toFixed(2)} m from ${nearest.other} at ${nearest.t}`,
 );
 
-// Non-ASCII characters escaped, as the Python generators wrote the file.
+// Non-ASCII characters escaped, as the Python generators wrote the file
+// (JSON.stringify leaves no other control character than the line breaks).
 const ascii = (s) =>
   s.replace(
-    /[^\x00-\x7f]/g,
+    /[^\n\x20-\x7f]/g,
     (c) => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'),
   );
 const out = ascii(JSON.stringify(loop, null, 2)) + '\n';
