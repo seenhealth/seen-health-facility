@@ -102,9 +102,9 @@
         50,
         58
       ],
-      "zoneId": "community:home-lin",
+      "zoneId": "community:home-wong",
       "roomId": null,
-      "settingId": "home-lin",
+      "settingId": "home-wong",
       "interactionIds": [
         "home-meal-meds"
       ],
@@ -1066,9 +1066,9 @@
         690,
         712
       ],
-      "zoneId": "community:home-lin",
+      "zoneId": "community:home-wong",
       "roomId": null,
-      "settingId": "home-lin",
+      "settingId": "home-wong",
       "interactionIds": [
         "home-health-visit",
         "after-hours-call"

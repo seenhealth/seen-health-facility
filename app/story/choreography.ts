@@ -142,7 +142,7 @@ export const CHAPTER_SHOTS: Record<string, ShotSpec> = {
     push: 1.05,
   },
   'network-home-am': {
-    place: { setting: 'home-lin', room: 'home-kitchen', anchor: 'door' },
+    place: { setting: 'home-wong', room: 'home-kitchen', anchor: 'door' },
     zoom: 4.6,
     azimuth: 1.12,
     elevation: 0.86,
@@ -179,7 +179,7 @@ export const CHAPTER_SHOTS: Record<string, ShotSpec> = {
     push: 1.05,
   },
   'network-home-pm': {
-    place: { setting: 'home-lin', room: 'home-living', anchor: 'door' },
+    place: { setting: 'home-wong', room: 'home-living', anchor: 'door' },
     zoom: 5,
     azimuth: 0.85,
     elevation: 1,

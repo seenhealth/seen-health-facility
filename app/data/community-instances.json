@@ -1,7 +1,7 @@
 {
  "version": 1,
  "instances": {
-  "home-lin": {
+  "home-wong": {
    "facilityId": "seen-home-wong",
    "revision": "2026-10-01 · Senior-friendly plan v1 (HOME-PLAN study, grid-aligned doors)",
    "floorY": 0.3,
@@ -20,7 +20,7 @@
      "home-zone-porch"
     ],
     "excludeObjectIds": [],
-    "castSha1": "6d60daf56afe5a23a90c08385a7024e1456a64a0"
+    "castSha1": "aff5f2154a3601fe9642be051c53adb90c854f6b"
    },
    "footprint": [
     [

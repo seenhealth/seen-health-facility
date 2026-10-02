@@ -13,12 +13,12 @@
 // size, from boxes, cylinders and rounded boxes that cast and receive
 // shadows, in materials the specification defines.
 //
-// The home-lin registry entry stands the house on its pad: the front door
+// The home-wong registry entry stands the house on its pad: the front door
 // within 0.3 m of the `door` anchor, the front wall on the porch slab's back
 // edge, the footprint ≥ 0.1 m from the porch slab and ramp and ≥ 1 m from the
 // drive, each room name readable on its plate at the label anchor, and the
 // derived pad within the authored size. The ADL cast (app/data/community/
-// home-lin.cast.json) keeps today's actor ids and the contract windows, puts
+// home-wong.cast.json) keeps today's actor ids and the contract windows, puts
 // every stop in a drawn room clear of furniture and walls, and routes every
 // walk on the instance grid at the person's clearance in the time the gaps
 // allow; the tracks generated from it (app/data/community-casts.json, `npm run
@@ -30,7 +30,7 @@ import * as T from 'three';
 import { loadSim } from './build-scenario.mjs';
 
 const FILE = process.argv[2] || 'public/models/seen-home-wong.json';
-const CAST = 'app/data/community/home-lin.cast.json';
+const CAST = 'app/data/community/home-wong.cast.json';
 const {
   schema,
   nav,
@@ -453,11 +453,11 @@ for (const id of used)
   );
 
 // --- Registry: where the home stands on its pad (SPEC-facility-instance §11) --
-const setting = settings.careSettingById('home-lin');
+const setting = settings.careSettingById('home-wong');
 const cfg = setting.facility;
 assert(
   cfg && cfg.id === model.id,
-  'home-lin registry entry names this facility',
+  'home-wong registry entry names this facility',
 );
 assert.equal(cfg.url, '/' + FILE.replace(/^public\//, ''));
 assert.deepEqual(cfg.levelIds, ['ground']);
@@ -653,7 +653,7 @@ assert.equal(
   JSON.stringify(cast, null, 2) + '\n',
   `${CAST}: 2-space JSON`,
 );
-assert.equal(cast.setting, 'home-lin');
+assert.equal(cast.setting, 'home-wong');
 assert.equal(cast.facility, model.id);
 // The instance view: excluded zones (with their rooms, walls and objects) and
 // objects removed, layers defaulted, as the build-time generator sees it.
@@ -904,10 +904,10 @@ for (const i of interactions.values()) {
 // along their paths), every 0.25 s.
 const generated = JSON.parse(
   readFileSync('app/data/community-casts.json', 'utf8'),
-).casts['home-lin'];
+).casts['home-wong'];
 assert(
   generated,
-  'app/data/community-casts.json has no home-lin cast: npm run build:community',
+  'app/data/community-casts.json has no home-wong cast: npm run build:community',
 );
 const along = (path, f) => {
   const lengths = path.slice(1).map((q, i) => nav.distance(path[i], q)),

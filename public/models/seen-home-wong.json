@@ -4,7 +4,7 @@
   "name": "The Wongs' home · senior-friendly single-story bungalow",
   "address": "Illustrative home on the community pad near the Alhambra center (not a real address)",
   "units": "m",
-  "coordinateSystem": "Plan frame P: metres, origin at the centre of the 11.6 x 13.0 m footprint (house plus porch), +X east (the front door and the street), +Z north, Y up; y = 0 is the finished floor (PORCH_Y on the community pad). Placed on the home-lin pad with frame { position: [0, -10.8], heading: -pi/2 } (pad-local), i.e. world = P + (-94.8, 12.0).",
+  "coordinateSystem": "Plan frame P: metres, origin at the centre of the 11.6 x 13.0 m footprint (house plus porch), +X east (the front door and the street), +Z north, Y up; y = 0 is the finished floor (PORCH_Y on the community pad). Placed on the home-wong pad with frame { position: [0, -10.8], heading: -pi/2 } (pad-local), i.e. world = P + (-94.8, 12.0).",
   "revision": "2026-10-01 · Senior-friendly plan v1 (HOME-PLAN study, grid-aligned doors)",
   "source": {
     "title": "The Wongs' home: a senior-friendly floor plan and its ADL day (HOME-PLAN design study)",
@@ -253,7 +253,7 @@
         1
       ],
       "floorMaterial": "concrete",
-      "notes": "The existing 8.0 x 2.6 m porch, the front ramp's top landing. Kept for standalone viewing: the community pad already draws it, so the home-lin registry entry excludes this zone from the stamped instance.",
+      "notes": "The existing 8.0 x 2.6 m porch, the front ramp's top landing. Kept for standalone viewing: the community pad already draws it, so the home-wong registry entry excludes this zone from the stamped instance.",
       "publishedAreaSqFt": null,
       "tracedFootprintSqFt": 223.9,
       "programId": "home",
@@ -3373,7 +3373,7 @@
     "referencePages": [
       1
     ],
-    "notes": "Bounds are the home-lin pad extended 8 m west (pad-local x -15..15, z -22..14) expressed in P. The outline is the house, porch and back landing. The yard planting, garden beds, drive and the porch rails belong to the community pad (community-pads.ts), not to this specification."
+    "notes": "Bounds are the home-wong pad extended 8 m west (pad-local x -15..15, z -22..14) expressed in P. The outline is the house, porch and back landing. The yard planting, garden beds, drive and the porch rails belong to the community pad (community-pads.ts), not to this specification."
   },
   "roofSections": [],
   "details": [],

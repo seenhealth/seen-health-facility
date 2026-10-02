@@ -108,7 +108,7 @@ const house = {
   objects: [],
   materials: {},
 } as unknown as Facility;
-const home = careSettingById('home-lin')!;
+const home = careSettingById('home-wong')!;
 const setting: CareSetting = {
   ...home,
   facility: {
@@ -121,7 +121,7 @@ const setting: CareSetting = {
 };
 const chair: Vec2 = [-2, -1.5];
 const cast: CastFile = {
-  setting: 'home-lin',
+  setting: 'home-wong',
   people: [
     {
       id: 'home-participant',
@@ -267,7 +267,7 @@ const sofaHouse = {
 } as unknown as Facility;
 const onSofa: Vec2 = [1.5, -2.5];
 const homeCast = (seat?: string): CastFile => ({
-  setting: 'home-lin',
+  setting: 'home-wong',
   people: [
     // Home from hospital at 600 s and present to the end of the day: the
     // seam is out of sight (hidden at 0 s), so the day need not end where it

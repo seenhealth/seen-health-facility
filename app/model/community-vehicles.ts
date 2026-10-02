@@ -345,7 +345,7 @@ const corner = (from: Lane, to: Lane): Vec2[] => {
 };
 
 // --- Itineraries ------------------------------------------------------------
-const home = careSettingById('home-lin')!,
+const home = careSettingById('home-wong')!,
   pharmacy = careSettingById('pharmacy')!,
   hospital = careSettingById('hospital')!,
   specialist = careSettingById('specialist')!;

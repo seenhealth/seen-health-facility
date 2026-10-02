@@ -446,7 +446,7 @@ const define = (d: Draft): CareSetting => {
  */
 export const careSettings: CareSetting[] = [
   define({
-    id: 'home-lin',
+    id: 'home-wong',
     kind: 'home',
     name: "The Wongs' home",
     short: 'Home',

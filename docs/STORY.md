@@ -102,7 +102,7 @@ Chapters come straight from `app/data/scenarios/day-in-the-life.json`, in order.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | `huddle` | 0–40 | 0–26 | 8:00 AM–8:17 AM | `upperfit-conference` | 4.10 · 0.62 · 0.72 | no (team meeting) |
 | 2 | `network-pharmacy` (cutaway) | 26–50 | 26–50 | 8:17 AM–8:33 AM | `pharmacy` · `counterBack` | 2.90 · 1.30 · 0.50 | `pharmacy-packing` |
-| 3 | `network-home-am` (cutaway) | 50–58 | 50–58 | 8:33 AM–8:38 AM | `home-lin` · instance room `home-kitchen` (`door`) | 4.60 · 1.12 · 0.86 | `home-meal-meds` |
+| 3 | `network-home-am` (cutaway) | 50–58 | 50–58 | 8:33 AM–8:38 AM | `home-wong` · instance room `home-kitchen` (`door`) | 4.60 · 1.12 · 0.86 | `home-meal-meds` |
 | 4 | `pickup` | 40–120 | 58–120 | 8:38 AM–9:20 AM | arrival kerb & ramp | 2.70 · −0.72 · 0.50 | yes, 40 m |
 | 5 | `checkin` | 120–140 | 120–140 | 9:20 AM–9:33 AM | `lobby-arrival` | 4.60 · −0.35 · 0.62 | yes |
 | 6 | `clinic` | 140–178 | 140–178 | 9:33 AM–9:58 AM | `clinic-nurse` | 4.40 · 0.28 · 0.68 | yes |
@@ -118,7 +118,7 @@ Chapters come straight from `app/data/scenarios/day-in-the-life.json`, in order.
 | 16 | `farewell` | 525–552 | 525–552 | 1:50 PM–2:08 PM | `lobby-arrival` | 4.60 · −0.45 · 0.60 | yes |
 | 17 | `ride-home` | 552–624 | 552–624 | 2:08 PM–2:56 PM | arrival kerb & ramp | 2.60 · −0.95 · 0.48 | yes, 40 m |
 | 18 | `care-plan` | 624–720 | 624–690 | 2:56 PM–3:40 PM | `upperfit-conference` | 3.30 · 1.05 · 0.74 | no (team meeting) |
-| 19 | `network-home-pm` (cutaway) | 690–712 | 690–712 | 3:40 PM–3:54 PM | `home-lin` · instance room `home-living` (`door`) | 5.00 · 0.85 · 1.00 | `home-health-visit`, `after-hours-call` |
+| 19 | `network-home-pm` (cutaway) | 690–712 | 690–712 | 3:40 PM–3:54 PM | `home-wong` · instance room `home-living` (`door`) | 5.00 · 0.85 · 1.00 | `home-health-visit`, `after-hours-call` |
 
 Small screens multiply chapter zoom by 1.45 (the stage there is about 56 % of the viewport height); the opening, team and network beats use 1.3.
 

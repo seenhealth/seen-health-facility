@@ -33,9 +33,9 @@ clock; no participant records are used.
 | `app/model/community-layer.ts` | `buildCommunityLayer(model, mat, { loadFacility, materialFor })`: pads, facility instances (`instance(id)`, `ready`) and vehicle bodies, `tick(time)`, `frame(settingId?)` camera framings, the network `bounds` / `shadowExtent` and `dispose()`. |
 | `app/model/alhambra-source.ts` | `alhambraSource(model, base)`: the care day exactly as the viewer plays it (base loop + community layer + fleet crew), and `alhambraVehicles()`, pure samplers under the engine's vehicle ids. |
 | `scripts/validate-community-traffic.mjs` | `npm run validate:community`: clearance, driving and cast checks (below). |
-| `public/models/seen-home-wong.json` | The Wongs' home as a schema 2.0 facility specification (below), for the `home-lin` pad. |
+| `public/models/seen-home-wong.json` | The Wongs' home as a schema 2.0 facility specification (below), for the `home-wong` pad. |
 | `app/model/home-assets.ts` | `buildHomeAsset(spec, material)`: bed, nightstand, wardrobe, kitchen range, grab bars, swing-up bar, bed rail, hospital bed and ramp kinds, called first by `buildAsset`. |
-| `app/data/community/home-lin.cast.json` | The Wongs' ADL day inside the home, the input of the instance cast pipeline (below). |
+| `app/data/community/home-wong.cast.json` | The Wongs' ADL day inside the home, the input of the instance cast pipeline (below). |
 | `scripts/validate-home.mjs` | `npm run validate:home`: the home's plan, assets, registry frame and cast. |
 
 Wiring: `alhambraSource(model, base)` composes the Alhambra care day once,
@@ -120,7 +120,7 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 
 | id | kind | position | services |
 | --- | --- | --- | --- |
-| `home-lin` | home | The Wongs' home (the id predates the rename): (−84, 12), two-lane drive; the aide's car uses the north street's western reach; `facility` seen-home-wong (below), `pad.back` 8 | home-care, home-health, pill-packs, meals, home-mods, after-hours |
+| `home-wong` | home | The Wongs' home (`home-lin` until October 2026): (−84, 12), two-lane drive; the aide's car uses the north street's western reach; `facility` seen-home-wong (below), `pad.back` 8 | home-care, home-health, pill-packs, meals, home-mods, after-hours |
 | `pharmacy` | pharmacy | (−84, −22) | pill-packs |
 | `hospital` | hospital | (94, 14), stub from the north street | ed, discharge |
 | `specialist` | specialist | (84, −56), stub from the south street | specialist |
@@ -358,7 +358,7 @@ walks or times.
 ```
 
 Three **scheduled people** from the Wongs' home (`app/data/community/
-home-lin.cast.json`, abridged to a few stops each): the home health nurse
+home-wong.cast.json`, abridged to a few stops each): the home health nurse
 visits through the front door (`door` anchor) from 642.5 to 708 s; Mrs. Wong,
 a resident, starts the day in bed and ends it on the sofa (points with `seat`)
 with her clinic trip as an `away` window; Mr. Wong comes home from hospital at
@@ -368,7 +368,7 @@ are hand-authored actors outside the cast.
 
 ```json
 {
-  "setting": "home-lin", "facility": "seen-home-wong",
+  "setting": "home-wong", "facility": "seen-home-wong",
   "people": [
     { "id": "home-rn", "role": "nurse", "label": "Home health nurse", "variant": 5, "gait": 1.35,
       "arrive": { "t": 642.5, "anchor": "door" }, "leave": { "t": 708, "anchor": "door" },
@@ -534,13 +534,13 @@ Roadmap hooks).
 
 ### The Wongs' home
 
-The `home-lin` pad stamps `public/models/seen-home-wong.json`, a schema 2.0
+The `home-wong` pad stamps `public/models/seen-home-wong.json`, a schema 2.0
 facility specification of an illustrative senior-friendly bungalow, informed
 by typical Alhambra and San Gabriel Valley two-bedroom listings and by 2010
 ADA Standards / ICC A117.1 guidance. It is not a real home or address and uses
 no participant records. Its six people (Mrs. Wong, her personal care aide, the
 OT, the home-mods installer, the home health nurse and Mr. Wong) are generated
-inside it from `app/data/community/home-lin.cast.json`; everything they do
+inside it from `app/data/community/home-wong.cast.json`; everything they do
 outside is a hole leg.
 
 #### Plan
@@ -578,7 +578,7 @@ centred on the 0.2 m navigation grid so each 0.9 m door passes a wheelchair
 
 #### On the pad
 
-`careSettings` `home-lin`: `facility: { id: 'seen-home-wong', url:
+`careSettings` `home-wong`: `facility: { id: 'seen-home-wong', url:
 '/models/seen-home-wong.json', frame: { position: [0, −10.8], heading: −π/2 },
 levelIds: ['ground'], excludeZoneIds: ['home-zone-porch'], cutaway: true,
 floorY: PORCH_Y, labels: {…}, margin: 1.6 }` and `pad.back: 8` (the pad grows
@@ -672,11 +672,11 @@ chapter's window):
 | Cutaway | Setting | Featured interactions | Camera anchor |
 | --- | --- | --- | --- |
 | `network-pharmacy` | `pharmacy` | `pharmacy-packing` | `counterBack` |
-| `network-home-am` | `home-lin` | `home-meal-meds` | instance room `home-kitchen` (`door` until stamped) |
+| `network-home-am` | `home-wong` | `home-meal-meds` | instance room `home-kitchen` (`door` until stamped) |
 | `network-specialist` | `specialist` | `specialist-visit` | `examSeat` |
 | `network-partner` | `partner-adc` | `partner-pt`, `partner-rn-review` | instance room `rehab-open` (`ptStand` until stamped) |
 | `network-hospital` | `hospital` | `hospital-discharge-huddle` | `huddleA` |
-| `network-home-pm` | `home-lin` | `home-health-visit`, `after-hours-call` | instance room `home-living` (`door` until stamped) |
+| `network-home-pm` | `home-wong` | `home-health-visit`, `after-hours-call` | instance room `home-living` (`door` until stamped) |
 
 Keep those interaction ids, room ids and anchor names stable when re-timing a
 cast or rebuilding a pad; the story reads anchors through the layer

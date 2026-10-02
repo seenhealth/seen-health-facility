@@ -10047,7 +10047,7 @@
     58
    ],
    "heroPresent": false,
-   "zoneId": "community:home-lin",
+   "zoneId": "community:home-wong",
    "roomId": null,
    "focusTime": 55,
    "focusActorId": "interaction:home-meal-meds",
@@ -10067,7 +10067,7 @@
     "pca",
     "home-care"
    ],
-   "settingId": "home-lin"
+   "settingId": "home-wong"
   },
   {
    "id": "pickup",
@@ -10856,7 +10856,7 @@
     712
    ],
    "heroPresent": false,
-   "zoneId": "community:home-lin",
+   "zoneId": "community:home-wong",
    "roomId": null,
    "focusTime": 699,
    "focusActorId": "interaction:home-health-visit",
@@ -10877,7 +10877,7 @@
     "rn",
     "home-care"
    ],
-   "settingId": "home-lin"
+   "settingId": "home-wong"
   }
  ],
  "heroSpeed": 1.36,

@@ -115,7 +115,7 @@ function vanStop(time: number) {
 
 /** Van ramp foot → the home's porch ramp foot: along the drive edge, then a short loop round onto the ramp. */
 function homeCrossing(foot: Vec2): Vec2[] {
-  const h = careSettingById('home-lin')!.anchors;
+  const h = careSettingById('home-wong')!.anchors;
   return [foot, h.crossA, h.crossB, h.crossC, h.crossD, h.rampFoot];
 }
 /** The point `m` metres from `a` toward `b`. */
@@ -159,7 +159,7 @@ function legTrack(
  * fixes the times in between.
  */
 export function wongClinicLeg(hole: InstanceHole, zoneId: string): Segment[] {
-  const home = careSettingById('home-lin')!,
+  const home = careSettingById('home-wong')!,
     specialist = careSettingById('specialist')!;
   const h = home.anchors,
     c = specialist.anchors;
@@ -532,7 +532,7 @@ const byWindow =
  * casts, by actor id: each returns the segments from `hole.from` at
  * `hole.start` to `hole.to` at `hole.end` (instance-cast.ts `fillHoles`), or
  * nothing to keep the person out of sight. The Wongs' home: everyone inside
- * the house comes from its cast (app/data/community/home-lin.cast.json);
+ * the house comes from its cast (app/data/community/home-wong.cast.json);
  * these are their times outside it.
  */
 const HOLE_LEGS: Record<string, Leg> = {
@@ -553,7 +553,7 @@ const HOLE_LEGS: Record<string, Leg> = {
 const instanceCasts = castFile as unknown as InstanceCasts;
 
 export function communitySource(model: Facility): SourceExtension {
-  const home = careSettingById('home-lin')!,
+  const home = careSettingById('home-wong')!,
     pharmacy = careSettingById('pharmacy')!,
     hospital = careSettingById('hospital')!,
     specialist = careSettingById('specialist')!;
