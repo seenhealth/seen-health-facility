@@ -60,8 +60,14 @@ const AISLE = [9.75, 4.55];
  * ramp heights (scripts/add-delivery-people.py).
  */
 const stop = deliveries.deliveryStops.find((s) => s.id === DELIVERY);
-const DOCK = [10.25, -21.8],
-  OUTSIDE = [DOCK, [10.3, -18.3], [8.8, -16.1], [...stop.door], [8.8, -13.9]],
+const DOCK = [stop.x + 1.45, stop.z],
+  OUTSIDE = [
+    DOCK,
+    [stop.x + 1.5, -18.3],
+    [8.8, -16.1],
+    [...stop.door],
+    [8.8, -13.9],
+  ],
   OUTSIDE_HEIGHTS = [-0.23, -0.23, -0.115, 0, 0];
 /**
  * Indoors: across the receiving room to the corridor east of the laundry

@@ -11,7 +11,7 @@ export const deliveryStops = [
   {
     id: 'delivery-food',
     kind: 'food',
-    x: 8.8,
+    x: 9.7,
     z: -21.8,
     door: [8.8, -15.212789],
     /**
@@ -29,10 +29,12 @@ export const deliveryStops = [
     id: 'delivery-package',
     kind: 'package',
     // The employee entrance is behind the rear court's palm island
-    // (REAR_COURT_PLANTERS), so the truck noses in between the island and
-    // the food truck's bay and its driver walks round the island's north end.
-    x: 5.75,
-    z: -18.5,
+    // (REAR_COURT_PLANTERS) and the utility pole in front of the garage wall,
+    // so the truck noses in east of the pole, short of the food truck's
+    // receiving ramp, and its driver walks north past the pole's east side and
+    // round to the door.
+    x: 6.75,
+    z: -19.6,
     door: [3.56, -12.465328],
     runs: [
       [280, 52],

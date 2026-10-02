@@ -3285,7 +3285,7 @@
             ],
             [
               -3.2,
-              10.0
+              10
             ],
             [
               -3.2,
@@ -3452,7 +3452,7 @@
               9.6
             ],
             [
-              -2.0,
+              -2,
               9.8
             ],
             [
@@ -3461,7 +3461,7 @@
             ],
             [
               -1.4,
-              10.0
+              10
             ]
           ],
           "zoneId": "day",
@@ -3515,7 +3515,7 @@
             ],
             [
               -3.2,
-              10.0
+              10
             ],
             [
               -3.2,
@@ -3682,7 +3682,7 @@
               9.6
             ],
             [
-              -2.0,
+              -2,
               9.8
             ],
             [
@@ -3691,7 +3691,7 @@
             ],
             [
               -1.4,
-              10.0
+              10
             ]
           ],
           "zoneId": "day",
@@ -4173,7 +4173,7 @@
         },
         {
           "start": 217.5,
-          "end": 222.0,
+          "end": 222,
           "action": "walk",
           "path": [
             [
@@ -4191,7 +4191,7 @@
           "title": "Rearranging the floor for Exercise"
         },
         {
-          "start": 222.0,
+          "start": 222,
           "end": 288,
           "action": "exercise",
           "path": [
@@ -4295,7 +4295,7 @@
               10.95
             ],
             [
-              -9.0,
+              -9,
               10.8
             ]
           ],
@@ -4310,11 +4310,11 @@
           "action": "dance",
           "path": [
             [
-              -9.0,
+              -9,
               10.8
             ],
             [
-              -9.0,
+              -9,
               10.8
             ]
           ],
@@ -4329,7 +4329,7 @@
           "action": "walk",
           "path": [
             [
-              -9.0,
+              -9,
               10.8
             ],
             [
@@ -4565,7 +4565,7 @@
         },
         {
           "start": 217.5,
-          "end": 222.0,
+          "end": 222,
           "action": "walk",
           "path": [
             [
@@ -4583,7 +4583,7 @@
           "title": "Rearranging the floor for Exercise"
         },
         {
-          "start": 222.0,
+          "start": 222,
           "end": 288,
           "action": "exercise",
           "path": [
@@ -5026,7 +5026,7 @@
               10.727083322159606
             ],
             [
-              -6.0,
+              -6,
               9.391
             ]
           ],
@@ -5041,11 +5041,11 @@
           "action": "conversation",
           "path": [
             [
-              -6.0,
+              -6,
               9.391
             ],
             [
-              -6.0,
+              -6,
               9.391
             ]
           ],
@@ -5060,11 +5060,11 @@
           "action": "conversation",
           "path": [
             [
-              -6.0,
+              -6,
               9.391
             ],
             [
-              -6.0,
+              -6,
               9.391
             ]
           ],
@@ -5079,7 +5079,7 @@
           "action": "roll",
           "path": [
             [
-              -6.0,
+              -6,
               9.391
             ],
             [
@@ -5132,7 +5132,7 @@
         },
         {
           "start": 577.5,
-          "end": 582.0,
+          "end": 582,
           "action": "roll",
           "path": [
             [
@@ -5150,7 +5150,7 @@
           "title": "Rearranging the floor for Erhu & sing-along"
         },
         {
-          "start": 582.0,
+          "start": 582,
           "end": 648,
           "action": "music",
           "path": [
@@ -5476,7 +5476,7 @@
               11.05
             ],
             [
-              -4.0,
+              -4,
               9.5
             ]
           ],
@@ -5491,11 +5491,11 @@
           "action": "consult",
           "path": [
             [
-              -4.0,
+              -4,
               9.5
             ],
             [
-              -4.0,
+              -4,
               9.5
             ]
           ],
@@ -5510,11 +5510,11 @@
           "action": "consult",
           "path": [
             [
-              -4.0,
+              -4,
               9.5
             ],
             [
-              -4.0,
+              -4,
               9.5
             ]
           ],
@@ -5525,11 +5525,11 @@
         },
         {
           "start": 577.5,
-          "end": 582.0,
+          "end": 582,
           "action": "walk",
           "path": [
             [
-              -4.0,
+              -4,
               9.5
             ],
             [
@@ -5543,7 +5543,7 @@
           "title": "Rearranging the floor for Erhu & sing-along"
         },
         {
-          "start": 582.0,
+          "start": 582,
           "end": 648,
           "action": "consult",
           "path": [
@@ -6201,14 +6201,14 @@
       "role": "participant",
       "variant": 2,
       "label": "Table games & crafts \u00b7 participant",
-      "offset": 0.0,
+      "offset": 0,
       "levelId": "ground",
       "seatId": "day-diamond-table-04-chair-1",
       "seated": true,
       "segments": [
         {
-          "start": 0.0,
-          "end": 240.0,
+          "start": 0,
+          "end": 240,
           "action": "write",
           "path": [
             [
@@ -6226,8 +6226,8 @@
           "title": "Watercolor \u6c34\u5f69\u756b"
         },
         {
-          "start": 240.0,
-          "end": 480.0,
+          "start": 240,
+          "end": 480,
           "action": "craft",
           "path": [
             [
@@ -6245,8 +6245,8 @@
           "title": "Origami \u647a\u7d19"
         },
         {
-          "start": 480.0,
-          "end": 720.0,
+          "start": 480,
+          "end": 720,
           "action": "write",
           "path": [
             [
@@ -6965,18 +6965,18 @@
             ],
             [
               -22.4,
-              19.0
+              19
             ],
             [
               -22.6,
-              19.0
+              19
             ],
             [
               -22.8,
               19.2
             ],
             [
-              -23.0,
+              -23,
               19.2
             ],
             [
@@ -7065,11 +7065,11 @@
             ],
             [
               -20.6,
-              19.0
+              19
             ],
             [
               -20.4,
-              19.0
+              19
             ],
             [
               -20.2,
@@ -7088,7 +7088,7 @@
               18.6
             ],
             [
-              -16.0,
+              -16,
               18.4
             ],
             [
@@ -7101,7 +7101,7 @@
             ],
             [
               -10.6,
-              16.0
+              16
             ]
           ],
           "heights": [
@@ -9319,11 +9319,11 @@
             ],
             [
               -3.2,
-              9.0
+              9
             ],
             [
-              -3.0,
-              9.0
+              -3,
+              9
             ],
             [
               -2.8,
@@ -9342,7 +9342,7 @@
               9.4
             ],
             [
-              -2.0,
+              -2,
               9.6
             ],
             [
@@ -9921,18 +9921,18 @@
             ],
             [
               -10.6,
-              8.0
+              8
             ],
             [
               -11.6,
-              9.0
+              9
             ],
             [
               -11.6,
               9.2
             ],
             [
-              -13.0,
+              -13,
               10.6
             ],
             [
@@ -9948,20 +9948,20 @@
               10.8
             ],
             [
-              -15.0,
-              11.0
+              -15,
+              11
             ],
             [
               -20.2,
-              11.0
+              11
             ],
             [
               -21.2,
-              12.0
+              12
             ],
             [
               -22.8,
-              12.0
+              12
             ],
             [
               -23.6,
@@ -9969,23 +9969,23 @@
             ],
             [
               -23.6,
-              13.0
+              13
             ],
             [
               -24.6,
-              14.0
+              14
             ],
             [
               -24.6,
               14.2
             ],
             [
-              -25.0,
+              -25,
               14.6
             ],
             [
-              -25.0,
-              16.0
+              -25,
+              16
             ]
           ],
           "heights": [
@@ -10057,11 +10057,11 @@
               16.4
             ],
             [
-              -23.0,
+              -23,
               18.2
             ],
             [
-              -23.0,
+              -23,
               18.4
             ],
             [
@@ -10704,18 +10704,18 @@
             ],
             [
               -10.6,
-              8.0
+              8
             ],
             [
               -11.6,
-              9.0
+              9
             ],
             [
               -11.6,
               9.2
             ],
             [
-              -13.0,
+              -13,
               10.6
             ],
             [
@@ -10731,20 +10731,20 @@
               10.8
             ],
             [
-              -15.0,
-              11.0
+              -15,
+              11
             ],
             [
               -20.2,
-              11.0
+              11
             ],
             [
               -21.2,
-              12.0
+              12
             ],
             [
               -22.8,
-              12.0
+              12
             ],
             [
               -23.6,
@@ -10752,23 +10752,23 @@
             ],
             [
               -23.6,
-              13.0
+              13
             ],
             [
               -24.6,
-              14.0
+              14
             ],
             [
               -24.6,
               14.2
             ],
             [
-              -25.0,
+              -25,
               14.6
             ],
             [
-              -25.0,
-              16.0
+              -25,
+              16
             ]
           ],
           "heights": [
@@ -10840,11 +10840,11 @@
               16.4
             ],
             [
-              -23.0,
+              -23,
               18.2
             ],
             [
-              -23.0,
+              -23,
               18.4
             ],
             [
@@ -15933,12 +15933,12 @@
       "role": "participant",
       "variant": 67,
       "profileId": "community-27",
-      "offset": 0.0,
+      "offset": 0,
       "levelId": "ground",
       "segments": [
         {
-          "start": 0.0,
-          "end": 360.0,
+          "start": 0,
+          "end": 360,
           "action": "read",
           "path": [
             [
@@ -15956,8 +15956,8 @@
           "title": "Photo albums \u76f8\u7c3f"
         },
         {
-          "start": 360.0,
-          "end": 720.0,
+          "start": 360,
+          "end": 720,
           "action": "craft",
           "path": [
             [
@@ -21168,15 +21168,15 @@
       "label": "Long arts table \u00b7 participant",
       "role": "participant",
       "variant": 100,
-      "offset": 0.0,
+      "offset": 0,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-communal-east-0",
       "seated": true,
       "segments": [
         {
-          "start": 0.0,
-          "end": 144.0,
+          "start": 0,
+          "end": 144,
           "action": "write",
           "path": [
             [
@@ -21194,8 +21194,8 @@
           "title": "Calligraphy \u00b7 long arts table"
         },
         {
-          "start": 144.0,
-          "end": 288.0,
+          "start": 144,
+          "end": 288,
           "action": "craft",
           "path": [
             [
@@ -21213,8 +21213,8 @@
           "title": "Paper-cutting \u00b7 long arts table"
         },
         {
-          "start": 288.0,
-          "end": 432.0,
+          "start": 288,
+          "end": 432,
           "action": "write",
           "path": [
             [
@@ -21232,8 +21232,8 @@
           "title": "Ink painting \u00b7 long arts table"
         },
         {
-          "start": 432.0,
-          "end": 576.0,
+          "start": 432,
+          "end": 576,
           "action": "craft",
           "path": [
             [
@@ -21251,8 +21251,8 @@
           "title": "Lantern making \u00b7 long arts table"
         },
         {
-          "start": 576.0,
-          "end": 720.0,
+          "start": 576,
+          "end": 720,
           "action": "write",
           "path": [
             [
@@ -21789,15 +21789,15 @@
       "label": "Long arts table \u00b7 participant",
       "role": "participant",
       "variant": 105,
-      "offset": 0.0,
+      "offset": 0,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-communal-east-5",
       "seated": true,
       "segments": [
         {
-          "start": 0.0,
-          "end": 144.0,
+          "start": 0,
+          "end": 144,
           "action": "write",
           "path": [
             [
@@ -21815,8 +21815,8 @@
           "title": "Calligraphy \u00b7 long arts table"
         },
         {
-          "start": 144.0,
-          "end": 288.0,
+          "start": 144,
+          "end": 288,
           "action": "craft",
           "path": [
             [
@@ -21834,8 +21834,8 @@
           "title": "Paper-cutting \u00b7 long arts table"
         },
         {
-          "start": 288.0,
-          "end": 432.0,
+          "start": 288,
+          "end": 432,
           "action": "write",
           "path": [
             [
@@ -21853,8 +21853,8 @@
           "title": "Ink painting \u00b7 long arts table"
         },
         {
-          "start": 432.0,
-          "end": 576.0,
+          "start": 432,
+          "end": 576,
           "action": "craft",
           "path": [
             [
@@ -21872,8 +21872,8 @@
           "title": "Lantern making \u00b7 long arts table"
         },
         {
-          "start": 576.0,
-          "end": 720.0,
+          "start": 576,
+          "end": 720,
           "action": "write",
           "path": [
             [
@@ -21898,15 +21898,15 @@
       "label": "Table games & crafts \u00b7 participant",
       "role": "participant",
       "variant": 106,
-      "offset": 0.0,
+      "offset": 0,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-tree-chair-2-1",
       "seated": true,
       "segments": [
         {
-          "start": 0.0,
-          "end": 360.0,
+          "start": 0,
+          "end": 360,
           "action": "board-game",
           "path": [
             [
@@ -21924,8 +21924,8 @@
           "title": "Chinese chess \u8c61\u68cb"
         },
         {
-          "start": 360.0,
-          "end": 720.0,
+          "start": 360,
+          "end": 720,
           "action": "tea",
           "path": [
             [
@@ -22462,15 +22462,15 @@
       "label": "Long arts table \u00b7 participant",
       "role": "participant",
       "variant": 111,
-      "offset": 0.0,
+      "offset": 0,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-communal-west-3",
       "seated": true,
       "segments": [
         {
-          "start": 0.0,
-          "end": 144.0,
+          "start": 0,
+          "end": 144,
           "action": "write",
           "path": [
             [
@@ -22488,8 +22488,8 @@
           "title": "Calligraphy \u00b7 long arts table"
         },
         {
-          "start": 144.0,
-          "end": 288.0,
+          "start": 144,
+          "end": 288,
           "action": "craft",
           "path": [
             [
@@ -22507,8 +22507,8 @@
           "title": "Paper-cutting \u00b7 long arts table"
         },
         {
-          "start": 288.0,
-          "end": 432.0,
+          "start": 288,
+          "end": 432,
           "action": "write",
           "path": [
             [
@@ -22526,8 +22526,8 @@
           "title": "Ink painting \u00b7 long arts table"
         },
         {
-          "start": 432.0,
-          "end": 576.0,
+          "start": 432,
+          "end": 576,
           "action": "craft",
           "path": [
             [
@@ -22545,8 +22545,8 @@
           "title": "Lantern making \u00b7 long arts table"
         },
         {
-          "start": 576.0,
-          "end": 720.0,
+          "start": 576,
+          "end": 720,
           "action": "write",
           "path": [
             [
@@ -22827,15 +22827,15 @@
       "label": "Tea corner \u00b7 participant",
       "role": "participant",
       "variant": 114,
-      "offset": 0.0,
+      "offset": 0,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-banquette-table-01-chair-1",
       "seated": true,
       "segments": [
         {
-          "start": 0.0,
-          "end": 360.0,
+          "start": 0,
+          "end": 360,
           "action": "read",
           "path": [
             [
@@ -22853,8 +22853,8 @@
           "title": "Morning tea & papers \u00b7 tea corner"
         },
         {
-          "start": 360.0,
-          "end": 720.0,
+          "start": 360,
+          "end": 720,
           "action": "tea",
           "path": [
             [
@@ -23163,15 +23163,15 @@
       "label": "Tea corner \u00b7 participant",
       "role": "participant",
       "variant": 119,
-      "offset": 0.0,
+      "offset": 0,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-banquette-table-03-chair-2",
       "seated": true,
       "segments": [
         {
-          "start": 0.0,
-          "end": 360.0,
+          "start": 0,
+          "end": 360,
           "action": "read",
           "path": [
             [
@@ -23189,8 +23189,8 @@
           "title": "Morning tea & papers \u00b7 tea corner"
         },
         {
-          "start": 360.0,
-          "end": 720.0,
+          "start": 360,
+          "end": 720,
           "action": "tea",
           "path": [
             [
@@ -24252,15 +24252,15 @@
       "label": "Table games & crafts \u00b7 participant",
       "role": "participant",
       "variant": 133,
-      "offset": 0.0,
+      "offset": 0,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-diamond-table-07-chair-1",
       "seated": true,
       "segments": [
         {
-          "start": 0.0,
-          "end": 240.0,
+          "start": 0,
+          "end": 240,
           "action": "board-game",
           "path": [
             [
@@ -24278,8 +24278,8 @@
           "title": "Go \u570d\u68cb"
         },
         {
-          "start": 240.0,
-          "end": 480.0,
+          "start": 240,
+          "end": 480,
           "action": "board-game",
           "path": [
             [
@@ -24297,8 +24297,8 @@
           "title": "Dominoes \u9aa8\u724c"
         },
         {
-          "start": 480.0,
-          "end": 720.0,
+          "start": 480,
+          "end": 720,
           "action": "board-game",
           "path": [
             [
@@ -25597,15 +25597,15 @@
       "label": "Table games & crafts \u00b7 participant",
       "role": "participant",
       "variant": 149,
-      "offset": 0.0,
+      "offset": 0,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-photo-lounge-chair-1",
       "seated": true,
       "segments": [
         {
-          "start": 0.0,
-          "end": 720.0,
+          "start": 0,
+          "end": 720,
           "action": "read",
           "path": [
             [
@@ -25682,15 +25682,15 @@
       "label": "Table games & crafts \u00b7 participant",
       "role": "participant",
       "variant": 151,
-      "offset": 0.0,
+      "offset": 0,
       "levelId": "ground",
       "roomId": "day-open",
       "seatId": "day-tree-chair-1-1",
       "seated": true,
       "segments": [
         {
-          "start": 0.0,
-          "end": 360.0,
+          "start": 0,
+          "end": 360,
           "action": "read",
           "path": [
             [
@@ -25708,8 +25708,8 @@
           "title": "Photo albums \u76f8\u7c3f"
         },
         {
-          "start": 360.0,
-          "end": 720.0,
+          "start": 360,
+          "end": 720,
           "action": "craft",
           "path": [
             [
@@ -27808,11 +27808,11 @@
           "action": "ride",
           "path": [
             [
-              10.25,
+              11.149999999999999,
               -21.8
             ],
             [
-              10.25,
+              11.149999999999999,
               -21.8
             ]
           ],
@@ -27827,15 +27827,15 @@
         },
         {
           "start": 254,
-          "end": 264.8362,
+          "end": 265.324,
           "action": "escort",
           "path": [
             [
-              10.25,
+              11.149999999999999,
               -21.8
             ],
             [
-              10.3,
+              11.2,
               -18.3
             ],
             [
@@ -27864,7 +27864,7 @@
           "title": "Delivering today\u2019s lunch"
         },
         {
-          "start": 264.8362,
+          "start": 265.324,
           "end": 285,
           "action": "escort",
           "path": [
@@ -27939,7 +27939,7 @@
         },
         {
           "start": 309,
-          "end": 327.8629,
+          "end": 327.4066,
           "action": "escort",
           "path": [
             [
@@ -27966,7 +27966,7 @@
           "title": "Returning through receiving"
         },
         {
-          "start": 327.8629,
+          "start": 327.4066,
           "end": 338,
           "action": "escort",
           "path": [
@@ -27983,11 +27983,11 @@
               -16.1
             ],
             [
-              10.3,
+              11.2,
               -18.3
             ],
             [
-              10.25,
+              11.149999999999999,
               -21.8
             ]
           ],
@@ -28009,11 +28009,11 @@
           "action": "ride",
           "path": [
             [
-              10.25,
+              11.149999999999999,
               -21.8
             ],
             [
-              10.25,
+              11.149999999999999,
               -21.8
             ]
           ],
@@ -28032,11 +28032,11 @@
           "action": "ride",
           "path": [
             [
-              10.25,
+              11.149999999999999,
               -21.8
             ],
             [
-              10.25,
+              11.149999999999999,
               -21.8
             ]
           ],
@@ -28055,11 +28055,11 @@
           "action": "escort",
           "path": [
             [
-              10.25,
+              11.149999999999999,
               -21.8
             ],
             [
-              10.3,
+              11.2,
               -18.3
             ],
             [
@@ -28128,11 +28128,11 @@
               -16.1
             ],
             [
-              10.3,
+              11.2,
               -18.3
             ],
             [
-              10.25,
+              11.149999999999999,
               -21.8
             ]
           ],
@@ -28154,11 +28154,11 @@
           "action": "ride",
           "path": [
             [
-              10.25,
+              11.149999999999999,
               -21.8
             ],
             [
-              10.25,
+              11.149999999999999,
               -21.8
             ]
           ],
@@ -28177,11 +28177,11 @@
           "action": "ride",
           "path": [
             [
-              10.25,
+              11.149999999999999,
               -21.8
             ],
             [
-              10.25,
+              11.149999999999999,
               -21.8
             ]
           ],
@@ -28213,12 +28213,12 @@
           "action": "ride",
           "path": [
             [
-              4.25,
-              -16.9
+              5.25,
+              -18
             ],
             [
-              4.25,
-              -16.9
+              5.25,
+              -18
             ]
           ],
           "zoneId": "site",
@@ -28236,8 +28236,12 @@
           "action": "escort",
           "path": [
             [
-              4.25,
-              -16.9
+              5.25,
+              -18
+            ],
+            [
+              5.25,
+              -16
             ],
             [
               4.25,
@@ -28259,6 +28263,7 @@
           "zoneId": "site",
           "heading": 0,
           "heights": [
+            -0.23,
             -0.23,
             -0.23,
             -0.115,
@@ -28313,8 +28318,12 @@
               -15
             ],
             [
-              4.25,
-              -16.9
+              5.25,
+              -16
+            ],
+            [
+              5.25,
+              -18
             ]
           ],
           "zoneId": "site",
@@ -28323,6 +28332,7 @@
             0,
             0,
             -0.115,
+            -0.23,
             -0.23,
             -0.23
           ],
@@ -28335,12 +28345,12 @@
           "action": "ride",
           "path": [
             [
-              4.25,
-              -16.9
+              5.25,
+              -18
             ],
             [
-              4.25,
-              -16.9
+              5.25,
+              -18
             ]
           ],
           "zoneId": "site",
@@ -28358,12 +28368,12 @@
           "action": "ride",
           "path": [
             [
-              4.25,
-              -16.9
+              5.25,
+              -18
             ],
             [
-              4.25,
-              -16.9
+              5.25,
+              -18
             ]
           ],
           "zoneId": "site",
@@ -28381,8 +28391,12 @@
           "action": "escort",
           "path": [
             [
-              4.25,
-              -16.9
+              5.25,
+              -18
+            ],
+            [
+              5.25,
+              -16
             ],
             [
               4.25,
@@ -28404,6 +28418,7 @@
           "zoneId": "site",
           "heading": 0,
           "heights": [
+            -0.23,
             -0.23,
             -0.23,
             -0.115,
@@ -28458,8 +28473,12 @@
               -15
             ],
             [
-              4.25,
-              -16.9
+              5.25,
+              -16
+            ],
+            [
+              5.25,
+              -18
             ]
           ],
           "zoneId": "site",
@@ -28468,6 +28487,7 @@
             0,
             0,
             -0.115,
+            -0.23,
             -0.23,
             -0.23
           ],
@@ -28480,12 +28500,12 @@
           "action": "ride",
           "path": [
             [
-              4.25,
-              -16.9
+              5.25,
+              -18
             ],
             [
-              4.25,
-              -16.9
+              5.25,
+              -18
             ]
           ],
           "zoneId": "site",
@@ -28503,12 +28523,12 @@
           "action": "ride",
           "path": [
             [
-              4.25,
-              -16.9
+              5.25,
+              -18
             ],
             [
-              4.25,
-              -16.9
+              5.25,
+              -18
             ]
           ],
           "zoneId": "site",
@@ -28818,7 +28838,7 @@
         },
         {
           "start": 506.25,
-          "end": 510.0,
+          "end": 510,
           "action": "walk",
           "path": [
             [
@@ -28830,7 +28850,7 @@
               12.675720779502168
             ],
             [
-              -5.0,
+              -5,
               12.15
             ]
           ],
@@ -28840,16 +28860,16 @@
           "title": "Rearranging the floor for Ribbon dance"
         },
         {
-          "start": 510.0,
+          "start": 510,
           "end": 576,
           "action": "dance",
           "path": [
             [
-              -5.0,
+              -5,
               12.15
             ],
             [
-              -5.0,
+              -5,
               12.15
             ]
           ],
@@ -28864,7 +28884,7 @@
           "action": "walk",
           "path": [
             [
-              -5.0,
+              -5,
               12.15
             ],
             [
@@ -28972,7 +28992,7 @@
         },
         {
           "start": 0.75,
-          "end": 6.0,
+          "end": 6,
           "action": "walk",
           "path": [
             [
@@ -28994,7 +29014,7 @@
           "title": "Rearranging the floor for Cantonese opera"
         },
         {
-          "start": 6.0,
+          "start": 6,
           "end": 72,
           "action": "clap",
           "path": [
@@ -29065,7 +29085,7 @@
             ]
           ],
           "zoneId": "day",
-          "heading": 0.0,
+          "heading": 0,
           "seated": false,
           "title": "Rearranging the floor for Device class"
         },
@@ -29084,7 +29104,7 @@
             ]
           ],
           "zoneId": "day",
-          "heading": 0.0,
+          "heading": 0,
           "seated": true,
           "title": "Device class \u00b7 standing / seated choice"
         },
@@ -29223,7 +29243,7 @@
         },
         {
           "start": 505.5,
-          "end": 510.0,
+          "end": 510,
           "action": "walk",
           "path": [
             [
@@ -29241,7 +29261,7 @@
           "title": "Rearranging the floor for Ribbon dance"
         },
         {
-          "start": 510.0,
+          "start": 510,
           "end": 576,
           "action": "dance",
           "path": [
@@ -29785,7 +29805,7 @@
         },
         {
           "start": 74.25,
-          "end": 78.0,
+          "end": 78,
           "action": "walk",
           "path": [
             [
@@ -29803,7 +29823,7 @@
           "title": "Rearranging the floor for Baduanjin qigong"
         },
         {
-          "start": 78.0,
+          "start": 78,
           "end": 144,
           "action": "qigong",
           "path": [
@@ -29880,7 +29900,7 @@
         },
         {
           "start": 217.5,
-          "end": 222.0,
+          "end": 222,
           "action": "walk",
           "path": [
             [
@@ -29898,7 +29918,7 @@
           "title": "Rearranging the floor for Exercise"
         },
         {
-          "start": 222.0,
+          "start": 222,
           "end": 288,
           "action": "exercise",
           "path": [
@@ -30503,7 +30523,7 @@
           "action": "walk",
           "path": [
             [
-              -8.0,
+              -8,
               10.85
             ],
             [
@@ -30842,7 +30862,7 @@
               11.211
             ],
             [
-              -8.0,
+              -8,
               10.85
             ]
           ],
@@ -30857,11 +30877,11 @@
           "action": "listen",
           "path": [
             [
-              -8.0,
+              -8,
               10.85
             ],
             [
-              -8.0,
+              -8,
               10.85
             ]
           ],
@@ -30904,7 +30924,7 @@
         },
         {
           "start": 2.25,
-          "end": 6.0,
+          "end": 6,
           "action": "walk",
           "path": [
             [
@@ -30922,7 +30942,7 @@
           "title": "Rearranging the floor for Cantonese opera"
         },
         {
-          "start": 6.0,
+          "start": 6,
           "end": 72,
           "action": "clap",
           "path": [
@@ -31102,7 +31122,7 @@
               12.75
             ],
             [
-              -6.0,
+              -6,
               12.509
             ]
           ],
@@ -31117,11 +31137,11 @@
           "action": "conversation",
           "path": [
             [
-              -6.0,
+              -6,
               12.509
             ],
             [
-              -6.0,
+              -6,
               12.509
             ]
           ],
@@ -31136,7 +31156,7 @@
           "action": "walk",
           "path": [
             [
-              -6.0,
+              -6,
               12.509
             ],
             [
@@ -31286,7 +31306,7 @@
         },
         {
           "start": 2.25,
-          "end": 6.0,
+          "end": 6,
           "action": "walk",
           "path": [
             [
@@ -31304,7 +31324,7 @@
           "title": "Rearranging the floor for Cantonese opera"
         },
         {
-          "start": 6.0,
+          "start": 6,
           "end": 72,
           "action": "clap",
           "path": [
@@ -31419,7 +31439,7 @@
         },
         {
           "start": 218.25,
-          "end": 222.0,
+          "end": 222,
           "action": "walk",
           "path": [
             [
@@ -31437,7 +31457,7 @@
           "title": "Rearranging the floor for Exercise"
         },
         {
-          "start": 222.0,
+          "start": 222,
           "end": 288,
           "action": "exercise",
           "path": [

@@ -1,7 +1,7 @@
 // Run after compile-model-modules.mjs; checks the complete repeating day at 50 Hz.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { Vector3 } from 'three';
+import { Box3, Vector3 } from 'three';
 import {
   sampleVan,
   alhambraVanWindows,
@@ -19,7 +19,10 @@ import {
   receivingRamp,
   sampleDelivery,
 } from '../work/validation/deliveries.mjs';
-import { REAR_COURT_PLANTERS } from '../work/validation/alhambra-exterior.mjs';
+import {
+  buildAlhambraExterior,
+  REAR_COURT_PLANTERS,
+} from '../work/validation/alhambra-exterior.mjs';
 import { sampleStreetCar } from '../work/validation/traffic-routes.mjs';
 import { vehicleGap } from '../work/validation/vehicle-clearance.mjs';
 import { buildSiteArrival } from '../work/validation/site-arrival.mjs';
@@ -111,9 +114,29 @@ const obstacles = [
   ['west sidewalk', curbs.sidewalks[0]],
   ...curbs.islands.map((p, i) => [`curb island ${i}`, p]),
 ];
+// What the exterior draws in the rear court up to a truck's roof (the staff
+// entrance's landing and pergola, the garage wall, its hood and gate, the
+// utility pole), read from the drawn meshes so the check follows the court
+// as its photographs refine it.
+const TRUCK_ROOF = 3.2;
+const rearCourtSolids = (() => {
+  const { facade } = buildAlhambraExterior(m);
+  facade.updateMatrixWorld(true);
+  const court = facade.getObjectByName('rear-court-staff-entrance-and-loading'),
+    found = [],
+    b = new Box3();
+  court?.traverse((o) => {
+    if (!o.isMesh) return;
+    b.setFromObject(o);
+    if (b.min.y < TRUCK_ROOF && b.max.y > 0.05)
+      found.push([`rear court exterior ${found.length}`, rect(b.min.x, b.min.z, b.max.x, b.max.z)]);
+  });
+  assert(found.length > 5, "the exterior draws the rear court's staff entrance, garage wall and pole");
+  return found;
+})();
 // Obstacles a delivery truck must keep clear of on its way in and out of the
-// rear court: the building and its receiving ramps, the court's planters, and
-// every curb island and sidewalk of the site.
+// rear court: the building and its receiving ramps, the court's planters and
+// exterior, and every curb island and sidewalk of the site.
 const truckObstacles = [
   ['building', m.site.buildingOutline],
   ...deliveryStops.map((s) => {
@@ -121,6 +144,7 @@ const truckObstacles = [
     return [`${s.kind} receiving ramp`, rect(r.x0, r.z0, r.x1, r.z1)];
   }),
   ...REAR_COURT_PLANTERS.map((r, i) => [`rear court planter ${i}`, rect(...r)]),
+  ...rearCourtSolids,
   ...curbs.sidewalks.map((p, i) => [`sidewalk ${i}`, p]),
   ...curbs.islands.map((p, i) => [`curb island ${i}`, p]),
 ];
