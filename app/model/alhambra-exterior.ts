@@ -434,7 +434,7 @@ export function buildAlhambraExterior(model: Facility) {
       new T.CylinderGeometry(0.28, 0.28, 0.75, 12),
       '#9a9c98',
     ).position.set(-37.7 + dx, 7.5, -27.2);
-  // Bottlebrush street trees on Valley Blvd: red bloom over green.
+  // Bottlebrush street trees on Valley Blvd, drawn green like the rest of the trees.
   for (const [x, z] of [
     [-11, 30.2],
     [1, 30.2],
@@ -446,7 +446,7 @@ export function buildAlhambraExterior(model: Facility) {
       const lobe = mesh(
         g,
         new T.IcosahedronGeometry(0.95, 1),
-        i % 2 ? '#a7524a' : '#5d7e4e',
+        i % 2 ? '#6f8f55' : '#5d7e4e',
       );
       lobe.position.set(
         x + Math.cos(i * 1.3) * 0.7,
