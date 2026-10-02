@@ -86,6 +86,12 @@
       "color": "#1F4D3A",
       "detail": "Long-sleeve uniform with lanyard",
       "skeleton": "seen-clay-16"
+    },
+    "instructor": {
+      "wardrobe": "costume",
+      "color": "#A63A2E",
+      "skeleton": "seen-clay-16",
+      "detail": "Guest cultural instructor in activity attire: tai chi silks, Tang jacket, qipao, opera costume or TCM coat"
     }
   },
   "people": [
@@ -2004,6 +2010,272 @@
       "glasses": false,
       "accent": "#b48b60",
       "height": 1.02
+    },
+    {
+      "id": "floor-member-01",
+      "role": "participant",
+      "appearance": 0,
+      "skin": "#dcae8b",
+      "hair": "#e6e2da",
+      "hairStyle": 2,
+      "glasses": false,
+      "accent": "#B8674A",
+      "height": 0.94,
+      "figure": "f",
+      "wardrobe": 0,
+      "cut": "cardigan"
+    },
+    {
+      "id": "floor-member-02",
+      "role": "participant",
+      "appearance": 1,
+      "skin": "#c48e69",
+      "hair": "#a19d96",
+      "hairStyle": 0,
+      "glasses": true,
+      "accent": "#B8674A",
+      "height": 0.97,
+      "figure": "m",
+      "wardrobe": 2,
+      "cut": "shirt"
+    },
+    {
+      "id": "floor-member-03",
+      "role": "participant",
+      "appearance": 2,
+      "skin": "#ecc9a8",
+      "hair": "#c8c5be",
+      "hairStyle": 1,
+      "glasses": false,
+      "accent": "#B8674A",
+      "height": 0.93,
+      "figure": "f",
+      "wardrobe": 3,
+      "cut": "sweater"
+    },
+    {
+      "id": "floor-member-04",
+      "role": "participant",
+      "appearance": 3,
+      "skin": "#a06e50",
+      "hair": "#d9d4ca",
+      "hairStyle": 3,
+      "glasses": false,
+      "accent": "#B8674A",
+      "height": 0.96,
+      "figure": "m",
+      "wardrobe": 5,
+      "cut": "cardigan"
+    },
+    {
+      "id": "floor-member-05",
+      "role": "participant",
+      "appearance": 4,
+      "skin": "#dcae8b",
+      "hair": "#e6e2da",
+      "hairStyle": 4,
+      "glasses": true,
+      "accent": "#B8674A",
+      "height": 0.95,
+      "figure": "f",
+      "wardrobe": 4,
+      "cut": "shirt"
+    },
+    {
+      "id": "floor-member-06",
+      "role": "participant",
+      "appearance": 5,
+      "skin": "#ecc9a8",
+      "hair": "#a19d96",
+      "hairStyle": 6,
+      "glasses": false,
+      "accent": "#B8674A",
+      "height": 0.98,
+      "figure": "m",
+      "wardrobe": 1,
+      "cut": "sweater"
+    },
+    {
+      "id": "floor-member-07",
+      "role": "participant",
+      "appearance": 6,
+      "skin": "#c48e69",
+      "hair": "#c8c5be",
+      "hairStyle": 2,
+      "glasses": false,
+      "accent": "#B8674A",
+      "height": 0.92,
+      "figure": "f",
+      "wardrobe": 2,
+      "cut": "sweater"
+    },
+    {
+      "id": "floor-member-08",
+      "role": "participant",
+      "appearance": 7,
+      "skin": "#dcae8b",
+      "hair": "#d9d4ca",
+      "hairStyle": 0,
+      "glasses": true,
+      "accent": "#B8674A",
+      "height": 0.97,
+      "figure": "m",
+      "wardrobe": 3,
+      "cut": "shirt"
+    },
+    {
+      "id": "instructor-opera",
+      "role": "instructor",
+      "appearance": 0,
+      "skin": "#ecc9a8",
+      "hair": "#231f1c",
+      "hairStyle": 2,
+      "glasses": false,
+      "accent": "#e39aa2",
+      "height": 0.99,
+      "figure": "f",
+      "costume": {
+        "style": "opera",
+        "color": "#e39aa2",
+        "trim": "#d6ae4f",
+        "accent": "#f6f1e8"
+      }
+    },
+    {
+      "id": "instructor-qigong",
+      "role": "instructor",
+      "appearance": 1,
+      "skin": "#dcae8b",
+      "hair": "#a19d96",
+      "hairStyle": 3,
+      "glasses": false,
+      "accent": "#c6d6c8",
+      "height": 1,
+      "figure": "m",
+      "costume": {
+        "style": "taichi",
+        "color": "#c6d6c8",
+        "trim": "#45685a"
+      }
+    },
+    {
+      "id": "instructor-dance",
+      "role": "instructor",
+      "appearance": 2,
+      "skin": "#ecc9a8",
+      "hair": "#231f1c",
+      "hairStyle": 2,
+      "glasses": false,
+      "accent": "#b8312f",
+      "height": 1,
+      "figure": "f",
+      "costume": {
+        "style": "qipao",
+        "color": "#b8312f",
+        "trim": "#e0b64e"
+      }
+    },
+    {
+      "id": "instructor-taichi",
+      "role": "instructor",
+      "appearance": 3,
+      "skin": "#dcae8b",
+      "hair": "#d9d4ca",
+      "hairStyle": 0,
+      "glasses": false,
+      "accent": "#f2eee6",
+      "height": 1.01,
+      "figure": "m",
+      "costume": {
+        "style": "taichi",
+        "color": "#f2eee6",
+        "trim": "#24211f"
+      }
+    },
+    {
+      "id": "instructor-erhu",
+      "role": "instructor",
+      "appearance": 4,
+      "skin": "#c48e69",
+      "hair": "#231f1c",
+      "hairStyle": 3,
+      "glasses": true,
+      "accent": "#2e3d61",
+      "height": 0.99,
+      "figure": "m",
+      "costume": {
+        "style": "tang",
+        "color": "#2e3d61",
+        "trim": "#c9a24a"
+      }
+    },
+    {
+      "id": "instructor-tcm",
+      "role": "instructor",
+      "appearance": 5,
+      "skin": "#dcae8b",
+      "hair": "#3b2a21",
+      "hairStyle": 4,
+      "glasses": true,
+      "accent": "#f3f1ea",
+      "height": 0.98,
+      "figure": "f",
+      "costume": {
+        "style": "tcm-coat",
+        "color": "#f3f1ea",
+        "trim": "#7b2f2b"
+      }
+    },
+    {
+      "id": "instructor-calligraphy",
+      "role": "instructor",
+      "appearance": 6,
+      "skin": "#dcae8b",
+      "hair": "#c8c5be",
+      "hairStyle": 3,
+      "glasses": true,
+      "accent": "#6a2c29",
+      "height": 1,
+      "figure": "m",
+      "costume": {
+        "style": "tang",
+        "color": "#6a2c29",
+        "trim": "#1e1b1a"
+      }
+    },
+    {
+      "id": "instructor-papercut",
+      "role": "instructor",
+      "appearance": 7,
+      "skin": "#ecc9a8",
+      "hair": "#3b2a21",
+      "hairStyle": 1,
+      "glasses": false,
+      "accent": "#b3312e",
+      "height": 0.97,
+      "figure": "f",
+      "costume": {
+        "style": "tang",
+        "color": "#b3312e",
+        "trim": "#e3bf5a"
+      }
+    },
+    {
+      "id": "instructor-tea",
+      "role": "instructor",
+      "appearance": 8,
+      "skin": "#dcae8b",
+      "hair": "#231f1c",
+      "hairStyle": 2,
+      "glasses": false,
+      "accent": "#5d8b77",
+      "height": 0.98,
+      "figure": "f",
+      "costume": {
+        "style": "qipao",
+        "color": "#5d8b77",
+        "trim": "#eee5d1"
+      }
     }
   ],
   "colorSource": "Role colours come from app/data/care-team.json (members[].color by characterRole). Front desk and food service sit outside the IDT and use the neutral colours below; participant tops use palette.participantWardrobe."

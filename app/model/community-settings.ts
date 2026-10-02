@@ -1,5 +1,4 @@
 import type { Vec2 } from './schema';
-import dayProgram from '../data/day-program.json';
 import instanceSummaryFile from '../data/community-instances.json';
 import {
   composeFrames,
@@ -680,10 +679,15 @@ export const careSettings: CareSetting[] = [
       frame: { position: [0.99, -8.15], heading: Math.PI / 2 },
       levelIds: ['ground'],
       excludeZoneIds: ['adjacent'],
-      // Seen's day room as Seen furnishes it (front tables cleared), and two
-      // dining places left open for wheelchairs.
+      // The partner furnishes its own day room: the three front tables
+      // cleared, as Seen first did, independent of Seen's day-program floor
+      // (its generated cast is placed against this furniture). Two dining
+      // places stay open for wheelchairs.
       excludeObjectIds: [
-        ...dayProgram.removedObjectIds,
+        ...[1, 2, 3].flatMap((n) => {
+          const table = `day-diamond-table-0${n}`;
+          return [table, ...[1, 2, 3, 4].map((c) => `${table}-chair-${c}`)];
+        }),
         'dining-table-02-chair-3',
         'dining-table-04-chair-3',
       ],

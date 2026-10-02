@@ -7,7 +7,7 @@ records. The companion [code review](CODE-REVIEW.md) holds the evidence behind e
 ## 1. Where we are
 
 The repository renders three Seen Health sites as architectural presentation models and animates a
-composite care day on one 720-second clock (8 AM to 4 PM). Alhambra carries the full loop: 167 people,
+composite care day on one 720-second clock (8 AM to 4 PM). Alhambra carries the full loop: 184 people,
 eight vans, deliveries, a programmable day room, a scripted participant story, a scenario compiler that
 routes people on a navigation grid, and a measurement layer that samples the same tracks. Olympic and
 Alveare reuse the rigs with site-specific casts and arrivals.

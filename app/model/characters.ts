@@ -21,7 +21,8 @@ export type CharacterRole =
   | 'activities'
   | 'nutrition'
   | 'dietitian'
-  | 'center-manager';
+  | 'center-manager'
+  | 'instructor';
 export type Action =
   | 'ping-pong'
   | 'billiards'
@@ -51,7 +52,52 @@ export type Action =
   | 'write'
   | 'craft'
   | 'music'
-  | 'listen';
+  | 'listen'
+  | 'qigong'
+  | 'fan-dance'
+  | 'opera'
+  | 'erhu'
+  | 'tea'
+  | 'board-game'
+  | 'watch'
+  | 'knit'
+  | 'cards'
+  | 'read';
+/** Guest-instructor attire: one silhouette and colour signature per style. */
+export type CostumeStyle = 'taichi' | 'tang' | 'qipao' | 'opera' | 'tcm-coat';
+export type Costume = {
+  style: CostumeStyle;
+  color: string;
+  trim: string;
+  /** Opera: water-sleeve colour. */
+  accent?: string;
+};
+/**
+ * Loop-seconds per cycle for the slow cultural actions; poses repeat exactly
+ * with this period (each divides the 720 s care day) and clips() bakes one
+ * full period. Other actions keep their 2 s clips.
+ */
+export const actionPeriods: Partial<Record<Action, number>> = {
+  'tai-chi': 16,
+  qigong: 12,
+  'fan-dance': 6,
+  opera: 8,
+  erhu: 3,
+  tea: 8,
+  'board-game': 8,
+  watch: 10,
+  knit: 3,
+  cards: 6,
+  read: 12,
+};
+/** Seated table activities: they always sit (a chair or wheelchair). */
+const TABLE_ACTIONS = new Set<Action>([
+  'board-game',
+  'watch',
+  'knit',
+  'cards',
+  'read',
+]);
 export type CharacterSpec = {
   id: string;
   role: CharacterRole;
@@ -77,6 +123,7 @@ export const roleNames: Record<CharacterRole, string> = {
   nutrition: 'Food service',
   dietitian: 'Dietitian',
   'center-manager': 'Center manager',
+  instructor: 'Guest instructor',
 };
 export const characterLibrary = templates;
 const roles = templates.roles as Record<
@@ -114,6 +161,8 @@ type Profile = {
   wardrobe: number;
   /** Participant garment cut: sweater, cardigan or shirt. */
   cut: string;
+  /** Guest instructors: cultural attire replacing the role uniform. */
+  costume?: Costume;
 };
 type StoredProfile = Partial<Profile> & { id: string; variant?: number };
 const people = templates.people as unknown as StoredProfile[];
@@ -155,6 +204,11 @@ export function characterProfile(spec: CharacterSpec): Profile {
     figure: figure === 'f' ? 'f' : 'm',
     wardrobe,
     cut: found?.cut ?? cuts[(h >>> 3) % cuts.length],
+    costume:
+      found?.costume ??
+      ((found?.role ?? spec.role) === 'instructor'
+        ? { style: 'tang', color: roleColors.instructor, trim: '#c9a24a' }
+        : undefined),
   };
 }
 
@@ -539,6 +593,33 @@ const pelvisKeys: Record<'f' | 'm', Key[]> = {
   ],
 };
 
+/**
+ * Guest-instructor attire. `hem` is the garment's lowest point in bind pose
+ * (long garments follow the legs below the waist); `ease` loosens the body,
+ * `sleeve`/`flare`/`leg` loosen sleeves and trousers; `collar` is the
+ * mandarin-collar height. Trousers default to the costume colour.
+ */
+// prettier-ignore
+const costumeWear: Record<
+  CostumeStyle,
+  {
+    hem: number;
+    ease: number;
+    sleeve: number;
+    flare: number;
+    leg: number;
+    collar: number;
+    shoe: string;
+    trouser?: string;
+  }
+> = {
+  taichi: { hem: 0.8, ease: 0.014, sleeve: 0.011, flare: 0.009, leg: 0.012, collar: 0.03, shoe: '#1f1d1b' },
+  tang: { hem: 0.815, ease: 0.008, sleeve: 0.006, flare: 0.003, leg: 0.002, collar: 0.03, shoe: '#2b2927', trouser: '#2b2826' },
+  qipao: { hem: 0.31, ease: 0.004, sleeve: 0, flare: 0, leg: 0, collar: 0.038, shoe: '#2a2321' },
+  opera: { hem: 0.1, ease: 0.008, sleeve: 0.009, flare: 0.006, leg: 0.004, collar: 0.03, shoe: '#262120', trouser: '#3a302d' },
+  'tcm-coat': { hem: 0.56, ease: 0.013, sleeve: 0.009, flare: 0.002, leg: 0.002, collar: 0.03, shoe: '#2b2927', trouser: '#3a3734' },
+};
+
 // Shared matte "clay" material: one shader program for every person.
 let clay: T.MeshStandardMaterial | null = null;
 const bodyMaterial = () =>
@@ -573,6 +654,57 @@ const aids = () =>
     }),
   });
 
+// ---- Target-driven limbs for the cultural performances ---------------------
+const TAU = Math.PI * 2;
+const _m4 = new T.Matrix4(),
+  _e1 = new T.Vector3(),
+  _e2 = new T.Vector3(),
+  _e3 = new T.Vector3();
+/** Rotation taking x to `a` and y to the part of `b` perpendicular to `a`. */
+function frameQ(out: T.Quaternion, a: T.Vector3, b: T.Vector3) {
+  _e1.copy(a).normalize();
+  _e2.copy(b).addScaledVector(_e1, -b.dot(_e1));
+  // Degenerate hint: any perpendicular will do.
+  if (_e2.lengthSq() < 1e-10) {
+    _e2.set(0, 0, 1).addScaledVector(_e1, -_e1.z);
+    if (_e2.lengthSq() < 1e-10) _e2.set(1, 0, 0);
+  }
+  _e2.normalize();
+  _e3.crossVectors(_e1, _e2);
+  return out.setFromRotationMatrix(_m4.makeBasis(_e1, _e2, _e3));
+}
+/** Eased 0 → 1 → 0 bump: rises over [a, b], holds, falls over [c, d]. */
+const bump = (f: number, a: number, b: number, c: number, d: number) =>
+  smooth(a, b, f) * (1 - smooth(c, d, f));
+/**
+ * Keyed hand path for one arm (right-arm values; the left arm mirrors x):
+ * [phase, hand centre, finger direction, palm normal, elbow direction, extra].
+ * Centres and directions are in the torso frame.
+ */
+type HandKey = [f: number, c: V3, fingers: V3, palm: V3, pole: V3, x: number[]];
+/** Baduanjin "holding up the heavens": extra = [rise onto toes, look]. */
+// prettier-ignore
+const qigongKeys: HandKey[] = [
+  [0, [0.075, -0.04, 0.2], [-1, 0.15, 0.35], [0, 1, 0], [0.5, -0.6, -0.6], [0, 0.12]],
+  [0.1, [0.075, -0.04, 0.2], [-1, 0.15, 0.35], [0, 1, 0], [0.5, -0.6, -0.6], [0, 0.12]],
+  [0.3, [0.075, 0.29, 0.26], [-1, 0.2, 0.3], [0, 1, 0.1], [0.45, -0.9, -0.1], [0.25, 0.04]],
+  [0.42, [0.075, 0.55, 0.22], [-0.8, 0.55, 0.2], [0, 0.35, 1], [0.55, -0.7, 0.15], [0.6, -0.25]],
+  [0.56, [0.08, 0.9, 0.07], [-1, 0.05, 0.15], [0, 1, 0], [0.8, -0.1, 0.35], [1, -0.42]],
+  [0.68, [0.08, 0.9, 0.07], [-1, 0.05, 0.15], [0, 1, 0], [0.8, -0.1, 0.35], [1, -0.42]],
+  [0.8, [0.39, 0.55, 0.19], [0.3, 1, 0.15], [0.9, 0, 0.45], [0.5, -0.5, -0.6], [0.5, -0.12]],
+  [0.92, [0.27, -0.1, 0.2], [0.2, -0.8, 0.55], [0.1, 0.25, 1], [0.4, -0.5, -0.7], [0, 0.08]],
+];
+/**
+ * Seated erhu, in the hip frame (hip joint at the origin, figure facing +z):
+ * the right-hand centre bows along x at `bowHand` height; the left hand
+ * stops the strings at `stopHand`; the instrument stands at `body`.
+ */
+export const ERHU = {
+  body: new T.Vector3(-0.09, 0.065, 0.2),
+  bowHand: new T.Vector3(0.17, 0.125, 0.2),
+  stopHand: new T.Vector3(-0.118, 0.4, 0.2),
+};
+
 /**
  * Architectural scale-model figures: realistic adult proportions, smooth matte
  * clay forms, a sculpted hair volume and one clothing signature per role.
@@ -584,10 +716,14 @@ export function createCharacter(spec: CharacterSpec) {
     wardrobe = roles[spec.role]?.wardrobe ?? 'uniform',
     F = profile.figure === 'f',
     fig = profile.figure,
-    h = hash(profile.id);
+    h = hash(profile.id),
+    costume = profile.costume,
+    cs = costume?.style;
   const roleColor = senior
     ? participantWardrobe[profile.wardrobe % participantWardrobe.length]
-    : roleColors[spec.role];
+    : costume
+      ? costume.color
+      : roleColors[spec.role];
   const skin = profile.skin,
     hair = profile.hair;
   // Garment plan: one signature detail per role.
@@ -603,29 +739,40 @@ export function createCharacter(spec: CharacterSpec) {
       'social-worker',
       'activities',
     ].includes(spec.role),
-    cut = senior ? profile.cut : scrubs || coat ? 'scrubs' : 'polo';
+    cut = costume
+      ? 'costume'
+      : senior
+        ? profile.cut
+        : scrubs || coat
+          ? 'scrubs'
+          : 'polo';
   const warmTrousers = ['#5f5850', '#7a7063', '#4b4743', '#8d8373', '#6a625a'],
-    trouser = senior
-      ? warmTrousers[(h >>> 5) % warmTrousers.length]
-      : scrubs
-        ? shadeOf(roleColor, 0.9)
-        : cap
-          ? shadeOf(roleColor, 0.82)
-          : apron
-            ? '#5d5249'
-            : '#3f3d3b',
+    trouser = costume
+      ? (costumeWear[costume.style].trouser ?? costume.color)
+      : senior
+        ? warmTrousers[(h >>> 5) % warmTrousers.length]
+        : scrubs
+          ? shadeOf(roleColor, 0.9)
+          : cap
+            ? shadeOf(roleColor, 0.82)
+            : apron
+              ? '#5d5249'
+              : '#3f3d3b',
     coatWhite = '#f1eee7',
-    shoe = senior
-      ? ['#4b4038', '#2f2d2b', '#8a7662', '#5a5550'][(h >>> 7) % 4]
-      : scrubs
-        ? '#dcd9d2'
-        : '#353331',
-    longSleeves =
-      coat ||
-      cap ||
-      spec.role === 'center-manager' ||
-      (senior && (profile.cut !== 'shirt' || (h >>> 9) % 2 === 0)),
-    sleeveColor = coat ? coatWhite : roleColor,
+    shoe = costume
+      ? costumeWear[costume.style].shoe
+      : senior
+        ? ['#4b4038', '#2f2d2b', '#8a7662', '#5a5550'][(h >>> 7) % 4]
+        : scrubs
+          ? '#dcd9d2'
+          : '#353331',
+    longSleeves = costume
+      ? cs !== 'qipao'
+      : coat ||
+        cap ||
+        spec.role === 'center-manager' ||
+        (senior && (profile.cut !== 'shirt' || (h >>> 9) % 2 === 0)),
+    sleeveColor = costume ? costume.color : coat ? coatWhite : roleColor,
     innerTop = cardigan ? mixHex(roleColor, '#f3efe6', 0.72) : roleColor;
 
   const root = new T.Group();
@@ -637,6 +784,7 @@ export function createCharacter(spec: CharacterSpec) {
     style: 'architectural clay figure',
     clothing:
       'White coats / V-neck scrubs / polos with lanyard / apron / driver cap; participants in warm casual wear',
+    ...(costume ? { costume: costume.style } : {}),
   };
   // Skeleton: the same 16 joints and hierarchy as earlier Seen rigs.
   const bones: T.Bone[] = [],
@@ -791,26 +939,27 @@ export function createCharacter(spec: CharacterSpec) {
       return neckTop - depth * f;
     };
   const hem = senior ? 0.845 : scrubs ? 0.83 : 0.855;
-  part(
-    loft({
-      keys: tk,
-      bottom: hem,
-      top:
-        cut === 'scrubs'
-          ? neckline(coat ? 0.13 : 0.155, 0.62, true)
-          : cut === 'polo' || cut === 'shirt'
-            ? neckline(0.075, 0.46, true)
-            : neckline(0.045, 1.05, false),
-      cols: 26,
-      rows: 13,
-      rim: 0.009,
-      rimTop: true,
-      rimBottom: true,
-      inflate: (y) => 0.005 + 0.011 * smooth(0.95, hem, y),
-    }),
-    innerTop,
-    waistBlend,
-  );
+  if (!costume)
+    part(
+      loft({
+        keys: tk,
+        bottom: hem,
+        top:
+          cut === 'scrubs'
+            ? neckline(coat ? 0.13 : 0.155, 0.62, true)
+            : cut === 'polo' || cut === 'shirt'
+              ? neckline(0.075, 0.46, true)
+              : neckline(0.045, 1.05, false),
+        cols: 26,
+        rows: 13,
+        rim: 0.009,
+        rimTop: true,
+        rimBottom: true,
+        inflate: (y) => 0.005 + 0.011 * smooth(0.95, hem, y),
+      }),
+      innerTop,
+      waistBlend,
+    );
   const chestZ = (y: number, x = 0) => {
     const [rx, zF] = ringAt(tk, y),
       s = T.MathUtils.clamp(Math.abs(x) / rx, 0, 0.98);
@@ -933,6 +1082,371 @@ export function createCharacter(spec: CharacterSpec) {
       careTeam.palette.paper,
       'torso',
     );
+  }
+
+  // ---- Guest-instructor costumes --------------------------------------------
+  // Same clay language, read by silhouette and colour: a mandarin collar with
+  // frog buttons (tai chi silks, Tang jacket, TCM coat), a fitted qipao with a
+  // piped diagonal opening, and an opera robe with a cloud collar.
+  const wear = costume ? costumeWear[costume.style] : null;
+  // Long garments: hip at the waist, then each thigh and shin, blended across
+  // the centre line so a skirt stretches between the legs instead of tearing.
+  const robeBlend = (p: T.Vector3): Weights => {
+    if (p.y > 0.95) return waistBlend(p);
+    const g = smooth(0.95, 0.8, p.y),
+      r = smooth(-0.05, 0.05, p.x),
+      k = smooth(0.6, 0.44, p.y);
+    return (
+      [
+        [bi('hip'), 1 - g],
+        [bi('legL'), g * (1 - r) * (1 - k)],
+        [bi('legR'), g * r * (1 - k)],
+        [bi('kneeL'), g * (1 - r) * k],
+        [bi('kneeR'), g * r * k],
+      ] as Weights
+    ).filter(([, x]) => x > 1e-4);
+  };
+  // Short jackets: the hem eases over the thighs in a deep stance or seated.
+  const jacketBlend = (p: T.Vector3): Weights => {
+    if (p.y > 0.93) return waistBlend(p);
+    const g = 0.8 * smooth(0.93, 0.78, p.y),
+      r = smooth(-0.05, 0.05, p.x);
+    return (
+      [
+        [bi('hip'), 1 - g],
+        [bi('legL'), g * (1 - r)],
+        [bi('legR'), g * r],
+      ] as Weights
+    ).filter(([, x]) => x > 1e-4);
+  };
+  if (costume && wear) {
+    const { color, trim } = costume,
+      long = wear.hem < 0.7,
+      m = F ? 1 : 1.05,
+      lower: Key[] =
+        cs === 'qipao'
+          ? [
+              [0.28, 0.152, 0.088, 0.094],
+              [0.4, 0.156, 0.088, 0.096],
+              [0.5, 0.162, 0.09, 0.098],
+              [0.6, 0.168, 0.092, 0.102],
+              [0.7, 0.176, 0.096, 0.11],
+              [0.8, 0.182, 0.102, 0.12],
+              [0.9, 0.178, 0.104, 0.126],
+            ]
+          : cs === 'opera'
+            ? [
+                [0.06, 0.25, 0.17, 0.18],
+                [0.2, 0.236, 0.156, 0.166],
+                [0.35, 0.218, 0.142, 0.152],
+                [0.5, 0.203, 0.13, 0.14],
+                [0.65, 0.192, 0.12, 0.132],
+                [0.8, 0.186, 0.112, 0.128],
+                [0.9, 0.18, 0.106, 0.126],
+              ]
+            : [
+                [0.52, 0.196, 0.122, 0.134],
+                [0.65, 0.19, 0.117, 0.13],
+                [0.8, 0.184, 0.112, 0.127],
+                [0.9, 0.177, 0.106, 0.124],
+              ],
+      keys: Key[] = long
+        ? [
+            ...lower.map(([y, rx, zF, zB]): Key => [y, rx * m, zF * m, zB * m]),
+            ...tk.filter((k) => k[0] >= 1),
+          ]
+        : tk,
+      ease = (y: number) =>
+        wear.ease +
+        (!long
+          ? 0.012 * smooth(0.95, wear.hem, y)
+          : cs === 'opera'
+            ? 0.012 * smooth(0.9, 0.15, y)
+            : cs === 'tcm-coat'
+              ? 0.01 * smooth(0.95, 0.6, y)
+              : 0),
+      weights = long ? robeBlend : jacketBlend,
+      surf = (y: number, th: number, extra = 0) =>
+        new T.Vector3(...section(keys, y, th, ease(y) + extra)),
+      neckR = F ? 0.046 : 0.054;
+    part(
+      loft({
+        keys,
+        bottom: wear.hem,
+        top: neckline(0.012, 0.55, false),
+        cols: 28,
+        rows: long ? Math.round((neckTop - wear.hem) / 0.04) : 14,
+        rim: 0.009,
+        rimTop: true,
+        rimBottom: true,
+        inflate: (y) => ease(y),
+      }),
+      color,
+      weights,
+    );
+    // Mandarin collar: a standing band round the neck, its front corners
+    // rounded down to a small opening.
+    const collarTop = (th: number, h: number) =>
+      h * (1 - 0.8 * (1 - smooth(0.08, 0.46, Math.abs(th))));
+    const collar = (c: string, h: number) => {
+      const y0 = neckTop - 0.008,
+        ring = (th: number, y: number, dr: number): V3 => {
+          const lean = 1 - 0.07 * smooth(y0, y0 + h, y),
+            cz = -0.006 + (y - 1.4) * 0.12;
+          return [
+            (neckR * 1.05 + 0.007 + dr) * lean * Math.sin(th),
+            y,
+            cz + (neckR + 0.007 + dr) * lean * Math.cos(th),
+          ];
+        };
+      part(
+        grid(
+          36,
+          4,
+          (i, j) => {
+            const th = (i / 36) * Math.PI * 2 - Math.PI,
+              top = y0 + collarTop(th, h);
+            return j === 0
+              ? ring(th, y0 - 0.012, 0)
+              : j === 1
+                ? ring(th, top, 0)
+                : j === 2
+                  ? ring(th, top + 0.0025, 0.0035)
+                  : j === 3
+                    ? ring(th, top, 0.007)
+                    : ring(th, y0 - 0.012, 0.007);
+          },
+          (_, j) => (j === 2 ? 0.9 : 1),
+        ),
+        c,
+        'torso',
+      );
+      return (th: number) => ring(th, y0 + collarTop(th, h) + 0.0012, 0.0035);
+    };
+    // Frog button: a corded bar with a knot, lying across the opening.
+    const frog = (th: number, y: number, c: string, w = 0.021) => {
+      const at = surf(y, th, 0.004),
+        t = new T.Vector3(Math.cos(th), 0, -Math.sin(th)),
+        n = new T.Vector3(Math.sin(th), 0, Math.cos(th));
+      part(
+        lathe(
+          at.clone().addScaledVector(t, -w),
+          t,
+          limbProfile(
+            2 * w,
+            [
+              [0, 0.0048],
+              [1, 0.0048],
+            ],
+            'round',
+            3,
+          ),
+          6,
+          0.7,
+        ),
+        c,
+        weights,
+      );
+      part(
+        ellipsoid(
+          at.addScaledVector(n, 0.003).toArray(),
+          [0.0075, 0.0075, 0.006],
+          8,
+          6,
+        ),
+        c,
+        weights,
+      );
+    };
+    const piping = (pts: T.Vector3[], c: string, r = 0.0042, closed = false) =>
+      part(
+        new T.TubeGeometry(
+          new T.CatmullRomCurve3(pts, closed),
+          Math.max(8, pts.length * 4),
+          r,
+          5,
+          closed,
+        ),
+        c,
+        weights,
+      );
+    // Centre placket: a slightly raised band down the front opening.
+    const placket = (bottom: number) =>
+      part(
+        loft({
+          keys,
+          bottom,
+          top: neckTop - 0.016,
+          cols: 4,
+          rows: Math.round((neckTop - bottom) / 0.05),
+          span: () => [-0.07, 0.07],
+          rim: 0.003,
+          rimBottom: true,
+          inflate: (y) => ease(y) + 0.0035,
+        }),
+        shadeOf(color, 0.93),
+        weights,
+      );
+    if (cs === 'taichi' || cs === 'tang') {
+      collar(trim, wear.collar);
+      if (cs === 'tang') placket(wear.hem + 0.012);
+      const top = neckTop - 0.04,
+        n = 5,
+        step = (top - (cs === 'tang' ? 1.06 : 1.08)) / (n - 1);
+      for (let i = 0; i < n; i++) frog(0, top - i * step, trim);
+    }
+    if (cs === 'tcm-coat') {
+      collar(color, wear.collar);
+      placket(wear.hem + 0.012);
+      for (let i = 0; i < 6; i++)
+        frog(0, neckTop - 0.045 - i * 0.082, trim, 0.016);
+    }
+    if (cs === 'qipao') {
+      const edge = collar(color, wear.collar),
+        rim: T.Vector3[] = [];
+      for (let i = 0; i < 36; i++)
+        rim.push(new T.Vector3(...edge((i / 36) * Math.PI * 2 - Math.PI)));
+      part(
+        new T.TubeGeometry(
+          new T.CatmullRomCurve3(rim, true),
+          72,
+          0.0032,
+          5,
+          true,
+        ),
+        trim,
+        'torso',
+      );
+      // 大襟: the opening sweeps from the collar across the right chest to the
+      // underarm, then down the side seam.
+      piping(
+        (
+          [
+            [0.02, neckTop - 0.014],
+            [0.32, neckTop - 0.03],
+            [0.68, 1.418],
+            [1.0, 1.38],
+            [1.26, 1.335],
+            [1.44, 1.27],
+            [1.52, 1.17],
+            [1.54, 1.05],
+          ] as const
+        ).map(([th, y]) => surf(y, th, 0.003)),
+        trim,
+      );
+      frog(0.3, neckTop - 0.03, trim, 0.016);
+      frog(0.98, 1.38, trim, 0.016);
+      frog(1.3, 1.326, trim, 0.016);
+      const hemRing: T.Vector3[] = [];
+      for (let i = 0; i < 40; i++)
+        hemRing.push(
+          surf(wear.hem + 0.008, (i / 40) * Math.PI * 2 - Math.PI, 0.002),
+        );
+      piping(hemRing, trim, 0.0045, true);
+    }
+    if (cs === 'opera') {
+      // Trim hem band and sash.
+      part(
+        loft({
+          keys,
+          bottom: wear.hem - 0.004,
+          top: wear.hem + 0.075,
+          cols: 32,
+          rows: 3,
+          rim: 0.004,
+          rimTop: true,
+          rimBottom: true,
+          inflate: (y) => ease(y) + 0.005,
+        }),
+        trim,
+        weights,
+      );
+      part(
+        loft({
+          keys,
+          bottom: 0.985,
+          top: 1.075,
+          cols: 28,
+          rows: 3,
+          rim: 0.004,
+          rimTop: true,
+          rimBottom: true,
+          inflate: (y) => ease(y) + 0.011,
+        }),
+        shadeOf(trim, 0.9),
+        weights,
+      );
+      for (const s of [-1, 1])
+        part(
+          loft({
+            keys,
+            bottom: s < 0 ? 0.62 : 0.66,
+            top: 1.0,
+            cols: 3,
+            rows: 9,
+            rim: 0.004,
+            rimBottom: true,
+            span: () => (s < 0 ? [-0.15, -0.03] : [0.03, 0.15]),
+            inflate: (y) => ease(y) + 0.009 + 0.008 * smooth(0.95, 0.65, y),
+          }),
+          shadeOf(trim, 0.9),
+          weights,
+        );
+      // Cloud collar (云肩): a scalloped cape over the shoulders, its lobes
+      // edged and tipped with beads.
+      const cols = 64,
+        rows = 7,
+        lobe = (th: number) => (0.5 + 0.5 * Math.cos(th * 8)) ** 2,
+        capeBottom = (th: number) => 1.372 - 0.05 * lobe(th),
+        capeInflate = (y: number, th: number) =>
+          0.014 +
+          0.042 * Math.sin(th) ** 2 * smooth(1.488, 1.425, y) +
+          0.004 * smooth(1.41, 1.33, y),
+        capeAt = (th: number, f: number, lift = 0) => {
+          const top = neckTop + 0.004,
+            y = top + (capeBottom(th) - top) * Math.pow(f, 0.85);
+          return section(tk, y, th, capeInflate(y, th) + lift);
+        };
+      part(
+        grid(
+          cols,
+          rows + 1,
+          (i, j) => {
+            const th = (i / cols) * Math.PI * 2 - Math.PI;
+            if (j <= rows) return capeAt(th, j / rows);
+            const [x, y, z] = capeAt(th, 1, -0.009);
+            return [x, y + 0.006, z];
+          },
+          (_, j) => (j > rows ? 0.7 : 1),
+        ),
+        trim,
+        'torso',
+      );
+      const edge: T.Vector3[] = [];
+      for (let i = 0; i < 96; i++)
+        edge.push(
+          new T.Vector3(...capeAt((i / 96) * Math.PI * 2 - Math.PI, 1, 0.001)),
+        );
+      part(
+        new T.TubeGeometry(
+          new T.CatmullRomCurve3(edge, true),
+          192,
+          0.0042,
+          5,
+          true,
+        ),
+        shadeOf(trim, 0.62),
+        'torso',
+      );
+      for (let i = 0; i < 8; i++) {
+        const [x, y, z] = capeAt((i / 8) * Math.PI * 2 - Math.PI, 1, 0.004);
+        part(
+          ellipsoid([x, y - 0.009, z], [0.0085, 0.011, 0.0085], 8, 6),
+          '#b8322c',
+          'torso',
+        );
+      }
+    }
   }
 
   // ---- Neck and head -------------------------------------------------------
@@ -1206,6 +1720,71 @@ export function createCharacter(spec: CharacterSpec) {
     );
   }
 
+  if (cs === 'opera' && costume) {
+    // Opera headdress: a gold band over the hair with red and gold pompoms.
+    const toward = (th: number, pol: number, lift: number) => {
+      const n = new T.Vector3(
+          Math.sin(pol) * Math.sin(th),
+          Math.cos(pol),
+          Math.sin(pol) * Math.cos(th),
+        ),
+        p = headAt(n);
+      return p.multiplyScalar((p.length() + lift) / p.length()).add(headC);
+    };
+    const band: T.Vector3[] = [];
+    for (let i = 0; i < 40; i++) {
+      const th = (i / 40) * Math.PI * 2 - Math.PI;
+      band.push(
+        toward(
+          th,
+          curve(
+            [
+              [0, 0.74],
+              [0.9, 1.02],
+              [1.57, 1.36],
+              [2.4, 1.36],
+              [3.15, 1.3],
+            ],
+            Math.abs(th),
+          ),
+          0.02,
+        ),
+      );
+    }
+    part(
+      new T.TubeGeometry(
+        new T.CatmullRomCurve3(band, true),
+        60,
+        0.0095,
+        6,
+        true,
+      ),
+      costume.trim,
+      'head',
+    );
+    const red = '#b8322c';
+    for (const [th, pol, r, c] of [
+      [0, 0.5, 0.022, red],
+      [-0.5, 0.6, 0.016, costume.trim],
+      [0.5, 0.6, 0.016, costume.trim],
+      [-0.95, 0.78, 0.017, red],
+      [0.95, 0.78, 0.017, red],
+      [-1.45, 1.06, 0.014, costume.trim],
+      [1.45, 1.06, 0.014, costume.trim],
+      [0, 0.82, 0.012, costume.trim],
+    ] as const)
+      part(
+        ellipsoid(
+          toward(th, pol, 0.022 + r * 0.55).toArray(),
+          [r, r, r],
+          10,
+          8,
+        ),
+        c,
+        'head',
+      );
+  }
+
   // ---- Limbs: one continuous skinned tube per limb, blended at the joint ----
   const limb = (
     from: T.Vector3,
@@ -1238,7 +1817,8 @@ export function createCharacter(spec: CharacterSpec) {
       la = elbow.distanceTo(shoulder),
       lf = wrist.distanceTo(elbow);
     const sleeve = longSleeves ? sleeveColor : skin,
-      pad = longSleeves ? (coat ? 0.009 : 0.004) : 0,
+      pad = wear ? wear.sleeve : longSleeves ? (coat ? 0.009 : 0.004) : 0,
+      fl = wear ? wear.flare : 0,
       r = (v: number) => v * girth + pad;
     limb(
       shoulder,
@@ -1251,8 +1831,8 @@ export function createCharacter(spec: CharacterSpec) {
           [0.2, r(0.039)],
           [la, r(0.034)],
           [la + 0.07, r(0.035)],
-          [la + 0.17, r(0.03)],
-          [la + lf, longSleeves ? r(0.03) : r(0.025)],
+          [la + 0.17, r(0.03) + fl * 0.5],
+          [la + lf, (longSleeves ? r(0.03) : r(0.025)) + fl],
         ],
         0.034,
         longSleeves ? 'cuff' : 'round',
@@ -1270,7 +1850,128 @@ export function createCharacter(spec: CharacterSpec) {
       sleeve,
       `elbow${side}`,
     );
-    if (!longSleeves) {
+    if (costume && (cs === 'taichi' || cs === 'tang')) {
+      // Contrasting turned-back cuff.
+      const R = r(0.03) + fl + 0.0045,
+        c = wear!.flare > 0.005 ? 0.05 : 0.042;
+      part(
+        lathe(
+          shoulder.clone().addScaledVector(dir, la + lf - c),
+          dir,
+          [
+            [0, -0.001],
+            [R - 0.004, 0],
+            [R, 0.004],
+            [R, c - 0.002],
+            [R - 0.003, c + 0.002],
+            [R - 0.009, c + 0.003],
+            [0, c + 0.003],
+          ],
+          14,
+        ),
+        costume.trim,
+        `elbow${side}`,
+      );
+    }
+    if (cs === 'qipao') {
+      // Cap sleeve with a piped edge.
+      const rs = (h: number) => (0.042 + 0.06 * h) * girth + 0.008,
+        L = 0.08;
+      part(
+        lathe(
+          shoulder,
+          dir,
+          [
+            [0, -0.042],
+            [rs(0) * 0.7, -0.03],
+            [rs(0) * 0.95, -0.012],
+            [rs(0), 0],
+            [rs(0.04), 0.04],
+            [rs(L), L],
+            [rs(L) - 0.007, L + 0.003],
+            [rs(L) - 0.013, L - 0.008],
+          ],
+          12,
+          1,
+          (j) => (j >= 6 ? 0.72 : 1),
+        ),
+        roleColor,
+        `arm${side}`,
+      );
+      part(
+        new T.TorusGeometry(rs(L) - 0.002, 0.0034, 5, 20)
+          .rotateX(Math.PI / 2)
+          .applyQuaternion(
+            new T.Quaternion().setFromUnitVectors(new T.Vector3(0, -1, 0), dir),
+          )
+          .translate(...shoulder.clone().addScaledVector(dir, L).toArray()),
+        costume!.trim,
+        `arm${side}`,
+      );
+    }
+    if (cs === 'opera') {
+      // Water sleeve (水袖): white silk flaring from the forearm and hanging
+      // well past the hand; the hand bone carries it so it can swing and fall.
+      const u = new T.Vector3(1, 0, 0).addScaledVector(dir, -dir.x).normalize(),
+        w = new T.Vector3().crossVectors(u, dir),
+        a0 = la + 0.12,
+        wd = la + lf,
+        q = new T.Vector3(),
+        st: [h: number, ru: number, rw: number][] = [
+          [a0 - 0.004, 0, 0],
+          [a0, r(0.035) + 0.003, r(0.035) + 0.003],
+          [a0 + 0.05, r(0.033) + 0.009, r(0.033) + 0.012],
+          [wd - 0.015, 0.045, 0.056],
+          [wd + 0.06, 0.038, 0.072],
+          [wd + 0.2, 0.027, 0.08],
+          [wd + 0.33, 0.022, 0.078],
+          [wd + 0.39, 0.016, 0.064],
+          [wd + 0.405, 0, 0],
+        ];
+      part(
+        grid(16, st.length - 1, (i, j) => {
+          const t = (i / 16) * Math.PI * 2,
+            [hh, ru, rw] = st[j];
+          return shoulder
+            .clone()
+            .addScaledVector(dir, hh)
+            .addScaledVector(u, Math.cos(t) * ru)
+            .addScaledVector(w, Math.sin(t) * rw)
+            .toArray();
+        }),
+        costume!.accent ?? '#f6f1e8',
+        (p) => {
+          const k = smooth(
+            wd - 0.03,
+            wd + 0.1,
+            q.copy(p).sub(shoulder).dot(dir),
+          );
+          return [
+            [bi(`hand${side}`), k],
+            [bi(`elbow${side}`), 1 - k],
+          ];
+        },
+      );
+      const R = r(0.035) + 0.007;
+      part(
+        lathe(
+          shoulder.clone().addScaledVector(dir, a0 - 0.01),
+          dir,
+          [
+            [0, 0],
+            [R - 0.003, 0],
+            [R, 0.004],
+            [R, 0.026],
+            [R - 0.003, 0.03],
+            [0, 0.03],
+          ],
+          14,
+        ),
+        costume!.trim,
+        `elbow${side}`,
+      );
+    }
+    if (!longSleeves && !costume) {
       // Short sleeve with a folded hem over the upper arm.
       const rs = (h: number) =>
         (h < 0.05 ? 0.04 + 0.12 * h : 0.046 - 0.035 * (h - 0.05)) * girth +
@@ -1333,33 +2034,40 @@ export function createCharacter(spec: CharacterSpec) {
     const hipJ = bw(`leg${side}`),
       knee = bw(`knee${side}`),
       ankle = bw(`foot${side}`),
-      kr = F ? 0.054 : 0.057;
+      kr = F ? 0.054 : 0.057,
+      lp = wear ? wear.leg : 0,
+      legColor = cs === 'qipao' ? skin : trouser;
     limb(
       hipJ,
       new T.Vector3(0, -1, 0),
       tubeProfile(
         [
-          [0, F ? 0.088 : 0.086],
-          [0.1, F ? 0.082 : 0.081],
-          [0.24, F ? 0.068 : 0.07],
-          [THIGH, kr],
-          [THIGH + 0.1, kr * 0.98],
-          [THIGH + 0.3, kr * 0.88],
-          [THIGH + SHIN + 0.035, kr * 0.84],
+          [0, (F ? 0.088 : 0.086) + lp],
+          [0.1, (F ? 0.082 : 0.081) + lp],
+          [0.24, (F ? 0.068 : 0.07) + lp],
+          [THIGH, kr + lp],
+          [THIGH + 0.1, kr * 0.98 + lp],
+          [THIGH + 0.3, kr * 0.88 + lp],
+          [THIGH + SHIN + 0.035, kr * 0.84 + lp * 0.5],
         ],
         0.05,
         'cuff',
       ),
       14,
-      trouser,
+      legColor,
       `leg${side}`,
       `knee${side}`,
       THIGH,
       0.05,
     );
     part(
-      ellipsoid(knee.toArray(), [kr * 0.97, kr * 0.97, kr * 0.97], 12, 8),
-      trouser,
+      ellipsoid(
+        knee.toArray(),
+        [kr * 0.97 + lp * 0.6, kr * 0.97 + lp * 0.6, kr * 0.97 + lp * 0.6],
+        12,
+        8,
+      ),
+      legColor,
       `knee${side}`,
     );
     part(
@@ -1695,6 +2403,706 @@ export function createCharacter(spec: CharacterSpec) {
       part(0, 0.42 + i * 0.19, 0.917, 0.055, 0.18, 0.012, '#e1d0aa', cargo);
     }
   }
+  // Rest frame of each mitten hand (fingers along the forearm, palm inward),
+  // and the hand centre's offset from the wrist joint.
+  const SIDES = [
+    ['L', -1],
+    ['R', 1],
+  ] as const;
+  const handRest = {
+      L: new T.Quaternion(),
+      R: new T.Quaternion(),
+    },
+    handDir = { L: new T.Vector3(), R: new T.Vector3() },
+    HAND_REACH = 0.072;
+  for (const [side, s] of SIDES) {
+    handDir[side].set(s * Math.sin(ARM_SPREAD), -Math.cos(ARM_SPREAD), 0);
+    frameQ(
+      handRest[side],
+      handDir[side],
+      new T.Vector3(-s * Math.cos(ARM_SPREAD), -Math.sin(ARM_SPREAD), 0),
+    ).invert();
+  }
+  const v1 = new T.Vector3(),
+    v2 = new T.Vector3(),
+    v3 = new T.Vector3(),
+    v4 = new T.Vector3(),
+    q1 = new T.Quaternion(),
+    q2 = new T.Quaternion(),
+    q3 = new T.Quaternion(),
+    qI = new T.Quaternion(),
+    eul = new T.Euler(),
+    X = new T.Vector3(1, 0, 0);
+  /** Hand rotation (torso frame, relative to rest) from finger and palm directions. */
+  const orient = (
+    side: 'L' | 'R',
+    fingers: T.Vector3,
+    palm: T.Vector3,
+    out: T.Quaternion,
+  ) => frameQ(out, fingers, palm).multiply(handRest[side]);
+  /** Two-bone arm: wrist to `wrist` (torso frame), elbow toward `pole`. */
+  function armTo(side: 'L' | 'R', wrist: T.Vector3, pole: T.Vector3) {
+    const arm = joints[`arm${side}`],
+      elbow = joints[`elbow${side}`],
+      u = elbow.position,
+      f = joints[`hand${side}`].position,
+      la = u.length(),
+      lf = f.length(),
+      d = v1.copy(wrist).sub(arm.position),
+      D = T.MathUtils.clamp(
+        d.length(),
+        Math.abs(la - lf) + 0.02,
+        la + lf - 1e-4,
+      ),
+      c = ((D * D - la * la - lf * lf) / 2 - u.x * f.x) / (u.y * f.y),
+      e = -Math.acos(T.MathUtils.clamp(c, -1, 1));
+    elbow.quaternion.setFromAxisAngle(X, e);
+    v2.set(f.x, f.y * Math.cos(e), f.y * Math.sin(e)).add(u);
+    frameQ(q1, v2, X).invert();
+    v3.crossVectors(d, pole);
+    if (v3.lengthSq() < 1e-8) v3.set(1, 0, 0);
+    frameQ(arm.quaternion, d, v3).multiply(q1);
+  }
+  /** Hand to a torso-frame rotation, with the wrist bend limited. */
+  function handTo(side: 'L' | 'R', q: T.Quaternion, limit = 1.5) {
+    const hand = joints[`hand${side}`];
+    hand.quaternion
+      .copy(joints[`arm${side}`].quaternion)
+      .multiply(joints[`elbow${side}`].quaternion)
+      .invert()
+      .multiply(q);
+    const a = 2 * Math.acos(Math.min(1, Math.abs(hand.quaternion.w)));
+    if (a > limit) hand.quaternion.slerp(qI, 1 - limit / a);
+  }
+  /** Hand centre to `c` with rotation `q` (torso frame); elbow toward `pole`. */
+  function reach(
+    side: 'L' | 'R',
+    c: T.Vector3,
+    q: T.Quaternion,
+    pole: T.Vector3,
+  ) {
+    armTo(
+      side,
+      v4
+        .copy(handDir[side])
+        .applyQuaternion(q)
+        .multiplyScalar(-HAND_REACH)
+        .add(c),
+      pole,
+    );
+    handTo(side, q);
+  }
+  /** Hip-frame point or rotation into the torso frame. */
+  const torsoPoint = (p: T.Vector3) =>
+    p
+      .sub(joints.torso.position)
+      .applyQuaternion(q3.copy(joints.torso.quaternion).invert());
+  const torsoTurn = (q: T.Quaternion) =>
+    q.premultiply(q3.copy(joints.torso.quaternion).invert());
+  /** Two-bone leg: ankle to a mesh-space point, knee over the toes, sole flat or pitched. */
+  function legTo(
+    side: 'L' | 'R',
+    x: number,
+    z: number,
+    yaw: number,
+    lift = 0,
+    pitch = 0,
+  ) {
+    const hip = joints.hip,
+      leg = joints[`leg${side}`],
+      knee = joints[`knee${side}`],
+      foot = joints[`foot${side}`],
+      hipInv = q3.copy(hip.quaternion).invert(),
+      t = v1
+        .set(x, ANKLE + lift, z)
+        .sub(hip.position)
+        .applyQuaternion(hipInv),
+      d = t.sub(leg.position),
+      a = knee.position.length(),
+      b = foot.position.length(),
+      D = T.MathUtils.clamp(d.length(), 0.05, a + b - 1e-4),
+      k =
+        Math.PI -
+        Math.acos(
+          T.MathUtils.clamp((a * a + b * b - D * D) / (2 * a * b), -1, 1),
+        );
+    knee.quaternion.setFromAxisAngle(X, k);
+    frameQ(q1, v2.set(0, -a - b * Math.cos(k), -b * Math.sin(k)), X).invert();
+    frameQ(
+      leg.quaternion,
+      d,
+      v3.set(Math.cos(yaw), 0, -Math.sin(yaw)).applyQuaternion(hipInv),
+    ).multiply(q1);
+    foot.quaternion
+      .copy(hip.quaternion)
+      .multiply(leg.quaternion)
+      .multiply(knee.quaternion)
+      .invert()
+      .multiply(q2.setFromEuler(eul.set(pitch, yaw, 0, 'YXZ')));
+  }
+  // Opera water sleeves: where each sleeve is thrown (mesh frame) and how far.
+  const sleeveAim = { L: new T.Vector3(0, -1, 0), R: new T.Vector3(0, -1, 0) };
+  const cv = new T.Vector3(),
+    sv = new T.Vector3(),
+    fv = new T.Vector3(),
+    pv = new T.Vector3(),
+    ov = new T.Vector3(),
+    hq = new T.Quaternion(),
+    kq = new T.Quaternion();
+  /** Interpolated key pose for one arm (eased between keys, cyclic). */
+  function keyed(keys: HandKey[], f: number, side: 'L' | 'R', s: number) {
+    let i = keys.length - 1;
+    while (i > 0 && keys[i][0] > f) i--;
+    const a = keys[i],
+      b = keys[(i + 1) % keys.length],
+      span = (b[0] <= a[0] ? b[0] + 1 : b[0]) - a[0],
+      t = smooth(0, 1, (f - a[0]) / span),
+      mir = (v: V3, out: T.Vector3) => out.set(v[0] * s, v[1], v[2]);
+    cv.lerpVectors(mir(a[1], v1), mir(b[1], v2), t);
+    pv.lerpVectors(mir(a[4], v1), mir(b[4], v2), t);
+    orient(side, mir(a[2], fv), mir(a[3], ov), hq);
+    orient(side, mir(b[2], fv), mir(b[3], ov), kq);
+    hq.slerp(kq, t);
+    return a[5].map((x, j) => x + (b[5][j] - x) * t);
+  }
+  /**
+   * Cycle phase (0–1) of an action for this person at loop time `time`, as
+   * pose() uses it. Table activities and guests' tea are staggered per
+   * person, so props tied to a moment (a placed piece, a turned page, a
+   * played card) can follow the same phase.
+   */
+  function phase(action: Action, time: number) {
+    const period = actionPeriods[action] ?? 2,
+      stagger =
+        TABLE_ACTIONS.has(action) ||
+        (action === 'tea' && spec.role !== 'instructor');
+    return (
+      (((time / period + (stagger ? (h % 997) / 997 : 0)) % 1) + 1) % 1
+    );
+  }
+  // Table layout shared by the seated table activities: top 0.74 m above the
+  // floor, near edge ~0.30 m and centre ~0.60 m in front of the hip joint.
+  const TABLE_TOP = 0.74,
+    TABLE_EDGE = 0.3,
+    TABLE_MID = 0.6;
+  type HandPose = {
+    f: number;
+    c: T.Vector3;
+    q: T.Quaternion;
+    p: T.Vector3;
+  };
+  const keyPool: HandPose[] = Array.from({ length: 8 }, () => ({
+    f: 0,
+    c: new T.Vector3(),
+    q: new T.Quaternion(),
+    p: new T.Vector3(),
+  }));
+  /**
+   * Hand key `k` at phase `f`: centre, fingers, palm and elbow direction,
+   * given in the hip frame (table work) or the torso frame (near the body).
+   */
+  function handKey(
+    k: number,
+    f: number,
+    side: 'L' | 'R',
+    hipFrame: boolean,
+    c: V3,
+    fingers: V3,
+    palm: V3,
+    pole: V3,
+  ) {
+    const o = keyPool[k];
+    o.f = f;
+    o.c.set(...c);
+    o.p.set(...pole);
+    orient(side, fv.set(...fingers), pv.set(...palm), o.q);
+    if (hipFrame) {
+      torsoPoint(o.c);
+      torsoTurn(o.q);
+    }
+  }
+  /** Eased cyclic blend of the first `n` hand keys at phase `f` into cv/hq/ov. */
+  function handPath(n: number, f: number) {
+    let i = n - 1;
+    while (i > 0 && keyPool[i].f > f) i--;
+    const a = keyPool[i],
+      b = keyPool[(i + 1) % n],
+      span = (b.f <= a.f ? b.f + 1 : b.f) - a.f,
+      t = smooth(0, 1, (f - a.f) / span);
+    cv.lerpVectors(a.c, b.c, t);
+    ov.lerpVectors(a.p, b.p, t);
+    hq.slerpQuaternions(a.q, b.q, t);
+  }
+  /** A hand resting palm-down at the near table edge (hip frame). */
+  function restAtTable(
+    k: number,
+    f: number,
+    side: 'L' | 'R',
+    s: number,
+    y: number,
+    z = 0,
+  ) {
+    handKey(
+      k,
+      f,
+      side,
+      true,
+      [s * 0.15, y + 0.035, TABLE_EDGE + 0.05 + z],
+      [-s * 0.25, -0.3, 1],
+      [0, -1, -0.3],
+      [s * 0.7, -0.7, -0.2],
+    );
+  }
+  /**
+   * Cultural activities: whole-body choreography standing, upper body only
+   * when seated or using a mobility aid. `motion` scales the range.
+   */
+  function perform(
+    action: Action,
+    time: number,
+    motion: number,
+    sitting: boolean,
+  ) {
+    const full = !sitting && !spec.mobility,
+      period = actionPeriods[action] ?? 8,
+      f = (((time / period) % 1) + 1) % 1,
+      th = f * TAU,
+      m = motion,
+      { hip, torso, head } = joints;
+    if (senior) torso.rotation.x += 0.045;
+    if (action === 'tai-chi') {
+      // Yang-style cloud hands: the hands circle past the face and waist in
+      // turn while the waist turns and the weight shifts in a low, wide stance.
+      const sw = Math.sin(th),
+        turn = 0.34 * sw * m;
+      if (full) {
+        // Tucked pelvis (尾闾中正), spine kept upright above it.
+        hip.position.set(0.065 * sw * m, baseY - 0.085, 0);
+        hip.rotation.set(-0.12, 0.5 * turn, 0);
+        torso.rotation.set(torso.rotation.x + 0.12, 0.5 * turn, 0);
+        legTo('L', -0.25, 0, -0.18);
+        legTo('R', 0.25, 0, 0.18);
+      } else torso.rotation.y = 0.75 * turn;
+      torso.rotation.x += 0.03;
+      for (const [side, s] of SIDES) {
+        const a = th + (s > 0 ? 0 : Math.PI),
+          sn = Math.sin(a),
+          cs = Math.cos(a),
+          up = (1 + cs) / 2;
+        cv.set(
+          s * (0.04 + 0.19 * sn * m),
+          0.235 + 0.27 * cs * m,
+          0.27 + 0.03 * cs,
+        );
+        fv.set(-s * 0.6, -0.05, 0.8).lerp(v1.set(-s * 0.2, 1, 0.2), up);
+        pv.set(0, -1, 0.1).lerp(v1.set(s * 0.15, 0.1, -1), up);
+        orient(side, fv, pv, hq);
+        // Sunk shoulders, dropped elbows (沉肩坠肘).
+        reach(side, cv, hq, ov.set(s * 0.45, -1, -0.15));
+      }
+      head.rotation.set(0.04, 0.16 * sw * m, 0);
+    }
+    if (action === 'qigong') {
+      // Holding up the heavens: palms lift from the belly, turn over and press
+      // overhead in a full stretch, then float down to the sides.
+      let rise = 0,
+        look = 0;
+      for (const [side, s] of SIDES) {
+        [rise, look] = keyed(qigongKeys, f, side, s);
+        // A reduced range still lifts the arms overhead, just less far.
+        cv.lerp(v3.set(s * 0.075, -0.04, 0.2), 0.4 * (1 - m));
+        reach(side, cv, hq, pv);
+      }
+      rise *= m;
+      if (full) {
+        hip.position.y = baseY - 0.03 * (1 - rise) + 0.022 * rise;
+        legTo('L', -0.11, 0, -0.08, 0.034 * rise, 0.3 * rise);
+        legTo('R', 0.11, 0, 0.08, 0.034 * rise, 0.3 * rise);
+      }
+      torso.rotation.x -= 0.05 * rise;
+      head.rotation.x = look * m;
+    }
+    if (action === 'fan-dance') {
+      // Fans raised high and low in turn with a wrist flick, torso sway and
+      // small side steps (fans face outward: palms face the front).
+      const sw = Math.sin(th),
+        lead = Math.sign(sw) * Math.pow(Math.abs(sw), 0.55),
+        flick = 0.5 * Math.sin(2 * th) * m;
+      torso.rotation.set(torso.rotation.x, 0.17 * lead * m, 0.07 * lead * m);
+      for (const [side, s] of SIDES) {
+        const hi = (1 + s * lead) / 2,
+          arc = Math.sin(Math.PI * hi);
+        cv.set(s * 0.43, 0.08, 0.1)
+          .lerp(v1.set(s * 0.36, 0.6, 0.06), hi * m)
+          .add(v2.set(-s * 0.08 * arc, 0, 0.1 * arc));
+        fv.set(s * 0.9, -0.1, 0.4).lerp(v1.set(s * 0.45, 0.9, 0.05), hi);
+        pv.set(0, -0.3, 1).lerp(v1.set(-s * 0.1, 0, 1), hi);
+        orient(side, fv, pv, hq).premultiply(
+          q1.setFromAxisAngle(fv.normalize(), s * flick),
+        );
+        reach(side, cv, hq, ov.set(s * 0.4, -1 + 0.4 * hi, -0.9 + 0.3 * hi));
+      }
+      head.rotation.set(
+        -0.08 - 0.06 * Math.abs(lead),
+        0.22 * lead * m,
+        -0.04 * lead,
+      );
+      if (full) {
+        hip.position.set(
+          0.05 * lead * m,
+          baseY - 0.028 + 0.01 * Math.abs(lead),
+          0,
+        );
+        hip.rotation.y = 0.08 * lead * m;
+        for (const [side, s] of SIDES) {
+          const free = Math.max(0, -s * lead) * m;
+          legTo(
+            side,
+            s * (0.11 + 0.11 * free),
+            0.05 * free,
+            s * 0.15,
+            0.03 * free,
+            0.5 * free,
+          );
+        }
+      }
+    }
+    if (action === 'opera') {
+      // Stage poise: weight on the back leg, front foot turned out; one hand
+      // raised at head height, the other at the waist; slow head turns and a
+      // flick of each water sleeve in turn.
+      const sw = Math.sin(th),
+        cw = Math.cos(th),
+        flickR = bump(f, 0.26, 0.34, 0.4, 0.56) * m,
+        flickL = bump(f, 0.72, 0.8, 0.84, 0.97) * m;
+      if (full) {
+        hip.position.set(-0.035, baseY - 0.032 + 0.008 * cw * m, 0);
+        hip.rotation.set(0, 0.14, 0.025);
+        legTo('L', -0.1, -0.03, -0.3);
+        legTo('R', 0.06, 0.16, 0.42, 0.012, 0.18);
+      }
+      torso.rotation.set(torso.rotation.x, 0.08 + 0.07 * sw * m, -0.035);
+      cv.set(
+        0.3 + 0.03 * cw * m + 0.05 * flickR,
+        0.4 + 0.05 * sw * m + 0.04 * flickR,
+        0.18,
+      );
+      orient('R', fv.set(0.25, 1, 0.25), pv.set(1, -0.1, 0.45), hq);
+      reach('R', cv, hq, ov.set(0.7, -0.8, -0.2));
+      cv.set(-0.1 - 0.06 * flickL, 0.0 + 0.04 * flickL, 0.24 + 0.05 * flickL);
+      orient('L', fv.set(0.5, -0.4, 0.75), pv.set(0.3, -1, -0.2), hq);
+      reach('L', cv, hq, ov.set(-0.8, -0.6, -0.4));
+      head.rotation.set(-0.04, 0.4 * sw * m, 0.06 * Math.sin(th + 1));
+      // Sleeve aims in the torso frame, carried to the mesh frame.
+      q2.copy(hip.quaternion).multiply(torso.quaternion);
+      sleeveAim.R.set(0, -1, 0)
+        .lerp(v1.set(0.85, 0.45, 0.3), flickR)
+        .applyQuaternion(q2);
+      sleeveAim.L.set(0, -1, 0)
+        .lerp(v1.set(-0.35, 0.15, 1), flickL * 0.85)
+        .applyQuaternion(q2);
+    }
+    if (action === 'erhu') {
+      // Seated erhu: the instrument stands on the left thigh (hip frame); the
+      // left hand stops the strings high on the neck, the right hand draws the
+      // bow level across the strings.
+      const sw = Math.sin(th),
+        bow = Math.sign(sw) * Math.pow(Math.abs(sw), 0.7) * m;
+      torso.rotation.set(
+        torso.rotation.x + 0.06,
+        -0.08 + 0.03 * bow,
+        0.015 * bow,
+      );
+      torsoPoint(cv.copy(ERHU.bowHand).setX(0.17 + 0.17 * bow));
+      orient('R', fv.set(-0.1, -0.35, 1), pv.set(-1, 0, 0), hq);
+      reach('R', cv, torsoTurn(hq), ov.set(0.4, -1, -0.5));
+      torsoPoint(
+        cv.copy(ERHU.stopHand).add(v1.set(0, 0.006 * Math.sin(4 * th), 0)),
+      );
+      orient('L', fv.set(0.35, 0.9, 0.15), pv.set(1, 0, 0), hq);
+      reach('L', cv, torsoTurn(hq), ov.set(-1, -0.7, -0.3));
+      head.rotation.set(0.12, -0.2 + 0.04 * bow, -0.05);
+    }
+    if (action === 'tea') {
+      const table = (sitting ? 0.74 : 1.03) - hip.position.y;
+      if (spec.role === 'instructor') {
+        // Tea host: lift the pot, pour in a small arc over the cups, set it
+        // down; the left hand steadies the lid; eyes on the cups.
+        const pour = bump(f, 0.2, 0.3, 0.64, 0.74),
+          tilt = bump(f, 0.3, 0.4, 0.56, 0.66),
+          arc = smooth(0.3, 0.62, f);
+        torso.rotation.x += 0.1 + 0.04 * pour;
+        cv.set(
+          0.2 - 0.27 * arc * pour,
+          table + 0.07 + 0.1 * pour,
+          0.4 + 0.04 * pour * Math.sin(Math.PI * arc),
+        );
+        sv.copy(cv);
+        torsoPoint(cv);
+        const r = 0.85 * tilt * m;
+        orient(
+          'R',
+          fv.set(0, -0.15, 1),
+          pv.set(-Math.cos(r), -Math.sin(r), 0),
+          hq,
+        );
+        reach('R', cv, torsoTurn(hq), ov.set(0.8, -0.6, -0.3));
+        cv.set(-0.16, table + 0.035, 0.32).lerp(
+          sv.add(v2.set(-0.07, 0.075, -0.01)),
+          pour,
+        );
+        torsoPoint(cv);
+        orient('L', fv.set(0.3, -0.25, 1), pv.set(0, -1, 0), hq);
+        reach('L', cv, torsoTurn(hq), ov.set(-0.8, -0.6, -0.3));
+        head.rotation.set(0.24, -0.1 * pour, 0);
+      } else {
+        // Seated guest: a sip every cycle (staggered per person), otherwise
+        // both hands rest at the table edge, the cup in the right hand.
+        const g = (((time / period + (h % 997) / 997) % 1) + 1) % 1,
+          sip = bump(g, 0.3, 0.44, 0.6, 0.74) * Math.min(1, m / 0.65);
+        torso.rotation.x += 0.05 - 0.03 * sip;
+        torsoPoint(cv.set(0.12, table + 0.045, 0.33)).lerp(
+          v1.set(0.04, 0.47, 0.17),
+          sip,
+        );
+        orient('R', fv.set(-0.25, -0.1, 1), pv.set(-1, 0, -0.25), hq);
+        orient('R', v2.set(-0.75, 0.15, 0.6), v3.set(-0.45, -0.55, -0.6), kq);
+        hq.premultiply(q3.copy(joints.torso.quaternion).invert()).slerp(
+          kq,
+          sip,
+        );
+        reach('R', cv, hq, ov.set(0.8, -0.7, -0.2));
+        torsoPoint(cv.set(-0.13, table + 0.035, 0.31));
+        orient('L', fv.set(0.25, -0.2, 1), pv.set(0, -1, 0), hq);
+        reach('L', cv, torsoTurn(hq), ov.set(-0.8, -0.6, -0.3));
+        head.rotation.set(0.12 - 0.2 * sip, 0, 0);
+      }
+    }
+    if (TABLE_ACTIONS.has(action)) tableWork(action, phase(action, time), m);
+  }
+  /**
+   * Seated table activities (always sitting): board games, watching a game,
+   * knitting, cards and reading. Table work is placed in the hip frame,
+   * hand-held work in the torso frame; `m` < 1 shortens reaches.
+   */
+  function tableWork(action: Action, g: number, m: number) {
+    const { torso, head } = joints,
+      top = TABLE_TOP / profile.height - joints.hip.position.y,
+      mid = TABLE_EDGE + (TABLE_MID - TABLE_EDGE) * (0.7 + 0.3 * m);
+    if (action === 'board-game') {
+      // Lean in, place a piece at the board centre, withdraw, then think
+      // with the right hand at the chin; eyes stay on the board.
+      const reachOut = bump(g, 0.26, 0.4, 0.53, 0.66),
+        think = bump(g, 0.58, 0.68, 0.86, 0.97);
+      torso.rotation.x += 0.1 + 0.16 * reachOut + 0.05 * think;
+      restAtTable(0, 0, 'R', 1, top);
+      restAtTable(1, 0.26, 'R', 1, top);
+      // Palm down so the pinched piece stays level.
+      const over: [V3, V3, V3] = [
+        [-0.1, -0.15, 1],
+        [0, -1, -0.12],
+        [0.6, -0.6, -0.5],
+      ];
+      handKey(2, 0.4, 'R', true, [0.05, top + 0.08, mid - 0.04], ...over);
+      handKey(3, 0.47, 'R', true, [0.05, top + 0.039, mid - 0.035], ...over);
+      handKey(4, 0.54, 'R', true, [0.06, top + 0.11, mid - 0.07], ...over);
+      handKey(
+        5,
+        0.68,
+        'R',
+        false,
+        [0.035, 0.405, 0.16],
+        [-0.3, 0.9, 0.3],
+        [0.1, 0.3, -1],
+        [0.3, -1, 0.3],
+      );
+      handKey(
+        6,
+        0.86,
+        'R',
+        false,
+        [0.035, 0.405, 0.16],
+        [-0.3, 0.9, 0.3],
+        [0.1, 0.3, -1],
+        [0.3, -1, 0.3],
+      );
+      restAtTable(7, 0.97, 'R', 1, top);
+      handPath(8, g);
+      reach('R', cv, hq, ov);
+      restAtTable(0, 0, 'L', -1, top);
+      handPath(1, 0);
+      reach('L', cv, hq, ov);
+      head.rotation.set(
+        0.42 + 0.06 * reachOut - 0.12 * think,
+        -0.06 * reachOut,
+        0.07 * think,
+      );
+    }
+    if (action === 'watch') {
+      // A spectator leaning on the table edge, glancing from player to
+      // player with small nods, now and then pointing at the board.
+      const sw = Math.sin(TAU * g),
+        turn = Math.sign(sw) * Math.pow(Math.abs(sw), 0.45) * m,
+        point = bump(g, 0.55, 0.63, 0.7, 0.78);
+      torso.rotation.x += 0.2;
+      torso.rotation.y = 0.1 * turn * (1 - point);
+      for (const [side, s] of SIDES) {
+        handKey(
+          0,
+          0,
+          side,
+          true,
+          [s * 0.13, top + 0.04, TABLE_EDGE + 0.08],
+          [-s * 0.35, -0.2, 1],
+          [0, -1, -0.2],
+          [s * 0.3, -0.6, -1],
+        );
+        handPath(1, 0);
+        if (side === 'R') {
+          hq.slerp(
+            orient('R', fv.set(-0.15, -0.15, 1), pv.set(-0.7, -0.7, 0), kq),
+            point * m,
+          );
+          cv.lerp(torsoPoint(v4.set(0.08, top + 0.2, mid - 0.08)), point * m);
+          ov.lerp(v3.set(0.6, -0.8, -0.2), point);
+        }
+        reach(side, cv, hq, ov);
+      }
+      head.rotation.set(
+        0.24 + 0.05 * Math.max(0, Math.sin(TAU * 3 * g)) * m,
+        0.42 * turn * (1 - point),
+        0,
+      );
+    }
+    if (action === 'knit') {
+      // Hands together in front of the lower chest, the needles stroking in
+      // turn; eyes on the work.
+      const a = TAU * g;
+      torso.rotation.x += 0.12;
+      for (const [side, s] of SIDES) {
+        const stroke = Math.max(0, s * Math.sin(a)) * (0.6 + 0.4 * m);
+        cv.set(s * 0.072, 0.22, 0.25).add(
+          v1.set(-s * 0.018 * stroke, 0.012 * stroke, 0.022 * stroke),
+        );
+        orient(
+          side,
+          fv.set(-s * 0.6, 0.3, 0.75),
+          pv.set(-s * 0.25, -0.95, 0.15),
+          hq,
+        );
+        hq.premultiply(q1.setFromAxisAngle(fv.normalize(), s * 0.3 * stroke));
+        reach(side, cv, hq, ov.set(s * 0.6, -0.9, -0.1));
+      }
+      head.rotation.set(0.42, 0.03 * Math.sin(a), 0);
+    }
+    if (action === 'cards') {
+      // The left hand holds a fan of cards at chest height facing the
+      // player; the right hand draws one, plays it to the table centre and
+      // returns to the table edge.
+      const play = bump(g, 0.28, 0.4, 0.46, 0.56);
+      torso.rotation.x += 0.06 + 0.12 * play;
+      cv.set(-0.075, 0.3 + 0.008 * Math.sin(TAU * g), 0.25);
+      orient('L', fv.set(0.3, 0.9, 0.15), pv.set(0.05, 0.25, -1), hq);
+      reach('L', cv, hq, ov.set(-0.7, -0.8, -0.1));
+      restAtTable(0, 0, 'R', 1, top);
+      restAtTable(1, 0.1, 'R', 1, top);
+      const pick: [V3, V3, V3] = [
+          [-0.4, 0.55, 0.7],
+          [-0.8, -0.3, 0.4],
+          [0.7, -0.8, -0.2],
+        ],
+        lay: [V3, V3, V3] = [
+          [-0.1, -0.2, 1],
+          [0, -1, -0.1],
+          [0.6, -0.6, -0.5],
+        ];
+      handKey(2, 0.2, 'R', false, [0.0, 0.39, 0.245], ...pick);
+      handKey(3, 0.26, 'R', false, [0.01, 0.42, 0.245], ...pick);
+      handKey(4, 0.4, 'R', true, [0.03, top + 0.07, mid - 0.06], ...lay);
+      handKey(5, 0.46, 'R', true, [0.03, top + 0.032, mid - 0.05], ...lay);
+      restAtTable(6, 0.56, 'R', 1, top);
+      handPath(7, g);
+      reach('R', cv, hq, ov);
+      head.rotation.set(0.22 + 0.2 * play, -0.12 * (1 - play), 0);
+    }
+    if (action === 'read') {
+      // An open book or folded paper held up in both hands, eyes scanning;
+      // the right hand turns a page once a cycle.
+      torso.rotation.x += 0.06;
+      for (const [side, s] of SIDES) {
+        handKey(
+          0,
+          0,
+          side,
+          false,
+          [s * 0.155, 0.24, 0.285],
+          [-s * 0.25, 0.65, 0.7],
+          [-s * 0.9, -0.1, -0.4],
+          [s * 0.6, -0.8, -0.3],
+        );
+        if (side === 'L') {
+          handPath(1, 0);
+          reach('L', cv, hq, ov);
+          continue;
+        }
+        handKey(
+          1,
+          0.68,
+          side,
+          false,
+          [0.155, 0.24, 0.285],
+          [-0.25, 0.65, 0.7],
+          [-0.9, -0.1, -0.4],
+          [0.6, -0.8, -0.3],
+        );
+        const turnPage: [V3, V3, V3] = [
+          [-0.6, 0.45, 0.65],
+          [0, -0.8, 0.55],
+          [0.6, -0.8, -0.3],
+        ];
+        handKey(
+          2,
+          0.76,
+          side,
+          false,
+          [0.12, 0.32 * m + 0.24 * (1 - m), 0.265],
+          ...turnPage,
+        );
+        handKey(
+          3,
+          0.83,
+          side,
+          false,
+          [0.155 - 0.195 * m, 0.33 * m + 0.24 * (1 - m), 0.285],
+          ...turnPage,
+        );
+        handPath(4, g);
+        reach('R', cv, hq, ov);
+      }
+      head.rotation.set(0.36, 0.07 * Math.sin(TAU * 3 * g) * m, 0);
+    }
+  }
+  /** Water sleeves hang from the hand bones; let them fall (or fly) freely. */
+  function drapeSleeves(thrown: boolean) {
+    for (const [side] of SIDES) {
+      const hand = joints[`hand${side}`];
+      // Elbow orientation in the mesh frame.
+      q1.copy(joints.hip.quaternion)
+        .multiply(joints.torso.quaternion)
+        .multiply(joints[`arm${side}`].quaternion)
+        .multiply(joints[`elbow${side}`].quaternion);
+      q2.copy(q1).multiply(hand.quaternion);
+      v1.copy(handDir[side]).applyQuaternion(q2);
+      v2.copy(thrown ? sleeveAim[side] : v3.set(0, -1, 0)).normalize();
+      q3.setFromUnitVectors(v1, v2);
+      const a = 2 * Math.acos(Math.min(1, Math.abs(q3.w))),
+        limit = 2.1;
+      if (a > limit) q3.slerp(qI, 1 - limit / a);
+      hand.quaternion.copy(q1.invert()).multiply(q3.multiply(q2));
+    }
+    sleeveAim.L.set(0, -1, 0);
+    sleeveAim.R.set(0, -1, 0);
+  }
   function pose(
     action: Action,
     time: number,
@@ -1702,7 +3110,7 @@ export function createCharacter(spec: CharacterSpec) {
     seatedOverride = false,
   ) {
     for (const b of bones) b.rotation.set(0, 0, 0);
-    joints.hip.position.y = baseY;
+    joints.hip.position.set(0, baseY, 0);
     wheels.forEach((w) => (w.rotation.x = 0));
     const stride = Math.sin(time * Math.PI * 2 * 0.9) * motion,
       breath = Math.sin(time * Math.PI * 2 * 0.25) * motion,
@@ -1727,9 +3135,12 @@ export function createCharacter(spec: CharacterSpec) {
       joints.hip.position.y += Math.abs(stride) * 0.016;
     }
     const inWheelchair = spec.mobility === 'wheelchair',
+      performing = action in actionPeriods,
       sitting =
         action === 'seated' ||
         action === 'ride' ||
+        action === 'erhu' ||
+        TABLE_ACTIONS.has(action) ||
         !!spec.seated ||
         seatedOverride ||
         inWheelchair;
@@ -1827,21 +3238,7 @@ export function createCharacter(spec: CharacterSpec) {
         joints.kneeL.rotation.x = joints.kneeR.rotation.x = 0.05 * (1 + stride);
       }
     }
-    if (action === 'tai-chi') {
-      joints.armL.rotation.set(-0.65 - 0.2 * slow, 0, -0.3);
-      joints.armR.rotation.set(-0.65 + 0.2 * slow, 0, 0.3);
-      joints.elbowL.rotation.x = -0.7 + 0.18 * slow;
-      joints.elbowR.rotation.x = -0.7 - 0.18 * slow;
-      joints.torso.rotation.y = 0.1 * slow;
-      if (!sitting) {
-        joints.hip.position.y -= 0.03;
-        for (const s of ['L', 'R']) {
-          joints[`leg${s}`].rotation.x = -0.12;
-          joints[`knee${s}`].rotation.x = 0.24;
-          joints[`foot${s}`].rotation.x = -0.12;
-        }
-      }
-    }
+    if (performing) perform(action, time, motion, sitting);
     if (['device', 'write', 'craft', 'music'].includes(action)) {
       joints.armL.rotation.x = -0.6;
       joints.armR.rotation.x = -0.6;
@@ -1907,9 +3304,17 @@ export function createCharacter(spec: CharacterSpec) {
     }
     // Participants: slightly shorter, with a gentle forward posture.
     if (senior) {
-      joints.torso.rotation.x += 0.045;
+      if (!performing) joints.torso.rotation.x += 0.045;
       joints.neck.rotation.x += 0.07;
       joints.head.rotation.x -= 0.1;
+    }
+    if (cs === 'opera') {
+      // Wide robe: arms hang a little away from it unless an act places them.
+      if (!performing) {
+        joints.armL.rotation.z -= 0.1;
+        joints.armR.rotation.z += 0.1;
+      }
+      drapeSleeves(action === 'opera');
     }
     mesh.updateMatrixWorld(true);
     mesh.skeleton.update();
@@ -1936,13 +3341,26 @@ export function createCharacter(spec: CharacterSpec) {
       'craft',
       'music',
       'listen',
+      'qigong',
+      'fan-dance',
+      'opera',
+      'erhu',
+      'tea',
+      'board-game',
+      'watch',
+      'knit',
+      'cards',
+      'read',
     ] as Action[]) {
+      // Cultural actions bake one full period; the rest keep 2 s clips.
+      const period = actionPeriods[action] ?? 2,
+        steps = period === 2 ? 40 : Math.max(40, Math.round(period * 6));
       const times: number[] = [],
         positions: number[] = [],
         tracks = new Map<T.Bone, number[]>();
       bones.forEach((b) => tracks.set(b, []));
-      for (let i = 0; i <= 40; i++) {
-        const t = i / 20;
+      for (let i = 0; i <= steps; i++) {
+        const t = (i * period) / steps;
         times.push(t);
         pose(action, t);
         positions.push(...joints.hip.position.toArray());
@@ -1951,7 +3369,7 @@ export function createCharacter(spec: CharacterSpec) {
       tracks.forEach((v) => v.splice(v.length - 4, 4, ...v.slice(0, 4)));
       positions.splice(positions.length - 3, 3, ...positions.slice(0, 3));
       list.push(
-        new T.AnimationClip(`${spec.id}:${action}`, 2, [
+        new T.AnimationClip(`${spec.id}:${action}`, period, [
           new T.VectorKeyframeTrack(
             `${joints.hip.name}.position`,
             times,
@@ -1971,5 +3389,5 @@ export function createCharacter(spec: CharacterSpec) {
     pose('idle', 0, 0);
     return list;
   }
-  return { root, mesh, bones, joints, pose, clips, profile };
+  return { root, mesh, bones, joints, pose, clips, profile, phase };
 }
