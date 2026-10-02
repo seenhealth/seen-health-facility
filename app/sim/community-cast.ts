@@ -21,6 +21,7 @@ import {
 import {
   instanceSelection,
   labelledRooms,
+  standingSurfaces,
 } from '../model/facility-instance';
 import {
   insidePolygon,
@@ -107,8 +108,10 @@ export function instanceView(facility: Facility, cfg: CareFacility): Facility {
 
 /**
  * The generated summary of a setting's instance, in the setting's local
- * frame (2 dp): the drawn zones' polygons (footprint) and rooms with their
- * label anchors and registry display names, plus the inputs it came from.
+ * frame (2 dp): the drawn zones' polygons (footprint), the surfaces people
+ * stand on above the floor (`platforms`, when there are any: a stage, choir
+ * risers) and rooms with their label anchors and registry display names,
+ * plus the inputs it came from.
  */
 export function instanceSummary(
   facility: Facility,
@@ -118,7 +121,11 @@ export function instanceSummary(
   const sel = instanceSelection(facility, cfg),
     labels = new Map(
       labelledRooms(sel.rooms, cfg.labels).map(([r, name]) => [r.id, name]),
-    );
+    ),
+    platforms = standingSurfaces(facility, sel).map((s) => ({
+      polygon: transformPolygon(cfg.frame, s.polygon).map(pt2),
+      y: r2(s.y),
+    }));
   return {
     facilityId: facility.id,
     revision: facility.revision,
@@ -133,6 +140,7 @@ export function instanceSummary(
     footprint: sel.zones.map((z) =>
       transformPolygon(cfg.frame, z.polygon).map(pt2),
     ),
+    ...(platforms.length ? { platforms } : {}),
     rooms: sel.rooms
       .filter((r) => r.kind !== 'shell')
       .map((r) => ({
@@ -460,12 +468,16 @@ const SEAT_KINDS = new Set([
   'lounge-chair',
   'chair',
   'task-chair',
+  'banquet-chair',
+  'piano-bench',
 ]);
 const TABLE_KINDS = new Set([
   'table',
   'round-table',
   'activity-tabletop',
   'mahjong-table',
+  'banquet-table',
+  'calligraphy-table',
 ]);
 const r3 = (v: number) => {
   const r = Math.round(v * 1000) / 1000;
@@ -1372,14 +1384,18 @@ export function communityCastFromScenes(
   };
   const holdSpan = (who: Person, k: number): [number, number] => {
     const w = who.walks[k],
+      next = who.walks[k + 1],
       start = Math.max(
         k === 0 ? 0 : w ? w.end : who.stays[k].start,
         arrival(who, k),
       ),
-      end = Math.min(
-        k + 1 < who.stays.length ? who.stays[k + 1].start : 720,
-        departure(who, k),
-      );
+      // A walk out moved later leaves the person here until it starts.
+      end = next
+        ? next.start
+        : Math.min(
+            k + 1 < who.stays.length ? who.stays[k + 1].start : 720,
+            departure(who, k),
+          );
     return [start, Math.max(start, end)];
   };
   /** Reaching a hole's door early: waiting there in sight until the hole opens. */

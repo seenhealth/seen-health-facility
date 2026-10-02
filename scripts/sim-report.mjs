@@ -202,7 +202,7 @@ line(
   `  ${hero.label}: ${hero.events.length} events, ${hero.interactions} interactions, ${hero.encounters} encounters, on site ${sim.clockLabel(hero.firstOnSite)}–${sim.clockLabel(hero.lastOnSite)}; disciplines ${hero.disciplines.length} of ${claimed.length} claimed by the scenario steps${missing.length ? ` (missing ${missing.join(', ')})` : ''}.`,
 );
 line(`  Zones: ${hero.zones.map((z) => `${z.zoneId} ${Math.round(min(z.seconds))} min`).join(' · ')}`);
-line(`  Size: ${(text.length / 1024).toFixed(0)} KB (bound ${(TRACE_SIZE_LIMIT / 1e6).toFixed(0)} MB)`);
+line(`  Size: ${(text.length / 1024).toFixed(0)} KB (bound ${(TRACE_SIZE_LIMIT / 1e6).toFixed(1)} MB)`);
 if (write) {
   writeFileSync(tracePath, text);
   line(`Wrote ${tracePath.replace(root + '/', '')}`);

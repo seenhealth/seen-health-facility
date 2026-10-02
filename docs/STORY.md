@@ -21,7 +21,7 @@ npm run preview:story   # serve the built site locally
 
 - `index.html`, `assets/*.js|css` (React, three.js and the facility renderer; the renderer, schema and hero tracks load as separate chunks after the opening paints)
 - `models/seen-alhambra-planning.json` (facility specification, minified)
-- the facility specifications the community layer stamps on its pads as instances, minified: every URL from `instanceFacilityUrls()` (`app/model/community-settings.ts`), today `models/seen-home-wong.json` (the Wongs' home); the partner day center stamps the Alhambra plan itself and needs no extra file. The stage loads them from the story's asset base (`loadFacility` in `app/story/stage.ts`).
+- the facility specifications the community layer stamps on its pads as instances, minified: every URL from `instanceFacilityUrls()` (`app/model/community-settings.ts`), today `models/seen-home-wong.json` (the Wongs' home and Mrs. Lin's) and `models/seen-partner-adhc.json` (the partner adult day center). The stage loads them from the story's asset base (`loadFacility` in `app/story/stage.ts`).
 - every texture the facilities reference (`reference/photos/*-sign.png`, `reference/fleet/final-vans.png`), collected from the specifications at build time
 - `brand/seen-health-horizontal.png`, `favicon.svg`
 
@@ -114,7 +114,7 @@ A step with `placement.mode: 'cutaway'` compiles no hero tracks. It features int
 | # | Highlight `id` | Service | Window (s) | Clock | Setting · anchor | Features |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 | `medication` | Medication | 28–58 | 8:18–8:38 AM | `pharmacy` · `counterBack` | `pharmacy-packing` |
-| 2 | `day-center` | Partner day center | 90–120 | 9:00–9:20 AM | `partner-adc` | `partner-line-dance` |
+| 2 | `day-center` | Partner day center | 298–328 | 11:18–11:38 AM | `partner-adc` · `hall` | `partner-line-dance` (fourteen dancers on the dance floor, the stage behind), `partner-pt` (the visiting Seen PT in the light rehab next door) |
 | 3 | `specialists` | Hospital specialists | 208–238 | 10:18–10:38 AM | `specialist` · `examSeat` | `specialist-visit` |
 | 4 | `optometry` | Optometry | 334–360 | 11:43 AM–12:00 PM | `specialist` · `optoSeat` | `optometry-exam` (slit lamp, then refraction) |
 | 5 | `imaging` | Imaging | 452–482 | 1:01–1:21 PM | `specialist` · `imagingTable` | `imaging-scan` (positioning, then the technologist at the console) |

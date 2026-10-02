@@ -12,8 +12,8 @@ clock and with the same engine and presentation palette, so it reads as one
 distributed care system. Everything is data first: a partner adult day center
 or a second Seen center is another registry entry, and a pad can carry a real
 facility specification instead of schematic massing (a *facility instance*):
-the partner adult day center is Seen's own Alhambra ground floor, stamped on
-its pad with its own generated cast.
+the partner adult day center is a small adult day health care center of its
+own, stamped on its pad with its own generated cast, and so is the Wongs' home.
 
 Everything here is illustrative. Pads sit on the paper ground beyond the ring
 streets, massing is schematic and timings are compressed onto the care-day
@@ -24,8 +24,8 @@ clock; no participant records are used.
 | File | Role |
 | --- | --- |
 | `app/model/community-settings.ts` | The registry (`careSettings`): kind, name, position, heading, pad size, access road, horseshoe drive, anchors, services, accent, and the optional stamped `facility`. Frame helpers (`toWorld`, `lanePath`, `lanePose`, `groundYAt`), the generated instance summaries (`instanceRooms`, `instanceFootprint`, `missingInstances`). No three.js. |
-| `app/model/community-pads.ts` | `buildCareSetting(setting, mat, { massing })`: plinth, drive band, stub and sidewalk, label plate, the building `massing` and the `site` around it (trees, patio) per kind. |
-| `app/model/facility-instance.ts` | `buildFacilityInstance(facility, frame, options)`: any schema 2.0 facility as a static cutaway with room plates, merged by material, with `picks` (each drawn object and its box) for hover and click; `instanceSelection` (what is drawn), shared with build-time navigation. Knows nothing of settings or sites. |
+| `app/model/community-pads.ts` | `buildCareSetting(setting, mat, { massing })`: plinth, drive band, stub and sidewalk, label plate, the building `massing` and the `site` around it (trees, planting, benches) per kind. |
+| `app/model/facility-instance.ts` | `buildFacilityInstance(facility, frame, options)`: any schema 2.0 facility as a static cutaway with room plates, merged by material, with `picks` (each drawn object and its box) for hover and click; `instanceSelection` (what is drawn), shared with build-time navigation; `standingSurfaces` (stages, risers, ramps and steps people stand on, from an asset's `parameters.standing`). Knows nothing of settings or sites. |
 | `app/model/community-track.ts` | The hand-authored `Track` builder (`hold`, with `seated` for a stool or a chair, `walk`, `hidden`, `ride`; `start` and `segmentsTo` for legs that fill holes). |
 | `app/model/instance-cast.ts` | `placeInstanceCast(setting, cast)`: a generated cast into world actors and interactions; `fillHoles` stitches hand-authored legs into a scheduled person's track. |
 | `app/sim/community-cast.ts` | Build time only: instance navigation options and view, the summary, the site checks, the cast generator `communityCastFromScenes` and its validator `checkInstanceCast`. |
@@ -41,14 +41,19 @@ clock; no participant records are used.
 | `app/data/community/home-wong.cast.json` | The Wongs' ADL day inside the home, the input of the instance cast pipeline (below). |
 | `app/data/community/home-lin.cast.json` | Mrs. Lin's day at home with her daughter (below, "Mrs. Lin's home"). |
 | `scripts/validate-home.mjs` | `npm run validate:home`: the home's plan, assets, registry frame and both homes' casts. |
+| `public/models/seen-partner-adhc.json` | The partner adult day health care center as a schema 2.0 facility specification (below), for the `partner-adc` pad. |
+| `scripts/build-partner-adhc.mjs` | Writes `seen-partner-adhc.json` deterministically from its constants (`--check` compares instead). |
+| `app/model/adhc-assets.ts` | `buildAdhcAsset(spec, material)`: stage platform, ramp and steps, backdrop, choir risers, lectern, piano and bench, banquet table and chair, dance floor, lantern post, bingo flashboard and caller's stand, calligraphy table, brush stand, easel, drying rack, scroll display, whiteboard, recumbent bike, band wall, practice stair and reception desk kinds, called by `buildAsset` after the home kinds. |
+| `app/data/community/partner-adc.cast.json` | The partner center's day, the input of the instance cast pipeline (below). |
+| `scripts/validate-partner-adhc.mjs` | `npm run validate:partner-adhc`: the center's program, plan, access, assets, registry and cast contract. |
 
 Wiring: `alhambraSource(model, base)` composes the Alhambra care day once,
 `withFleetCrew(composeSources(base, communitySource(model)))`, memoised per base
 loop. The renderer, the Measure panel (metrics and trace), the story scenario
 (`composedStorySource`), `scripts/sim-report.mjs` and `scripts/validate-trace.mjs`
 all read it, so every count, trace and report describes the people the scene
-animates (223 in the base loop: the center's 167, the fleet crew's 10 and the
-community's 46, of whom 33 are generated inside facility instances: 25 in the
+animates (241 in the base loop: the center's 167, the fleet crew's 10 and the
+community's 64, of whom 41 are generated inside facility instances: 33 in the
 partner day center, 6 in the Wongs' home and 2 in Mrs. Lin's). When
 the played source carries the `community` view, `renderer.ts` passes
 `registerCommunityVehicles` to `createActivity` (which rejects a seat in an
@@ -61,7 +66,7 @@ Layers) shows or hides the layer. The pads live in the site context, so they
 also hide with **Street & parking context** and stay out of Plan. The engine
 hides the layer's people through its view (`hiddenSources`, matched against
 `ActorSpec.sourceId`), so the activity panel's people count (the snapshot's
-`people`: 223 with the layer, 177 without), walking-path lines and follow
+`people`: 241 with the layer, 177 without), walking-path lines and follow
 targets follow the toggle; site-level people (the community cast and the fleet
 drivers) show only with the site context, at every level.
 
@@ -70,9 +75,9 @@ the sim report (`npm run sim:report`) fold them into one participant bucket,
 "Care at home & in the community", and the trace summary counts participants
 with a community touchpoint. The settings are zones of the composed source
 (`ActivityData.zones`, `community:<id>`), so occupancy and the trace name them
-(a setting with a facility by its `traceName`, e.g. "Partner ADC · Seen
-layout"); the zone carries the instance's rooms (`SourceZone.rooms`), so trace
-`enter` events read "Partner ADC · Day room" inside them. On-site counts and
+(a setting with a facility by its `traceName`, e.g. "Partner ADC"); the zone
+carries the instance's rooms (`SourceZone.rooms`), so trace `enter` events
+read "Partner ADC · Studio" inside them. On-site counts and
 staff time by role cover the center. Family members (role `family`: Mrs. Lin's
 daughter) are neither staff nor participants (`isStaffRole`,
 `characters.ts`): Measure counts them among the people (`headline.family`) but
@@ -123,7 +128,9 @@ pass and stop on the outer lane and the aide's car parks on the outer exit leg.
 
 Heights: pavement at street level (`STREET_Y = -0.23`), the pad plinth at
 sidewalk level (`PAD_Y = -0.05`), the porch at `PORCH_Y = 0.3` with the new
-ramp between. `groundYAt(point)` gives the height under a walker anywhere.
+ramp between. `groundYAt(point)` gives the height under a walker anywhere,
+including on a stamped facility's stage, choir risers, ramp and steps (the
+instance summary's `platforms`).
 
 ### Settings in this session
 
@@ -134,7 +141,7 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 | `home-lin` | home | Mrs. Lin's home, "Lives with her daughter · Seen van door to door" (short "Lin home"): (−84, −56), heading π/2, stub from the west street's southern reach; the Wongs' pad, drive, porch anchors and `facility` (seen-home-wong) | transport |
 | `hospital` | hospital | (94, 14), stub from the north street | ed, discharge |
 | `specialist` | specialist | Specialty clinic · cardiology, optometry & imaging: (84, −56), 44 × 26 m pad, stub from the south street (below) | specialist, optometry, imaging |
-| `partner-adc` | partner-adc | Partner adult day center, "Seen Health floor plan": (4, −68), Seen's Alhambra ground floor stamped on a 62 × 50 m pad | day-program |
+| `partner-adc` | partner-adc | Partner adult day center: (4, −68), its own 484 m² adult day health care center (`facility` seen-partner-adhc, below) on a 34 × 40 m pad | day-program |
 
 ## The day (care-day clock, 1 loop second = 40 clock seconds)
 
@@ -153,13 +160,16 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 | 9:55–10:45 | Specialty clinic | Drop-off under the canopy, check-in, vitals by the MA, cardiology follow-up 10:17–10:42; van leaves 11:02 and returns by the south and west streets. |
 | 10:47–12:40 | Specialty clinic | Diabetic eye exam: a participant with a cane and her Seen escort aide walk up from a Seen ride at the kerb and check in at 11:12; the escort waits in the lobby. The optometric technician calls her in, checks acuity and eye pressure and dilates her eyes (11:36–11:43), then reads her glasses on the lensometer; the optometrist's retina exam at the slit lamp and refraction 11:45–12:01, the report to the Seen PCP. Back in the lobby at 12:13 and out to the ride, passing the next walk-in on the way. |
 | 12:08–14:11 | Specialty clinic | Wrist X-ray six weeks after a fall: a participant and her Seen escort aide walk up from the kerb and check in at 12:33. The radiologic technologist calls her in, seats her at the end of the X-ray table with her forearm under the tube (13:01), takes three views from the console behind the shielded window (13:13–13:21) and checks them with her; the radiologist's read goes to the Seen PCP. Out at 13:45. |
-| 8:00–12:00 | Partner ADC | Twenty participants settle at the day-room tables (two wheelchair places at table ends); the activities lead welcomes them, the aide serves coffee, the partner nurse charts at the nurse station all day. |
-| 9:52–10:45 | Partner ADC | Tai chi on the patio under the slatted awning: eight participants and the lead, out through the front door and along the clinic front, arriving and leaving staggered. |
-| 11:00–11:50 | Partner ADC | Visiting Seen PT (walks in from the road end at 10:20) with participant 5 at the parallel bars and participant 6 on seated strength. |
-| 11:11–11:40 | Partner ADC | Visiting Seen RN reviews medications at the nurse station with participants 8 and 10, one after the other. |
-| 11:40–12:10 | Partner ADC | Tabletop games in the day room with the lead. |
-| 12:01–13:03 | Partner ADC | Lunch in the dining room: participants come in staggered from 12:00 to 12:20, the aide sets up and serves, two chairs are left out for the wheelchairs; she clears up until 14:30. |
-| 13:20–16:00 | Partner ADC | Seated music led from the front of the day room (the lead sets up from 12:13; walkers and wheelchairs join a little later), then afternoon conversation at the same tables. |
+| 8:00–9:07 | Partner ADC | Twenty-six participants have coffee at their own places at the long banquet tables (three wheelchair places at table ends); the activities lead welcomes everyone at the hall doors and the aide pours. |
+| 9:15–10:13 | Partner ADC | The morning rotation: brush calligraphy in the studio with the aide, a class at the whiteboard with the lead and a support group in the group room's circle with the social worker. |
+| 10:17–10:49 | Partner ADC | Four of the calligraphers stay on to paint at the easels. |
+| 10:51–11:50 | Partner ADC | Visiting Seen PT (in through the front doors from the street) with three participants in the light rehab: the parallel bars, seated strength with bands from a wheelchair and the practice stair with the partner's rehab aide. |
+| 10:57–11:50 | Partner ADC | Line dance: fourteen participants in three staggered rows on the dance floor, the lead calling the steps, the music leader at the stage piano; the others clap along from the tables. |
+| 12:00–13:00 | Partner ADC | Lunch at the long tables, served by the lead and the aide, with piano music. |
+| 13:10–14:23 | Partner ADC | The choir on the stage risers (eleven singers, filing off row by row), the lead conducting from the floor; the rest listen from the tables. |
+| 14:11–15:05 | Partner ADC | Bingo at the long tables: eighteen players, the lead calling beside the flashboard. |
+| 14:20–15:15 | Partner ADC | Afternoon studio, straight from the choir: calligraphy and painting for the eight singers who skip bingo. |
+| 15:11–15:41 | Partner ADC | The fan dance troupe (eight) on the dance floor, led by the music leader; the rest watch from the tables. |
 | 10:30–10:55 | Hospital | Rounds at Mr. Wong's bedside: the hospitalist, the case manager and the hospital's discharge nurse plan his discharge. |
 | 11:45–13:12 | Home | Van home; the aide meets her and follows her up the ramp and in (12:07); after the clinic: toileting, the assisted shower and dressing, lunch at the dining table; the aide hands over to the OT on the porch at 13:00 and drives off at 13:12. |
 | 12:14 | Home | Home-delivered lunch handed to the aide at the front door, a wellness check with Mrs. Wong on the entry bench (meals car on the outer lane; it leaves by the inner lane's exit, round the aide's parked car; back at the center by 13:00). |
@@ -317,27 +327,26 @@ registry entry, the specification and the cast file are the whole input.
 ```ts
 export type CareFacility = {
   id: string;                  // expected Facility.id; the viewer's own model id → stamped from it, no fetch
-  url: string;                 // root-relative spec, '/models/seen-alhambra-planning.json'
+  url: string;                 // root-relative spec, '/models/seen-partner-adhc.json'
   frame: Frame;                // facility origin and rotation in the setting's local frame
   levelIds?: string[];         // default: the level at elevation 0
-  excludeZoneIds?: string[];   // zones not drawn (Alhambra: 'adjacent')
+  excludeZoneIds?: string[];   // zones not drawn (the home's porch)
   excludeObjectIds?: string[]; // objects not drawn, nor obstacles, nor seats
   cutaway?: boolean;           // walls cut at CUTAWAY_HEIGHT (default true; ignores the wall mode)
   labels?: boolean | Record<string, string>; // room plates: rooms ≥ 12 m², or these ids with names
   floorY?: number;             // finished floor (default 0; a home uses PORCH_Y)
   margin?: number;             // footprint to pad edge (default 1.6 m)
-  grounds?: string[];          // anchors the site builder draws on (trees, patio corners): ≥ 1 m outside
+  grounds?: string[];          // anchors the site builder draws on (trees, a bench, planting): ≥ 1 m outside
 };
 ```
 
 `frame` composes with the setting's frame (`facilityWorldFrame`): with
 `heading` h a facility point (x, z) lands at `position + (x cos h + z sin h,
-−x sin h + z cos h)`. The partner uses `{ position: [0.99, −8.15], heading:
-π/2 }`, which puts the plan's west entrance (facility (−14.65, −0.99)) on the
-pad's front axis facing the drive; it excludes the `adjacent` zone, the
-day-room tables the day program clears and two dining chairs (wheelchair
-places), labels six rooms (Day room, Physical therapy, Dining, Nurse station,
-Reception, Games lounge) and draws only the ground floor. The pad is derived
+−x sin h + z cos h)`. The partner uses `{ position: [0, −6.6], heading: 0 }`,
+which puts its front doors (facility (0, 10.2)) on the pad's front axis 1.1 m
+behind the drop-off apron, facing the drive; it leaves out three table-end
+chairs, a classroom chair and an armchair (wheelchair places) and labels four
+rooms (Studio, Classroom, Group room, Rehab). The pad is derived
 from the footprint (`derivePad`: wide enough for footprint + margin, extended
 behind the origin by `pad.back` when deep, never smaller than authored, the
 front edge and drive fixed; a building past the front edge throws).
@@ -346,17 +355,20 @@ At run time the layer (`community-layer.ts`) stamps the instance synchronously
 when the facility is the viewer's own model, otherwise when `loadFacility`
 resolves (the massing stays until then and on failure); the story and both
 static builds ship every facility a registry entry stamps
-(`instanceFacilityUrls`). The instance is one merged static group: about 116
-draw calls (196 with shadows) and 305k triangles for the partner. The viewer
+(`instanceFacilityUrls`). The instance is one merged static group: about 54
+draw calls (four of them room plates; about 105 with shadows) and 158k
+triangles for the partner. The viewer
 cannot pick one chair out of merged geometry, so the build keeps a pick index,
 `picks`: each drawn object with its frame relative to the instance root and
 its box, measured once per asset from the geometry before the merge. Hover and
 click (`app/model/pick.ts`) test the ray against those boxes, the highlight
 outlines the box and the furniture card reads the stamped specification and
 the setting (`app/model/inspect.ts`); the people inside are the composed
-source's actors, picked like everyone else. People
-inside get the floor height from `groundYAt`, which checks instance footprints
-first.
+source's actors, picked like everyone else. People inside get the floor height from
+`groundYAt`, which checks instance footprints first, then the summary's
+`platforms`: the surfaces an asset's `parameters.standing` declares (`deck`,
+`tiers`, `ramp`, `steps`, collected by `standingSurfaces`), so a choir stands
+on its risers and a wheelchair climbs the stage ramp.
 
 ### Pipeline
 
@@ -377,7 +389,7 @@ community-settings.ts (pads, groundYAt, rooms)    community-people.ts → placeI
 The geometry summary and the tracks are separate files so that code needing
 only geometry (`community-settings.ts`, imported by the page, metrics and the
 trace) never carries the tracks, which only `community-people.ts` imports
-(about 11 KB gzipped for the partner; the summary is about 3.5 KB). A summary
+(about 14 KB gzipped for the partner; its summary is about 3.7 KB). A summary
 whose inputs no longer match the registry is ignored: the pad keeps its
 authored size, the setting is listed in `missingInstances`, and
 `validate-community.mjs` (in `npm run validate:activity`) fails until the
@@ -486,34 +498,36 @@ type Scene = {
 };
 ```
 
-A **scene person**, from the partner's cast: the visiting PT walks in from
-the street through the `front` entrance in time for the scene, treats two
-participants at the parallel bars and leaves after it; nobody writes her
-walks or times.
+A **scene person**, from the partner's cast (abridged): the visiting PT walks
+in from the street through the `front` entrance in time for the scene, works
+beside the parallel bars and leaves after it; nobody writes her walks or
+times. The participants arrive staggered from their places at the long tables
+and go back to them.
 
 ```json
 {
   "entrances": {
-    "front": { "inside": [-14.1, -0.99],
-               "path": ["sidewalkEnd", "sidewalkPad", "courtA", "courtB", "doorOutside"] }
+    "front": { "inside": [0, 9.4],
+               "path": ["sidewalkEnd", "sidewalkPad", "frontWalk", "doorOutside"] }
   },
   "people": [
     { "id": "visiting-pt", "role": "pt", "label": "Visiting Seen physical therapist",
       "variant": 8, "visit": { "entrance": "front" } },
-    { "id": "adc-participant-5", "role": "participant", "label": "Day center participant 5", "variant": 14 },
-    { "id": "adc-participant-6", "role": "participant", "label": "Day center participant 6", "variant": 15,
-      "mobility": "walker" }
+    { "id": "adc-participant-18", "role": "participant", "label": "Day center participant 18", "variant": 27,
+      "mobility": "wheelchair" },
+    { "id": "adc-participant-25", "role": "participant", "label": "Day center participant 25", "variant": 34 }
   ],
   "scenes": [
-    { "id": "partner-pt", "room": "rehab-open", "window": [270, 345], "category": "partner",
+    { "id": "partner-pt", "room": "adhc-rehab", "window": [256, 345], "category": "partner",
       "label": "Visiting Seen PT · strength & balance",
       "description": "A Seen physical therapist visits the partner center for strength and balance …",
       "slots": [
-        { "who": "visiting-pt", "action": "treat", "spot": "rehab-parallel-bars", "title": "Strength & balance" },
-        { "who": "adc-participant-5", "action": "exercise", "spot": "rehab-parallel-bars",
-          "title": "Parallel bars with the Seen PT" },
-        { "who": "adc-participant-6", "action": "exercise", "seat": "rehab-ot-chair-participant",
-          "title": "Seated strength with the Seen PT" }
+        { "who": "visiting-pt", "action": "treat", "at": { "point": [-8.4, -7.4], "heading": -1.5708 },
+          "title": "Strength & balance" },
+        { "who": "adc-participant-25", "action": "exercise", "at": { "point": [-9.3, -7.4], "heading": 0 },
+          "window": [268, 338], "title": "Parallel bars with the Seen PT" },
+        { "who": "adc-participant-18", "action": "exercise", "at": { "point": [-10.8, -6.9], "heading": -1.5708 },
+          "window": [262, 334], "title": "Seated strength with bands" }
       ] }
   ]
 }
@@ -662,37 +676,125 @@ another away window re-times the walks at either end of it.
 
 ### The partner adult day center
 
-The partner pad (`partner-adc`, (4, −68), heading 0, pad 62 × 50 m south of
-the south street, stub from (4, −35.8)) stamps Seen's own Alhambra ground
-floor, `seen-alhambra-planning`, as "Seen Health floor plan": facility frame
-`{ position: [0.99, −8.15], heading: π/2 }` so the plan's west entrance and
-arrival court face the drive, `adjacent` zone excluded, Seen's cleared
-day-room tables (`day-program.json` `removedObjectIds`, explicit in the
-registry) and two dining chairs (wheelchair places) excluded, six room plates
-(Day room, Physical therapy, Dining, Nurse station, Reception, Games lounge),
-margin 1.6 m, `grounds` for the trees, bench and patio corners. Its pad
-builder draws the hall massing only when the instance is missing, and the
-grounds (four trees, a bench, planting and the tai chi patio under a slatted
-pergola in the arrival court's west half) always. Same id as the viewer's model, so
-the instance is stamped synchronously with no fetch.
+The `partner-adc` pad stamps `public/models/seen-partner-adhc.json`, a schema
+2.0 facility specification of an illustrative partner adult day health care
+center (ADHC), written by `scripts/build-partner-adhc.mjs` from the program
+brief: mostly long tables, lots of dancing (line and fan dance), bingo, a choir
+and a stage, large groups in one large activity hall, a few smaller rooms for
+calligraphy, painting, classes and group therapy, and a light rehab space;
+nothing else but an entry with reception and restrooms, and substantially
+smaller than the main center. It is not a real provider or address and uses no
+participant records. Its 33 people are generated inside it from
+`app/data/community/partner-adc.cast.json`.
 
-Its cast, `app/data/community/partner-adc.cast.json`, is all scene people:
-twenty participants (canes 2, 9 and 20; walkers 6 and 17; wheelchairs 13 and
-18), the partner's activities lead, aide and nurse, and visiting Seen PT and
-RN (`visit` through the `front` entrance: sidewalk, court walk, west door).
-Scenes: morning in the day room (0–360), tai chi for eight on the patio
-(outdoor place `patio`, 168–247.5), PT with participants 5 and 6 at the bars
-and the OT chair (270–345), the RN's medication reviews with participants 8
-and 10 at the nurse station with the partner nurse (286–330), tabletop games
-(330–375), lunch in the dining room with staggered arrivals and the two
-wheelchair places (362–455), the aide clearing up, music (480–600) and
-afternoon conversation (600–720); the partner nurse charts all day.
-`keep` pins the ids other code uses (`adc-participant-1…6`, `adc-lead`,
-`visiting-pt`, `partner-tai-chi`, `partner-tabletop`, `partner-pt`, which the
-story's partner cutaway features). The trace names the zone "Partner ADC ·
-Seen layout" and its rooms "Partner ADC · Day room" and so on; Measure counts
-one occupancy series for the pad (25 people). Nobody arrives by van yet (see
-Roadmap hooks).
+#### Plan
+
+One storey, 24.2 × 18.0 m plus a 13.4 × 3.6 m entry pavilion in front (483.8
+m² gross, about a quarter of the main center's 1,956 m² ground floor; 457.8 m²
+net). Plan frame P: metres, origin on the hall's centre line 6.6 m behind the
+hall's front wall, +x east, +z toward the front doors and the drive, y = 0 the
+finished floor. P is world-aligned: world = P + (4, −74.6).
+
+| Room (id) | Size (m) | m² | What it holds |
+| --- | --- | --- | --- |
+| Multipurpose hall (`adhc-hall`) | 13.08 × 14.04 | 183.6 | Two rows of long banquet tables (six 8 ft tables under red cloths and gold runners, 49 banquet chairs, three wheelchair places at the table ends), a 9.2 × 5.2 m parquet dance floor with lantern posts at its corners, the bingo flashboard and caller's stand on the west wall, the stage ramp and steps |
+| Stage (`adhc-stage`) | 13.08 × 3.6 | 47.1 | Raised 0.40 m across the back of the hall: backdrop with banners and a lantern valance, three-tier choir risers, lectern, soloist microphone, upright piano and bench, two speakers |
+| Light rehab (`adhc-rehab`) | 5.24 × 9.04 | 47.4 | Parallel bars, two recumbent bikes, a mat table, a resistance-band wall, a practice stair, a weights and bands rack, chairs for seated strength |
+| Classroom (`adhc-classroom`) | 5.24 × 8.44 | 44.2 | Six two-place tables in three rows facing a mobile whiteboard; one place open for a wheelchair |
+| Calligraphy and painting studio (`adhc-studio`) | 5.24 × 11.04 | 57.8 | Two felt-laid calligraphy tables for twelve with ink stones and brush racks, a brush and ink stand, a hanging scroll display, four easels along the east wall and a drying rack by the door |
+| Group room (`adhc-group-room`) | 5.24 × 6.44 | 33.7 | A circle of eight armchairs round a low table for classes and group therapy; one place open for a wheelchair |
+| Entry and reception (`adhc-reception`) | 5.88 × 3.44 | 20.2 | Double front doors (1.8 m, flush threshold), the reception desk, three waiting chairs and a planter, double doors into the hall |
+| Accessible restrooms (`adhc-restroom-w`, `adhc-restroom-e`) | 3.44 × 3.44 | 11.8 each | Single-user, off the hall: toilet with side and rear grab bars, roll-under basin, 1.5 m turning circle |
+
+The light rehab and the classroom open off the hall's west side, the studio
+and the group room off its east side, the restrooms off its front; all four
+wings are one step-free floor. The stage is step-free by a 1:12 ramp along its
+front (0.40 m over 4.8 m) rising west to a 1.54 × 1.5 m landing level with the
+deck, with a handrail on the open side; walking performers also have three
+steps with side and centre handrails at the east end (two 0.64 m lanes), too
+narrow for walkers and wheelchairs. Doors are 1.0 m clear (1.8 m double
+doors at the front and into the hall), centred on the 0.2 m navigation grid so
+each passes a wheelchair straight through; five 1.5 m turning circles
+(restrooms, reception, ramp foot, stage deck). The stage platform, risers,
+ramp and steps declare their standing surfaces (`parameters.standing`), so the
+choir stands 0.6–1.0 m up and a wheelchair rolls up the slope; their
+navigation footprints are only the stage's front edge (open at the ramp
+landing and the steps), the ramp's handrail and the steps' rails. A banquet
+chair's navigation footprint reaches 0.25 m behind its frame (the chair pushed
+out and the seated person), so people walking behind a row keep clear of the
+backs.
+
+Decor, in the specification's own `adhc-*` materials (so the presentation
+palette leaves them alone): honey maple floors with a checkered parquet dance
+floor (two honey tones, a cinnabar border and a jade-and-gold medallion), red
+cloths with gold runners on the long tables, black lacquer and gold on the
+stage, its backdrop and the lantern posts, paper lanterns and hanging scrolls,
+a sage carpet in the classroom, a rose carpet in the group room, a mint rehab
+floor, terrazzo in the entry and warm terracotta stucco outside. The ADHC
+kinds are in `app/model/adhc-assets.ts` (fronts in each asset's
+`parameters.front`); every asset has a `name`.
+
+#### On the pad
+
+`careSettings` `partner-adc`: (4, −68), heading 0, pad 34 × 40 m south of the
+south street (stub from (4, −35.8)), a one-lane drive (depth 6, radius 6.2)
+and a 10 × 3 m apron; `facility: { id: 'seen-partner-adhc', url:
+'/models/seen-partner-adhc.json', frame: { position: [0, −6.6], heading: 0 },
+levelIds: ['ground'], excludeObjectIds: […], cutaway: true, labels: {…},
+margin: 1.6, grounds: [treeA–D, bench, bedWest, bedEast] }`. The front doors
+face the drop-off 1.1 m behind the apron; the building stays 1.05 m from the
+paving and the derived pad equals the authored one (slack side 3.3, front
+14.7, back 0.5 m). Left out as wheelchair places: the table-end chairs of row a
+and the west end of row b, one classroom chair and one armchair in the circle.
+Plates: Studio, Classroom, Group room, Rehab (none in the hall: at its label
+anchor, between the dance floor and the first row of tables, the chairs would
+hide it from the front). Anchors: the street walk
+(`sidewalkEnd`, `sidewalkPad`, `frontWalk`, `doorOutside`), the camera and
+story anchors `hall` (the dance floor's centre, world (4, −77.6)), `stage` and
+`ptStand` (beside the parallel bars, world (−4.4, −82.0)), and the grounds:
+four trees, a bench and two planting beds flanking the entry pavilion. While
+the instance loads (or if it fails) the pad draws the footprint as plain
+massing with a roof slab.
+
+#### The day
+
+The cast is all scene people: twenty-six participants (canes 2, 9, 20 and 26;
+walkers 6, 17 and 22; wheelchairs 13, 18 and 24), the partner's activities
+lead, activity aide, music and choir leader, social worker, rehab aide and
+receptionist, and the visiting Seen PT (`visit` through the `front` entrance:
+sidewalk, front walk, front doors). Each participant keeps a place at the long
+tables all day (alternate chairs, by the side of the hall nearest their
+morning room) and leaves it for the activities; the staff keep a place in
+their own rooms between sessions.
+
+| Interaction (id) | Loop s | Clock | Room | Who |
+| --- | --- | --- | --- | --- |
+| `partner-morning` | 0–100 | 8:00–9:07 | hall | Coffee at the long tables: all 26, the lead greeting at the hall doors, the aide pouring |
+| `partner-calligraphy` | 112–200 | 9:15–10:13 | studio | The aide demonstrating at the brush stand; seven participants |
+| `partner-class` | 112–200 | 9:15–10:13 | classroom | The lead at the whiteboard; seven participants (one in a wheelchair) |
+| `partner-group-therapy` | 115–200 | 9:17–10:13 | group room | The social worker; five participants and one in a wheelchair |
+| `partner-painting` | 206–254 | 10:17–10:49 | studio | Four calligraphers stay on at the easels; the aide |
+| `partner-pt` | 256–345 | 10:51–11:50 | light rehab | Visiting Seen PT beside the parallel bars: participant 25 on the bars, 18 on seated strength with bands, 9 on the practice stair with the rehab aide |
+| `partner-line-dance` | 266–345 | 10:57–11:50 | hall | Fourteen dancers in three staggered rows 1.65 m apart, the lead calling, the music leader at the piano; nine clap from the tables |
+| `partner-lunch` | 360–450 | 12:00–13:00 | hall | All 26 at their places, the lead and the aide serving, piano music |
+| `partner-choir` | 465–574 | 13:10–14:23 | stage | Eleven singers on the risers (back tier in first, each tier off east to west once the one in front is clear), the music leader at the piano, the lead conducting from the floor; fifteen listen from the tables |
+| `partner-bingo` | 556–638 | 14:11–15:05 | hall | The lead calling beside the flashboard; eighteen players |
+| `partner-afternoon` | 570–652 | 14:20–15:15 | studio | The eight singers who skip bingo: calligraphy and painting, with the aide |
+| `partner-fan-dance` | 646–692 | 15:11–15:41 | hall | The fan dance troupe (eight), led by the music leader; the rest watch from the tables |
+
+`keep` pins `visiting-pt`, `adc-lead`, `adc-aide`, `adc-music` and these twelve
+interactions; `npm run validate:partner-adhc` checks them, the line dance's
+dancers and the PT's window. The trace names the zone "Partner ADC" and its
+rooms "Partner ADC · Multipurpose hall", "Partner ADC · Studio" and so on;
+Measure counts one occupancy series for
+the pad (33 people). Nobody arrives by van yet (see Roadmap hooks).
+
+Assumptions: an illustrative composite. Lunch is catered (no kitchen in the
+program) and there is no clinic or nurse station: the visiting Seen PT is the
+only clinician on site. Two single-user restrooms are light for 33 people; the
+brief approved restrooms without a count. The music leader also leads the fan
+dance. People keep 0.6 m apart, so the line dance and the choir stand a little
+looser than a real troupe.
 
 ### The Wongs' home
 
@@ -943,7 +1045,7 @@ service each, on its own clock:
 | Highlight | Setting | Featured interactions | Camera anchor |
 | --- | --- | --- | --- |
 | `medication` | `pharmacy` | `pharmacy-packing` | `counterBack` |
-| `day-center` | `partner-adc` | `partner-line-dance` | the pad (instance) |
+| `day-center` | `partner-adc` | `partner-line-dance`, `partner-pt` | `hall` |
 | `specialists` | `specialist` | `specialist-visit` | `examSeat` |
 | `optometry` | `specialist` | `optometry-exam` | `optoSeat` |
 | `imaging` | `specialist` | `imaging-scan` | `imagingTable` |
@@ -1039,6 +1141,30 @@ review: `?site=alhambra&debug=1`, then
 `window.__viewer.focusSetting('partner-adc')` or `view('community')`.
 
 ```bash
+npm run validate:partner-adhc
+```
+
+The partner center: `scripts/build-partner-adhc.mjs --check` rewrites the
+specification unchanged; it validates, stays under 200 kB with no textures and
+is formatted like `prepare-public-models.mjs` writes it; one storey of
+450–650 m² gross (at most 35 % of the main center's ground floor) with exactly
+the brief's rooms and the approved extras, the hall the largest; every gap
+between a wall run's segments is a scheduled door ≥ 0.9 m (interior) or
+≥ 1.0 m (exterior) with plan-door leaves, passed straight through at
+wheelchair clearance; no floor furniture overlaps other furniture or walls or
+leaves its room, and everything on the stage rests on the deck; the five
+turning circles are clear; every room is reachable from just inside the front
+doors at wheelchair and walker clearance, and both reach the stage deck only
+up the 1:12 ramp (walking performers take the steps); every asset has a name
+and builds, the ADHC kinds at their declared size with their fronts
+documented; the registry stamps the file (and `instanceFacilityUrls` ships it),
+its site checks pass, the front doors face the drop-off and the camera anchors
+lie in their rooms; and the cast keeps the twelve contract interactions (each
+≥ 20 s inside the day), its staff and the visiting PT, a line dance of at least
+twelve dancers with the lead dancing, and a PT session across the story's
+289–300 s chapter, as do the generated tracks.
+
+```bash
 npm run validate:home
 ```
 
@@ -1068,9 +1194,10 @@ up to 1.45 m/s, the story's limit for her), and `lin-evening` must cover
 
 ## Roadmap hooks
 
-- **Partner ADC scenario.** The Seen layout, its cast and the visiting PT and
-  RN are in place; a Seen van drop at its drive (8:30, pickup 3:30) is one
-  more `van-…` itinerary plus riders arriving through the `front` entrance.
+- **Partner ADC scenario.** The partner's own center, its cast and the
+  visiting PT are in place; a Seen van drop at its drive (8:30, pickup 3:30)
+  is one more `van-…` itinerary plus riders arriving through the `front`
+  entrance.
 - **Replicate a building.** Any facility specification can be stamped on a
   pad (`facility`): the partner day center and the Wongs' home are, with their
   people generated inside (`HOLE_LEGS` for the home's outdoor parts), and Mrs.

@@ -2,6 +2,7 @@ import * as T from 'three';
 import type { Vec2 } from './schema';
 import {
   frontZ,
+  instanceSummary,
   LABEL_PLATE,
   LANE,
   lanePose,
@@ -1006,52 +1007,37 @@ function buildImaging(s: CareSetting, h: Ctx) {
   h.box(tx, fl + 1.08, -11.295, 0.42, 0.42, 0.01, PALETTE.optics);
 }
 /**
- * The partner's own single-storey hall: the massing shown when no facility
- * instance is stamped on the pad (or while one loads).
+ * The partner center while its facility instance loads (or if it fails): the
+ * stamped footprint from the generated summary, extruded to one storey under
+ * a flat roof. Nothing when there is no current summary.
  */
-function buildPartnerHall(s: CareSetting, h: Ctx) {
-  h.box(3, PAD_Y, -8.5, 16, 3.4, 8.2, PALETTE.wallWarm);
-  pitchedRoof(h, -5, 11, -12.6, -4.4, PAD_Y + 3.4, 1.2, PALETTE.roof, 0.6);
-  h.windows(-4.4, 0.6, PAD_Y + 1.0, -4.36, 1.4, 2.2, 1.4);
-  h.windows(3.6, 10.4, PAD_Y + 1.0, -4.36, 1.4, 2.2, 1.4);
-  h.box(2, PAD_Y, -4.36, 1.6, 2.2, 0.08, s.accent);
-  h.box(2, PAD_Y + 2.5, -3.6, 3.6, 0.16, 1.8, PALETTE.roof);
+function buildPartnerMassing(s: CareSetting, h: Ctx) {
+  for (const poly of instanceSummary(s)?.footprint ?? []) {
+    h.patch(poly, PAD_Y, 3.2, PALETTE.wallWarm);
+    h.patch(poly, PAD_Y + 3.2, 0.18, PALETTE.roof);
+  }
 }
 /**
- * Grounds around the stamped building: the tai chi patio in the arrival
- * court's west half under a slatted awning (people stay visible from above),
- * a bench, a planting strip along the west edge and four trees.
+ * Grounds around the stamped building: trees at the pad's back corners and
+ * beside the wings, and in front of the wings, either side of the entry
+ * pavilion, planting beds with low shrubs and a bench facing the drive.
  */
 function buildPartnerGrounds(s: CareSetting, h: Ctx) {
   const a = (k: string) => toLocal(s, s.anchors[k]);
-  const [x0, z0] = a('patioMin'),
-    [x1, z1] = a('patioMax'),
-    cx = (x0 + x1) / 2,
-    cz = (z0 + z1) / 2;
-  h.box(cx, PAD_Y, cz, x1 - x0, 0.02, z1 - z0, PALETTE.paver);
-  const postX = [x0 + 0.35, x1 - 0.35],
-    postZ = [z0 + 0.35, cz, z1 - 0.35];
-  for (const x of postX)
-    for (const z of postZ) h.box(x, PAD_Y, z, 0.16, 2.9, 0.16, PALETTE.metal);
-  for (const x of postX)
-    h.box(x, PAD_Y + 2.9, cz, 0.14, 0.18, z1 - z0 - 0.4, PALETTE.metal);
-  for (let z = z0 + 0.8; z < z1 - 0.5; z += 1.15)
-    h.box(cx, PAD_Y + 3.08, z, x1 - x0 - 0.2, 0.05, 0.34, s.accent);
-  const bench = a('bench');
-  h.box(bench[0], PAD_Y, bench[1], 0.5, 0.45, 1.8, PALETTE.wood);
-  const back = -s.pad.d / 2 - (s.pad.back ?? 0);
-  h.box(
-    -s.pad.w / 2 + 1,
-    PAD_Y,
-    (back + s.pad.d / 2) / 2,
-    0.8,
-    0.5,
-    s.pad.d / 2 - back - 3,
-    PALETTE.planting,
-  );
+  for (const k of ['bedWest', 'bedEast']) {
+    const [x, z] = a(k);
+    h.box(x, PAD_Y, z, 4.2, 0.1, 0.9, PALETTE.planting);
+    for (let i = 0; i < 5; i++)
+      h.tree(x - 1.6 + i * 0.8, z + (i % 2 ? 0.12 : -0.12), 0.32, 0.22, i);
+  }
+  const [bx, bz] = a('bench');
+  h.box(bx, PAD_Y, bz, 1.8, 0.45, 0.5, PALETTE.wood);
+  h.box(bx, PAD_Y + 0.45, bz - 0.22, 1.8, 0.4, 0.06, PALETTE.wood);
+  for (const dx of [-0.8, 0.8])
+    h.box(bx + dx, PAD_Y, bz, 0.08, 0.6, 0.5, PALETTE.dark);
   ['treeA', 'treeB', 'treeC', 'treeD'].forEach((k, i) => {
     const [x, z] = a(k);
-    h.tree(x, z, i === 3 ? 1.4 : 1.6, i === 3 ? 2.8 : 3.1, i);
+    h.tree(x, z, i < 2 ? 1.6 : 1.4, i < 2 ? 3.1 : 2.8, i);
   });
 }
 type Builder = (s: CareSetting, h: Ctx) => void;
@@ -1063,7 +1049,7 @@ const BUILDERS: Partial<
   pharmacy: { massing: buildPharmacy },
   hospital: { massing: buildHospital },
   specialist: { massing: buildSpecialist },
-  'partner-adc': { massing: buildPartnerHall, site: buildPartnerGrounds },
+  'partner-adc': { massing: buildPartnerMassing, site: buildPartnerGrounds },
 };
 /**
  * A complete pad for one setting, placed in the world: ground, `site` and

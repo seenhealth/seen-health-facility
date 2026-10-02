@@ -204,15 +204,17 @@ export const HIGHLIGHT_SHOTS: Record<string, ShotSpec> = {
     push: 1.16,
     drift: 0.16,
   },
+  // The line dance on the patterned floor, the stage and its lanterns
+  // behind: looking in over the long tables from the front doors' side.
   'day-center': {
-    place: { setting: 'partner-adc' },
-    zoom: 2.4,
-    azimuth: 0.42,
-    elevation: 0.86,
-    follow: 0.5,
-    radius: 16,
-    push: 1.18,
-    drift: 0.14,
+    place: { setting: 'partner-adc', anchor: 'hall' },
+    zoom: 4.4,
+    azimuth: 0.3,
+    elevation: 0.72,
+    follow: 0.3,
+    radius: 10,
+    push: 1.16,
+    drift: 0.12,
   },
   specialists: {
     place: { setting: 'specialist', anchor: 'examSeat' },

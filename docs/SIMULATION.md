@@ -480,8 +480,8 @@ per participant.
 `npm run sim:report` (or `npm run trace:report` for the trace alone) traces the
 base loop and the story source, both composed as the viewer plays them, at 1 s
 and writes `public/models/touchpoint-trace.json`: `{ sources: { base, story } }`,
-each with a `summary` and one event per line, about 2.5 MB for ~8,700 events
-(223 people in the base loop, 238 in the story), under the 3 MB bound.
+each with a `summary` and one event per line, about 3.1 MB for ~10,200 events
+(241 people in the base loop, 256 in the story), under the 3.5 MB bound.
 Compactness comes from coalescing encounters, not from short keys. The console
 prints events by kind, participants covered per category and the hero's
 discipline coverage. `npm run validate:trace` recomputes the trace and asserts

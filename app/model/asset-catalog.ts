@@ -514,6 +514,124 @@ export const assetCatalog: Record<string, CatalogEntry> = {
       'Gentle 1:12 ramp with handrails on both sides, so a wheelchair or walker gets in and out without steps.',
   },
 
+  // Partner adult day center: the hall, its stage, the studio and the rehab
+  'stage-platform': {
+    name: 'Stage',
+    purpose:
+      'Raised stage at the back of the hall for the choir, performances and celebrations, low enough that everyone at the long tables can see.',
+  },
+  'stage-ramp': {
+    name: 'Stage ramp',
+    purpose:
+      'Gentle 1:12 ramp with handrails and a level landing at the top, so performers in wheelchairs or with walkers reach the stage on their own.',
+  },
+  'stage-steps': {
+    name: 'Stage steps',
+    purpose:
+      'Shallow steps with handrails on both sides and down the middle for performers who walk up to the stage.',
+  },
+  'stage-backdrop': {
+    name: 'Stage backdrop',
+    purpose:
+      'Red curtain with banners and paper lanterns behind the stage: a festive backdrop for the choir, performances and holidays.',
+  },
+  'choir-riser': {
+    name: 'Choir risers',
+    purpose:
+      'Three low tiers so every singer can see the conductor and be seen, with a shallow step between tiers.',
+  },
+  lectern: {
+    name: 'Lectern',
+    purpose:
+      'Stand at the front of the stage for announcements, birthday wishes and introducing performers.',
+  },
+  'upright-piano': {
+    name: 'Upright piano',
+    purpose:
+      'Played by the music leader for the choir, line dancing and sing-alongs, with familiar songs in several languages.',
+  },
+  'piano-bench': {
+    name: 'Piano bench',
+    purpose: 'Bench for the music leader at the piano.',
+  },
+  'banquet-table': {
+    name: 'Long table',
+    purpose:
+      'Long banquet table where participants keep their own places all day for coffee, lunch and bingo, with room at the ends for wheelchairs.',
+  },
+  'banquet-chair': {
+    name: 'Banquet chair',
+    purpose:
+      'Light stacking chair at the long tables, set back far enough for staff to pass behind seated participants.',
+  },
+  'dance-floor': {
+    name: 'Dance floor',
+    purpose:
+      'Patterned parquet floor in the middle of the hall for line dancing and fan dancing; flush with the floor, so nothing to trip on.',
+  },
+  'lantern-post': {
+    name: 'Lantern post',
+    purpose:
+      'Paper lantern on a post around the dance floor, part of the hall’s festive decor.',
+  },
+  'bingo-board': {
+    name: 'Bingo flashboard',
+    purpose:
+      'Large board that lights up each number as it is called, so players who are hard of hearing can follow along.',
+  },
+  'bingo-caller': {
+    name: 'Bingo caller’s stand',
+    purpose: 'Ball cage and stand where the activities lead calls the numbers.',
+  },
+  'calligraphy-table': {
+    name: 'Calligraphy table',
+    purpose:
+      'Long table laid with felt, rice paper and ink stones for brush calligraphy, with places on both sides.',
+  },
+  'brush-stand': {
+    name: 'Brush and ink stand',
+    purpose:
+      'Cabinet and rack for brushes, ink sticks and paper, ready for calligraphy and painting.',
+  },
+  easel: {
+    name: 'Easel',
+    purpose:
+      'Studio easel for painting classes; set at a height for painting seated or standing.',
+  },
+  'drying-rack': {
+    name: 'Drying rack',
+    purpose:
+      'Shelves where paintings and calligraphy dry flat before they go home or up on the wall.',
+  },
+  'scroll-display': {
+    name: 'Scroll display',
+    purpose: 'Hanging scrolls showing participants’ calligraphy and paintings.',
+  },
+  whiteboard: {
+    name: 'Whiteboard',
+    purpose:
+      'Mobile whiteboard for classes, such as phone and video-call skills, health talks and language lessons.',
+  },
+  'recumbent-bike': {
+    name: 'Recumbent bike',
+    purpose:
+      'Exercise bike with a supportive seat and back for gentle leg strengthening and endurance, safe for people with balance problems.',
+  },
+  'band-wall': {
+    name: 'Resistance-band wall',
+    purpose:
+      'Wall-mounted resistance bands in graded strengths for seated and standing strengthening exercises.',
+  },
+  'practice-stair': {
+    name: 'Practice stair',
+    purpose:
+      'A few steps with handrails on both sides to practise stairs safely before facing the ones at home.',
+  },
+  'reception-desk': {
+    name: 'Reception desk',
+    purpose:
+      'Front desk where participants and visitors sign in, and families call or drop by.',
+  },
   // Site
   car: {
     name: 'Parked car',

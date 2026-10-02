@@ -994,16 +994,17 @@
     {
       "id": "day-center",
       "label": "Partner day center",
-      "kicker": "9:00 AM \u00b7 Partner adult day center",
+      "kicker": "11:20 AM \u00b7 Partner adult day center",
       "title": "A dance floor across town.",
-      "body": "Line dancing, bingo, a choir and calligraphy at a partner day center, where a Seen therapist visits to keep everyone steady on their feet.",
+      "body": "Line dancing, a choir on the stage, calligraphy and bingo at a partner day center, where a visiting Seen therapist works on balance next door.",
       "settingId": "partner-adc",
       "interactionIds": [
-        "partner-line-dance"
+        "partner-line-dance",
+        "partner-pt"
       ],
       "window": [
-        90,
-        120
+        298,
+        328
       ],
       "roles": [
         "pt"

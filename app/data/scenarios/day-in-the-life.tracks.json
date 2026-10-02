@@ -9827,7 +9827,7 @@
    "start": 306.4561,
    "end": 329.022,
    "zoneId": "dining",
-   "description": "11:20 AM · Dining"
+   "description": "11:25 AM · Dining"
   },
   {
    "id": "hero-lin-social-work",
@@ -10016,62 +10016,27 @@
    ]
   },
   {
-   "id": "network-pharmacy",
+   "id": "home-am",
    "window": [
-    26,
+    20,
     50
    ],
    "heroPresent": false,
-   "zoneId": "community:pharmacy",
+   "zoneId": "community:home-lin",
    "roomId": null,
-   "focusTime": 38,
-   "focusActorId": "interaction:pharmacy-packing",
+   "focusTime": 36.25,
+   "focusActorId": "interaction:lin-van-pickup",
    "stops": [],
    "companionIds": [],
    "interactionIds": [
-    "pharmacy-packing"
+    "lin-van-pickup"
    ],
-   "handoffs": [
-    {
-     "from": "rn",
-     "to": "home-care",
-     "note": "This week’s packs go out at nine"
-    }
-   ],
+   "handoffs": [],
    "roles": [
-    "rn",
-    "home-care"
+    "driver"
    ],
-   "settingId": "pharmacy"
-  },
-  {
-   "id": "network-home-am",
-   "window": [
-    50,
-    58
-   ],
-   "heroPresent": false,
-   "zoneId": "community:home-wong",
-   "roomId": null,
-   "focusTime": 55,
-   "focusActorId": "interaction:home-meal-meds",
-   "stops": [],
-   "companionIds": [],
-   "interactionIds": [
-    "home-meal-meds"
-   ],
-   "handoffs": [
-    {
-     "from": "pca",
-     "to": "home-care",
-     "note": "Slept well; ankles a little swollen"
-    }
-   ],
-   "roles": [
-    "pca",
-    "home-care"
-   ],
-   "settingId": "home-wong"
+   "settingId": "home-lin",
+   "heroAlias": "lin-at-home"
   },
   {
    "id": "pickup",
@@ -10292,36 +10257,6 @@
    ]
   },
   {
-   "id": "network-specialist",
-   "window": [
-    232,
-    240
-   ],
-   "heroPresent": false,
-   "zoneId": "community:specialist",
-   "roomId": null,
-   "focusTime": 236,
-   "focusActorId": "interaction:specialist-visit",
-   "stops": [],
-   "companionIds": [],
-   "interactionIds": [
-    "specialist-visit"
-   ],
-   "handoffs": [
-    {
-     "from": "pca",
-     "to": "pcp",
-     "note": "Ankle swelling is mild; recheck in three months"
-    }
-   ],
-   "roles": [
-    "driver",
-    "pca",
-    "pcp"
-   ],
-   "settingId": "specialist"
-  },
-  {
    "id": "program",
    "window": [
     240,
@@ -10377,39 +10312,25 @@
    ]
   },
   {
-   "id": "network-partner",
+   "id": "kitchen",
    "window": [
     289,
-    300
+    304
    ],
    "heroPresent": false,
-   "zoneId": "community:partner-adc",
-   "roomId": null,
-   "focusTime": 294.5,
-   "focusActorId": "interaction:partner-pt",
+   "zoneId": "kitchen",
+   "roomId": "kitchen-prep",
+   "focusTime": 296.5,
+   "focusActorId": "interaction:kitchen-lunch-delivery",
    "stops": [],
    "companionIds": [],
    "interactionIds": [
-    "partner-pt",
-    "partner-rn-review"
+    "kitchen-lunch-delivery"
    ],
-   "handoffs": [
-    {
-     "from": "pt",
-     "to": "rn",
-     "note": "Both steadier on turns; keep the walker"
-    },
-    {
-     "from": "rn",
-     "to": "pcp",
-     "note": "Two medicine lists checked with the partner nurse"
-    }
-   ],
+   "handoffs": [],
    "roles": [
-    "pt",
-    "rn"
-   ],
-   "settingId": "partner-adc"
+    "dietitian"
+   ]
   },
   {
    "id": "lunch",
@@ -10680,41 +10601,6 @@
    ]
   },
   {
-   "id": "network-hospital",
-   "window": [
-    500,
-    525
-   ],
-   "heroPresent": false,
-   "zoneId": "community:hospital",
-   "roomId": null,
-   "focusTime": 512.5,
-   "focusActorId": "interaction:hospital-discharge-call",
-   "stops": [],
-   "companionIds": [],
-   "interactionIds": [
-    "hospital-discharge-call"
-   ],
-   "handoffs": [
-    {
-     "from": "rn",
-     "to": "home-care",
-     "note": "Home health visit as soon as he is home"
-    },
-    {
-     "from": "home-care",
-     "to": "driver",
-     "note": "Hospital canopy pickup at 2:10"
-    }
-   ],
-   "roles": [
-    "rn",
-    "home-care",
-    "driver"
-   ],
-   "settingId": "hospital"
-  },
-  {
    "id": "farewell",
    "window": [
     525,
@@ -10769,7 +10655,7 @@
     {
      "from": "home-care",
      "to": "driver",
-     "note": "Drop-off to the side door; neighbor meets her"
+     "note": "Home by three; her daughter meets her at the porch"
     }
    ],
    "roles": [
@@ -10798,6 +10684,36 @@
     "driver",
     "pca"
    ]
+  },
+  {
+   "id": "home-pm",
+   "window": [
+    624,
+    668
+   ],
+   "heroPresent": false,
+   "zoneId": "community:home-lin",
+   "roomId": null,
+   "focusTime": 649,
+   "focusActorId": "interaction:lin-van-dropoff",
+   "stops": [],
+   "companionIds": [],
+   "interactionIds": [
+    "lin-van-dropoff",
+    "lin-evening"
+   ],
+   "handoffs": [
+    {
+     "from": "driver",
+     "to": "home-care",
+     "note": "Home at 3:05; her daughter is with her"
+    }
+   ],
+   "roles": [
+    "driver"
+   ],
+   "settingId": "home-lin",
+   "heroAlias": "lin-at-home"
   },
   {
    "id": "care-plan",
@@ -10852,36 +10768,6 @@
     "pca",
     "driver"
    ]
-  },
-  {
-   "id": "network-home-pm",
-   "window": [
-    690,
-    712
-   ],
-   "heroPresent": false,
-   "zoneId": "community:home-wong",
-   "roomId": null,
-   "focusTime": 699,
-   "focusActorId": "interaction:home-health-visit",
-   "stops": [],
-   "companionIds": [],
-   "interactionIds": [
-    "home-health-visit",
-    "after-hours-call"
-   ],
-   "handoffs": [
-    {
-     "from": "rn",
-     "to": "pcp",
-     "note": "Vitals stable; new medicines reconciled"
-    }
-   ],
-   "roles": [
-    "rn",
-    "home-care"
-   ],
-   "settingId": "home-wong"
   }
  ],
  "heroSpeed": 1.36,

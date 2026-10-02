@@ -226,13 +226,14 @@ void test('isInspectable: furniture and fittings, not doors, stairs or finishes'
   assert.equal(isInspectable(object(), undefined), false);
 });
 
-void test('every asset kind of the published sites and the home has a catalog entry', () => {
+void test('every asset kind of the published sites, the home and the partner center has a catalog entry', () => {
   for (const file of [
     'seen-alhambra-planning',
     'seen-olympic',
     'seen-olympic-option',
     'seen-alveare',
     'seen-home-wong',
+    'seen-partner-adhc',
   ]) {
     const f = JSON.parse(
       readFileSync(`public/models/${file}.json`, 'utf8'),
