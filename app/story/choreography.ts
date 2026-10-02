@@ -294,10 +294,10 @@ export const DEFAULT_HIGHLIGHT_SHOT: ShotSpec = {
  */
 export const PEACE_SHOT: ShotSpec = {
   place: { setting: 'home-lin', room: 'home-living', anchor: 'porch' },
-  zoom: 4.2,
+  zoom: 3.2,
   azimuth: 0.98,
   elevation: 0.9,
-  push: 1.22,
+  push: 1.28,
   drift: 0.22,
 };
 /**

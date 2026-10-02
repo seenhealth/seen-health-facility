@@ -108,7 +108,7 @@ export function IdtRing({
     step && atHome(step)
       ? 'At home'
       : step && isMeanwhile(step)
-        ? 'For her lunch'
+        ? 'Her lunch'
         : heroAway
           ? 'Discussed'
           : `${hero.age} · ${hero.mobility}`;

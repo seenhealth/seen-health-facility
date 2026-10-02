@@ -173,7 +173,7 @@ export function StoryExperience({
     // Highlights: the scene sits up and to the right of the lower-left title.
     if (kind === 'highlight') return { x: l.revealX * 0.8, y: -0.06, zoom: l.zoom };
     // The close: the home below the copy, as in the opening.
-    if (kind === 'peace' || kind === 'cta') return { x: 0, y: l.openingY * 0.75, zoom: l.zoom };
+    if (kind === 'peace' || kind === 'cta') return { x: 0, y: l.openingY * 1.3, zoom: l.zoom };
     return { x: 0, y: 0.04, zoom: l.wideZoom };
   }, []);
 
