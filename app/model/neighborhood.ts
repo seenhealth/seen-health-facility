@@ -362,7 +362,9 @@ export function buildNeighborhood(model: Facility) {
       }
     });
   };
-  roadText('STOP', -35, -30.7, -Math.PI / 2);
+  // STOP on the lot's exit lane just before the sidewalk, with its stop bar ahead of it.
+  roadText('STOP', -36.4, -28.8, -Math.PI / 2);
+  box(-38.6, -0.206, -28.8, 0.45, 0.012, 3.4, SITE.marking);
   dashes(
     59,
     farX,

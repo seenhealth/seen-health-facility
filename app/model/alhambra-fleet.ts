@@ -131,6 +131,10 @@ export const FLEET_LOT = {
    * drop-off's line before the ramp.
    */
   entry: 4.3,
+  /** The turn in from the northbound lane is wide, so the tail does not swing into the southbound lane as a departing van passes. */
+  entryRadius: 7.5,
+  /** Metres of the west street before the turn in, from the lot's exit junction, treated as lot time. */
+  approach: 20,
   streetY: -0.23,
   /** Aisle east of the bay noses, where bay pull-outs and back-ins turn. */
   aisle: AISLE_X,
@@ -142,6 +146,18 @@ export const FLEET_LOT = {
    * 0.3 m.
    */
   exitLane: DRIVEWAY_X - 0.5,
+  /**
+   * The lot's exit lane west to Ethel runs along the lot's north edge inside
+   * its own paving (STOP is painted there before the sidewalk), not on the
+   * alley's lane further north (Street View, May 2025).
+   */
+  exitZ: -28.8,
+  /** Where the turn west begins: far enough south that the tail has passed the curb island at the driveway before it swings. */
+  exitTurnZ: -28.0,
+  /** The drift back north onto the exit lane ends with the van's nose at the STOP bar before Ethel. */
+  exitDriftRadius: 6,
+  /** Seconds a departing van stands at the STOP bar. */
+  exitStop: 2,
   /**
    * Lot arcs; lane changes; the long drift from the drop-off exit to the exit
    * lane (gentle enough that the van's front corner stays 0.5 m off the bay
@@ -283,7 +299,8 @@ export const fleetRoutes = {
     return [
       ...awayToEntry(pen),
       leg(pen, 'dock-in', 'Arriving at drop-off', LOT, (p) =>
-        p.lineToX(L.dock[0] - 1.0 - jogLength(L.entry - L.dock[1], R))
+        p
+          .lineToX(L.dock[0] - 1.0 - jogLength(L.entry - L.dock[1], R))
           .jog(L.entry - L.dock[1], R)
           .lineToX(L.dock[0]),
       ),
@@ -322,20 +339,22 @@ export const fleetRoutes = {
 /** Southbound on the exit lane, out onto the street and off site to the south. */
 function drivewayToAway(pen: Pen): FleetLeg[] {
   return [
-    leg(pen, 'aisle-south', 'Driving to the street', LOT, (p) =>
-      p.lineToZ(L.westbound + R),
+    leg(pen, 'aisle-south', 'Driving to the exit', LOT, (p) =>
+      p.lineToZ(L.exitTurnZ),
     ),
-    leg(pen, 'driveway-out', 'Turning onto the south street', LOT, (p) =>
-      p.arc(R, Math.PI / 2),
+    leg(pen, 'driveway-out', 'Turning onto the exit lane', LOT, (p) =>
+      p.arc(R, Math.PI / 2).jog(L.exitZ - (L.exitTurnZ - R), L.exitDriftRadius),
     ),
-    leg(pen, 'street-west', 'Westbound on the south street', STREET, (p) =>
+    leg(pen, 'street-west', 'Out to the west street', LOT, (p) =>
       p.lineToX(L.southbound + L.streetRadius),
     ),
+    // The corner onto the west street counts as lot time, so the next
+    // arrival is booked only once the departing van has cleared the junction.
     leg(
       pen,
       'corner-south',
       'Turning south onto the west street',
-      CORNER,
+      { ...CORNER, lot: true },
       (p) => p.arc(L.streetRadius, -Math.PI / 2),
     ),
     leg(pen, 'street-south', 'Southbound to the neighborhood', STREET, (p) =>
@@ -357,10 +376,19 @@ function awayToEntry(pen: Pen): FleetLeg[] {
       (p) => p.line(L.fade),
     ),
     leg(pen, 'street-north', 'Returning from the neighborhood', STREET, (p) =>
-      p.lineToZ(L.entry - R),
+      p.lineToZ(L.entry - L.entryRadius - L.approach),
+    ),
+    // The last stretch past the lot's exit counts as lot time, so an arrival is
+    // booked only once a departing van has cleared the junction ahead of it.
+    leg(
+      pen,
+      'street-approach',
+      'Returning from the neighborhood',
+      { ...STREET, lot: true },
+      (p) => p.lineToZ(L.entry - L.entryRadius),
     ),
     leg(pen, 'entry-in', 'Turning into the lot', LOT, (p) =>
-      p.arc(R, Math.PI / 2),
+      p.arc(L.entryRadius, Math.PI / 2),
     ),
   ];
 }
@@ -546,6 +574,16 @@ const pause = (seconds: number, phase: string, visible = true): Move => ({
   visible,
 });
 const r = fleetRoutes;
+/** A departure stops at the STOP bar at the lot's mouth before pulling out onto the street. */
+function withExitStop(legs: FleetLeg[]): Move[] {
+  const i = legs.findIndex((l) => l.id === 'street-west');
+  if (i < 0) return [drive(legs, true, false)];
+  return [
+    drive(legs.slice(0, i), true, true),
+    pause(L.exitStop, 'Stopped at the exit'),
+    drive(legs.slice(i), true, false),
+  ];
+}
 function buildMoves(kind: FleetTripKind, index: number): Move[] {
   // Drop-off arrivals always come in from off site, where the riders board.
   if (kind === 'toDock') return [drive(r.awayToDock(), false, true)];
@@ -553,9 +591,9 @@ function buildMoves(kind: FleetTripKind, index: number): Move[] {
     return [
       drive(r.dockReverse(), true, true, true),
       pause(0.6, 'Stopped to pull away'),
-      drive(r.dockToAway(), true, false),
+      ...withExitStop(r.dockToAway()),
     ];
-  if (kind === 'out') return [drive(r.bayToAway(index), true, false)];
+  if (kind === 'out') return withExitStop(r.bayToAway(index));
   if (atCurb(index)) return [drive(r.awayToBay(index), false, true)];
   return [
     drive(r.awayToBay(index), false, true),
