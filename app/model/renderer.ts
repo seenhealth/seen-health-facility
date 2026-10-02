@@ -1601,22 +1601,6 @@ export function createViewer(
     focusTarget = new T.Vector3(...framing.target);
     zoomTarget = framing.zoom;
   }
-  function focusSiteObjects(ids: string[], instant = false) {
-    scene.updateMatrixWorld(true);
-    const bounds = new T.Box3();
-    for (const id of ids) {
-      const o = scene.getObjectByName(id);
-      if (o) bounds.union(new T.Box3().setFromObject(o));
-    }
-    if (bounds.isEmpty()) {
-      focus(null, null, instant);
-      return;
-    }
-    focusTarget = bounds.getCenter(new T.Vector3());
-    const size = bounds.getSize(new T.Vector3());
-    zoomTarget = T.MathUtils.clamp(30 / Math.max(size.x, size.z), 1.35, 8);
-    finishFocus(instant);
-  }
   function view(mode: string) {
     const c = controls.target.clone();
     if (mode === 'plan')
@@ -2009,7 +1993,6 @@ export function createViewer(
     cancelRecording: () => stopRecording?.(),
     update,
     focus,
-    focusSiteObjects,
     focusSetting,
     community,
     focusArrival: () => {

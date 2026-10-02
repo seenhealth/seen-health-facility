@@ -31,7 +31,7 @@ Everything the repository produces, in one place. The claude.ai previews were bu
 | Specification format | [facility-format.md](public/models/facility-format.md), [facility.schema.json](public/models/facility.schema.json) |
 | GLB exports (9 to 24 MB each) | [Alhambra](public/models/seen-alhambra-planning.glb), [Olympic](public/models/seen-olympic.glb), [Olympic option](public/models/seen-olympic-option.glb), [Alveare](public/models/seen-alveare.glb), [animated cast](public/models/seen-health-animated-cast.glb) |
 | Simulation outputs | [simulation report](public/models/sim-report.json), [touchpoint trace](public/models/touchpoint-trace.json) |
-| Activity and program data | [activity loop](public/models/activity-loop.json), [care journeys](public/models/care-journeys.json), [character templates](public/models/character-templates.json), [day program](public/models/day-program.json) |
+| Activity and program data | [activity loop](public/models/activity-loop.json), [character templates](public/models/character-templates.json), [day program](public/models/day-program.json) |
 | Story and community tracks | [story scenario](app/data/scenarios/day-in-the-life.json), [compiled story tracks](app/data/scenarios/day-in-the-life.tracks.json), [the Wongs' home cast](app/data/community/home-lin.cast.json), [partner day center cast](app/data/community/partner-adc.cast.json) |
 
 ## Explore
@@ -99,7 +99,7 @@ npm run preview:viewer   # serve the built site locally
 
 The default relative base works from any folder whose URL ends in `/`; `VIEWER_BASE=/facility/ npm run build:viewer` sets an absolute base instead. App code requests its files root-relative (`/models/…`, `/reference/…`, `/brand/…`); `viewer/site/asset-base.ts` rebases those URLs onto the build's folder where they become requests (`fetch`, image loads, `src`/`href` attributes), so app code is unchanged and exported specifications keep portable paths.
 
-Exporting the specification, a GLB or a PNG of the view, opening a local specification and recording video all run in the browser. Not shipped: the GLB, Markdown and JSON files linked as downloads under **Model files**, the accuracy register, **Animated care day** and **Participant journeys** (those links 404). **Site map** tiles load from openstreetmap.org.
+Exporting the specification, a GLB or a PNG of the view, opening a local specification and recording video all run in the browser. Not shipped: the GLB, Markdown and JSON files linked as downloads under **Model files**, the accuracy register and **Animated care day** (those links 404). **Site map** tiles load from openstreetmap.org.
 
 ## Validation
 

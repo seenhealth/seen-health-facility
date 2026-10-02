@@ -42,8 +42,6 @@ import {
   SETTING_ZONE_PREFIX,
 } from './model/community-settings';
 import { roomLabelCode } from './model/room-labels';
-import { JourneyPanel } from './components/journey-panel';
-import type { JourneyStep } from './model/journeys';
 import { ActivityPanel, MiniPlayer } from './components/activity-panel';
 import { isRotationDay, setProgramRotation } from './model/day-room';
 import { ShowcaseControls } from './components/showcase-controls';
@@ -120,9 +118,7 @@ export default function Home() {
     [panelOpen, setPanelOpen] = useState(true),
     // The space card follows explicit picks, not camera moves from the panel.
     [cardOpen, setCardOpen] = useState(false),
-    [panelTab, setPanelTab] = useState<'activity' | 'journeys' | 'measure'>(
-      'activity',
-    ),
+    [panelTab, setPanelTab] = useState<'activity' | 'measure'>('activity'),
     [exporting, setExporting] = useState(false),
     [notice, setNotice] = useState(''),
     // The viewer builds the community layer when its source carries one.
@@ -175,42 +171,6 @@ export default function Home() {
       if (actor) viewer.current.followActor(actor);
     },
     [model],
-  );
-  const focusJourney = useCallback(
-    (step: JourneyStep) => {
-      if (!model || !ready || !viewer.current) return;
-      const z = model.zones.find((z) => z.id === step.zoneId);
-      const next: ViewerState = {
-        ...defaultState,
-        level: z?.levelId || 'all',
-        selected: z?.id || null,
-        room: step.roomId || null,
-        isolate: false,
-        roof: !z,
-        exterior: !z,
-        ceilings: false,
-        walls: z ? 'cutaway' : 'full',
-        stack: 0,
-        explode: 0,
-        plan: false,
-        sectionAxis: 'none',
-      };
-      setState(next);
-      setCardOpen(false);
-      setView(z ? 'iso' : 'building');
-      viewer.current.update(next);
-      viewer.current.view('iso');
-      const instant = window.matchMedia(
-        '(prefers-reduced-motion: reduce)',
-      ).matches;
-      if (step.scene === 'transport')
-        viewer.current.focusSiteObjects(
-          ['fleet-van-a', 'fleet-van-b'],
-          instant,
-        );
-      else viewer.current.focus(z?.id || null, step.roomId, instant);
-    },
-    [model, ready],
   );
   const selectSite = (id: SiteId) => {
     setShowcase(false);
@@ -1298,14 +1258,13 @@ export default function Home() {
           ref={sidePanel}
           className="side-panel"
           data-tab={panelTab}
-          aria-label="Care day, journeys and measures"
+          aria-label="Care day and measures"
         >
           <div className="side-panel-tabs">
             {siteId === 'alhambra' ? (
               (
                 [
                   ['activity', 'Care day'],
-                  ['journeys', 'Journeys'],
                   ['measure', 'Measure'],
                 ] as const
               ).map(([id, label]) => (
@@ -1354,9 +1313,6 @@ export default function Home() {
                   getViewer={getViewer}
                 />
               </Suspense>
-            )}
-            {panelTab === 'journeys' && siteId === 'alhambra' && (
-              <JourneyPanel onFocus={focusJourney} />
             )}
           </div>
         </aside>
