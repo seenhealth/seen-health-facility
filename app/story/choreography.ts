@@ -209,7 +209,7 @@ export const HIGHLIGHT_SHOTS: Record<string, ShotSpec> = {
   },
   specialists: {
     place: { setting: 'specialist', anchor: 'examSeat' },
-    zoom: 3.6,
+    zoom: 4.2,
     azimuth: 0.2,
     elevation: 0.44,
     follow: 0.3,
@@ -217,25 +217,28 @@ export const HIGHLIGHT_SHOTS: Record<string, ShotSpec> = {
     push: 1.16,
     drift: -0.12,
   },
+  // The clinic's open front sits under its upper storey: keep elevation at
+  // or below ≈0.55, and the azimuth low enough that the optometrist (≤0.45)
+  // and the X-ray shield wall (≤0.35) don't hide the patient.
   optometry: {
     place: { setting: 'specialist', anchor: 'optoSeat' },
-    zoom: 3.8,
+    zoom: 6.4,
     azimuth: 0.3,
-    elevation: 0.46,
+    elevation: 0.5,
     follow: 0.3,
-    radius: 8,
+    radius: 6,
     push: 1.16,
-    drift: 0.12,
+    drift: 0.08,
   },
   imaging: {
     place: { setting: 'specialist', anchor: 'imagingTable' },
-    zoom: 3.8,
-    azimuth: 0.1,
-    elevation: 0.48,
+    zoom: 6.2,
+    azimuth: 0.26,
+    elevation: 0.5,
     follow: 0.3,
-    radius: 8,
+    radius: 6,
     push: 1.16,
-    drift: -0.12,
+    drift: -0.08,
   },
   discharge: {
     place: { setting: 'hospital', anchor: 'patient' },

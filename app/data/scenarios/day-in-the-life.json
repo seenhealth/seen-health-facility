@@ -1038,7 +1038,7 @@
     {
       "id": "optometry",
       "label": "Optometry",
-      "kicker": "11:30 AM \u00b7 Specialty clinic",
+      "kicker": "11:45 AM \u00b7 Specialty clinic",
       "title": "Eyes checked, glasses fitted.",
       "body": "A diabetic eye exam and a new prescription, booked by the team and escorted there and back.",
       "settingId": "specialist",
@@ -1046,8 +1046,8 @@
         "optometry-exam"
       ],
       "window": [
-        315,
-        345
+        334,
+        360
       ],
       "roles": [
         "pcp",
@@ -1060,16 +1060,16 @@
     {
       "id": "imaging",
       "label": "Imaging",
-      "kicker": "1:00 PM \u00b7 Specialty clinic",
+      "kicker": "1:05 PM \u00b7 Specialty clinic",
       "title": "Scans that come back to the team.",
-      "body": "A bone-density scan after last spring\u2019s fall, read and returned to her doctor within the day.",
+      "body": "An X-ray of the wrist she broke in a fall, taken with an escort beside her and read back to her doctor the same day.",
       "settingId": "specialist",
       "interactionIds": [
         "imaging-scan"
       ],
       "window": [
-        435,
-        465
+        452,
+        482
       ],
       "roles": [
         "pcp",

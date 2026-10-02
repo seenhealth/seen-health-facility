@@ -115,8 +115,8 @@ A step with `placement.mode: 'cutaway'` compiles no hero tracks. It features int
 | 1 | `medication` | Medication | 28–58 | 8:18–8:38 AM | `pharmacy` · `counterBack` | `pharmacy-packing` |
 | 2 | `day-center` | Partner day center | 90–120 | 9:00–9:20 AM | `partner-adc` | `partner-line-dance` |
 | 3 | `specialists` | Hospital specialists | 208–238 | 10:18–10:38 AM | `specialist` · `examSeat` | `specialist-visit` |
-| 4 | `optometry` | Optometry | 315–345 | 11:30–11:50 AM | `specialist` · `optoSeat` | `optometry-exam` |
-| 5 | `imaging` | Imaging | 435–465 | 12:50–1:10 PM | `specialist` · `imagingTable` | `imaging-scan` |
+| 4 | `optometry` | Optometry | 334–360 | 11:43 AM–12:00 PM | `specialist` · `optoSeat` | `optometry-exam` (slit lamp, then refraction) |
+| 5 | `imaging` | Imaging | 452–482 | 1:01–1:21 PM | `specialist` · `imagingTable` | `imaging-scan` (positioning, then the technologist at the console) |
 | 6 | `discharge` | Hospital discharge | 497–523 | 1:31–1:48 PM | `hospital` · `patient` | `hospital-discharge-call` (the hospital’s discharge nurse and Seen’s nurse, by phone) |
 | 7 | `home-mods` | Home modifications | 522–540 | 1:48–2:00 PM | `home-wong` · room `home-bath` | `home-grab-bar` |
 | 8 | `after-hours` | After-hours care & emergency transport | 64–94 | 8:43–9:03 AM | `hospital` · `edBay` | `hospital-ed-arrival` |
