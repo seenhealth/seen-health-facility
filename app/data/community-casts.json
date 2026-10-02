@@ -5474,6 +5474,1564 @@
     "home-participant: walk to Bath arrives 1 s earlier (385.496–396 s)"
    ]
   },
+  "home-lin": {
+   "actors": [
+    {
+     "id": "lin-at-home",
+     "role": "participant",
+     "variant": 11,
+     "profileId": "arrival-cane",
+     "label": "Mrs. Lin · at home",
+     "offset": 0,
+     "mobility": "cane",
+     "segments": [
+      {
+       "start": 0,
+       "end": 0.5,
+       "action": "idle",
+       "path": [
+        [
+         -3.3,
+         -15.4
+        ],
+        [
+         -3.3,
+         -15.4
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Away",
+       "visible": false
+      },
+      {
+       "start": 0.5,
+       "end": 2.335,
+       "action": "seated",
+       "path": [
+        [
+         -3.3,
+         -15.4
+        ],
+        [
+         -3.3,
+         -15.4
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Awake on the edge of her bed, cane at hand",
+       "seated": true,
+       "seatId": "home-primary-bed"
+      },
+      {
+       "start": 2.335,
+       "end": 10,
+       "action": "walk",
+       "path": [
+        [
+         -3.3,
+         -15.4
+        ],
+        [
+         -2.8,
+         -15.4
+        ],
+        [
+         -2.6,
+         -15.2
+        ],
+        [
+         -2.6,
+         -15
+        ],
+        [
+         -2.4,
+         -14.8
+        ],
+        [
+         -2.4,
+         -13.8
+        ],
+        [
+         -1.8,
+         -13.8
+        ],
+        [
+         -1.2,
+         -13.2
+        ],
+        [
+         -0.6,
+         -13.2
+        ],
+        [
+         0,
+         -12.6
+        ],
+        [
+         0,
+         -12
+        ],
+        [
+         0.8,
+         -12
+        ],
+        [
+         1,
+         -11.8
+        ],
+        [
+         1.4,
+         -11.8
+        ],
+        [
+         1.6,
+         -11.6
+        ],
+        [
+         1.8,
+         -11.6
+        ],
+        [
+         2,
+         -11.4
+        ],
+        [
+         2.2,
+         -11.4
+        ],
+        [
+         2.4,
+         -11.2
+        ],
+        [
+         2.6,
+         -11.2
+        ],
+        [
+         2.8,
+         -11
+        ],
+        [
+         3.2,
+         -11
+        ],
+        [
+         3.4,
+         -10.8
+        ],
+        [
+         4.08,
+         -10.7
+        ]
+       ],
+       "heading": 1.571,
+       "title": "To Dining nook"
+      },
+      {
+       "start": 10,
+       "end": 15.8,
+       "action": "tabletop",
+       "path": [
+        [
+         4.08,
+         -10.7
+        ],
+        [
+         4.08,
+         -10.7
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Breakfast with her daughter: rice porridge, an egg and jasmine tea",
+       "seated": true,
+       "seatId": "home-dining-chair-n"
+      },
+      {
+       "start": 15.8,
+       "end": 16.05,
+       "action": "seated",
+       "path": [
+        [
+         4.08,
+         -10.7
+        ],
+        [
+         4.08,
+         -10.7
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Breakfast with her daughter: rice porridge, an egg and jasmine tea",
+       "seated": true,
+       "seatId": "home-dining-chair-n"
+      },
+      {
+       "start": 16.05,
+       "end": 19,
+       "action": "walk",
+       "path": [
+        [
+         4.08,
+         -10.7
+        ],
+        [
+         3.4,
+         -10.8
+        ],
+        [
+         3.2,
+         -10.6
+        ],
+        [
+         3.2,
+         -10.4
+        ],
+        [
+         2.8,
+         -10
+        ],
+        [
+         2.8,
+         -9.8
+        ],
+        [
+         2.6,
+         -9.6
+        ],
+        [
+         2.6,
+         -9.4
+        ],
+        [
+         2.4,
+         -9.2
+        ],
+        [
+         2.4,
+         -8.8
+        ],
+        [
+         2.2,
+         -8.6
+        ],
+        [
+         2.1,
+         -8.01
+        ]
+       ],
+       "heading": 1.571,
+       "title": "To Living room"
+      },
+      {
+       "start": 19,
+       "end": 21.843,
+       "action": "seated",
+       "path": [
+        [
+         2.1,
+         -8.01
+        ],
+        [
+         2.1,
+         -8.01
+        ]
+       ],
+       "heading": 3.142,
+       "title": "Shoes and a cardigan on at the entry bench",
+       "seated": true,
+       "seatId": "home-living-entry-bench"
+      },
+      {
+       "start": 21.843,
+       "end": 24.1,
+       "action": "walk",
+       "path": [
+        [
+         2.1,
+         -8.01
+        ],
+        [
+         2.2,
+         -8.6
+        ],
+        [
+         1.2,
+         -8.6
+        ],
+        [
+         0.8,
+         -8.2
+        ],
+        [
+         0.6,
+         -8.2
+        ],
+        [
+         0.4,
+         -8
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 3.142,
+       "title": "To the door"
+      },
+      {
+       "start": 24.1,
+       "end": 659,
+       "action": "idle",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 0,
+       "title": "Away",
+       "visible": false
+      },
+      {
+       "start": 659,
+       "end": 660.827,
+       "action": "walk",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -8
+        ],
+        [
+         0.2,
+         -8.2
+        ],
+        [
+         -0.6,
+         -8.2
+        ],
+        [
+         -0.8,
+         -8.4
+        ],
+        [
+         -0.78,
+         -9.1
+        ]
+       ],
+       "heading": 0,
+       "title": "To Living room"
+      },
+      {
+       "start": 660.827,
+       "end": 680,
+       "action": "seated",
+       "path": [
+        [
+         -0.78,
+         -9.1
+        ],
+        [
+         -0.78,
+         -9.1
+        ]
+       ],
+       "heading": 4.412,
+       "title": "Home: settling on the sofa",
+       "seated": true,
+       "seatId": "home-living-sofa"
+      },
+      {
+       "start": 680,
+       "end": 720,
+       "action": "conversation",
+       "path": [
+        [
+         -0.78,
+         -9.1
+        ],
+        [
+         -0.78,
+         -9.1
+        ]
+       ],
+       "heading": 4.412,
+       "title": "Tea with her daughter: karaoke, the clinic, the care plan",
+       "seated": true,
+       "seatId": "home-living-sofa"
+      }
+     ]
+    },
+    {
+     "id": "lin-daughter",
+     "role": "family",
+     "variant": 15,
+     "label": "Mrs. Lin's daughter",
+     "offset": 0,
+     "segments": [
+      {
+       "start": 0,
+       "end": 0.5,
+       "action": "idle",
+       "path": [
+        [
+         5.085,
+         -15.35
+        ],
+        [
+         5.085,
+         -15.35
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Away",
+       "visible": false
+      },
+      {
+       "start": 0.5,
+       "end": 7,
+       "action": "serve",
+       "path": [
+        [
+         5.085,
+         -15.35
+        ],
+        [
+         5.085,
+         -15.35
+        ]
+       ],
+       "heading": 3.141,
+       "title": "Rice porridge on the stove, the kettle on"
+      },
+      {
+       "start": 7,
+       "end": 7.135,
+       "action": "idle",
+       "path": [
+        [
+         5.085,
+         -15.35
+        ],
+        [
+         5.085,
+         -15.35
+        ]
+       ],
+       "heading": 3.141,
+       "title": "Rice porridge on the stove, the kettle on"
+      },
+      {
+       "start": 7.135,
+       "end": 10,
+       "action": "walk",
+       "path": [
+        [
+         5.085,
+         -15.35
+        ],
+        [
+         5,
+         -15.4
+        ],
+        [
+         5,
+         -13.8
+        ],
+        [
+         4.8,
+         -13.6
+        ],
+        [
+         4.8,
+         -12.2
+        ],
+        [
+         5,
+         -12
+        ],
+        [
+         4.9,
+         -11.52
+        ]
+       ],
+       "heading": 3.141,
+       "title": "To Dining nook"
+      },
+      {
+       "start": 10,
+       "end": 13.5,
+       "action": "tabletop",
+       "path": [
+        [
+         4.9,
+         -11.52
+        ],
+        [
+         4.9,
+         -11.52
+        ]
+       ],
+       "heading": 0,
+       "title": "Breakfast with her mother; this morning's pills from the weekly pack",
+       "seated": true,
+       "seatId": "home-dining-chair-w"
+      },
+      {
+       "start": 13.5,
+       "end": 13.724,
+       "action": "seated",
+       "path": [
+        [
+         4.9,
+         -11.52
+        ],
+        [
+         4.9,
+         -11.52
+        ]
+       ],
+       "heading": 0,
+       "title": "Breakfast with her mother; this morning's pills from the weekly pack",
+       "seated": true,
+       "seatId": "home-dining-chair-w"
+      },
+      {
+       "start": 13.724,
+       "end": 17.7,
+       "action": "walk",
+       "path": [
+        [
+         4.9,
+         -11.52
+        ],
+        [
+         5,
+         -12
+        ],
+        [
+         4.4,
+         -12
+        ],
+        [
+         4,
+         -11.6
+        ],
+        [
+         3.6,
+         -11.6
+        ],
+        [
+         3.2,
+         -11.2
+        ],
+        [
+         3.2,
+         -10.2
+        ],
+        [
+         3,
+         -10
+        ],
+        [
+         3,
+         -8.14
+        ]
+       ],
+       "heading": 0,
+       "title": "To Living room"
+      },
+      {
+       "start": 17.7,
+       "end": 20.2,
+       "action": "treat",
+       "path": [
+        [
+         3,
+         -8.14
+        ],
+        [
+         3,
+         -8.14
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Helps with her shoes and cardigan"
+      },
+      {
+       "start": 20.2,
+       "end": 20.309,
+       "action": "idle",
+       "path": [
+        [
+         3,
+         -8.14
+        ],
+        [
+         3,
+         -8.14
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Helps with her shoes and cardigan"
+      },
+      {
+       "start": 20.309,
+       "end": 22.9,
+       "action": "walk",
+       "path": [
+        [
+         3,
+         -8.14
+        ],
+        [
+         3,
+         -8.2
+        ],
+        [
+         2.8,
+         -8.4
+        ],
+        [
+         2.8,
+         -8.8
+        ],
+        [
+         1.4,
+         -8.8
+        ],
+        [
+         0.4,
+         -7.8
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 4.712,
+       "title": "To the door"
+      },
+      {
+       "start": 22.9,
+       "end": 57,
+       "action": "idle",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 0,
+       "title": "Away",
+       "visible": false
+      },
+      {
+       "start": 57,
+       "end": 64.034,
+       "action": "walk",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.8
+        ],
+        [
+         0.2,
+         -8
+        ],
+        [
+         0.2,
+         -8.2
+        ],
+        [
+         0,
+         -8.4
+        ],
+        [
+         0,
+         -10.8
+        ],
+        [
+         -0.2,
+         -11
+        ],
+        [
+         -0.2,
+         -11.4
+        ],
+        [
+         -3.4,
+         -11.4
+        ],
+        [
+         -3.6,
+         -11.2
+        ],
+        [
+         -3.6,
+         -10
+        ],
+        [
+         -3.8,
+         -9.8
+        ],
+        [
+         -3.8,
+         -9.4
+        ],
+        [
+         -4,
+         -9.2
+        ],
+        [
+         -3.95,
+         -8.7
+        ]
+       ],
+       "heading": 0,
+       "title": "To Second bedroom (family)"
+      },
+      {
+       "start": 64.034,
+       "end": 65,
+       "action": "seated",
+       "path": [
+        [
+         -3.95,
+         -8.7
+        ],
+        [
+         -3.95,
+         -8.7
+        ]
+       ],
+       "heading": 0,
+       "title": "Working from home at her desk",
+       "seated": true,
+       "seatId": "home-bed2-chair"
+      },
+      {
+       "start": 65,
+       "end": 330,
+       "action": "document",
+       "path": [
+        [
+         -3.95,
+         -8.7
+        ],
+        [
+         -3.95,
+         -8.7
+        ]
+       ],
+       "heading": 0,
+       "title": "Working from home at her desk",
+       "seated": true,
+       "seatId": "home-bed2-chair"
+      },
+      {
+       "start": 330,
+       "end": 332.162,
+       "action": "seated",
+       "path": [
+        [
+         -3.95,
+         -8.7
+        ],
+        [
+         -3.95,
+         -8.7
+        ]
+       ],
+       "heading": 0,
+       "title": "Working from home at her desk",
+       "seated": true,
+       "seatId": "home-bed2-chair"
+      },
+      {
+       "start": 332.162,
+       "end": 340,
+       "action": "walk",
+       "path": [
+        [
+         -3.95,
+         -8.7
+        ],
+        [
+         -4,
+         -9.2
+        ],
+        [
+         -3.8,
+         -9.4
+        ],
+        [
+         -3.8,
+         -9.8
+        ],
+        [
+         -3.6,
+         -10
+        ],
+        [
+         -3.6,
+         -11.2
+        ],
+        [
+         -3.4,
+         -11.4
+        ],
+        [
+         0.4,
+         -11.4
+        ],
+        [
+         1,
+         -12
+        ],
+        [
+         1.8,
+         -12
+        ],
+        [
+         2,
+         -12.2
+        ],
+        [
+         2,
+         -14.6
+        ],
+        [
+         2.2,
+         -14.8
+        ]
+       ],
+       "heading": 0,
+       "title": "To Laundry & back door"
+      },
+      {
+       "start": 340,
+       "end": 347,
+       "action": "serve",
+       "path": [
+        [
+         2.2,
+         -14.8
+        ],
+        [
+         2.2,
+         -14.8
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Loads the washer"
+      },
+      {
+       "start": 347,
+       "end": 348.404,
+       "action": "idle",
+       "path": [
+        [
+         2.2,
+         -14.8
+        ],
+        [
+         2.2,
+         -14.8
+        ]
+       ],
+       "heading": 4.712,
+       "title": "Loads the washer"
+      },
+      {
+       "start": 348.404,
+       "end": 353.5,
+       "action": "walk",
+       "path": [
+        [
+         2.2,
+         -14.8
+        ],
+        [
+         2.2,
+         -12.8
+        ],
+        [
+         2,
+         -12.6
+        ],
+        [
+         2,
+         -12.2
+        ],
+        [
+         2.2,
+         -12
+        ],
+        [
+         3.2,
+         -12
+        ],
+        [
+         4.8,
+         -13.6
+        ],
+        [
+         5.4,
+         -13.6
+        ],
+        [
+         5.38,
+         -13.04
+        ]
+       ],
+       "heading": 4.712,
+       "title": "To Kitchen"
+      },
+      {
+       "start": 353.5,
+       "end": 378,
+       "action": "tabletop",
+       "path": [
+        [
+         5.38,
+         -13.04
+        ],
+        [
+         5.38,
+         -13.04
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Lunch at the kitchen worktop",
+       "seated": true,
+       "seatId": "home-kitchen-chair"
+      },
+      {
+       "start": 378,
+       "end": 380.881,
+       "action": "seated",
+       "path": [
+        [
+         5.38,
+         -13.04
+        ],
+        [
+         5.38,
+         -13.04
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Lunch at the kitchen worktop",
+       "seated": true,
+       "seatId": "home-kitchen-chair"
+      },
+      {
+       "start": 380.881,
+       "end": 390,
+       "action": "walk",
+       "path": [
+        [
+         5.38,
+         -13.04
+        ],
+        [
+         5.4,
+         -13.6
+        ],
+        [
+         4.8,
+         -13.6
+        ],
+        [
+         3.2,
+         -12
+        ],
+        [
+         2,
+         -12
+        ],
+        [
+         1.8,
+         -11.8
+        ],
+        [
+         1.6,
+         -11.8
+        ],
+        [
+         1.4,
+         -11.6
+        ],
+        [
+         -0.2,
+         -11.6
+        ],
+        [
+         -0.4,
+         -11.4
+        ],
+        [
+         -3.4,
+         -11.4
+        ],
+        [
+         -3.6,
+         -11.2
+        ],
+        [
+         -3.6,
+         -10
+        ],
+        [
+         -3.8,
+         -9.8
+        ],
+        [
+         -3.8,
+         -9.4
+        ],
+        [
+         -4,
+         -9.2
+        ],
+        [
+         -3.95,
+         -8.7
+        ]
+       ],
+       "heading": 1.571,
+       "title": "To Second bedroom (family)"
+      },
+      {
+       "start": 390,
+       "end": 588,
+       "action": "document",
+       "path": [
+        [
+         -3.95,
+         -8.7
+        ],
+        [
+         -3.95,
+         -8.7
+        ]
+       ],
+       "heading": 0,
+       "title": "An afternoon at her desk",
+       "seated": true,
+       "seatId": "home-bed2-chair"
+      },
+      {
+       "start": 588,
+       "end": 588.784,
+       "action": "seated",
+       "path": [
+        [
+         -3.95,
+         -8.7
+        ],
+        [
+         -3.95,
+         -8.7
+        ]
+       ],
+       "heading": 0,
+       "title": "An afternoon at her desk",
+       "seated": true,
+       "seatId": "home-bed2-chair"
+      },
+      {
+       "start": 588.784,
+       "end": 598,
+       "action": "walk",
+       "path": [
+        [
+         -3.95,
+         -8.7
+        ],
+        [
+         -4,
+         -9.2
+        ],
+        [
+         -3.8,
+         -9.4
+        ],
+        [
+         -3.8,
+         -9.8
+        ],
+        [
+         -3.6,
+         -10
+        ],
+        [
+         -3.6,
+         -11.2
+        ],
+        [
+         -3.4,
+         -11.4
+        ],
+        [
+         0.4,
+         -11.4
+        ],
+        [
+         1,
+         -12
+        ],
+        [
+         3.2,
+         -12
+        ],
+        [
+         4.8,
+         -13.6
+        ],
+        [
+         4.8,
+         -13.8
+        ],
+        [
+         5,
+         -14
+        ],
+        [
+         5,
+         -14.4
+        ],
+        [
+         5.2,
+         -14.6
+        ],
+        [
+         5.3,
+         -14.69
+        ]
+       ],
+       "heading": 0,
+       "title": "To Kitchen"
+      },
+      {
+       "start": 598,
+       "end": 606,
+       "action": "serve",
+       "path": [
+        [
+         5.3,
+         -14.69
+        ],
+        [
+         5.3,
+         -14.69
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Rice washed, soup on low for dinner"
+      },
+      {
+       "start": 606,
+       "end": 607.708,
+       "action": "idle",
+       "path": [
+        [
+         5.3,
+         -14.69
+        ],
+        [
+         5.3,
+         -14.69
+        ]
+       ],
+       "heading": 1.571,
+       "title": "Rice washed, soup on low for dinner"
+      },
+      {
+       "start": 607.708,
+       "end": 614,
+       "action": "walk",
+       "path": [
+        [
+         5.3,
+         -14.69
+        ],
+        [
+         5.2,
+         -14.6
+        ],
+        [
+         3.2,
+         -12.6
+        ],
+        [
+         3.2,
+         -12
+        ],
+        [
+         1.6,
+         -10.4
+        ],
+        [
+         1.6,
+         -9.6
+        ],
+        [
+         0.8,
+         -8.8
+        ],
+        [
+         0.8,
+         -8.6
+        ],
+        [
+         0.6,
+         -8.4
+        ],
+        [
+         0.6,
+         -8
+        ],
+        [
+         0.4,
+         -7.8
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 1.571,
+       "title": "To the door"
+      },
+      {
+       "start": 614,
+       "end": 661,
+       "action": "idle",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.6
+        ]
+       ],
+       "heading": 0,
+       "title": "Away",
+       "visible": false
+      },
+      {
+       "start": 661,
+       "end": 667.761,
+       "action": "walk",
+       "path": [
+        [
+         0.4,
+         -7.6
+        ],
+        [
+         0.4,
+         -7.8
+        ],
+        [
+         2.6,
+         -10
+        ],
+        [
+         2.6,
+         -10.2
+        ],
+        [
+         2.8,
+         -10.4
+        ],
+        [
+         2.8,
+         -10.6
+        ],
+        [
+         3,
+         -10.8
+        ],
+        [
+         3,
+         -11.2
+        ],
+        [
+         3.2,
+         -11.4
+        ],
+        [
+         3.2,
+         -13.2
+        ],
+        [
+         4.8,
+         -14.8
+        ],
+        [
+         4.8,
+         -15.2
+        ],
+        [
+         5,
+         -15.4
+        ],
+        [
+         5.085,
+         -15.35
+        ]
+       ],
+       "heading": 0,
+       "title": "To Kitchen"
+      },
+      {
+       "start": 667.761,
+       "end": 669,
+       "action": "idle",
+       "path": [
+        [
+         5.085,
+         -15.35
+        ],
+        [
+         5.085,
+         -15.35
+        ]
+       ],
+       "heading": 3.141,
+       "title": "Jasmine tea for two"
+      },
+      {
+       "start": 669,
+       "end": 674,
+       "action": "serve",
+       "path": [
+        [
+         5.085,
+         -15.35
+        ],
+        [
+         5.085,
+         -15.35
+        ]
+       ],
+       "heading": 3.141,
+       "title": "Jasmine tea for two"
+      },
+      {
+       "start": 674,
+       "end": 674.814,
+       "action": "idle",
+       "path": [
+        [
+         5.085,
+         -15.35
+        ],
+        [
+         5.085,
+         -15.35
+        ]
+       ],
+       "heading": 3.141,
+       "title": "Jasmine tea for two"
+      },
+      {
+       "start": 674.814,
+       "end": 681,
+       "action": "walk",
+       "path": [
+        [
+         5.085,
+         -15.35
+        ],
+        [
+         5,
+         -15.4
+        ],
+        [
+         3.2,
+         -13.6
+        ],
+        [
+         3.2,
+         -12
+        ],
+        [
+         2.4,
+         -11.2
+        ],
+        [
+         2,
+         -11.2
+        ],
+        [
+         1.8,
+         -11
+        ],
+        [
+         1.2,
+         -11
+        ],
+        [
+         0.6,
+         -10.4
+        ],
+        [
+         0.2,
+         -10.4
+        ],
+        [
+         0,
+         -10.2
+        ],
+        [
+         -0.78,
+         -10.2
+        ]
+       ],
+       "heading": 3.141,
+       "title": "To Living room"
+      },
+      {
+       "start": 681,
+       "end": 720,
+       "action": "conversation",
+       "path": [
+        [
+         -0.78,
+         -10.2
+        ],
+        [
+         -0.78,
+         -10.2
+        ]
+       ],
+       "heading": 5.012,
+       "title": "Tea on the sofa with her mother",
+       "seated": true,
+       "seatId": "home-living-sofa"
+      }
+     ]
+    }
+   ],
+   "interactions": [
+    {
+     "id": "lin-breakfast",
+     "label": "Mrs. Lin · breakfast with her daughter",
+     "category": "home",
+     "description": "Her daughter has the rice porridge on before Mrs. Lin is up; they eat together at the dining table and she takes her morning pills from the weekly pack before the Seen van comes.",
+     "actorIds": [
+      "lin-at-home",
+      "lin-daughter"
+     ],
+     "start": 1.5,
+     "end": 15.8
+    },
+    {
+     "id": "lin-evening",
+     "label": "Mrs. Lin · home with her daughter",
+     "category": "home",
+     "description": "Home from the center, Mrs. Lin settles on the sofa; her daughter brings jasmine tea and they talk over her day: the clinic check, therapy, lunch and karaoke, and what the care team planned.",
+     "actorIds": [
+      "lin-at-home",
+      "lin-daughter"
+     ],
+     "start": 662,
+     "end": 720
+    }
+   ],
+   "holes": {
+    "lin-at-home": [
+     {
+      "kind": "before",
+      "start": 0,
+      "end": 0.5,
+      "from": [
+       -3.3,
+       -15.4
+      ],
+      "to": [
+       -3.3,
+       -15.4
+      ]
+     },
+     {
+      "kind": "away",
+      "start": 24.1,
+      "end": 659,
+      "from": [
+       0.4,
+       -7.6
+      ],
+      "to": [
+       0.4,
+       -7.6
+      ]
+     }
+    ],
+    "lin-daughter": [
+     {
+      "kind": "before",
+      "start": 0,
+      "end": 0.5,
+      "from": [
+       5.085,
+       -15.35
+      ],
+      "to": [
+       5.085,
+       -15.35
+      ]
+     },
+     {
+      "kind": "away",
+      "start": 22.9,
+      "end": 57,
+      "from": [
+       0.4,
+       -7.6
+      ],
+      "to": [
+       0.4,
+       -7.6
+      ]
+     },
+     {
+      "kind": "away",
+      "start": 614,
+      "end": 661,
+      "from": [
+       0.4,
+       -7.6
+      ],
+      "to": [
+       0.4,
+       -7.6
+      ]
+     }
+    ]
+   },
+   "notes": []
+  },
   "partner-adc": {
    "actors": [
     {
