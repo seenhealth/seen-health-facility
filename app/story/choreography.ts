@@ -83,8 +83,8 @@ export const FINALE_SHOT: ShotSpec = {
 };
 /**
  * The whole care network around the center. Seen from the east, the network
- * is about 115 m across the screen (from the north-east it is about 210 m), so
- * every pad fits between the card and the team panel.
+ * is about 125 m across the screen (from the north-east it is about 250 m), so
+ * every pad fits to the right of the card (the team panel is hidden here).
  */
 export const NETWORK_SHOT: ShotSpec = {
   place: 'network',

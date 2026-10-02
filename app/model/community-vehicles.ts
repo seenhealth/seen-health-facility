@@ -372,15 +372,16 @@ const legAt = (s: CareSetting, lane: 0 | 1, side: 'entry' | 'exit') =>
 const receiving = deliveryStops.find((d) => d.kind === 'package')!.door;
 /**
  * The Seen center's rear kerb: the meals car's home and the courier's stop by
- * receiving, in the 2.4 m strip between the south street slab (z ≤ -28.8)
- * and the raised sidewalk (z ≥ -26.4), so a 1.76 m car clears both.
+ * receiving, on the lot's edge just inside the south street slab (z ≤ -28.8),
+ * which a 1.76 m car at z -27.7 clears. The re-measured block has no raised
+ * sidewalk along the alley; the yard runs on to the building and its planters.
  */
 export const CENTER_LOT = {
   meals: { at: [-4, -27.7] as Vec2, dir: [1, 0] as Vec2 },
   courier: { at: [-16, -27.7] as Vec2, dir: [1, 0] as Vec2 },
   /**
-   * On foot from the courier's door (street side) round the car's nose,
-   * across the sidewalk and the yard to rear receiving.
+   * On foot from the courier's door (street side) round the car's nose and
+   * across the yard to rear receiving.
    */
   receivingWalk: [
     [-13.2, -29.0],
