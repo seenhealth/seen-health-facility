@@ -318,93 +318,117 @@ export function buildAlhambraExterior(model: Facility) {
   // Lot-side door of the two-storey wing: navy awning, three steps down to the lot
   // and a block planter wall beside them (Street View, May 2025).
   const lotDoor = group(facade, 'therapy-lot-door-awning-and-steps');
-  // Street View (May 2025, camera calibrated against the front pano): the
-  // awning door sits at x ≈ -27.4 on the wing's lot face; a split-face block
-  // wall runs east of it along the face to the lobby corner, and four steps
-  // descend westward from the door landing, parallel to the wall, with a pipe
-  // handrail on the lot side.
+  // Street View (May 2025): the awning door at x ≈ -27.4 on the wing's lot face.
+  // A split-face block wall stands 1.8 m clear of the face, from the lobby
+  // corner west to the stairs; behind it a raised walkway at door level, and at
+  // the wall's west end four steps rise from the lot into that gap, a pipe
+  // handrail hooked onto the wall and another on the building side.
   const doorX = -31.18 + 3.25 + 0.55;
   const brick = '#c49a6c',
     brickJoint = '#b58a5e';
   box(lotDoor, doorX, 2.32, 8.35, 2.7, 0.14, 1.1, '#2d4a74');
   box(lotDoor, doorX, 2.28, 8.35, 2.6, 0.05, 1.0, '#eeeee7');
-  const landTop = 0.5;
-  box(lotDoor, doorX, -0.23, 8.3, 2.4, landTop + 0.23, 1.2, '#c5c8c2');
-  const stepRun = 0.36,
-    stepRise = (landTop + 0.23) / 4;
+  const landTop = 0.5,
+    wallZ = 7.0,
+    wallX0 = -25.8,
+    wallX1 = -18.1;
+  // Walkway at door level from the door east behind the wall.
+  box(
+    lotDoor,
+    (doorX - 1.2 + wallX1) / 2,
+    -0.23,
+    8.0,
+    wallX1 - (doorX - 1.2),
+    landTop + 0.23,
+    1.8,
+    '#c5c8c2',
+  );
+  const stairX = (wallX0 + doorX - 1.2) / 2 + 0.05,
+    stairW = wallX0 - (doorX - 1.2) - 0.1,
+    run = 0.3,
+    riseStep = (landTop + 0.23) / 4;
   for (let i = 0; i < 4; i++)
     box(
       lotDoor,
-      doorX - 1.2 - stepRun / 2 - stepRun * i,
+      stairX,
       -0.23,
-      8.3,
-      stepRun,
-      landTop + 0.23 - stepRise * (i + 1),
-      1.2,
+      wallZ + 0.1 - run / 2 - run * i,
+      stairW,
+      landTop + 0.23 - riseStep * (i + 1),
+      run,
       '#c5c8c2',
     );
-  const stairFoot = doorX - 1.2 - stepRun * 4;
-  for (const [x, base] of [
-    [doorX - 1.1, landTop],
-    [stairFoot + 0.1, -0.23],
-  ])
-    box(lotDoor, x, base, 7.65, 0.035, 0.95, 0.035, steel);
-  beam(
-    lotDoor,
-    [doorX - 1.1, landTop + 0.95, 7.65],
-    [stairFoot + 0.1, -0.23 + 0.95, 7.65],
-    0.035,
-    0.035,
-    steel,
-  );
-  const wallX0 = doorX + 1.3,
-    wallX1 = -14.75;
+  const stairFootZ = wallZ + 0.1 - run * 4;
+  for (const xx of [wallX0 - 0.05, doorX - 1.2 + 0.05]) {
+    box(lotDoor, xx, -0.23, stairFootZ, 0.035, 0.95, 0.035, steel);
+    box(lotDoor, xx, landTop, wallZ + 0.1, 0.035, 0.95, 0.035, steel);
+    beam(
+      lotDoor,
+      [xx, 0.72, stairFootZ],
+      [xx, landTop + 0.95, wallZ + 0.1],
+      0.035,
+      0.035,
+      steel,
+    );
+  }
   box(
     lotDoor,
     (wallX0 + wallX1) / 2,
     -0.23,
-    8.55,
+    wallZ,
     wallX1 - wallX0,
-    1.35,
+    1.5,
     0.3,
     brick,
   );
-  for (let y = 0.05; y < 1.3; y += 0.2)
-    box(
-      lotDoor,
-      (wallX0 + wallX1) / 2,
-      y,
-      8.39,
-      wallX1 - wallX0,
-      0.012,
-      0.01,
-      brickJoint,
-    );
-  for (let xx = wallX0 + 0.3; xx < wallX1; xx += 0.4)
-    box(lotDoor, xx, -0.23, 8.39, 0.01, 1.35, 0.01, brickJoint);
-  // Low curbed planter left of the drop-off door: short pygmy palms and shrubs.
-  const island = group(site, 'wing-palm-island');
-  box(island, -21.2, -0.23, 6.45, 4.6, 0.18, 2.3, '#dcd7cd');
-  box(island, -21.2, -0.23, 5.3, 4.6, 0.2, 0.07, red);
-  box(island, -21.2, -0.05, 6.45, 4.3, 0.02, 2.0, '#8c7a5c');
+  for (const zz of [wallZ - 0.16, wallZ + 0.16]) {
+    for (let y = 0.05; y < 1.45; y += 0.2)
+      box(
+        lotDoor,
+        (wallX0 + wallX1) / 2,
+        y,
+        zz,
+        wallX1 - wallX0,
+        0.012,
+        0.01,
+        brickJoint,
+      );
+    for (let xx = wallX0 + 0.3; xx < wallX1; xx += 0.4)
+      box(lotDoor, xx, -0.23, zz, 0.01, 1.5, 0.01, brickJoint);
+  }
+  // Low curbed planter just inside the lot entrance, on its north side: short
+  // pygmy palms and shrubs, the entry lane between it and the wing.
+  const island = group(site, 'entrance-palm-planter');
+  box(island, -29.9, -0.23, 1.95, 4.2, 0.18, 2.1, '#dcd7cd');
+  box(island, -29.9, -0.23, 3.0, 4.2, 0.2, 0.07, red);
+  box(island, -27.8, -0.23, 1.95, 0.07, 0.2, 2.1, red);
+  box(island, -29.9, -0.05, 1.95, 3.9, 0.02, 1.8, '#8c7a5c');
   for (const [x, z, h] of [
-    [-22.6, 6.0, 1.3],
-    [-21.0, 7.0, 1.6],
-    [-19.6, 6.1, 1.2],
+    [-31.2, 1.5, 1.3],
+    [-29.8, 2.4, 1.6],
+    [-28.5, 1.6, 1.2],
   ])
     palm(x, z, h, 1.0);
-  for (let xx = -23.1; xx < -19.2; xx += 0.75) {
-    const tuft = mesh(island, new T.IcosahedronGeometry(0.3, 1), '#7f9a5f');
-    tuft.position.set(xx, 0.12, 6.45 + (xx % 1.5 > 0.75 ? 0.6 : -0.6));
+  for (let xx = -31.6; xx < -28.0; xx += 0.75) {
+    const tuft = mesh(island, new T.IcosahedronGeometry(0.28, 1), '#7f9a5f');
+    tuft.position.set(xx, 0.12, 1.95 + (xx % 1.5 > 0.75 ? 0.55 : -0.55));
     tuft.scale.set(1, 0.7, 1);
   }
   // Drop-off landing along the lobby wall across the glass door, window and
-  // side door at floor level, with short steps at its north end and the
-  // accessible ramp dropping toward the wing; bronze rails on the lot side and
-  // along the ramp (Street View, May 2025).
+  // side door at floor level, with short steps at its north end. The
+  // accessible ramp is a switchback: an upper run descends along the wall
+  // toward the wing, turns on a landing beside the block wall, and the lower
+  // run comes back in front of it down to the lot. Bronze rails throughout
+  // (Street View, May 2025).
   const landing = group(site, 'lobby-landing-and-ramp');
   const LAND = { x: -15.5, w: 1.3, z0: -2.0, z1: 3.6, top: 0 };
-  const rise = LAND.top - L_STREET;
+  const bronze = '#6b5845',
+    paving = '#c5c8c2';
+  const rise = LAND.top - L_STREET,
+    midTop = LAND.top - rise / 2;
+  const upper = { z0: LAND.z1, z1: 7.6 },
+    turn = { x0: -17.95, x1: -14.85, z0: 7.6, z1: 8.75 },
+    lower = { x: -17.15, z0: 2.9, z1: 7.6 };
   box(
     landing,
     LAND.x,
@@ -413,7 +437,7 @@ export function buildAlhambraExterior(model: Facility) {
     LAND.w,
     rise,
     LAND.z1 - LAND.z0,
-    '#c5c8c2',
+    paving,
   );
   for (let i = 0; i < 2; i++)
     box(
@@ -424,47 +448,98 @@ export function buildAlhambraExterior(model: Facility) {
       LAND.w,
       rise - (rise / 3) * (i + 1),
       0.4,
-      '#c5c8c2',
+      paving,
     );
-  const rampLen = 5.0;
-  const rampSlab = box(
+  const upperLen = upper.z1 - upper.z0,
+    lowerLen = lower.z1 - lower.z0;
+  const upperSlab = box(
     landing,
     LAND.x,
-    L_STREET + rise / 2 - 0.06,
-    LAND.z1 + rampLen / 2,
+    (LAND.top + midTop) / 2 - 0.06,
+    (upper.z0 + upper.z1) / 2,
     LAND.w,
     0.12,
-    rampLen,
-    '#c5c8c2',
+    upperLen,
+    paving,
   );
-  rampSlab.rotation.x = Math.atan2(rise, rampLen);
-  const bronze = '#6b5845';
-  const walkY = (z: number) =>
-    z <= LAND.z1 ? LAND.top : LAND.top - (rise * (z - LAND.z1)) / rampLen;
-  for (const x of [LAND.x - LAND.w / 2 - 0.05, LAND.x + LAND.w / 2 + 0.05]) {
-    const zStart = x < LAND.x ? LAND.z0 - 0.8 : LAND.z1;
-    for (let z = zStart; z <= LAND.z1 + rampLen + 0.01; z += 1.5)
-      box(landing, x, walkY(z), z, 0.035, 0.95, 0.035, bronze);
-    for (const y of [0.45, 0.65, 0.85, 1.0]) {
-      if (zStart < LAND.z1)
-        beam(
-          landing,
-          [x, LAND.top + y, zStart],
-          [x, LAND.top + y, LAND.z1],
-          0.03,
-          0.03,
-          bronze,
-        );
+  upperSlab.rotation.x = Math.atan2(rise / 2, upperLen);
+  box(
+    landing,
+    (turn.x0 + turn.x1) / 2,
+    L_STREET,
+    (turn.z0 + turn.z1) / 2,
+    turn.x1 - turn.x0,
+    midTop - L_STREET,
+    turn.z1 - turn.z0,
+    paving,
+  );
+  const lowerSlab = box(
+    landing,
+    lower.x,
+    (midTop + L_STREET) / 2 - 0.06,
+    (lower.z0 + lower.z1) / 2,
+    LAND.w,
+    0.12,
+    lowerLen,
+    paving,
+  );
+  lowerSlab.rotation.x = Math.atan2(rise / 2, lowerLen);
+  const upperY = (z: number) =>
+    LAND.top - ((rise / 2) * (z - upper.z0)) / upperLen;
+  const lowerY = (z: number) =>
+    midTop - ((rise / 2) * (lower.z1 - z)) / lowerLen;
+  const railRun = (
+    x: number,
+    z0: number,
+    z1: number,
+    y: (z: number) => number,
+  ) => {
+    for (let z = z0; z <= z1 + 0.01; z += 1.4)
+      box(
+        landing,
+        x,
+        y(Math.min(z, z1)),
+        Math.min(z, z1),
+        0.035,
+        0.95,
+        0.035,
+        bronze,
+      );
+    box(landing, x, y(z1), z1, 0.035, 0.95, 0.035, bronze);
+    for (const dy of [0.45, 0.65, 0.85, 1.0])
       beam(
         landing,
-        [x, LAND.top + y, LAND.z1],
-        [x, L_STREET + y, LAND.z1 + rampLen],
+        [x, y(z0) + dy, z0],
+        [x, y(z1) + dy, z1],
         0.03,
         0.03,
         bronze,
       );
-    }
-  }
+  };
+  const lotSide = LAND.x - LAND.w / 2 - 0.05;
+  railRun(lotSide, LAND.z0 - 0.8, LAND.z1, () => LAND.top);
+  railRun(lotSide, upper.z0, upper.z1, upperY);
+  railRun(lower.x + LAND.w / 2 + 0.05, lower.z0, lower.z1, lowerY);
+  railRun(lower.x - LAND.w / 2 - 0.05, lower.z0, lower.z1, lowerY);
+  for (const dy of [0.45, 0.65, 0.85, 1.0])
+    beam(
+      landing,
+      [turn.x0 + 0.05, midTop + dy, turn.z0],
+      [turn.x0 + 0.05, midTop + dy, turn.z1 - 0.05],
+      0.03,
+      0.03,
+      bronze,
+    );
+  box(
+    landing,
+    turn.x0 + 0.05,
+    midTop,
+    turn.z1 - 0.05,
+    0.035,
+    0.95,
+    0.035,
+    bronze,
+  );
   // Rear loading door on the alley: flat canopy over the roll-up and a gated enclosure beside it.
   const rear = group(facade, 'clinic-rear-loading-canopy-and-gate');
   box(rear, -5.6, 3.15, -23.1, 4.2, 0.16, 1.2, '#b7b9b2');
@@ -477,8 +552,8 @@ export function buildAlhambraExterior(model: Facility) {
   // corner, the utility pole with its transformers, bottlebrush trees and a
   // hydrant on the Valley Blvd frontage.
   for (const [z0, z1] of [
-    [-23.5, -1.2],
-    [4.5, 27.4],
+    [-23.5, 2.4],
+    [6.6, 27.4],
   ])
     box(street, -36.0, -0.05, (z0 + z1) / 2, 1.6, 0.012, z1 - z0, lawn);
   function hydrant(x: number, z: number) {
@@ -499,7 +574,7 @@ export function buildAlhambraExterior(model: Facility) {
         .rotateZ(Math.PI / 2)
         .position.set(x + dx, 0.4, z);
   }
-  hydrant(-35.9, -18.6);
+  hydrant(-36.3, -23.0);
   hydrant(-35.6, 31.6);
   function palm(x: number, z: number, h: number, crown: number) {
     const g = group(street, 'fan-palm');
@@ -571,20 +646,20 @@ export function buildAlhambraExterior(model: Facility) {
     mesh(fdc, new T.CylinderGeometry(0.09, 0.09, 0.1, 10), red)
       .rotateX(Math.PI / 2)
       .position.set(-31.0 + dx, 0.82, 9.3);
-  // Wooden utility pole with two transformers at the alley corner.
+  // Wooden utility pole with two transformers on the alley's north edge at the Ethel corner.
   const pole = group(street, 'utility-pole');
   mesh(
     pole,
     new T.CylinderGeometry(0.13, 0.17, 9.5, 10),
     '#7d6a55',
-  ).position.set(-37.7, 4.5, -27.2);
-  box(pole, -37.7, 8.4, -27.2, 2.2, 0.1, 0.1, '#7d6a55');
+  ).position.set(-37.6, 4.5, -36.5);
+  box(pole, -37.6, 8.4, -36.5, 2.2, 0.1, 0.1, '#7d6a55');
   for (const dx of [-0.45, 0.45])
     mesh(
       pole,
       new T.CylinderGeometry(0.28, 0.28, 0.75, 12),
       '#9a9c98',
-    ).position.set(-37.7 + dx, 7.5, -27.2);
+    ).position.set(-37.6 + dx, 7.5, -36.5);
   // Bottlebrush street trees on Valley Blvd, drawn green like the rest of the trees.
   for (const [x, z] of [
     [-11, 30.2],

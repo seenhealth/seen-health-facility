@@ -126,10 +126,11 @@ export const FLEET_LOT = {
   dockHeading: -Math.PI / 2,
   /**
    * The lot entrance: the curb cut on the west street beside the two-storey
-   * wing (Street View, May 2025). It lines up with the drop-off, so an arrival
-   * turns in and drives straight to the ramp.
+   * wing (Street View, May 2025), with the low palm planter on its north side,
+   * so the lane runs beside the wing and an arrival drifts over to the
+   * drop-off's line before the ramp.
    */
-  entry: 1.5,
+  entry: 4.3,
   streetY: -0.23,
   /** Aisle east of the bay noses, where bay pull-outs and back-ins turn. */
   aisle: AISLE_X,
@@ -276,13 +277,15 @@ export const fleetRoutes = {
       ...drivewayToAway(pen),
     ];
   },
-  /** Off site → drop-off: north on the west street, left through the entrance and straight east to the ramp. */
+  /** Off site → drop-off: north on the west street, in through the entrance beside the wing, over to the drop-off's line and east to the ramp. */
   awayToDock(): FleetLeg[] {
     const pen = new Pen(L.northbound, L.vanishSouth, NORTH);
     return [
       ...awayToEntry(pen),
       leg(pen, 'dock-in', 'Arriving at drop-off', LOT, (p) =>
-        p.lineToX(L.dock[0]),
+        p.lineToX(L.dock[0] - 1.0 - jogLength(L.entry - L.dock[1], R))
+          .jog(L.entry - L.dock[1], R)
+          .lineToX(L.dock[0]),
       ),
     ];
   },

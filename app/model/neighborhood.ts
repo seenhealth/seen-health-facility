@@ -32,12 +32,12 @@ const SITE = {
 const SIDEWALKS_PX = [
   [
     [180, 260],
-    [180, 1135],
-    [350, 1135],
+    [180, 1276],
+    [350, 1276],
     [350, 210],
   ],
   [
-    [180, 1359],
+    [180, 1441],
     [180, 2390],
     [240, 2535],
     [500, 2535],
@@ -48,7 +48,7 @@ const SIDEWALKS_PX = [
     [1050, 2335],
     [1050, 2260],
     [350, 2260],
-    [350, 1359],
+    [350, 1441],
   ],
   [
     [180, 260],
@@ -306,17 +306,63 @@ export function buildNeighborhood(model: Facility) {
   dashes(-26, 40, 6, 3, westLine, 0.12);
   dashes(-farZ, -37, 6, 3, westLine, 0.12);
   dashes(47, farZ, 6, 3, westLine, 0.12);
-  dashes(
-    -40,
-    50,
-    5,
-    2.5,
-    (x) => [
-      [x, -32.3],
-      [x + 2.5, -32.3],
-    ],
-    0.1,
-  );
+  // The alley (south street) is an unmarked driveway: no centre dashes.
+  // STOP is painted across the exit lane where it meets the west street.
+  const roadText = (text: string, x0: number, z0: number, h: number) => {
+    const d: Vec2 = [Math.sin(h), Math.cos(h)],
+      r: Vec2 = [-Math.cos(h), Math.sin(h)], // the reader's right in this map frame
+      stroke = 0.24;
+    const glyphs: Record<string, number[][]> = {
+      S: [
+        [0.9, 1.9, 0.1, 1.9],
+        [0.1, 1.9, 0.1, 1.05],
+        [0.1, 1.05, 0.9, 1.05],
+        [0.9, 1.05, 0.9, 0.1],
+        [0.9, 0.1, 0.1, 0.1],
+      ],
+      T: [
+        [0.05, 1.9, 0.95, 1.9],
+        [0.5, 1.9, 0.5, 0.1],
+      ],
+      O: [
+        [0.1, 0.1, 0.9, 0.1],
+        [0.9, 0.1, 0.9, 1.9],
+        [0.9, 1.9, 0.1, 1.9],
+        [0.1, 1.9, 0.1, 0.1],
+      ],
+      P: [
+        [0.1, 0.1, 0.1, 1.9],
+        [0.1, 1.9, 0.9, 1.9],
+        [0.9, 1.9, 0.9, 1.05],
+        [0.9, 1.05, 0.1, 1.05],
+      ],
+    };
+    const g = new T.Group();
+    g.name = `road-text-${text}`;
+    root.add(g);
+    const total = text.length * 1.15 - 0.25;
+    [...text].forEach((ch, k) => {
+      const u0 = k * 1.15 - total / 2;
+      for (const [a, b, c, e] of glyphs[ch] ?? []) {
+        const cu = u0 + (a + c) / 2,
+          cv = (b + e) / 2 - 1,
+          wx = (c - a) * r[0] + (e - b) * d[0],
+          wz = (c - a) * r[1] + (e - b) * d[1];
+        const m = box(
+          x0 + cu * r[0] + cv * d[0],
+          -0.206,
+          z0 + cu * r[1] + cv * d[1],
+          stroke,
+          0.012,
+          Math.hypot(wx, wz) + stroke,
+          SITE.marking,
+          g,
+        );
+        m.rotation.y = Math.atan2(wx, wz);
+      }
+    });
+  };
+  roadText('STOP', -35, -30.7, -Math.PI / 2);
   dashes(
     59,
     farX,
@@ -330,7 +376,7 @@ export function buildNeighborhood(model: Facility) {
   );
   // The entrance apron: a concrete slab at lot level where the west sidewalk is cut, with a one-way arrow in.
   patch(
-    [px(180, 1135), px(350, 1135), px(350, 1359), px(180, 1359)],
+    [px(180, 1276), px(350, 1276), px(350, 1441), px(180, 1441)],
     -0.235,
     0.03,
     SITE.curb,
@@ -352,7 +398,7 @@ export function buildNeighborhood(model: Facility) {
     tip.rotation.x = -Math.PI / 2;
     root.add(g);
   };
-  arrow(-34.5, 1.5, Math.PI / 2);
+  arrow(-34.5, 4.3, Math.PI / 2);
   arrow(-22.5, -6, Math.PI);
   arrow(-22.5, -16, Math.PI);
   // Crosswalks, blue loading access and parking bays are geometry rather than a photograph.
