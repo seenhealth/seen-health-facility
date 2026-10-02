@@ -4,6 +4,7 @@ import '../site/asset-base';
 import { validateFacility } from '../../app/model/schema';
 import { createViewer, defaultState } from '../../app/model/renderer';
 import { createLiveLot, type LiveMessage } from '../../app/model/live-lot';
+import { createDaylight } from '../../app/model/daylight';
 
 /**
  * Static page that shows Seen's real vehicles on the Alhambra lot. A parent
@@ -11,7 +12,9 @@ import { createLiveLot, type LiveMessage } from '../../app/model/live-lot';
  * (app/model/live-lot.ts); this page answers `{ type: 'seen-live-lot-ready' }`
  * once the scene is up so the parent sends the current state. A message with
  * `follow: <vehicle id>` centres the camera on that car and keeps it centred as
- * it moves; `follow: null` returns to the whole-lot shot.
+ * it moves; `follow: null` returns to the whole-lot shot. The scene is lit by
+ * the real sun over the center (app/model/daylight.ts), refreshed every
+ * minute; `?at=HH:MM` or `?at=<ISO date>` lights it for another moment.
  */
 async function main() {
   const host = document.getElementById('root')!;
@@ -20,6 +23,7 @@ async function main() {
     await (await fetch('/models/seen-alhambra-planning.json')).json(),
   );
   let lot: ReturnType<typeof createLiveLot> | null = null;
+  let daylight: ReturnType<typeof createDaylight> | null = null;
   const viewer = createViewer(host, model, () => {}, {
     interactive: true,
     labels: false,
@@ -27,9 +31,23 @@ async function main() {
       // `?debug=1` exposes the scene for inspection from the console.
       if (new URLSearchParams(location.search).has('debug'))
         (window as unknown as { seenScene?: unknown }).seenScene = ctx.scene;
+      daylight = createDaylight(ctx.scene);
       return (lot = createLiveLot(ctx));
     },
   });
+  // Real sun and sky for the moment being shown; `?at=` pins another moment for review.
+  const at = new URLSearchParams(location.search).get('at');
+  const momentNow = () => {
+    if (!at) return new Date();
+    const hm = /^(\d{1,2}):(\d{2})$/.exec(at);
+    if (!hm) return new Date(at);
+    const d = new Date();
+    d.setHours(Number(hm[1]), Number(hm[2]), 0, 0);
+    return d;
+  };
+  const relight = () => daylight?.apply(momentNow());
+  relight();
+  setInterval(relight, 60_000);
   // No care-day cast and no community pads: only the center, its streets and the live vehicles.
   viewer.activity.setOptions({ enabled: false, playing: false, time: 180 });
   viewer.update({ ...defaultState, labels: false, community: false });
