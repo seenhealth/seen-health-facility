@@ -226,14 +226,13 @@ export type MetricsOptions = {
   /** Hero whose touchpoints are measured. */
   heroId?: string;
   /**
-   * Scenario steps whose handoffs are counted. Cutaways (steps with a
-   * `settingId`: moments across the care network, without the hero) are left
-   * out, so the handoffs are the hero's.
+   * Scenario steps whose handoffs are counted: every step is part of the
+   * hero's day (her moments at home and behind the scenes included); the
+   * story's closing highlights are kept apart in `scenario.highlights`.
    */
   steps?: {
     id: string;
     handoffs: { from: string; to: string; note: string }[];
-    settingId?: string;
   }[];
   /** Distance (m) that counts as being with the hero. */
   touchRadius?: number;
@@ -601,7 +600,7 @@ export function computeMetrics(
 
   // Handoffs.
   let handoffs: HandoffMetrics | null = null;
-  const heroSteps = options.steps?.filter((s) => !s.settingId);
+  const heroSteps = options.steps;
   if (heroSteps) {
     const pairs = new Map<string, number>(),
       sent = new Map<string, number>(),

@@ -124,68 +124,32 @@ export const CHAPTER_SHOTS: Record<string, ShotSpec> = {
     drift: -0.2,
   },
   'care-plan': { zoom: 3.3, azimuth: 1.05, elevation: 0.74, push: 1.12, drift: 0.16 },
-  // Cutaways: anchored where the featured people are (an instance room, or a
-  // registry anchor, so a pad that moves or turns keeps its framing) and
-  // leaning toward the first featured interaction. Fronts face east (home,
-  // pharmacy: seen from azimuth ≈ 1.1-1.3) or north (clinic, partner,
-  // hospital: ≈ 0-0.5). Elevations stay low enough to see under the clinic's
-  // upper storey, the pharmacy's roof and the hospital bay's roof; the
-  // stamped home and partner center are cut away at 1.2 m, so their shots
-  // look down into the rooms.
-  'network-pharmacy': {
-    place: { setting: 'pharmacy', anchor: 'counterBack' },
-    zoom: 2.9,
-    azimuth: 1.3,
-    elevation: 0.5,
-    follow: 0.3,
-    radius: 8,
-    push: 1.05,
+  // Cutaways: Mrs. Lin at home (she lives west of the west street, her
+  // front facing east, so the camera looks in from the east, azimuth ≈ 1)
+  // and lunch arriving in the kitchen. Home shots anchor through the
+  // community layer (`place`), so they survive the pad moving; the stamped
+  // house is cut away at 1.2 m and its shots look down into the rooms, wide
+  // enough to hold the porch and the van at the drive's apex.
+  'home-am': {
+    place: { setting: 'home-lin', anchor: 'porch' },
+    zoom: 3.3,
+    azimuth: 1.1,
+    elevation: 0.78,
+    follow: 0.55,
+    radius: 14,
+    push: 1.1,
+    drift: 0.12,
   },
-  'network-home-am': {
-    place: { setting: 'home-wong', room: 'home-kitchen', anchor: 'door' },
-    zoom: 4.6,
-    azimuth: 1.12,
-    elevation: 0.86,
-    follow: 0.4,
-    radius: 6,
-    push: 1.05,
-  },
-  'network-specialist': {
-    place: { setting: 'specialist', anchor: 'examSeat' },
-    zoom: 3.0,
-    azimuth: 0.22,
-    elevation: 0.42,
-    follow: 0.3,
-    radius: 8,
-    push: 1.05,
-  },
-  'network-partner': {
-    place: { setting: 'partner-adc', room: 'rehab-open', anchor: 'ptStand' },
-    zoom: 2.8,
-    azimuth: 0.5,
-    elevation: 0.64,
-    follow: 0.4,
-    radius: 10,
-    push: 1.05,
-    drift: 0.08,
-  },
-  'network-hospital': {
-    place: { setting: 'hospital', anchor: 'huddleA' },
-    zoom: 2.6,
-    azimuth: 0.08,
-    elevation: 0.5,
-    follow: 0.3,
-    radius: 8,
-    push: 1.05,
-  },
-  'network-home-pm': {
-    place: { setting: 'home-wong', room: 'home-living', anchor: 'door' },
-    zoom: 5,
-    azimuth: 0.85,
-    elevation: 1,
-    follow: 0.4,
-    radius: 6,
-    push: 1.04,
+  kitchen: { zoom: 4.4, azimuth: 0.62, elevation: 0.7, follow: 0.4, radius: 9, push: 1.08, drift: 0.1 },
+  'home-pm': {
+    place: { setting: 'home-lin', anchor: 'porch' },
+    zoom: 3.3,
+    azimuth: 0.95,
+    elevation: 0.8,
+    follow: 0.55,
+    radius: 14,
+    push: 1.12,
+    drift: -0.12,
   },
 };
 export const DEFAULT_CHAPTER_SHOT: ShotSpec = {
@@ -196,7 +160,7 @@ export const DEFAULT_CHAPTER_SHOT: ShotSpec = {
   radius: 8,
   push: 1.06,
 };
-/** Cutaways without an entry in CHAPTER_SHOTS: their own setting's pad. */
+/** Cutaways at a care setting without an entry in CHAPTER_SHOTS: the setting's pad. */
 export const DEFAULT_CUTAWAY_SHOT: ShotSpec = {
   zoom: 2.4,
   azimuth: 0.55,
@@ -205,6 +169,133 @@ export const DEFAULT_CUTAWAY_SHOT: ShotSpec = {
   radius: 14,
   push: 1.05,
 };
+
+/**
+ * The closing highlights, keyed by highlight id: one quick look per service,
+ * each anchored where its featured people are and pushing in hard, so every
+ * cut lands on a scene already in motion. Fronts face east (homes, pharmacy:
+ * azimuth ≈ 1.1-1.3) or north (clinic, partner, hospital: ≈ 0-0.5).
+ */
+export const HIGHLIGHT_SHOTS: Record<string, ShotSpec> = {
+  medication: {
+    place: { setting: 'pharmacy', anchor: 'counterBack' },
+    zoom: 3.4,
+    azimuth: 1.24,
+    elevation: 0.52,
+    follow: 0.3,
+    radius: 8,
+    push: 1.16,
+    drift: 0.16,
+  },
+  'day-center': {
+    place: { setting: 'partner-adc' },
+    zoom: 2.4,
+    azimuth: 0.42,
+    elevation: 0.86,
+    follow: 0.5,
+    radius: 16,
+    push: 1.18,
+    drift: 0.14,
+  },
+  specialists: {
+    place: { setting: 'specialist', anchor: 'examSeat' },
+    zoom: 3.6,
+    azimuth: 0.2,
+    elevation: 0.44,
+    follow: 0.3,
+    radius: 8,
+    push: 1.16,
+    drift: -0.12,
+  },
+  optometry: {
+    place: { setting: 'specialist', anchor: 'optoSeat' },
+    zoom: 3.8,
+    azimuth: 0.3,
+    elevation: 0.46,
+    follow: 0.3,
+    radius: 8,
+    push: 1.16,
+    drift: 0.12,
+  },
+  imaging: {
+    place: { setting: 'specialist', anchor: 'imagingTable' },
+    zoom: 3.8,
+    azimuth: 0.1,
+    elevation: 0.48,
+    follow: 0.3,
+    radius: 8,
+    push: 1.16,
+    drift: -0.12,
+  },
+  discharge: {
+    place: { setting: 'hospital', anchor: 'patient' },
+    zoom: 3.2,
+    azimuth: 0.12,
+    elevation: 0.5,
+    follow: 0.4,
+    radius: 10,
+    push: 1.14,
+    drift: 0.14,
+  },
+  'home-mods': {
+    place: { setting: 'home-wong', room: 'home-bath', anchor: 'door' },
+    zoom: 5.0,
+    azimuth: 1.0,
+    elevation: 0.98,
+    follow: 0.4,
+    radius: 6,
+    push: 1.12,
+    drift: 0.12,
+  },
+  'after-hours': {
+    place: { setting: 'hospital', anchor: 'edBay' },
+    zoom: 3.0,
+    azimuth: 0.36,
+    elevation: 0.5,
+    follow: 0.35,
+    radius: 12,
+    push: 1.14,
+    drift: -0.14,
+  },
+  pers: {
+    place: { setting: 'home-wong', room: 'home-primary', anchor: 'door' },
+    zoom: 5.0,
+    azimuth: 0.9,
+    elevation: 1.0,
+    follow: 0.45,
+    radius: 7,
+    push: 1.12,
+    drift: 0.1,
+  },
+};
+/** Highlights without an entry in HIGHLIGHT_SHOTS: their setting's pad. */
+export const DEFAULT_HIGHLIGHT_SHOT: ShotSpec = {
+  zoom: 2.8,
+  azimuth: 0.55,
+  elevation: 0.62,
+  follow: 0.35,
+  radius: 12,
+  push: 1.14,
+  drift: 0.12,
+};
+/**
+ * Peace of mind: Mrs. Lin and her daughter at home at four, a slow, high
+ * push into the living room. The call to action holds its end state.
+ */
+export const PEACE_SHOT: ShotSpec = {
+  place: { setting: 'home-lin', room: 'home-living', anchor: 'porch' },
+  zoom: 4.2,
+  azimuth: 0.98,
+  elevation: 0.9,
+  push: 1.22,
+  drift: 0.22,
+};
+/**
+ * Where the camera lands after a cut, relative to the beat's shot: a touch
+ * wider and turned, so the critically damped spring carries it into the
+ * framing (each cut arrives in motion instead of on a dead frame).
+ */
+export const CUT_SETTLE = { zoom: 0.9, azimuth: -0.09, elevation: 0.04 };
 
 export type Shot = {
   target: [number, number, number];

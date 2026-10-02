@@ -1,9 +1,10 @@
 'use client';
 import type { CSSProperties } from 'react';
 import {
+  atHome,
   groups,
   hero,
-  isCutaway,
+  isMeanwhile,
   isTeamMeeting,
   kickerTime,
   laneMembers,
@@ -11,21 +12,21 @@ import {
   placeLabel,
   shortLabel,
   steps,
-  type Step,
+  withHero,
 } from './data';
 
 type Orientation = 'across' | 'down';
 
 /**
  * Geometry for the role x step grid. `across`: steps are columns (desktop).
- * Cutaway columns (moments across the network) are narrower than Mrs. Lin's;
- * a "Partners" lane for external roles sits below the eleven disciplines.
+ * A "Partners" lane for people outside the team (her daughter, the caterer)
+ * sits below the eleven disciplines.
  */
 function grid(o: Orientation) {
   const across = o === 'across';
   const lane = across ? 34 : 25,
     gap = across ? 14 : 9;
-  const sizeOf = (s: Step) => (isCutaway(s) ? (across ? 56 : 30) : across ? 76 : 40);
+  const col = across ? 72 : 38;
   const labelW = across ? 292 : 112,
     head = across ? 74 : 86;
   const laneOffset = laneMembers.map((m, i) => {
@@ -34,14 +35,9 @@ function grid(o: Orientation) {
   });
   const partnersOffset = laneOffset.at(-1)! + lane + gap;
   const lanesLen = partnersOffset + lane / 2 + 6;
-  const starts: number[] = [];
-  let stepsLen = 0;
-  for (const s of steps) {
-    starts.push(stepsLen);
-    stepsLen += sizeOf(s);
-  }
-  const size = (i: number) => sizeOf(steps[i]);
-  const mid = (i: number) => starts[i] + size(i) / 2;
+  const stepsLen = steps.length * col;
+  const size = () => col;
+  const mid = (i: number) => i * col + col / 2;
   const width = across ? labelW + stepsLen + 16 : labelW + lanesLen + 4;
   const height = across ? head + lanesLen + 8 : head + stepsLen + 8;
   /** Lane l of step s; l = laneMembers.length is the partners lane. */
@@ -81,7 +77,7 @@ function arrowPath(
   return { d, head };
 }
 
-/** Setting badge: the network colour behind the moment's short label. */
+/** Home badge: a warm pill behind the moment's short label. */
 function Badge({ x, y, text, anchor }: { x: number; y: number; text: string; anchor: 'middle' | 'start' }) {
   // Width from the label length (10 px semibold ≈ 5.9 px a character).
   const w = text.length * 5.9 + 12,
@@ -109,13 +105,8 @@ function Grid({ o, revealed }: { o: Orientation; revealed: number }) {
     const [x, y] = g.at(0, l),
       [x2, y2] = g.at(last, l);
     return g.across
-      ? { x1: x - g.size(0) / 2 + 4, x2: x2 + g.size(last) / 2 - 4, y1: y, y2 }
-      : { x1: x, x2, y1: y - g.size(0) / 2 + 4, y2: y2 + g.size(last) / 2 - 4 };
-  };
-  /** Index of the previous step with Mrs. Lin's dot (cutaways have none). */
-  const prevHero = (i: number) => {
-    for (let j = i - 1; j >= 0; j--) if (!isCutaway(steps[j])) return j;
-    return -1;
+      ? { x1: x - g.size() / 2 + 4, x2: x2 + g.size() / 2 - 4, y1: y, y2 }
+      : { x1: x, x2, y1: y - g.size() / 2 + 4, y2: y2 + g.size() / 2 - 4 };
   };
   return (
     <svg
@@ -184,14 +175,13 @@ function Grid({ o, revealed }: { o: Orientation; revealed: number }) {
         {g.across ? `${hero.name}’s day` : ''}
       </text>
       {steps.map((s, i) => {
-        const away = isCutaway(s);
-        const j = away ? -1 : prevHero(i);
+        const home = atHome(s);
         const [hx, hy] = heroAt(i);
-        const prev = j >= 0 ? heroAt(j) : null;
+        const prev = i > 0 ? heroAt(i - 1) : null;
         const team = isTeamMeeting(s);
         const on = i < revealed;
         const [cx, cy] = g.at(i, 0);
-        const size = g.size(i);
+        const size = g.size();
         const time = kickerTime(s).replace(/ (AM|PM)$/, '');
         const partners = s.partners || [];
         return (
@@ -199,27 +189,27 @@ function Grid({ o, revealed }: { o: Orientation; revealed: number }) {
             key={s.id}
             className="story-swim-col"
             data-on={on || undefined}
-            data-network={away || undefined}
+            data-home={home || undefined}
             style={{ '--j': i } as CSSProperties}
           >
-            {(team || away) &&
+            {(team || home) &&
               (g.across ? (
                 <rect
-                  className={away ? 'band network' : 'band'}
-                  x={cx - size / 2 + (away ? 4 : 5)}
+                  className={home ? 'band home' : 'band'}
+                  x={cx - size / 2 + 5}
                   y={g.head - 6}
-                  width={size - (away ? 8 : 10)}
+                  width={size - 10}
                   height={g.lanesLen + 10}
-                  rx={away ? 12 : 14}
+                  rx={14}
                 />
               ) : (
                 <rect
-                  className={away ? 'band network' : 'band'}
+                  className={home ? 'band home' : 'band'}
                   x={g.labelW - 6}
-                  y={cy - size / 2 + (away ? 3 : 4)}
+                  y={cy - size / 2 + 4}
                   width={g.lanesLen + 8}
-                  height={size - (away ? 6 : 8)}
-                  rx={away ? 8 : 10}
+                  height={size - 8}
+                  rx={10}
                 />
               ))}
             {g.across ? (
@@ -227,7 +217,7 @@ function Grid({ o, revealed }: { o: Orientation; revealed: number }) {
                 <text className="time" x={cx} y={14} textAnchor="middle">
                   {time}
                 </text>
-                {away ? (
+                {home ? (
                   <Badge x={cx} y={31} text={shortLabel(s)} anchor="middle" />
                 ) : (
                   <text className="step" x={cx} y={30} textAnchor="middle">
@@ -240,7 +230,7 @@ function Grid({ o, revealed }: { o: Orientation; revealed: number }) {
                 <text className="time" x={0} y={cy - 2}>
                   {time}
                 </text>
-                {away ? (
+                {home ? (
                   <Badge x={0} y={cy + 12} text={shortLabel(s)} anchor="start" />
                 ) : (
                   <text className="step" x={0} y={cy + 11}>
@@ -249,7 +239,7 @@ function Grid({ o, revealed }: { o: Orientation; revealed: number }) {
                 )}
               </>
             )}
-            {/* Mrs. Lin's path joins her own moments and passes behind the cutaways. */}
+            {/* Mrs. Lin's path runs through her day, front door to front door. */}
             {prev && (
               <line
                 className="story-swim-path"
@@ -260,15 +250,14 @@ function Grid({ o, revealed }: { o: Orientation; revealed: number }) {
                 pathLength={1}
               />
             )}
-            {!away && (
-              <circle
-                className="story-swim-hero"
-                data-away={!s.heroPresent || undefined}
-                cx={hx}
-                cy={hy}
-                r={5.5}
-              />
-            )}
+            <circle
+              className="story-swim-hero"
+              data-away={!withHero(s) || undefined}
+              data-home={home || undefined}
+              cx={hx}
+              cy={hy}
+              r={5.5}
+            />
             {s.handoffs.map((h, k) => {
               const a = laneIndex.get(h.from),
                 b = laneIndex.get(h.to);
@@ -292,7 +281,7 @@ function Grid({ o, revealed }: { o: Orientation; revealed: number }) {
               const inStep = s.roles.includes(m.id);
               const receives = !inStep && s.handoffs.some((h) => h.to === m.id);
               if (!inStep && !receives) return null;
-              const kind = !inStep ? ' receives' : away ? ' network' : '';
+              const kind = !inStep ? ' receives' : '';
               return (
                 <circle
                   key={m.id}
@@ -326,9 +315,10 @@ function Grid({ o, revealed }: { o: Orientation; revealed: number }) {
   );
 }
 
-/** Where a moment happens, for the table: with Mrs. Lin, at the center, or a setting. */
-function whereOf(s: Step) {
-  if (isCutaway(s)) return placeLabel(s);
+/** Where a moment happens, for the table: at home, with Mrs. Lin, or behind the scenes. */
+function whereOf(s: (typeof steps)[number]) {
+  if (atHome(s)) return 'At home, with her daughter';
+  if (isMeanwhile(s)) return `In the ${placeLabel(s).toLowerCase()}`;
   return s.heroPresent ? `With ${hero.name}` : 'At the center, team meeting';
 }
 
@@ -339,7 +329,7 @@ function SwimTable() {
   return (
     <table className="sr-only">
       <caption>
-        Who was involved in each moment of {hero.name}’s day, and across the care network
+        Who was involved in each moment of {hero.name}’s day
       </caption>
       <thead>
         <tr>

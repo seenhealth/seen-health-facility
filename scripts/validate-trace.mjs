@@ -249,10 +249,16 @@ for (const [name, source] of [
   );
 }
 
-// The hero's trace covers every discipline her scenario steps claim (cutaways,
-// steps with a settingId, show other people across the care network).
+// The hero's trace covers every discipline her compiled steps claim (cutaways
+// add no hero tracks: at home she is her stand-in, in the kitchen she is away).
 const hero = sim.personJourney(results.story.events, heroId);
-const claimed = [...new Set(scenario.steps.filter((s) => !s.settingId).flatMap((s) => s.roles))];
+const claimed = [
+  ...new Set(
+    scenario.steps
+      .filter((s) => !s.settingId && s.placement?.mode !== 'cutaway')
+      .flatMap((s) => s.roles),
+  ),
+];
 const missing = claimed.filter((d) => !hero.disciplines.includes(d));
 assert.equal(
   missing.length,

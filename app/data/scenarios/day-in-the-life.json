@@ -62,67 +62,29 @@
       }
     },
     {
-      "id": "network-pharmacy",
+      "id": "home-am",
       "window": [
-        26,
+        16,
         50
       ],
-      "zoneId": "community:pharmacy",
+      "zoneId": "community:home-lin",
       "roomId": null,
-      "settingId": "pharmacy",
+      "settingId": "home-lin",
+      "heroAlias": "lin-at-home",
       "interactionIds": [
-        "pharmacy-packing"
+        "lin-van-pickup",
+        "lin-breakfast"
       ],
-      "title": "Medicines, packed and checked",
-      "kicker": "8:20 AM \u00b7 Partner pharmacy",
-      "body": "Across town, a partner pharmacist checks each participant\u2019s blister packs against the medication list Seen\u2019s nurses keep current. The home care coordinator lines up the drop-offs; by nine the courier is on the road.",
+      "title": "Out the door, together",
+      "kicker": "8:15 AM \u00b7 At home",
+      "body": "Congee and tea with her daughter, the morning pills from her weekly pack, shoes on at the bench. When the Seen van pulls up, her daughter walks her down the ramp to the driver.",
       "roles": [
-        "rn",
-        "home-care"
+        "driver"
       ],
       "partners": [
-        "Pharmacist",
-        "Pharmacy technician"
+        "Her daughter"
       ],
-      "handoffs": [
-        {
-          "from": "rn",
-          "to": "home-care",
-          "note": "This week\u2019s packs go out at nine"
-        }
-      ],
-      "heroPresent": false,
-      "placement": {
-        "mode": "cutaway"
-      }
-    },
-    {
-      "id": "network-home-am",
-      "window": [
-        50,
-        58
-      ],
-      "zoneId": "community:home-wong",
-      "roomId": null,
-      "settingId": "home-wong",
-      "interactionIds": [
-        "home-meal-meds"
-      ],
-      "title": "Breakfast at home",
-      "kicker": "8:35 AM \u00b7 The Wongs\u2019 home",
-      "body": "At home, a personal care attendant warms congee for Mrs. Wong, sets up breakfast at her seated kitchen worktop and opens the morning slot of her weekly pill pack, a routine her home care coordinator set up. Then a Seen van takes her to her cardiologist.",
-      "roles": [
-        "pca",
-        "home-care"
-      ],
-      "partners": [],
-      "handoffs": [
-        {
-          "from": "pca",
-          "to": "home-care",
-          "note": "Slept well; ankles a little swollen"
-        }
-      ],
+      "handoffs": [],
       "heroPresent": false,
       "placement": {
         "mode": "cutaway"
@@ -138,7 +100,7 @@
       "roomId": null,
       "title": "Door to door",
       "kicker": "8:45 AM \u00b7 Van A arrives",
-      "body": "The driver deploys the ramp and walks Mrs. Lin to the entrance. He noticed she was slower on the steps this morning, and passes it on.",
+      "body": "Van A pulls into the drop-off. The driver deploys the ramp and walks Mrs. Lin to the entrance. He noticed she was slower on her porch ramp this morning, and passes it on.",
       "roles": [
         "driver",
         "pca"
@@ -410,42 +372,6 @@
       }
     },
     {
-      "id": "network-specialist",
-      "window": [
-        232,
-        240
-      ],
-      "zoneId": "community:specialist",
-      "roomId": null,
-      "settingId": "specialist",
-      "interactionIds": [
-        "specialist-visit"
-      ],
-      "title": "A specialist, with an escort",
-      "kicker": "10:35 AM \u00b7 Cardiology clinic",
-      "body": "Mrs. Wong sees her cardiologist across town. A Seen driver brought her and a personal care attendant checked her in; the consult note goes straight back to her primary care provider.",
-      "roles": [
-        "driver",
-        "pca",
-        "pcp"
-      ],
-      "partners": [
-        "Cardiologist",
-        "Medical assistant"
-      ],
-      "handoffs": [
-        {
-          "from": "pca",
-          "to": "pcp",
-          "note": "Ankle swelling is mild; recheck in three months"
-        }
-      ],
-      "heroPresent": false,
-      "placement": {
-        "mode": "cutaway"
-      }
-    },
-    {
       "id": "program",
       "window": [
         240,
@@ -500,40 +426,27 @@
       }
     },
     {
-      "id": "network-partner",
+      "id": "kitchen",
       "window": [
         289,
-        300
+        304
       ],
-      "zoneId": "community:partner-adc",
-      "roomId": null,
-      "settingId": "partner-adc",
+      "zoneId": "kitchen",
+      "roomId": "kitchen-prep",
       "interactionIds": [
-        "partner-pt",
-        "partner-rn-review"
+        "kitchen-lunch-delivery"
       ],
-      "title": "Care that travels",
-      "kicker": "11:15 AM \u00b7 Partner day center",
-      "body": "At a partner adult day center, a visiting Seen physical therapist works on strength and balance with two participants enrolled in both programs, and a Seen nurse goes over two others\u2019 medicines with the partner\u2019s own nurse.",
+      "title": "Lunch arrives from down the road",
+      "kicker": "11:15 AM \u00b7 Kitchen",
+      "body": "Steamed fish with ginger, soft rice and bok choy from a Cantonese kitchen in the neighborhood, with a vegetarian dish beside it. The dietitian checks every tray against each participant\u2019s texture and sodium plan.",
       "roles": [
-        "pt",
-        "rn"
+        "dietitian"
       ],
       "partners": [
-        "Partner nurse"
+        "Local caterer",
+        "Kitchen staff"
       ],
-      "handoffs": [
-        {
-          "from": "pt",
-          "to": "rn",
-          "note": "Both steadier on turns; keep the walker"
-        },
-        {
-          "from": "rn",
-          "to": "pcp",
-          "note": "Two medicine lists checked with the partner nurse"
-        }
-      ],
+      "handoffs": [],
       "heroPresent": false,
       "placement": {
         "mode": "cutaway"
@@ -547,9 +460,9 @@
       ],
       "zoneId": "dining",
       "roomId": "dining-1421",
-      "title": "A meal made for her",
-      "kicker": "11:20 AM \u00b7 Dining",
-      "body": "Low sodium and soft textures, planned by the dietitian and served warm. An attendant sits nearby, just in case.",
+      "title": "A meal that tastes like home",
+      "kicker": "11:25 AM \u00b7 Dining",
+      "body": "The fish she grew up with, cooked soft and low in salt to the dietitian\u2019s plan, with jasmine tea. Her tablemates chat in Cantonese; an attendant sits nearby, just in case.",
       "roles": [
         "dietitian",
         "pca"
@@ -882,47 +795,6 @@
       }
     },
     {
-      "id": "network-hospital",
-      "window": [
-        500,
-        525
-      ],
-      "zoneId": "community:hospital",
-      "roomId": null,
-      "settingId": "hospital",
-      "interactionIds": [
-        "hospital-discharge-huddle"
-      ],
-      "title": "Planning the trip home",
-      "kicker": "1:35 PM \u00b7 Community hospital",
-      "body": "Mr. Wong, Mrs. Wong\u2019s husband, goes home today. Seen\u2019s liaison nurse plans his discharge with the hospitalist and the case manager; his home care coordinator lines up home health and meals, and a Seen van comes at 2:10.",
-      "roles": [
-        "rn",
-        "home-care",
-        "driver"
-      ],
-      "partners": [
-        "Hospitalist",
-        "Case manager"
-      ],
-      "handoffs": [
-        {
-          "from": "rn",
-          "to": "home-care",
-          "note": "Home health visit as soon as he is home"
-        },
-        {
-          "from": "home-care",
-          "to": "driver",
-          "note": "Hospital canopy pickup at 2:10"
-        }
-      ],
-      "heroPresent": false,
-      "placement": {
-        "mode": "cutaway"
-      }
-    },
-    {
       "id": "farewell",
       "window": [
         525,
@@ -941,7 +813,7 @@
         {
           "from": "home-care",
           "to": "driver",
-          "note": "Drop-off to the side door; neighbor meets her"
+          "note": "Home by three; her daughter meets her at the porch"
         }
       ],
       "heroPresent": true,
@@ -1003,7 +875,7 @@
       "roomId": null,
       "title": "Safely home",
       "kicker": "2:30 PM \u00b7 Van A departs",
-      "body": "The same driver, the same ramp, a known face at the other end.",
+      "body": "The same driver, the same ramp, and a familiar face waiting at the other end.",
       "roles": [
         "driver",
         "pca"
@@ -1019,6 +891,41 @@
       }
     },
     {
+      "id": "home-pm",
+      "window": [
+        624,
+        664
+      ],
+      "zoneId": "community:home-lin",
+      "roomId": null,
+      "settingId": "home-lin",
+      "heroAlias": "lin-at-home",
+      "interactionIds": [
+        "lin-van-dropoff",
+        "lin-evening"
+      ],
+      "title": "Home, to her daughter",
+      "kicker": "3:00 PM \u00b7 Home",
+      "body": "The same driver brings her down the van ramp and up the porch. Her daughter is waiting at the door, and the kettle is already on.",
+      "roles": [
+        "driver"
+      ],
+      "partners": [
+        "Her daughter"
+      ],
+      "handoffs": [
+        {
+          "from": "driver",
+          "to": "home-care",
+          "note": "Home at 3:05; her daughter is with her"
+        }
+      ],
+      "heroPresent": false,
+      "placement": {
+        "mode": "cutaway"
+      }
+    },
+    {
       "id": "care-plan",
       "window": [
         624,
@@ -1027,8 +934,8 @@
       "zoneId": "upper-office",
       "roomId": "upperfit-conference",
       "title": "One plan, eleven perspectives",
-      "kicker": "3:00 PM \u00b7 The team closes the loop",
-      "body": "Every observation from today lands in one shared care plan: a medication change, a shower chair, an evening visit. Tomorrow starts where today left off.",
+      "kicker": "3:30 PM \u00b7 The team closes the loop",
+      "body": "Every observation from today lands in one shared care plan: a medication change, a shower chair, evening visits for next week. Tomorrow starts where today left off.",
       "roles": [
         "pcp",
         "rn",
@@ -1059,39 +966,209 @@
         "mode": "meeting",
         "category": "coordination"
       }
-    },
+    }
+  ],
+  "highlights": [
     {
-      "id": "network-home-pm",
-      "window": [
-        690,
-        712
-      ],
-      "zoneId": "community:home-wong",
-      "roomId": null,
-      "settingId": "home-wong",
+      "id": "medication",
+      "label": "Medication",
+      "kicker": "8:20 AM \u00b7 Partner pharmacy",
+      "title": "Every pill, packed and checked.",
+      "body": "A partner pharmacist packs each week\u2019s blister packs against the list Seen\u2019s nurses keep current, and a courier brings them to the door.",
+      "settingId": "pharmacy",
       "interactionIds": [
-        "home-health-visit",
-        "after-hours-call"
+        "pharmacy-packing"
       ],
-      "title": "Home, and not alone",
-      "kicker": "3:45 PM \u00b7 The Wongs\u2019 home",
-      "body": "Mr. Wong is home. The home health nurse his care coordinator booked checks his vitals and matches his new medicines to the pill packs, and the Seen nurse line calls Mrs. Wong to confirm the evening plan.",
+      "window": [
+        28,
+        58
+      ],
       "roles": [
         "rn",
         "home-care"
       ],
-      "partners": [],
-      "handoffs": [
-        {
-          "from": "rn",
-          "to": "pcp",
-          "note": "Vitals stable; new medicines reconciled"
-        }
+      "partners": [
+        "Pharmacist",
+        "Courier"
+      ]
+    },
+    {
+      "id": "day-center",
+      "label": "Partner day center",
+      "kicker": "9:00 AM \u00b7 Partner adult day center",
+      "title": "A dance floor across town.",
+      "body": "Line dancing, bingo, a choir and calligraphy at a partner day center, where a Seen therapist visits to keep everyone steady on their feet.",
+      "settingId": "partner-adc",
+      "interactionIds": [
+        "partner-line-dance"
       ],
-      "heroPresent": false,
-      "placement": {
-        "mode": "cutaway"
-      }
+      "window": [
+        90,
+        120
+      ],
+      "roles": [
+        "pt"
+      ],
+      "partners": [
+        "Activities lead"
+      ]
+    },
+    {
+      "id": "specialists",
+      "label": "Hospital specialists",
+      "kicker": "10:25 AM \u00b7 Specialty clinic",
+      "title": "The specialist, without the hassle.",
+      "body": "A Seen driver and aide take Mrs. Wong to her cardiologist, and the consult note goes straight back to her doctor.",
+      "settingId": "specialist",
+      "interactionIds": [
+        "specialist-visit"
+      ],
+      "window": [
+        208,
+        238
+      ],
+      "roles": [
+        "driver",
+        "pca",
+        "pcp"
+      ],
+      "partners": [
+        "Cardiologist"
+      ]
+    },
+    {
+      "id": "optometry",
+      "label": "Optometry",
+      "kicker": "11:30 AM \u00b7 Specialty clinic",
+      "title": "Eyes checked, glasses fitted.",
+      "body": "A diabetic eye exam and a new prescription, booked by the team and escorted there and back.",
+      "settingId": "specialist",
+      "interactionIds": [
+        "optometry-exam"
+      ],
+      "window": [
+        315,
+        345
+      ],
+      "roles": [
+        "pcp",
+        "pca"
+      ],
+      "partners": [
+        "Optometrist"
+      ]
+    },
+    {
+      "id": "imaging",
+      "label": "Imaging",
+      "kicker": "1:00 PM \u00b7 Specialty clinic",
+      "title": "Scans that come back to the team.",
+      "body": "A bone-density scan after last spring\u2019s fall, read and returned to her doctor within the day.",
+      "settingId": "specialist",
+      "interactionIds": [
+        "imaging-scan"
+      ],
+      "window": [
+        435,
+        465
+      ],
+      "roles": [
+        "pcp",
+        "driver"
+      ],
+      "partners": [
+        "Radiologic technologist"
+      ]
+    },
+    {
+      "id": "discharge",
+      "label": "Hospital discharge",
+      "kicker": "1:35 PM \u00b7 Community hospital",
+      "title": "Two nurses, one phone call.",
+      "body": "Before Mr. Wong leaves the hospital, its discharge nurse calls Seen\u2019s nurse. Medicines, a home health visit, meals and a van at 2:10 are set before he\u2019s out the door.",
+      "settingId": "hospital",
+      "interactionIds": [
+        "hospital-discharge-call"
+      ],
+      "window": [
+        497,
+        523
+      ],
+      "roles": [
+        "rn",
+        "home-care",
+        "driver"
+      ],
+      "partners": [
+        "Hospital discharge nurse"
+      ]
+    },
+    {
+      "id": "home-mods",
+      "label": "Home modifications",
+      "kicker": "1:50 PM \u00b7 The Wongs\u2019 home",
+      "title": "A grab bar, right where it\u2019s needed.",
+      "body": "An occupational therapist and an installer fit a swing-up grab bar the week the need shows up.",
+      "settingId": "home-wong",
+      "interactionIds": [
+        "home-grab-bar"
+      ],
+      "window": [
+        522,
+        540
+      ],
+      "roles": [
+        "ot",
+        "home-care"
+      ],
+      "partners": [
+        "Installer"
+      ]
+    },
+    {
+      "id": "after-hours",
+      "label": "After-hours care & emergency transport",
+      "kicker": "8:45 AM \u00b7 Emergency department",
+      "title": "Day or night, someone answers.",
+      "body": "A Seen nurse is on call around the clock. When it\u2019s an emergency, the ambulance is on its way and the hospital already knows who to call.",
+      "settingId": "hospital",
+      "interactionIds": [
+        "hospital-ed-arrival"
+      ],
+      "window": [
+        64,
+        94
+      ],
+      "roles": [
+        "rn",
+        "pcp"
+      ],
+      "partners": [
+        "Paramedics",
+        "Hospitalist"
+      ]
+    },
+    {
+      "id": "pers",
+      "label": "Personal emergency response",
+      "kicker": "8:10 AM \u00b7 The Wongs\u2019 home",
+      "title": "One press, and help is on the line.",
+      "body": "Mrs. Wong presses her pendant. The response center answers through the console and brings in Seen\u2019s nurse, who stays on until her aide arrives.",
+      "settingId": "home-wong",
+      "interactionIds": [
+        "home-pers-call"
+      ],
+      "window": [
+        10,
+        30
+      ],
+      "roles": [
+        "rn",
+        "pca"
+      ],
+      "partners": [
+        "Response center"
+      ]
     }
   ],
   "placement": {

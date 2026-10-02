@@ -228,31 +228,41 @@ disappears (`visible: false` off duty); `exit` optionally differs.
 
 ### Cutaway steps
 
-A cutaway looks in on the care network around the center (a partner site or a
-home) for a few seconds of the story, without the hero:
+A cutaway tells a moment of the hero's day through interactions that already
+exist in the care day, instead of compiling hero tracks: Mrs. Lin at her own
+home (where the compiled hero never goes), or lunch arriving in the center's
+kitchen. At a care setting it names the setting, and the actor who stands in
+for the hero there:
 
 ```jsonc
 {
-  "id": "network-partner",
-  "window": [289, 300],                 // inside a gap between the hero's stops
-  "zoneId": "community:partner-adc",    // settingZone(settingId)
+  "id": "home-am",
+  "window": [16, 50],                   // inside a gap between the hero's stops
+  "zoneId": "community:home-lin",       // settingZone(settingId)
   "roomId": null,
-  "settingId": "partner-adc",           // a careSettings id
-  "interactionIds": ["partner-pt"],     // community interactions; the first is the camera's follow target
-  "title": "Therapy that travels", "kicker": "11:15 AM · Partner day center", "body": "…",
-  "roles": ["pt"],                      // IDT disciplines involved
-  "partners": ["Activities lead"],      // external roles (story only)
-  "handoffs": [{ "from": "pt", "to": "rn", "note": "Both steadier on turns; keep the walker" }],
+  "settingId": "home-lin",              // a careSettings id
+  "heroAlias": "lin-at-home",           // the hero's stand-in there (camera, name tag)
+  "interactionIds": ["lin-van-pickup", "lin-breakfast"], // the first is the camera's follow target
+  "title": "Out the door, together", "kicker": "8:15 AM · At home", "body": "…",
+  "roles": ["driver"],                  // IDT disciplines involved
+  "partners": ["Her daughter"],         // people outside the team (story only)
+  "handoffs": [],
   "heroPresent": false,
   "placement": { "mode": "cutaway" }
 }
 ```
 
+In the center it leaves `settingId` out and names its zone and room
+(`"zoneId": "kitchen", "roomId": "kitchen-prep"`).
+
 It adds no stops, companions, meetings or interactions, so the compiled actors
 and interactions do not change. The story trims the hero chapters next to a
 cutaway on screen only (`scrubWindows`, `app/sim/story-timeline.ts`); the hero
-steps' `window`s stay as authored. Metrics, the sim report and the trace
-validator count the hero's steps only (steps without `settingId`).
+steps' `window`s stay as authored. Every step is part of the hero's day, so
+Measure's handoffs count them all; the trace validator checks the disciplines
+of the steps with compiled hero tracks (not the cutaways). The story's closing
+highlights (`highlights` in the same file) are a separate track on their own
+clocks, validated by `build-scenario` but never compiled.
 
 ### What the compiler does
 
@@ -278,8 +288,9 @@ validator count the hero's steps only (steps without `settingId`).
    person they are, so the same RN is seen at the huddle and in the clinic.
 8. Emits interactions per stop, arrival, check-in, departure and meeting, and a
    `steps` summary with arrive/depart and a **focus time** for each step. A
-   cutaway's summary has `heroPresent: false`, `roomId: null`, its `settingId`
-   and featured `interactionIds`, `focusActorId: 'interaction:<first id>'` and a
+   cutaway's summary has `heroPresent: false`, its `roomId` (null at a care
+   setting), `settingId` and `heroAlias` when it has them, the featured
+   `interactionIds`, `focusActorId: 'interaction:<first id>'` and a
    focus time in the middle of the featured interactions' span inside the
    window. The interactions come from `CompileOptions.context` (the composed
    source; `build-scenario` passes `alhambraSource(model, activityData)`);
@@ -344,8 +355,8 @@ Measure and the reports read that one.
 
 Each `CompiledStep` has `window`, `focusTime`, `focusActorId`, `stops` (anchor,
 heading, action, arrive/depart, overlap, companions, partners, interaction id),
-`companionIds`, `interactionIds`, `handoffs` and `roles`; cutaways also carry
-`settingId`.
+`companionIds`, `interactionIds`, `handoffs` and `roles`; cutaways at a care
+setting also carry `settingId`, and the hero's own moments there `heroAlias`.
 
 ## What is measured (`app/sim/metrics.ts`)
 

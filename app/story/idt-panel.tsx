@@ -1,18 +1,17 @@
 'use client';
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import {
+  atHome,
   before,
-  beforeNetwork,
   hero,
-  heroSteps,
-  isCutaway,
+  isMeanwhile,
   isTeamMeeting,
   kickerTime,
   memberById,
-  placeLabel,
   shortLabel,
   steps,
   totals,
+  withHero,
   type Step,
 } from './data';
 import {
@@ -28,19 +27,12 @@ import {
   spoke,
 } from './idt-geometry';
 
-/**
- * `network`: every discipline lit, no spokes (the care network beat).
- * `away`: a cutaway; the moment's disciplines with dashed spokes to the
- * setting instead of Mrs. Lin.
- */
-export type RingMode = 'idle' | 'intro' | 'network' | 'step' | 'away' | 'mesh';
+/** `mesh`: a team meeting, every discipline joined to every other. */
+export type RingMode = 'idle' | 'intro' | 'step' | 'mesh';
 
-/** Moments each discipline takes part in: in Mrs. Lin's day, and across the network. */
+/** Moments of Mrs. Lin's day each discipline takes part in. */
 const involvement = new Map(
-  ringNodes.map((n) => [n.id, heroSteps.filter((s) => s.roles.includes(n.id)).length]),
-);
-const networkInvolvement = new Map(
-  ringNodes.map((n) => [n.id, steps.filter((s) => isCutaway(s) && s.roles.includes(n.id)).length]),
+  ringNodes.map((n) => [n.id, steps.filter((s) => s.roles.includes(n.id)).length]),
 );
 const pct = (v: number) => `${((v / VIEW) * 100).toFixed(3)}%`;
 
@@ -106,21 +98,20 @@ export function IdtRing({
   const [focus, setFocus] = useState<string | null>(null);
   const involved = useMemo(() => new Set(step?.roles || []), [step]);
   const flows = useMemo(() => arrows(step?.handoffs || []), [step]);
-  const all = mode === 'intro' || mode === 'mesh' || mode === 'network';
-  const active = (id: string) =>
-    all || ((mode === 'step' || mode === 'away') && involved.has(id));
+  const all = mode === 'intro' || mode === 'mesh';
+  const active = (id: string) => all || (mode === 'step' && involved.has(id));
   const meeting = mode === 'mesh';
-  const away = mode === 'away' && !!step,
-    network = mode === 'network';
-  const heroAway = !!step && !step.heroPresent;
-  const hubName = network ? 'One team' : away ? shortLabel(step) : hero.name;
-  const hubMeta = network
-    ? 'Many places'
-    : away
-      ? 'Meanwhile'
-      : heroAway
-        ? 'Discussed'
-        : `${hero.age} · ${hero.mobility}`;
+  // Without her in the picture (team meetings, the kitchen) her node dims.
+  const heroAway = !!step && !withHero(step);
+  const hubName = hero.name;
+  const hubMeta =
+    step && atHome(step)
+      ? 'At home'
+      : step && isMeanwhile(step)
+        ? 'For her lunch'
+        : heroAway
+          ? 'Discussed'
+          : `${hero.age} · ${hero.mobility}`;
   const focused = focus ? memberById.get(focus) : null;
   const pairs = useMemo(() => {
     const out: [number, number][] = [];
@@ -135,13 +126,7 @@ export function IdtRing({
       <svg
         viewBox={`0 0 ${VIEW} ${VIEW}`}
         className="story-ring-svg"
-        aria-label={
-          away
-            ? `Care team ring: disciplines involved at ${placeLabel(step)}`
-            : network
-              ? 'Care team ring: the eleven disciplines, across the care network'
-              : `Care team ring: the eleven disciplines around ${hero.name}`
-        }
+        aria-label={`Care team ring: the eleven disciplines around ${hero.name}`}
       >
         <circle className="story-ring-track" cx={C} cy={C} r={R} />
         {!compact &&
@@ -166,7 +151,7 @@ export function IdtRing({
               key={n.id}
               d={spoke(n)}
               pathLength={1}
-              className={active(n.id) && !network ? 'on' : undefined}
+              className={active(n.id) ? 'on' : undefined}
               data-away={heroAway || undefined}
               style={{ '--c': n.color, '--k': k } as CSSProperties}
             />
@@ -218,12 +203,7 @@ export function IdtRing({
             </g>
           );
         })}
-        <g
-          className="story-hub"
-          data-away={(heroAway && !away) || undefined}
-          data-net={away ? 'away' : network ? 'network' : undefined}
-          transform={`translate(${C} ${C})`}
-        >
+        <g className="story-hub" data-away={heroAway || undefined} transform={`translate(${C} ${C})`}>
           <circle className="halo" r={HUB + 10} />
           <circle className="disc" r={HUB} />
           {!compact && (
@@ -272,10 +252,7 @@ export function IdtRing({
               <span className="title">{focused.title}</span>
               <span className="text">{focused.focus}</span>
               <span className="count">
-                Part of {involvement.get(focused.id)} of {heroSteps.length} moments in {hero.name}’s day
-                {networkInvolvement.get(focused.id)
-                  ? ` · ${networkInvolvement.get(focused.id)} across the network`
-                  : ''}
+                Part of {involvement.get(focused.id)} of {steps.length} moments in {hero.name}’s day
               </span>
             </>
           )}
@@ -305,19 +282,11 @@ export function DayFlow({
         }
       >
         {steps.map((step, i) => (
-          <li
-            key={step.id}
-            data-state={i < current ? 'past' : i === current ? 'now' : 'next'}
-            data-kind={isCutaway(step) ? 'network' : undefined}
-          >
+          <li key={step.id} data-state={i < current ? 'past' : i === current ? 'now' : 'next'}>
             <button
               type="button"
               onClick={() => onSelect(i)}
-              aria-label={
-                isCutaway(step)
-                  ? `${kickerTime(step)}, meanwhile at ${placeLabel(step)}: ${step.title}`
-                  : `${kickerTime(step)}, ${step.title}`
-              }
+              aria-label={`${kickerTime(step)}, ${step.title}`}
               aria-current={i === current ? 'step' : undefined}
             >
               <span className="node" />
@@ -331,11 +300,7 @@ export function DayFlow({
         ))}
       </ol>
       <p className="story-dayflow-label" aria-live="polite">
-        {s && isCutaway(s) ? (
-          <>
-            <b>{kickerTime(s)}</b> Meanwhile · <span className="story-net-badge">{shortLabel(s)}</span>
-          </>
-        ) : s ? (
+        {s ? (
           <>
             <b>{kickerTime(s)}</b> {shortLabel(s)}
           </>
@@ -355,25 +320,17 @@ export function IdtPanel({
   stepIndex,
   phase,
   onSelect,
-  showNetwork = false,
 }: {
   mode: RingMode;
   step: Step | null;
   stepIndex: number;
   phase: number;
   onSelect: (i: number) => void;
-  /** Show the "Across the network" counter (from the network beat on). */
-  showNetwork?: boolean;
 }) {
   // Counts before the active step (the whole day once no step is active).
   const i = step ? Math.max(0, stepIndex) : steps.length;
-  const own = !!step && !isCutaway(step),
-    away = !!step && isCutaway(step);
-  // Touchpoints and handoffs are Mrs. Lin's: a cutaway neither adds to them
-  // nor resets them; its disciplines count across the network instead.
-  const touch = stepIndex < 0 ? 0 : before[i].touchpoints + (own ? step.roles.length : 0);
-  const hand = stepIndex < 0 ? 0 : before[i].handoffs + (own ? phase : 0);
-  const net = stepIndex < 0 ? 0 : beforeNetwork[i].touchpoints + (away ? step.roles.length : 0);
+  const touch = stepIndex < 0 ? 0 : before[i].touchpoints + (step ? step.roles.length : 0);
+  const hand = stepIndex < 0 ? 0 : before[i].handoffs + (step ? phase : 0);
   return (
     <aside className="story-idt" aria-label="The interdisciplinary care team">
       <header className="story-idt-head">
@@ -384,19 +341,14 @@ export function IdtPanel({
               ? 'All eleven, one table'
               : mode === 'intro'
                 ? `Around ${hero.name}`
-                : mode === 'network'
-                  ? 'Across the care network'
-                  : step && step.roles.length
+                : step && step.roles.length
                   ? `${step.roles.length} of ${totals.disciplines} involved`
                   : 'Around one person'}
           </p>
         </div>
-        <div className="story-idt-stats" data-network={showNetwork || undefined}>
+        <div className="story-idt-stats">
           <Counter value={touch} label="Touchpoints" />
           <Counter value={hand} label="Handoffs" />
-          {showNetwork && (
-            <Counter className="story-stat network" value={net} label="Across the network" />
-          )}
         </div>
       </header>
       <IdtRing mode={mode} step={step} phase={phase} />
