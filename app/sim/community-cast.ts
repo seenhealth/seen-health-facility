@@ -292,6 +292,8 @@ type CastCommon = {
   role: CharacterRole;
   label: string;
   variant: number;
+  /** A stored character profile (character-templates.json): the same person, and look, as another actor's. */
+  profileId?: string;
   mobility?: CastMobility;
   /** Metres per loop second (defaults: staff 1.0, participant 0.75, cane 0.65, walker 0.5, wheelchair 0.6; ≤ 1.65). */
   gait?: number;
@@ -1734,6 +1736,7 @@ export function communityCastFromScenes(
       id: spec.id,
       role: spec.role,
       variant: spec.variant,
+      ...(spec.profileId ? { profileId: spec.profileId } : {}),
       label: spec.label,
       offset: 0,
       ...(spec.mobility ? { mobility: spec.mobility } : {}),

@@ -21,9 +21,10 @@ const m = JSON.parse(
 );
 // The engine plays its source as given; the viewer gives it the composed
 // Alhambra source: the 167-person loop, the fleet crew (177) and the
-// community cast (220: 12 hand-authored, 31 generated inside facility
-// instances, 25 in the partner day center and 6 in the Wongs' home), with the
-// community vehicles registered so their riders' seats resolve.
+// community cast (223: 13 hand-authored, 33 generated inside facility
+// instances, 25 in the partner day center, 6 in the Wongs' home and 2 in Mrs.
+// Lin's), with the community vehicles registered so their riders' seats
+// resolve.
 const scene = new T.Scene(),
   activity = createActivity(
     m,
@@ -34,7 +35,7 @@ const scene = new T.Scene(),
   ),
   neighborhood = buildNeighborhood(m);
 scene.add(neighborhood.root);
-assert.equal(activity.actors.length, 220);
+assert.equal(activity.actors.length, 223);
 assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 167);
 for (const role of [
   'doctor',
@@ -215,9 +216,9 @@ const communityIds = new Set(
     .filter((a) => a.spec.sourceId === COMMUNITY_SOURCE_ID)
     .map((a) => a.spec.id),
 );
-assert.equal(communityIds.size, 43, 'the community layer brings its cast');
+assert.equal(communityIds.size, 46, 'the community layer brings its cast');
 activity.updateView(allView);
-assert.equal(activity.getState().people, 220);
+assert.equal(activity.getState().people, 223);
 activity.updateView({ ...allView, hiddenSources: [COMMUNITY_SOURCE_ID] });
 assert.equal(
   activity.getState().people,
@@ -499,8 +500,8 @@ assert.ok(
 assert.equal(buffer.readUInt32LE(0), 0x46546c67);
 const n = buffer.readUInt32LE(12),
   gltf = JSON.parse(buffer.subarray(20, 20 + n).toString());
-assert.equal(gltf.skins.length, 15);
-assert.equal(gltf.animations.length, 270);
+assert.equal(gltf.skins.length, 16);
+assert.equal(gltf.animations.length, 288);
 assert.ok(gltf.animations.some((a) => a.name === 'cast-doctor:walk'));
 // The checked cast is written to work/ so validation leaves the tree clean;
 // `--out public/models` publishes it.
@@ -510,6 +511,6 @@ const out = process.argv.includes('--out')
 mkdirSync(out, { recursive: true });
 writeFileSync(`${out}/seen-health-animated-cast.glb`, buffer);
 console.log(
-  `Validated ${activity.actors.length} actors, ${activityData.roles.length} roles, ${samples} path samples, ${minWall.toFixed(3)}m minimum wall clearance; pause, repeat, seek, speed, synchronized pairs, levels and 3D context. Exported 15 rigs and 270 clips (${(buffer.length / 1024 / 1024).toFixed(2)} MB) to ${out}/.`,
+  `Validated ${activity.actors.length} actors, ${activityData.roles.length} roles, ${samples} path samples, ${minWall.toFixed(3)}m minimum wall clearance; pause, repeat, seek, speed, synchronized pairs, levels and 3D context. Exported 16 rigs and 288 clips (${(buffer.length / 1024 / 1024).toFixed(2)} MB) to ${out}/.`,
 );
 activity.dispose();
