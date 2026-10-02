@@ -6,12 +6,12 @@ Interactive planning models of **Alhambra (1839 W Valley), 1630 Olympic and Alve
 
 ## Outputs
 
-Everything the repository produces, in one place. The claude.ai previews were built from the merge of [pull request #5](https://github.com/seenhealth/seen-health-facility/pull/5) and are private to the publishing account until shared.
+Everything the repository produces, in one place. The viewer and story previews are static builds of `main` after [pull request #7](https://github.com/seenhealth/seen-health-facility/pull/7) (`npm run build:viewer`, `npm run build:story`); the storyboard was recorded after [pull request #5](https://github.com/seenhealth/seen-health-facility/pull/5). The claude.ai previews are private to the publishing account until shared.
 
 | Interactive | Where |
 | --- | --- |
 | Live 3D model, all three sites | [seen-health-facility.xingpersonal.chatgpt.site](https://seen-health-facility.xingpersonal.chatgpt.site/). Deployed separately from GitHub, so it can lag `main` |
-| 3D viewer, static build of `main` (vans, drivers, community layer, Measure and Trace) | [Preview](https://claude.ai/artifact/ENDpmBX2GKSLtMz6YuQCbh) |
+| 3D viewer, static build of `main` (cultural day room with guest instructors and the weekly repertoire, vans, drivers, community layer, Measure and Trace) | [Preview](https://claude.ai/artifact/ENDpmBX2GKSLtMz6YuQCbh). **Care day → Day activities** frames the day room; pick a weekday beside the program picker |
 | "A day at Seen Health" scroll story with the six network cutaways | [Preview](https://claude.ai/artifact/Sa8vEJrsRbJA45BoaTeWy4) · `/story` locally |
 | Clips and stills of the care day: dock choreography, the Wongs' home, the partner day center | [Storyboard](https://claude.ai/artifact/CfrUyccAgz9LDi3msDdkTx) |
 
