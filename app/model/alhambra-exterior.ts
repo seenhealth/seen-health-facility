@@ -272,6 +272,144 @@ export function buildAlhambraExterior(model: Facility) {
   box(rear, -5.6, 3.15, -23.1, 4.2, 0.16, 1.2, '#b7b9b2');
   box(rear, -2.3, -0.23, -23.3, 2.6, 2.2, 0.08, '#b9aa89');
   box(rear, -2.3, 2.0, -22.9, 2.8, 0.1, 0.9, '#b7b9b2');
+  // Streetscape from the lot-side and Valley Blvd photographs (May 2025 Street
+  // View and the 2026 photo): the Ethel Avenue parkway lawn with its yellow
+  // hydrant, red-curbed planters with fan palms along the lot's west edge and
+  // beside the wing, the palm island at the alley corner, the FDC on the wing's
+  // corner, the utility pole with its transformers, bottlebrush trees and a
+  // hydrant on the Valley Blvd frontage.
+  const street = group(site, 'ethel-and-valley-streetscape');
+  const lawn = '#9db87c',
+    red = '#b8403a',
+    yellow = '#e6c03c';
+  for (const [z0, z1] of [
+    [-23.5, -1.2],
+    [4.5, 27.4],
+  ])
+    box(street, -36.0, -0.05, (z0 + z1) / 2, 1.6, 0.012, z1 - z0, lawn);
+  function hydrant(x: number, z: number) {
+    const g = group(street, 'fire-hydrant');
+    mesh(g, new T.CylinderGeometry(0.15, 0.17, 0.72, 12), yellow).position.set(
+      x,
+      0.31,
+      z,
+    );
+    mesh(g, new T.CylinderGeometry(0.2, 0.2, 0.06, 12), yellow).position.set(
+      x,
+      0.42,
+      z,
+    );
+    mesh(g, new T.SphereGeometry(0.14, 12, 8), yellow).position.set(x, 0.72, z);
+    for (const dx of [-0.21, 0.21])
+      mesh(g, new T.CylinderGeometry(0.07, 0.07, 0.16, 10), yellow)
+        .rotateZ(Math.PI / 2)
+        .position.set(x + dx, 0.4, z);
+  }
+  hydrant(-35.9, -18.6);
+  hydrant(-34.6, 30.8);
+  function palm(x: number, z: number, h: number, crown: number) {
+    const g = group(street, 'fan-palm');
+    const trunk = mesh(g, new T.CylinderGeometry(0.11, 0.17, h, 10), '#8a7254');
+    trunk.position.set(x, h / 2 - 0.05, z);
+    for (let i = 0; i < 9; i++) {
+      const a = (i / 9) * Math.PI * 2 + (x + z) * 0.3;
+      const frond = mesh(
+        g,
+        new T.BoxGeometry(crown, 0.05, 0.42),
+        i % 2 ? '#4f7a46' : '#5d8a50',
+      );
+      frond.position.set(
+        x + Math.cos(a) * crown * 0.42,
+        h - 0.1 + crown * 0.1,
+        z + Math.sin(a) * crown * 0.42,
+      );
+      frond.rotation.set(0, -a, -0.45);
+    }
+    mesh(g, new T.SphereGeometry(0.22, 10, 8), '#6b8f4a').position.set(
+      x,
+      h + 0.05,
+      z,
+    );
+  }
+  for (const z of [-21, -16.5, -12]) palm(-32.1, z, 2.2, 1.3);
+  for (const z of [9.6, 13.8]) palm(-32.0, z, 2.5, 1.4);
+  palm(-19.6, -23.9, 5.2, 1.9);
+  // Low grasses in the planters, and the red-painted curbs facing the lot.
+  for (const [x, z0, z1] of [
+    [-32.15, -24.2, -7.8],
+    [-32.0, 7.8, 26.8],
+  ])
+    for (let z = z0 + 0.6; z < z1; z += 1.1) {
+      const tuft = mesh(street, new T.IcosahedronGeometry(0.3, 1), '#7f9a5f');
+      tuft.position.set(x, 0.18, z);
+      tuft.scale.set(1, 0.7, 1);
+    }
+  box(street, -31.78, -0.23, -15.95, 0.07, 0.2, 17.5, red);
+  box(street, -31.48, -0.23, 17.3, 0.07, 0.2, 20, red);
+  for (const [[ax, az], [bx, bz]] of [
+    [
+      [-21.0, -22.2],
+      [-16.2, -24.7],
+    ],
+  ]) {
+    const curb = box(
+      street,
+      (ax + bx) / 2,
+      -0.23,
+      (az + bz) / 2,
+      Math.hypot(bx - ax, bz - az),
+      0.2,
+      0.07,
+      red,
+    );
+    curb.rotation.y = -Math.atan2(bz - az, bx - ax);
+  }
+  // Fire department connection at the wing's west corner.
+  const fdc = group(street, 'fire-department-connection');
+  mesh(fdc, new T.CylinderGeometry(0.06, 0.06, 0.8, 8), red).position.set(
+    -31.0,
+    0.4,
+    9.4,
+  );
+  for (const dx of [-0.12, 0.12])
+    mesh(fdc, new T.CylinderGeometry(0.09, 0.09, 0.1, 10), red)
+      .rotateX(Math.PI / 2)
+      .position.set(-31.0 + dx, 0.82, 9.3);
+  // Wooden utility pole with two transformers at the alley corner.
+  const pole = group(street, 'utility-pole');
+  mesh(
+    pole,
+    new T.CylinderGeometry(0.13, 0.17, 9.5, 10),
+    '#7d6a55',
+  ).position.set(-37.7, 4.5, -27.2);
+  box(pole, -37.7, 8.4, -27.2, 2.2, 0.1, 0.1, '#7d6a55');
+  for (const dx of [-0.45, 0.45])
+    mesh(
+      pole,
+      new T.CylinderGeometry(0.28, 0.28, 0.75, 12),
+      '#9a9c98',
+    ).position.set(-37.7 + dx, 7.5, -27.2);
+  // Bottlebrush street trees on Valley Blvd: red bloom over green.
+  for (const [x, z] of [
+    [-8, 30.2],
+    [11, 30.2],
+  ]) {
+    const g = group(street, 'bottlebrush-tree');
+    box(g, x, 0, z, 0.16, 2.6, 0.16, '#6f5a47');
+    for (let i = 0; i < 5; i++) {
+      const lobe = mesh(
+        g,
+        new T.IcosahedronGeometry(0.95, 1),
+        i % 2 ? '#a7524a' : '#5d7e4e',
+      );
+      lobe.position.set(
+        x + Math.cos(i * 1.3) * 0.7,
+        3.1 + Math.sin(i * 2.1) * 0.35,
+        z + Math.sin(i * 1.3) * 0.7,
+      );
+      lobe.scale.y = 0.85;
+    }
+  }
   for (const g of [facade, roof, site]) batch(g);
   return { facade, roof, site };
 }
