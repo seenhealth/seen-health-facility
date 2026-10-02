@@ -1,16 +1,34 @@
 {
+  "version": 1,
   "setting": "partner-adc",
+  "facility": "seen-partner-adhc",
+  "notes": [
+    "The partner adult day health care center (public/models/seen-partner-adhc.json). Everyone is a scene person: twenty-six participants keep their own places at the two long tables all day (partner-tables, no interaction) and leave them for the morning rotation (calligraphy in the studio, a class in the classroom, group therapy in the group room), painting, the line dance, light rehab with the visiting Seen PT, the choir on the stage, bingo, the afternoon studio and the fan dance.",
+    "Points are in the facility plan frame P; heading h faces (sin h, cos h): 0 faces +z (the drive and the long tables), 3.1416 faces the stage.",
+    "Walking performers reach the stage by its steps, walkers and wheelchairs by the ramp. The choir arrives back tier first and files off a tier at a time, front tier first and each east to west once the tier in front is clear; the dance rows arrive back row first and leave front row first, so nobody passes between people already in place.",
+    "Dancers stand 1.65 m apart in staggered rows, just outside the touchpoint trace’s 1.6 m encounter radius; the audiences at the tables are not interaction members, so the trace stays under its size bound."
+  ],
   "entrances": {
-    "front": { "inside": [-14.1, -0.99], "path": ["sidewalkEnd", "sidewalkPad", "courtA", "courtB", "doorOutside"] }
+    "front": {
+      "inside": [
+        0,
+        9.4
+      ],
+      "path": [
+        "sidewalkEnd",
+        "sidewalkPad",
+        "frontWalk",
+        "doorOutside"
+      ]
+    }
   },
-  "places": { "patio": { "label": "Patio", "entrance": "front", "path": ["courtWest", "patioGate"] } },
   "people": [
     {
       "id": "adc-participant-1",
       "role": "participant",
       "label": "Day center participant 1",
       "variant": 10,
-      "gait": 0.65
+      "gait": 0.7
     },
     {
       "id": "adc-participant-2",
@@ -23,17 +41,21 @@
       "id": "adc-participant-3",
       "role": "participant",
       "label": "Day center participant 3",
-      "variant": 12,
-      "gait": 0.65
+      "variant": 12
     },
     {
       "id": "adc-participant-4",
       "role": "participant",
       "label": "Day center participant 4",
       "variant": 13,
-      "gait": 0.65
+      "gait": 0.7
     },
-    { "id": "adc-participant-5", "role": "participant", "label": "Day center participant 5", "variant": 14 },
+    {
+      "id": "adc-participant-5",
+      "role": "participant",
+      "label": "Day center participant 5",
+      "variant": 14
+    },
     {
       "id": "adc-participant-6",
       "role": "participant",
@@ -45,15 +67,14 @@
       "id": "adc-participant-7",
       "role": "participant",
       "label": "Day center participant 7",
-      "variant": 16,
-      "gait": 0.65
+      "variant": 16
     },
     {
       "id": "adc-participant-8",
       "role": "participant",
       "label": "Day center participant 8",
       "variant": 17,
-      "gait": 0.65
+      "gait": 0.7
     },
     {
       "id": "adc-participant-9",
@@ -66,11 +87,21 @@
       "id": "adc-participant-10",
       "role": "participant",
       "label": "Day center participant 10",
-      "variant": 19,
-      "gait": 0.65
+      "variant": 19
     },
-    { "id": "adc-participant-11", "role": "participant", "label": "Day center participant 11", "variant": 20 },
-    { "id": "adc-participant-12", "role": "participant", "label": "Day center participant 12", "variant": 21 },
+    {
+      "id": "adc-participant-11",
+      "role": "participant",
+      "label": "Day center participant 11",
+      "variant": 20,
+      "gait": 0.7
+    },
+    {
+      "id": "adc-participant-12",
+      "role": "participant",
+      "label": "Day center participant 12",
+      "variant": 21
+    },
     {
       "id": "adc-participant-13",
       "role": "participant",
@@ -78,9 +109,25 @@
       "variant": 22,
       "mobility": "wheelchair"
     },
-    { "id": "adc-participant-14", "role": "participant", "label": "Day center participant 14", "variant": 23 },
-    { "id": "adc-participant-15", "role": "participant", "label": "Day center participant 15", "variant": 24 },
-    { "id": "adc-participant-16", "role": "participant", "label": "Day center participant 16", "variant": 25 },
+    {
+      "id": "adc-participant-14",
+      "role": "participant",
+      "label": "Day center participant 14",
+      "variant": 23
+    },
+    {
+      "id": "adc-participant-15",
+      "role": "participant",
+      "label": "Day center participant 15",
+      "variant": 24,
+      "gait": 0.7
+    },
+    {
+      "id": "adc-participant-16",
+      "role": "participant",
+      "label": "Day center participant 16",
+      "variant": 25
+    },
     {
       "id": "adc-participant-17",
       "role": "participant",
@@ -95,7 +142,12 @@
       "variant": 27,
       "mobility": "wheelchair"
     },
-    { "id": "adc-participant-19", "role": "participant", "label": "Day center participant 19", "variant": 28 },
+    {
+      "id": "adc-participant-19",
+      "role": "participant",
+      "label": "Day center participant 19",
+      "variant": 28
+    },
     {
       "id": "adc-participant-20",
       "role": "participant",
@@ -103,385 +155,2825 @@
       "variant": 29,
       "mobility": "cane"
     },
-    { "id": "adc-lead", "role": "activities", "label": "Day center activities lead", "variant": 3 },
-    { "id": "adc-nurse", "role": "nurse", "label": "Day center nurse", "variant": 21 },
-    { "id": "adc-aide", "role": "aide", "label": "Day center aide", "variant": 22 },
+    {
+      "id": "adc-participant-21",
+      "role": "participant",
+      "label": "Day center participant 21",
+      "variant": 30
+    },
+    {
+      "id": "adc-participant-22",
+      "role": "participant",
+      "label": "Day center participant 22",
+      "variant": 31,
+      "mobility": "walker"
+    },
+    {
+      "id": "adc-participant-23",
+      "role": "participant",
+      "label": "Day center participant 23",
+      "variant": 32,
+      "gait": 0.7
+    },
+    {
+      "id": "adc-participant-24",
+      "role": "participant",
+      "label": "Day center participant 24",
+      "variant": 33,
+      "mobility": "wheelchair"
+    },
+    {
+      "id": "adc-participant-25",
+      "role": "participant",
+      "label": "Day center participant 25",
+      "variant": 34
+    },
+    {
+      "id": "adc-participant-26",
+      "role": "participant",
+      "label": "Day center participant 26",
+      "variant": 35,
+      "mobility": "cane"
+    },
+    {
+      "id": "adc-lead",
+      "role": "activities",
+      "label": "Day center activities lead",
+      "variant": 3
+    },
+    {
+      "id": "adc-aide",
+      "role": "aide",
+      "label": "Day center activity aide",
+      "variant": 22
+    },
+    {
+      "id": "adc-music",
+      "role": "activities",
+      "label": "Day center music and choir leader",
+      "variant": 6
+    },
+    {
+      "id": "adc-social-worker",
+      "role": "social-worker",
+      "label": "Day center social worker",
+      "variant": 12
+    },
+    {
+      "id": "adc-rehab-aide",
+      "role": "aide",
+      "label": "Day center rehab aide",
+      "variant": 15
+    },
+    {
+      "id": "adc-reception",
+      "role": "reception",
+      "label": "Day center receptionist",
+      "variant": 9
+    },
     {
       "id": "visiting-pt",
       "role": "pt",
       "label": "Visiting Seen physical therapist",
       "variant": 8,
-      "visit": { "entrance": "front" }
-    },
-    {
-      "id": "visiting-rn",
-      "role": "nurse",
-      "label": "Visiting Seen nurse",
-      "variant": 9,
-      "visit": { "entrance": "front" }
+      "visit": {
+        "entrance": "front"
+      }
     }
   ],
   "scenes": [
     {
-      "id": "partner-morning",
-      "room": "day-open",
-      "window": [0, 360],
-      "label": "Partner center · morning in the day room",
-      "description": "Twenty participants settle in with coffee and conversation at the tables of a Seen-designed day room; the partner’s activities lead and aide run the floor.",
+      "id": "partner-tables",
+      "room": "adhc-hall",
+      "window": [
+        0,
+        720
+      ],
+      "label": "Partner center · at the long tables",
+      "description": "Participants’ own places at the long tables between activities.",
       "category": "partner",
-      "memberAction": "conversation",
-      "near": [-10.5, 9.5],
+      "interaction": false,
       "slots": [
-        { "who": "adc-participant-1", "action": "member", "seat": true },
-        { "who": "adc-participant-3", "action": "member", "seat": true },
-        { "who": "adc-participant-4", "action": "member", "seat": true },
-        { "who": "adc-participant-7", "action": "member", "seat": true },
-        { "who": "adc-participant-8", "action": "member", "seat": true },
-        { "who": "adc-participant-10", "action": "member", "seat": true },
-        { "who": "adc-participant-2", "action": "member", "seat": true },
-        { "who": "adc-participant-9", "action": "member", "seat": true },
-        { "who": "adc-participant-6", "action": "member", "seat": true },
-        { "who": "adc-participant-13", "action": "member", "spot": "day-tree-table-3" },
-        { "who": "adc-participant-17", "action": "member", "seat": true },
-        { "who": "adc-participant-18", "action": "member", "spot": "day-banquette-table-04" },
-        { "who": "adc-participant-20", "action": "member", "seat": true },
-        { "who": "adc-participant-5", "action": "member", "seat": true },
-        { "who": "adc-participant-11", "action": "member", "seat": true },
-        { "who": "adc-participant-12", "action": "member", "seat": true },
-        { "who": "adc-participant-14", "action": "member", "seat": true },
-        { "who": "adc-participant-15", "action": "member", "seat": true },
-        { "who": "adc-participant-16", "action": "member", "seat": true },
-        { "who": "adc-participant-19", "action": "member", "seat": true },
-        {
-          "who": "adc-lead",
-          "action": "conversation",
-          "at": { "point": [-7, 10], "heading": 0 },
-          "window": [0, 170],
-          "title": "Welcoming the group"
-        },
-        { "who": "adc-aide", "action": "serve", "spot": "day-banquette-table-03", "title": "Coffee and snacks" }
-      ]
-    },
-    {
-      "id": "partner-tai-chi",
-      "place": "patio",
-      "window": [168, 247.5],
-      "label": "Partner center · morning tai chi",
-      "description": "Eight participants follow the activities lead under the slatted patio awning: the same repertoire as the Seen day room.",
-      "category": "partner",
-      "slots": [
-        {
-          "who": "adc-lead",
-          "action": "tai-chi",
-          "at": { "anchor": "tcLead", "heading": 3.1416 },
-          "title": "Leading tai chi"
-        },
         {
           "who": "adc-participant-1",
-          "action": "tai-chi",
-          "at": { "anchor": "tc1", "heading": 0 },
-          "window": [168, 247.5],
-          "title": "Morning tai chi"
-        },
-        {
-          "who": "adc-participant-3",
-          "action": "tai-chi",
-          "at": { "anchor": "tc2", "heading": 0 },
-          "window": [172, 244],
-          "title": "Morning tai chi"
-        },
-        {
-          "who": "adc-participant-4",
-          "action": "tai-chi",
-          "at": { "anchor": "tc3", "heading": 0 },
-          "window": [176, 240.5],
-          "title": "Morning tai chi"
-        },
-        {
-          "who": "adc-participant-7",
-          "action": "tai-chi",
-          "at": { "anchor": "tc4", "heading": 0 },
-          "window": [180, 237],
-          "title": "Morning tai chi"
-        },
-        {
-          "who": "adc-participant-8",
-          "action": "tai-chi",
-          "at": { "anchor": "tc5", "heading": 0 },
-          "window": [184, 233.5],
-          "title": "Morning tai chi"
-        },
-        {
-          "who": "adc-participant-10",
-          "action": "tai-chi",
-          "at": { "anchor": "tc6", "heading": 0 },
-          "window": [188, 230],
-          "title": "Morning tai chi"
+          "action": "conversation",
+          "seat": "adhc-chair-a2-02",
+          "title": "At the long tables"
         },
         {
           "who": "adc-participant-2",
-          "action": "tai-chi",
-          "at": { "anchor": "tc7", "heading": 0 },
-          "window": [192, 226.5],
-          "title": "Morning tai chi"
+          "action": "conversation",
+          "seat": "adhc-chair-b1-10",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-3",
+          "action": "conversation",
+          "seat": "adhc-chair-a1-05",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-4",
+          "action": "conversation",
+          "seat": "adhc-chair-a2-06",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-5",
+          "action": "conversation",
+          "seat": "adhc-chair-a2-08",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-6",
+          "action": "conversation",
+          "seat": "adhc-chair-b-east",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-7",
+          "action": "conversation",
+          "seat": "adhc-chair-a1-03",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-8",
+          "action": "conversation",
+          "seat": "adhc-chair-a2-10",
+          "title": "At the long tables"
         },
         {
           "who": "adc-participant-9",
-          "action": "tai-chi",
-          "at": { "anchor": "tc8", "heading": 0 },
-          "window": [196, 223],
-          "title": "Morning tai chi"
+          "action": "conversation",
+          "seat": "adhc-chair-a2-04",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-10",
+          "action": "conversation",
+          "seat": "adhc-chair-b2-10",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-11",
+          "action": "conversation",
+          "seat": "adhc-chair-a1-07",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-12",
+          "action": "conversation",
+          "seat": "adhc-chair-b2-04",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-13",
+          "action": "conversation",
+          "spot": "adhc-chair-a-east",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-14",
+          "action": "conversation",
+          "seat": "adhc-chair-a1-09",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-15",
+          "action": "conversation",
+          "seat": "adhc-chair-b1-12",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-16",
+          "action": "conversation",
+          "seat": "adhc-chair-b2-06",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-17",
+          "action": "conversation",
+          "seat": "adhc-chair-b2-12",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-18",
+          "action": "conversation",
+          "spot": "adhc-chair-a-west",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-19",
+          "action": "conversation",
+          "seat": "adhc-chair-a1-11",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-20",
+          "action": "conversation",
+          "seat": "adhc-chair-b1-02",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-21",
+          "action": "conversation",
+          "seat": "adhc-chair-b2-08",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-22",
+          "action": "conversation",
+          "seat": "adhc-chair-b1-04",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-23",
+          "action": "conversation",
+          "seat": "adhc-chair-b1-06",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-24",
+          "action": "conversation",
+          "spot": "adhc-chair-b-west",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-25",
+          "action": "conversation",
+          "seat": "adhc-chair-b2-02",
+          "title": "At the long tables"
+        },
+        {
+          "who": "adc-participant-26",
+          "action": "conversation",
+          "seat": "adhc-chair-b1-08",
+          "title": "At the long tables"
         }
       ]
     },
     {
-      "id": "partner-patio-tidy",
-      "place": "patio",
-      "window": [247.5, 280],
-      "label": "Activities lead",
-      "description": "The activities lead puts the patio back in order after tai chi.",
+      "id": "partner-lead-desk",
+      "room": "adhc-classroom",
+      "window": [
+        0,
+        720
+      ],
+      "label": "Day center activities lead",
+      "description": "The activities lead prepares classes and activities at the classroom table between sessions.",
       "category": "partner",
       "interaction": false,
       "slots": [
         {
           "who": "adc-lead",
-          "action": "idle",
-          "at": { "anchor": "tcLead", "heading": 3.1416 },
-          "title": "Tidying the patio"
+          "action": "document",
+          "seat": "adhc-class-table-1b-chair-1",
+          "title": "Planning the day"
+        }
+      ]
+    },
+    {
+      "id": "partner-aide-studio",
+      "room": "adhc-studio",
+      "window": [
+        0,
+        720
+      ],
+      "label": "Day center activity aide",
+      "description": "The activity aide prepares paper, ink and paints in the studio between sessions.",
+      "category": "partner",
+      "interaction": false,
+      "slots": [
+        {
+          "who": "adc-aide",
+          "action": "craft",
+          "seat": "adhc-studio-table-2-chair-e1",
+          "title": "Preparing paper and ink"
+        }
+      ]
+    },
+    {
+      "id": "partner-front-desk",
+      "room": "adhc-reception",
+      "window": [
+        0,
+        720
+      ],
+      "label": "Day center receptionist",
+      "description": "The receptionist at the front desk.",
+      "category": "partner",
+      "interaction": false,
+      "slots": [
+        {
+          "who": "adc-reception",
+          "action": "document",
+          "seat": "adhc-reception-chair",
+          "title": "At the front desk"
+        }
+      ]
+    },
+    {
+      "id": "partner-rehab-floor",
+      "room": "adhc-rehab",
+      "window": [
+        0,
+        720
+      ],
+      "label": "Day center rehab aide",
+      "description": "The rehab aide logs exercise sessions in the light rehab room.",
+      "category": "partner",
+      "interaction": false,
+      "slots": [
+        {
+          "who": "adc-rehab-aide",
+          "action": "document",
+          "seat": "adhc-rehab-chair-3",
+          "title": "Logging exercise sessions"
+        }
+      ]
+    },
+    {
+      "id": "partner-piano",
+      "room": "adhc-stage",
+      "window": [
+        0,
+        720
+      ],
+      "label": "Day center music and choir leader",
+      "description": "The music leader at the stage piano between sessions.",
+      "category": "partner",
+      "interaction": false,
+      "slots": [
+        {
+          "who": "adc-music",
+          "action": "seated",
+          "seat": "adhc-stage-piano-bench",
+          "title": "At the piano"
+        }
+      ]
+    },
+    {
+      "id": "partner-group-desk",
+      "room": "adhc-group-room",
+      "window": [
+        0,
+        720
+      ],
+      "label": "Day center social worker",
+      "description": "The social worker in the group room between sessions.",
+      "category": "partner",
+      "interaction": false,
+      "slots": [
+        {
+          "who": "adc-social-worker",
+          "action": "document",
+          "seat": "adhc-group-chair-1",
+          "title": "Notes in the group room"
+        }
+      ]
+    },
+    {
+      "id": "partner-morning",
+      "room": "adhc-hall",
+      "window": [
+        0,
+        100
+      ],
+      "label": "Partner center · arrival and coffee at the long tables",
+      "description": "Participants settle in at the long banquet tables with coffee and tea; the activities lead welcomes everyone at the hall doors and the aide pours.",
+      "category": "partner",
+      "memberAction": "tabletop",
+      "slots": [
+        {
+          "who": "adc-participant-1",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-2",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-3",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-4",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-5",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-6",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-7",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-8",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-9",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-10",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-11",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-12",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-13",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-14",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-15",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-16",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-17",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-18",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-19",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-20",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-21",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-22",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-23",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-24",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-25",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-participant-26",
+          "action": "member",
+          "seat": "home",
+          "title": "Coffee at the long tables"
+        },
+        {
+          "who": "adc-lead",
+          "action": "greet",
+          "at": {
+            "point": [
+              0,
+              6.2
+            ],
+            "heading": 3.1416
+          },
+          "window": [
+            26,
+            95
+          ],
+          "title": "Welcoming everyone"
+        },
+        {
+          "who": "adc-aide",
+          "action": "serve",
+          "spot": "adhc-table-a2",
+          "window": [
+            30,
+            92
+          ],
+          "title": "Pouring coffee and tea"
+        }
+      ]
+    },
+    {
+      "id": "partner-calligraphy",
+      "room": "adhc-studio",
+      "window": [
+        112,
+        200
+      ],
+      "label": "Partner center · calligraphy",
+      "description": "Brush calligraphy at the felt-laid tables in the studio: the activity aide demonstrates strokes and seven participants practise characters on rice paper.",
+      "category": "partner",
+      "slots": [
+        {
+          "who": "adc-aide",
+          "action": "present",
+          "at": {
+            "point": [
+              7.05,
+              -9.5
+            ],
+            "heading": 1.5708
+          },
+          "window": [
+            112,
+            200
+          ],
+          "title": "Demonstrating brush strokes"
+        },
+        {
+          "who": "adc-participant-5",
+          "action": "write",
+          "seat": "adhc-studio-table-1-chair-w1",
+          "window": [
+            116,
+            199
+          ],
+          "title": "Brush calligraphy"
+        },
+        {
+          "who": "adc-participant-8",
+          "action": "write",
+          "seat": "adhc-studio-table-1-chair-e1",
+          "window": [
+            120,
+            198
+          ],
+          "title": "Brush calligraphy"
+        },
+        {
+          "who": "adc-participant-11",
+          "action": "write",
+          "seat": "adhc-studio-table-1-chair-w3",
+          "window": [
+            124,
+            197
+          ],
+          "title": "Brush calligraphy"
+        },
+        {
+          "who": "adc-participant-14",
+          "action": "write",
+          "seat": "adhc-studio-table-1-chair-e3",
+          "window": [
+            128,
+            196
+          ],
+          "title": "Brush calligraphy"
+        },
+        {
+          "who": "adc-participant-19",
+          "action": "write",
+          "seat": "adhc-studio-table-2-chair-w1",
+          "window": [
+            132,
+            195
+          ],
+          "title": "Brush calligraphy"
+        },
+        {
+          "who": "adc-participant-2",
+          "action": "write",
+          "seat": "adhc-studio-table-2-chair-w3",
+          "window": [
+            136,
+            194
+          ],
+          "title": "Brush calligraphy"
+        },
+        {
+          "who": "adc-participant-26",
+          "action": "write",
+          "seat": "adhc-studio-table-2-chair-e3",
+          "window": [
+            140,
+            193
+          ],
+          "title": "Brush calligraphy"
+        }
+      ]
+    },
+    {
+      "id": "partner-class",
+      "room": "adhc-classroom",
+      "window": [
+        112,
+        200
+      ],
+      "label": "Partner center · class",
+      "description": "A morning class at the whiteboard (healthy living and fall prevention): the activities lead teaches seven participants, one at the wheelchair place.",
+      "category": "partner",
+      "slots": [
+        {
+          "who": "adc-lead",
+          "action": "present",
+          "at": {
+            "point": [
+              -9.3,
+              5.25
+            ],
+            "heading": 3.1416
+          },
+          "window": [
+            114,
+            198
+          ],
+          "title": "Teaching at the whiteboard"
+        },
+        {
+          "who": "adc-participant-1",
+          "action": "listen",
+          "seat": "adhc-class-table-1a-chair-1",
+          "window": [
+            118,
+            199
+          ],
+          "title": "Class at the whiteboard"
+        },
+        {
+          "who": "adc-participant-3",
+          "action": "listen",
+          "seat": "adhc-class-table-1b-chair-2",
+          "window": [
+            121,
+            198
+          ],
+          "title": "Class at the whiteboard"
+        },
+        {
+          "who": "adc-participant-4",
+          "action": "listen",
+          "seat": "adhc-class-table-2a-chair-1",
+          "window": [
+            124,
+            197
+          ],
+          "title": "Class at the whiteboard"
+        },
+        {
+          "who": "adc-participant-7",
+          "action": "listen",
+          "seat": "adhc-class-table-2b-chair-2",
+          "window": [
+            127,
+            196
+          ],
+          "title": "Class at the whiteboard"
+        },
+        {
+          "who": "adc-participant-25",
+          "action": "listen",
+          "seat": "adhc-class-table-3a-chair-1",
+          "window": [
+            130,
+            195
+          ],
+          "title": "Class at the whiteboard"
+        },
+        {
+          "who": "adc-participant-9",
+          "action": "listen",
+          "seat": "adhc-class-table-3a-chair-2",
+          "window": [
+            133,
+            194
+          ],
+          "title": "Class at the whiteboard"
+        },
+        {
+          "who": "adc-participant-24",
+          "action": "listen",
+          "spot": "adhc-class-table-3b-chair-2",
+          "window": [
+            136,
+            192
+          ],
+          "title": "Class at the whiteboard"
+        }
+      ]
+    },
+    {
+      "id": "partner-group-therapy",
+      "room": "adhc-group-room",
+      "window": [
+        115,
+        200
+      ],
+      "label": "Partner center · group therapy",
+      "description": "A support group in the circle of armchairs, led by the social worker: six participants, one at the wheelchair place in the circle.",
+      "category": "partner",
+      "slots": [
+        {
+          "who": "adc-social-worker",
+          "action": "conversation",
+          "seat": "home",
+          "title": "Leading the support group"
+        },
+        {
+          "who": "adc-participant-17",
+          "action": "conversation",
+          "seat": "adhc-group-chair-6",
+          "window": [
+            118,
+            199
+          ],
+          "title": "Support group"
+        },
+        {
+          "who": "adc-participant-6",
+          "action": "conversation",
+          "seat": "adhc-group-chair-7",
+          "window": [
+            123,
+            197
+          ],
+          "title": "Support group"
+        },
+        {
+          "who": "adc-participant-15",
+          "action": "conversation",
+          "seat": "adhc-group-chair-2",
+          "window": [
+            128,
+            195
+          ],
+          "title": "Support group"
+        },
+        {
+          "who": "adc-participant-10",
+          "action": "conversation",
+          "seat": "adhc-group-chair-3",
+          "window": [
+            133,
+            193
+          ],
+          "title": "Support group"
+        },
+        {
+          "who": "adc-participant-21",
+          "action": "conversation",
+          "seat": "adhc-group-chair-4",
+          "window": [
+            138,
+            191
+          ],
+          "title": "Support group"
+        },
+        {
+          "who": "adc-participant-13",
+          "action": "conversation",
+          "spot": "adhc-group-chair-5",
+          "window": [
+            140,
+            172
+          ],
+          "title": "Support group"
+        }
+      ]
+    },
+    {
+      "id": "partner-painting",
+      "room": "adhc-studio",
+      "window": [
+        206,
+        254
+      ],
+      "label": "Partner center · painting",
+      "description": "Four of the calligraphers stay on to paint watercolour landscapes at the studio easels, with tips from the activity aide.",
+      "category": "partner",
+      "slots": [
+        {
+          "who": "adc-aide",
+          "action": "present",
+          "at": {
+            "point": [
+              9,
+              -1
+            ],
+            "heading": 1.5708
+          },
+          "window": [
+            210,
+            254
+          ],
+          "title": "Painting tips"
+        },
+        {
+          "who": "adc-participant-2",
+          "action": "craft",
+          "at": {
+            "point": [
+              10.55,
+              -0.6
+            ],
+            "heading": 1.5708
+          },
+          "window": [
+            206,
+            250
+          ],
+          "title": "Painting at the easel"
+        },
+        {
+          "who": "adc-participant-19",
+          "action": "craft",
+          "at": {
+            "point": [
+              10.55,
+              -1.65
+            ],
+            "heading": 1.5708
+          },
+          "window": [
+            208,
+            248
+          ],
+          "title": "Painting at the easel"
+        },
+        {
+          "who": "adc-participant-11",
+          "action": "craft",
+          "at": {
+            "point": [
+              10.55,
+              -2.7
+            ],
+            "heading": 1.5708
+          },
+          "window": [
+            210,
+            252
+          ],
+          "title": "Painting at the easel"
+        },
+        {
+          "who": "adc-participant-5",
+          "action": "craft",
+          "at": {
+            "point": [
+              10.55,
+              -3.75
+            ],
+            "heading": 1.5708
+          },
+          "window": [
+            212,
+            246
+          ],
+          "title": "Painting at the easel"
+        }
+      ]
+    },
+    {
+      "id": "partner-line-dance",
+      "room": "adhc-hall",
+      "window": [
+        266,
+        345
+      ],
+      "label": "Partner center · line dance",
+      "description": "Fourteen participants line-dance in three rows on the patterned dance floor, the activities lead calling the steps and the music leader playing from the stage; the others clap along from the long tables.",
+      "category": "partner",
+      "with": [
+        "adc-music"
+      ],
+      "slots": [
+        {
+          "who": "adc-lead",
+          "action": "dance",
+          "at": {
+            "point": [
+              0,
+              -0.4
+            ],
+            "heading": 3.1416
+          },
+          "window": [
+            266,
+            345
+          ],
+          "title": "Calling the line dance"
+        },
+        {
+          "who": "adc-participant-15",
+          "action": "dance",
+          "at": {
+            "point": [
+              -2.475,
+              -4.7
+            ],
+            "heading": 0
+          },
+          "window": [
+            270,
+            343
+          ],
+          "title": "Line dance"
+        },
+        {
+          "who": "adc-participant-19",
+          "action": "dance",
+          "at": {
+            "point": [
+              -0.825,
+              -4.7
+            ],
+            "heading": 0
+          },
+          "window": [
+            271.5,
+            342.4
+          ],
+          "title": "Line dance"
+        },
+        {
+          "who": "adc-participant-21",
+          "action": "dance",
+          "at": {
+            "point": [
+              0.825,
+              -4.7
+            ],
+            "heading": 0
+          },
+          "window": [
+            273,
+            341.8
+          ],
+          "title": "Line dance"
+        },
+        {
+          "who": "adc-participant-14",
+          "action": "dance",
+          "at": {
+            "point": [
+              2.475,
+              -4.7
+            ],
+            "heading": 0
+          },
+          "window": [
+            274.5,
+            341.2
+          ],
+          "title": "Line dance"
+        },
+        {
+          "who": "adc-participant-4",
+          "action": "dance",
+          "at": {
+            "point": [
+              -3.3,
+              -3.05
+            ],
+            "heading": 0
+          },
+          "window": [
+            276,
+            340.6
+          ],
+          "title": "Line dance"
+        },
+        {
+          "who": "adc-participant-11",
+          "action": "dance",
+          "at": {
+            "point": [
+              -1.65,
+              -3.05
+            ],
+            "heading": 0
+          },
+          "window": [
+            277.5,
+            340
+          ],
+          "title": "Line dance"
+        },
+        {
+          "who": "adc-participant-10",
+          "action": "dance",
+          "at": {
+            "point": [
+              0,
+              -3.05
+            ],
+            "heading": 0
+          },
+          "window": [
+            279,
+            339.4
+          ],
+          "title": "Line dance"
+        },
+        {
+          "who": "adc-participant-1",
+          "action": "dance",
+          "at": {
+            "point": [
+              1.65,
+              -3.05
+            ],
+            "heading": 0
+          },
+          "window": [
+            280.5,
+            338.8
+          ],
+          "title": "Line dance"
+        },
+        {
+          "who": "adc-participant-3",
+          "action": "dance",
+          "at": {
+            "point": [
+              3.3,
+              -3.05
+            ],
+            "heading": 0
+          },
+          "window": [
+            282,
+            338.2
+          ],
+          "title": "Line dance"
+        },
+        {
+          "who": "adc-participant-5",
+          "action": "dance",
+          "at": {
+            "point": [
+              -3.3,
+              -1.4
+            ],
+            "heading": 0
+          },
+          "window": [
+            283.5,
+            337.6
+          ],
+          "title": "Line dance"
+        },
+        {
+          "who": "adc-participant-7",
+          "action": "dance",
+          "at": {
+            "point": [
+              -1.65,
+              -1.4
+            ],
+            "heading": 0
+          },
+          "window": [
+            285,
+            337
+          ],
+          "title": "Line dance"
+        },
+        {
+          "who": "adc-participant-8",
+          "action": "dance",
+          "at": {
+            "point": [
+              0,
+              -1.4
+            ],
+            "heading": 0
+          },
+          "window": [
+            286.5,
+            336.4
+          ],
+          "title": "Line dance"
+        },
+        {
+          "who": "adc-participant-12",
+          "action": "dance",
+          "at": {
+            "point": [
+              1.65,
+              -1.4
+            ],
+            "heading": 0
+          },
+          "window": [
+            288,
+            335.8
+          ],
+          "title": "Line dance"
+        },
+        {
+          "who": "adc-participant-16",
+          "action": "dance",
+          "at": {
+            "point": [
+              3.3,
+              -1.4
+            ],
+            "heading": 0
+          },
+          "window": [
+            289.5,
+            335.2
+          ],
+          "title": "Line dance"
+        }
+      ]
+    },
+    {
+      "id": "partner-line-dance-music",
+      "room": "adhc-stage",
+      "window": [
+        266,
+        345
+      ],
+      "label": "Day center music and choir leader",
+      "description": "Music for the line dance from the stage piano.",
+      "category": "partner",
+      "interaction": false,
+      "slots": [
+        {
+          "who": "adc-music",
+          "action": "music",
+          "seat": "home",
+          "title": "Playing for the line dance"
+        }
+      ]
+    },
+    {
+      "id": "partner-line-dance-audience",
+      "room": "adhc-hall",
+      "window": [
+        274,
+        345
+      ],
+      "label": "Partner center · clapping along",
+      "description": "Participants who sit the line dance out clap along from the long tables.",
+      "category": "partner",
+      "interaction": false,
+      "slots": [
+        {
+          "who": "adc-participant-2",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            274,
+            343
+          ],
+          "title": "Clapping along to the line dance"
+        },
+        {
+          "who": "adc-participant-6",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            275,
+            343
+          ],
+          "title": "Clapping along to the line dance"
+        },
+        {
+          "who": "adc-participant-13",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            276,
+            343
+          ],
+          "title": "Clapping along to the line dance"
+        },
+        {
+          "who": "adc-participant-17",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            277,
+            343
+          ],
+          "title": "Clapping along to the line dance"
+        },
+        {
+          "who": "adc-participant-20",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            278,
+            343
+          ],
+          "title": "Clapping along to the line dance"
+        },
+        {
+          "who": "adc-participant-22",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            279,
+            343
+          ],
+          "title": "Clapping along to the line dance"
+        },
+        {
+          "who": "adc-participant-23",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            280,
+            343
+          ],
+          "title": "Clapping along to the line dance"
+        },
+        {
+          "who": "adc-participant-24",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            281,
+            343
+          ],
+          "title": "Clapping along to the line dance"
+        },
+        {
+          "who": "adc-participant-26",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            282,
+            343
+          ],
+          "title": "Clapping along to the line dance"
         }
       ]
     },
     {
       "id": "partner-pt",
-      "room": "rehab-open",
-      "window": [270, 345],
+      "room": "adhc-rehab",
+      "window": [
+        256,
+        345
+      ],
       "label": "Visiting Seen PT · strength & balance",
-      "description": "A Seen physical therapist visits the partner center for strength and balance with two participants who are also enrolled with Seen.",
+      "description": "A Seen physical therapist visits the partner center for strength and balance with three participants who are also enrolled with Seen: walking between the parallel bars, seated strength with bands from a wheelchair, and the practice stair with the partner’s rehab aide.",
       "category": "partner",
       "slots": [
-        { "who": "visiting-pt", "action": "treat", "spot": "rehab-parallel-bars", "title": "Strength & balance" },
         {
-          "who": "adc-participant-5",
+          "who": "visiting-pt",
+          "action": "treat",
+          "at": {
+            "point": [
+              -8.4,
+              -7.4
+            ],
+            "heading": -1.5708
+          },
+          "title": "Strength & balance"
+        },
+        {
+          "who": "adc-participant-25",
           "action": "exercise",
-          "spot": "rehab-parallel-bars",
+          "at": {
+            "point": [
+              -9.3,
+              -7.4
+            ],
+            "heading": 0
+          },
+          "window": [
+            268,
+            338
+          ],
           "title": "Parallel bars with the Seen PT"
         },
         {
-          "who": "adc-participant-6",
+          "who": "adc-participant-18",
           "action": "exercise",
-          "seat": "rehab-ot-chair-participant",
-          "title": "Seated strength with the Seen PT"
-        }
-      ]
-    },
-    {
-      "id": "partner-rn-review",
-      "room": "clinic-nurse",
-      "window": [286, 330],
-      "label": "Visiting Seen RN · medication review",
-      "description": "The visiting Seen nurse reviews medicines with two participants at the nurse station, with the partner’s own nurse.",
-      "category": "partner",
-      "with": ["adc-nurse"],
-      "slots": [
-        { "who": "visiting-rn", "action": "consult", "seat": "clinic-nurse-task-chair-0", "title": "Medication review" },
-        {
-          "who": "adc-participant-8",
-          "action": "consult",
-          "spot": "clinic-photo-nurse-station",
-          "window": [286, 307],
-          "title": "Medication review with the Seen nurse"
+          "at": {
+            "point": [
+              -10.8,
+              -6.9
+            ],
+            "heading": -1.5708
+          },
+          "window": [
+            262,
+            334
+          ],
+          "title": "Seated strength with bands"
         },
         {
-          "who": "adc-participant-10",
-          "action": "consult",
-          "spot": "clinic-photo-nurse-station",
-          "window": [306, 328],
-          "title": "Medication review with the Seen nurse"
-        }
-      ]
-    },
-    {
-      "id": "partner-tabletop",
-      "room": "day-open",
-      "window": [330, 375],
-      "label": "Partner center · tabletop games",
-      "description": "Games at the day-room tables after tai chi.",
-      "category": "partner",
-      "slots": [
-        { "who": "adc-lead", "action": "present", "spot": "day-tree-table-2", "title": "Tabletop games" },
-        { "who": "adc-participant-11", "action": "tabletop", "seat": "home", "title": "Tabletop games" },
-        { "who": "adc-participant-12", "action": "tabletop", "seat": "home", "title": "Tabletop games" },
-        { "who": "adc-participant-14", "action": "tabletop", "seat": "home", "title": "Tabletop games" },
-        { "who": "adc-participant-15", "action": "tabletop", "seat": "home", "title": "Tabletop games" },
-        { "who": "adc-participant-16", "action": "tabletop", "seat": "home", "title": "Tabletop games" },
-        { "who": "adc-participant-19", "action": "tabletop", "seat": "home", "title": "Tabletop games" }
-      ]
-    },
-    {
-      "id": "partner-nurse-desk",
-      "room": "clinic-nurse",
-      "window": [0, 720],
-      "label": "Day center nurse",
-      "description": "The partner’s nurse charts at the nurse station.",
-      "category": "partner",
-      "interaction": false,
-      "slots": [
+          "who": "adc-participant-9",
+          "action": "exercise",
+          "spot": "adhc-rehab-stair",
+          "window": [
+            270,
+            330
+          ],
+          "title": "Practice stair"
+        },
         {
-          "who": "adc-nurse",
-          "action": "document",
-          "seat": "clinic-nurse-task-chair-1",
-          "title": "Charting at the nurse station"
+          "who": "adc-rehab-aide",
+          "action": "treat",
+          "spot": "adhc-rehab-stair",
+          "window": [
+            268,
+            332
+          ],
+          "title": "Spotting on the practice stair"
         }
       ]
     },
     {
       "id": "partner-lunch",
-      "room": "dining-1421",
-      "window": [362, 455],
-      "label": "Partner center · lunch",
-      "description": "The aide sets up and serves lunch in the dining room, with two places left open for wheelchairs.",
+      "room": "adhc-hall",
+      "window": [
+        360,
+        450
+      ],
+      "label": "Partner center · lunch at the long tables",
+      "description": "A catered lunch at the long tables: the activities lead and the aide serve from the side aisles, then sit down to eat; three places at the table ends stay open for wheelchairs; the music leader plays.",
       "category": "partner",
-      "memberAction": "seated",
+      "memberAction": "tabletop",
+      "with": [
+        "adc-music"
+      ],
       "slots": [
-        { "who": "adc-participant-1", "action": "member", "seat": true, "window": [390, 455], "title": "Lunch" },
-        { "who": "adc-participant-2", "action": "member", "seat": true, "window": [390, 455], "title": "Lunch" },
-        { "who": "adc-participant-3", "action": "member", "seat": true, "window": [390, 455], "title": "Lunch" },
-        { "who": "adc-participant-4", "action": "member", "seat": true, "window": [390, 455], "title": "Lunch" },
-        { "who": "adc-participant-5", "action": "member", "seat": true, "window": [410, 455], "title": "Lunch" },
-        { "who": "adc-participant-6", "action": "member", "seat": true, "window": [430, 455], "title": "Lunch" },
-        { "who": "adc-participant-7", "action": "member", "seat": true, "window": [394, 455], "title": "Lunch" },
-        { "who": "adc-participant-8", "action": "member", "seat": true, "window": [394, 455], "title": "Lunch" },
-        { "who": "adc-participant-9", "action": "member", "seat": true, "window": [394, 455], "title": "Lunch" },
-        { "who": "adc-participant-10", "action": "member", "seat": true, "window": [394, 455], "title": "Lunch" },
-        { "who": "adc-participant-11", "action": "member", "seat": true, "window": [398, 455], "title": "Lunch" },
-        { "who": "adc-participant-12", "action": "member", "seat": true, "window": [398, 455], "title": "Lunch" },
+        {
+          "who": "adc-participant-1",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-2",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-3",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-4",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-5",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-6",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-7",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-8",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-9",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            366,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-10",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-11",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-12",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
         {
           "who": "adc-participant-13",
           "action": "member",
-          "spot": "dining-table-02-chair-3",
-          "window": [398, 455],
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
           "title": "Lunch"
         },
-        { "who": "adc-participant-14", "action": "member", "seat": true, "window": [398, 455], "title": "Lunch" },
-        { "who": "adc-participant-15", "action": "member", "seat": true, "window": [402, 455], "title": "Lunch" },
-        { "who": "adc-participant-16", "action": "member", "seat": true, "window": [402, 455], "title": "Lunch" },
-        { "who": "adc-participant-17", "action": "member", "seat": true, "window": [402, 455], "title": "Lunch" },
+        {
+          "who": "adc-participant-14",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-15",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-16",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-17",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
         {
           "who": "adc-participant-18",
           "action": "member",
-          "spot": "dining-table-04-chair-3",
-          "window": [402, 455],
+          "seat": "home",
+          "window": [
+            366,
+            450
+          ],
           "title": "Lunch"
         },
-        { "who": "adc-participant-19", "action": "member", "seat": true, "window": [402, 455], "title": "Lunch" },
-        { "who": "adc-participant-20", "action": "member", "seat": true, "window": [402, 455], "title": "Lunch" },
-        { "who": "adc-aide", "action": "serve", "spot": "kitchen-equipment-6", "title": "Setting up and serving lunch" }
+        {
+          "who": "adc-participant-19",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-20",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-21",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-22",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-23",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-24",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-25",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            366,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-participant-26",
+          "action": "member",
+          "seat": "home",
+          "window": [
+            362,
+            450
+          ],
+          "title": "Lunch"
+        },
+        {
+          "who": "adc-aide",
+          "action": "serve",
+          "spot": "adhc-table-a2",
+          "window": [
+            362,
+            440
+          ],
+          "title": "Serving lunch"
+        },
+        {
+          "who": "adc-lead",
+          "action": "serve",
+          "spot": "adhc-table-b2",
+          "window": [
+            364,
+            440
+          ],
+          "title": "Serving lunch"
+        }
       ]
     },
     {
-      "id": "partner-lunch-clearing",
-      "room": "dining-1421",
-      "window": [455, 585],
-      "label": "Aide",
-      "description": "The aide clears up after lunch.",
+      "id": "partner-lunch-music",
+      "room": "adhc-stage",
+      "window": [
+        360,
+        450
+      ],
+      "label": "Day center music and choir leader",
+      "description": "Piano music through lunch.",
       "category": "partner",
       "interaction": false,
       "slots": [
-        { "who": "adc-aide", "action": "serve", "spot": "kitchen-equipment-6", "title": "Clearing up after lunch" }
+        {
+          "who": "adc-music",
+          "action": "music",
+          "seat": "home",
+          "title": "Piano through lunch"
+        }
       ]
     },
     {
-      "id": "partner-music-setup",
-      "room": "day-open",
-      "window": [380, 480],
-      "label": "Activities lead",
-      "description": "The activities lead sets up for music at the front of the day room.",
+      "id": "partner-choir",
+      "room": "adhc-stage",
+      "window": [
+        465,
+        574
+      ],
+      "label": "Partner center · choir on the stage",
+      "description": "The day center choir sings on the risers, the music leader at the piano and the activities lead conducting; the rest of the center listens and claps from the long tables.",
+      "category": "partner",
+      "with": [
+        "adc-lead"
+      ],
+      "slots": [
+        {
+          "who": "adc-music",
+          "action": "music",
+          "seat": "home",
+          "title": "Accompanying the choir"
+        },
+        {
+          "who": "adc-participant-1",
+          "action": "perform",
+          "at": {
+            "point": [
+              -1.65,
+              -10.45
+            ],
+            "heading": 0
+          },
+          "window": [
+            467,
+            572
+          ],
+          "title": "Singing in the choir"
+        },
+        {
+          "who": "adc-participant-4",
+          "action": "perform",
+          "at": {
+            "point": [
+              -0.55,
+              -10.45
+            ],
+            "heading": 0
+          },
+          "window": [
+            470,
+            570
+          ],
+          "title": "Singing in the choir"
+        },
+        {
+          "who": "adc-participant-7",
+          "action": "perform",
+          "at": {
+            "point": [
+              0.55,
+              -10.45
+            ],
+            "heading": 0
+          },
+          "window": [
+            473,
+            568
+          ],
+          "title": "Singing in the choir"
+        },
+        {
+          "who": "adc-participant-10",
+          "action": "perform",
+          "at": {
+            "point": [
+              1.65,
+              -10.45
+            ],
+            "heading": 0
+          },
+          "window": [
+            476,
+            566
+          ],
+          "title": "Singing in the choir"
+        },
+        {
+          "who": "adc-participant-12",
+          "action": "perform",
+          "at": {
+            "point": [
+              -1.1,
+              -9.85
+            ],
+            "heading": 0
+          },
+          "window": [
+            479,
+            552
+          ],
+          "title": "Singing in the choir"
+        },
+        {
+          "who": "adc-participant-21",
+          "action": "perform",
+          "at": {
+            "point": [
+              0,
+              -9.85
+            ],
+            "heading": 0
+          },
+          "window": [
+            482,
+            550
+          ],
+          "title": "Singing in the choir"
+        },
+        {
+          "who": "adc-participant-16",
+          "action": "perform",
+          "at": {
+            "point": [
+              1.1,
+              -9.85
+            ],
+            "heading": 0
+          },
+          "window": [
+            485,
+            548
+          ],
+          "title": "Singing in the choir"
+        },
+        {
+          "who": "adc-participant-2",
+          "action": "perform",
+          "at": {
+            "point": [
+              -1.65,
+              -9.25
+            ],
+            "heading": 0
+          },
+          "window": [
+            488,
+            534
+          ],
+          "title": "Singing in the choir"
+        },
+        {
+          "who": "adc-participant-15",
+          "action": "perform",
+          "at": {
+            "point": [
+              -0.55,
+              -9.25
+            ],
+            "heading": 0
+          },
+          "window": [
+            491,
+            532
+          ],
+          "title": "Singing in the choir"
+        },
+        {
+          "who": "adc-participant-23",
+          "action": "perform",
+          "at": {
+            "point": [
+              0.55,
+              -9.25
+            ],
+            "heading": 0
+          },
+          "window": [
+            494,
+            530
+          ],
+          "title": "Singing in the choir"
+        },
+        {
+          "who": "adc-participant-26",
+          "action": "perform",
+          "at": {
+            "point": [
+              1.65,
+              -9.25
+            ],
+            "heading": 0
+          },
+          "window": [
+            497,
+            528
+          ],
+          "title": "Singing in the choir"
+        }
+      ]
+    },
+    {
+      "id": "partner-choir-conductor",
+      "room": "adhc-hall",
+      "window": [
+        468,
+        540
+      ],
+      "label": "Day center activities lead",
+      "description": "The activities lead conducts the choir from the hall floor below the stage.",
       "category": "partner",
       "interaction": false,
       "slots": [
         {
           "who": "adc-lead",
           "action": "present",
-          "at": { "point": [-7, 10], "heading": 0 },
-          "title": "Setting up for music"
+          "at": {
+            "point": [
+              -1,
+              -5.4
+            ],
+            "heading": 3.1416
+          },
+          "title": "Conducting the choir"
         }
       ]
     },
     {
-      "id": "partner-music",
-      "room": "day-open",
-      "window": [480, 600],
-      "label": "Partner center · music",
-      "description": "Seated music and clapping, led from the front of the day room.",
+      "id": "partner-choir-audience",
+      "room": "adhc-hall",
+      "window": [
+        472,
+        550
+      ],
+      "label": "Partner center · listening to the choir",
+      "description": "The rest of the center listens and claps from the long tables.",
+      "category": "partner",
+      "interaction": false,
+      "slots": [
+        {
+          "who": "adc-participant-3",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            472,
+            548
+          ],
+          "title": "Listening to the choir"
+        },
+        {
+          "who": "adc-participant-5",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            473,
+            548
+          ],
+          "title": "Listening to the choir"
+        },
+        {
+          "who": "adc-participant-6",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            474,
+            548
+          ],
+          "title": "Listening to the choir"
+        },
+        {
+          "who": "adc-participant-8",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            475,
+            548
+          ],
+          "title": "Listening to the choir"
+        },
+        {
+          "who": "adc-participant-9",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            476,
+            548
+          ],
+          "title": "Listening to the choir"
+        },
+        {
+          "who": "adc-participant-11",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            472,
+            548
+          ],
+          "title": "Listening to the choir"
+        },
+        {
+          "who": "adc-participant-13",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            473,
+            548
+          ],
+          "title": "Listening to the choir"
+        },
+        {
+          "who": "adc-participant-14",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            474,
+            548
+          ],
+          "title": "Listening to the choir"
+        },
+        {
+          "who": "adc-participant-17",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            475,
+            548
+          ],
+          "title": "Listening to the choir"
+        },
+        {
+          "who": "adc-participant-18",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            476,
+            548
+          ],
+          "title": "Listening to the choir"
+        },
+        {
+          "who": "adc-participant-19",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            472,
+            548
+          ],
+          "title": "Listening to the choir"
+        },
+        {
+          "who": "adc-participant-20",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            473,
+            548
+          ],
+          "title": "Listening to the choir"
+        },
+        {
+          "who": "adc-participant-22",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            474,
+            548
+          ],
+          "title": "Listening to the choir"
+        },
+        {
+          "who": "adc-participant-24",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            475,
+            548
+          ],
+          "title": "Listening to the choir"
+        },
+        {
+          "who": "adc-participant-25",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            476,
+            548
+          ],
+          "title": "Listening to the choir"
+        }
+      ]
+    },
+    {
+      "id": "partner-bingo",
+      "room": "adhc-hall",
+      "window": [
+        556,
+        638
+      ],
+      "label": "Partner center · bingo",
+      "description": "Bingo at the long tables: the activities lead calls from the caller’s stand beside the flashboard and eighteen participants play.",
       "category": "partner",
       "slots": [
-        { "who": "adc-lead", "action": "music", "at": { "point": [-7, 10], "heading": 0 }, "title": "Leading music" },
-        { "who": "adc-participant-1", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
-        { "who": "adc-participant-2", "action": "clap", "seat": "home", "window": [530, 600], "title": "Music" },
-        { "who": "adc-participant-3", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
-        { "who": "adc-participant-4", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
-        { "who": "adc-participant-5", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
-        { "who": "adc-participant-6", "action": "clap", "seat": "home", "window": [530, 600], "title": "Music" },
-        { "who": "adc-participant-7", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
-        { "who": "adc-participant-8", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
-        { "who": "adc-participant-9", "action": "clap", "seat": "home", "window": [530, 600], "title": "Music" },
-        { "who": "adc-participant-10", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
-        { "who": "adc-participant-11", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
-        { "who": "adc-participant-12", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
-        { "who": "adc-participant-13", "action": "clap", "seat": "home", "window": [510, 600], "title": "Music" },
-        { "who": "adc-participant-14", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
-        { "who": "adc-participant-15", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
-        { "who": "adc-participant-16", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
-        { "who": "adc-participant-17", "action": "clap", "seat": "home", "window": [530, 600], "title": "Music" },
-        { "who": "adc-participant-18", "action": "clap", "seat": "home", "window": [510, 600], "title": "Music" },
-        { "who": "adc-participant-19", "action": "clap", "seat": "home", "window": [490, 600], "title": "Music" },
-        { "who": "adc-participant-20", "action": "clap", "seat": "home", "window": [530, 600], "title": "Music" }
+        {
+          "who": "adc-lead",
+          "action": "present",
+          "at": {
+            "point": [
+              -5.95,
+              0.35
+            ],
+            "heading": 1.5708
+          },
+          "window": [
+            558,
+            638
+          ],
+          "title": "Calling bingo"
+        },
+        {
+          "who": "adc-participant-2",
+          "action": "tabletop",
+          "seat": "home",
+          "window": [
+            562,
+            638
+          ],
+          "title": "Bingo"
+        },
+        {
+          "who": "adc-participant-3",
+          "action": "tabletop",
+          "seat": "home",
+          "window": [
+            556,
+            638
+          ],
+          "title": "Bingo"
+        },
+        {
+          "who": "adc-participant-5",
+          "action": "tabletop",
+          "seat": "home",
+          "window": [
+            556,
+            638
+          ],
+          "title": "Bingo"
+        },
+        {
+          "who": "adc-participant-6",
+          "action": "tabletop",
+          "seat": "home",
+          "window": [
+            556,
+            638
+          ],
+          "title": "Bingo"
+        },
+        {
+          "who": "adc-participant-8",
+          "action": "tabletop",
+          "seat": "home",
+          "window": [
+            556,
+            638
+          ],
+          "title": "Bingo"
+        },
+        {
+          "who": "adc-participant-9",
+          "action": "tabletop",
+          "seat": "home",
+          "window": [
+            556,
+            638
+          ],
+          "title": "Bingo"
+        },
+        {
+          "who": "adc-participant-11",
+          "action": "tabletop",
+          "seat": "home",
+          "window": [
+            556,
+            638
+          ],
+          "title": "Bingo"
+        },
+        {
+          "who": "adc-participant-13",
+          "action": "tabletop",
+          "seat": "home",
+          "window": [
+            556,
+            638
+          ],
+          "title": "Bingo"
+        },
+        {
+          "who": "adc-participant-14",
+          "action": "tabletop",
+          "seat": "home",
+          "window": [
+            556,
+            638
+          ],
+          "title": "Bingo"
+        },
+        {
+          "who": "adc-participant-15",
+          "action": "tabletop",
+          "seat": "home",
+          "window": [
+            562,
+            638
+          ],
+          "title": "Bingo"
+        },
+        {
+          "who": "adc-participant-17",
+          "action": "tabletop",
+          "seat": "home",
+          "window": [
+            556,
+            638
+          ],
+          "title": "Bingo"
+        },
+        {
+          "who": "adc-participant-18",
+          "action": "tabletop",
+          "seat": "home",
+          "window": [
+            556,
+            638
+          ],
+          "title": "Bingo"
+        },
+        {
+          "who": "adc-participant-19",
+          "action": "tabletop",
+          "seat": "home",
+          "window": [
+            556,
+            638
+          ],
+          "title": "Bingo"
+        },
+        {
+          "who": "adc-participant-20",
+          "action": "tabletop",
+          "seat": "home",
+          "window": [
+            556,
+            638
+          ],
+          "title": "Bingo"
+        },
+        {
+          "who": "adc-participant-22",
+          "action": "tabletop",
+          "seat": "home",
+          "window": [
+            556,
+            638
+          ],
+          "title": "Bingo"
+        },
+        {
+          "who": "adc-participant-24",
+          "action": "tabletop",
+          "seat": "home",
+          "window": [
+            556,
+            638
+          ],
+          "title": "Bingo"
+        },
+        {
+          "who": "adc-participant-25",
+          "action": "tabletop",
+          "seat": "home",
+          "window": [
+            556,
+            638
+          ],
+          "title": "Bingo"
+        },
+        {
+          "who": "adc-participant-26",
+          "action": "tabletop",
+          "seat": "home",
+          "window": [
+            562,
+            638
+          ],
+          "title": "Bingo"
+        }
       ]
     },
     {
       "id": "partner-afternoon",
-      "room": "day-open",
-      "window": [600, 720],
-      "label": "Partner center · afternoon",
-      "description": "Conversation at the tables until pickup.",
+      "room": "adhc-studio",
+      "window": [
+        570,
+        652
+      ],
+      "label": "Partner center · afternoon studio",
+      "description": "Open studio time after the choir: calligraphy at the tables and painting at the easels with the activity aide.",
       "category": "partner",
       "slots": [
-        { "who": "adc-participant-1", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-participant-2", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-participant-3", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-participant-4", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-participant-5", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-participant-6", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-participant-7", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-participant-8", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-participant-9", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-participant-10", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-participant-11", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-participant-12", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-participant-13", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-participant-14", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-participant-15", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-participant-16", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-participant-17", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-participant-18", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-participant-19", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-participant-20", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-lead", "action": "conversation", "seat": "home", "title": "Afternoon conversation" },
-        { "who": "adc-aide", "action": "serve", "seat": "home", "title": "Afternoon snacks" }
+        {
+          "who": "adc-aide",
+          "action": "present",
+          "at": {
+            "point": [
+              7.05,
+              -9.5
+            ],
+            "heading": 1.5708
+          },
+          "window": [
+            570,
+            652
+          ],
+          "title": "Open studio"
+        },
+        {
+          "who": "adc-participant-16",
+          "action": "craft",
+          "at": {
+            "point": [
+              10.55,
+              -1.65
+            ],
+            "heading": 1.5708
+          },
+          "window": [
+            570,
+            643
+          ],
+          "title": "Painting at the easel"
+        },
+        {
+          "who": "adc-participant-21",
+          "action": "craft",
+          "at": {
+            "point": [
+              10.55,
+              -2.7
+            ],
+            "heading": 1.5708
+          },
+          "window": [
+            572,
+            641.5
+          ],
+          "title": "Painting at the easel"
+        },
+        {
+          "who": "adc-participant-12",
+          "action": "craft",
+          "at": {
+            "point": [
+              10.55,
+              -0.6
+            ],
+            "heading": 1.5708
+          },
+          "window": [
+            574,
+            644.5
+          ],
+          "title": "Painting at the easel"
+        },
+        {
+          "who": "adc-participant-10",
+          "action": "write",
+          "seat": "adhc-studio-table-1-chair-e3",
+          "window": [
+            588,
+            646
+          ],
+          "title": "Calligraphy practice"
+        },
+        {
+          "who": "adc-participant-7",
+          "action": "write",
+          "seat": "adhc-studio-table-1-chair-w3",
+          "window": [
+            590,
+            647.5
+          ],
+          "title": "Calligraphy practice"
+        },
+        {
+          "who": "adc-participant-4",
+          "action": "write",
+          "seat": "adhc-studio-table-1-chair-e1",
+          "window": [
+            596,
+            649
+          ],
+          "title": "Calligraphy practice"
+        },
+        {
+          "who": "adc-participant-1",
+          "action": "write",
+          "seat": "adhc-studio-table-1-chair-w1",
+          "window": [
+            598,
+            650.5
+          ],
+          "title": "Calligraphy practice"
+        },
+        {
+          "who": "adc-participant-23",
+          "action": "craft",
+          "at": {
+            "point": [
+              10.55,
+              -3.75
+            ],
+            "heading": 1.5708
+          },
+          "window": [
+            600,
+            640
+          ],
+          "title": "Painting at the easel"
+        }
+      ]
+    },
+    {
+      "id": "partner-fan-dance",
+      "room": "adhc-hall",
+      "window": [
+        646,
+        692
+      ],
+      "label": "Partner center · fan dance",
+      "description": "The fan dance troupe performs on the dance floor, the music leader dancing at the front; the rest of the center watches from the long tables.",
+      "category": "partner",
+      "slots": [
+        {
+          "who": "adc-music",
+          "action": "dance",
+          "at": {
+            "point": [
+              0,
+              -1.1
+            ],
+            "heading": 0
+          },
+          "window": [
+            650,
+            690
+          ],
+          "title": "Leading the fan dance"
+        },
+        {
+          "who": "adc-participant-3",
+          "action": "dance",
+          "at": {
+            "point": [
+              -2.475,
+              -4.4
+            ],
+            "heading": 0
+          },
+          "window": [
+            648,
+            690
+          ],
+          "title": "Fan dance"
+        },
+        {
+          "who": "adc-participant-5",
+          "action": "dance",
+          "at": {
+            "point": [
+              -0.825,
+              -4.4
+            ],
+            "heading": 0
+          },
+          "window": [
+            649.5,
+            689.2
+          ],
+          "title": "Fan dance"
+        },
+        {
+          "who": "adc-participant-8",
+          "action": "dance",
+          "at": {
+            "point": [
+              0.825,
+              -4.4
+            ],
+            "heading": 0
+          },
+          "window": [
+            651,
+            688.4
+          ],
+          "title": "Fan dance"
+        },
+        {
+          "who": "adc-participant-11",
+          "action": "dance",
+          "at": {
+            "point": [
+              2.475,
+              -4.4
+            ],
+            "heading": 0
+          },
+          "window": [
+            652.5,
+            687.6
+          ],
+          "title": "Fan dance"
+        },
+        {
+          "who": "adc-participant-14",
+          "action": "dance",
+          "at": {
+            "point": [
+              -2.475,
+              -2.75
+            ],
+            "heading": 0
+          },
+          "window": [
+            654,
+            686.8
+          ],
+          "title": "Fan dance"
+        },
+        {
+          "who": "adc-participant-15",
+          "action": "dance",
+          "at": {
+            "point": [
+              -0.825,
+              -2.75
+            ],
+            "heading": 0
+          },
+          "window": [
+            655.5,
+            686
+          ],
+          "title": "Fan dance"
+        },
+        {
+          "who": "adc-participant-19",
+          "action": "dance",
+          "at": {
+            "point": [
+              0.825,
+              -2.75
+            ],
+            "heading": 0
+          },
+          "window": [
+            657,
+            685.2
+          ],
+          "title": "Fan dance"
+        },
+        {
+          "who": "adc-participant-25",
+          "action": "dance",
+          "at": {
+            "point": [
+              2.475,
+              -2.75
+            ],
+            "heading": 0
+          },
+          "window": [
+            658.5,
+            684.4
+          ],
+          "title": "Fan dance"
+        }
+      ]
+    },
+    {
+      "id": "partner-fan-dance-audience",
+      "room": "adhc-hall",
+      "window": [
+        657,
+        692
+      ],
+      "label": "Partner center · watching the fan dance",
+      "description": "The rest of the center watches the fan dance from the long tables.",
+      "category": "partner",
+      "interaction": false,
+      "slots": [
+        {
+          "who": "adc-participant-2",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            657,
+            690
+          ],
+          "title": "Watching the fan dance"
+        },
+        {
+          "who": "adc-participant-6",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            657,
+            690
+          ],
+          "title": "Watching the fan dance"
+        },
+        {
+          "who": "adc-participant-9",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            657,
+            690
+          ],
+          "title": "Watching the fan dance"
+        },
+        {
+          "who": "adc-participant-13",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            657,
+            690
+          ],
+          "title": "Watching the fan dance"
+        },
+        {
+          "who": "adc-participant-17",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            657,
+            690
+          ],
+          "title": "Watching the fan dance"
+        },
+        {
+          "who": "adc-participant-18",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            657,
+            690
+          ],
+          "title": "Watching the fan dance"
+        },
+        {
+          "who": "adc-participant-20",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            657,
+            690
+          ],
+          "title": "Watching the fan dance"
+        },
+        {
+          "who": "adc-participant-22",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            657,
+            690
+          ],
+          "title": "Watching the fan dance"
+        },
+        {
+          "who": "adc-participant-24",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            657,
+            690
+          ],
+          "title": "Watching the fan dance"
+        },
+        {
+          "who": "adc-participant-26",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            657,
+            690
+          ],
+          "title": "Watching the fan dance"
+        },
+        {
+          "who": "adc-participant-1",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            678,
+            690
+          ],
+          "title": "Watching the fan dance"
+        },
+        {
+          "who": "adc-participant-4",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            678,
+            690
+          ],
+          "title": "Watching the fan dance"
+        },
+        {
+          "who": "adc-participant-7",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            678,
+            690
+          ],
+          "title": "Watching the fan dance"
+        },
+        {
+          "who": "adc-participant-10",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            678,
+            690
+          ],
+          "title": "Watching the fan dance"
+        },
+        {
+          "who": "adc-participant-12",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            678,
+            690
+          ],
+          "title": "Watching the fan dance"
+        },
+        {
+          "who": "adc-participant-16",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            678,
+            690
+          ],
+          "title": "Watching the fan dance"
+        },
+        {
+          "who": "adc-participant-21",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            678,
+            690
+          ],
+          "title": "Watching the fan dance"
+        },
+        {
+          "who": "adc-participant-23",
+          "action": "clap",
+          "seat": "home",
+          "window": [
+            678,
+            690
+          ],
+          "title": "Watching the fan dance"
+        }
       ]
     }
   ],
   "keep": {
     "actors": [
-      "adc-participant-1",
-      "adc-participant-2",
-      "adc-participant-3",
-      "adc-participant-4",
-      "adc-participant-5",
-      "adc-participant-6",
+      "visiting-pt",
       "adc-lead",
-      "visiting-pt"
+      "adc-aide",
+      "adc-music"
     ],
-    "interactions": ["partner-tai-chi", "partner-tabletop", "partner-pt"]
+    "interactions": [
+      "partner-morning",
+      "partner-line-dance",
+      "partner-fan-dance",
+      "partner-calligraphy",
+      "partner-painting",
+      "partner-class",
+      "partner-group-therapy",
+      "partner-bingo",
+      "partner-pt",
+      "partner-lunch",
+      "partner-choir",
+      "partner-afternoon"
+    ]
   }
 }

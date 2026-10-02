@@ -1379,14 +1379,18 @@ export function communityCastFromScenes(
   };
   const holdSpan = (who: Person, k: number): [number, number] => {
     const w = who.walks[k],
+      next = who.walks[k + 1],
       start = Math.max(
         k === 0 ? 0 : w ? w.end : who.stays[k].start,
         arrival(who, k),
       ),
-      end = Math.min(
-        k + 1 < who.stays.length ? who.stays[k + 1].start : 720,
-        departure(who, k),
-      );
+      // A walk out moved later leaves the person here until it starts.
+      end = next
+        ? next.start
+        : Math.min(
+            k + 1 < who.stays.length ? who.stays[k + 1].start : 720,
+            departure(who, k),
+          );
     return [start, Math.max(start, end)];
   };
   /** Reaching a hole's door early: waiting there in sight until the hole opens. */

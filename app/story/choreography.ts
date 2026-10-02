@@ -160,7 +160,7 @@ export const CHAPTER_SHOTS: Record<string, ShotSpec> = {
     push: 1.05,
   },
   'network-partner': {
-    place: { setting: 'partner-adc', room: 'rehab-open', anchor: 'ptStand' },
+    place: { setting: 'partner-adc', room: 'adhc-rehab', anchor: 'ptStand' },
     zoom: 2.8,
     azimuth: 0.5,
     elevation: 0.64,
