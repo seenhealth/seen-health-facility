@@ -746,79 +746,170 @@ export function buildAlhambraExterior(model: Facility) {
     -12.465 - BUMP_Z + 0.24,
     stone,
   );
-  const pergBlue = '#6b8bb4',
-    pergFrame = '#587aa4';
   // The entrance is on the wing's EAST face (x 15.26, z −12.5 → 3.5, the long wall the dispatcher shaded), elements
-  // protruding +x; the pergola spans the wall's middle, door at its north end, window south of it.
+  // protruding +x. Proportions from the 2026-10-02 photo: a 8.8 m steel-blue canopy of boards on edge inside a flat
+  // perimeter beam, hung on three cables from plates 1.4 m up the wall, its north end 1.3 m past the aluminium glass
+  // double door; the square window 1.3 m across south of the door; bronze pipe rails on a raised concrete landing; the
+  // dirt planter in front with its blue-painted curb, an agave by the door and a pygmy date palm toward the window.
+  const pergBlue = '#6f90b9',
+    pergEdge = '#5f80ab',
+    alu = '#b9bcbe',
+    glassDark = '#2a3338';
   const FACE_X = 15.264;
-  const pz0 = -9.4,
-    pz1 = -1.8,
+  // The plan's door opening on this wall is at z −2.34 → −0.36; the canopy's north end is 1.3 m past it.
+  const doorW = 1.9,
+    doorZ = -1.35;
+  const pz1 = doorZ + doorW / 2 + 1.3,
+    pz0 = pz1 - 8.8,
     pzc = (pz0 + pz1) / 2,
     pwz = pz1 - pz0,
-    pdepth = 1.6,
-    py = 3.05;
-  box(court2, FACE_X + pdepth - 0.08, py, pzc, 0.16, 0.22, pwz, pergFrame);
-  box(court2, FACE_X + 0.06, py + 0.06, pzc, 0.12, 0.1, pwz, pergFrame);
+    pdepth = 1.55,
+    py = 3.0;
+  // Perimeter beam: outer edge, both ends, and the ledger against the wall.
+  box(court2, FACE_X + pdepth - 0.06, py, pzc, 0.12, 0.26, pwz, pergEdge);
+  box(court2, FACE_X + 0.06, py, pzc, 0.12, 0.26, pwz, pergEdge);
   for (const sz of [pz0 + 0.06, pz1 - 0.06])
-    box(court2, FACE_X + pdepth / 2, py, sz, pdepth, 0.2, 0.12, pergFrame);
-  for (let sz = pz0 + 0.25; sz < pz1 - 0.1; sz += 0.27)
+    box(court2, FACE_X + pdepth / 2, py, sz, pdepth, 0.26, 0.12, pergEdge);
+  // Boards on edge every 0.3 m running out from the wall.
+  for (let sz = pz0 + 0.3; sz < pz1 - 0.15; sz += 0.3)
     box(
       court2,
-      FACE_X + pdepth / 2 + 0.05,
-      py + 0.02,
+      FACE_X + pdepth / 2,
+      py + 0.03,
       sz,
-      pdepth - 0.25,
-      0.14,
-      0.07,
+      pdepth - 0.2,
+      0.2,
+      0.05,
       pergBlue,
     );
-  for (const sz of [pz0 + 0.3, pzc, pz1 - 0.3]) {
+  // Three cables from the outer beam to plates on the wall.
+  for (const sz of [pz0 + 0.9, pzc, pz1 - 0.9]) {
     beam(
       court2,
-      [FACE_X + pdepth - 0.08, py + 0.2, sz],
-      [FACE_X + 0.03, py + 1.35, sz],
-      0.025,
-      0.025,
-      steel,
+      [FACE_X + pdepth - 0.06, py + 0.26, sz],
+      [FACE_X + 0.04, py + 1.4, sz],
+      0.02,
+      0.02,
+      '#8a8f90',
     );
-    box(court2, FACE_X + 0.05, py + 1.3, sz, 0.08, 0.12, 0.12, steel);
+    box(court2, FACE_X + 0.04, py + 1.33, sz, 0.06, 0.16, 0.16, '#9a9fa0');
   }
-  // Glass double door (1839 W Valley Blvd, staff entrance) at the pergola's north end, with its dark frame.
-  const doorZ2 = pz1 - 1.15;
-  box(court2, FACE_X + 0.04, 0, doorZ2, 0.08, 2.4, 2.1, '#3a4448');
-  box(court2, FACE_X + 0.07, 0.05, doorZ2, 0.04, 2.3, 1.9, '#7f9aa8');
-  box(court2, FACE_X + 0.09, 0.05, doorZ2, 0.02, 2.3, 0.05, '#3a4448');
-  // Dark square window south of the door.
-  box(court2, FACE_X + 0.04, 1.25, pz0 + 2.6, 0.07, 1.35, 1.35, pergFrame);
-  box(court2, FACE_X + 0.06, 1.33, pz0 + 2.6, 0.04, 1.2, 1.2, '#1e2a30');
-  // Bronze pipe rails along the landing's edge in front of the door, a return to the wall at the south end.
-  const railX2 = FACE_X + 1.95;
-  for (const sz of [pz1 + 0.1, pz1 - 1.2, pz1 - 2.5, pz1 - 3.8])
+  // Aluminium-framed glass double door, 1.9 m wide, 1.3 m in from the canopy's north end; a camera above its north jamb.
+  box(court2, FACE_X + 0.03, 0, doorZ, 0.1, 2.45, doorW + 0.2, alu);
+  box(court2, FACE_X + 0.07, 0.03, doorZ, 0.04, 2.35, doorW, glassDark);
+  box(court2, FACE_X + 0.1, 0.03, doorZ, 0.02, 2.35, 0.06, alu);
+  for (const sz of [doorZ - 0.6, doorZ + 0.6])
+    box(court2, FACE_X + 0.1, 1.0, sz, 0.02, 0.9, 0.04, alu);
+  box(
+    court2,
+    FACE_X + 0.12,
+    2.65,
+    doorZ + doorW / 2 + 0.45,
+    0.14,
+    0.14,
+    0.14,
+    '#cfd2d3',
+  );
+  // Square window with a silver frame, sill 1.3 m up, south of the door.
+  const winZ = pz0 + 2.5 + 0.65;
+  box(court2, FACE_X + 0.03, 1.25, winZ, 0.08, 1.4, 1.4, alu);
+  box(court2, FACE_X + 0.06, 1.3, winZ, 0.04, 1.3, 1.3, glassDark);
+  // Raised concrete landing along the wall in front of the door and window, two steps up from the lot.
+  const landW = 2.1,
+    landZ0 = pz0 + 0.4,
+    landZ1 = pz1 + 0.3;
+  box(
+    court2,
+    FACE_X + landW / 2,
+    -0.23,
+    (landZ0 + landZ1) / 2,
+    landW,
+    0.23,
+    landZ1 - landZ0,
+    '#c5c8c2',
+  );
+  // Bronze pipe rails: two bars along the landing's front edge in front of the door, a return to the wall at the
+  // north end, and a single handrail on posts continuing south past the window.
+  const railX2 = FACE_X + landW - 0.08;
+  const rail2 = [landZ1 - 0.05, doorZ - doorW / 2 - 0.9];
+  for (const sz of [rail2[0], (rail2[0] + rail2[1]) / 2, rail2[1]])
+    box(court2, railX2, 0, sz, 0.04, 0.95, 0.04, bronze);
+  for (const y of [0.95, 0.62])
+    beam(
+      court2,
+      [railX2, y, rail2[0]],
+      [railX2, y, rail2[1]],
+      0.035,
+      0.035,
+      bronze,
+    );
+  beam(
+    court2,
+    [railX2, 0.95, rail2[0]],
+    [FACE_X + 0.1, 0.95, rail2[0]],
+    0.035,
+    0.035,
+    bronze,
+  );
+  for (const sz of [rail2[1] - 1.4, rail2[1] - 2.8, landZ0 + 0.1])
     box(court2, railX2, 0, sz, 0.04, 0.95, 0.04, bronze);
   beam(
     court2,
-    [railX2, 0.95, pz1 + 0.1],
-    [railX2, 0.95, pz1 - 3.8],
-    0.04,
-    0.04,
+    [railX2, 0.95, rail2[1]],
+    [railX2, 0.95, landZ0 + 0.1],
+    0.035,
+    0.035,
     bronze,
   );
-  beam(
+  // Dirt planter in front of the landing with its blue-painted curb; agave by the door, pygmy date palm by the window.
+  const plX0 = FACE_X + landW,
+    plX1 = plX0 + 3.0;
+  box(
     court2,
-    [railX2, 0.62, pz1 + 0.1],
-    [railX2, 0.62, pz1 - 3.8],
-    0.03,
-    0.03,
-    bronze,
+    (plX0 + plX1) / 2,
+    -0.23,
+    (landZ0 + landZ1) / 2,
+    plX1 - plX0,
+    0.14,
+    landZ1 - landZ0,
+    '#9a8663',
   );
-  beam(
+  box(
     court2,
-    [railX2, 0.95, pz1 - 3.8],
-    [FACE_X + 0.1, 0.95, pz1 - 3.8],
-    0.04,
-    0.04,
-    bronze,
+    plX1 - 0.08,
+    -0.23,
+    (landZ0 + landZ1) / 2,
+    0.16,
+    0.2,
+    landZ1 - landZ0,
+    '#2d5aa6',
   );
+  for (const sz of [landZ0 + 0.08, landZ1 - 0.08])
+    box(
+      court2,
+      (plX0 + plX1) / 2,
+      -0.23,
+      sz,
+      plX1 - plX0,
+      0.2,
+      0.16,
+      '#2d5aa6',
+    );
+  palm(plX0 + 1.6, winZ - 0.4, 1.7, 1.2);
+  const agave = group(court2, 'agave');
+  for (let i = 0; i < 14; i++) {
+    const a = (i / 14) * Math.PI * 2,
+      r = 0.9 + (i % 3) * 0.25,
+      h = 0.7 + (i % 4) * 0.2;
+    beam(
+      agave,
+      [plX0 + 1.0, -0.05, landZ1 - 0.9],
+      [plX0 + 1.0 + Math.cos(a) * r, h, landZ1 - 0.9 + Math.sin(a) * r],
+      0.16,
+      0.05,
+      '#7d9a84',
+    );
+  }
   // Wall light high on the face south of the pergola.
   beam(
     court2,
@@ -829,6 +920,36 @@ export function buildAlhambraExterior(model: Facility) {
     '#6f7577',
   );
   box(court2, FACE_X + 1.3, 4.08, -11.2, 0.55, 0.16, 0.3, '#7d8284');
+  // Lobby entrance on the lot side (photo 2026-10-02): the automatic sliding glass door sits in a brushed-aluminium
+  // portal that stands proud of the stucco, with "1839 W Valley Blvd" on the glass; two tall silver-framed windows
+  // to its south; a camera dome high on the wall north of the door and a small sconce beside it. The bronze canopy,
+  // its channel letters and the switchback ramp are drawn elsewhere.
+  const lobby = group(facade, 'lobby-entry-portal-and-windows');
+  const LOBBY_X = -14.653 - 0.125;
+  const aluBright = '#c3c6c8';
+  const ldZ = -0.6,
+    ldW = 2.2,
+    ldH = 2.5;
+  for (const sz of [ldZ - ldW / 2 - 0.11, ldZ + ldW / 2 + 0.11])
+    box(lobby, LOBBY_X - 0.07, 0, sz, 0.14, ldH + 0.22, 0.22, aluBright);
+  box(lobby, LOBBY_X - 0.07, ldH, ldZ, 0.14, 0.22, ldW + 0.44, aluBright);
+  box(lobby, LOBBY_X - 0.02, 0.02, ldZ, 0.03, ldH - 0.04, ldW, '#2a3338');
+  for (const sz of [ldZ, ldZ - ldW / 4, ldZ + ldW / 4])
+    box(lobby, LOBBY_X - 0.035, 0.02, sz, 0.02, ldH - 0.04, 0.05, aluBright);
+  box(lobby, LOBBY_X - 0.045, 1.85, ldZ - 0.55, 0.01, 0.1, 0.62, '#f3efe4');
+  box(lobby, LOBBY_X - 0.045, 1.7, ldZ - 0.55, 0.01, 0.1, 0.62, '#f3efe4');
+  for (const wz of [2.0, 3.5]) {
+    box(lobby, LOBBY_X - 0.045, 0.95, wz, 0.09, 1.55, 1.05, aluBright);
+    box(lobby, LOBBY_X - 0.06, 1.0, wz, 0.03, 1.45, 0.95, '#2a3338');
+  }
+  const dome = mesh(
+    lobby,
+    new T.SphereGeometry(0.11, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2),
+    '#e8eaea',
+  );
+  dome.position.set(LOBBY_X - 0.06, 2.9, ldZ - 2.4);
+  dome.rotation.z = Math.PI / 2;
+  box(lobby, LOBBY_X - 0.05, 2.1, ldZ - 1.9, 0.08, 0.14, 0.16, '#9a9fa0');
   // The garage wall (the wing's court face): rolling door under the grey hood, the electricity-room gate beside it,
   // the louvred vent and the meter panel.
   const gFace = BUMP_Z - 0.03;
