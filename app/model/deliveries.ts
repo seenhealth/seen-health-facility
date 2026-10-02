@@ -14,8 +14,16 @@ export const deliveryStops = [
     x: 8.8,
     z: -21.8,
     door: [8.8, -15.212789],
-    starts: [110, 460],
-    dwell: 60,
+    /**
+     * Runs as [start, dwell] in loop seconds. The morning run brings lunch: it
+     * waits while its trolley goes through receiving into the kitchen and
+     * back (`delivery-food` in activity-loop.json, written by
+     * scripts/apply-kitchen-delivery.mjs).
+     */
+    runs: [
+      [228, 88],
+      [460, 60],
+    ],
   },
   {
     id: 'delivery-package',
@@ -23,8 +31,10 @@ export const deliveryStops = [
     x: 3.56,
     z: -18.5,
     door: [3.56, -12.465328],
-    starts: [280, 590],
-    dwell: 52,
+    runs: [
+      [280, 52],
+      [590, 52],
+    ],
   },
 ] as const;
 /**
@@ -33,7 +43,7 @@ export const deliveryStops = [
  * It leaves by backing straight out `backOut` m, stopping, then pulling
  * forward from a `lead` m straight into a right turn east across the yard,
  * south at `exitX` to the street and east along its eastbound lane to `offX`.
- * Loop seconds: `approach` to arrive, the stop's dwell, then `reverse`,
+ * Loop seconds: `approach` to arrive, the run's dwell, then `reverse`,
  * `pause` and the rest of `departure` to leave.
  */
 const TRUCK = {
@@ -50,6 +60,26 @@ const TRUCK = {
   tailgate: 2,
 };
 type Stop = (typeof deliveryStops)[number];
+/** Loop seconds of each run: sets off, parks at the door, starts backing out, gone. */
+export function deliveryRuns(s: Stop) {
+  return s.runs.map(([start, dwell]) => {
+    const arrive = start + TRUCK.approach,
+      leave = arrive + dwell;
+    return { start, arrive, leave, end: leave + TRUCK.departure };
+  });
+}
+/**
+ * Lunch on the kitchen island: the morning food run's carriers, unloaded from
+ * its trolley during the `kitchen-lunch-delivery` hand-over and left out until
+ * lunch service ends (day-program.json `lunch.service`). `at` is the first
+ * carrier's centre on the island; `from` and `to` are loop seconds, and
+ * scripts/apply-kitchen-delivery.mjs starts the unloading at `from`.
+ */
+export const KITCHEN_LUNCH = {
+  at: [10.79, 2.95] as [number, number],
+  from: 297,
+  to: 405,
+};
 const STREET_Y = -0.23;
 function truckRoutes(s: Stop) {
   const eastbound = laneLine('south', 1),
@@ -96,10 +126,7 @@ export function sampleDelivery(index: number, time: number) {
   const s = deliveryStops[index],
     t = ((time % 720) + 720) % 720,
     r = routesOf(s);
-  for (const start of s.starts) {
-    const arrive = start + TRUCK.approach,
-      leave = arrive + s.dwell,
-      end = leave + TRUCK.departure;
+  for (const { start, arrive, leave, end } of deliveryRuns(s)) {
     if (t < start || t >= end) continue;
     const moving = { visible: true, door: 0, reverse: false };
     if (t < arrive)
@@ -255,6 +282,16 @@ export function buildDeliveries() {
     ramp.rotation.x = -Math.atan2(0.23, 1.7);
     return pivot;
   });
+  // The trolley's carriers (characters.ts), set out in a row on the island
+  // counter with their labels toward the west aisle.
+  const lunch = new T.Group();
+  lunch.name = 'kitchen-lunch-carriers';
+  lunch.position.set(KITCHEN_LUNCH.at[0], 0.9, KITCHEN_LUNCH.at[1]);
+  root.add(lunch);
+  for (let i = 0; i < 3; i++) {
+    box(lunch, 0, 0.09, i * 0.56, 0.46, 0.18, 0.52, '#a4baa5');
+    box(lunch, -0.236, 0.09, i * 0.56, 0.012, 0.18, 0.055, '#e1d0aa');
+  }
   function tick(time: number, enabled: boolean) {
     root.visible = enabled;
     vehicles.forEach((v, i) => {
@@ -265,6 +302,8 @@ export function buildDeliveries() {
       v.tail.position.y = 1.4 + p.door * 0.65;
       doors[i].rotation.y = -Math.PI * 0.47 * p.door;
     });
+    const t = ((time % 720) + 720) % 720;
+    lunch.visible = t >= KITCHEN_LUNCH.from && t < KITCHEN_LUNCH.to;
   }
-  return { root, tick, vehicles, doors };
+  return { root, tick, vehicles, doors, lunch };
 }

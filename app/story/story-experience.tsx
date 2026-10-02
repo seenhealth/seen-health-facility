@@ -1,19 +1,18 @@
 'use client';
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import {
   clockLabel,
   hero,
+  highlights,
   isCutaway,
+  isMeanwhile,
   isTeamMeeting,
   kickerTime,
   memberById,
   members,
-  networkSteps,
-  networkTotals,
   palette,
   placeLabel,
   scrub,
-  shortLabel,
   steps,
   totals,
 } from './data';
@@ -31,23 +30,56 @@ export type StoryProps = {
   learnMoreHref?: string;
 };
 
+/**
+ * Mrs. Lin's day from her front door and back, the whole day at a glance,
+ * then a rapid run through everything else the team coordinates (each on its
+ * own clock), and home again for the close.
+ */
 const BEATS: BeatDef[] = [
   { kind: 'opening' },
   { kind: 'reveal' },
   { kind: 'team' },
-  { kind: 'network' },
   ...steps.map((step, stepIndex) => ({ kind: 'chapter' as const, step, stepIndex })),
   { kind: 'finale' },
+  { kind: 'network' },
+  ...highlights.map((highlight, highlightIndex) => ({
+    kind: 'highlight' as const,
+    highlight,
+    highlightIndex,
+  })),
+  { kind: 'peace' },
   { kind: 'cta' },
 ];
-const NETWORK = BEATS.findIndex((b) => b.kind === 'network');
 const FIRST_CHAPTER = BEATS.findIndex((b) => b.kind === 'chapter');
 const FINALE = BEATS.findIndex((b) => b.kind === 'finale');
+const NETWORK = BEATS.findIndex((b) => b.kind === 'network');
+const PEACE = BEATS.findIndex((b) => b.kind === 'peace');
 const MOBILE = '(max-width: 760px)';
-/** The places the cutaways visit, in story order (from their kickers). */
-const PLACES = [...new Set(networkSteps.map(placeLabel))];
-const NUMBER_WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
-const inWords = (n: number) => NUMBER_WORDS[n] || String(n);
+const pad2 = (n: number) => String(n).padStart(2, '0');
+/** Stage transition at a cut: covers in, holds a beat, reveals (ms). */
+const WIPE = { cover: 340, hold: 70, reveal: 520 };
+
+/**
+ * Kinetic headline: each word rises out of its own mask when the section
+ * becomes active (`data-active`), staggered by `--w`. Screen readers get the
+ * plain sentence.
+ */
+function Words({ text, className }: { text: string; className?: string }) {
+  const words = text.split(' ');
+  return (
+    <span className={className ? `story-words ${className}` : 'story-words'}>
+      <span className="sr-only">{text}</span>
+      {words.map((w, k) => (
+        <Fragment key={k}>
+          <span className="w" aria-hidden="true">
+            <span style={{ '--w': k } as CSSProperties}>{w}</span>
+          </span>
+          {k < words.length - 1 ? ' ' : null}
+        </Fragment>
+      ))}
+    </span>
+  );
+}
 
 function Kicker({ text }: { text: string }) {
   const [time, ...rest] = text.split('·');
@@ -80,18 +112,18 @@ function RoleChips({ roles, partners = [] }: { roles: string[]; partners?: strin
       className="story-chips"
       aria-label={partners.length ? 'Disciplines and partners involved' : 'Disciplines involved'}
     >
-      {roles.map((r) => {
+      {roles.map((r, k) => {
         const m = memberById.get(r);
         if (!m) return null;
         return (
-          <li key={r} className="story-chip" style={{ '--c': m.color } as CSSProperties}>
+          <li key={r} className="story-chip" style={{ '--c': m.color, '--k': k } as CSSProperties}>
             <i aria-hidden="true" />
             {m.title}
           </li>
         );
       })}
-      {partners.map((p) => (
-        <li key={p} className="story-chip partner">
+      {partners.map((p, k) => (
+        <li key={p} className="story-chip partner" style={{ '--k': roles.length + k } as CSSProperties}>
           <i aria-hidden="true" />
           {p}
         </li>
@@ -111,6 +143,7 @@ export function StoryExperience({
     sectionRefs = useRef<HTMLElement[]>([]),
     clockRef = useRef<HTMLSpanElement>(null),
     pinRef = useRef<HTMLDivElement>(null),
+    wipeRef = useRef<HTMLDivElement>(null),
     directorRef = useRef<Director | null>(null),
     layoutRef = useRef({ chapterX: 0, chapterY: 0, openingY: 0.1, revealX: 0, zoom: 1, wideZoom: 1 });
   const [beat, setBeat] = useState(0),
@@ -128,25 +161,19 @@ export function StoryExperience({
         : -1;
   const step = current.kind === 'chapter' ? current.step! : null;
   const ringMode: RingMode =
-    current.kind === 'team'
-      ? 'intro'
-      : current.kind === 'network'
-        ? 'network'
-        : step
-          ? isCutaway(step)
-            ? 'away'
-            : isTeamMeeting(step)
-              ? 'mesh'
-              : 'step'
-          : 'idle';
+    current.kind === 'team' ? 'intro' : step ? (isTeamMeeting(step) ? 'mesh' : 'step') : 'idle';
   const finaleRevealed = beat === FINALE ? phase : beat > FINALE ? steps.length + 1 : 0;
 
   const framing = useCallback((kind: BeatKind): Framing => {
     const l = layoutRef.current;
     if (kind === 'opening') return { x: 0, y: l.openingY, zoom: l.wideZoom };
-    if (kind === 'reveal') return { x: l.revealX, y: 0.02, zoom: l.wideZoom };
-    if (kind === 'team' || kind === 'network') return { x: l.chapterX, y: l.chapterY, zoom: l.wideZoom };
+    if (kind === 'reveal' || kind === 'network') return { x: l.revealX, y: 0.02, zoom: l.wideZoom };
+    if (kind === 'team') return { x: l.chapterX, y: l.chapterY, zoom: l.wideZoom };
     if (kind === 'chapter') return { x: l.chapterX, y: l.chapterY, zoom: l.zoom };
+    // Highlights: the scene sits up and to the right of the lower-left title.
+    if (kind === 'highlight') return { x: l.revealX * 0.8, y: -0.06, zoom: l.zoom };
+    // The close: the home below the copy, as in the opening.
+    if (kind === 'peace' || kind === 'cta') return { x: 0, y: l.openingY * 1.3, zoom: l.zoom };
     return { x: 0, y: 0.04, zoom: l.wideZoom };
   }, []);
 
@@ -208,6 +235,28 @@ export function StoryExperience({
         onPhase: setPhase,
         onClock: (t) => {
           if (clockRef.current) clockRef.current.textContent = clockLabel(t);
+        },
+        // A shutter crosses the stage: it sweeps in with an accelerating
+        // edge, holds while the director swaps camera, clock and view
+        // underneath, and sweeps out decelerating. Direction follows scroll.
+        onCut: (direction) => {
+          const el = wipeRef.current;
+          if (!el || typeof el.animate !== 'function') return 0;
+          const total = WIPE.cover + WIPE.hold + WIPE.reveal,
+            from = direction > 0 ? 118 : -118,
+            at = (x: number) => `translate3d(${x}%, 0, 0) skewX(-12deg)`;
+          el.dataset.dir = direction > 0 ? 'in' : 'back';
+          for (const a of el.getAnimations()) a.cancel();
+          el.animate(
+            [
+              { transform: at(from), easing: 'cubic-bezier(0.7, 0, 0.84, 0)' },
+              { transform: at(0), offset: WIPE.cover / total },
+              { transform: at(0), offset: (WIPE.cover + WIPE.hold) / total, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' },
+              { transform: at(-from) },
+            ],
+            { duration: total, fill: 'none' },
+          );
+          return WIPE.cover + WIPE.hold * 0.5;
         },
       },
     });
@@ -334,6 +383,7 @@ export function StoryExperience({
       <div className="story-stage" aria-hidden="true">
         <div className="story-canvas" ref={hostRef} />
         <div className="story-fallback" />
+        <div className="story-glow" />
         <div className="story-hero-pin" ref={pinRef}>
           <span className="tag">{hero.name}</span>
           <span className="stem" />
@@ -341,12 +391,15 @@ export function StoryExperience({
         </div>
         <div className="story-scrim" />
         <div className="story-veil" />
+        <div className="story-wipe" ref={wipeRef}>
+          <i />
+        </div>
       </div>
       <p className="sr-only">
-        As you scroll, an animated 3D model of the Seen Health center in Alhambra follows {hero.name}{' '}
-        from room to room and looks in on the homes, partner sites and hospital around the center, while a
-        diagram of her eleven-person care team shows who is involved in each moment and how information is
-        handed from one discipline to the next.
+        As you scroll, an animated 3D model follows {hero.name} from her front door to the Seen Health center in
+        Alhambra and home again, while a diagram of her eleven-person care team shows who is involved in each
+        moment and how information is handed from one discipline to the next. Then it looks in, one by one, on
+        the other kinds of care the same team coordinates across the community.
       </p>
       <output className="story-loading" aria-live="polite">
         {status === 'loading' ? (
@@ -358,14 +411,7 @@ export function StoryExperience({
       </output>
 
       <div className="story-idt-wrap">
-        <IdtPanel
-          mode={ringMode}
-          step={step}
-          stepIndex={stepIndex}
-          phase={phase}
-          onSelect={goToStep}
-          showNetwork={beat >= NETWORK}
-        />
+        <IdtPanel mode={ringMode} step={step} stepIndex={stepIndex} phase={phase} onSelect={goToStep} />
       </div>
       <div className="story-idt-compact" aria-hidden="true">
         <IdtRing mode={ringMode} step={step} phase={phase} compact />
@@ -377,46 +423,52 @@ export function StoryExperience({
         </span>
         <ol className="story-rail-track">
           <li className="story-rail-fill" aria-hidden="true" />
-          {steps.map((s, i) => {
-            const away = isCutaway(s);
-            return (
-              <li
-                key={s.id}
-                className="story-rail-tick"
-                data-kind={away ? 'network' : undefined}
-                data-state={i < stepIndex ? 'past' : i === stepIndex ? 'now' : 'next'}
-                style={{ '--at': scrub[i][0] / 720 } as CSSProperties}
-              >
-                <button
-                  type="button"
-                  onClick={() => goToStep(i)}
-                  aria-label={
-                    away
-                      ? `${kickerTime(s)}, meanwhile at ${placeLabel(s)}: ${s.title}`
-                      : `${kickerTime(s)}: ${s.title}`
-                  }
-                  aria-current={i === stepIndex ? 'step' : undefined}
-                  data-label={
-                    away ? `${kickerTime(s)} · Meanwhile · ${shortLabel(s)}` : `${kickerTime(s)} · ${s.title}`
-                  }
-                />
-              </li>
-            );
-          })}
+          {steps.map((s, i) => (
+            <li
+              key={s.id}
+              className="story-rail-tick"
+              data-state={i < stepIndex ? 'past' : i === stepIndex ? 'now' : 'next'}
+              style={{ '--at': scrub[i][0] / 720 } as CSSProperties}
+            >
+              <button
+                type="button"
+                onClick={() => goToStep(i)}
+                aria-label={`${kickerTime(s)}: ${s.title}`}
+                aria-current={i === stepIndex ? 'step' : undefined}
+                data-label={`${kickerTime(s)} · ${s.title}`}
+              />
+            </li>
+          ))}
         </ol>
       </nav>
 
+      {/* Highlights: one segment per service, filled by scroll (--hl). */}
+      <ol className="story-progress" aria-hidden="true">
+        {highlights.map((h, i) => (
+          <li key={h.id} style={{ '--i': i } as CSSProperties}>
+            <i />
+          </li>
+        ))}
+      </ol>
+
       <main className="story-main">
-        <section className="story-beat story-opening" ref={registerSection} data-beat-index={0} aria-labelledby="story-title">
+        <section
+          className="story-beat story-opening"
+          ref={registerSection}
+          data-beat-index={0}
+          data-active={beat === 0 || undefined}
+          aria-labelledby="story-title"
+        >
           <div className="story-pin">
             <div className="story-opening-copy">
               <p className="story-eyebrow">A day at Seen Health · Alhambra, California</p>
               <h1 id="story-title" className="story-display">
-                <span>One day.</span> <span>Eleven people.</span> <span className="accent">One life, fully seen.</span>
+                <Words text="One day." /> <Words text="Eleven people." />{' '}
+                <Words className="accent" text="One life, fully seen." />
               </h1>
               <p className="story-lede">
-                Follow {hero.name}, {hero.age}, through a day at our PACE center, and meet the team that plans,
-                delivers and oversees every part of her care, wherever it happens.
+                Follow {hero.name}, {hero.age}, from her front door to our PACE center and home again, and meet the
+                team that plans, delivers and oversees every part of her care, wherever it happens.
               </p>
             </div>
             <button type="button" className="story-cue" onClick={() => scrollToBeat(1)}>
@@ -428,14 +480,20 @@ export function StoryExperience({
           </div>
         </section>
 
-        <section className="story-beat story-reveal" ref={registerSection} data-beat-index={1} aria-labelledby="story-reveal-title">
+        <section
+          className="story-beat story-reveal"
+          ref={registerSection}
+          data-beat-index={1}
+          data-active={beat === 1 || undefined}
+          aria-labelledby="story-reveal-title"
+        >
           <div className="story-pin">
             <article className="story-card">
               <p className="story-kicker">
                 <span className="time">Inside the center</span>
               </p>
               <h2 id="story-reveal-title" className="story-headline">
-                Everything she needs, under one roof.
+                <Words text="Everything she needs, under one roof." />
               </h2>
               <p className="story-body">
                 A clinic, a therapy gym, a day room, dining, personal care and, upstairs, the team that plans it
@@ -445,55 +503,30 @@ export function StoryExperience({
           </div>
         </section>
 
-        <section className="story-beat story-team" ref={registerSection} data-beat-index={2} aria-labelledby="story-team-title">
+        <section
+          className="story-beat story-team"
+          ref={registerSection}
+          data-beat-index={2}
+          data-active={beat === 2 || undefined}
+          aria-labelledby="story-team-title"
+        >
           <div className="story-pin">
             <article className="story-card">
               <p className="story-kicker">
                 <span className="time">The interdisciplinary team</span>
               </p>
               <h2 id="story-team-title" className="story-headline">
-                Eleven disciplines. One plan.
+                <Words text="Eleven disciplines. One plan." />
               </h2>
               <p className="story-body">
                 Every PACE participant has an interdisciplinary team who design, deliver and oversee her care
                 together. Here is {hero.name}’s.
               </p>
               <ul className="story-legend" aria-label="The eleven disciplines">
-                {teamIntro.flat().map((m) => (
-                  <li key={m.id} style={{ '--c': m.color } as CSSProperties}>
+                {teamIntro.flat().map((m, k) => (
+                  <li key={m.id} style={{ '--c': m.color, '--k': k } as CSSProperties}>
                     <i aria-hidden="true" />
                     {m.title}
-                  </li>
-                ))}
-              </ul>
-            </article>
-          </div>
-        </section>
-
-        <section
-          className="story-beat story-network"
-          ref={registerSection}
-          data-beat-index={NETWORK}
-          aria-labelledby="story-network-title"
-        >
-          <div className="story-pin">
-            <article className="story-card">
-              <p className="story-kicker">
-                <span className="time">Beyond the building</span>
-              </p>
-              <h2 id="story-network-title" className="story-headline">
-                One team, many places.
-              </h2>
-              <p className="story-body">
-                Most of a participant’s week happens outside the center: at home, at the pharmacy, in a
-                specialist’s office, at a partner day center or in a hospital. The same team plans for every one of
-                those places. While we follow {hero.name}, we will look in on a few.
-              </p>
-              <ul className="story-places" aria-label="Places across the care network">
-                {PLACES.map((p) => (
-                  <li key={p}>
-                    <i aria-hidden="true" />
-                    {p}
                   </li>
                 ))}
               </ul>
@@ -507,21 +540,23 @@ export function StoryExperience({
             id={`moment-${s.id}`}
             className="story-beat story-chapter"
             data-team={isTeamMeeting(s) || undefined}
-            data-network={isCutaway(s) || undefined}
-            ref={registerSection} data-beat-index={FIRST_CHAPTER + i}
+            data-cutaway={isCutaway(s) || undefined}
+            data-active={beat === FIRST_CHAPTER + i || undefined}
+            ref={registerSection}
+            data-beat-index={FIRST_CHAPTER + i}
             aria-labelledby={`moment-${s.id}-title`}
           >
             <div className="story-pin">
               <article className="story-card">
-                {isCutaway(s) && (
+                {isMeanwhile(s) && (
                   <p className="story-meanwhile">
                     <i aria-hidden="true" />
-                    Meanwhile, across the network
+                    Meanwhile, in the {placeLabel(s).toLowerCase()}
                   </p>
                 )}
                 <Kicker text={s.kicker} />
                 <h2 id={`moment-${s.id}-title`} className="story-headline">
-                  {s.title}
+                  <Words text={s.title} />
                 </h2>
                 <p className="story-body">{s.body}</p>
                 <RoleChips roles={s.roles} partners={s.partners} />
@@ -554,7 +589,9 @@ export function StoryExperience({
         <section
           className="story-beat story-finale"
           id="story-summary"
-          ref={registerSection} data-beat-index={FINALE}
+          ref={registerSection}
+          data-beat-index={FINALE}
+          data-active={beat === FINALE || undefined}
           aria-labelledby="story-finale-title"
         >
           <div className="story-pin">
@@ -562,12 +599,12 @@ export function StoryExperience({
               <div className="story-finale-head">
                 <p className="story-eyebrow">4:00 PM · The whole day, at a glance</p>
                 <h2 id="story-finale-title" className="story-headline large">
-                  The whole team, around one person.
+                  <Words text="The whole team, around one person." />
                 </h2>
                 <p className="story-body">
-                  Eleven disciplines each saw a different part of {hero.name}’s day. Every observation was handed
-                  to the person who could act on it, and all of it landed in one shared care plan. And across town,
-                  the same disciplines kept {inWords(networkTotals.moments)} more moments of care on track.
+                  Eleven disciplines each saw a different part of {hero.name}’s day, from her front door and back
+                  again. Every observation was handed to the person who could act on it, and all of it landed in one
+                  shared care plan.
                 </p>
               </div>
               <Swimlane revealed={finaleRevealed} />
@@ -575,24 +612,109 @@ export function StoryExperience({
                 <Counter className="story-total" value={finaleRevealed > steps.length ? totals.disciplines : 0} label="disciplines" />
                 <Counter className="story-total" value={finaleRevealed > steps.length ? totals.touchpoints : 0} label="touchpoints" />
                 <Counter className="story-total" value={finaleRevealed > steps.length ? totals.handoffs : 0} label="handoffs" />
-                {/* The same count as the panel's "Across the network" counter at the end of the day. */}
-                <Counter
-                  className="story-total network"
-                  value={finaleRevealed > steps.length ? networkTotals.touchpoints : 0}
-                  label={`touchpoints across the network · ${networkTotals.moments} moments`}
-                />
                 <Counter className="story-total" value={finaleRevealed > steps.length ? 1 : 0} label="shared care plan" />
               </div>
             </div>
           </div>
         </section>
 
-        <section className="story-beat story-cta" ref={registerSection} data-beat-index={FINALE + 1} aria-labelledby="story-cta-title">
+        <section
+          className="story-beat story-network"
+          ref={registerSection}
+          data-beat-index={NETWORK}
+          data-active={beat === NETWORK || undefined}
+          aria-labelledby="story-network-title"
+        >
+          <div className="story-pin">
+            <article className="story-card">
+              <p className="story-kicker">
+                <span className="time">Beyond one day</span>
+              </p>
+              <h2 id="story-network-title" className="story-headline">
+                <Words text="Everything else, handled." />
+              </h2>
+              <p className="story-body">
+                {hero.name}’s day is one of many. Around every participant, the same team coordinates care wherever
+                it is needed, across town and around the clock.
+              </p>
+              <ol className="story-places" aria-label="Care the team coordinates across the community">
+                {highlights.map((h, k) => (
+                  <li key={h.id} style={{ '--k': k } as CSSProperties}>
+                    <span className="n" aria-hidden="true">
+                      {pad2(k + 1)}
+                    </span>
+                    {h.label}
+                  </li>
+                ))}
+              </ol>
+            </article>
+          </div>
+        </section>
+
+        {highlights.map((h, i) => (
+          <section
+            key={h.id}
+            id={`highlight-${h.id}`}
+            className="story-beat story-highlight"
+            ref={registerSection}
+            data-beat-index={NETWORK + 1 + i}
+            data-active={beat === NETWORK + 1 + i || undefined}
+            aria-labelledby={`highlight-${h.id}-title`}
+          >
+            <div className="story-pin">
+              <article className="story-hl">
+                <p className="story-hl-index" aria-hidden="true">
+                  <span className="num">{pad2(i + 1)}</span>
+                  <span className="of">/ {pad2(highlights.length)}</span>
+                </p>
+                <p className="story-hl-label">{h.label}</p>
+                <h2 id={`highlight-${h.id}-title`} className="story-hl-title">
+                  <Words text={h.title} />
+                </h2>
+                <p className="story-hl-body">{h.body}</p>
+                <div className="story-hl-meta">
+                  <Kicker text={h.kicker} />
+                  <RoleChips roles={h.roles} partners={h.partners} />
+                </div>
+              </article>
+            </div>
+          </section>
+        ))}
+
+        <section
+          className="story-beat story-peace"
+          ref={registerSection}
+          data-beat-index={PEACE}
+          data-active={beat === PEACE || undefined}
+          aria-labelledby="story-peace-title"
+        >
+          <div className="story-pin">
+            <div className="story-peace-copy">
+              <p className="story-eyebrow">4:00 PM · Home</p>
+              <h2 id="story-peace-title" className="story-display">
+                <Words text="Home by four." /> <Words text="Tea with her daughter." />{' '}
+                <Words className="accent" text="We’ve got them." />
+              </h2>
+              <p className="story-lede">
+                That is peace of mind: a family that knows the same team will be there tomorrow, at home, at the
+                center and everywhere in between.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section
+          className="story-beat story-cta"
+          ref={registerSection}
+          data-beat-index={PEACE + 1}
+          data-active={beat === PEACE + 1 || undefined}
+          aria-labelledby="story-cta-title"
+        >
           <div className="story-cta-inner">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className="story-cta-logo" src={logo} alt="" width={262} height={18} />
             <h2 id="story-cta-title" className="story-headline large">
-              Care that sees the whole person.
+              <Words text="Care that sees the whole person." />
             </h2>
             <p className="story-body">
               Seen Health is a PACE program: medical care, therapy, meals, transportation, social work and support
@@ -609,8 +731,8 @@ export function StoryExperience({
           </div>
           <footer className="story-foot">
             <p>
-              {hero.name} and the Wongs are composite, illustrative participants, and the partner sites around the
-              center are illustrative too. Their days are compressed and do not describe real people, places or
+              {hero.name}, her daughter and the Wongs are composite, illustrative people, and the partner sites around
+              the center are illustrative too. Their days are compressed and do not describe real people, places or
               records.
             </p>
             <p>

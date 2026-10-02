@@ -1,6 +1,6 @@
 import scenario from '../data/scenarios/day-in-the-life.json';
 import careTeam from '../data/care-team.json';
-import { isCutawayStep, scrubWindows } from '../sim/story-timeline';
+import { isCutawayStep, scrubWindows, type StoryHighlight } from '../sim/story-timeline';
 
 /** Typed views of the shared story contracts (scenario script + IDT roster). */
 export type Handoff = { from: string; to: string; note: string };
@@ -17,13 +17,16 @@ export type Step = {
   handoffs: Handoff[];
   heroPresent: boolean;
   stops?: Stop[];
-  /** Cutaways only: the care setting shown (a `careSettings` id). */
+  /** Cutaways at a care setting: the setting shown (a `careSettings` id). */
   settingId?: string;
-  /** Cutaways only: the community interactions shown; the camera follows the first. */
+  /** Cutaways only: the interactions shown; the camera follows the first. */
   interactionIds?: string[];
-  /** External roles named on the card and in the swimlane (not IDT disciplines). */
+  /** Cutaways that are Mrs. Lin's own moment (at home): the actor standing in for her. */
+  heroAlias?: string;
+  /** People outside the team named on the card and in the swimlane (not IDT disciplines). */
   partners?: string[];
 };
+export type Highlight = StoryHighlight;
 export type Member = {
   id: string;
   title: string;
@@ -36,6 +39,8 @@ export type Member = {
 
 // The JSON also carries simulation placement fields the story ignores.
 export const steps = scenario.steps as unknown as Step[];
+/** The closing highlights: services beyond Mrs. Lin's day, each on its own clock. */
+export const highlights = scenario.highlights as unknown as Highlight[];
 export const hero = scenario.hero;
 export const clock = scenario.clock;
 export const basis = scenario.basis;
@@ -79,11 +84,19 @@ export const laneMembers: Member[] = groups.flatMap((g) =>
 );
 
 /**
- * A cutaway: a moment across the care network (a partner site or a home)
- * without Mrs. Lin. Cutaways have their own counters; touchpoints and
- * handoffs stay hers.
+ * A cutaway: a moment told through interactions already in the care day
+ * (Mrs. Lin at home, lunch arriving in the kitchen) rather than compiled hero
+ * tracks. Every step is part of her day and counts toward her totals.
  */
 export const isCutaway = (s: Step) => isCutawayStep(s);
+/** Her own moment at home, where `heroAlias` stands in for her. */
+export const atHome = (s: Step) => !!s.heroAlias;
+/** Behind the scenes of her day, without her (lunch arriving in the kitchen). */
+export const isMeanwhile = (s: Step) => isCutaway(s) && !atHome(s);
+/** Mrs. Lin is in the picture: in person, or as her stand-in at home. */
+export const withHero = (s: Step) => s.heroPresent || atHome(s);
+/** The actor who is Mrs. Lin at home (the closing shot finds her there). */
+export const homeAlias = steps.find(atHome)?.heroAlias ?? null;
 
 /** Compact UI labels for the day-flow strip, rail, ring hub and swimlane headers. */
 const SHORT: Record<string, string> = {
@@ -96,16 +109,13 @@ const SHORT: Record<string, string> = {
   lunch: 'Lunch',
   'social-work': 'Social work',
   recreation: 'Recreation',
-  'personal-care': 'Personal care',
+  'personal-care': 'Shower',
   farewell: 'Farewell',
   'ride-home': 'Ride home',
   'care-plan': 'Care plan',
-  'network-pharmacy': 'Pharmacy',
-  'network-home-am': 'At home',
-  'network-specialist': 'Cardiology',
-  'network-partner': 'Partner ADC',
-  'network-hospital': 'Hospital',
-  'network-home-pm': 'Home health',
+  'home-am': 'At home',
+  kitchen: 'Kitchen',
+  'home-pm': 'Home',
 };
 export const shortLabel = (s: Step) =>
   SHORT[s.id] || s.kicker.split('·').pop()!.trim();
@@ -133,30 +143,20 @@ const count = (list: Step[]): Counts => ({
   touchpoints: list.reduce((n, s) => n + s.roles.length, 0),
   handoffs: list.reduce((n, s) => n + s.handoffs.length, 0),
 });
-/** Cumulative counts of the steps before each step index that pass `keep`. */
-const cumulative = (keep: (s: Step) => boolean) =>
-  steps.reduce<Counts[]>(
-    (acc, s, i) => {
-      const prev = acc[i],
-        add = keep(s) ? count([s]) : { touchpoints: 0, handoffs: 0 };
-      acc.push({
-        touchpoints: prev.touchpoints + add.touchpoints,
-        handoffs: prev.handoffs + add.handoffs,
-      });
-      return acc;
-    },
-    [{ touchpoints: 0, handoffs: 0 }],
-  );
-export const heroSteps = steps.filter((s) => !isCutaway(s));
-export const networkSteps = steps.filter(isCutaway);
 /** Mrs. Lin's day: disciplines, and touchpoints and handoffs across her steps. */
-export const totals = { disciplines: members.length, ...count(heroSteps) };
-/** The moments across the care network (cutaways), kept apart from Mrs. Lin's. */
-export const networkTotals = { moments: networkSteps.length, ...count(networkSteps) };
-/** Mrs. Lin's counts before each step index (index i = her steps among steps < i). */
-export const before = cumulative((s) => !isCutaway(s));
-/** The network's counts before each step index (cutaways among steps < i). */
-export const beforeNetwork = cumulative(isCutaway);
+export const totals = { disciplines: members.length, ...count(steps) };
+/** Her counts before each step index (index i = the steps before step i). */
+export const before = steps.reduce<Counts[]>(
+  (acc, s, i) => {
+    const add = count([s]);
+    acc.push({
+      touchpoints: acc[i].touchpoints + add.touchpoints,
+      handoffs: acc[i].handoffs + add.handoffs,
+    });
+    return acc;
+  },
+  [{ touchpoints: 0, handoffs: 0 }],
+);
 export const isTeamMeeting = (s: Step) =>
   !s.heroPresent && !isCutaway(s) && s.roles.length >= members.length;
 /**

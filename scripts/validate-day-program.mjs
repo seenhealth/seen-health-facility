@@ -113,6 +113,54 @@ assert.deepEqual(
 for (const p of repertoire)
   assert.ok(scheduled.has(p.id), `${p.id} appears in at least one rotation`);
 
+// Weekly lunch: a culturally focused menu every weekday, each with a
+// vegetarian main, sides, a soup or dessert and the dietitian's low-sodium,
+// texture and diabetes adaptations, delivered to the kitchen before service.
+const lunch = data.lunch;
+text(lunch.source, 'lunch.source');
+assert.deepEqual(
+  Object.keys(lunch.menus).sort(),
+  [...days].sort(),
+  'lunch menus cover Monday to Friday',
+);
+const served = new Set();
+for (const day of days) {
+  const m = lunch.menus[day],
+    where = `lunch.menus.${day}`;
+  for (const k of ['title', 'main', 'vegetarian']) text(m[k], `${where}.${k}`);
+  list(m.sides, `${where}.sides`);
+  list(m.cultures, `${where}.cultures`);
+  assert.ok(m.soup || m.dessert, `${where} has a soup or a dessert`);
+  for (const k of ['soup', 'dessert']) if (k in m) text(m[k], `${where}.${k}`);
+  assert.deepEqual(
+    Object.keys(m.adaptations).sort(),
+    ['diabetes', 'lowSodium', 'texture'],
+    `${where}.adaptations: low sodium, texture and diabetes`,
+  );
+  for (const [k, v] of Object.entries(m.adaptations))
+    text(v, `${where}.adaptations.${k}`);
+  m.cultures.forEach((c) => served.add(c));
+}
+assert.equal(
+  new Set(days.map((d) => lunch.menus[d].main)).size,
+  days.length,
+  'a different main every weekday',
+);
+assert.ok(served.size >= 6, `the week serves ${served.size} communities (≥ 6)`);
+const [open, close] = lunch.service;
+assert.ok(
+  0 <= open && open < close && close <= 720,
+  'lunch is served in the day',
+);
+const delivery = JSON.parse(
+  readFileSync('app/data/activity-loop.json', 'utf8'),
+).interactions.find((i) => i.id === lunch.delivery);
+assert.ok(
+  delivery?.category === 'meals' && delivery.zoneId === 'kitchen',
+  `lunch.delivery "${lunch.delivery}" is a meals interaction in the kitchen`,
+);
+assert.ok(delivery.start < open, 'lunch reaches the kitchen before service');
+
 // Runtime: the compiled modules re-derive the floor's windows per rotation.
 execFileSync('node', ['scripts/compile-model-modules.mjs'], {
   stdio: 'inherit',
@@ -156,9 +204,10 @@ for (const day of days) {
       data.programs.filter((p) => p.zone === zone).map((p) => p.id),
       `${zone} keeps its sessions on ${day}`,
     );
+  assert.deepEqual(program.todaysLunch(), lunch.menus[day], `${day} lunch`);
 }
 program.setProgramRotation('mon');
 assert.equal(program.programAt(3).id, base[0].id, 'rotation restores Monday');
 console.log(
-  `Day program: ${base.length} floor + ${data.programs.length - base.length} zone sessions and ${repertoire.length} repertoire programs across ${days.length} rotations, each in a slot whose layout fits; ${actions.size} actions in the union; slot windows re-derive per day.`,
+  `Day program: ${base.length} floor + ${data.programs.length - base.length} zone sessions and ${repertoire.length} repertoire programs across ${days.length} rotations, each in a slot whose layout fits; ${actions.size} actions in the union; slot windows re-derive per day. Lunch: ${days.length} weekday menus for ${served.size} communities, each with a vegetarian main and three diet adaptations, delivered before service.`,
 );

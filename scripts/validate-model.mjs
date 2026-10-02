@@ -10,7 +10,6 @@ import {
 } from 'three';
 for (const name of [
   'activity-loop',
-  'care-journeys',
   'character-templates',
   'day-program',
 ])

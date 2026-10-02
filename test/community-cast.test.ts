@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
+import type { ActivitySource, ActorSpec } from '../app/model/activity';
+import { isStaffRole, type CharacterRole } from '../app/model/characters';
 import { communitySource, wongClinicLeg } from '../app/model/community-people';
 import {
   careSettingById,
@@ -8,6 +10,7 @@ import {
   settingZone,
   type CareSetting,
 } from '../app/model/community-settings';
+import { sampleCommunityVehicle } from '../app/model/community-vehicles';
 import { fillHoles, placeInstanceCast } from '../app/model/instance-cast';
 import type { Facility, Vec2 } from '../app/model/schema';
 import {
@@ -16,6 +19,9 @@ import {
   instanceNavOptions,
   type CastFile,
 } from '../app/sim/community-cast';
+import { computeMetrics } from '../app/sim/metrics';
+import { storyActivitySource } from '../app/sim/story-source';
+import { traceTouchpoints } from '../app/sim/trace';
 
 // The stitch between a generated instance track and hand-authored legs
 // (SPEC-facility-instance §8.6): a scheduled person leaves a stamped house
@@ -108,7 +114,7 @@ const house = {
   objects: [],
   materials: {},
 } as unknown as Facility;
-const home = careSettingById('home-lin')!;
+const home = careSettingById('home-wong')!;
 const setting: CareSetting = {
   ...home,
   facility: {
@@ -121,7 +127,7 @@ const setting: CareSetting = {
 };
 const chair: Vec2 = [-2, -1.5];
 const cast: CastFile = {
-  setting: 'home-lin',
+  setting: 'home-wong',
   people: [
     {
       id: 'home-participant',
@@ -267,7 +273,7 @@ const sofaHouse = {
 } as unknown as Facility;
 const onSofa: Vec2 = [1.5, -2.5];
 const homeCast = (seat?: string): CastFile => ({
-  setting: 'home-lin',
+  setting: 'home-wong',
   people: [
     // Home from hospital at 600 s and present to the end of the day: the
     // seam is out of sight (hidden at 0 s), so the day need not end where it
@@ -351,5 +357,128 @@ void test('scheduled people: a late arrival present at 720 s, short stops, a sof
   assert.throws(
     () => checkInstanceCast(sofaHouse, setting, generate(homeCast()), { nav }),
     /overlaps furniture/,
+  );
+});
+
+// Mrs. Lin's home (home-lin): the story's participant at home with her
+// daughter, generated in the Wongs' plan, and her Seen van there and back
+// filling her `away` hole (HOLE_LEGS).
+void test("Mrs. Lin's home: at home with her daughter, on her Seen van there and back", () => {
+  const model = JSON.parse(
+    readFileSync('public/models/seen-alhambra-planning.json', 'utf8'),
+  ) as Facility;
+  const source = communitySource(model),
+    actor = (id: string) => (source.actors ?? []).find((a) => a.id === id)!,
+    interaction = (id: string) =>
+      (source.interactions ?? []).find((i) => i.id === id)!,
+    lin = actor('lin-at-home'),
+    daughter = actor('lin-daughter');
+  // The center's Mrs. Lin (the story's hero) is the same person, drawn alike.
+  const { source: story, heroId } = storyActivitySource(),
+    hero = story.actors.find((a) => a.id === heroId)!;
+  assert.deepEqual(
+    [lin.role, lin.profileId, lin.variant, lin.mobility],
+    [hero.role, hero.profileId, hero.variant, hero.mobility],
+  );
+  assert.equal(daughter.role, 'family');
+  assert.ok(!isStaffRole(daughter.role), 'her daughter is not staff');
+  const at = (a: ActorSpec, t: number) =>
+    a.segments.find((s) => s.start <= t && t < s.end)!;
+  assert.equal(at(lin, 12).action, 'tabletop', 'breakfast at 8:08');
+  assert.equal(at(lin, 300).visible, false, 'at the center, out of sight');
+  assert.ok(at(lin, 719.5).seated && at(daughter, 719.5).seated, 'tea on the sofa');
+  // On board from the apex until the van has left the map, and from its return.
+  assert.deepEqual(
+    lin.segments.filter((s) => s.vehicleId).map((s) => [s.vehicleId, s.start, s.end]),
+    [
+      ['van-lin', 43.7, 62],
+      ['van-lin', 620, 637],
+    ],
+  );
+  const van = (t: number) => sampleCommunityVehicle('van-lin', t);
+  assert.ok((van(43.7).ramp ?? 0) > 0.99, 'she boards with the ramp down');
+  assert.ok((van(637).ramp ?? 0) > 0.99, 'and steps off with it down');
+  assert.equal(van(49.9).phase, 'Picking up Mrs. Lin');
+  assert.equal(van(50).phase, 'Taking Mrs. Lin to the center');
+  assert.ok(!van(300).visible, 'the van is off the map at midday');
+  for (const id of ['lin-van-pickup', 'lin-van-dropoff'])
+    assert.deepEqual(interaction(id).actorIds, [
+      'lin-at-home',
+      'lin-daughter',
+      'lin-van-driver',
+    ]);
+  assert.deepEqual(interaction('lin-breakfast').actorIds, [
+    'lin-at-home',
+    'lin-daughter',
+  ]);
+  const evening = interaction('lin-evening');
+  assert.ok(evening.start <= 700 && evening.end === 720, 'the story closes on tea');
+});
+
+void test('family members are neither staff nor participants in Measure and the trace', () => {
+  const still = (id: string, role: CharacterRole, x: number): ActorSpec => ({
+    id,
+    role,
+    variant: 0,
+    label: id,
+    offset: 0,
+    levelId: 'site',
+    segments: [
+      {
+        start: 0,
+        end: 720,
+        action: 'idle',
+        path: [
+          [x, 0],
+          [x, 0],
+        ],
+        zoneId: 'site',
+        heading: 0,
+      },
+    ],
+  });
+  const care = (id: string, actorIds: string[], start: number) => ({
+    id,
+    label: id,
+    category: 'home',
+    actorIds,
+    start,
+    end: start + 20,
+    zoneId: 'site',
+    description: id,
+  });
+  // Breakfast with her daughter, then a visit from the nurse.
+  const source: ActivitySource = {
+    duration: 720,
+    dayStartMinutes: 480,
+    dayDurationMinutes: 480,
+    description: 'A home.',
+    timing: 'illustrative',
+    evidence: [],
+    roles: ['participant', 'family', 'nurse'],
+    actors: [
+      still('mother', 'participant', 0),
+      still('daughter', 'family', 1),
+      still('nurse', 'nurse', 2),
+    ],
+    interactions: [
+      care('breakfast', ['mother', 'daughter'], 10),
+      care('visit', ['mother', 'nurse'], 40),
+    ],
+  };
+  const model = { zones: [], rooms: [] } as unknown as Facility,
+    m = computeMetrics(source, model, { step: 2 });
+  const { people, participants, staff, family } = m.headline;
+  assert.deepEqual([people, participants, staff, family], [3, 1, 1, 1]);
+  const street = m.zones.find((z) => z.zoneId === 'site')!;
+  assert.deepEqual([street.peakParticipants, street.peakStaff], [1, 1]);
+  // Her daughter is not a care-team member, so the nurse's arrival is no handoff.
+  const events = traceTouchpoints(source, model, { step: 1 });
+  assert.equal(events.filter((e) => e.kind === 'handoff').length, 0);
+  assert.ok(
+    events.some(
+      (e) => e.actorId === 'daughter' && e.interactionId === 'breakfast',
+    ),
+    'she is traced in the breakfast',
   );
 });

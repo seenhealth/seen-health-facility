@@ -67,7 +67,7 @@ export type CareFacility = {
   margin?: number;
   /**
    * Anchors of things the pad's site builder draws on the grounds (trees,
-   * benches, a patio's corners); `npm run build:community` checks each stays
+   * benches, planting beds); `npm run build:community` checks each stays
    * at least 1 m outside the footprint.
    */
   grounds?: string[];
@@ -78,7 +78,7 @@ export type CareSetting = {
   name: string;
   /** Short display name: trace places, story badges ('Partner ADC', 'Home', 'Pharmacy'). */
   short: string;
-  /** Zone name in the trace and Measure (default `name`), e.g. 'Partner ADC · Seen layout'. */
+  /** Zone name in the trace and Measure (default `name`), e.g. 'Partner ADC'. */
   traceName?: string;
   subtitle: string;
   position: Vec2;
@@ -121,6 +121,12 @@ export type InstanceSummary = {
   };
   /** Polygons of the drawn zones. */
   footprint: Vec2[][];
+  /**
+   * Surfaces people stand on above the floor (a stage deck, riser tiers, a
+   * ramp landing: facility-instance.ts `standingSurfaces`), `y` above the
+   * instance floor; omitted when there are none.
+   */
+  platforms?: { polygon: Vec2[]; y: number }[];
   rooms: SettingRoom[];
 };
 export type InstanceSummaries = {
@@ -227,7 +233,8 @@ const boundsCache = new Map<string, [Vec2, Vec2]>();
  * that setting's paving; elsewhere it is the street level of the center's lot.
  */
 export function groundYAt(p: Vec2) {
-  // Inside a stamped facility: its finished floor.
+  // Inside a stamped facility: its finished floor, or the highest surface
+  // people stand on there (a stage, a riser tier).
   for (const s of careSettings) {
     const fp = footprintCache(s);
     if (
@@ -238,7 +245,13 @@ export function groundYAt(p: Vec2) {
       p[1] <= fp.bounds[1][1] &&
       fp.polygons.some((poly) => insidePolygon(p, poly))
     )
-      return s.facility!.floorY ?? 0;
+      return (
+        (s.facility!.floorY ?? 0) +
+        fp.platforms.reduce(
+          (top, pl) => (pl.y > top && insidePolygon(p, pl.polygon) ? pl.y : top),
+          0,
+        )
+      );
   }
   for (const s of careSettings) {
     let b = boundsCache.get(s.id);
@@ -301,7 +314,11 @@ export function facilityWorldFrame(
 }
 const footprints = new Map<
   string,
-  { polygons: Vec2[][]; bounds: [Vec2, Vec2] } | null
+  {
+    polygons: Vec2[][];
+    bounds: [Vec2, Vec2];
+    platforms: { polygon: Vec2[]; y: number }[];
+  } | null
 >();
 function footprintCache(s: CareSetting) {
   if (!footprints.has(s.id)) {
@@ -319,6 +336,10 @@ function footprintCache(s: CareSetting) {
           [Math.min(...xs), Math.min(...zs)],
           [Math.max(...xs), Math.max(...zs)],
         ],
+        platforms: (summary.platforms ?? []).map((pl) => ({
+          polygon: transformPolygon(s, pl.polygon),
+          y: pl.y,
+        })),
       });
     }
   }
@@ -330,7 +351,7 @@ export function instanceFootprint(s: CareSetting): Vec2[][] {
 }
 /**
  * Rooms of a setting's stamped facility in world coordinates, ids prefixed
- * with the setting's zone (`community:partner-adc/day-open`), or [].
+ * with the setting's zone (`community:partner-adc/adhc-hall`), or [].
  */
 export function instanceRooms(s: CareSetting): SettingRoom[] {
   return (instanceSummary(s)?.rooms ?? []).map((r) => ({
@@ -441,11 +462,11 @@ const define = (d: Draft): CareSetting => {
 /**
  * Local anchor layout per setting. Apex stops are read from `lanePose`, so the
  * anchors here are the on-foot places: doors, the porch, the ramp, beds,
- * counters, patio positions and the kerb crossing between drive and pad.
+ * counters, the front walk and the kerb crossing between drive and pad.
  */
 export const careSettings: CareSetting[] = [
   define({
-    id: 'home-lin',
+    id: 'home-wong',
     kind: 'home',
     name: "The Wongs' home",
     short: 'Home',
@@ -581,6 +602,73 @@ export const careSettings: CareSetting[] = [
       loadingCar: [0, -1.2],
     },
   }),
+  // --- Mrs. Lin's home ---------------------------------------------------------
+  // The story's participant lives here with her daughter; a Seen van takes
+  // her to the center in the morning and brings her home in the afternoon
+  // (docs/COMMUNITY.md, "Mrs. Lin's home"). South of the pharmacy, its stub
+  // on the west street's southern reach, which only the fleet's off-site runs
+  // share. The same senior-friendly bungalow as the Wongs',
+  // stamped with the same plan, frame and exclusions (validate-home.mjs), so
+  // the porch, ramp and crossing anchors below are theirs.
+  define({
+    id: 'home-lin',
+    kind: 'home',
+    name: "Mrs. Lin's home",
+    short: 'Lin home',
+    subtitle: 'Lives with her daughter · Seen van door to door',
+    position: [-81.2, -56],
+    heading: Math.PI / 2,
+    pad: { w: 30, d: 28, back: 8 },
+    road: { from: [-46.2, -56], to: [-68.6, -56] },
+    drive: { depth: 7, radius: 6.2, lanes: 2 },
+    apron: { w: 0, d: 0 },
+    services: ['transport'],
+    accent: '#9b7a96',
+    // The Wongs' plan (public/models/seen-home-wong.json): world = P + (−92.0, −56).
+    facility: {
+      id: 'seen-home-wong',
+      url: '/models/seen-home-wong.json',
+      frame: { position: [0, -10.8], heading: -Math.PI / 2 },
+      levelIds: ['ground'],
+      excludeZoneIds: ['home-zone-porch'],
+      cutaway: true,
+      floorY: PORCH_Y,
+      labels: {
+        'home-living': 'Living room',
+        'home-kitchen': 'Kitchen',
+        'home-bath': 'Bath',
+      },
+      margin: 1.6,
+    },
+    local: {
+      kerb: [0.2, -4.4],
+      rampFoot: [9.9, -6.3],
+      rampMid: [6.6, -6.3],
+      rampTop: [3.4, -6.3],
+      rampTopAside: [3.2, -5.5],
+      porch: [0.4, -6.3],
+      porchSeat: [-4.0, -7.0],
+      porchAside: [2.6, -6.0],
+      porchGreet: [1.6, -5.5],
+      porchStep: [-3.4, -5.6],
+      porchStepFoot: [-3.4, -4.5],
+      door: [0.4, -7.6],
+      doorStep: [0.4, -6.9],
+      inside: [0.4, -9.6],
+      // Van ramp foot → porch ramp, as at the Wongs' (crossA–D).
+      crossA: [6.0, -4.0],
+      crossB: [10.8, -4.7],
+      crossC: [11.5, -5.6],
+      crossD: [10.7, -6.3],
+      // Her daughter: watching for the van on the porch, and meeting it
+      // beside the ramp foot, off the crossing.
+      porchWait: [2.0, -5.6],
+      rampFootSouth: [10.4, -7.0],
+      sidewalkEnd: [12.5, 35],
+      sidewalkPad: [12.5, 13.5],
+      padCorner: [12.4, -2],
+    },
+  }),
   define({
     id: 'hospital',
     kind: 'hospital',
@@ -613,10 +701,15 @@ export const careSettings: CareSetting[] = [
       huddleA: [10.4, -7.3],
       huddleB: [11.6, -8.6],
       huddleC: [9.8, -9.6],
+      // The discharge nurse's call to Seen: out from under the ward bay's
+      // roof (its edge at z −6.2), so the call arc rises clear of it.
+      rnVia: [9.0, -7.4],
+      rnPhone: [8.9, -5.5],
       bayFront: [7.6, -6.5],
       walkway: [2.4, -5.4],
-      edBay: [14, -5.4],
-      edBayVan: [5, 2],
+      // The hospitalist's call to Seen's on-call nurse after the ambulance
+      // handoff: on the sidewalk, under the open sky.
+      edPhone: [9.9, 3.9],
       sidewalkEnd: [9.5, 21.6],
       sidewalkPad: [9.5, 13.5],
       sidewalkIn: [9.5, -5.4],
@@ -625,16 +718,19 @@ export const careSettings: CareSetting[] = [
   define({
     id: 'specialist',
     kind: 'specialist',
-    name: 'Cardiology & specialty clinic',
-    short: 'Cardiology',
-    subtitle: 'Contracted specialist visits with a Seen escort',
+    name: 'Specialty clinic · cardiology, optometry & imaging',
+    short: 'Specialty clinic',
+    subtitle: 'Specialist visits, eye exams and X-rays with a Seen escort',
     position: [100.3, -56],
     heading: 0,
-    pad: { w: 28, d: 26 },
+    // Wide for the ground floor's row of rooms behind the open front, from
+    // west to east: cardiology exam room, lobby (the entrance faces the
+    // drive), optometry and imaging (community-pads.ts `buildSpecialist`).
+    pad: { w: 44, d: 26 },
     road: { from: [100.3, -35.8], to: [100.3, -43] },
     drive: { depth: 6, radius: 6.2, lanes: 1 },
     apron: { w: 10, d: 4.6 },
-    services: ['specialist'],
+    services: ['specialist', 'optometry', 'imaging'],
     accent: '#6d8fb3',
     local: {
       kerb: [-0.4, -4.3],
@@ -642,8 +738,8 @@ export const careSettings: CareSetting[] = [
       doorway: [-2.2, -6.2],
       checkIn: [3.2, -7.5],
       checkInB: [2.4, -6.9],
-      deskEnd: [4.8, -9.2],
-      lobbyMid: [4.6, -7.4],
+      deskEnd: [4.7, -9.2],
+      lobbyMid: [4.5, -7.4],
       receptionMa: [3.2, -9.6],
       examSeat: [-6.4, -8.8],
       examMd: [-4.8, -8.5],
@@ -653,6 +749,60 @@ export const careSettings: CareSetting[] = [
       waitB: [1.7, -7.8],
       waitFront: [1.2, -6.4],
       mdDesk: [-6.4, -10.3],
+      // Walk-ins from a Seen ride at the street kerb: up the sidewalk stub
+      // (in on its west half, out on its east half), along the plinth
+      // outside the drive and in through the open front east of the canopy.
+      sidewalkEnd: [8.55, 19.5],
+      sidewalkPad: [8.55, 12.4],
+      sidewalkEndOut: [9.25, 19.5],
+      sidewalkPadOut: [9.25, 12.4],
+      approachA: [8.85, 5.0],
+      approachB: [7.6, -1.4],
+      approachC: [5.2, -4.6],
+      approachAOut: [9.6, 5.0],
+      approachBOut: [8.3, -1.1],
+      approachCOut: [5.9, -4.2],
+      // The lobby's front: where staff call a patient in, where an escort
+      // meets her (clear of the way in from the gallery), and the gallery
+      // along the open front to the rooms east of the lobby (each partition
+      // stops 1.6 m short of the front).
+      lobbyCall: [2.0, -6.45],
+      escortMeet: [2.0, -7.15],
+      galleryA: [5.3, -6.25],
+      galleryB: [10.5, -6.35],
+      // Optometry (x 5.4–10.4): a mirrored lane, the exam chair facing the
+      // mirror on the imaging partition with the acuity screen behind it on
+      // the lobby partition (about 7.8 m by way of the mirror); the slit
+      // lamp's instrument table at the chair's right, the optometrist's
+      // stool beside it, the instrument stand behind the chair's left; the
+      // technician's counter and the optometrist's desk at the back. The
+      // patient sits down from the chair's left side.
+      optoIn: [9.0, -6.65],
+      optoAside: [9.75, -7.6],
+      optoWest: [6.1, -7.1],
+      optoSeat: [7.4, -8.3],
+      optoChart: [5.4, -8.3],
+      optoMirror: [10.4, -8.3],
+      optoSlit: [7.55, -7.35],
+      optoStool: [8.25, -7.4],
+      optoStand: [7.15, -9.1],
+      optoTech: [8.05, -8.95],
+      optoApproach: [8.6, -8.8],
+      optoSide: [7.45, -8.85],
+      optoCounter: [6.3, -10.65],
+      optoDesk: [9.3, -10.6],
+      // Imaging (x 10.6–17.6): the shielded control alcove in the front
+      // corner by the optometry partition, its lead-glass window facing the
+      // X-ray table; the patient's chair at the table's east end, under the
+      // overhead tube.
+      imagingIn: [16.5, -6.35],
+      imagingTable: [15.2, -7.35],
+      imagingSeat: [16.85, -7.35],
+      imagingTech: [15.55, -8.2],
+      imagingAround: [13.5, -8.3],
+      alcoveGate: [13.5, -6.6],
+      alcoveIn: [11.8, -6.65],
+      imagingConsole: [11.9, -8.45],
     },
   }),
   define({
@@ -660,80 +810,67 @@ export const careSettings: CareSetting[] = [
     kind: 'partner-adc',
     name: 'Partner adult day center',
     short: 'Partner ADC',
-    traceName: 'Partner ADC · Seen layout',
-    subtitle:
-      'Seen Health floor plan · partner day program · visiting Seen clinicians',
+    traceName: 'Partner ADC',
+    subtitle: 'Partner day program · dance, choir, arts, classes and light rehab',
     position: [4, -68],
     heading: 0,
-    pad: { w: 62, d: 50 }, // minimum; the facility footprint derives w and back
-    road: { from: [4, -35.8], to: [4, -43] },
+    pad: { w: 34, d: 40 }, // minimum; the facility footprint derives w and back
+    road: { from: [4, -35.8], to: [4, -48] },
     drive: { depth: 6, radius: 6.2, lanes: 1 },
     apron: { w: 10, d: 3 },
     services: ['day-program'],
     accent: '#b39a5c',
-    // Seen's own ground floor, its west entrance and arrival court facing the
-    // street: facility (x, z) → pad (z + 0.99, −x − 8.15).
+    // The partner's own adult day health care center
+    // (public/models/seen-partner-adhc.json): its plan frame is the pad's
+    // frame 6.6 m further back, so the entry pavilion's front doors (P z
+    // 10.2) face the drop-off apron 1.1 m ahead and the hall's stage is at
+    // the back. Three table-end chairs, one classroom chair and one armchair
+    // in the group-room circle are left out as wheelchair places.
     facility: {
-      id: 'seen-alhambra-planning',
-      url: '/models/seen-alhambra-planning.json',
-      frame: { position: [0.99, -8.15], heading: Math.PI / 2 },
+      id: 'seen-partner-adhc',
+      url: '/models/seen-partner-adhc.json',
+      frame: { position: [0, -6.6], heading: 0 },
       levelIds: ['ground'],
-      excludeZoneIds: ['adjacent'],
-      // The partner furnishes its own day room: the three front tables
-      // cleared, as Seen first did, independent of Seen's day-program floor
-      // (its generated cast is placed against this furniture). Two dining
-      // places stay open for wheelchairs.
       excludeObjectIds: [
-        ...[1, 2, 3].flatMap((n) => {
-          const table = `day-diamond-table-0${n}`;
-          return [table, ...[1, 2, 3, 4].map((c) => `${table}-chair-${c}`)];
-        }),
-        'dining-table-02-chair-3',
-        'dining-table-04-chair-3',
+        'adhc-chair-a-west',
+        'adhc-chair-a-east',
+        'adhc-chair-b-west',
+        'adhc-class-table-3b-chair-2',
+        'adhc-group-chair-5',
       ],
       cutaway: true,
+      // No plate in the hall: at its label anchor (the strip between the
+      // dance floor and the first row of tables) the chairs hide it from the
+      // front, and the stage, tables and dance floor name the room anyway.
       labels: {
-        'day-open': 'Day room',
-        'rehab-open': 'Physical therapy',
-        'dining-1421': 'Dining',
-        'clinic-nurse': 'Nurse station',
-        'lobby-arrival': 'Reception',
-        'admin-workstations': 'Games lounge',
+        'adhc-studio': 'Studio',
+        'adhc-classroom': 'Classroom',
+        'adhc-group-room': 'Group room',
+        'adhc-rehab': 'Rehab',
       },
       margin: 1.6,
-      grounds: ['treeA', 'treeB', 'treeC', 'treeD', 'bench', 'patioMin', 'patioMax'],
+      grounds: ['treeA', 'treeB', 'treeC', 'treeD', 'bench', 'bedWest', 'bedEast'],
     },
     local: {
-      // Visiting staff: street sidewalk → court walk (between the drive and
-      // the rehab block) → west door.
+      // Visiting staff: the street sidewalk → down the pad east of the drive
+      // → along the entry pavilion's front → the front doors (P (0, 11.0)).
       sidewalkEnd: [8.8, 31.4],
-      sidewalkPad: [8.8, 24.4],
-      courtA: [8.85, 21.5],
-      courtB: [8.6, 8.4],
-      doorOutside: [0, 7.15], // facility (−15.3, −0.99)
-      // The tai chi patio in the arrival court's west half, under a slatted
-      // awning: out of the front door (the plan's west entrance), along the
-      // clinic front, in at the patio's south-east corner; the lead faces
-      // two rows of four.
-      patioMin: [-20, 9],
-      patioMax: [-11, 19],
-      courtWest: [-8.6, 7.9],
-      patioGate: [-11.8, 9.9],
-      tcLead: [-15.6, 17.3],
-      tc1: [-18.15, 14.7],
-      tc2: [-16.45, 14.7],
-      tc3: [-14.75, 14.7],
-      tc4: [-13.05, 14.7],
-      tc5: [-18.15, 12.5],
-      tc6: [-16.45, 12.5],
-      tc7: [-14.75, 12.5],
-      tc8: [-13.05, 12.5],
+      sidewalkPad: [8.8, 19.4],
+      frontWalk: [8.8, 4.4],
+      doorOutside: [0, 4.4],
+      // Camera and story anchors: the dance floor's centre, the stage and
+      // where the visiting PT works beside the parallel bars in the rehab.
+      hall: [0, -9.6],
+      stage: [0, -15.8],
+      ptStand: [-8.4, -14.0],
       // Grounds (outside the footprint and the drive; validated).
-      treeA: [-26.5, 19.5],
-      treeB: [-26.5, 1.5],
-      treeC: [-26.5, -17.5],
-      treeD: [-16.5, 21.0],
-      bench: [-21.4, 14.0],
+      treeA: [-15.0, -15.5],
+      treeB: [15.0, -15.5],
+      treeC: [-15.0, -2.5],
+      treeD: [15.0, 4.6],
+      bench: [-9.6, 2.6],
+      bedWest: [-9.4, 1.3],
+      bedEast: [9.4, 1.3],
     },
   }),
 ];
@@ -754,9 +891,12 @@ export const serviceLabels: Record<string, string> = {
   'home-mods': 'Home modifications',
   'after-hours': '24/7 nurse line',
   specialist: 'Specialist visits',
+  optometry: 'Eye exams',
+  imaging: 'X-ray & imaging',
   ed: 'Emergency care',
   discharge: 'Discharge coordination',
   'day-program': 'Partner day program',
+  transport: 'Door-to-door transport',
 };
 /** Interaction categories contributed by the community layer (id, panel label). */
 export const COMMUNITY_CATEGORIES: [string, string][] = [

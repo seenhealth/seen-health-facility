@@ -342,13 +342,15 @@ function unionLength(spans) {
 }
 const overlapOf = (a, b) => Math.max(0, Math.min(a[1], b[1]) - Math.max(a[0], b[0]));
 /**
- * The story's timeline and cutaways (docs/STORY.md, "Cutaways"). Every
- * cutaway features community interactions that exist in the composed story
- * source, at its setting, inside its window; the scrub windows
- * (`scrubWindows`) tile the day from 0; and the on-screen trimming never hides
- * a hero focus time, cuts into a stop or leaves a kicker time outside its
- * chapter. Throws one error listing every failure; returns the timeline
- * rows.
+ * The story's timeline, cutaways and highlights (docs/STORY.md). Every
+ * cutaway features interactions that exist in the composed story source, at
+ * its setting (or in its room of the center), inside its window, and a
+ * cutaway that is the hero's own moment names the actor standing in for her
+ * (`heroAlias`), who takes part; the scrub windows (`scrubWindows`) tile the
+ * day from 0; the on-screen trimming never hides a hero focus time, cuts into
+ * a stop or leaves a kicker time outside its chapter; and every closing
+ * highlight features interactions at its setting inside its own window.
+ * Throws one error listing every failure; returns the timeline rows.
  */
 export function validateStory(sim, model, scenario, result) {
   const duration = result.source.duration,
@@ -356,7 +358,10 @@ export function validateStory(sim, model, scenario, result) {
   const compiled = new Map(result.steps.map((s) => [s.id, s]));
   const composed = sim.alhambraSource(model, result.source);
   const interactions = new Map(composed.interactions.map((i) => [i.id, i]));
+  const actors = new Set(composed.actors.map((a) => a.id));
   const settings = new Set(sim.careSettings.map((s) => s.id));
+  const rooms = new Map(model.rooms.map((r) => [r.id, r]));
+  const zones = new Set(model.zones.map((z) => z.id));
   const team = new Set(sim.careTeam.members.map((m) => m.id));
   const failures = [];
   const fail = (message) => failures.push(message);
@@ -367,40 +372,71 @@ export function validateStory(sim, model, scenario, result) {
   };
   const span = (w) => `${round(w[0], 2)}–${round(w[1], 2)}`;
 
-  // 1. Cutaways: setting, window, featured interactions, roles, kicker.
-  for (const s of steps.filter(isCutaway)) {
-    const at = `cutaway ${s.id}`,
-      [w0, w1] = s.window,
-      zone = sim.settingZone(s.settingId);
-    if (s.placement?.mode !== 'cutaway') fail(`${at}: placement.mode must be 'cutaway'`);
-    if (s.heroPresent !== false) fail(`${at}: heroPresent must be false`);
-    if (s.roomId !== null) fail(`${at}: roomId must be null`);
-    if (!settings.has(s.settingId)) fail(`${at}: settingId ${s.settingId} is not in careSettings`);
-    if (s.zoneId !== zone) fail(`${at}: zoneId ${s.zoneId} must be ${zone}`);
-    if (!(w0 >= 0 && w1 <= duration && w1 - w0 >= 6))
-      fail(`${at}: window ${span(s.window)} must lie inside 0–${duration} and last at least 6 s`);
-    const ids = s.interactionIds || [];
+  /**
+   * The interactions a cutaway or highlight features: each exists, overlaps
+   * the window by at least 4 s and happens where it is shown (`places`);
+   * together they cover 60 % of the window. Returns the members.
+   */
+  const featured = (at, ids, window, places) => {
+    const [w0, w1] = window,
+      spans = [],
+      members = new Set();
     if (!ids.length) fail(`${at}: interactionIds is empty`);
-    const spans = [];
     for (const id of ids) {
       const i = interactions.get(id);
       if (!i) {
         fail(`${at}: interaction ${id} is not in the composed story source`);
         continue;
       }
-      const o = overlapOf([i.start, i.end], s.window);
+      i.actorIds.forEach((a) => members.add(a));
+      const o = overlapOf([i.start, i.end], window);
       if (o < 4)
         fail(`${at}: ${id} (${span([i.start, i.end])}) overlaps the window by ${round(o, 2)} s (need at least 4)`);
-      if (![zone, 'site', 'upper-office'].includes(i.zoneId))
-        fail(`${at}: ${id} happens in ${i.zoneId}, not at ${s.settingId}`);
+      if (!places.includes(i.zoneId)) fail(`${at}: ${id} happens in ${i.zoneId}, not in ${places.join(' / ')}`);
       if (o > 0) spans.push([Math.max(i.start, w0), Math.min(i.end, w1)]);
     }
     const covered = unionLength(spans);
     if (ids.length && covered < 0.6 * (w1 - w0) - 1e-9)
       fail(`${at}: featured interactions cover ${round(covered, 2)} s of the ${w1 - w0} s window (need 60 %)`);
+    return members;
+  };
+  const people = (at, s) => {
     for (const r of s.roles) if (!team.has(r)) fail(`${at}: role ${r} is not a care-team id`);
-    for (const h of s.handoffs)
+    for (const h of s.handoffs || [])
       for (const end of [h.from, h.to]) if (!team.has(end)) fail(`${at}: handoff end ${end} is not a care-team id`);
+  };
+
+  // 1. Cutaways: place, window, featured interactions, stand-in, roles, kicker.
+  for (const s of steps.filter(isCutaway)) {
+    const at = `cutaway ${s.id}`,
+      [w0, w1] = s.window;
+    if (s.placement?.mode !== 'cutaway') fail(`${at}: placement.mode must be 'cutaway'`);
+    if (s.heroPresent !== false) fail(`${at}: heroPresent must be false`);
+    let places;
+    if (s.settingId) {
+      // At a care setting: the setting's zone (its pad); the nurse line and
+      // the fleet's site-level people may join from the center.
+      const zone = sim.settingZone(s.settingId);
+      if (s.roomId !== null) fail(`${at}: roomId must be null at a care setting`);
+      if (!settings.has(s.settingId)) fail(`${at}: settingId ${s.settingId} is not in careSettings`);
+      if (s.zoneId !== zone) fail(`${at}: zoneId ${s.zoneId} must be ${zone}`);
+      places = [zone, 'site', 'upper-office'];
+    } else {
+      // In the center: a zone of the model and, optionally, one of its rooms.
+      if (!zones.has(s.zoneId)) fail(`${at}: zoneId ${s.zoneId} is not a zone of the center`);
+      if (s.roomId !== null && rooms.get(s.roomId)?.zoneId !== s.zoneId)
+        fail(`${at}: roomId ${s.roomId} is not a room of ${s.zoneId}`);
+      places = [s.zoneId, 'site'];
+    }
+    if (!(w0 >= 0 && w1 <= duration && w1 - w0 >= 6))
+      fail(`${at}: window ${span(s.window)} must lie inside 0–${duration} and last at least 6 s`);
+    const ids = s.interactionIds || [];
+    const members = featured(at, ids, s.window, places);
+    if (s.heroAlias) {
+      if (!actors.has(s.heroAlias)) fail(`${at}: heroAlias ${s.heroAlias} is not an actor of the composed story source`);
+      else if (!members.has(s.heroAlias)) fail(`${at}: heroAlias ${s.heroAlias} takes part in none of ${ids.join(', ')}`);
+    }
+    people(at, s);
     const k = kickerAt(s);
     if (k === null || k < w0 - 1e-6 || k > w1 + 1e-6)
       fail(`${at}: kicker "${s.kicker}" (${k === null ? 'no time' : round(k, 2) + ' s'}) lies outside its window ${span(s.window)}`);
@@ -408,8 +444,8 @@ export function validateStory(sim, model, scenario, result) {
     const c = compiled.get(s.id);
     if (!c) fail(`${at}: missing from the compiled steps`);
     else {
-      if (c.heroPresent !== false || c.settingId !== s.settingId || c.roomId !== null)
-        fail(`${at}: compiled step must have heroPresent false, roomId null and settingId ${s.settingId}`);
+      if (c.heroPresent !== false || c.settingId !== s.settingId || c.roomId !== s.roomId)
+        fail(`${at}: compiled step must have heroPresent false, roomId ${s.roomId} and settingId ${s.settingId}`);
       if (c.focusActorId !== `interaction:${ids[0]}`)
         fail(`${at}: compiled focusActorId ${c.focusActorId} must be interaction:${ids[0]}`);
       if (!(c.focusTime >= w0 && c.focusTime <= w1)) fail(`${at}: focus time ${c.focusTime} lies outside its window`);
@@ -457,6 +493,26 @@ export function validateStory(sim, model, scenario, result) {
     }
   });
 
+  // 4. Highlights: each on its own clock, at its setting.
+  const highlights = scenario.highlights || [],
+    seen = new Set();
+  for (const h of highlights) {
+    const at = `highlight ${h.id}`,
+      [w0, w1] = h.window;
+    if (seen.has(h.id)) fail(`${at}: duplicate id`);
+    seen.add(h.id);
+    for (const key of ['label', 'title', 'kicker', 'body'])
+      if (!h[key]) fail(`${at}: ${key} is empty`);
+    if (!settings.has(h.settingId)) fail(`${at}: settingId ${h.settingId} is not in careSettings`);
+    if (!(w0 >= 0 && w1 <= duration && w1 - w0 >= 8))
+      fail(`${at}: window ${span(h.window)} must lie inside 0–${duration} and last at least 8 s`);
+    featured(at, h.interactionIds || [], h.window, [sim.settingZone(h.settingId), 'site', 'upper-office']);
+    people(at, h);
+    const k = kickerAt(h);
+    if (k === null || k < w0 - 1e-6 || k > w1 + 1e-6)
+      fail(`${at}: kicker "${h.kicker}" (${k === null ? 'no time' : round(k, 2) + ' s'}) lies outside its window ${span(h.window)}`);
+  }
+
   assert.equal(failures.length, 0, `Story timeline (${failures.length} problem(s)):\n  ${failures.join('\n  ')}`);
   const rows = steps.map((s, i) => {
     const c = compiled.get(s.id);
@@ -475,7 +531,19 @@ export function validateStory(sim, model, scenario, result) {
       featured: featured.join(', ') || '—',
     };
   });
-  return { rows };
+  const highlightRows = highlights.map((h) => ({
+    id: h.id,
+    window: h.window,
+    clock: `${sim.clockLabel(h.window[0])}–${sim.clockLabel(h.window[1])}`,
+    place: h.settingId,
+    featured: h.interactionIds
+      .map((id) => {
+        const x = interactions.get(id);
+        return `${id} ${span([x.start, x.end])}`;
+      })
+      .join(', '),
+  }));
+  return { rows, highlightRows };
 }
 
 /**
@@ -555,6 +623,20 @@ export async function compile({
           [`${r.scrub[0]}–${r.scrub[1]}`, 9],
           [r.clock, 18],
           [r.focus === undefined ? '—' : r.focus.toFixed(1), 7],
+          [r.featured, 0],
+        ),
+      ),
+    );
+    console.log('Closing highlights (each on its own clock):');
+    console.log(row(['#', 3], ['Highlight', 13], ['Window', 9], ['Clock', 18], ['Setting', 12], ['Featured interactions', 0]));
+    story.highlightRows.forEach((r, i) =>
+      console.log(
+        row(
+          [i + 1, 3],
+          [r.id, 13],
+          [`${r.window[0]}–${r.window[1]}`, 9],
+          [r.clock, 18],
+          [r.place, 12],
           [r.featured, 0],
         ),
       ),

@@ -6043,6 +6043,104 @@
         },
         {
           "start": 180,
+          "end": 280.9235,
+          "action": "serve",
+          "path": [
+            [
+              10,
+              4.8
+            ],
+            [
+              10,
+              4.8
+            ]
+          ],
+          "zoneId": "kitchen",
+          "heading": 0,
+          "title": "Meal service"
+        },
+        {
+          "start": 280.9235,
+          "end": 285,
+          "action": "walk",
+          "path": [
+            [
+              10,
+              4.8
+            ],
+            [
+              9.75,
+              4.55
+            ],
+            [
+              9.75,
+              2.05
+            ]
+          ],
+          "zoneId": "kitchen",
+          "heading": 0,
+          "title": "Walk to the lunch delivery"
+        },
+        {
+          "start": 285,
+          "end": 297,
+          "action": "serve",
+          "path": [
+            [
+              9.75,
+              2.05
+            ],
+            [
+              9.75,
+              2.05
+            ]
+          ],
+          "zoneId": "kitchen",
+          "heading": 1.768,
+          "title": "Checking lunch against the diet plans"
+        },
+        {
+          "start": 297,
+          "end": 309,
+          "action": "serve",
+          "path": [
+            [
+              9.75,
+              2.05
+            ],
+            [
+              9.75,
+              2.05
+            ]
+          ],
+          "zoneId": "kitchen",
+          "heading": 0.857,
+          "title": "Unloading lunch onto the island counter"
+        },
+        {
+          "start": 309,
+          "end": 313.0765,
+          "action": "walk",
+          "path": [
+            [
+              9.75,
+              2.05
+            ],
+            [
+              9.75,
+              4.55
+            ],
+            [
+              10,
+              4.8
+            ]
+          ],
+          "zoneId": "kitchen",
+          "heading": 0,
+          "title": "Back to meal prep"
+        },
+        {
+          "start": 313.0765,
           "end": 360,
           "action": "serve",
           "path": [
@@ -27166,7 +27264,7 @@
       "segments": [
         {
           "start": 0,
-          "end": 136,
+          "end": 254,
           "action": "ride",
           "path": [
             [
@@ -27188,8 +27286,8 @@
           "title": "Delivery route"
         },
         {
-          "start": 136,
-          "end": 156,
+          "start": 254,
+          "end": 264.8362,
           "action": "escort",
           "path": [
             [
@@ -27223,34 +27321,113 @@
             0
           ],
           "visible": true,
-          "title": "Delivering fresh meals"
+          "title": "Delivering today\u2019s lunch"
         },
         {
-          "start": 156,
-          "end": 174,
-          "action": "serve",
+          "start": 264.8362,
+          "end": 285,
+          "action": "escort",
           "path": [
             [
               8.8,
               -13.9
             ],
             [
-              8.8,
-              -13.9
+              10.45,
+              -10.8
+            ],
+            [
+              10.45,
+              1.25
             ]
           ],
-          "zoneId": "site",
+          "zoneId": "kitchen",
+          "heading": 0,
+          "heights": [
+            0,
+            0,
+            0
+          ],
+          "visible": true,
+          "title": "Delivering lunch to the kitchen"
+        },
+        {
+          "start": 285,
+          "end": 297,
+          "action": "document",
+          "path": [
+            [
+              10.45,
+              1.25
+            ],
+            [
+              10.45,
+              1.25
+            ]
+          ],
+          "zoneId": "kitchen",
           "heading": 0,
           "heights": [
             0,
             0
           ],
           "visible": true,
-          "title": "Receiving food delivery"
+          "title": "Delivering lunch \u00b7 order checked in"
         },
         {
-          "start": 174,
-          "end": 192,
+          "start": 297,
+          "end": 309,
+          "action": "idle",
+          "path": [
+            [
+              10.45,
+              1.25
+            ],
+            [
+              10.45,
+              1.25
+            ]
+          ],
+          "zoneId": "kitchen",
+          "heading": 0,
+          "heights": [
+            0,
+            0
+          ],
+          "visible": true,
+          "title": "Lunch handed over to the kitchen"
+        },
+        {
+          "start": 309,
+          "end": 327.8629,
+          "action": "escort",
+          "path": [
+            [
+              10.45,
+              1.25
+            ],
+            [
+              10.45,
+              -10.8
+            ],
+            [
+              8.8,
+              -13.9
+            ]
+          ],
+          "zoneId": "ot",
+          "heading": 0,
+          "heights": [
+            0,
+            0,
+            0
+          ],
+          "visible": true,
+          "title": "Returning through receiving"
+        },
+        {
+          "start": 327.8629,
+          "end": 338,
           "action": "escort",
           "path": [
             [
@@ -27287,8 +27464,8 @@
           "title": "Returning with empty trolley"
         },
         {
-          "start": 192,
-          "end": 194,
+          "start": 338,
+          "end": 340,
           "action": "ride",
           "path": [
             [
@@ -27310,7 +27487,7 @@
           "title": "Returning to delivery vehicle"
         },
         {
-          "start": 194,
+          "start": 340,
           "end": 486,
           "action": "ride",
           "path": [
@@ -31966,6 +32143,19 @@
       "end": 720,
       "zoneId": "dining",
       "description": "Continuous composite interaction track; select a person to inspect their individual activity stages."
+    },
+    {
+      "id": "kitchen-lunch-delivery",
+      "label": "Lunch delivery \u00b7 kitchen hand-over",
+      "category": "meals",
+      "actorIds": [
+        "delivery-food",
+        "food-service-02"
+      ],
+      "start": 285,
+      "end": 309,
+      "zoneId": "kitchen",
+      "description": "Today\u2019s culturally focused lunch arrives from a local supplier in insulated carriers. The kitchen checks each tray against the dietitian\u2019s texture and low-sodium plans before unloading it for plating."
     },
     {
       "id": "support-team",

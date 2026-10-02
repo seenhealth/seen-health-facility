@@ -22,9 +22,10 @@ const m = JSON.parse(
 );
 // The engine plays its source as given; the viewer gives it the composed
 // Alhambra source: the 184-person loop, the fleet crew (194) and the
-// community cast (237: 12 hand-authored, 31 generated inside facility
-// instances, 25 in the partner day center and 6 in the Wongs' home), with the
-// community vehicles registered so their riders' seats resolve.
+// community cast (258: 23 hand-authored, 41 generated inside facility
+// instances, 33 in the partner day center, 6 in the Wongs' home and 2 in Mrs.
+// Lin's), with the community vehicles registered so their riders' seats
+// resolve.
 const scene = new T.Scene(),
   activity = createActivity(
     m,
@@ -35,7 +36,7 @@ const scene = new T.Scene(),
   ),
   neighborhood = buildNeighborhood(m);
 scene.add(neighborhood.root);
-assert.equal(activity.actors.length, 237);
+assert.equal(activity.actors.length, 258);
 assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 184);
 for (const role of [
   'doctor',
@@ -217,7 +218,7 @@ const communityIds = new Set(
     .filter((a) => a.spec.sourceId === COMMUNITY_SOURCE_ID)
     .map((a) => a.spec.id),
 );
-assert.equal(communityIds.size, 43, 'the community layer brings its cast');
+assert.equal(communityIds.size, 64, 'the community layer brings its cast');
 activity.updateView(allView);
 assert.equal(activity.getState().people, activity.actors.length);
 activity.updateView({ ...allView, hiddenSources: [COMMUNITY_SOURCE_ID] });
@@ -512,8 +513,9 @@ assert.ok(
 assert.equal(buffer.readUInt32LE(0), 0x46546c67);
 const n = buffer.readUInt32LE(12),
   gltf = JSON.parse(buffer.subarray(20, 20 + n).toString());
-// One rig per role plus the three mobility aids, each with every action clip.
-const rigs = activityData.roles.length + 3,
+// One rig per role of the composed source (the loop's roles plus the
+// community's family) and the three mobility aids, each with every action clip.
+const rigs = alhambraSource(m).roles.length + 3,
   clipsPerRig = createCharacter({ id: 'clip-count', role: 'nurse', variant: 0 }).clips().length;
 assert.equal(gltf.skins.length, rigs);
 assert.equal(gltf.animations.length, rigs * clipsPerRig);

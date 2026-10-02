@@ -108,3 +108,13 @@ export const sessionsAt = (time: number) =>
   }));
 export const instructorOf = (session: DaySession) =>
   program.instructors.find((i) => i.id === session.instructorId);
+/**
+ * The weekly lunch: a culturally focused menu per weekday, delivered to the
+ * kitchen before service (`delivery`, an interaction id) and served in the
+ * `service` window (loop seconds).
+ */
+export const lunch = program.lunch;
+/** One weekday's lunch (day-program.json `lunch.menus`). */
+export type LunchMenu = (typeof lunch.menus)[RotationDay];
+/** The selected weekday's lunch menu (follows setProgramRotation). */
+export const todaysLunch = (): LunchMenu => lunch.menus[activeDay];

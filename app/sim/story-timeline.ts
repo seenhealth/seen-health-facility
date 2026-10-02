@@ -4,19 +4,24 @@
  * story (`app/story/data.ts`, the director), `scripts/build-scenario.mjs` and
  * the unit tests share one definition.
  *
- * Cutaway steps (`settingId` set, `placement.mode: 'cutaway'`) look in on the
- * care network around the center for a few loop seconds. The hero chapters on
- * either side give those seconds up on screen only: their scenario windows,
- * and so the compiled tracks, never change.
+ * Cutaway steps (`placement.mode: 'cutaway'`, or a `settingId`) compile no
+ * hero tracks: they look in on interactions that already exist in the care
+ * day, at a care setting (Mrs. Lin at home with her daughter, through the
+ * stand-in actor `heroAlias`) or in a room of the center (lunch arriving in
+ * the kitchen). Each keeps its own window; the hero chapters on either side
+ * give those seconds up on screen only, so their scenario windows, and the
+ * compiled tracks, never change.
  */
 export type TimedStep = {
   window: readonly [number, number];
   settingId?: string;
+  placement?: { mode?: string };
 };
 export type ScrubWindow = [number, number];
 
-/** True for a cutaway step (a moment across the care network, not with the hero). */
-export const isCutawayStep = (s: Pick<TimedStep, 'settingId'>) => !!s.settingId;
+/** True for a cutaway step (it features existing interactions instead of compiling hero tracks). */
+export const isCutawayStep = (s: Pick<TimedStep, 'settingId' | 'placement'>) =>
+  !!s.settingId || s.placement?.mode === 'cutaway';
 
 /**
  * Scrub window per step, in scenario order: a cutaway keeps its window; a
@@ -38,3 +43,22 @@ export function scrubWindows(steps: readonly TimedStep[]): ScrubWindow[] {
     ];
   });
 }
+
+/**
+ * One moment of the story's closing highlights: a service Seen coordinates
+ * beyond the center, shown on its own clock (not part of Mrs. Lin's day).
+ * The beat scrubs `window` and features `interactionIds` at `settingId`.
+ */
+export type StoryHighlight = {
+  id: string;
+  /** Short service name ("Medication", "Optometry"). */
+  label: string;
+  title: string;
+  kicker: string;
+  body: string;
+  settingId: string;
+  interactionIds: string[];
+  window: [number, number];
+  roles: string[];
+  partners?: string[];
+};
