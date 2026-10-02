@@ -12,7 +12,7 @@ Everything the repository produces, in one place. The claude.ai previews were bu
 | --- | --- |
 | Live 3D model, all three sites | [seen-health-facility.xingpersonal.chatgpt.site](https://seen-health-facility.xingpersonal.chatgpt.site/). Deployed separately from GitHub, so it can lag `main` |
 | 3D viewer, static build of `main` (vans, drivers, community layer, Measure and Trace) | [Preview](https://claude.ai/artifact/ENDpmBX2GKSLtMz6YuQCbh) |
-| "A day at Seen Health" scroll story with the six network cutaways | [Preview](https://claude.ai/artifact/Sa8vEJrsRbJA45BoaTeWy4) · `/story` locally |
+| "A day at Seen Health" scroll story: Mrs. Lin from her front door and back, nine closing highlights across the care network | [Preview](https://claude.ai/artifact/Sa8vEJrsRbJA45BoaTeWy4) · `/story` locally |
 | Clips and stills of the care day: dock choreography, the Wongs' home, the partner day center | [Storyboard](https://claude.ai/artifact/CfrUyccAgz9LDi3msDdkTx) |
 
 | Documents | Where |
@@ -32,7 +32,7 @@ Everything the repository produces, in one place. The claude.ai previews were bu
 | GLB exports (9 to 24 MB each) | [Alhambra](public/models/seen-alhambra-planning.glb), [Olympic](public/models/seen-olympic.glb), [Olympic option](public/models/seen-olympic-option.glb), [Alveare](public/models/seen-alveare.glb), [animated cast](public/models/seen-health-animated-cast.glb) |
 | Simulation outputs | [simulation report](public/models/sim-report.json), [touchpoint trace](public/models/touchpoint-trace.json) |
 | Activity and program data | [activity loop](public/models/activity-loop.json), [care journeys](public/models/care-journeys.json), [character templates](public/models/character-templates.json), [day program](public/models/day-program.json) |
-| Story and community tracks | [story scenario](app/data/scenarios/day-in-the-life.json), [compiled story tracks](app/data/scenarios/day-in-the-life.tracks.json), [the Wongs' home cast](app/data/community/home-lin.cast.json), [partner day center cast](app/data/community/partner-adc.cast.json) |
+| Story and community tracks | [story scenario](app/data/scenarios/day-in-the-life.json), [compiled story tracks](app/data/scenarios/day-in-the-life.tracks.json), [the Wongs' home cast](app/data/community/home-wong.cast.json), [Mrs. Lin's home cast](app/data/community/home-lin.cast.json), [partner day center cast](app/data/community/partner-adc.cast.json) |
 
 ## Explore
 
@@ -48,7 +48,7 @@ Everything the repository produces, in one place. The claude.ai previews were bu
 
 ## A day at Seen Health
 
-`/story` follows Mrs. Lin, a composite participant, through a care day with the eleven-discipline team, and cuts away six times to the homes, partner sites and hospital the same team serves. Scrolling controls the camera and simulation clock. Its itinerary uses the reviewed room layout: social work in the side office, table tennis in the games lounge and karaoke in the rear corner room.
+`/story` follows Mrs. Lin, a composite participant, through a care day with the eleven-discipline team, from breakfast with her daughter and the Seen van at her door, through the center (lunch arriving in the kitchen first), to the van home and tea with her daughter. A rapid run of nine highlights then cuts across the care network (medication, a partner day center, specialists, optometry, imaging, hospital discharge coordinated by phone, home modifications, after-hours care and emergency transport, a personal emergency response system), and the story closes at her home at four. Scrolling controls the camera and simulation clock; headlines, cards and the cuts between highlights carry their own motion. Its itinerary uses the reviewed room layout: social work in the side office, table tennis in the games lounge and karaoke in the rear corner room.
 
 ```bash
 npm run build:scenario   # compile and validate the story tracks
@@ -127,7 +127,7 @@ npm run build:viewer
 | `npm run validate:traffic` | Vehicle clearance (including the lot's curbs, ramp and building), nose-first motion, a 4 m minimum turning radius, fleet fades inside the drawn street and loop continuity at 50 Hz; the motion rules (nose-first, no jumps, 4 m radius) cover every fleet van, delivery truck and street car and the Olympic and Alveare vans |
 | `npm run validate:fleet` | Drivers' and riders' choreography (seated while the van moves, nobody appearing or vanishing seated in a van in view, arrivals setting off out of sight, drivers' walks between the fleet office and parked vans, cabin walks, every ramp descent and ascent attended, the driver's and sliding doors, wall clearance) |
 | `npm run validate:community` | Distributed-care vehicles and cast (see [docs/COMMUNITY.md](docs/COMMUNITY.md)) |
-| `npm run validate:scenario` | Story tracks (wall clearance, continuity, dwell) and timeline (cutaways feature real community interactions; trimming never hides a hero focus time, stop or kicker); fails if the committed tracks JSON differs from a fresh compile |
+| `npm run validate:scenario` | Story tracks (wall clearance, continuity, dwell), timeline (cutaways at her home and in the kitchen feature real interactions, her stand-in takes part; trimming never hides a hero focus time, stop or kicker) and the closing highlights (each features real interactions at its setting inside its own window); fails if the committed tracks JSON differs from a fresh compile |
 | `npm run validate:trace` | Touchpoint trace of the composed source the viewer plays: structure, coverage, determinism and file freshness |
 | `npm run validate:renderer` | Headless viewer per site: 10 frames through every render mode, then disposal leaves no geometry, material, listener, element or frame behind |
 | `npm run validate:public` | No architectural PDFs, drawings or source text in `public/` (also runs before `npm run build`) |
