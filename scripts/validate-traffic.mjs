@@ -96,6 +96,12 @@ for (let i = 0; i < VANS; i++)
 // landing, switchback ramp, their rails and the palm planter at the foot of
 // its steps (alhambra-exterior.ts DROP_OFF), the curb islands and the west
 // sidewalk (vans cross the south sidewalk only at the driveway).
+const rect = (x0, z0, x1, z1) => [
+  [x0, z0],
+  [x1, z0],
+  [x1, z1],
+  [x0, z1],
+];
 const curbs = siteCurbs(m);
 const obstacles = [
   ['building', m.site.buildingOutline],
