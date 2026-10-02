@@ -93,7 +93,7 @@ const LABEL_W = 14,
 /** Canvas pixels per metre of label; the plate grows in width with the crew it carries. */
 const LABEL_PX = 1024 / LABEL_W;
 /** The opened bubble is drawn this much larger on screen than the compact plates, so its detail lines read easily. */
-const EXPAND_BOOST = 1.4;
+const EXPAND_BOOST = 1.6;
 const RING_COLOR = {
   high: '#c0392b',
   assisted: '#d08214',
@@ -206,6 +206,8 @@ type Live = {
   drawnExpanded: boolean;
   /** 1 while another vehicle is hovered, easing to 0.5: the dimmed look. */
   dim: number;
+  /** The plate's own visibility: eases to 0 while another vehicle's bubble is open, so only that one shows. */
+  plateFade: number;
   mode: Mode;
   drive: Drive | null;
   s: number;
@@ -478,11 +480,12 @@ function paintExpanded(sprite: T.Sprite, v: LiveVehicle, repaint: () => void) {
     ...(v.riders ?? []).slice(0, 8).map((p) => ({ p, square: false })),
   ];
   const more = Math.max(0, (v.riders?.length ?? 0) - 8);
-  const AV = 118,
-    NAME = 26,
-    PAD = 40,
-    GAP = 18,
-    LINE = 62;
+  // Larger than the compact plate: avatars big enough to recognise a face, lines easy to read at the follow zoom.
+  const AV = 200,
+    NAME = 36,
+    PAD = 48,
+    GAP = 26,
+    LINE = 74;
   const lines = (v.lines ?? []).slice(0, 8);
   const probe = canvas.getContext('2d')!;
   const measure = (font: string, text: string) => {
@@ -490,16 +493,16 @@ function paintExpanded(sprite: T.Sprite, v: LiveVehicle, repaint: () => void) {
     return probe.measureText(text).width;
   };
   const title = `${v.label}${v.detail ? ` · ${v.detail}` : ''}`;
-  const TITLE = '600 56px system-ui, sans-serif';
-  const LINEF = '500 44px system-ui, sans-serif';
+  const TITLE = '600 64px system-ui, sans-serif';
+  const LINEF = '500 52px system-ui, sans-serif';
   const nameW = (p: LivePerson) =>
     Math.max(AV, measure(`600 ${NAME + 8}px system-ui, sans-serif`, p.name));
   const cells = people.map(({ p, square }) => (square ? AV : nameW(p)) + GAP);
   const crewW = cells.reduce((a, b) => a + b, 0) + (more ? 90 : 0);
   const width = Math.min(
-    3072,
+    4096,
     Math.max(
-      720,
+      1000,
       Math.round(
         PAD * 2 +
           Math.max(
@@ -510,11 +513,11 @@ function paintExpanded(sprite: T.Sprite, v: LiveVehicle, repaint: () => void) {
       ),
     ),
   );
-  const yTitle = 72,
-    yAv = 130,
-    yLines = yAv + AV + (people.some((c) => !c.square) ? 96 : 60);
+  const yTitle = 84,
+    yAv = 150,
+    yLines = yAv + AV + (people.some((c) => !c.square) ? 112 : 64);
   const height = Math.round(
-    yLines + lines.length * LINE + (lines.length ? 34 : 10),
+    yLines + lines.length * LINE + (lines.length ? 40 : 12),
   );
   canvas.width = width;
   canvas.height = height;
@@ -522,9 +525,9 @@ function paintExpanded(sprite: T.Sprite, v: LiveVehicle, repaint: () => void) {
   g.clearRect(0, 0, width, height);
   g.fillStyle = v.highlight ? 'rgba(90,40,24,0.97)' : 'rgba(14,35,33,0.96)';
   g.beginPath();
-  g.roundRect(8, 8, width - 16, height - 16, 60);
+  g.roundRect(8, 8, width - 16, height - 16, 72);
   g.fill();
-  g.lineWidth = 6;
+  g.lineWidth = 8;
   g.strokeStyle = v.highlight ? '#fbae97' : '#7fc9ad';
   g.stroke();
   g.fillStyle = v.highlight ? '#fbae97' : '#e9f6ef';
@@ -541,14 +544,14 @@ function paintExpanded(sprite: T.Sprite, v: LiveVehicle, repaint: () => void) {
       g.font = `600 ${NAME + 8}px system-ui, sans-serif`;
       g.textAlign = 'center';
       g.textBaseline = 'middle';
-      g.fillText(p.name, x + w / 2, yAv + AV + 38, w + 10);
+      g.fillText(p.name, x + w / 2, yAv + AV + 46, w + 10);
       g.textAlign = 'left';
     }
     x += w + GAP;
   }
   if (more) {
     g.fillStyle = '#cbedd9';
-    g.font = '600 48px system-ui, sans-serif';
+    g.font = '600 56px system-ui, sans-serif';
     g.textBaseline = 'middle';
     g.fillText(`+${more}`, x, yAv + AV / 2);
   }
@@ -556,8 +559,8 @@ function paintExpanded(sprite: T.Sprite, v: LiveVehicle, repaint: () => void) {
     g.strokeStyle = 'rgba(255,255,255,0.18)';
     g.lineWidth = 3;
     g.beginPath();
-    g.moveTo(PAD, yLines - 26);
-    g.lineTo(width - PAD, yLines - 26);
+    g.moveTo(PAD, yLines - 30);
+    g.lineTo(width - PAD, yLines - 30);
     g.stroke();
   }
   g.font = LINEF;
@@ -788,6 +791,7 @@ export function createLiveLot(ctx: {
           plateT: 1,
           drawnExpanded: false,
           dim: 1,
+          plateFade: 1,
           mode: 'waiting',
           drive: null,
           s: 0,
@@ -1031,7 +1035,7 @@ export function createLiveLot(ctx: {
     }[] = [];
     // The opened plate is placed first so it keeps the low spot and the others stack around it.
     const items = Array.from(live.values())
-      .filter((l) => l.opacity > 0.3)
+      .filter((l) => l.opacity > 0.3 && l.plateFade > 0.3)
       .sort(
         (a, b) =>
           Number(b.v.id === expandedId) - Number(a.v.id === expandedId) ||
@@ -1195,10 +1199,12 @@ export function createLiveLot(ctx: {
         (h0 + (l.plate[1] - h0) * k) * labelScale,
         1,
       );
-      l.label.visible = l.opacity > 0.3;
+      // While a bubble is open the other plates fade out, so the details stand alone over the lot.
+      l.plateFade = tween(l.plateFade, expandedId && !expanded ? 0 : 1, 4, dt);
+      l.label.visible = l.opacity > 0.3 && l.plateFade > 0.01;
       // The opened bubble draws over every other plate.
       l.label.renderOrder = expanded ? 11 : 10;
-      (l.label.material as T.SpriteMaterial).opacity = shown;
+      (l.label.material as T.SpriteMaterial).opacity = shown * l.plateFade;
     }
     placeLabels();
     walkers.tick(dt);
@@ -1286,7 +1292,10 @@ export function createLiveLot(ctx: {
       let best: { id: string; d: number } | null = null;
       for (const l of live.values()) {
         if (l.mode === 'gone' || l.opacity <= 0.3) continue;
-        const hit = ray.intersectObjects([l.body.object, l.label], true)[0];
+        // A faded-out plate must not catch the click meant for the car or the ground behind it.
+        const targets =
+          l.plateFade > 0.3 ? [l.body.object, l.label] : [l.body.object];
+        const hit = ray.intersectObjects(targets, true)[0];
         if (hit && (!best || hit.distance < best.d))
           best = { id: l.v.id, d: hit.distance };
       }
