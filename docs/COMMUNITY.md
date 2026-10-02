@@ -3,7 +3,8 @@
 Seen Health does not only care for people inside the Alhambra building. The
 same care team runs home care with personal care aides, home health visits,
 pharmacy pill-pack delivery, home-delivered meals, home modifications, escorted
-specialist appointments, hospital admissions with discharge coordination and a
+specialist appointments, eye exams and X-rays, hospital admissions with
+discharge coordination and a
 24/7 nurse line, joined by door-to-door transport. The model builds those
 settings *around* the center, in the same scene, on the same 720 s care-day
 clock and with the same engine and presentation palette, so it reads as one
@@ -24,7 +25,7 @@ clock; no participant records are used.
 | `app/model/community-settings.ts` | The registry (`careSettings`): kind, name, position, heading, pad size, access road, horseshoe drive, anchors, services, accent, and the optional stamped `facility`. Frame helpers (`toWorld`, `lanePath`, `lanePose`, `groundYAt`), the generated instance summaries (`instanceRooms`, `instanceFootprint`, `missingInstances`). No three.js. |
 | `app/model/community-pads.ts` | `buildCareSetting(setting, mat, { massing })`: plinth, drive band, stub and sidewalk, label plate, the building `massing` and the `site` around it (trees, patio) per kind. |
 | `app/model/facility-instance.ts` | `buildFacilityInstance(facility, frame, options)`: any schema 2.0 facility as a static cutaway with room plates, merged by material; `instanceSelection` (what is drawn), shared with build-time navigation. Knows nothing of settings or sites. |
-| `app/model/community-track.ts` | The hand-authored `Track` builder (`hold`, `walk`, `hidden`, `ride`; `start` and `segmentsTo` for legs that fill holes). |
+| `app/model/community-track.ts` | The hand-authored `Track` builder (`hold`, with `seated` for a stool or a chair, `walk`, `hidden`, `ride`; `start` and `segmentsTo` for legs that fill holes). |
 | `app/model/instance-cast.ts` | `placeInstanceCast(setting, cast)`: a generated cast into world actors and interactions; `fillHoles` stitches hand-authored legs into a scheduled person's track. |
 | `app/sim/community-cast.ts` | Build time only: instance navigation options and view, the summary, the site checks, the cast generator `communityCastFromScenes` and its validator `checkInstanceCast`. |
 | `scripts/build-community-tracks.mjs` | `npm run build:community` / `npm run validate:community-tracks`: writes and checks `app/data/community-instances.json` and `app/data/community-casts.json` from `app/data/community/<setting>.cast.json`. |
@@ -99,9 +100,9 @@ world coordinates, so people and vehicles never depend on the pad's placement.
 Fronts face +x or +z, the sides the default and Community cameras see
 (azimuth ≈ 0.58): the home and pharmacy sit west of the west street, the
 partner day center south of the south street, the hospital east of the east
-street with its stub on the north street, and the specialist clinic south of
+street with its stub on the north street, and the specialty clinic south of
 the south street east of the center. Drop-offs, the hospital's ED canopy and
-ward bay and the clinic's glazed lobby are therefore in view without orbiting;
+ward bay and the clinic's open front are therefore in view without orbiting;
 `focusSetting(id)` frames the pad and, if the camera has been turned to look at
 a pad's back, orbits round to its front first.
 
@@ -123,7 +124,7 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 | `home-wong` | home | The Wongs' home (`home-lin` until October 2026): (−84, 12), two-lane drive; the aide's car uses the north street's western reach; `facility` seen-home-wong (below), `pad.back` 8 | home-care, home-health, pill-packs, meals, home-mods, after-hours |
 | `pharmacy` | pharmacy | (−84, −22) | pill-packs |
 | `hospital` | hospital | (94, 14), stub from the north street | ed, discharge |
-| `specialist` | specialist | (84, −56), stub from the south street | specialist |
+| `specialist` | specialist | Specialty clinic · cardiology, optometry & imaging: (84, −56), 44 × 26 m pad, stub from the south street (below) | specialist, optometry, imaging |
 | `partner-adc` | partner-adc | Partner adult day center, "Seen Health floor plan": (4, −68), Seen's Alhambra ground floor stamped on a 62 × 50 m pad | day-program |
 
 ## The day (care-day clock, 1 loop second = 40 clock seconds)
@@ -135,7 +136,9 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 | 8:38–9:14 | Hospital | Ambulance in along the north street's eastern reach to the ED; hospitalist takes the handoff (8:41–9:05). |
 | 8:54–9:15 | Home | Mrs. Wong (walker) out of the front door behind her aide, down the new ramp and up the van ramp; the Seen van leaves at 9:15 with the escort aide and driver. |
 | 9:27 | Home | Courier hands the pill packs to the aide; then to the center's rear receiving (10:04–11:28) and back to the pharmacy by 12:40. |
-| 9:55–10:45 | Specialist clinic | Drop-off under the canopy, check-in, vitals by the MA, cardiology follow-up 10:17–10:42; van leaves 11:02 and returns by the south and west streets. |
+| 9:55–10:45 | Specialty clinic | Drop-off under the canopy, check-in, vitals by the MA, cardiology follow-up 10:17–10:42; van leaves 11:02 and returns by the south and west streets. |
+| 10:47–12:40 | Specialty clinic | Diabetic eye exam: a participant with a cane and her Seen escort aide walk up from a Seen ride at the kerb and check in at 11:12; the escort waits in the lobby. The optometric technician calls her in, checks acuity and eye pressure and dilates her eyes (11:36–11:43), then reads her glasses on the lensometer; the optometrist's retina exam at the slit lamp and refraction 11:45–12:01, the report to the Seen PCP. Back in the lobby at 12:13 and out to the ride, passing the next walk-in on the way. |
+| 12:08–14:11 | Specialty clinic | Wrist X-ray six weeks after a fall: a participant and her Seen escort aide walk up from the kerb and check in at 12:33. The radiologic technologist calls her in, seats her at the end of the X-ray table with her forearm under the tube (13:01), takes three views from the console behind the shielded window (13:13–13:21) and checks them with her; the radiologist's read goes to the Seen PCP. Out at 13:45. |
 | 8:00–12:00 | Partner ADC | Twenty participants settle at the day-room tables (two wheelchair places at table ends); the activities lead welcomes them, the aide serves coffee, the partner nurse charts at the nurse station all day. |
 | 9:52–10:45 | Partner ADC | Tai chi on the patio under the slatted awning: eight participants and the lead, out through the front door and along the clinic front, arriving and leaving staggered. |
 | 11:00–11:50 | Partner ADC | Visiting Seen PT (walks in from the road end at 10:20) with participant 5 at the parallel bars and participant 6 on seated strength. |
@@ -150,6 +153,82 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 | 13:30–13:50 | Hospital | Discharge huddle; 14:10–14:16 Mr. Wong wheeled to the Seen van; van leaves 14:23. |
 | 15:08–15:52 | Home | Mr. Wong home: the driver wheels him up the porch ramp to the front door (15:28) and he rolls in beside his armchair; the home health nurse (in at 15:08 from the road end) checks his transfer, vitals and medicines and leaves at 15:52. |
 | 15:40–15:52 | Home ↔ center | 24/7 nurse line call between the upstairs RN and Mrs. Wong. |
+
+## The specialty clinic
+
+`specialist`: "Specialty clinic · cardiology, optometry & imaging", (84, −56),
+heading 0, a 44 × 26 m pad south of the south street with its stub from
+(84, −35.8). Its massing (`buildSpecialist` in `community-pads.ts`, local
+`CLINIC`) is a two-storey bar 29.6 m wide whose ground floor is 3.9 m high and
+open to the front under a solid upper storey, so the story's and the viewer's
+oblique cameras (azimuth 0–0.6, elevation up to about 0.6) look into its rooms.
+From west to east (local x): the cardiology exam room (−10 to −2.3: exam chair,
+the cardiologist's desk), the lobby under the drop-off canopy (−2.1 to 5.2:
+reception desk, two waiting chairs), optometry (5.4 to 10.4) and imaging (10.6
+to 17.6, glazed at the front of the east end). Partitions stop 1.6 m short of
+the front, leaving a gallery from the lobby to the rooms east of it; room signs
+sit on the band above the open front, and a footpath runs from the street
+sidewalk to the front beside the drive. Front columns stay off the sight lines
+into both new rooms.
+
+- **Optometry**, a mirrored lane: the exam chair faces the mirror on the
+  imaging partition with the visual acuity screen behind it on the lobby
+  partition (about 7.8 m by way of the mirror), so the phoropter on its arm, its
+  two lens wheels in front of the patient's eyes, and the patient's face turn
+  toward the cameras. The slit lamp (chin rest, illumination tower, microscope
+  and oculars) stands on its instrument table at the chair's right beside the
+  optometrist's stool; the instrument stand is behind the chair; the
+  technician's counter (autorefractor, lensometer) and the optometrist's desk
+  run along the back wall.
+- **Imaging**, a digital X-ray room: the table (carbon top, detector housing)
+  along the front with the patient's chair at its east end; the tube hangs
+  from a telescoping column on a bridge riding two ceiling rails, its
+  collimator over the end of the table. The shielded control alcove (lead-lined
+  walls 2.4 m high, a lead-glass window toward the table, the console and the
+  technologist's chair) fills the front corner by the optometry partition,
+  lead aprons on its outer face; the upright detector stands against the back
+  wall.
+
+The two new visits are hand-authored `Track`s in the clinic's block of
+`community-people.ts`. Both participants come with a Seen escort aide from a
+Seen ride at the street kerb, up the sidewalk stub (in on its west half, out
+on its east half, where the optometry pair passes the imaging pair at about
+12:24), along the footpath and in through the open front east of the canopy;
+the clinic's medical assistant checks them in at the front desk, the escort
+waits in the lobby and the room's staff call the participant in. Seated holds
+at a stool, the console or the X-ray table use `hold(…, { seated: true })`.
+
+| Who (id) | Role | Day (loop s) |
+| --- | --- | --- |
+| `optometry-participant`, "Seen participant · eye exam" | participant (cane) | In from the kerb 251.5–289.5, check-in, the exam chair 321–364, back to the lobby by 380, out to the ride by 419.5 |
+| `optometry-escort`, "Seen escort aide · eye exam" | aide | Leads her in (250–288), checks her in, waits at the lobby chairs, meets her at 379 |
+| `optometry-tech`, "Optometric technician" | nurse | At the counter; calls her in (303), acuity, eye pressure and dilating drops 324.5–334, her glasses on the lensometer 337–348 |
+| `optometrist`, "Optometrist" | doctor | At the desk; retina exam at the slit lamp 338–350, refraction and results 350–361, the report to the Seen PCP |
+| `imaging-participant`, "Seen participant · X-ray" | participant | In from the kerb 373.5–411.5, check-in, at the X-ray table 452–495, back to the lobby by 517, out to the ride by 556.5 |
+| `imaging-escort`, "Seen escort aide · X-ray" | aide | Leads her in (372–410), checks her in, waits at the lobby chairs, meets her at 517 |
+| `imaging-tech`, "Radiologic technologist" | nurse | At the console; calls her in (427), positions her wrist 444–461, three views behind the shielded window 469–481, checks the images with her 489–495 |
+
+Interactions (category `specialist`, zone `community:specialist`):
+
+| Id | Loop s | Clock | Members |
+| --- | --- | --- | --- |
+| `optometry-checkin` | 288–297 | 11:12–11:18 | `optometry-escort`, `optometry-participant`, `clinic-ma` |
+| `optometry-exam` | 321–364 | 11:34–12:03 | `optometry-participant`, `optometry-tech`, `optometrist` |
+| `imaging-checkin` | 410–419 | 12:33–12:39 | `imaging-escort`, `imaging-participant`, `clinic-ma` |
+| `imaging-scan` | 452–495 | 13:01–13:30 | `imaging-participant`, `imaging-tech` |
+
+Anchors for camera shots (the story reads them through the layer, at 0.8 m):
+
+| Anchor | Local | World | Shot (zoom · azimuth · elevation) |
+| --- | --- | --- | --- |
+| `examSeat` | (−6.4, −8.8) | (77.6, −64.8) | 3.0 · 0.22 · 0.42, the story's cardiology cutaway |
+| `optoSeat` | (7.4, −8.3) | (91.4, −64.3) | 7–8 · 0.3 · 0.5 around 345 s: the optometrist at the slit lamp, the patient behind the phoropter |
+| `imagingTable` | (15.2, −7.35) | (99.2, −63.35) | 7 · 0.3 · 0.5 around 475 s: the technologist at the console, the patient's forearm under the tube |
+
+Above an elevation of about 0.6 the upper storey hides the tops of the
+equipment (the tube's column, the acuity screen); from azimuth 0.4 to 0.6 the
+alcove's shield wall hides the technologist at the console, and the X-ray
+patient is seen past the glazed east end.
 
 ## Facility instances
 
@@ -678,8 +757,10 @@ chapter's window):
 | `network-hospital` | `hospital` | `hospital-discharge-huddle` | `huddleA` |
 | `network-home-pm` | `home-wong` | `home-health-visit`, `after-hours-call` | instance room `home-living` (`door` until stamped) |
 
-Keep those interaction ids, room ids and anchor names stable when re-timing a
-cast or rebuilding a pad; the story reads anchors through the layer
+The specialty clinic also exposes `optoSeat` and `imagingTable` for shots of
+its eye room and X-ray room, with `optometry-exam` and `imaging-scan` to
+feature (see The specialty clinic). Keep those interaction ids, room ids and
+anchor names stable when re-timing a cast or rebuilding a pad; the story reads anchors through the layer
 (`settings`, `frame(id)`, `instance(id).roomCenter(room)`), never through world
 coordinates, and falls back to the pad centre when an anchor disappears.
 
