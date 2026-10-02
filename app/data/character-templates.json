@@ -540,14 +540,14 @@
       "variant": 11,
       "skin": "#7a523b",
       "hair": "#e6e2da",
-      "hairStyle": 0,
+      "hairStyle": 4,
       "glasses": false,
       "accent": "#BD9A6A",
       "height": 0.97,
       "role": "participant",
-      "figure": "m",
+      "figure": "f",
       "wardrobe": 5,
-      "cut": "shirt"
+      "cut": "cardigan"
     },
     {
       "id": "arrival-aide-a",

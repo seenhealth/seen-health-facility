@@ -99,7 +99,7 @@ The story moves on two clocks: scroll (camera, sim time, card fades and parallax
 
 A step with `placement.mode: 'cutaway'` compiles no hero tracks. It features interactions that already exist in the composed care day and keeps its own window on the timeline; the hero chapters beside it are clipped on screen (never extended). Three of Mrs. Lin’s sixteen chapters are cutaways:
 
-- **At home** (`home-am`, `home-pm`): her own moments at her home (setting `home-lin`, the senior-friendly bungalow stamped on its pad west of the west street), where the compiled hero never goes. `heroAlias: 'lin-at-home'` names the actor who stands in for her there: the camera follows her, her name tag tags her, and the step counts toward her touchpoints and handoffs like any other. The morning features her breakfast with her daughter and the Seen van at her door; the afternoon the van bringing her home and tea with her daughter. People outside the team (“Her daughter”) are chips in the grey partner style and a dot in the swimlane’s Partners lane.
+- **At home** (`home-am`, `home-pm`): her own moments at her home (setting `home-lin`, the senior-friendly bungalow stamped on its pad west of the west street), where the compiled hero never goes. `heroAlias: 'lin-at-home'` names the actor who stands in for her there: the camera follows her, her name tag tags her, and the step counts toward her touchpoints and handoffs like any other. The morning features the Seen van at her door (`lin-van-pickup`: her daughter walks her out to the driver); the afternoon the van bringing her home (`lin-van-dropoff`) and tea with her daughter on the sofa (`lin-evening`, which also holds the closing shot). People outside the team (“Her daughter”) are chips in the grey partner style and a dot in the swimlane’s Partners lane.
 - **In the kitchen** (`kitchen`): the center’s lunch delivery reaching the kitchen just before her lunch, with no `settingId`, its `zoneId` and `roomId` naming the center’s kitchen. The card says “Meanwhile, in the kitchen”; the room is highlighted like a hero chapter’s and the camera leans toward the delivery.
 
 `build-scenario` (and `--check`) enforces the placement rules: the window lies in a gap between Mrs. Lin’s stops (trimming may shorten a hero chapter but never cuts into a stop, hides its focus time or leaves its kicker outside it, and every hero chapter keeps at least 20 s); the kicker time lies inside the window; every featured interaction exists in the composed story source, happens where it is shown (the setting’s zone, or the step’s zone in the center; the site, and for a setting the center’s upstairs office, also count), overlaps the window by at least 4 s, and together they cover at least 60 % of it; a `heroAlias` is an actor of the composed source and takes part in a featured interaction; `roles` and handoff ends are IDT ids.
@@ -132,8 +132,8 @@ Chapters come straight from `steps` in `app/data/scenarios/day-in-the-life.json`
 
 | # | Step `id` | Window (s) | Scrub (s) | Clock | Room / anchor | Shot (zoom · azimuth · elevation) | Follows / features |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | `huddle` | 0–40 | 0–16 | 8:00 AM–8:10 AM | `upperfit-conference` | 4.10 · 0.62 · 0.72 | no (team meeting) |
-| 2 | `home-am` (cutaway) | 16–50 | 16–50 | 8:10 AM–8:33 AM | `home-lin` · `porch` | 3.30 · 1.10 · 0.78 | `lin-at-home`; `lin-van-pickup`, `lin-breakfast` |
+| 1 | `huddle` | 0–40 | 0–20 | 8:00 AM–8:13 AM | `upperfit-conference` | 4.10 · 0.62 · 0.72 | no (team meeting) |
+| 2 | `home-am` (cutaway) | 20–50 | 20–50 | 8:13 AM–8:33 AM | `home-lin` · `porch` | 3.30 · 1.10 · 0.78 | `lin-at-home`; `lin-van-pickup` |
 | 3 | `pickup` | 40–120 | 50–120 | 8:33 AM–9:20 AM | arrival kerb & ramp | 2.70 · −0.72 · 0.50 | yes, 40 m |
 | 4 | `checkin` | 120–140 | 120–140 | 9:20 AM–9:33 AM | `lobby-arrival` | 4.60 · −0.35 · 0.62 | yes |
 | 5 | `clinic` | 140–178 | 140–178 | 9:33 AM–9:58 AM | `clinic-nurse` | 4.40 · 0.28 · 0.68 | yes |
@@ -146,8 +146,8 @@ Chapters come straight from `steps` in `app/data/scenarios/day-in-the-life.json`
 | 12 | `recreation` | 440–525 | 440–525 | 12:53 PM–1:50 PM | `admin-workstations` → `admin-conference` (stops) | 4.60 · −0.30 · 0.95 | yes |
 | 13 | `farewell` | 525–552 | 525–552 | 1:50 PM–2:08 PM | `lobby-arrival` | 4.60 · −0.45 · 0.60 | yes |
 | 14 | `ride-home` | 552–624 | 552–624 | 2:08 PM–2:56 PM | arrival kerb & ramp | 2.60 · −0.95 · 0.48 | yes, 40 m |
-| 15 | `home-pm` (cutaway) | 624–664 | 624–664 | 2:56 PM–3:22 PM | `home-lin` · `porch` | 3.30 · 0.95 · 0.80 | `lin-at-home`; `lin-van-dropoff`, `lin-evening` |
-| 16 | `care-plan` | 624–720 | 664–720 | 3:22 PM–4:00 PM | `upperfit-conference` | 3.30 · 1.05 · 0.74 | no (team meeting) |
+| 15 | `home-pm` (cutaway) | 624–668 | 624–668 | 2:56 PM–3:25 PM | `home-lin` · `porch` | 3.30 · 0.95 · 0.80 | `lin-at-home`; `lin-van-dropoff`, `lin-evening` |
+| 16 | `care-plan` | 624–720 | 668–720 | 3:25 PM–4:00 PM | `upperfit-conference` | 3.30 · 1.05 · 0.74 | no (team meeting) |
 
 Small screens multiply chapter and highlight zoom by 1.45 (the stage there is about 56 % of the viewport height); the opening, team and network beats use 1.3.
 
