@@ -52,7 +52,8 @@ export type Action =
   | 'write'
   | 'craft'
   | 'music'
-  | 'listen';
+  | 'listen'
+  | 'phone';
 export type CharacterSpec = {
   id: string;
   role: CharacterRole;
@@ -1478,6 +1479,20 @@ export function createCharacter(spec: CharacterSpec) {
     o.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), v.normalize());
     return o;
   };
+  // People who take calls ('phone' segments) get a handset in the right
+  // hand, shown only while the pose is 'phone'.
+  const caller = (
+    spec as CharacterSpec & { segments?: { action: string }[] }
+  ).segments?.some((s) => s.action === 'phone');
+  const handset = caller
+    ? put(new RoundedBoxGeometry(0.014, 0.165, 0.072, 2, 0.006), aids().dark)
+    : null;
+  if (handset) {
+    handset.name = `${spec.id}_handset`;
+    handset.position.set(-0.025, -0.092, 0.006);
+    handset.visible = false;
+    joints.handR.add(handset);
+  }
   const wheels: T.Object3D[] = [];
   const wheel = (
     x: number,
@@ -1883,6 +1898,20 @@ export function createCharacter(spec: CharacterSpec) {
       joints.elbowL.rotation.x = joints.elbowR.rotation.x = -0.85;
       joints.head.rotation.y = 0.06 * slow;
     }
+    if (action === 'phone') {
+      // A handset at the ear: the upper arm forward and turned in, the elbow
+      // folded; the head leans into it and turns slowly while talking.
+      joints.armR.rotation.set(-0.89, -0.46, 0.83);
+      joints.elbowR.rotation.set(-2.78, 0, 0);
+      joints.handR.rotation.set(0.47, 0.23, 0.63);
+      joints.head.rotation.z = -0.1;
+      joints.head.rotation.y = 0.1 * slow;
+      if (!sitting) {
+        joints.armL.rotation.x = -0.14 - 0.04 * breath;
+        joints.elbowL.rotation.x = -0.4;
+      }
+    }
+    if (handset) handset.visible = action === 'phone';
     if (spec.mobility === 'cane' && !sitting) {
       joints.armR.rotation.set(-0.02, 0, 0);
       joints.elbowR.rotation.set(-0.02, 0, 0);

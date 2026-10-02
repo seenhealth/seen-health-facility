@@ -325,6 +325,8 @@ export type ScheduleStop = {
     label: string;
     description: string;
     window?: [number, number];
+    /** 'phone': a call with members elsewhere, placed by this stop's person (Interaction.channel). */
+    channel?: Interaction['channel'];
   };
 };
 /** Follows an explicit schedule. */
@@ -1328,6 +1330,7 @@ export function communityCastFromScenes(
             actorIds: ids,
             start: w[0],
             end: w[1],
+            ...(s.interaction.channel ? { channel: s.interaction.channel } : {}),
           });
       }
     }

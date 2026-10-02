@@ -1937,7 +1937,31 @@
         1
       ],
       "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
-      "notes": "Mrs. Wong's side: lamp, phone, glasses. Bedside lamp on top (asset height includes the lamp).",
+      "notes": "Mrs. Wong's side: lamp, phone, glasses and the PERS base unit. Bedside lamp on top (asset height includes the lamp).",
+      "layer": "furniture"
+    },
+    {
+      "id": "home-primary-pers-console",
+      "assetId": "home-pers-console",
+      "zoneId": "home-zone-night",
+      "levelId": "ground",
+      "position": [
+        -5.36,
+        0.59,
+        2.96
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "home-primary",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (HOME-PLAN study); not a surveyed home",
+      "notes": "Personal emergency response (PERS) base unit beside the lamp on Mrs. Wong's nightstand, facing the bed: her pendant's alarm reaches the response center through it, which talks back through its speaker and conferences in Seen's 24/7 nurse line.",
       "layer": "furniture"
     },
     {
@@ -2761,6 +2785,24 @@
         "front": "drawer front at local +z (the bedside)"
       }
     },
+    "home-pers-console": {
+      "kind": "pers-console",
+      "dimensions": [
+        0.2,
+        0.05,
+        0.13
+      ],
+      "material": "photo-white",
+      "materials": {
+        "panel": "photo-black",
+        "button": "pers-help",
+        "key": "photo-silver",
+        "light": "pers-light"
+      },
+      "parameters": {
+        "front": "speaker grille and status light at local +z; the help button on top"
+      }
+    },
     "home-wardrobe": {
       "kind": "wardrobe",
       "dimensions": [
@@ -3118,6 +3160,16 @@
       "roughness": 0.75,
       "emissive": "#ffd8a3",
       "emissiveIntensity": 0.75
+    },
+    "pers-help": {
+      "color": "#c4553f",
+      "roughness": 0.45
+    },
+    "pers-light": {
+      "color": "#9ad4a2",
+      "roughness": 0.4,
+      "emissive": "#6fcf86",
+      "emissiveIntensity": 0.6
     }
   },
   "programs": [],

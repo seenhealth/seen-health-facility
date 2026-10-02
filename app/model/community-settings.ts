@@ -681,10 +681,15 @@ export const careSettings: CareSetting[] = [
       huddleA: [10.4, -7.3],
       huddleB: [11.6, -8.6],
       huddleC: [9.8, -9.6],
+      // The discharge nurse's call to Seen: out from under the ward bay's
+      // roof (its edge at z −6.2), so the call arc rises clear of it.
+      rnVia: [9.0, -7.4],
+      rnPhone: [8.9, -5.5],
       bayFront: [7.6, -6.5],
       walkway: [2.4, -5.4],
-      edBay: [14, -5.4],
-      edBayVan: [5, 2],
+      // The hospitalist's call to Seen's on-call nurse after the ambulance
+      // handoff: on the sidewalk, under the open sky.
+      edPhone: [9.9, 3.9],
       sidewalkEnd: [9.5, 21.6],
       sidewalkPad: [9.5, 13.5],
       sidewalkIn: [9.5, -5.4],

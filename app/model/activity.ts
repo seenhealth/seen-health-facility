@@ -73,6 +73,12 @@ export type Interaction = {
   end: number;
   zoneId: string;
   description: string;
+  /**
+   * How the members meet when they are not in one place: 'phone' is a call,
+   * placed by the first member (the community layer draws an arc from them
+   * to the others while the call lasts, call-arcs.ts). Default: in person.
+   */
+  channel?: 'phone';
 };
 export type ActivityData = {
   siteSpecific?: boolean;
@@ -810,9 +816,13 @@ export function createActivity(
       const interaction = data.interactions.find(
         (i) => 'interaction:' + i.id === id,
       );
-      const people = (interaction?.actorIds || [id])
-        .map((id) => actorMap.get(id))
-        .filter((a) => a?.root.visible);
+      const ids = interaction?.actorIds || [id];
+      // A call is followed at its caller's end, not between the two places.
+      const caller =
+        interaction?.channel === 'phone' ? actorMap.get(ids[0]) : undefined;
+      const people = (
+        caller?.root.visible ? [caller] : ids.map((id) => actorMap.get(id))
+      ).filter((a) => a?.root.visible);
       if (people.length)
         return people
           .reduce((v, a) => v.add(a!.root.position), new T.Vector3())

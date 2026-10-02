@@ -7,8 +7,9 @@
     "Positions are facility-local (plan frame P, +x east, +z north, metres); headings follow three.js (heading h faces (sin h, cos h)). `at` is a seat object (chairs and benches: seatPose) or a point with `heading`; `seat` names the furniture a seated point sits on, exempt from the furniture-clearance check.",
     "Each stop is a stationary hold over `window`; the gap to the next stop (or to an away/leave time) is the walk at the person's `gait` (metres per loop second), with 1.5-2 s of slack so the generator can stagger people. Consecutive stops at the same place change only the action or title.",
     "`arrive`/`leave` are front-door passes (the `door` anchor), staggered at least 2 s apart; `away` windows go out and back through it. Mrs. Wong arrives at her bed at 0.5 s (the loop seam out of sight) and leaves at 720 s (present to the end); Mr. Wong rolls in at 672 s. Time outside is a hole filled by HOLE_LEGS in community-people.ts (the clinic trip, the aide's car and porch, the visitors' arrivals, Mr. Wong's hospital day).",
-    "An `interaction` is defined once, on one stop: actors = the person plus `with`; `window` defaults to the stop window. Ids kept stable: home-personal-care (30-72), home-health-visit (683.5-700), after-hours-call (690-708), home-return, home-meals, home-mods, home-discharge-arrival. home-van-boarding and home-pill-drop stay outdoors in community-people.ts.",
-    "Mr. Wong keeps his wheelchair all day (no per-segment mobility override yet), so the nurse checks his transfer technique beside the armchair instead of moving him into it."
+    "An `interaction` is defined once, on one stop: actors = the person plus `with`; `window` defaults to the stop window. Ids kept stable: home-personal-care (30-72), home-health-visit (683.5-700), after-hours-call (690-708), home-pers-call (23-38.5, before the aide is in at 44), home-return, home-meals, home-mods, home-discharge-arrival. home-van-boarding and home-pill-drop stay outdoors in community-people.ts.",
+    "Mr. Wong keeps his wheelchair all day (no per-segment mobility override yet), so the nurse checks his transfer technique beside the armchair instead of moving him into it.",
+    "Both nurse-line calls are phone calls (`channel: 'phone'`, placed by the stop's person): the PERS call while Mrs. Wong is alone at the foot of the bed, the console on her nightstand, and the evening call on speakerphone. The nurse line (community-people.ts) reads their windows from the generated cast."
   ],
   "people": [
     {
@@ -39,7 +40,7 @@
         {
           "window": [
             0.5,
-            4
+            2.5
           ],
           "roomId": "home-primary",
           "at": [
@@ -54,8 +55,8 @@
         },
         {
           "window": [
-            11.5,
-            14
+            9,
+            11.5
           ],
           "roomId": "home-bath",
           "at": [
@@ -70,8 +71,8 @@
         },
         {
           "window": [
-            17.5,
-            19
+            14,
+            15.5
           ],
           "roomId": "home-bath",
           "at": [
@@ -84,14 +85,19 @@
         },
         {
           "window": [
-            27,
-            30.5
+            21,
+            23
           ],
           "roomId": "home-primary",
-          "at": "home-primary-chair",
+          "at": [
+            -3.66,
+            3.55
+          ],
+          "heading": 1.571,
+          "seat": "home-primary-bed",
           "action": "seated",
           "seated": true,
-          "title": "Dresses her top half, seated in the dressing chair",
+          "title": "Dresses her top half, sitting at the foot of the bed",
           "with": [
             "home-pca"
           ],
@@ -108,14 +114,29 @@
         },
         {
           "window": [
-            45,
-            52
+            23,
+            38.5
           ],
-          "roomId": "home-kitchen",
-          "at": "home-kitchen-chair",
-          "action": "seated",
+          "roomId": "home-primary",
+          "at": [
+            -3.66,
+            3.55
+          ],
+          "heading": 1.571,
+          "seat": "home-primary-bed",
+          "action": "phone",
           "seated": true,
-          "title": "Waits at the seated kitchen worktop"
+          "title": "Light-headed: presses her PERS pendant; the nurse line on the console speaker",
+          "with": [
+            "nurse-line-rn"
+          ],
+          "interaction": {
+            "id": "home-pers-call",
+            "category": "after-hours",
+            "label": "Mrs. Wong · PERS call to the nurse line",
+            "description": "Alone before her aide arrives, Mrs. Wong feels light-headed as she stands to get ready, sits back down at the foot of the bed and presses her personal emergency response (PERS) pendant. The response center answers through the console on her nightstand and conferences in Seen’s 24/7 nurse line: the nurse keeps her seated and talking, checks for chest pain, a fall or new weakness, has her sip water and stand slowly with the walker, and lets her aide (in at 8:29) and today’s cardiology clinic know.",
+            "channel": "phone"
+          }
         },
         {
           "window": [
@@ -476,7 +497,7 @@
           ],
           "heading": -1.571,
           "action": "conversation",
-          "title": "Morning check-in: sleep, pain, dizziness, ankles",
+          "title": "Morning check-in after the nurse line's call: dizziness, blood pressure, sleep, ankles",
           "with": [
             "home-participant"
           ]
@@ -1298,7 +1319,8 @@
             "id": "after-hours-call",
             "category": "after-hours",
             "label": "Nurse line call · evening plan",
-            "description": "24/7 nurse line and on-call coordination: from beside his armchair on speakerphone, the nurse confirms tonight's medicines and the re-packed blister with Mr. and Mrs. Wong, reminds them when to call, and confirms tomorrow's aide visit."
+            "description": "24/7 nurse line and on-call coordination: from beside his armchair on speakerphone, the nurse confirms tonight's medicines and the re-packed blister with Mr. and Mrs. Wong, reminds them when to call, and confirms tomorrow's aide visit.",
+            "channel": "phone"
           }
         },
         {

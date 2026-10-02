@@ -2,10 +2,11 @@
 
 Seen Health does not only care for people inside the Alhambra building. The
 same care team runs home care with personal care aides, home health visits,
-pharmacy pill-pack delivery, home-delivered meals, home modifications, escorted
-specialist appointments, eye exams and X-rays, hospital admissions with
-discharge coordination and a
-24/7 nurse line, joined by door-to-door transport. The model builds those
+pharmacy pill-pack delivery, home-delivered meals, home modifications, a
+personal emergency response system, escorted specialist appointments, eye
+exams and X-rays, hospital admissions with discharge coordination and a 24/7
+nurse line, much of it coordinated by phone, joined by door-to-door transport.
+The model builds those
 settings *around* the center, in the same scene, on the same 720 s care-day
 clock and with the same engine and presentation palette, so it reads as one
 distributed care system. Everything is data first: a partner adult day center
@@ -31,11 +32,12 @@ clock; no participant records are used.
 | `scripts/build-community-tracks.mjs` | `npm run build:community` / `npm run validate:community-tracks`: writes and checks `app/data/community-instances.json` and `app/data/community-casts.json` from `app/data/community/<setting>.cast.json`. |
 | `app/model/community-vehicles.ts` | `communityVehicles` itineraries (dwell/drive legs) with each vehicle's name, roof decor and livery, `sampleCommunityVehicle(id, time)` pure samplers (with the fade at the map edge), `registerCommunityVehicles(registry)` (the samplers under their names), lane and turning helpers, car and ambulance bodies. |
 | `app/model/community-people.ts` | `communitySource(model)`: the hand-authored cast, the placed instance casts (with `HOLE_LEGS`), touchpoint interactions, the setting zones with their instance rooms and the `community` view as a `SourceExtension` composed into the care-day source. |
-| `app/model/community-layer.ts` | `buildCommunityLayer(model, mat, { loadFacility, materialFor })`: pads, facility instances (`instance(id)`, `ready`) and vehicle bodies, `tick(time)`, `frame(settingId?)` camera framings, the network `bounds` / `shadowExtent` and `dispose()`. |
+| `app/model/community-layer.ts` | `buildCommunityLayer(model, mat, { loadFacility, materialFor, calls })`: pads, facility instances (`instance(id)`, `ready`), vehicle bodies and the call arcs (`calls`), `tick(time)`, `frame(settingId?)` camera framings, the network `bounds` / `shadowExtent` and `dispose()`. |
+| `app/model/call-arcs.ts` | `buildCallArcs({ interactions, people, motion?, style? })`: an arc between the callers of every phone interaction (`channel: 'phone'`) while it lasts (below, Calls). |
 | `app/model/alhambra-source.ts` | `alhambraSource(model, base)`: the care day exactly as the viewer plays it (base loop + community layer + fleet crew), and `alhambraVehicles()`, pure samplers under the engine's vehicle ids. |
 | `scripts/validate-community-traffic.mjs` | `npm run validate:community`: clearance, driving and cast checks (below). |
 | `public/models/seen-home-wong.json` | The Wongs' home as a schema 2.0 facility specification (below), for the `home-wong` pad; Mrs. Lin's `home-lin` pad stamps the same plan. |
-| `app/model/home-assets.ts` | `buildHomeAsset(spec, material)`: bed, nightstand, wardrobe, kitchen range, grab bars, swing-up bar, bed rail, hospital bed and ramp kinds, called first by `buildAsset`. |
+| `app/model/home-assets.ts` | `buildHomeAsset(spec, material)`: bed, nightstand, wardrobe, kitchen range, grab bars, swing-up bar, bed rail, hospital bed, ramp and PERS console kinds, called first by `buildAsset`; `homeAssetSurface(spec)`, the height things stand on (a nightstand's top beside its lamp). |
 | `app/data/community/home-wong.cast.json` | The Wongs' ADL day inside the home, the input of the instance cast pipeline (below). |
 | `app/data/community/home-lin.cast.json` | Mrs. Lin's day at home with her daughter (below, "Mrs. Lin's home"). |
 | `scripts/validate-home.mjs` | `npm run validate:home`: the home's plan, assets, registry frame and both homes' casts. |
@@ -142,9 +144,11 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 | 8:00–8:49 | Home | Mrs. Wong wakes, toilets, washes and dresses her top half on her own; the personal care aide parks at 8:19 (in along the north street's western reach) and is at the front door at 8:29: breakfast and the morning pills at the seated kitchen worktop 8:35–8:43, stockings and shoes on the entry bench. |
 | 8:00–8:11 | Lin home | Mrs. Lin wakes (in sight from 8:00:20, past the loop seam) and comes through to breakfast with her daughter at the dining table, 8:07–8:11; her daughter has had the rice porridge on since 8:00. |
 | 8:13–8:41 | Lin home | Shoes and cardigan on the entry bench, her daughter helping; the Seen van (livery J) in from the south end of the west street to the apex at 8:15; her daughter out at 8:15, Mrs. Lin at 8:16, down the porch ramp and along the drive; the driver follows her up the van ramp (on board 8:29) and the van leaves at 8:33, south and off the map by 8:41. |
+| 8:15–8:26 | Home ↔ center | Alone and light-headed, Mrs. Wong sits down at the foot of the bed and presses her PERS pendant; the response center answers through the console on her nightstand and conferences in Seen's 24/7 nurse line, who keeps her talking and lets her aide know (a call). |
 | 8:38 | Lin home | Her daughter back in by the porch step; she works from home at the bedroom-2 desk (to 11:40 and 12:20–14:32), loads the washer (11:47) and has lunch at the kitchen worktop (11:56–12:12). |
-| 8:38–9:14 | Hospital | Ambulance in along the north street's eastern reach to the ED; hospitalist takes the handoff (8:41–9:05). |
+| 8:38–9:14 | Hospital | Ambulance in along the north street's eastern reach to the ED bay; its two-person crew gets out of the cab and hands over to the hospitalist at the rear doors (8:52–9:01) and drives off at 9:05. |
 | 8:54–9:15 | Home | Mrs. Wong (walker) out of the front door behind her aide, down the new ramp and up the van ramp; the Seen van leaves at 9:15 with the escort aide and driver. |
+| 9:03–9:11 | Hospital ↔ center | The hospitalist phones Seen's on-call nurse (the 24/7 nurse line) from the sidewalk: the participant is here (a call). |
 | 9:27 | Home | Courier hands the pill packs to the aide; then to the center's rear receiving (10:04–11:28) and back to the pharmacy by 12:40. |
 | 9:55–10:45 | Specialty clinic | Drop-off under the canopy, check-in, vitals by the MA, cardiology follow-up 10:17–10:42; van leaves 11:02 and returns by the south and west streets. |
 | 10:47–12:40 | Specialty clinic | Diabetic eye exam: a participant with a cane and her Seen escort aide walk up from a Seen ride at the kerb and check in at 11:12; the escort waits in the lobby. The optometric technician calls her in, checks acuity and eye pressure and dilates her eyes (11:36–11:43), then reads her glasses on the lensometer; the optometrist's retina exam at the slit lamp and refraction 11:45–12:01, the report to the Seen PCP. Back in the lobby at 12:13 and out to the ride, passing the next walk-in on the way. |
@@ -156,15 +160,73 @@ ramp between. `groundYAt(point)` gives the height under a walker anywhere.
 | 11:40–12:10 | Partner ADC | Tabletop games in the day room with the lead. |
 | 12:01–13:03 | Partner ADC | Lunch in the dining room: participants come in staggered from 12:00 to 12:20, the aide sets up and serves, two chairs are left out for the wheelchairs; she clears up until 14:30. |
 | 13:20–16:00 | Partner ADC | Seated music led from the front of the day room (the lead sets up from 12:13; walkers and wheelchairs join a little later), then afternoon conversation at the same tables. |
-| 10:30–10:55 | Hospital | Rounds with the Seen liaison nurse, hospitalist and case manager. |
+| 10:30–10:55 | Hospital | Rounds at Mr. Wong's bedside: the hospitalist, the case manager and the hospital's discharge nurse plan his discharge. |
 | 11:45–13:12 | Home | Van home; the aide meets her and follows her up the ramp and in (12:07); after the clinic: toileting, the assisted shower and dressing, lunch at the dining table; the aide hands over to the OT on the porch at 13:00 and drives off at 13:12. |
 | 12:14 | Home | Home-delivered lunch handed to the aide at the front door, a wellness check with Mrs. Wong on the entry bench (meals car on the outer lane; it leaves by the inner lane's exit, round the aide's parked car; back at the center by 13:00). |
 | 13:02–14:28 | Home | OT and installer: dry-run toilet and shower transfers with Mrs. Wong, Mr. Wong's side of the bed, the swing-up grab bar fitted (13:48–14:00) while the OT checks the porch ramp, then the sign-off. |
-| 13:30–13:50 | Hospital | Discharge huddle; 14:10–14:16 Mr. Wong wheeled to the Seen van; van leaves 14:23. |
+| 13:30–13:50 | Hospital ↔ center | The hospital's discharge nurse steps out of the ward bay and phones Seen's care-transitions nurse at her upstairs desk: medicines, the home health start, meals and the van pickup (a call); then the medication teach-back, and 14:10–14:17 she wheels Mr. Wong under the canopy to the Seen van; van leaves 14:23. |
 | 14:39–15:25 | Lin home | Her daughter puts dinner on (14:39), then watches for the van on the porch from 14:49; the van back from the south end (on the map 14:53, apex 15:00); the driver sees Mrs. Lin down its ramp (15:05) and walks behind her along the drive; her daughter meets her at the porch-ramp foot (15:13) and follows her up; in at 15:19 and 15:21; the van leaves at 15:25. |
 | 15:08–15:52 | Home | Mr. Wong home: the driver wheels him up the porch ramp to the front door (15:28) and he rolls in beside his armchair; the home health nurse (in at 15:08 from the road end) checks his transfer, vitals and medicines and leaves at 15:52. |
 | 15:21–16:00 | Lin home | Tea together on the sofa: her daughter makes jasmine tea (15:26–15:29) and sits with her from 15:34 to the end of the day. |
-| 15:40–15:52 | Home ↔ center | 24/7 nurse line call between the upstairs RN and Mrs. Wong. |
+| 15:40–15:52 | Home ↔ center | 24/7 nurse line call between the upstairs RN and Mr. and Mrs. Wong on speakerphone (a call). |
+
+### Calls
+
+Some touchpoints happen by phone. An interaction with `channel: 'phone'`
+(`Interaction` in `activity.ts`; a cast stop's `interaction.channel`) is a
+call between members in different places, placed by its first member; the
+callers hold the `phone` pose (a handset at the ear) for its window.
+
+| Interaction | Window (s) | Caller → other end |
+| --- | --- | --- |
+| `home-pers-call` | 23–38.5 | Mrs. Wong, at the foot of her bed (PERS pendant; the console on her nightstand) → `nurse-line-rn` |
+| `hospital-ed-call` | 95–107 | `hospitalist`, on the sidewalk by the ED (`edPhone`) → `nurse-line-rn` |
+| `hospital-discharge-call` | 495–525 | `hospital-rn`, out in front of the ward bay (`rnPhone`) → `seen-transitions-rn` |
+| `after-hours-call` | 690–708 | Mr. and Mrs. Wong in the living room, on speakerphone → `nurse-line-rn` |
+
+Seen's nurses on the phone sit at the perimeter desks of the upstairs open
+office (`SEEN_DESKS` in `community-people.ts`, in order along it): the 24/7
+nurse line at the corner desk, the care-transitions nurse at the next one.
+The nurse line takes the Wongs' calls when their generated cast places them
+(`castCall`), so both ends stay in step when the cast is re-timed. The
+hospital's callers step out from under a roof first, so the arc rises clear.
+
+The community layer draws every call as an arc (`call-arcs.ts`; the renderer
+passes it the played source's interactions and the engine's people): a cubic
+curve from just above the caller's head to just above the other end, its
+crown `lift` × the span above the higher end (about 20 m between the hospital
+and the center, 93 m apart) and its ends rising steeply, so a close shot of
+one end shows it climbing out of the frame toward the other. Members within
+8 m of each other share an end (the Wongs on speakerphone). The line draws on
+from the caller over the call's first 4 loop seconds (eased out, its tip
+glowing) and the far end's ring pops in as it arrives; while they talk a
+pulse runs out along the line and one comes back (one 3.6 s exchange), each
+ring ripples as a pulse reaches it and both breathe; over the last 3 loop
+seconds the line retracts into the far end and fades. Draw-on and retraction
+are functions of the care-day clock, so a scrubbed story shows the same frame
+at the same time; the pulses, breathing and ripples run on wall-clock time
+and stop under `prefers-reduced-motion` (`motion: false`), which holds the
+fully drawn line for the whole call. An arc shows while its callers are in
+the scene (on duty, not indoors or driving) and at least one of its ends is
+drawn, so a call to the upstairs nurses also shows when the upper floor is
+not (`level: 'ground'`: the viewer's default view, the story's cutaways), its
+far end marking where they sit; a wide shot that should show the nurse at her
+desk uses `level: 'all'` with the roof off. Arcs hide with the layer
+(Community sites, Street & parking context, Plan) and with the people.
+Following a call (`followActor('interaction:<id>')`, the activity panel, the
+story's cutaway subject) aims at its caller, not at the empty ground between
+the two places.
+
+Styling knobs (`CALL_ARC_STYLE`, overridden per layer with `calls.style`):
+`color`, `glow` and `pulse` (terracotta `#b0603a`, a soft `#e7b48c` halo and
+`#ec7d43` pulses on the paper ground), `width` and `glowWidth` (2 and 12 CSS
+px), `ring` and `ringStroke` (7 and 1.6 px), `lift`, `minLift` and `maxLift`
+(0.22 × the span, 3–30 m), `above` (0.3 m over the head), `drawOn` and
+`retract` (4 and 3 loop s) and `pulsePeriod` and `breathPeriod` (3.6 and
+2.4 s). The curve is evaluated and widened in the vertex shader, so it keeps
+its pixel width at any zoom and a frame only writes uniforms (nothing is
+allocated); one ribbon and one ring geometry are shared by every arc, and
+`dispose()` frees them with the arcs' materials.
 
 ## The specialty clinic
 
@@ -392,7 +454,8 @@ type ScheduledPerson = Person & {
     title: string;
     with?: string[];                                 // other members of this stop's interaction (only read with
                                                      // `interaction`); people outside the cast are allowed
-    interaction?: { id: string; category: string; label: string; description: string; window?: [number, number] };
+    interaction?: { id: string; category: string; label: string; description: string; window?: [number, number];
+                    channel?: 'phone' };             // a call placed by this person (Calls)
   }[];
 };
 type Scene = {
@@ -496,7 +559,7 @@ are hand-authored actors outside the cast.
         { "window": [690, 708], "roomId": "home-living", "at": [2.58, 0.78], "heading": -0.35,
           "action": "conversation", "title": "Nurse-line call on speakerphone",
           "with": ["nurse-line-rn", "home-participant"],
-          "interaction": { "id": "after-hours-call", "category": "after-hours",
+          "interaction": { "id": "after-hours-call", "category": "after-hours", "channel": "phone",
                            "label": "Nurse line call · evening plan", "description": "…" } }
       ] }
   ]
@@ -651,7 +714,7 @@ world-aligned: world = P + (−94.8, 12.0).
 | Hall (`home-hall`) | 1.18 clear | 11.6 | Open to the living room along its south part; linen cupboard |
 | Laundry & back door (`home-laundry`) | 4.0 × 1.75 | 7.0 | Washer and dryer on 0.30 m pedestals; door lined up with the back door |
 | Accessible bath (`home-bath`) | 4.0 × 2.9 | 11.6 | Curbless 1.55 × 1.45 m roll-in shower with fold-down seat, raised toilet with side, rear, vertical and swing-up bars, roll-under basin, pocket doors to the hall and the bedroom |
-| Primary bedroom (`home-primary`) | 4.0 × 4.2 | 16.8 | Shared queen bed: her 1.0 m walker side by the en-suite, his 1.6 m wheelchair side with the bed's transfer handle |
+| Primary bedroom (`home-primary`) | 4.0 × 4.2 | 16.8 | Shared queen bed: her 1.0 m walker side by the en-suite, his 1.6 m wheelchair side with the bed's transfer handle; the PERS base unit beside the lamp on her nightstand |
 | Bedroom 2 (`home-bedroom-2`) | 3.18 × 3.4 | 10.8 | Full bed, desk and wardrobe for family |
 | Back landing (`home-back-landing`) | 1.6 × 1.65 | 2.6 | Level with the floor; 1:12 back ramp (4.2 m) to the yard |
 
@@ -660,7 +723,10 @@ plate), 0.90 m clear interior and 1.00 m exterior doors, the 1.18 m hall, seven
 1.5 m turning circles (entry, bath, both sides of the bed, kitchen, dining,
 porch), toilet centreline 0.45 m from the wall with 1.525 × 1.42 m clear,
 grab bars at 0.84–0.88 m, seated worktop, raised laundry, bedroom on the main
-floor next to the bath, no rugs, night lights from bed to bath. Zones group the
+floor next to the bath, no rugs, night lights from bed to bath, and a personal
+emergency response system (PERS): Mrs. Wong's pendant and its base unit on
+her nightstand (`home-primary-pers-console`, kind `pers-console`), whose
+speaker the response center talks through. Zones group the
 rooms (day rooms, night rooms, back landing, porch); walls carry the door gaps,
 centred on the 0.2 m navigation grid so each 0.9 m door passes a wheelchair
 (0.37 m clearance); `doorSchedule`, `windowSchedule`, `turningCircles` and
@@ -696,7 +762,8 @@ stagger people in a small house; the build reports a closest pair of 0.65 m.
 
 | Clock | Who | Where | What |
 | --- | --- | --- | --- |
-| 8:00–8:20 | Mrs. Wong | bedroom, bath | Wakes, toilets on her own (raised seat, bars), washes at the roll-under basin, dresses her top half in the dressing chair |
+| 8:00–8:15 | Mrs. Wong | bedroom, bath | Wakes, toilets on her own (raised seat, bars), washes at the roll-under basin, dresses her top half at the foot of the bed |
+| 8:15–8:26 | Mrs. Wong, nurse line | bedroom | Light-headed as she stands: sits back down and presses her PERS pendant; the response center answers through the console on her nightstand and conferences in Seen's 24/7 nurse line, who keeps her talking and lets her aide know (a call) |
 | 8:29–8:43 | Aide, Mrs. Wong | kitchen | Aide in at 8:29: check-in, congee on the front-control range, breakfast and the morning blister at the seated worktop |
 | 8:48–8:54 | Aide, Mrs. Wong | entry bench, front door | Stockings, Velcro shoes and jacket; the aide out ahead with the clinic bag at 8:51, Mrs. Wong at 8:54 |
 | 9:42–11:30 | Aide | whole house | Files the new pill packs, remakes the bed for two, laundry, cleans bath and kitchen, clears the route to the armchair |
@@ -710,15 +777,17 @@ stagger people in a small house; the build reports a closest pair of 0.65 m.
 | 3:40–3:52 | Mr. and Mrs. Wong, nurse line | living room | Nurse-line call on speakerphone |
 
 Interactions (id · window in loop s): `home-personal-care` 30–72,
-`home-meal-meds` 52–64, `home-dressing-am` 71.7–74.2, `home-housekeeping`
+`home-pers-call` 23–38.5 (a call), `home-meal-meds` 52–64, `home-dressing-am` 71.7–74.2, `home-housekeeping`
 152.5–316, `home-return` 330–373, `home-meals` 381–386, `home-toileting`
 397–404, `home-bathing` 404–411, `home-dressing-pm` 419.5–425.5,
 `home-lunch` 430.5–446, `home-mods` 453–583, `home-grab-bar` 522–540,
 `home-ramp-check` 523–548 (on the porch ramp), `home-discharge-arrival`
 642–683.5, `home-transfer` 674.5–683.5, `home-health-visit` 683.5–700,
-`after-hours-call` 690–708. The cast keeps `home-personal-care`,
+`after-hours-call` 690–708 (a call). The cast keeps `home-personal-care`,
 `home-health-visit` and `after-hours-call` at those windows (the story and
-the trace read them; `npm run validate:home` checks them).
+the trace read them; `npm run validate:home` checks them), and
+`home-pers-call` a call between Mrs. Wong and the nurse line of at least
+15 s, over before her aide is in at 44 s.
 `home-van-boarding` (80.5–113) and `home-pill-drop` (130–141) stay outdoors in
 `community-people.ts`.
 
@@ -739,7 +808,9 @@ van driver waits at the drive.
 
 Assumptions: an illustrative composite, not a care plan. Mrs. Wong toilets,
 washes and starts dressing on her own before the aide arrives (in another plan
-the aide could start at 8:00); bathing and full dressing follow the clinic, so
+the aide could start at 8:00), wearing her PERS pendant, which is how the
+nurse line hears of her dizzy spell before her cardiology visit; bathing and
+full dressing follow the clinic, so
 the aide's visit runs to 1:12 PM (her car's dwell, `community-vehicles.ts`).
 The couple share the queen bed with a transfer handle on his side (no hospital
 bed yet; `home-hospital-bed` is a catalog entry). Mr. Wong keeps his wheelchair
@@ -856,7 +927,7 @@ chapter's window):
 | `network-home-am` | `home-wong` | `home-meal-meds` | instance room `home-kitchen` (`door` until stamped) |
 | `network-specialist` | `specialist` | `specialist-visit` | `examSeat` |
 | `network-partner` | `partner-adc` | `partner-pt`, `partner-rn-review` | instance room `rehab-open` (`ptStand` until stamped) |
-| `network-hospital` | `hospital` | `hospital-discharge-huddle` | `huddleA` |
+| `network-hospital` | `hospital` | `hospital-discharge-call` | `huddleA` |
 | `network-home-pm` | `home-wong` | `home-health-visit`, `after-hours-call` | instance room `home-living` (`door` until stamped) |
 
 The specialty clinic also exposes `optoSeat` and `imagingTable` for shots of
@@ -917,10 +988,11 @@ keep ≥ 0.6 m from props and other people. Add every place a person stands or
 passes as a local anchor of its setting and give poses as `rel(setting,
 localHeading)`, never as world coordinates or world headings, so the cast
 follows when an entry moves or turns; places at the center come from the model
-(the nurse line's desk is found by zone and asset) or from `CENTER_LOT`. Use
+(Seen's nurses' desks are found by zone and asset) or from `CENTER_LOT`. Use
 `zoneId: settingZone(id)` and `levelId: 'site'`. Add interactions with one of
 the categories `home`, `pharmacy`, `specialist`, `hospital`, `partner`,
-`after-hours`.
+`after-hours`; a call between two places is one with `channel: 'phone'`, the
+caller first, and the callers in the `phone` action for its window (Calls).
 
 ## Validation
 
@@ -953,7 +1025,8 @@ The Wongs' home: the specification validates, stays under 150 kB with no
 textures and is formatted like `prepare-public-models.mjs` writes it; every gap
 between a wall run's segments is a scheduled door ≥ 0.9 m (interior) or ≥ 1.0 m
 (exterior) and passes a wheelchair straight through; no furniture overlaps
-other furniture or walls, stacked items rest on something; the seven 1.5 m
+other furniture or walls, stacked items rest on something (the PERS console on
+a nightstand's top, beside its lamp); the seven 1.5 m
 turning circles are clear on the navigation grid (explicit options: no
 removals, reservations or excluded zones); every room is reachable from the
 front door at wheelchair (0.37 m) and walker (0.33 m) clearance; every asset
@@ -961,7 +1034,8 @@ builds and the home kinds come out at their declared size from boxes and
 cylinders in defined materials; the registry frame meets the door anchor and
 the porch slab, keeps the building ≥ 1 m from the drive and each room name
 readable on its plate (≥ 90 % in the room and clear of floor items); and the
-cast names community actors and keeps the contract windows, clears furniture
+cast names community actors and keeps the contract windows and the PERS call,
+clears furniture
 and walls at every stop, routes every walk on the instance grid in the time its
 gap allows (door passes at the door, a resident's arrival at a point at her
 first stop), and its generated tracks (`community-casts.json`) keep people

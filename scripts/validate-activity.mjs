@@ -21,7 +21,7 @@ const m = JSON.parse(
 );
 // The engine plays its source as given; the viewer gives it the composed
 // Alhambra source: the 167-person loop, the fleet crew (177) and the
-// community cast (230: 20 hand-authored, 33 generated inside facility
+// community cast (233: 23 hand-authored, 33 generated inside facility
 // instances, 25 in the partner day center, 6 in the Wongs' home and 2 in Mrs.
 // Lin's), with the community vehicles registered so their riders' seats
 // resolve.
@@ -35,7 +35,7 @@ const scene = new T.Scene(),
   ),
   neighborhood = buildNeighborhood(m);
 scene.add(neighborhood.root);
-assert.equal(activity.actors.length, 230);
+assert.equal(activity.actors.length, 233);
 assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 167);
 for (const role of [
   'doctor',
@@ -216,9 +216,9 @@ const communityIds = new Set(
     .filter((a) => a.spec.sourceId === COMMUNITY_SOURCE_ID)
     .map((a) => a.spec.id),
 );
-assert.equal(communityIds.size, 53, 'the community layer brings its cast');
+assert.equal(communityIds.size, 56, 'the community layer brings its cast');
 activity.updateView(allView);
-assert.equal(activity.getState().people, 230);
+assert.equal(activity.getState().people, 233);
 activity.updateView({ ...allView, hiddenSources: [COMMUNITY_SOURCE_ID] });
 assert.equal(
   activity.getState().people,

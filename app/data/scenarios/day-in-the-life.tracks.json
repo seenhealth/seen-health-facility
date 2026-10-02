@@ -10689,11 +10689,11 @@
    "zoneId": "community:hospital",
    "roomId": null,
    "focusTime": 512.5,
-   "focusActorId": "interaction:hospital-discharge-huddle",
+   "focusActorId": "interaction:hospital-discharge-call",
    "stops": [],
    "companionIds": [],
    "interactionIds": [
-    "hospital-discharge-huddle"
+    "hospital-discharge-call"
    ],
    "handoffs": [
     {

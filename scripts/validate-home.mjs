@@ -249,8 +249,12 @@ for (const o of floorItems) {
 }
 for (const o of stacked) {
   const base = floorItems.find((b) => {
-    const top =
-      b.position[1] + model.assets[b.assetId].dimensions[1] * b.scale[1];
+    // The surface things stand on: the declared height, or a nightstand's
+    // top beside its lamp.
+    const spec = model.assets[b.assetId],
+      top =
+        b.position[1] +
+        (home.homeAssetSurface(spec) ?? spec.dimensions[1]) * b.scale[1];
     return (
       Math.abs(top - o.position[1]) < 0.02 &&
       rectDistance([o.position[0], o.position[2]], objectRect(b)) === 0
@@ -745,6 +749,7 @@ const ACTIONS = new Set([
   'write',
   'craft',
   'listen',
+  'phone',
 ]);
 const SEATS = new Set([
   'upholstered-chair',
@@ -966,6 +971,17 @@ check(
 check(
   evening[0] <= 700 && evening[1] === 720,
   `lin-evening ${evening.join('–')} must cover 700–720 (the story closes on it)`,
+);
+// The PERS call: Mrs. Wong alone, before her aide is in, on the phone with
+// the nurse line for at least 15 s.
+const pers = interactions.get('home-pers-call'),
+  aideIn = cast.people.find((p) => p.id === 'home-pca')?.arrive.t ?? 0;
+check(
+  pers?.channel === 'phone' &&
+    pers.actorIds.join() === 'home-participant,nurse-line-rn' &&
+    pers.window[1] - pers.window[0] >= 15 &&
+    pers.window[1] <= aideIn,
+  `home-pers-call must be Mrs. Wong's phone call with the nurse line, at least 15 s long and over before her aide is in at ${aideIn} s`,
 );
 for (const i of interactions.values()) {
   check(categories.has(i.category), `${i.id}: category ${i.category}`);

@@ -62,6 +62,12 @@ flowchart LR
   fleet crew (`withFleetCrew`) to a base loop, memoised per base. The renderer,
   the Measure panel, `composedStorySource(model)` and the report scripts all use
   it; the engine plays its source as given.
+- **Calls**: an `Interaction` with `channel: 'phone'` is a call between
+  members in different places, placed by its first member (the others are
+  the far end); its people hold the `phone` action for the window. The
+  community layer draws each call as an arc between the callers while it
+  lasts (`app/model/call-arcs.ts`, docs/COMMUNITY.md, Calls); metrics count a
+  call as direct care and the trace lists it like any interaction.
 - **Measurement** uses `sampleActor`, `sampleEscort` and `samplePairedActors`
   from the activity engine, seats riders in their vehicles through the same
   samplers the scene uses, and reads that same composed source, so it measures
@@ -391,7 +397,7 @@ where the scene draws them:
 | --- | --- |
 | Zone occupancy | visible participants and staff per zone at each sample (ground zones by point-in-polygon, like the engine; the home and partner sites by the composed source's `zones`; `site` for the street and vans); peaks, means and person-hours |
 | On site | participants and staff visible at the center (not at a home or partner site) |
-| Staff utilization | per role and per person: **direct care & programs** (treat, consult, tabletop, exercise, serve, greet, present, conversation, music …), **walking & escorting**, **documenting & standby** (document, idle, listen), **team meetings** (seated upstairs), **driving**; shares of on-duty time |
+| Staff utilization | per role and per person: **direct care & programs** (treat, consult, tabletop, exercise, serve, greet, present, conversation, music, phone calls …), **walking & escorting**, **documenting & standby** (document, idle, listen), **team meetings** (seated upstairs), **driving**; shares of on-duty time |
 | Walking distance | visible displacement per person, averaged per role |
 | Participant time | per participant: arrivals, clinical, therapy, activities, meals, coordination, care at home & in the community (from interaction categories), walking between, waiting & free time, home, in the van or away (away from the center only community touchpoints count) |
 | Hero touchpoints | per IDT discipline: minutes with someone of that discipline within 1.6 m or in a shared interaction, encounters, first time |
@@ -474,8 +480,8 @@ per participant.
 `npm run sim:report` (or `npm run trace:report` for the trace alone) traces the
 base loop and the story source, both composed as the viewer plays them, at 1 s
 and writes `public/models/touchpoint-trace.json`: `{ sources: { base, story } }`,
-each with a `summary` and one event per line, about 2.3 MB for ~8,100 events
-(220 people in the base loop, 235 in the story), under the 3 MB bound.
+each with a `summary` and one event per line, about 2.5 MB for ~8,700 events
+(223 people in the base loop, 238 in the story), under the 3 MB bound.
 Compactness comes from coalescing encounters, not from short keys. The console
 prints events by kind, participants covered per category and the hero's
 discipline coverage. `npm run validate:trace` recomputes the trace and asserts

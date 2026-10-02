@@ -782,7 +782,8 @@ export const communityVehicles: CommunityVehicle[] = [
       visible: false,
       phase: 'Off site',
     },
-    seats: {},
+    // The crew in the cab (the nose is at local −z).
+    seats: { driver: [-0.45, 0.55, -1.55], attendant: [0.45, 0.55, -1.55] },
     legs: [
       drive(
         58,
