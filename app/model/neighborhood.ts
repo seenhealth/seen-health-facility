@@ -424,7 +424,6 @@ export function buildNeighborhood(model: Facility) {
   ].forEach((p, i) => tree(p[0], p[1], p[2], p[3], i));
   for (const [x, z] of [
     [-34, 30],
-    [-20, 32],
     [-4, 31],
     [30, 29],
     [44, -24],

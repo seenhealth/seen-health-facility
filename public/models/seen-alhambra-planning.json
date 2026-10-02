@@ -14282,10 +14282,13 @@
       "kind": "sign",
       "dimensions": [
         8.8,
-        1.15,
-        0.025
+        1.05,
+        0.02
       ],
-      "material": "photo-sign-front"
+      "material": "photo-sign-front",
+      "materials": {
+        "backing": "om-stone"
+      }
     },
     "photo-dropoff-sign": {
       "kind": "sign",
@@ -14294,7 +14297,10 @@
         0.7,
         0.025
       ],
-      "material": "photo-sign-dropoff"
+      "material": "photo-sign-dropoff",
+      "materials": {
+        "backing": "om-stone"
+      }
     },
     "photo-clinic-sign": {
       "kind": "sign",
@@ -20648,7 +20654,7 @@
       "levelId": "ground",
       "position": [
         -25.9,
-        5.5,
+        5.15,
         27.321965
       ],
       "rotation": 0,
@@ -31390,12 +31396,14 @@
     "photo-sign-front": {
       "color": "#ffffff",
       "roughness": 0.6,
-      "textureUrl": "/reference/photos/front-sign.png"
+      "textureUrl": "/reference/photos/front-sign.png",
+      "opacity": 1.0
     },
     "photo-sign-dropoff": {
       "color": "#ffffff",
       "roughness": 0.6,
-      "textureUrl": "/reference/photos/dropoff-sign.png"
+      "textureUrl": "/reference/photos/dropoff-sign.png",
+      "opacity": 1.0
     },
     "photo-sign-clinic": {
       "color": "#ffffff",

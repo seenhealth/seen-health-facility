@@ -134,8 +134,21 @@ export function buildAlhambraExterior(model: Facility) {
 
   const edge = group(site, 'valley-entry-terrace-and-rails');
   box(edge, -7.3, -0.15, 26.73, 14.9, 0.55, 2.75, stone);
-  for (let i = 0; i < 4; i++)
-    box(edge, -9.7, -0.22, 29.1 - i * 0.36, 3.2, 0.155 * (i + 1), 0.4, stone);
+  // Street-facing stairs: five steps the width of the photo's flight up to the
+  // terrace between the annex doors, a handrail each side, and a narrower
+  // flight at the 1827 end.
+  function stairs(x: number, w: number) {
+    for (let i = 0; i < 5; i++)
+      box(edge, x, -0.22, 29.5 - i * 0.36, w, 0.124 * (i + 1), 0.4, stone);
+    for (const s of [-1, 1]) {
+      const xx = x + (s * (w - 0.1)) / 2;
+      box(edge, xx, -0.22, 29.6, 0.035, 1.05, 0.035, steel);
+      box(edge, xx, 0.4, 28.0, 0.035, 0.95, 0.035, steel);
+      beam(edge, [xx, 0.7, 29.6], [xx, 1.3, 28.0], 0.03, 0.03, steel);
+    }
+  }
+  stairs(-9.4, 4.4);
+  stairs(1.5, 2.4);
   // The accessible ramp runs along the wing's front, rising from the Ethel end
   // to the terrace at the annex, with cable rails on both sides; the terrace
   // edge carries the same rail either side of the stairs (photo, 2026).
@@ -184,10 +197,19 @@ export function buildAlhambraExterior(model: Facility) {
   for (const z of [RAMP.z - 0.68, RAMP.z + 0.68])
     rail(RAMP.x0, RAMP.x1, z, rampY);
   for (const [a, b] of [
-    [-14.75, -11.4],
-    [-8.0, 2.8],
+    [-14.75, -11.7],
+    [-7.1, 0.2],
   ])
     rail(a, b, 28.45, () => RAMP.y1);
+  // Sidewalk tree wells: a square of soil at the foot of every street tree on Valley Blvd.
+  for (const [x, z] of [
+    [-29.6, 29.1],
+    [-27.4, 29.1],
+    [-11, 30.2],
+    [1, 30.2],
+    [9, 30.2],
+  ])
+    box(edge, x, -0.04, z, 1.3, 0.01, 1.3, '#6b5a48');
   const planters = group(site, 'frontage-low-planters');
   for (const [x, z, w] of [
     [7.8, 27.35, 10.6],
