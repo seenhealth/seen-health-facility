@@ -72,6 +72,12 @@ export type Interaction = {
   end: number;
   zoneId: string;
   description: string;
+  /**
+   * How the members meet when they are not in one place: 'phone' is a call,
+   * placed by the first member (the community layer draws an arc from them
+   * to the others while the call lasts, call-arcs.ts). Default: in person.
+   */
+  channel?: 'phone';
 };
 export type ActivityData = {
   siteSpecific?: boolean;

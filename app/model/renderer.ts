@@ -919,6 +919,7 @@ export function createViewer(
     ? buildCommunityLayer(model, mat, {
         loadFacility: options.loadFacility,
         materialFor: (f) => (id) => mat(id, f),
+        calls: { interactions: source?.interactions ?? [], people: activity },
       })
     : null;
   if (community) context.add(community.root);
