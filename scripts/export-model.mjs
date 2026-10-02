@@ -159,96 +159,57 @@ if (m.envelope) {
   );
 }
 api.activity.setOptions({ enabled: false });
-const journeys = JSON.parse(
-  readFileSync('public/models/care-journeys.json', 'utf8'),
+// Reduced motion: an instant focus lands on the whole site, on every area and
+// on a room in it at once, as the explorer and the care-day panel ask.
+api.update({ ...defaultState, walls: 'full', stack: 0, explode: 0 });
+headless.tick(100);
+api.focus(null);
+headless.tick(200);
+const siteTarget = new T.Vector3(...api.getShot().target);
+api.setShot({ target: [20, 0, 20], zoom: 2, azimuth: 0.5, elevation: 0.6 });
+api.focus(null, null, true);
+assert.ok(
+  new T.Vector3(...api.getShot().target).distanceTo(siteTarget) < 0.02,
+  'The whole-site framing is immediate for reduced motion',
 );
-let journeySteps = 0;
-for (const journey of journeys.journeys) {
-  assert.ok(journey.steps.length > 1, `${journey.id} has playable steps`);
-  assert.equal(
-    new Set(journey.steps.map((s) => s.id)).size,
-    journey.steps.length,
-  );
-  for (const step of journey.steps) {
-    const zone = m.zones.find((z) => z.id === step.zoneId);
-    const room = m.rooms.find((r) => r.id === step.roomId);
-    if (step.zoneId)
-      assert.ok(zone, `${journey.id}/${step.id} binds a real zone`);
-    if (step.roomId) {
-      assert.ok(room, `${journey.id}/${step.id} binds a real room`);
-      assert.equal(room.zoneId, zone.id, 'Room belongs to focused zone');
-    }
+let focusTargets = 1;
+for (const zone of m.zones) {
+  const room = m.rooms.find((r) => r.zoneId === zone.id && r.kind !== 'shell');
+  for (const r of room ? [null, room] : [null]) {
     api.update({
       ...defaultState,
-      level: zone?.levelId || 'all',
-      selected: zone?.id || null,
-      room: step.roomId || null,
-      roof: !zone,
-      exterior: !zone,
+      level: zone.levelId,
+      selected: zone.id,
+      room: r?.id || null,
+      roof: false,
+      exterior: false,
       ceilings: false,
-      walls: zone ? 'cutaway' : 'full',
+      walls: 'cutaway',
       stack: 0,
       explode: 0,
     });
     headless.tick(100);
-    let expected;
-    if (step.scene === 'transport') {
-      const bounds = new T.Box3();
-      scene.updateMatrixWorld(true);
-      for (const id of ['fleet-van-a', 'fleet-van-b']) {
-        const van = scene.getObjectByName(id);
-        assert.ok(van, 'Fleet journey references a rendered van');
-        assert.ok(
-          van.visible && van.parent.visible,
-          'Fleet is visible for its journey',
-        );
-        bounds.union(new T.Box3().setFromObject(van));
-      }
-      expected = bounds.getCenter(new T.Vector3());
-      api.focusSiteObjects(['fleet-van-a', 'fleet-van-b'], true);
-    } else {
-      if (!zone) {
-        // The whole-site framing depends on the exterior style: the animated
-        // focus settles on it, and the instant focus must land there at once.
-        api.focus(null);
-        headless.tick(200);
-        expected = new T.Vector3(...api.getShot().target);
-        api.setShot({
-          target: [20, 0, 20],
-          zoom: 2,
-          azimuth: 0.5,
-          elevation: 0.6,
-        });
-      }
-      api.focus(step.zoneId, step.roomId, true);
-      if (zone) {
-        const points = room?.polygon || zone.polygon;
-        expected = new T.Vector3(
-          points.reduce((sum, p) => sum + p[0], 0) / points.length,
-          0,
-          points.reduce((sum, p) => sum + p[1], 0) / points.length,
-        ).add(scene.getObjectByName(zone.id).position);
-        assert.ok(
-          scene.getObjectByName(zone.id).visible,
-          'Journey level is visible',
-        );
-      }
-    }
+    api.focus(zone.id, r?.id, true);
+    const points = r?.polygon || zone.polygon;
+    const expected = new T.Vector3(
+      points.reduce((sum, p) => sum + p[0], 0) / points.length,
+      0,
+      points.reduce((sum, p) => sum + p[1], 0) / points.length,
+    ).add(scene.getObjectByName(zone.id).position);
+    assert.ok(scene.getObjectByName(zone.id).visible, `${zone.id} is visible`);
     assert.ok(
       new T.Vector3(...api.getShot().target).distanceTo(expected) < 0.02,
-      `${journey.id}/${step.id} focuses its scene immediately for reduced motion`,
+      `${r?.id || zone.id} is focused immediately for reduced motion`,
     );
     assert.ok(
       [...headless.camera.position.toArray(), headless.camera.zoom].every(
         Number.isFinite,
       ),
     );
-    journeySteps++;
+    focusTargets++;
   }
 }
-console.log(
-  `Validated ${journeys.journeys.length} journeys and ${journeySteps} room/fleet camera targets.`,
-);
+console.log(`Validated ${focusTargets} site, area and room camera targets.`);
 api.update({
   ...defaultState,
   walls: 'hidden',

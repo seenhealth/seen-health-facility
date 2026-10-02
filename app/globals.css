@@ -664,6 +664,368 @@ input[type='range'] {
 .space-actions .chosen {
   background: #dfead7;
 }
+/* Hover name by the pointer (renderer.ts): positioned by transform only, it
+   fades and rises a few pixels in. */
+.pick-tooltip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 4;
+  pointer-events: none;
+  will-change: transform;
+}
+.pick-tooltip-card {
+  position: absolute;
+  left: 14px;
+  top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 6px 10px 7px;
+  border-radius: 8px;
+  background: #223a2cf0;
+  color: #fff;
+  box-shadow:
+    0 1px 2px #12261a29,
+    0 8px 22px #12261a33;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(4px) scale(0.97);
+  transform-origin: 0 0;
+  transition:
+    opacity 140ms ease-out,
+    transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pick-tooltip[data-show='true'] .pick-tooltip-card {
+  opacity: 1;
+  transform: none;
+}
+.pick-tooltip[data-side='left'] .pick-tooltip-card {
+  left: auto;
+  right: 14px;
+  transform-origin: 100% 0;
+}
+.pick-tooltip[data-v='above'] .pick-tooltip-card {
+  top: auto;
+  bottom: 12px;
+}
+.pick-tooltip-card strong {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+}
+.pick-tooltip-card span {
+  font-size: 10.5px;
+  color: #c9dccf;
+}
+.pick-tooltip-card span:empty {
+  display: none;
+}
+/* Info card for a clicked person, piece of furniture or vehicle
+   (inspect-card.tsx), in the space card's slot. Motion is opacity and
+   transform only: a spring-like entrance with staggered rows, a cross-fade
+   and surface morph between items, and a quicker exit. */
+.inspect-card {
+  --accent: #c97d12;
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  position: absolute;
+  right: 14px;
+  top: 64px;
+  width: 316px;
+  max-height: calc(100% - 150px);
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  color: #2f4637;
+  transform-origin: 80% 0;
+  animation: inspect-in 330ms var(--ease-spring) both;
+}
+.inspect-card[data-phase='leave'] {
+  animation: inspect-out 160ms cubic-bezier(0.4, 0, 1, 1) both;
+  pointer-events: none;
+}
+.inspect-surface {
+  position: absolute;
+  inset: 0;
+  background: #fcfdf9;
+  border: 1px solid #dbe3d4;
+  border-radius: 12px;
+  box-shadow:
+    0 1px 2px #183a2b0f,
+    0 16px 42px #183a2b1c;
+  transform-origin: top center;
+}
+.inspect-surface::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: -1px;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: var(--accent);
+}
+.inspect-body,
+.inspect-ghost {
+  padding: 19px 20px 16px;
+}
+.inspect-body {
+  position: relative;
+  min-height: 0;
+  padding-bottom: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+/* The bottom padding, drawn as a fade that stays on the bottom edge while a
+   long card scrolls, so the card never ends on a cut line. */
+.inspect-body::after {
+  content: '';
+  position: sticky;
+  bottom: 0;
+  display: block;
+  height: 16px;
+  background: linear-gradient(#fcfdf900, #fcfdf9 75%);
+  pointer-events: none;
+}
+.inspect-ghost {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  max-height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  animation: inspect-ghost-out 170ms ease-in both;
+}
+.inspect-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: #6f7e6b;
+}
+.inspect-close:hover {
+  background: #edf2e9;
+  color: #2f4637;
+}
+.inspect-overline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 34px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #7e8c79;
+}
+.inspect-overline i {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--accent);
+}
+.inspect-card h3 {
+  margin: 10px 34px 0 0;
+  font-family: Georgia, serif;
+  font-size: 23px;
+  font-weight: 400;
+  line-height: 1.16;
+  letter-spacing: -0.03em;
+  color: #2c4a37;
+}
+.inspect-lead {
+  margin: 9px 0 0;
+  font-size: 13px;
+  line-height: 1.62;
+  color: #5d6d5a;
+}
+.inspect-rows {
+  margin: 15px 0 0;
+  border-top: 1px solid #e3e9de;
+}
+.inspect-row {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 12px;
+  padding: 9px 0 10px;
+  border-bottom: 1px solid #edf1e9;
+}
+.inspect-row dt {
+  padding-top: 2px;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #95a18e;
+}
+.inspect-row dd {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.inspect-row dd small {
+  display: block;
+  margin-top: 3px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: #7a8976;
+}
+.inspect-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.inspect-follow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 13px 8px 11px;
+  border: 1px solid #cfdccf;
+  border-radius: 999px;
+  background: #f3f7f0;
+  color: #2f5a44;
+  font-size: 12px;
+  font-weight: 600;
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease;
+}
+.inspect-follow:hover {
+  background: #e4eee2;
+}
+.inspect-follow[aria-pressed='true'] {
+  background: #345f43;
+  border-color: #345f43;
+  color: #fff;
+}
+.inspect-fine {
+  margin: 12px 0 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  color: #a1ab99;
+  overflow-wrap: break-word;
+}
+.inspect-anim {
+  animation: inspect-row 360ms var(--ease-spring) both;
+  animation-delay: calc(60ms + var(--i, 0) * 48ms);
+}
+.inspect-value {
+  animation: inspect-swap 260ms var(--ease-spring) both;
+}
+@keyframes inspect-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes inspect-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(6px) scale(0.985);
+  }
+}
+@keyframes inspect-row {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes inspect-ghost-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@keyframes inspect-swap {
+  from {
+    opacity: 0.2;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* Phones (the model above the docked panel): a sheet rising from the bottom
+   of the model, over its toolbars, so the item (a followed person is
+   centred) stays in view above it; it scrolls when the card is longer. */
+@media (max-width: 800px) {
+  .inspect-card {
+    top: auto;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: auto;
+    max-height: min(52%, 360px);
+    transform-origin: 50% 100%;
+  }
+  .inspect-surface {
+    transform-origin: bottom center;
+  }
+  .inspect-body,
+  .inspect-ghost {
+    padding: 15px 16px 12px;
+  }
+  .inspect-body {
+    padding-bottom: 0;
+  }
+  .inspect-body::after {
+    height: 14px;
+  }
+  .inspect-card h3 {
+    margin-top: 8px;
+    font-size: 21px;
+  }
+  .inspect-lead {
+    margin-top: 7px;
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+  .inspect-rows {
+    margin-top: 11px;
+  }
+  .inspect-row {
+    grid-template-columns: 62px minmax(0, 1fr);
+    gap: 10px;
+    padding: 7px 0 8px;
+  }
+  .inspect-close {
+    top: 9px;
+    right: 9px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .inspect-card,
+  .inspect-card *,
+  .pick-tooltip-card {
+    animation: none !important;
+    transition: none !important;
+  }
+}
 .source-thumbs {
   display: flex;
   gap: 6px;
@@ -1743,227 +2105,12 @@ td a {
   width: 100%;
 }
 
-/* Guided workflow playback shares the facility's camera and room controls. */
-.journey-panel {
-  font-size: 14px;
-}
-.journey-select {
-  display: grid;
-  gap: 7px;
-  color: #566259;
-  font-size: 12px;
-}
-.journey-select select {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #cbd8cd;
-  border-radius: 5px;
-  background: white;
-  font: inherit;
-  font-size: 14px;
-  color: #183a2b;
-}
-.journey-summary {
-  margin: 12px 0;
-  line-height: 1.55;
-  color: #536457;
-}
-.journey-player {
-  display: flex;
-  gap: 5px;
-  align-items: center;
-}
-.journey-player button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  border: 1px solid #cbd8cd;
-  border-radius: 5px;
-  padding: 8px;
-  min-height: 36px;
-}
-.journey-player button:disabled {
-  opacity: 0.35;
-  cursor: default;
-}
-.journey-player .primary {
-  background: #17656c;
-  color: white;
-  border-color: #17656c;
-}
-.journey-player label {
-  margin-left: auto;
-  display: grid;
-  gap: 2px;
-  font-size: 10px;
-  color: #607369;
-}
-.journey-player select {
-  background: transparent;
-  border: 0;
-  font-size: 12px;
-  color: #244f45;
-}
-.journey-scrub {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin: 13px 0;
-  font-size: 11px;
-  color: #536457;
-}
-.journey-scrub input {
-  flex: 1;
-  min-width: 0;
-  accent-color: #17656c;
-}
-.journey-current {
-  background: #eef4ed;
-  padding: 15px;
-  border-radius: 7px;
-}
-.journey-evidence {
-  display: inline-block;
-  font-size: 10px;
-  color: #21604d;
-  border: 1px solid #b6cdc2;
-  background: #f7faf5;
-  border-radius: 20px;
-  padding: 3px 8px;
-}
-.journey-evidence.unknown {
-  color: #795916;
-  background: #fff8e9;
-  border-color: #d7c598;
-}
-.journey-evidence.scene {
-  color: #637266;
-}
-.journey-current h3 {
-  font-family: Georgia, serif;
-  font-size: 25px;
-  font-weight: 400;
-  color: #254b3e;
-  margin: 11px 0;
-}
-.journey-place {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #17656c;
-}
-.journey-place span {
-  display: grid;
-  gap: 3px;
-  font-size: 13px;
-}
-.journey-place small {
-  font-size: 11px;
-  color: #536457;
-}
-.journey-current p {
-  line-height: 1.6;
-  margin: 12px 0;
-  font-size: 13px;
-  color: #46594b;
-}
-.journey-timing {
-  font-size: 12px;
-  color: #234f43;
-  font-weight: 600;
-}
-.journey-handoff {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  padding: 16px 0 2px;
-  color: #17656c;
-}
-.journey-handoff span {
-  max-width: 75px;
-  font-size: 10px;
-  line-height: 1.4;
-}
-.journey-steps {
-  list-style: none;
-  padding: 0;
-  margin: 12px 0;
-}
-.journey-steps button {
-  width: 100%;
-  display: flex;
-  gap: 9px;
-  align-items: center;
-  text-align: left;
-  padding: 8px 5px;
-  border-radius: 4px;
-  font-size: 12px;
-  color: #506454;
-}
-.journey-steps button > span {
-  display: grid;
-  place-items: center;
-  width: 21px;
-  height: 21px;
-  flex: 0 0 21px;
-  border: 1px solid #c7d3c5;
-  border-radius: 50%;
-  font-size: 10px;
-}
-.journey-steps button[aria-current='step'] {
-  background: #dfece0;
-  color: #194f3f;
-}
-.journey-steps button[aria-current='step'] > span {
-  background: #17656c;
-  color: white;
-  border-color: #17656c;
-}
-.journey-steps svg {
-  margin-left: auto;
-}
-.journey-evidence-note {
-  border-top: 1px solid #d4dfd3;
-  padding-top: 12px;
-  font-size: 12px;
-  line-height: 1.6;
-  color: #526555;
-}
-.journey-evidence-note summary {
-  cursor: pointer;
-  font-weight: 600;
-}
-.journey-footnote {
-  color: #6a756c;
-  font-size: 10px;
-  line-height: 1.6;
-  margin: 12px 0 8px;
-}
-.journey-download {
-  font-size: 11px;
-  color: #17656c;
-  text-decoration: underline;
-}
-
 .header-actions button[aria-pressed='true'] {
   background: #dfebe1;
   color: #17656c;
 }
-@media (max-width: 800px) {
-  .journey-current h3 {
-    font-size: 22px;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .journey-panel * {
-    scroll-behavior: auto;
-    transition: none;
-  }
-}
 
-/* Docked side panel: care day, journeys and measures share one column beside the model. */
+/* Docked side panel: care day and measures share one column beside the model. */
 .side-panel {
   grid-column: 3;
   grid-row: 2;

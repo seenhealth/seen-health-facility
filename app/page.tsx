@@ -42,9 +42,9 @@ import {
   SETTING_ZONE_PREFIX,
 } from './model/community-settings';
 import { roomLabelCode } from './model/room-labels';
-import { JourneyPanel } from './components/journey-panel';
-import type { JourneyStep } from './model/journeys';
 import { ActivityPanel, MiniPlayer } from './components/activity-panel';
+import { InspectCard } from './components/inspect-card';
+import type { InspectTarget } from './model/pick';
 import { isRotationDay, setProgramRotation } from './model/day-room';
 import { ShowcaseControls } from './components/showcase-controls';
 import { SiteMap } from './components/site-map';
@@ -120,16 +120,19 @@ export default function Home() {
     [panelOpen, setPanelOpen] = useState(true),
     // The space card follows explicit picks, not camera moves from the panel.
     [cardOpen, setCardOpen] = useState(false),
-    [panelTab, setPanelTab] = useState<'activity' | 'journeys' | 'measure'>(
-      'activity',
-    ),
+    [panelTab, setPanelTab] = useState<'activity' | 'measure'>('activity'),
     [exporting, setExporting] = useState(false),
     [notice, setNotice] = useState(''),
     // The viewer builds the community layer when its source carries one.
     [hasCommunity, setHasCommunity] = useState(false),
+    // The person, piece of furniture or vehicle whose card is open.
+    [inspected, setInspected] = useState<InspectTarget | null>(null),
     [dataTab, setDataTab] = useState<'overview' | 'assets'>('overview');
   const patch = (s: Partial<ViewerState>) => setState((p) => ({ ...p, ...s }));
   const getViewer = useCallback(() => viewer.current, []);
+  // Cards share the top-right slot: an item's card closes the space card and
+  // a space card closes the item's.
+  const closeInspect = useCallback(() => viewer.current?.inspect(null), []);
   const focusActivity = useCallback(
     (zoneId: string, actor?: string | null) => {
       if (!model || !viewer.current) return;
@@ -175,42 +178,6 @@ export default function Home() {
       if (actor) viewer.current.followActor(actor);
     },
     [model],
-  );
-  const focusJourney = useCallback(
-    (step: JourneyStep) => {
-      if (!model || !ready || !viewer.current) return;
-      const z = model.zones.find((z) => z.id === step.zoneId);
-      const next: ViewerState = {
-        ...defaultState,
-        level: z?.levelId || 'all',
-        selected: z?.id || null,
-        room: step.roomId || null,
-        isolate: false,
-        roof: !z,
-        exterior: !z,
-        ceilings: false,
-        walls: z ? 'cutaway' : 'full',
-        stack: 0,
-        explode: 0,
-        plan: false,
-        sectionAxis: 'none',
-      };
-      setState(next);
-      setCardOpen(false);
-      setView(z ? 'iso' : 'building');
-      viewer.current.update(next);
-      viewer.current.view('iso');
-      const instant = window.matchMedia(
-        '(prefers-reduced-motion: reduce)',
-      ).matches;
-      if (step.scene === 'transport')
-        viewer.current.focusSiteObjects(
-          ['fleet-van-a', 'fleet-van-b'],
-          instant,
-        );
-      else viewer.current.focus(z?.id || null, step.roomId, instant);
-    },
-    [model, ready],
   );
   const selectSite = (id: SiteId) => {
     setShowcase(false);
@@ -330,11 +297,16 @@ export default function Home() {
               : {}),
           }));
           setCardOpen(!!zone);
+          if (zone) viewer.current?.inspect(null);
           if (selectedZone) {
             setView('iso');
             viewer.current?.view('iso');
             requestAnimationFrame(() => viewer.current?.focus(zone, room));
           }
+        });
+        viewer.current.onInspect((target) => {
+          setInspected(target);
+          if (target) setCardOpen(false);
         });
         viewer.current.update(state);
         // Same console hook as the story (?debug=1): lets screenshot and
@@ -355,6 +327,7 @@ export default function Home() {
       ended = true;
       viewer.current?.dispose();
       viewer.current = null;
+      setInspected(null);
     };
   }, [model]);
   useEffect(() => viewer.current?.update(state), [state, ready]);
@@ -457,6 +430,7 @@ export default function Home() {
         sectionAxis: 'none',
       });
     setCardOpen(true);
+    closeInspect();
     setView('iso');
     viewer.current?.view('iso');
     if (narrow()) setCollapsed(true);
@@ -479,6 +453,7 @@ export default function Home() {
     viewer.current?.view('iso');
     requestAnimationFrame(() => viewer.current?.focus(r.zoneId, r.id));
     setCardOpen(true);
+    closeInspect();
     if (narrow()) setCollapsed(true);
   };
   const selectLevel = (id: string) => {
@@ -1022,6 +997,14 @@ export default function Home() {
             </div>
           </article>
         )}
+        {ready && !showcase && (
+          <InspectCard
+            key={model?.id}
+            viewer={viewer.current}
+            target={inspected}
+            onClose={closeInspect}
+          />
+        )}
         <div className="zoom-tools">
           <button
             aria-label="Zoom in"
@@ -1298,14 +1281,13 @@ export default function Home() {
           ref={sidePanel}
           className="side-panel"
           data-tab={panelTab}
-          aria-label="Care day, journeys and measures"
+          aria-label="Care day and measures"
         >
           <div className="side-panel-tabs">
             {siteId === 'alhambra' ? (
               (
                 [
                   ['activity', 'Care day'],
-                  ['journeys', 'Journeys'],
                   ['measure', 'Measure'],
                 ] as const
               ).map(([id, label]) => (
@@ -1354,9 +1336,6 @@ export default function Home() {
                   getViewer={getViewer}
                 />
               </Suspense>
-            )}
-            {panelTab === 'journeys' && siteId === 'alhambra' && (
-              <JourneyPanel onFocus={focusJourney} />
             )}
           </div>
         </aside>

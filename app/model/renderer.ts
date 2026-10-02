@@ -42,9 +42,21 @@ import { alhambraSource } from './alhambra-source';
 import { COMMUNITY_SOURCE_ID, COMMUNITY_VIEW } from './community-settings';
 import { buildCommunityLayer } from './community-layer';
 import { registerCommunityVehicles } from './community-vehicles';
+import { fleetVanId } from './alhambra-fleet';
+import { isInspectable } from './asset-catalog';
+import type { FacilityInstance } from './facility-instance';
+import { createHighlights } from './highlight';
+import { tooltipFor } from './inspect';
+import {
+  createPicker,
+  targetKey,
+  type InspectTarget,
+  type Pickable,
+} from './pick';
 import {
   center,
   type Facility,
+  type Instance,
   type MaterialSpec,
   type Vec2,
 } from './schema';
@@ -924,6 +936,14 @@ export function createViewer(
     : null;
   if (community) context.add(community.root);
   const furnitureRoots: T.Group[] = [];
+  // Objects a hover or click can inspect (pick.ts); the rest occlude.
+  const centerObjects: {
+      object: Instance;
+      group: T.Group;
+      inspectable: boolean;
+      clipped: boolean;
+    }[] = [],
+    inspectableGroups = new WeakSet<T.Object3D>();
   const exteriorAssets: T.Group[] = [],
     roofAssets: T.Group[] = [];
   let disposed = false;
@@ -963,6 +983,16 @@ export function createViewer(
     }
     if (layer !== 'exterior' && layer !== 'roof') parent.add(g);
     furnitureRoots.push(g);
+    const inspectable = isInspectable(o, spec);
+    // Site furniture stays whole in a section, like the rest of the context.
+    centerObjects.push({
+      object: o,
+      group: g,
+      inspectable,
+      clipped:
+        parent !== context || layer === 'exterior' || layer === 'roof',
+    });
+    if (inspectable) inspectableGroups.add(g);
     if (spec.modelUrl) {
       customLoads.push(
         import('three/addons/loaders/GLTFLoader.js').then(
@@ -1268,6 +1298,89 @@ export function createViewer(
   applySectionMaterials(activity.props);
   applySectionMaterials(activity.dayRoom.root);
   applySectionMaterials(activity.arrival.root);
+  // Hover and click inspection: people, the center's furniture, furniture of
+  // facilities stamped on community pads and vehicles (pick.ts), with eased
+  // highlights (highlight.ts) and card content from inspect.ts.
+  const occluderRoots: T.Object3D[] = [
+    ...groups.values(),
+    facade,
+    roof,
+    ceiling,
+    ...(siteMassing ? [siteMassing] : []),
+  ];
+  // Fleet vans take the section like the building; trucks and community
+  // vehicles are drawn whole.
+  const vehicleBodies: {
+    id: string;
+    object: T.Object3D;
+    clipped: boolean;
+  }[] = [
+    ...activity.arrival.vans.map((v, i) => ({
+      id: fleetVanId(i),
+      object: v.root,
+      clipped: true,
+    })),
+    ...(activity.deliveries?.root.children ?? [])
+      .filter((o) => activity.vehicles.has(o.name))
+      .map((o) => ({ id: o.name, object: o, clipped: false })),
+    ...(community?.vehicleIds ?? []).flatMap((id) => {
+      const object = community!.root.getObjectByName(id);
+      return object && activity.vehicles.has(id)
+        ? [{ id, object, clipped: false }]
+        : [];
+    }),
+  ];
+  let stamped: { settingId: string; instance: FacilityInstance }[] = [];
+  const refreshStamped = () => {
+    stamped = (community?.settings ?? []).flatMap((s) => {
+      const instance = community!.instance(s.id);
+      return instance ? [{ settingId: s.id, instance }] : [];
+    });
+  };
+  refreshStamped();
+  void community?.ready.then(() => {
+    if (!disposed) refreshStamped();
+  });
+  const inspectContext = { model, activity, community };
+  const picker = createPicker({
+    camera,
+    section: () => (activePlanes ? sectionPlane : null),
+    people: activity.actors,
+    peopleRoot: activity.root,
+    objects: centerObjects,
+    occluders: () => occluderRoots,
+    skipOccluder: (o) => o.name === 'furniture' || inspectableGroups.has(o),
+    instances: () => stamped,
+    vehicles: () => vehicleBodies,
+    label: (target) => tooltipFor(inspectContext, target),
+  });
+  // Furniture boxes are measured once per asset (a few ms) so the first
+  // hover does not pay for them.
+  picker.warm();
+  const motion =
+    typeof window !== 'undefined' && window.matchMedia
+      ? window.matchMedia('(prefers-reduced-motion: reduce)')
+      : null;
+  const highlights = createHighlights(scene, {
+    clip(material) {
+      material.clipShadows = true;
+      material.clippingPlanes = activePlanes;
+      sectionMaterials.add(material);
+    },
+    reducedMotion: () => !!motion?.matches,
+  });
+  highlights.warm(activity.actors.find((a) => a.root.visible)?.mesh);
+  let selected: Pickable | null = null;
+  const inspectListeners = new Set<(target: InspectTarget | null) => void>();
+  /** Open (or close, with null) the card of a pickable; listeners hear it. */
+  function select(item: Pickable | null, ripple = false) {
+    const before = selected ? targetKey(selected.target) : '',
+      after = item ? targetKey(item.target) : '';
+    selected = item;
+    highlights.select(item, ripple);
+    if (before !== after)
+      inspectListeners.forEach((listen) => listen(item?.target ?? null));
+  }
   let state = { ...defaultState },
     frame = 0,
     focusTarget: T.Vector3 | null = null,
@@ -1287,6 +1400,8 @@ export function createViewer(
   };
   function update(next: ViewerState) {
     state = next;
+    // What was under the pointer may be hidden or moved now.
+    setHover(null);
     activity.updateView({
       ...next,
       hiddenSources: next.community === false ? [COMMUNITY_SOURCE_ID] : [],
@@ -1602,22 +1717,6 @@ export function createViewer(
     focusTarget = new T.Vector3(...framing.target);
     zoomTarget = framing.zoom;
   }
-  function focusSiteObjects(ids: string[], instant = false) {
-    scene.updateMatrixWorld(true);
-    const bounds = new T.Box3();
-    for (const id of ids) {
-      const o = scene.getObjectByName(id);
-      if (o) bounds.union(new T.Box3().setFromObject(o));
-    }
-    if (bounds.isEmpty()) {
-      focus(null, null, instant);
-      return;
-    }
-    focusTarget = bounds.getCenter(new T.Vector3());
-    const size = bounds.getSize(new T.Vector3());
-    zoomTarget = T.MathUtils.clamp(30 / Math.max(size.x, size.z), 1.35, 8);
-    finishFocus(instant);
-  }
   function view(mode: string) {
     const c = controls.target.clone();
     if (mode === 'plan')
@@ -1677,6 +1776,7 @@ export function createViewer(
     camera.bottom = -40;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
+    highlights.setViewport(w, h);
     if (tiltComposer) sizeTilt(w, h);
     post?.setSize(w, h, renderer.getPixelRatio());
   };
@@ -1703,13 +1803,105 @@ export function createViewer(
     slowFrames = 0;
   let start: [number, number] = [0, 0];
   const ray = new T.Raycaster();
+  /** What is under a client point: a person, furniture or a vehicle. */
+  const pickAt = (clientX: number, clientY: number) => {
+    const r = renderer.domElement.getBoundingClientRect();
+    if (!r.width || !r.height) return null;
+    return picker.pick(
+      ((clientX - r.left) / r.width) * 2 - 1,
+      (-(clientY - r.top) / r.height) * 2 + 1,
+    );
+  };
+  // Hover (mouse and pen): pointer moves are coalesced into one pick per
+  // animation frame, and nothing is picked while a button is down, in the
+  // showcase or when the viewer is not interactive.
+  let pointerX = 0,
+    pointerY = 0,
+    hoverPending = false,
+    pressed = false,
+    tooltip: HTMLDivElement | null = null,
+    tooltipCard: HTMLDivElement | null = null,
+    tooltipName: HTMLElement | null = null,
+    tooltipDetail: HTMLElement | null = null,
+    tooltipItem: Pickable | null = null;
+  const canHover = () => controls.enabled && !showcase;
+  /** Hover highlight, cursor and the small name tooltip by the pointer. */
+  function setHover(item: Pickable | null) {
+    highlights.hover(item);
+    renderer.domElement.style.cursor = item ? 'pointer' : '';
+    if (!item) {
+      tooltip?.setAttribute('data-show', 'false');
+      tooltipItem = null;
+      return;
+    }
+    if (!tooltip) {
+      tooltip = document.createElement('div');
+      tooltip.className = 'pick-tooltip';
+      tooltip.setAttribute('aria-hidden', 'true');
+      tooltipCard = document.createElement('div');
+      tooltipCard.className = 'pick-tooltip-card';
+      tooltipName = document.createElement('strong');
+      tooltipDetail = document.createElement('span');
+      tooltipCard.appendChild(tooltipName);
+      tooltipCard.appendChild(tooltipDetail);
+      tooltip.appendChild(tooltipCard);
+      host.appendChild(tooltip);
+    }
+    const r = renderer.domElement.getBoundingClientRect(),
+      x = pointerX - r.left,
+      y = pointerY - r.top,
+      side = x > r.width - 240 ? 'left' : 'right',
+      v = y > r.height - 70 ? 'above' : 'below';
+    tooltip.style.transform = `translate3d(${Math.round(x)}px, ${Math.round(
+      y,
+    )}px, 0)`;
+    // Flip toward the inside near the right and bottom edges.
+    if (tooltip.getAttribute('data-side') !== side)
+      tooltip.setAttribute('data-side', side);
+    if (tooltip.getAttribute('data-v') !== v) tooltip.setAttribute('data-v', v);
+    if (item !== tooltipItem) {
+      tooltipName!.textContent = item.label;
+      tooltipDetail!.textContent = item.detail();
+      // A quick settle when the pointer moves from one item to the next.
+      if (tooltipItem && !motion?.matches)
+        tooltipCard!.animate?.(
+          [
+            { opacity: 0.4, transform: 'translateY(3px)' },
+            { opacity: 1, transform: 'none' },
+          ],
+          { duration: 160, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' },
+        );
+      tooltipItem = item;
+    }
+    if (tooltip.getAttribute('data-show') !== 'true')
+      tooltip.setAttribute('data-show', 'true');
+  }
+  const pm = (e: PointerEvent) => {
+    if (e.pointerType === 'touch') return;
+    pointerX = e.clientX;
+    pointerY = e.clientY;
+    if (pressed && e.buttons === 0) pressed = false;
+    if (pressed) {
+      // An orbit or pan drag: no hover until the button is released.
+      if (Math.hypot(e.clientX - start[0], e.clientY - start[1]) > 5)
+        setHover(null);
+      return;
+    }
+    hoverPending = canHover();
+  };
+  const leave = () => {
+    hoverPending = false;
+    setHover(null);
+  };
   const pd = (e: PointerEvent) => {
     start = [e.clientX, e.clientY];
+    pressed = true;
     focusTarget = null;
     zoomTarget = null;
     if (activity.getState().follow) activity.setOptions({ follow: null });
   };
   const pu = (e: PointerEvent) => {
+    pressed = false;
     if (showcase) return;
     if (
       !controls.enabled ||
@@ -1717,6 +1909,23 @@ export function createViewer(
       Math.hypot(e.clientX - start[0], e.clientY - start[1]) > 5
     )
       return;
+    // A person, a piece of furniture or a vehicle opens its card; a person
+    // is also followed. A click on empty space closes an open card.
+    const item = pickAt(e.clientX, e.clientY);
+    if (item) {
+      select(item, true);
+      // The card names it now; the tooltip returns with the next move.
+      setHover(null);
+      if (item.target.kind === 'person') {
+        activity.setOptions({ follow: item.target.id });
+        zoomTarget = 9;
+      }
+      return;
+    }
+    if (selected) {
+      select(null);
+      return;
+    }
     const r = renderer.domElement.getBoundingClientRect();
     ray.setFromCamera(
       new T.Vector2(
@@ -1725,25 +1934,6 @@ export function createViewer(
       ),
       camera,
     );
-    if (activity.root.visible) {
-      const person = ray.intersectObject(activity.root, true).find((hit) => {
-        for (let o: T.Object3D | null = hit.object; o; o = o.parent)
-          if (!o.visible) return false;
-        return (
-          state.sectionAxis === 'none' ||
-          sectionPlane.distanceToPoint(hit.point) >= 0
-        );
-      });
-      if (person) {
-        let selected: T.Object3D | null = person.object;
-        while (selected && !selected.userData.role) selected = selected.parent;
-        if (selected) {
-          activity.setOptions({ follow: selected.name });
-          zoomTarget = 9;
-          return;
-        }
-      }
-    }
     if (facade.visible && state.sectionAxis === 'none') {
       const hit = ray.intersectObject(facade, true)[0];
       let object: T.Object3D | null = hit?.object || null;
@@ -1768,9 +1958,13 @@ export function createViewer(
   // Wheel zoom takes over from any in-flight focus zoom instead of fighting it.
   const wheel = () => {
     zoomTarget = null;
+    // The view moves under a resting pointer: the next move picks again.
+    setHover(null);
   };
   renderer.domElement.addEventListener('pointerdown', pd);
   renderer.domElement.addEventListener('pointerup', pu);
+  renderer.domElement.addEventListener('pointermove', pm);
+  renderer.domElement.addEventListener('pointerleave', leave);
   const gameProps: T.Object3D[] = [];
   scene.traverse((o) => {
     if (o.userData.gameMotion) gameProps.push(o);
@@ -1808,6 +2002,9 @@ export function createViewer(
     showcasePlaying = true;
     controls.enabled = !active;
     if (active) {
+      // Video mode shows no hover, highlight or card.
+      setHover(null);
+      select(null);
       if (tiltShiftEnabled) prepareTilt();
       activity.setOptions({
         enabled: true,
@@ -1988,6 +2185,12 @@ export function createViewer(
     }
     for (const prop of gameProps)
       animateCommunityProp(prop, activity.getState().time);
+    // At most one hover pick per frame, only after the pointer moved.
+    if (hoverPending) {
+      hoverPending = false;
+      setHover(canHover() ? pickAt(pointerX, pointerY) : null);
+    }
+    highlights.tick(dt);
     if (showcase) {
       if (showcasePlaying && !document.hidden)
         showcaseTime += Math.min(dt, 0.15);
@@ -2010,7 +2213,6 @@ export function createViewer(
     cancelRecording: () => stopRecording?.(),
     update,
     focus,
-    focusSiteObjects,
     focusSetting,
     community,
     focusArrival: () => {
@@ -2035,6 +2237,45 @@ export function createViewer(
       }
     },
     view,
+    /** The facility specification this viewer draws. */
+    model,
+    /**
+     * Hear when a card opens or closes: a click on a person, a piece of
+     * furniture or a vehicle, `inspect()`, or a click on empty space (null).
+     */
+    onInspect(listener: (target: InspectTarget | null) => void) {
+      inspectListeners.add(listener);
+      return () => {
+        inspectListeners.delete(listener);
+      };
+    },
+    /** Open the card (and highlight) of a target, or close it with null. */
+    inspect(target: InspectTarget | null) {
+      select(target ? picker.resolve(target) : null);
+    },
+    /** The target whose card is open. */
+    inspected: (): InspectTarget | null => selected?.target ?? null,
+    /** The target under the pointer. */
+    hovered: (): InspectTarget | null => highlights.hovered()?.target ?? null,
+    /** What a click at client coordinates would open (scripts and tests). */
+    pickAt: (clientX: number, clientY: number): InspectTarget | null =>
+      pickAt(clientX, clientY)?.target ?? null,
+    /** Client coordinates of a target's centre while it is drawn, else null. */
+    screenPoint(target: InspectTarget): { x: number; y: number } | null {
+      const item = picker.resolve(target),
+        box = new T.Box3(),
+        frame = new T.Matrix4();
+      if (!item || !item.place(box, frame)) return null;
+      const p = box
+          .getCenter(new T.Vector3())
+          .applyMatrix4(frame)
+          .project(camera),
+        r = renderer.domElement.getBoundingClientRect();
+      return {
+        x: r.left + ((p.x + 1) / 2) * r.width,
+        y: r.top + ((1 - p.y) / 2) * r.height,
+      };
+    },
     /** Place the camera exactly; cancels any in-flight focus animation. */
     setShot(shot: CameraShot) {
       focusTarget = null;
@@ -2064,6 +2305,7 @@ export function createViewer(
     },
     setInteractive(on: boolean) {
       controls.enabled = on;
+      if (!on) setHover(null);
     },
     /** Stop or resume the render loop, e.g. while the stage is covered. */
     setPaused(on: boolean) {
@@ -2205,7 +2447,13 @@ export function createViewer(
       controls.dispose();
       renderer.domElement.removeEventListener('pointerdown', pd);
       renderer.domElement.removeEventListener('pointerup', pu);
+      renderer.domElement.removeEventListener('pointermove', pm);
+      renderer.domElement.removeEventListener('pointerleave', leave);
       renderer.domElement.removeEventListener('wheel', wheel);
+      // Before the people: restores their own materials from any tint.
+      inspectListeners.clear();
+      highlights.dispose();
+      tooltip?.remove();
       activity.dispose();
       const geos = new Set<T.BufferGeometry>(),
         mats = new Set<T.Material>();
