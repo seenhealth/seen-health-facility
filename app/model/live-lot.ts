@@ -59,6 +59,8 @@ export type LiveVehicle = {
   label: string;
   /** Second line: ETA, riders, next departure. */
   detail?: string;
+  /** Detail lines shown when the vehicle's plate is opened (`setExpanded`): phone, device, runs, next departure, shift, advice. */
+  lines?: string[];
   state: LiveState;
   /** Minutes to the center while inbound; drives how far along the approach the vehicle is drawn. */
   etaMinutes?: number | null;
@@ -90,6 +92,8 @@ const LABEL_W = 14,
   LABEL_H = 3.5;
 /** Canvas pixels per metre of label; the plate grows in width with the crew it carries. */
 const LABEL_PX = 1024 / LABEL_W;
+/** The opened bubble is drawn this much larger on screen than the compact plates, so its detail lines read easily. */
+const EXPAND_BOOST = 1.4;
 const RING_COLOR = {
   high: '#c0392b',
   assisted: '#d08214',
@@ -163,13 +167,7 @@ const RAMP_IN: WalkPoint[] = [
 ];
 
 type Mode =
-  | 'waiting'
-  | 'arriving'
-  | 'docked'
-  | 'toBay'
-  | 'parked'
-  | 'leaving'
-  | 'gone';
+  'waiting' | 'arriving' | 'docked' | 'toBay' | 'parked' | 'leaving' | 'gone';
 type Drive = {
   pieces: Piece[];
   length: number;
@@ -200,6 +198,14 @@ type Live = {
   body: Body;
   label: T.Sprite;
   labelText: string;
+  /** The plate's drawn size (metres at scale 1) and, while it grows or shrinks, the size it is coming from. */
+  plate: [number, number];
+  plateFrom: [number, number] | null;
+  plateT: number;
+  /** Whether the plate currently painted is the opened bubble. */
+  drawnExpanded: boolean;
+  /** 1 while another vehicle is hovered, easing to 0.5: the dimmed look. */
+  dim: number;
   mode: Mode;
   drive: Drive | null;
   s: number;
@@ -290,8 +296,28 @@ function makeLabel(): T.Sprite {
   sprite.scale.set(LABEL_W, LABEL_H, 1);
   sprite.renderOrder = 10;
   sprite.userData.canvas = canvas;
+  sprite.userData.texSize = `${canvas.width}x${canvas.height}`;
   sprite.userData.widthM = LABEL_W;
+  sprite.userData.heightM = LABEL_H;
   return sprite;
+}
+/**
+ * Upload the repainted canvas. A canvas that changed size needs a new texture: WebGL cannot grow the old one in
+ * place (Chrome logs "Offset overflows texture dimensions" and keeps the stale image).
+ */
+function uploadLabel(sprite: T.Sprite) {
+  const canvas = sprite.userData.canvas as HTMLCanvasElement;
+  const mat = sprite.material as T.SpriteMaterial;
+  const tex = mat.map as T.CanvasTexture;
+  const size = `${canvas.width}x${canvas.height}`;
+  if (sprite.userData.texSize !== size) {
+    sprite.userData.texSize = size;
+    const next = new T.CanvasTexture(canvas);
+    next.colorSpace = T.SRGBColorSpace;
+    mat.map = next;
+    mat.needsUpdate = true;
+    tex.dispose();
+  } else tex.needsUpdate = true;
 }
 /** One avatar: a photo or initials, a risk ring, the wheelchair badge; `square` for the driver. */
 function drawAvatar(
@@ -364,8 +390,18 @@ function drawAvatar(
     g.restore();
   }
 }
-/** Paint the plate: driver square, participants with first names, then the car's number and its countdown. Resizes the canvas and the sprite to fit. */
-function paintLabel(sprite: T.Sprite, v: LiveVehicle, repaint: () => void) {
+/**
+ * Paint the plate: driver square, participants with first names, then the car's number and its countdown. Resizes the
+ * canvas and the sprite to fit. `expanded` paints the opened bubble instead: the full title on top, the crew under it
+ * and the vehicle's detail lines below, so the plate itself carries what a details card would.
+ */
+function paintLabel(
+  sprite: T.Sprite,
+  v: LiveVehicle,
+  expanded: boolean,
+  repaint: () => void,
+) {
+  if (expanded) return paintExpanded(sprite, v, repaint);
   const canvas = sprite.userData.canvas as HTMLCanvasElement;
   const people: { p: LivePerson; square: boolean }[] = [
     ...(v.driver ? [{ p: v.driver, square: true }] : []),
@@ -430,9 +466,115 @@ function paintLabel(sprite: T.Sprite, v: LiveVehicle, repaint: () => void) {
   g.font = '600 56px system-ui, sans-serif';
   g.textBaseline = 'middle';
   g.fillText(tail, x + 8, 128, width - x - PAD);
-  const tex = (sprite.material as T.SpriteMaterial).map as T.CanvasTexture;
-  tex.needsUpdate = true;
+  uploadLabel(sprite);
   sprite.userData.widthM = width / LABEL_PX;
+  sprite.userData.heightM = LABEL_H;
+}
+/** The opened bubble: title line, crew row with names, then each detail line; a brighter rim marks it as the one picked. */
+function paintExpanded(sprite: T.Sprite, v: LiveVehicle, repaint: () => void) {
+  const canvas = sprite.userData.canvas as HTMLCanvasElement;
+  const people: { p: LivePerson; square: boolean }[] = [
+    ...(v.driver ? [{ p: v.driver, square: true }] : []),
+    ...(v.riders ?? []).slice(0, 8).map((p) => ({ p, square: false })),
+  ];
+  const more = Math.max(0, (v.riders?.length ?? 0) - 8);
+  const AV = 118,
+    NAME = 26,
+    PAD = 40,
+    GAP = 18,
+    LINE = 62;
+  const lines = (v.lines ?? []).slice(0, 8);
+  const probe = canvas.getContext('2d')!;
+  const measure = (font: string, text: string) => {
+    probe.font = font;
+    return probe.measureText(text).width;
+  };
+  const title = `${v.label}${v.detail ? ` · ${v.detail}` : ''}`;
+  const TITLE = '600 56px system-ui, sans-serif';
+  const LINEF = '500 44px system-ui, sans-serif';
+  const nameW = (p: LivePerson) =>
+    Math.max(AV, measure(`600 ${NAME + 8}px system-ui, sans-serif`, p.name));
+  const cells = people.map(({ p, square }) => (square ? AV : nameW(p)) + GAP);
+  const crewW = cells.reduce((a, b) => a + b, 0) + (more ? 90 : 0);
+  const width = Math.min(
+    3072,
+    Math.max(
+      720,
+      Math.round(
+        PAD * 2 +
+          Math.max(
+            measure(TITLE, title),
+            crewW,
+            ...lines.map((t) => measure(LINEF, t)),
+          ),
+      ),
+    ),
+  );
+  const yTitle = 72,
+    yAv = 130,
+    yLines = yAv + AV + (people.some((c) => !c.square) ? 96 : 60);
+  const height = Math.round(
+    yLines + lines.length * LINE + (lines.length ? 34 : 10),
+  );
+  canvas.width = width;
+  canvas.height = height;
+  const g = canvas.getContext('2d')!;
+  g.clearRect(0, 0, width, height);
+  g.fillStyle = v.highlight ? 'rgba(90,40,24,0.97)' : 'rgba(14,35,33,0.96)';
+  g.beginPath();
+  g.roundRect(8, 8, width - 16, height - 16, 60);
+  g.fill();
+  g.lineWidth = 6;
+  g.strokeStyle = v.highlight ? '#fbae97' : '#7fc9ad';
+  g.stroke();
+  g.fillStyle = v.highlight ? '#fbae97' : '#e9f6ef';
+  g.font = TITLE;
+  g.textAlign = 'left';
+  g.textBaseline = 'middle';
+  g.fillText(title, PAD, yTitle, width - PAD * 2);
+  let x = PAD;
+  for (const { p, square } of people) {
+    const w = square ? AV : nameW(p);
+    drawAvatar(g, p, x + (w - AV) / 2, yAv, AV, square, repaint);
+    if (!square) {
+      g.fillStyle = '#f3efe4';
+      g.font = `600 ${NAME + 8}px system-ui, sans-serif`;
+      g.textAlign = 'center';
+      g.textBaseline = 'middle';
+      g.fillText(p.name, x + w / 2, yAv + AV + 38, w + 10);
+      g.textAlign = 'left';
+    }
+    x += w + GAP;
+  }
+  if (more) {
+    g.fillStyle = '#cbedd9';
+    g.font = '600 48px system-ui, sans-serif';
+    g.textBaseline = 'middle';
+    g.fillText(`+${more}`, x, yAv + AV / 2);
+  }
+  if (lines.length) {
+    g.strokeStyle = 'rgba(255,255,255,0.18)';
+    g.lineWidth = 3;
+    g.beginPath();
+    g.moveTo(PAD, yLines - 26);
+    g.lineTo(width - PAD, yLines - 26);
+    g.stroke();
+  }
+  g.font = LINEF;
+  g.textBaseline = 'middle';
+  lines.forEach((t, i) => {
+    g.fillStyle =
+      i === lines.length - 1 &&
+      v.lines &&
+      v.lines.length === lines.length &&
+      i >= 3
+        ? '#cbedd9'
+        : '#e9f6ef';
+    g.fillText(t, PAD, yLines + LINE * i + LINE / 2 - 8, width - PAD * 2);
+  });
+  uploadLabel(sprite);
+  sprite.userData.widthM = width / LABEL_PX;
+  sprite.userData.heightM = height / LABEL_PX;
 }
 
 const KIND_ACCENT: Record<LiveKind, string> = {
@@ -482,6 +624,9 @@ export function createLiveLot(ctx: {
   let viewAz = -2.35,
     viewEl = 0.9;
   let night = 0;
+  /** The vehicle under the pointer (every other one is dimmed) and the one whose plate is opened. */
+  let hoverId: string | null = null,
+    expandedId: string | null = null;
   /** The lobby's sliding leaves (arrival.ts), opened for walkers; found once the scene has them. */
   let leaves: T.Object3D[] | null = null;
   let entryOpen = 0;
@@ -638,6 +783,11 @@ export function createLiveLot(ctx: {
           body: b,
           label,
           labelText: '',
+          plate: [LABEL_W, LABEL_H],
+          plateFrom: null,
+          plateT: 1,
+          drawnExpanded: false,
+          dim: 1,
           mode: 'waiting',
           drive: null,
           s: 0,
@@ -872,28 +1022,46 @@ export function createLiveLot(ctx: {
       ca = Math.cos(viewAz),
       se = Math.sin(viewEl),
       ce = Math.cos(viewEl);
-    const h = LABEL_H * labelScale;
-    const placed: { across: number; along: number; y: number; w: number }[] =
-      [];
+    const placed: {
+      across: number;
+      along: number;
+      y: number;
+      w: number;
+      h: number;
+    }[] = [];
+    // The opened plate is placed first so it keeps the low spot and the others stack around it.
     const items = Array.from(live.values())
       .filter((l) => l.opacity > 0.3)
-      .sort((a, b) => a.body.object.position.z - b.body.object.position.z);
+      .sort(
+        (a, b) =>
+          Number(b.v.id === expandedId) - Number(a.v.id === expandedId) ||
+          a.body.object.position.z - b.body.object.position.z,
+      );
     for (const l of items) {
       const { x, z } = l.body.object.position;
       const across = x * ca - z * sa,
         along = x * sa + z * ca;
-      const w = (l.label.userData.widthM as number) * labelScale;
-      let y = 3.6 + 1.2 * labelScale + (l.door > 0.01 ? 2.6 : 0);
+      const w = l.label.scale.x,
+        h = l.label.scale.y;
+      // The plate's bottom edge sits where the compact plate's always did; a taller plate grows upward from there.
+      const bottom =
+        3.6 +
+        1.2 * labelScale -
+        (LABEL_H * labelScale) / 2 +
+        (l.door > 0.01 ? 2.6 : 0);
+      let y = bottom + h / 2;
       for (let tries = 0; tries < 8; tries++) {
         const clash = placed.some(
           (p) =>
             Math.abs(p.across - across) < ((p.w + w) / 2) * 0.92 &&
-            Math.abs((p.along - along) * se + (p.y - y) * ce) < h * 1.02,
+            // Screen height: up for y, down for ground distance toward the camera.
+            Math.abs((p.y - y) * ce - (p.along - along) * se) <
+              ((p.h + h) / 2) * 1.02,
         );
         if (!clash) break;
         y += h * 1.08;
       }
-      placed.push({ across, along, y, w });
+      placed.push({ across, along, y, w, h });
       l.label.position.set(x, y, z);
     }
   }
@@ -956,6 +1124,9 @@ export function createLiveLot(ctx: {
       const rampGoal = l.door < 0.99 && l.ramp < 0.01 ? 0 : l.rampTarget;
       l.ramp = tween(l.ramp, rampGoal, RATE.ramp, dt);
       l.cab = tween(l.cab, l.cabTarget, RATE.cab, dt);
+      // Hovering one vehicle dims every other one (body and plate) to half; the change eases over ~0.2 s.
+      l.dim = tween(l.dim, hoverId && hoverId !== l.v.id ? 0.5 : 1, 3, dt);
+      const shown = l.opacity * l.dim;
       // Body, fade, doors, lamps and label.
       if (l.body.van)
         updateArrivalVan(
@@ -967,13 +1138,13 @@ export function createLiveLot(ctx: {
             door: l.door,
             ramp: l.body.hasRamp ? l.ramp : 0,
             cabDoor: l.cab,
-            opacity: l.opacity,
+            opacity: shown,
           },
           true,
         );
       else {
         l.body.object.visible = l.opacity > 0.01;
-        fadeVehicle(l.body.object, l.opacity);
+        fadeVehicle(l.body.object, shown);
         if (l.body.car)
           l.body.car.door.rotation.y =
             l.body.car.doorOpenAngle * smooth(0, 1, l.door);
@@ -985,27 +1156,49 @@ export function createLiveLot(ctx: {
         reversing: l.reversing,
         on: l.mode !== 'parked' && l.mode !== 'waiting' && l.opacity > 0.3,
       });
+      const expanded = l.v.id === expandedId;
       const text = JSON.stringify([
         l.v.label,
         l.v.detail ?? '',
         !!l.v.highlight,
         l.v.driver,
         l.v.riders,
+        expanded,
+        expanded ? l.v.lines : null,
       ]);
       if (text !== l.labelText) {
         const v = l.v;
-        paintLabel(l.label, v, () => {
+        const wasExpanded = l.drawnExpanded;
+        l.drawnExpanded = expanded;
+        paintLabel(l.label, v, expanded, () => {
           if (l.v === v) l.labelText = '';
         });
         l.labelText = text;
+        const boost = expanded ? EXPAND_BOOST : 1;
+        const next: [number, number] = [
+          (l.label.userData.widthM as number) * boost,
+          (l.label.userData.heightM as number) * boost,
+        ];
+        // Opening or closing the bubble grows or shrinks the plate over ~0.3 s instead of snapping.
+        if (expanded !== wasExpanded) {
+          l.plateFrom = l.plate;
+          l.plateT = 0;
+        }
+        l.plate = next;
       }
+      l.plateT = Math.min(1, l.plateT + dt / 0.3);
+      const k = l.plateFrom ? smooth(0, 1, l.plateT) : 1;
+      const [w0, h0] = l.plateFrom ?? l.plate;
+      if (l.plateT >= 1) l.plateFrom = null;
       l.label.scale.set(
-        (l.label.userData.widthM as number) * labelScale,
-        LABEL_H * labelScale,
+        (w0 + (l.plate[0] - w0) * k) * labelScale,
+        (h0 + (l.plate[1] - h0) * k) * labelScale,
         1,
       );
       l.label.visible = l.opacity > 0.3;
-      (l.label.material as T.SpriteMaterial).opacity = l.opacity;
+      // The opened bubble draws over every other plate.
+      l.label.renderOrder = expanded ? 11 : 10;
+      (l.label.material as T.SpriteMaterial).opacity = shown;
     }
     placeLabels();
     walkers.tick(dt);
@@ -1055,6 +1248,17 @@ export function createLiveLot(ctx: {
     /** 0 = day, 1 = night: lamps and headlight beams on the vehicles. */
     setNight(k: number) {
       night = Math.min(1, Math.max(0, k));
+    },
+    /** The vehicle under the pointer: every other vehicle and plate is drawn at half opacity while one is set. */
+    setHover(id: string | null) {
+      hoverId = id && live.has(id) ? id : null;
+    },
+    /** Open one vehicle's plate into its details bubble (null closes it). */
+    setExpanded(id: string | null) {
+      expandedId = id;
+    },
+    get expanded() {
+      return expandedId;
     },
     /** Debug view of every vehicle's state (`?debug=1` exposes the lot as `window.seenLot`). */
     inspect() {

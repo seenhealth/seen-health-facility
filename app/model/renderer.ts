@@ -42,12 +42,7 @@ import { alhambraSource } from './alhambra-source';
 import { COMMUNITY_SOURCE_ID, COMMUNITY_VIEW } from './community-settings';
 import { buildCommunityLayer } from './community-layer';
 import { registerCommunityVehicles } from './community-vehicles';
-import {
-  center,
-  type Facility,
-  type MaterialSpec,
-  type Vec2,
-} from './schema';
+import { center, type Facility, type MaterialSpec, type Vec2 } from './schema';
 
 /** Warm drawing-paper backdrop shared with the page behind the canvas. */
 export const PAPER = '#f3f0e9';
@@ -407,6 +402,13 @@ export type ViewerOptions = {
    * zone and room selection does not run (the live lot picks its vehicles this way).
    */
   pick?: (ray: T.Raycaster) => boolean;
+  /**
+   * Runs as the pointer moves over the canvas (at most once a frame) with the
+   * ray through it, and with null when the pointer leaves or a drag is under way,
+   * so a layer can pick out what is under the pointer (the live lot dims the
+   * other vehicles).
+   */
+  hover?: (ray: T.Raycaster | null) => void;
 };
 const SHOT_DISTANCE = 150;
 export function createViewer(
@@ -527,10 +529,7 @@ export function createViewer(
       return s - Math.floor(s);
     };
     // Grayscale shade per pixel with an optional warm bias for timber.
-    const shade = (
-      fn: (x: number, y: number) => number,
-      warm = [1, 1, 1],
-    ) => {
+    const shade = (fn: (x: number, y: number) => number, warm = [1, 1, 1]) => {
       for (let y = 0; y < size; y++)
         for (let x = 0; x < size; x++) {
           const v = Math.max(0, Math.min(1, fn(x, y))) * 255,
@@ -1786,8 +1785,42 @@ export function createViewer(
   const wheel = () => {
     zoomTarget = null;
   };
+  // Hover: the latest pointer position is turned into a ray once per frame.
+  let hoverAt: [number, number] | null = null,
+    hoverQueued = false;
+  const hoverFlush = () => {
+    hoverQueued = false;
+    if (!options.hover) return;
+    if (!hoverAt || !controls.enabled) return options.hover(null);
+    const r = renderer.domElement.getBoundingClientRect();
+    ray.setFromCamera(
+      new T.Vector2(
+        ((hoverAt[0] - r.left) / r.width) * 2 - 1,
+        (-(hoverAt[1] - r.top) / r.height) * 2 + 1,
+      ),
+      camera,
+    );
+    options.hover(ray);
+  };
+  const pm = (e: PointerEvent) => {
+    if (!options.hover) return;
+    hoverAt = e.buttons ? null : [e.clientX, e.clientY];
+    if (!hoverQueued) {
+      hoverQueued = true;
+      requestAnimationFrame(hoverFlush);
+    }
+  };
+  const pl = () => {
+    hoverAt = null;
+    if (options.hover && !hoverQueued) {
+      hoverQueued = true;
+      requestAnimationFrame(hoverFlush);
+    }
+  };
   renderer.domElement.addEventListener('pointerdown', pd);
   renderer.domElement.addEventListener('pointerup', pu);
+  renderer.domElement.addEventListener('pointermove', pm);
+  renderer.domElement.addEventListener('pointerleave', pl);
   const gameProps: T.Object3D[] = [];
   scene.traverse((o) => {
     if (o.userData.gameMotion) gameProps.push(o);
@@ -2073,7 +2106,9 @@ export function createViewer(
         for (let j = 0; j < i; j++)
           if (overlaps(a, zoneSlots[j]))
             a.stem =
-              a.y - (zoneSlots[j].y - zoneSlots[j].stem - zoneSlots[j].size[1]) + 6;
+              a.y -
+              (zoneSlots[j].y - zoneSlots[j].stem - zoneSlots[j].size[1]) +
+              6;
     }
     for (const a of zoneSlots) placeHighlight(a, true);
     for (let i = 0; i < tableSlots.length; i++) {
@@ -2102,7 +2137,13 @@ export function createViewer(
     frame = requestAnimationFrame(loop);
     const dt = Math.max(0, (now - lastTime) / 1000);
     lastTime = now;
-    if (autoQuality && !recordingSize && quality === 'high' && dt < 0.5 && !document.hidden) {
+    if (
+      autoQuality &&
+      !recordingSize &&
+      quality === 'high' &&
+      dt < 0.5 &&
+      !document.hidden
+    ) {
       if (++sampledFrames > 0 && dt > 0.045) slowFrames++;
       if (sampledFrames >= 180) {
         if (slowFrames > 120) {
@@ -2415,6 +2456,8 @@ export function createViewer(
       controls.dispose();
       renderer.domElement.removeEventListener('pointerdown', pd);
       renderer.domElement.removeEventListener('pointerup', pu);
+      renderer.domElement.removeEventListener('pointermove', pm);
+      renderer.domElement.removeEventListener('pointerleave', pl);
       renderer.domElement.removeEventListener('wheel', wheel);
       activity.dispose();
       const geos = new Set<T.BufferGeometry>(),
