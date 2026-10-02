@@ -36,11 +36,11 @@
      "action": "ride",
      "path": [
       [
-       -20.31,
+       -21.735,
        2.535
       ],
       [
-       -20.31,
+       -21.735,
        2.535
       ]
      ],
@@ -60,11 +60,11 @@
      "action": "walk",
      "path": [
       [
-       -20.31,
+       -21.735,
        2.535
       ],
       [
-       -20.31,
+       -21.735,
        5.435
       ]
      ],
@@ -80,23 +80,33 @@
     },
     {
      "start": 78,
-     "end": 90,
+     "end": 89.164,
      "action": "walk",
      "path": [
       [
-       -20.31,
+       -21.735,
        5.435
       ],
       [
-       -17,
+       -18.3,
        5.435
       ],
       [
-       -15.518,
-       5.5
+       -18.3,
+       2.45
+      ],
+      [
+       -17.15,
+       2.45
+      ],
+      [
+       -17.15,
+       2.9
       ]
      ],
      "heights": [
+      -0.23,
+      -0.23,
       -0.23,
       -0.23,
       -0.23
@@ -108,21 +118,56 @@
      "vehicleId": "van-a"
     },
     {
-     "start": 90,
-     "end": 108,
+     "start": 89.164,
+     "end": 110.912,
      "action": "walk",
      "path": [
       [
-       -15.518,
-       5.5
+       -17.15,
+       2.9
       ],
       [
-       -15.518,
+       -17.15,
+       7.6
+      ],
+      [
+       -17.15,
+       7.775
+      ],
+      [
+       -16.75,
+       8.175
+      ],
+      [
+       -15.9,
+       8.175
+      ],
+      [
+       -15.5,
+       7.775
+      ],
+      [
+       -15.5,
+       7.6
+      ],
+      [
+       -15.5,
+       3.6
+      ],
+      [
+       -15.5,
        -0.992
       ]
      ],
      "heights": [
       -0.23,
+      -0.115,
+      -0.115,
+      -0.115,
+      -0.115,
+      -0.115,
+      -0.115,
+      0,
       0
      ],
      "visible": true,
@@ -132,12 +177,12 @@
      "vehicleId": "van-a"
     },
     {
-     "start": 108,
+     "start": 110.912,
      "end": 113,
      "action": "walk",
      "path": [
       [
-       -15.518,
+       -15.5,
        -0.992
       ],
       [
@@ -301,7 +346,7 @@
      "seated": true,
      "action": "idle",
      "start": 144.9296,
-     "end": 159.2147,
+     "end": 159.2144,
      "path": [
       [
        -7.55,
@@ -318,8 +363,8 @@
      "heading": 0,
      "zoneId": "clinic",
      "title": "Walk to the therapy gym",
-     "start": 159.2147,
-     "end": 189.9481,
+     "start": 159.2144,
+     "end": 189.9479,
      "path": [
       [
        -7.55,
@@ -468,8 +513,8 @@
      "heading": 3.1416,
      "title": "Parallel bars with her physical therapist",
      "action": "exercise",
-     "start": 189.9481,
-     "end": 198.9481,
+     "start": 189.9479,
+     "end": 198.9479,
      "path": [
       [
        -22.8,
@@ -486,8 +531,8 @@
      "heading": 0,
      "zoneId": "rehab",
      "title": "Walk to the mat table",
-     "start": 198.9481,
-     "end": 211.15,
+     "start": 198.9479,
+     "end": 211.1498,
      "path": [
       [
        -22.8,
@@ -561,8 +606,8 @@
      "title": "Transfer practice with her occupational therapist",
      "seated": true,
      "action": "tabletop",
-     "start": 211.15,
-     "end": 226.812,
+     "start": 211.1498,
+     "end": 226.8117,
      "path": [
       [
        -25,
@@ -579,8 +624,8 @@
      "heading": 0,
      "zoneId": "rehab",
      "title": "Walk to the day room",
-     "start": 226.812,
-     "end": 240.5714,
+     "start": 226.8117,
+     "end": 240.571,
      "path": [
       [
        -25,
@@ -661,7 +706,7 @@
      "heading": 3.1416,
      "title": "Group movement in the day room · Exercise",
      "action": "exercise",
-     "start": 240.5714,
+     "start": 240.571,
      "end": 288,
      "path": [
       [
@@ -680,7 +725,7 @@
      "title": "Group movement in the day room · Fan dance",
      "action": "fan-dance",
      "start": 288,
-     "end": 288.4665,
+     "end": 288.4675,
      "path": [
       [
        -8.4,
@@ -697,8 +742,8 @@
      "heading": 0,
      "zoneId": "day",
      "title": "Walk to lunch",
-     "start": 288.4665,
-     "end": 308.9013,
+     "start": 288.4675,
+     "end": 308.9023,
      "path": [
       [
        -8.4,
@@ -776,8 +821,8 @@
      "title": "Lunch planned by her dietitian",
      "seated": true,
      "action": "seated",
-     "start": 308.9013,
-     "end": 329.0607,
+     "start": 308.9023,
+     "end": 329.0592,
      "path": [
       [
        3.287,
@@ -794,8 +839,8 @@
      "heading": 0,
      "zoneId": "dining",
      "title": "Walk to the social worker",
-     "start": 329.0607,
-     "end": 365.4215,
+     "start": 329.0592,
+     "end": 365.4199,
      "path": [
       [
        3.287,
@@ -953,8 +998,8 @@
      "title": "A quiet talk with her social worker",
      "seated": true,
      "action": "conversation",
-     "start": 365.4215,
-     "end": 378.0215,
+     "start": 365.4199,
+     "end": 378.0199,
      "path": [
       [
        1.781,
@@ -971,8 +1016,8 @@
      "heading": 0,
      "zoneId": "admin",
      "title": "Walk to personal care",
-     "start": 378.0215,
-     "end": 409.5853,
+     "start": 378.0199,
+     "end": 409.5838,
      "path": [
       [
        1.781,
@@ -1114,8 +1159,8 @@
      "title": "Supported shower and hair care",
      "seated": true,
      "action": "seated",
-     "start": 409.5853,
-     "end": 423.9853,
+     "start": 409.5838,
+     "end": 423.9838,
      "path": [
       [
        6.72,
@@ -1132,8 +1177,8 @@
      "heading": 0,
      "zoneId": "ot",
      "title": "Walk to the ping-pong table",
-     "start": 423.9853,
-     "end": 453.8886,
+     "start": 423.9838,
+     "end": 453.8871,
      "path": [
       [
        6.72,
@@ -1250,8 +1295,8 @@
      "heading": 1.5708,
      "title": "A gentle rally at the ping-pong table",
      "action": "ping-pong",
-     "start": 453.8886,
-     "end": 481.5808,
+     "start": 453.8871,
+     "end": 481.5786,
      "path": [
       [
        4.3,
@@ -1268,8 +1313,8 @@
      "heading": 0,
      "zoneId": "admin",
      "title": "Walk to the karaoke room",
-     "start": 481.5808,
-     "end": 490.1146,
+     "start": 481.5786,
+     "end": 490.1124,
      "path": [
       [
        4.3,
@@ -1350,8 +1395,8 @@
      "heading": 1.5708,
      "title": "Karaoke: she always sings first",
      "action": "karaoke",
-     "start": 490.1146,
-     "end": 499.1146,
+     "start": 490.1124,
+     "end": 499.1124,
      "path": [
       [
        12.9,
@@ -1368,8 +1413,8 @@
      "heading": 0,
      "zoneId": "admin",
      "title": "Walk back to the lobby",
-     "start": 499.1146,
-     "end": 543.7675,
+     "start": 499.1124,
+     "end": 543.7653,
      "path": [
       [
        12.9,
@@ -1514,8 +1559,8 @@
      "heading": -1.5708,
      "title": "The plan goes home with her",
      "action": "greet",
-     "start": 543.7675,
-     "end": 555.8965,
+     "start": 543.7653,
+     "end": 555.8989,
      "path": [
       [
        -12.4,
@@ -1528,7 +1573,7 @@
      ]
     },
     {
-     "start": 555.8965,
+     "start": 555.8989,
      "end": 586,
      "action": "walk",
      "path": [
@@ -1589,23 +1634,59 @@
        -0.992
       ],
       [
-       -15.518,
+       -15.5,
        -0.992
       ],
       [
-       -15.518,
-       5.5
+       -15.5,
+       3.6
       ],
       [
-       -17,
+       -15.5,
+       7.6
+      ],
+      [
+       -15.5,
+       7.775
+      ],
+      [
+       -15.9,
+       8.175
+      ],
+      [
+       -16.75,
+       8.175
+      ],
+      [
+       -17.15,
+       7.775
+      ],
+      [
+       -17.15,
+       7.6
+      ],
+      [
+       -17.15,
+       2.9
+      ],
+      [
+       -17.15,
+       2.45
+      ],
+      [
+       -18.3,
+       2.45
+      ],
+      [
+       -18.3,
        5.435
       ],
       [
-       -20.31,
+       -21.735,
        5.435
       ],
       [
-       -20.31,
+       -21.735,
        2.535
       ]
      ],
@@ -1625,6 +1706,15 @@
       0,
       0,
       0,
+      0,
+      -0.115,
+      -0.115,
+      -0.115,
+      -0.115,
+      -0.115,
+      -0.115,
+      -0.23,
+      -0.23,
       -0.23,
       -0.23,
       -0.23,
@@ -1642,11 +1732,11 @@
      "action": "ride",
      "path": [
       [
-       -20.31,
+       -21.735,
        2.535
       ],
       [
-       -20.31,
+       -21.735,
        2.535
       ]
      ],
@@ -1677,11 +1767,11 @@
      "action": "ride",
      "path": [
       [
-       -20.31,
+       -21.735,
        2.535
       ],
       [
-       -20.31,
+       -21.735,
        2.535
       ]
      ],
@@ -1701,11 +1791,11 @@
      "action": "walk",
      "path": [
       [
-       -20.31,
+       -21.735,
        2.535
       ],
       [
-       -20.31,
+       -21.735,
        5.435
       ]
      ],
@@ -1721,23 +1811,33 @@
     },
     {
      "start": 78,
-     "end": 90,
+     "end": 89.164,
      "action": "walk",
      "path": [
       [
-       -20.31,
+       -21.735,
        5.435
       ],
       [
-       -17,
+       -18.3,
        5.435
       ],
       [
-       -15.518,
-       5.5
+       -18.3,
+       2.45
+      ],
+      [
+       -17.15,
+       2.45
+      ],
+      [
+       -17.15,
+       2.9
       ]
      ],
      "heights": [
+      -0.23,
+      -0.23,
       -0.23,
       -0.23,
       -0.23
@@ -1749,21 +1849,56 @@
      "vehicleId": "van-a"
     },
     {
-     "start": 90,
-     "end": 108,
+     "start": 89.164,
+     "end": 110.912,
      "action": "walk",
      "path": [
       [
-       -15.518,
-       5.5
+       -17.15,
+       2.9
       ],
       [
-       -15.518,
+       -17.15,
+       7.6
+      ],
+      [
+       -17.15,
+       7.775
+      ],
+      [
+       -16.75,
+       8.175
+      ],
+      [
+       -15.9,
+       8.175
+      ],
+      [
+       -15.5,
+       7.775
+      ],
+      [
+       -15.5,
+       7.6
+      ],
+      [
+       -15.5,
+       3.6
+      ],
+      [
+       -15.5,
        -0.992
       ]
      ],
      "heights": [
       -0.23,
+      -0.115,
+      -0.115,
+      -0.115,
+      -0.115,
+      -0.115,
+      -0.115,
+      0,
       0
      ],
      "visible": true,
@@ -1773,12 +1908,12 @@
      "vehicleId": "van-a"
     },
     {
-     "start": 108,
+     "start": 110.912,
      "end": 113,
      "action": "walk",
      "path": [
       [
-       -15.518,
+       -15.5,
        -0.992
       ],
       [
@@ -1942,7 +2077,7 @@
      "seated": true,
      "action": "idle",
      "start": 144.9296,
-     "end": 159.2147,
+     "end": 159.2144,
      "path": [
       [
        -7.55,
@@ -1959,8 +2094,8 @@
      "heading": 0,
      "zoneId": "clinic",
      "title": "Walk to the therapy gym",
-     "start": 159.2147,
-     "end": 189.9481,
+     "start": 159.2144,
+     "end": 189.9479,
      "path": [
       [
        -7.55,
@@ -2109,8 +2244,8 @@
      "heading": 3.1416,
      "title": "Parallel bars with her physical therapist",
      "action": "exercise",
-     "start": 189.9481,
-     "end": 198.9481,
+     "start": 189.9479,
+     "end": 198.9479,
      "path": [
       [
        -22.8,
@@ -2127,8 +2262,8 @@
      "heading": 0,
      "zoneId": "rehab",
      "title": "Walk to the mat table",
-     "start": 198.9481,
-     "end": 211.15,
+     "start": 198.9479,
+     "end": 211.1498,
      "path": [
       [
        -22.8,
@@ -2202,8 +2337,8 @@
      "title": "Transfer practice with her occupational therapist",
      "seated": true,
      "action": "tabletop",
-     "start": 211.15,
-     "end": 226.812,
+     "start": 211.1498,
+     "end": 226.8117,
      "path": [
       [
        -25,
@@ -2220,8 +2355,8 @@
      "heading": 0,
      "zoneId": "rehab",
      "title": "Walk to the day room",
-     "start": 226.812,
-     "end": 240.5714,
+     "start": 226.8117,
+     "end": 240.571,
      "path": [
       [
        -25,
@@ -2302,7 +2437,7 @@
      "heading": 3.1416,
      "title": "Group movement in the day room · Exercise",
      "action": "exercise",
-     "start": 240.5714,
+     "start": 240.571,
      "end": 288,
      "path": [
       [
@@ -2321,7 +2456,7 @@
      "title": "Group movement in the day room · Fan dance",
      "action": "fan-dance",
      "start": 288,
-     "end": 288.4665,
+     "end": 288.4675,
      "path": [
       [
        -8.4,
@@ -2338,8 +2473,8 @@
      "heading": 0,
      "zoneId": "day",
      "title": "Walk to lunch",
-     "start": 288.4665,
-     "end": 308.9013,
+     "start": 288.4675,
+     "end": 308.9023,
      "path": [
       [
        -8.4,
@@ -2417,8 +2552,8 @@
      "title": "Lunch planned by her dietitian",
      "seated": true,
      "action": "seated",
-     "start": 308.9013,
-     "end": 329.0607,
+     "start": 308.9023,
+     "end": 329.0592,
      "path": [
       [
        3.287,
@@ -2435,8 +2570,8 @@
      "heading": 0,
      "zoneId": "dining",
      "title": "Walk to the social worker",
-     "start": 329.0607,
-     "end": 365.4215,
+     "start": 329.0592,
+     "end": 365.4199,
      "path": [
       [
        3.287,
@@ -2594,8 +2729,8 @@
      "title": "A quiet talk with her social worker",
      "seated": true,
      "action": "conversation",
-     "start": 365.4215,
-     "end": 378.0215,
+     "start": 365.4199,
+     "end": 378.0199,
      "path": [
       [
        1.781,
@@ -2612,8 +2747,8 @@
      "heading": 0,
      "zoneId": "admin",
      "title": "Walk to personal care",
-     "start": 378.0215,
-     "end": 409.5853,
+     "start": 378.0199,
+     "end": 409.5838,
      "path": [
       [
        1.781,
@@ -2755,8 +2890,8 @@
      "title": "Supported shower and hair care",
      "seated": true,
      "action": "seated",
-     "start": 409.5853,
-     "end": 423.9853,
+     "start": 409.5838,
+     "end": 423.9838,
      "path": [
       [
        6.72,
@@ -2773,8 +2908,8 @@
      "heading": 0,
      "zoneId": "ot",
      "title": "Walk to the ping-pong table",
-     "start": 423.9853,
-     "end": 453.8886,
+     "start": 423.9838,
+     "end": 453.8871,
      "path": [
       [
        6.72,
@@ -2891,8 +3026,8 @@
      "heading": 1.5708,
      "title": "A gentle rally at the ping-pong table",
      "action": "ping-pong",
-     "start": 453.8886,
-     "end": 481.5808,
+     "start": 453.8871,
+     "end": 481.5786,
      "path": [
       [
        4.3,
@@ -2909,8 +3044,8 @@
      "heading": 0,
      "zoneId": "admin",
      "title": "Walk to the karaoke room",
-     "start": 481.5808,
-     "end": 490.1146,
+     "start": 481.5786,
+     "end": 490.1124,
      "path": [
       [
        4.3,
@@ -2991,8 +3126,8 @@
      "heading": 1.5708,
      "title": "Karaoke: she always sings first",
      "action": "karaoke",
-     "start": 490.1146,
-     "end": 499.1146,
+     "start": 490.1124,
+     "end": 499.1124,
      "path": [
       [
        12.9,
@@ -3009,8 +3144,8 @@
      "heading": 0,
      "zoneId": "admin",
      "title": "Walk back to the lobby",
-     "start": 499.1146,
-     "end": 543.7675,
+     "start": 499.1124,
+     "end": 543.7653,
      "path": [
       [
        12.9,
@@ -3155,8 +3290,8 @@
      "heading": -1.5708,
      "title": "The plan goes home with her",
      "action": "greet",
-     "start": 543.7675,
-     "end": 555.8965,
+     "start": 543.7653,
+     "end": 555.8989,
      "path": [
       [
        -12.4,
@@ -3169,7 +3304,7 @@
      ]
     },
     {
-     "start": 555.8965,
+     "start": 555.8989,
      "end": 586,
      "action": "walk",
      "path": [
@@ -3230,23 +3365,59 @@
        -0.992
       ],
       [
-       -15.518,
+       -15.5,
        -0.992
       ],
       [
-       -15.518,
-       5.5
+       -15.5,
+       3.6
       ],
       [
-       -17,
+       -15.5,
+       7.6
+      ],
+      [
+       -15.5,
+       7.775
+      ],
+      [
+       -15.9,
+       8.175
+      ],
+      [
+       -16.75,
+       8.175
+      ],
+      [
+       -17.15,
+       7.775
+      ],
+      [
+       -17.15,
+       7.6
+      ],
+      [
+       -17.15,
+       2.9
+      ],
+      [
+       -17.15,
+       2.45
+      ],
+      [
+       -18.3,
+       2.45
+      ],
+      [
+       -18.3,
        5.435
       ],
       [
-       -20.31,
+       -21.735,
        5.435
       ],
       [
-       -20.31,
+       -21.735,
        2.535
       ]
      ],
@@ -3266,6 +3437,15 @@
       0,
       0,
       0,
+      0,
+      -0.115,
+      -0.115,
+      -0.115,
+      -0.115,
+      -0.115,
+      -0.115,
+      -0.23,
+      -0.23,
       -0.23,
       -0.23,
       -0.23,
@@ -3283,11 +3463,11 @@
      "action": "ride",
      "path": [
       [
-       -20.31,
+       -21.735,
        2.535
       ],
       [
-       -20.31,
+       -21.735,
        2.535
       ]
      ],
@@ -3501,7 +3681,7 @@
      "zoneId": "lobby",
      "heading": 0,
      "start": 152.2404,
-     "end": 525.7211,
+     "end": 526.7188,
      "path": [
       [
        -4.1,
@@ -3518,8 +3698,8 @@
      "heading": 0,
      "zoneId": "lobby",
      "title": "Walk to see you thursday",
-     "start": 525.7211,
-     "end": 539.7675,
+     "start": 526.7188,
+     "end": 540.7653,
      "path": [
       [
        -4.1,
@@ -3580,8 +3760,8 @@
      "zoneId": "lobby",
      "heading": 1.5708,
      "title": "See you Thursday",
-     "start": 539.7675,
-     "end": 555.8965,
+     "start": 540.7653,
+     "end": 555.8989,
      "path": [
       [
        -13.4,
@@ -3598,8 +3778,8 @@
      "heading": 0,
      "zoneId": "lobby",
      "title": "Back to base",
-     "start": 555.8965,
-     "end": 569.943,
+     "start": 555.8989,
+     "end": 569.9453,
      "path": [
       [
        -13.4,
@@ -3673,7 +3853,7 @@
      "title": "Off duty",
      "zoneId": "lobby",
      "heading": 0,
-     "start": 569.943,
+     "start": 569.9453,
      "end": 720,
      "path": [
       [
@@ -3808,7 +3988,7 @@
      "heading": -0.9828,
      "title": "Orthostatic blood-pressure recheck",
      "start": 141.9296,
-     "end": 164.2147,
+     "end": 164.2144,
      "path": [
       [
        -6.8,
@@ -3825,8 +4005,8 @@
      "heading": 0,
      "zoneId": "clinic",
      "title": "Back to base",
-     "start": 164.2147,
-     "end": 173.2996,
+     "start": 164.2144,
+     "end": 173.2994,
      "path": [
       [
        -6.8,
@@ -3892,8 +4072,8 @@
      "title": "Off duty",
      "zoneId": "clinic",
      "heading": 0,
-     "start": 173.2996,
-     "end": 391.3685,
+     "start": 173.2994,
+     "end": 391.3669,
      "path": [
       [
        -1.9,
@@ -3910,8 +4090,8 @@
      "heading": 0,
      "zoneId": "clinic",
      "title": "Walk to skin check",
-     "start": 391.3685,
-     "end": 406.5853,
+     "start": 391.3669,
+     "end": 406.5838,
      "path": [
       [
        -1.9,
@@ -3988,8 +4168,8 @@
      "zoneId": "ot",
      "heading": -1.9784,
      "title": "Skin check",
-     "start": 406.5853,
-     "end": 424.9853,
+     "start": 406.5838,
+     "end": 424.9838,
      "path": [
       [
        7.6,
@@ -4006,8 +4186,8 @@
      "heading": 0,
      "zoneId": "ot",
      "title": "Back to base",
-     "start": 424.9853,
-     "end": 440.2021,
+     "start": 424.9838,
+     "end": 440.2006,
      "path": [
       [
        7.6,
@@ -4097,7 +4277,7 @@
      "title": "Off duty",
      "zoneId": "clinic",
      "heading": 0,
-     "start": 440.2021,
+     "start": 440.2006,
      "end": 720,
      "path": [
       [
@@ -4209,7 +4389,7 @@
      "title": "Medication review on the spot",
      "seated": true,
      "start": 149.9296,
-     "end": 157.2147,
+     "end": 157.2144,
      "path": [
       [
        -8.45,
@@ -4226,8 +4406,8 @@
      "heading": 0,
      "zoneId": "clinic",
      "title": "Back to base",
-     "start": 157.2147,
-     "end": 170.7042,
+     "start": 157.2144,
+     "end": 170.7039,
      "path": [
       [
        -8.45,
@@ -4309,7 +4489,7 @@
      "title": "Off duty",
      "zoneId": "clinic",
      "heading": 0,
-     "start": 170.7042,
+     "start": 170.7039,
      "end": 720,
      "path": [
       [
@@ -4340,7 +4520,7 @@
      "zoneId": "rehab",
      "heading": 0,
      "start": 0,
-     "end": 178.8818,
+     "end": 178.8815,
      "path": [
       [
        -28.1,
@@ -4357,8 +4537,8 @@
      "heading": 0,
      "zoneId": "rehab",
      "title": "Walk to balance and gait training",
-     "start": 178.8818,
-     "end": 191.9481,
+     "start": 178.8815,
+     "end": 191.9479,
      "path": [
       [
        -28.1,
@@ -4415,8 +4595,8 @@
      "zoneId": "rehab",
      "heading": -1.2068,
      "title": "Balance and gait training",
-     "start": 191.9481,
-     "end": 199.9481,
+     "start": 191.9479,
+     "end": 199.9479,
      "path": [
       [
        -21.75,
@@ -4433,8 +4613,8 @@
      "heading": 0,
      "zoneId": "rehab",
      "title": "Back to base",
-     "start": 199.9481,
-     "end": 213.0145,
+     "start": 199.9479,
+     "end": 213.0142,
      "path": [
       [
        -21.75,
@@ -4516,7 +4696,7 @@
      "title": "Off duty",
      "zoneId": "rehab",
      "heading": 0,
-     "start": 213.0145,
+     "start": 213.0142,
      "end": 720,
      "path": [
       [
@@ -4547,7 +4727,7 @@
      "zoneId": "rehab",
      "heading": 0,
      "start": 0,
-     "end": 203.4328,
+     "end": 203.4326,
      "path": [
       [
        -25.2,
@@ -4564,8 +4744,8 @@
      "heading": 0,
      "zoneId": "rehab",
      "title": "Walk to shower-transfer practice",
-     "start": 203.4328,
-     "end": 207.15,
+     "start": 203.4326,
+     "end": 207.1498,
      "path": [
       [
        -25.2,
@@ -4598,8 +4778,8 @@
      "zoneId": "rehab",
      "heading": -0.7086,
      "title": "Shower-transfer practice",
-     "start": 207.15,
-     "end": 229.812,
+     "start": 207.1498,
+     "end": 229.8117,
      "path": [
       [
        -24.4,
@@ -4616,8 +4796,8 @@
      "heading": 0,
      "zoneId": "rehab",
      "title": "Back to base",
-     "start": 229.812,
-     "end": 233.5293,
+     "start": 229.8117,
+     "end": 233.5289,
      "path": [
       [
        -24.4,
@@ -4651,7 +4831,7 @@
      "title": "Off duty",
      "zoneId": "rehab",
      "heading": 0,
-     "start": 233.5293,
+     "start": 233.5289,
      "end": 720,
      "path": [
       [
@@ -4682,7 +4862,7 @@
      "zoneId": "kitchen",
      "heading": 0,
      "start": 0,
-     "end": 290.3466,
+     "end": 290.3476,
      "path": [
       [
        12.2,
@@ -4699,8 +4879,8 @@
      "heading": 0,
      "zoneId": "kitchen",
      "title": "Walk to low-sodium, soft-texture plan",
-     "start": 290.3466,
-     "end": 310.9013,
+     "start": 290.3476,
+     "end": 310.9023,
      "path": [
       [
        12.2,
@@ -4781,8 +4961,8 @@
      "zoneId": "dining",
      "heading": -2.227,
      "title": "Low-sodium, soft-texture plan",
-     "start": 310.9013,
-     "end": 326.0607,
+     "start": 310.9023,
+     "end": 326.0592,
      "path": [
       [
        4.2,
@@ -4799,8 +4979,8 @@
      "heading": 0,
      "zoneId": "dining",
      "title": "Back to base",
-     "start": 326.0607,
-     "end": 346.6154,
+     "start": 326.0592,
+     "end": 346.6139,
      "path": [
       [
        4.2,
@@ -4894,7 +5074,7 @@
      "title": "Off duty",
      "zoneId": "kitchen",
      "heading": 0,
-     "start": 346.6154,
+     "start": 346.6139,
      "end": 720,
      "path": [
       [
@@ -4925,7 +5105,7 @@
      "zoneId": "admin",
      "heading": 0,
      "start": 0,
-     "end": 352.1797,
+     "end": 352.1782,
      "path": [
       [
        1.85,
@@ -4942,8 +5122,8 @@
      "heading": 0,
      "zoneId": "admin",
      "title": "Walk to planning for the daughter's trip",
-     "start": 352.1797,
-     "end": 359.4215,
+     "start": 352.1782,
+     "end": 359.4199,
      "path": [
       [
        1.85,
@@ -5001,8 +5181,8 @@
      "heading": 3.1416,
      "title": "Planning for the daughter's trip",
      "seated": true,
-     "start": 359.4215,
-     "end": 379.0215,
+     "start": 359.4199,
+     "end": 379.0199,
      "path": [
       [
        1.781,
@@ -5019,8 +5199,8 @@
      "heading": 0,
      "zoneId": "admin",
      "title": "Back to base",
-     "start": 379.0215,
-     "end": 386.2632,
+     "start": 379.0199,
+     "end": 386.2617,
      "path": [
       [
        1.781,
@@ -5074,7 +5254,7 @@
      "title": "Off duty",
      "zoneId": "admin",
      "heading": 0,
-     "start": 386.2632,
+     "start": 386.2617,
      "end": 720,
      "path": [
       [
@@ -5105,7 +5285,7 @@
      "zoneId": "veranda",
      "heading": 0,
      "start": 0,
-     "end": 435.257,
+     "end": 435.2555,
      "path": [
       [
        -13.3,
@@ -5122,8 +5302,8 @@
      "heading": 0,
      "zoneId": "veranda",
      "title": "Walk to table-tennis partner",
-     "start": 435.257,
-     "end": 449.8886,
+     "start": 435.2555,
+     "end": 449.8871,
      "path": [
       [
        12,
@@ -5236,8 +5416,8 @@
      "zoneId": "admin",
      "heading": -1.5708,
      "title": "Table-tennis partner",
-     "start": 449.8886,
-     "end": 478.5808,
+     "start": 449.8871,
+     "end": 478.5786,
      "path": [
       [
        8.3,
@@ -5254,8 +5434,8 @@
      "zoneId": "admin",
      "heading": -1.5708,
      "title": "Waiting",
-     "start": 478.5808,
-     "end": 480.3339,
+     "start": 478.5786,
+     "end": 480.3316,
      "path": [
       [
        8.3,
@@ -5272,8 +5452,8 @@
      "heading": 0,
      "zoneId": "admin",
      "title": "Walk to karaoke host",
-     "start": 480.3339,
-     "end": 488.1146,
+     "start": 480.3316,
+     "end": 488.1124,
      "path": [
       [
        8.3,
@@ -5346,8 +5526,8 @@
      "zoneId": "admin",
      "heading": 1.5708,
      "title": "Karaoke host",
-     "start": 488.1146,
-     "end": 501.1146,
+     "start": 488.1124,
+     "end": 501.1124,
      "path": [
       [
        11.5,
@@ -5364,8 +5544,8 @@
      "heading": 0,
      "zoneId": "admin",
      "title": "Back to base",
-     "start": 501.1146,
-     "end": 562.1561,
+     "start": 501.1124,
+     "end": 562.1539,
      "path": [
       [
        11.5,
@@ -5507,7 +5687,7 @@
      "title": "Off duty",
      "zoneId": "lobby",
      "heading": 0,
-     "start": 562.1561,
+     "start": 562.1539,
      "end": 720,
      "path": [
       [
@@ -5538,7 +5718,7 @@
      "zoneId": "lobby",
      "heading": 0,
      "start": 0,
-     "end": 522.5467,
+     "end": 522.5444,
      "path": [
       [
        -4.8,
@@ -5555,8 +5735,8 @@
      "heading": 0,
      "zoneId": "lobby",
      "title": "Walk to tonight's visit and the shower chair",
-     "start": 522.5467,
-     "end": 540.7675,
+     "start": 522.5444,
+     "end": 540.7653,
      "path": [
       [
        -4.8,
@@ -5617,8 +5797,8 @@
      "zoneId": "lobby",
      "heading": 1.5708,
      "title": "Tonight's visit and the shower chair",
-     "start": 540.7675,
-     "end": 556.8965,
+     "start": 540.7653,
+     "end": 556.8989,
      "path": [
       [
        -13.35,
@@ -5635,8 +5815,8 @@
      "heading": 0,
      "zoneId": "lobby",
      "title": "Back to base",
-     "start": 556.8965,
-     "end": 575.1174,
+     "start": 556.8989,
+     "end": 575.1197,
      "path": [
       [
        -13.35,
@@ -5706,7 +5886,7 @@
      "title": "Off duty",
      "zoneId": "lobby",
      "heading": 0,
-     "start": 575.1174,
+     "start": 575.1197,
      "end": 720,
      "path": [
       [
@@ -9738,7 +9918,7 @@
     "arrival-aide-a",
     "driver-1"
    ],
-   "start": 555.8965,
+   "start": 555.8989,
    "end": 586,
    "zoneId": "site",
    "description": "Back through the sliding entrance and down the accessible ramp to board Van A."
@@ -9754,7 +9934,7 @@
     "idt-pcp"
    ],
    "start": 144.9296,
-   "end": 159.2147,
+   "end": 159.2144,
    "zoneId": "clinic",
    "description": "9:35 AM · Clinic"
   },
@@ -9767,8 +9947,8 @@
     "arrival-aide-a",
     "idt-pt"
    ],
-   "start": 189.9481,
-   "end": 198.9481,
+   "start": 189.9479,
+   "end": 198.9479,
    "zoneId": "rehab",
    "description": "10:05 AM · Physical & occupational therapy"
   },
@@ -9781,8 +9961,8 @@
     "arrival-aide-a",
     "idt-ot"
    ],
-   "start": 211.15,
-   "end": 226.812,
+   "start": 211.1498,
+   "end": 226.8117,
    "zoneId": "rehab",
    "description": "10:05 AM · Physical & occupational therapy"
   },
@@ -9799,8 +9979,8 @@
     "member-group-02",
     "member-wheelchair"
    ],
-   "start": 240.5714,
-   "end": 288.4665,
+   "start": 240.571,
+   "end": 288.4675,
    "zoneId": "day",
    "description": "10:40 AM · Day room"
   },
@@ -9816,8 +9996,8 @@
     "seated-3",
     "food-service-01"
    ],
-   "start": 308.9013,
-   "end": 329.0607,
+   "start": 308.9023,
+   "end": 329.0592,
    "zoneId": "dining",
    "description": "11:25 AM · Dining"
   },
@@ -9830,8 +10010,8 @@
     "arrival-aide-a",
     "idt-msw"
    ],
-   "start": 365.4215,
-   "end": 378.0215,
+   "start": 365.4199,
+   "end": 378.0199,
    "zoneId": "admin",
    "description": "12:00 PM · Social work"
   },
@@ -9844,8 +10024,8 @@
     "arrival-aide-a",
     "idt-rn"
    ],
-   "start": 409.5853,
-   "end": 423.9853,
+   "start": 409.5838,
+   "end": 423.9838,
    "zoneId": "ot",
    "description": "12:25 PM · Personal care"
   },
@@ -9858,8 +10038,8 @@
     "arrival-aide-a",
     "idt-rec"
    ],
-   "start": 453.8886,
-   "end": 481.5808,
+   "start": 453.8871,
+   "end": 481.5786,
    "zoneId": "admin",
    "description": "12:55 PM · Table tennis & karaoke"
   },
@@ -9872,8 +10052,8 @@
     "arrival-aide-a",
     "idt-rec"
    ],
-   "start": 490.1146,
-   "end": 499.1146,
+   "start": 490.1124,
+   "end": 499.1124,
    "zoneId": "admin",
    "description": "12:55 PM · Table tennis & karaoke"
   },
@@ -9888,8 +10068,8 @@
     "idt-cm",
     "receptionist-02"
    ],
-   "start": 543.7675,
-   "end": 555.8965,
+   "start": 543.7653,
+   "end": 555.8989,
    "zoneId": "lobby",
    "description": "2:00 PM · Getting ready to leave"
   },
@@ -10117,8 +10297,8 @@
      "action": "idle",
      "seated": true,
      "arrive": 144.9296,
-     "depart": 159.2147,
-     "overlap": 14.29,
+     "depart": 159.2144,
+     "overlap": 14.28,
      "focusTime": 152.07,
      "companionIds": [
       "idt-rn",
@@ -10182,8 +10362,8 @@
      "heading": 3.1416,
      "action": "exercise",
      "seated": false,
-     "arrive": 189.9481,
-     "depart": 198.9481,
+     "arrive": 189.9479,
+     "depart": 198.9479,
      "overlap": 9,
      "focusTime": 194.45,
      "companionIds": [
@@ -10210,8 +10390,8 @@
      "heading": 1.5708,
      "action": "tabletop",
      "seated": true,
-     "arrive": 211.15,
-     "depart": 226.812,
+     "arrive": 211.1498,
+     "depart": 226.8117,
      "overlap": 15.66,
      "focusTime": 218.98,
      "companionIds": [
@@ -10277,8 +10457,8 @@
      "heading": 3.1416,
      "action": "exercise",
      "seated": false,
-     "arrive": 240.5714,
-     "depart": 288.4665,
+     "arrive": 240.571,
+     "depart": 288.4675,
      "overlap": 46.43,
      "focusTime": 263.79,
      "companionIds": [],
@@ -10353,8 +10533,8 @@
      "heading": 5.4978,
      "action": "seated",
      "seated": true,
-     "arrive": 308.9013,
-     "depart": 329.0607,
+     "arrive": 308.9023,
+     "depart": 329.0592,
      "overlap": 20.16,
      "focusTime": 318.98,
      "companionIds": [
@@ -10416,8 +10596,8 @@
      "heading": 0,
      "action": "conversation",
      "seated": true,
-     "arrive": 365.4215,
-     "depart": 378.0215,
+     "arrive": 365.4199,
+     "depart": 378.0199,
      "overlap": 12.6,
      "focusTime": 371.72,
      "companionIds": [
@@ -10454,7 +10634,7 @@
    "heroPresent": true,
    "zoneId": "ot",
    "roomId": "rear-wc-east",
-   "focusTime": 416.79,
+   "focusTime": 416.78,
    "focusActorId": "hero-lin",
    "stops": [
     {
@@ -10474,10 +10654,10 @@
      "heading": 0,
      "action": "seated",
      "seated": true,
-     "arrive": 409.5853,
-     "depart": 423.9853,
+     "arrive": 409.5838,
+     "depart": 423.9838,
      "overlap": 14.4,
-     "focusTime": 416.79,
+     "focusTime": 416.78,
      "companionIds": [
       "idt-rn"
      ],
@@ -10533,8 +10713,8 @@
      "heading": 1.5708,
      "action": "ping-pong",
      "seated": false,
-     "arrive": 453.8886,
-     "depart": 481.5808,
+     "arrive": 453.8871,
+     "depart": 481.5786,
      "overlap": 24.11,
      "focusTime": 465.94,
      "companionIds": [
@@ -10561,8 +10741,8 @@
      "heading": 1.5708,
      "action": "karaoke",
      "seated": false,
-     "arrive": 490.1146,
-     "depart": 499.1146,
+     "arrive": 490.1124,
+     "depart": 499.1124,
      "overlap": 9,
      "focusTime": 494.61,
      "companionIds": [
@@ -10621,8 +10801,8 @@
      "heading": -1.5708,
      "action": "greet",
      "seated": false,
-     "arrive": 543.7675,
-     "depart": 555.8965,
+     "arrive": 543.7653,
+     "depart": 555.8989,
      "overlap": 8.23,
      "focusTime": 547.88,
      "companionIds": [
@@ -10765,7 +10945,7 @@
  "heroSpeed": 1.36,
  "notes": [
   "Departure re-derived from the farewell anchor.",
-  "idt-cm: 2 walk(s) re-timed to avoid passing through people",
+  "idt-cm: 1 walk(s) re-timed to avoid passing through people",
   "idt-rec: 1 walk(s) re-timed to avoid passing through people"
  ]
 }
