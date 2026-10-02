@@ -14,37 +14,77 @@ import { createLiveLot, type LiveMessage } from '../../app/model/live-lot';
 async function main() {
   const host = document.getElementById('root')!;
   const hud = document.getElementById('hud')!;
-  const model = validateFacility(await (await fetch('/models/seen-alhambra-planning.json')).json());
+  const model = validateFacility(
+    await (await fetch('/models/seen-alhambra-planning.json')).json(),
+  );
   let lot: ReturnType<typeof createLiveLot> | null = null;
   const viewer = createViewer(host, model, () => {}, {
     interactive: true,
     labels: false,
-    layer: (ctx) => (lot = createLiveLot(ctx)),
+    layer: (ctx) => {
+      // `?debug=1` exposes the scene for inspection from the console.
+      if (new URLSearchParams(location.search).has('debug'))
+        (window as unknown as { seenScene?: unknown }).seenScene = ctx.scene;
+      return (lot = createLiveLot(ctx));
+    },
   });
   // No care-day cast and no community pads: only the center, its streets and the live vehicles.
   viewer.activity.setOptions({ enabled: false, playing: false, time: 180 });
   viewer.update({ ...defaultState, labels: false, community: false });
-  // The lot with the approach streets. The viewer re-frames the site once its textures load, so the shot is held for
+  // The whole lot from the south-west, high enough to read the stalls, the entrance and the drop-off. The viewer re-frames the site once its textures load, so the shot is held for
   // the first seconds unless the person has started orbiting or zooming themselves.
   // `?shot=x,z,zoom,azimuth,elevation` overrides the lot shot, for reviewing other sides of the center.
-  const override = new URLSearchParams(location.search).get('shot')?.split(',').map(Number);
+  const override = new URLSearchParams(location.search)
+    .get('shot')
+    ?.split(',')
+    .map(Number);
   const SHOT =
-    override && override.length === 5 && override.every((n) => Number.isFinite(n))
-      ? { target: [override[0], 0, override[1]] as [number, number, number], zoom: override[2], azimuth: override[3], elevation: override[4] }
-      : { target: [-30, 0, -19] as [number, number, number], zoom: 1.6, azimuth: -2.35, elevation: 0.72 };
+    override &&
+    override.length === 5 &&
+    override.every((n) => Number.isFinite(n))
+      ? {
+          target: [override[0], 0, override[1]] as [number, number, number],
+          zoom: override[2],
+          azimuth: override[3],
+          elevation: override[4],
+        }
+      : {
+          target: [-21, 0, -3] as [number, number, number],
+          zoom: 1.22,
+          azimuth: -2.35,
+          elevation: 0.9,
+        };
   viewer.setShot(SHOT);
   let touched = false;
-  host.addEventListener('pointerdown', () => { touched = true; }, { once: true });
-  host.addEventListener('wheel', () => { touched = true; }, { once: true, passive: true });
+  host.addEventListener(
+    'pointerdown',
+    () => {
+      touched = true;
+    },
+    { once: true },
+  );
+  host.addEventListener(
+    'wheel',
+    () => {
+      touched = true;
+    },
+    { once: true, passive: true },
+  );
   const hold = setInterval(() => {
     if (touched) return clearInterval(hold);
     const s = viewer.getShot();
-    const off = Math.abs(s.zoom - SHOT.zoom) > 0.02 || Math.hypot(s.target[0] - SHOT.target[0], s.target[2] - SHOT.target[2]) > 0.5;
+    const off =
+      Math.abs(s.zoom - SHOT.zoom) > 0.02 ||
+      Math.hypot(s.target[0] - SHOT.target[0], s.target[2] - SHOT.target[2]) >
+        0.5;
     if (off) viewer.setShot(SHOT);
   }, 250);
   setTimeout(() => clearInterval(hold), 20_000);
   // Labels keep their on-screen size whatever the zoom.
-  setInterval(() => lot?.setLabelScale(SHOT.zoom / Math.max(0.2, viewer.getShot().zoom)), 250);
+  setInterval(
+    () => lot?.setLabelScale(SHOT.zoom / Math.max(0.2, viewer.getShot().zoom)),
+    250,
+  );
   let pending: LiveMessage | null = null;
   const onMessage = (e: MessageEvent) => {
     const msg = e.data as LiveMessage | undefined;
@@ -63,15 +103,45 @@ async function main() {
   ready();
   // `?demo=1`: a few vehicles so the page can be looked at without the dispatch app.
   if (new URLSearchParams(location.search).get('demo')) {
-    const demo = (eta: number | null, state: 'inbound' | 'on-lot'): LiveMessage => ({
+    const demo = (
+      eta: number | null,
+      state: 'inbound' | 'on-lot',
+    ): LiveMessage => ({
       type: 'seen-live-lot',
       capacity: 8,
       clock: '13:05',
       vehicles: [
-        { id: 'v1', kind: 'van', label: '11825 · Lim, Linda', detail: `ETA ${eta ?? 0} min · 3 riders`, state, etaMinutes: eta },
-        { id: 'v2', kind: 'suv', label: '11818 · Chen, Andrew', detail: 'departs 13:30 · 2 riders', state: 'on-lot' },
-        { id: 'v3', kind: 'sedan', label: '2979 · Xu, Mark', detail: 'ETA 2 min · 1 rider', state: 'inbound', etaMinutes: 2, highlight: true },
-        { id: 'v4', kind: 'wav', label: '11821 · Ng, Ka Lun', detail: 'departs 14:00', state: 'on-lot' },
+        {
+          id: 'v1',
+          kind: 'van',
+          label: '11825 · Lim, Linda',
+          detail: `ETA ${eta ?? 0} min · 3 riders`,
+          state,
+          etaMinutes: eta,
+        },
+        {
+          id: 'v2',
+          kind: 'suv',
+          label: '11818 · Chen, Andrew',
+          detail: 'departs 13:30 · 2 riders',
+          state: 'on-lot',
+        },
+        {
+          id: 'v3',
+          kind: 'sedan',
+          label: '2979 · Xu, Mark',
+          detail: 'ETA 2 min · 1 rider',
+          state: 'inbound',
+          etaMinutes: 2,
+          highlight: true,
+        },
+        {
+          id: 'v4',
+          kind: 'wav',
+          label: '11821 · Ng, Ka Lun',
+          detail: 'departs 14:00',
+          state: 'on-lot',
+        },
       ],
     });
     setTimeout(() => window.postMessage(demo(6, 'inbound'), '*'), 500);

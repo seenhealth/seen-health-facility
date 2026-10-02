@@ -156,16 +156,15 @@ export function buildArrival(
     root.add(van.root);
     return van;
   });
-  // Paint real 6.9m van stalls around the parked vehicle footprints, in each
-  // bay's own frame (local +z is the rear of the parked van).
+  // A wheel stop at the rear of each lot bay, in the bay's own frame (local +z
+  // is the rear of the parked van). The stall lines are the site's (the aerial's
+  // stripes in neighborhood.ts), and the curb spots on Ethel get nothing.
   for (const bay of fleetParking) {
+    if (bay.heading !== -Math.PI / 2) continue;
     const stall = new T.Group();
     stall.position.set(bay.x, 0, bay.z);
     stall.rotation.y = bay.heading;
     root.add(stall);
-    for (const x of [-1.4, 1.4])
-      box(stall, x, -0.208, 0, 0.07, 0.012, 6.9, mat('#ebe9dc'));
-    box(stall, 0, -0.208, 3.45, 2.8, 0.012, 0.07, mat('#ebe9dc'));
     box(stall, 0, -0.19, 2.7, 1.8, 0.09, 0.14, mat('#d7c389'));
   }
   let doorOpen = 0;

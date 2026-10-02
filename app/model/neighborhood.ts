@@ -85,10 +85,9 @@ const CURB_ISLANDS_PX = [
     [350, 2255],
   ],
   [
-    [834, 140],
-    [928, 140],
-    [928, 294],
-    [834, 294],
+    [834, 211],
+    [1015, 211],
+    [834, 317],
   ],
   [
     [2720, 209],
@@ -283,11 +282,6 @@ export function buildNeighborhood(model: Facility) {
     );
     o.rotation.y = -Math.atan2(dz, dx);
   };
-  // The west row is reserved and striped by the animated fleet controller.
-  for (let y = 305; y < 1070; y += 148)
-    strip(px(780, y + 160), px(1032, y + 25), 0.075, SITE.marking);
-  for (let y = 535; y < 2120; y += 138)
-    strip(px(3170, y + 166), px(3390, y - 47), 0.075, SITE.marking);
   // Centre-line dashes, continued along the extensions (east of x 56.5 they
   // keep the phase of the pads' own street stubs).
   const dashes = (
@@ -376,8 +370,8 @@ export function buildNeighborhood(model: Facility) {
   // STOP at the driveway's mouth onto the north strip (aerial), read by a van
   // heading north, with its stop bar across the driveway ahead of it and the
   // one-way arrow behind it.
-  roadText('STOP', -23.0, -22.6, Math.PI);
-  box(-23.0, -0.206, -24.5, 3.4, 0.012, 0.45, SITE.marking);
+  roadText('STOP', -22.5, -22.6, Math.PI);
+  box(-22.5, -0.206, -24.5, 3.6, 0.012, 0.45, SITE.marking);
   dashes(
     74,
     farX,
@@ -419,8 +413,9 @@ export function buildNeighborhood(model: Facility) {
   arrow(37.7, -16.7, Math.PI);
   arrow(37.7, 12.1, Math.PI);
   // Crosswalks, blue loading access and parking bays are geometry rather than a photograph.
-  for (let z = 32.4; z < 40.6; z += 0.85)
-    box(-37.4, -0.208, z, 3.2, 0.012, 0.4, SITE.marking);
+  // Crosswalk across Valley on the east side of Ethel, between the two walks.
+  for (let z = 31.9; z < 40.6; z += 0.85)
+    box(-34.0, -0.208, z, 2.8, 0.012, 0.4, SITE.marking);
   // Our lot, from the aerial: a west row of head-in stalls behind the palm
   // planter (the fleet's bays, at their pitch), the hatched accessible aisle
   // and stall at its south end, and a row of slightly angled stalls along the
@@ -486,6 +481,8 @@ export function buildNeighborhood(model: Facility) {
     g.position.set(a, 0, b);
     root.add(g);
     const trunk = Math.max(0.045, Math.min(0.1, r * 0.045));
+    // The slender trunk casts no shadow: on its own (the canopy sits above the
+    // shadow camera) it read as a bar painted on the road.
     add(
       new T.CylinderGeometry(trunk * 0.7, trunk, h, 10),
       SITE.trunk,
@@ -493,7 +490,7 @@ export function buildNeighborhood(model: Facility) {
       h / 2 - 0.2,
       0,
       g,
-    );
+    ).castShadow = false;
     const tone = SITE.canopy[i % SITE.canopy.length];
     const lobes =
       r > 1.5
@@ -535,7 +532,7 @@ export function buildNeighborhood(model: Facility) {
     [551, 2334, 0.55, 1.6],
   ].forEach((p, i) => tree(p[0], p[1], p[2], p[3], i));
   for (const [x, z] of [
-    [-33.8, 29.6],
+    [-31.2, 29.6],
     [-4, 31],
     [30, 29],
     [63.6, -24],

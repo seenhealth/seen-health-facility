@@ -539,7 +539,7 @@ export function buildAlhambraExterior(model: Facility) {
   // tall fan palm west of the stall row, and a palm cluster at its east end.
   const court = group(site, 'rear-court-planters');
   for (const [x0, z0, x1, z1] of [
-    [-3.4, -21.2, -0.4, -18.0],
+    [1.0, -21.4, 4.0, -18.2],
     [13.2, -24.0, 16.4, -20.4],
   ]) {
     box(
@@ -563,7 +563,7 @@ export function buildAlhambraExterior(model: Facility) {
       '#8c7a5c',
     );
   }
-  palm(-1.9, -19.6, 5.0, 1.9);
+  palm(2.5, -19.8, 5.0, 1.9);
   palm(14.2, -22.9, 2.2, 1.3);
   palm(15.4, -21.4, 1.6, 1.1);
   // Rear loading door on the alley: flat canopy over the roll-up and a gated enclosure beside it.
@@ -601,7 +601,7 @@ export function buildAlhambraExterior(model: Facility) {
         .position.set(x + dx, 0.4, z);
   }
   hydrant(-34.5, -23.2);
-  hydrant(-33.9, 30.4);
+  hydrant(-32.6, 28.8);
   function palm(x: number, z: number, h: number, crown: number) {
     const g = group(street, 'fan-palm');
     const trunk = mesh(g, new T.CylinderGeometry(0.11, 0.17, h, 10), '#8a7254');

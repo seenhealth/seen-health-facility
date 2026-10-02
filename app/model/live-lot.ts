@@ -267,6 +267,11 @@ export function createLiveLot(ctx: { scene: T.Scene; model: Facility; material: 
       for (const o of ctx.model.objects) if (o.assetId.startsWith('fleet-van')) ctx.scene.getObjectByName(o.id)?.removeFromParent();
       // No street cars on the live lot either: it shows Seen's vehicles only.
       for (const name of ['street-car-1', 'street-car-2']) ctx.scene.getObjectByName(name)?.removeFromParent();
+      // Nor the care-day's own animated vans and delivery trucks: parked at the curb with their bodies faded, their
+      // steps and racks still drew as bars on the road.
+      const stale: T.Object3D[] = [];
+      ctx.scene.traverse((o) => { if (/^(animated-van-|rear-deliveries$)/.test(o.name)) stale.push(o); });
+      for (const o of stale) o.removeFromParent();
       hidStaticVans = true;
     }
     for (const l of [...live.values()]) {
