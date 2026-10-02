@@ -23,7 +23,7 @@ clock; no participant records are used.
 | --- | --- |
 | `app/model/community-settings.ts` | The registry (`careSettings`): kind, name, position, heading, pad size, access road, horseshoe drive, anchors, services, accent, and the optional stamped `facility`. Frame helpers (`toWorld`, `lanePath`, `lanePose`, `groundYAt`), the generated instance summaries (`instanceRooms`, `instanceFootprint`, `missingInstances`). No three.js. |
 | `app/model/community-pads.ts` | `buildCareSetting(setting, mat, { massing })`: plinth, drive band, stub and sidewalk, label plate, the building `massing` and the `site` around it (trees, patio) per kind. |
-| `app/model/facility-instance.ts` | `buildFacilityInstance(facility, frame, options)`: any schema 2.0 facility as a static cutaway with room plates, merged by material; `instanceSelection` (what is drawn), shared with build-time navigation. Knows nothing of settings or sites. |
+| `app/model/facility-instance.ts` | `buildFacilityInstance(facility, frame, options)`: any schema 2.0 facility as a static cutaway with room plates, merged by material, with `picks` (each drawn object and its box) for hover and click; `instanceSelection` (what is drawn), shared with build-time navigation. Knows nothing of settings or sites. |
 | `app/model/community-track.ts` | The hand-authored `Track` builder (`hold`, `walk`, `hidden`, `ride`; `start` and `segmentsTo` for legs that fill holes). |
 | `app/model/instance-cast.ts` | `placeInstanceCast(setting, cast)`: a generated cast into world actors and interactions; `fillHoles` stitches hand-authored legs into a scheduled person's track. |
 | `app/sim/community-cast.ts` | Build time only: instance navigation options and view, the summary, the site checks, the cast generator `communityCastFromScenes` and its validator `checkInstanceCast`. |
@@ -194,7 +194,14 @@ when the facility is the viewer's own model, otherwise when `loadFacility`
 resolves (the massing stays until then and on failure); the story and both
 static builds ship every facility a registry entry stamps
 (`instanceFacilityUrls`). The instance is one merged static group: about 116
-draw calls (196 with shadows) and 305k triangles for the partner. People
+draw calls (196 with shadows) and 305k triangles for the partner. The viewer
+cannot pick one chair out of merged geometry, so the build keeps a pick index,
+`picks`: each drawn object with its frame relative to the instance root and
+its box, measured once per asset from the geometry before the merge. Hover and
+click (`app/model/pick.ts`) test the ray against those boxes, the highlight
+outlines the box and the furniture card reads the stamped specification and
+the setting (`app/model/inspect.ts`); the people inside are the composed
+source's actors, picked like everyone else. People
 inside get the floor height from `groundYAt`, which checks instance footprints
 first.
 

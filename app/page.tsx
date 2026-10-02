@@ -43,6 +43,8 @@ import {
 } from './model/community-settings';
 import { roomLabelCode } from './model/room-labels';
 import { ActivityPanel, MiniPlayer } from './components/activity-panel';
+import { InspectCard } from './components/inspect-card';
+import type { InspectTarget } from './model/pick';
 import { isRotationDay, setProgramRotation } from './model/day-room';
 import { ShowcaseControls } from './components/showcase-controls';
 import { SiteMap } from './components/site-map';
@@ -123,9 +125,14 @@ export default function Home() {
     [notice, setNotice] = useState(''),
     // The viewer builds the community layer when its source carries one.
     [hasCommunity, setHasCommunity] = useState(false),
+    // The person, piece of furniture or vehicle whose card is open.
+    [inspected, setInspected] = useState<InspectTarget | null>(null),
     [dataTab, setDataTab] = useState<'overview' | 'assets'>('overview');
   const patch = (s: Partial<ViewerState>) => setState((p) => ({ ...p, ...s }));
   const getViewer = useCallback(() => viewer.current, []);
+  // Cards share the top-right slot: an item's card closes the space card and
+  // a space card closes the item's.
+  const closeInspect = useCallback(() => viewer.current?.inspect(null), []);
   const focusActivity = useCallback(
     (zoneId: string, actor?: string | null) => {
       if (!model || !viewer.current) return;
@@ -290,11 +297,16 @@ export default function Home() {
               : {}),
           }));
           setCardOpen(!!zone);
+          if (zone) viewer.current?.inspect(null);
           if (selectedZone) {
             setView('iso');
             viewer.current?.view('iso');
             requestAnimationFrame(() => viewer.current?.focus(zone, room));
           }
+        });
+        viewer.current.onInspect((target) => {
+          setInspected(target);
+          if (target) setCardOpen(false);
         });
         viewer.current.update(state);
         // Same console hook as the story (?debug=1): lets screenshot and
@@ -315,6 +327,7 @@ export default function Home() {
       ended = true;
       viewer.current?.dispose();
       viewer.current = null;
+      setInspected(null);
     };
   }, [model]);
   useEffect(() => viewer.current?.update(state), [state, ready]);
@@ -417,6 +430,7 @@ export default function Home() {
         sectionAxis: 'none',
       });
     setCardOpen(true);
+    closeInspect();
     setView('iso');
     viewer.current?.view('iso');
     if (narrow()) setCollapsed(true);
@@ -439,6 +453,7 @@ export default function Home() {
     viewer.current?.view('iso');
     requestAnimationFrame(() => viewer.current?.focus(r.zoneId, r.id));
     setCardOpen(true);
+    closeInspect();
     if (narrow()) setCollapsed(true);
   };
   const selectLevel = (id: string) => {
@@ -981,6 +996,14 @@ export default function Home() {
               {!room && <button onClick={() => setList('rooms')}>Rooms</button>}
             </div>
           </article>
+        )}
+        {ready && !showcase && (
+          <InspectCard
+            key={model?.id}
+            viewer={viewer.current}
+            target={inspected}
+            onClose={closeInspect}
+          />
         )}
         <div className="zoom-tools">
           <button

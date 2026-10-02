@@ -71,8 +71,23 @@ export type InstanceRoom = {
   polygon: Vec2[];
   anchor: Vec2;
 };
+/**
+ * One drawn object of an instance, for picking: the merged drawing has no
+ * per-object meshes, so the viewer raycasts these boxes instead.
+ */
+export type InstancePick = {
+  object: Instance;
+  /** Object frame → instance root frame (compose with `root.matrixWorld`). */
+  matrix: T.Matrix4;
+  /** Drawn extent in the object's frame (shared by an asset's objects). */
+  box: T.Box3;
+};
 export type FacilityInstance = {
   root: T.Group;
+  /** The stamped specification. */
+  facility: Facility;
+  /** Every drawn object with its box, built before the merge. */
+  picks: InstancePick[];
   /** World x/z bounds of the drawn zones. */
   bounds: [Vec2, Vec2];
   /** World polygons of the drawn zones (the footprint). */
@@ -309,10 +324,42 @@ function openingsOf(
 const isDoor = (kind: string) =>
   kind === 'plan-door' || kind === 'folding-partition';
 /**
+ * The pick index: each built object's frame relative to the instance root
+ * and its drawn box, measured once per asset from the geometry (a table
+ * setting covers the middle of its table, not the asset's nominal footprint).
+ */
+function instancePicks(
+  root: T.Group,
+  built: { object: Instance; group: T.Group }[],
+): InstancePick[] {
+  root.updateMatrixWorld(true);
+  const toRoot = root.matrixWorld.clone().invert(),
+    boxes = new Map<string, T.Box3>(),
+    inverse = new T.Matrix4(),
+    relative = new T.Matrix4(),
+    part = new T.Box3();
+  return built.map(({ object, group }) => {
+    let box = boxes.get(object.assetId);
+    if (!box) {
+      const b = new T.Box3();
+      inverse.copy(group.matrixWorld).invert();
+      group.traverse((m) => {
+        if (!(m instanceof T.Mesh)) return;
+        if (!m.geometry.boundingBox) m.geometry.computeBoundingBox();
+        relative.multiplyMatrices(inverse, m.matrixWorld);
+        b.union(part.copy(m.geometry.boundingBox!).applyMatrix4(relative));
+      });
+      boxes.set(object.assetId, (box = b));
+    }
+    return { object, box, matrix: toRoot.clone().multiply(group.matrixWorld) };
+  });
+}
+/**
  * Build the instance under a root carrying the world frame of the facility
  * origin (position, `floorY`, heading). Everything static is merged by
  * canonical material; room plates stay separate (and are skipped without a
- * DOM). Not pickable, no DOM labels, no section clipping.
+ * DOM). No DOM labels, no section clipping; objects are picked through
+ * `picks`, boxes measured from their geometry before the merge.
  */
 export function buildFacilityInstance(
   facility: Facility,
@@ -386,12 +433,14 @@ export function buildFacilityInstance(
     cap.position.y = h - 0.004;
     zoneGroups.get(w.zoneId)!.add(wall, cap);
   }
+  const built: { object: Instance; group: T.Group }[] = [];
   if (options.furniture !== false)
     for (const o of sel.objects) {
       const spec = facility.assets[o.assetId];
       if (!spec) continue;
       // GLB `modelUrl`s are not swapped in: the procedural model stays.
       const g = buildAsset(spec, mat);
+      built.push({ object: o, group: g });
       g.position.fromArray(o.position);
       g.rotation.y = o.rotation;
       g.scale.fromArray(o.scale);
@@ -407,6 +456,7 @@ export function buildFacilityInstance(
       }
       zoneGroups.get(o.zoneId)!.add(g);
     }
+  const picks = instancePicks(root, built);
   mergeByMaterial(statics, { canonical: true, keep: handed });
   const toWorld = (p: Vec2) => frameToWorld(frame, p),
     toLocal = (p: Vec2) => frameToLocal(frame, p);
@@ -436,6 +486,8 @@ export function buildFacilityInstance(
       );
   return {
     root,
+    facility,
+    picks,
     bounds: [
       [Math.min(...xs), Math.min(...zs)],
       [Math.max(...xs), Math.max(...zs)],

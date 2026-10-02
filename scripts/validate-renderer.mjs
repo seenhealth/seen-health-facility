@@ -14,7 +14,9 @@
 //
 // The smoke test opens every site model, ticks 10 frames through the main
 // render modes (ambient-occlusion pipeline, balanced, interior with labels,
-// tilt-shift showcase), disposes the viewer and checks that every geometry
+// tilt-shift showcase), hovers and clicks a person and a piece of furniture
+// (and furniture of each facility stamped on a community pad) with synthetic
+// pointer events, disposes the viewer and checks that every geometry
 // and material the renderer would have uploaded was disposed after its last
 // use, that no DOM listener, element, resize observer or animation frame is
 // left behind, and that every texture URL resolves to a file.
@@ -666,6 +668,193 @@ const describe = (resource, { object, context }) => {
   return `${label} on ${object.type} ${names.join('/') || '(unnamed)'} [${context}]`;
 };
 
+/**
+ * A mouse event as the browser sends it: to the canvas, and a release also to
+ * the document, where OrbitControls listens while a button is down.
+ */
+function pointer(canvas, type, x, y, buttons = 0) {
+  const event = {
+    type,
+    clientX: x,
+    clientY: y,
+    pageX: x,
+    pageY: y,
+    pointerId: 1,
+    pointerType: 'mouse',
+    button: 0,
+    buttons,
+    ctrlKey: false,
+    metaKey: false,
+    shiftKey: false,
+    preventDefault() {},
+    stopPropagation() {},
+  };
+  const targets =
+    type === 'pointerup' ? [canvas, globalThis.document] : [canvas];
+  // A copy: a listener added while this event is dispatched hears the next.
+  for (const target of targets)
+    for (const listener of Array.from(target.listeners.get(type) ?? []))
+      listener(event);
+}
+/**
+ * Hover and click inspection (app/model/pick.ts, highlight.ts): a person and
+ * a piece of furniture drawn on screen are picked where they are drawn,
+ * hovering highlights them with a tooltip and a pointer cursor, a click
+ * opens their card (and follows a person); nothing is picked where a section
+ * cuts it, while it is hidden or in the showcase; with a community layer,
+ * furniture of every facility stamped on a pad is picked too.
+ */
+function inspectionChecks(viewer, api, model, host, defaultState) {
+  const canvas = harness.renderers[0].domElement;
+  canvas.clientWidth = host.clientWidth;
+  canvas.clientHeight = host.clientHeight;
+  const events = [];
+  api.onInspect((target) => events.push(target));
+  const same = (a, b) =>
+    !!a &&
+    !!b &&
+    a.kind === b.kind &&
+    a.id === b.id &&
+    a.settingId === b.settingId;
+  const onScreen = (p) =>
+    p &&
+    p.x > 0 &&
+    p.y > 0 &&
+    p.x < host.clientWidth &&
+    p.y < host.clientHeight;
+  /** The first target picked back at its own screen point. */
+  const find = (targets) => {
+    for (const target of targets) {
+      const p = api.screenPoint(target);
+      if (onScreen(p) && same(api.pickAt(p.x, p.y), target))
+        return { target, p };
+    }
+    return null;
+  };
+  const hoverAndClick = ({ target, p }, label) => {
+    pointer(canvas, 'pointermove', p.x, p.y);
+    viewer.tick(2);
+    assert.ok(same(api.hovered(), target), `${label}: hovered`);
+    const tooltip = host.children.find((c) => c.className === 'pick-tooltip');
+    assert.equal(
+      tooltip?.getAttribute('data-show'),
+      'true',
+      `${label}: tooltip shown`,
+    );
+    assert.equal(canvas.style.cursor, 'pointer', `${label}: pointer cursor`);
+    pointer(canvas, 'pointerdown', p.x, p.y, 1);
+    pointer(canvas, 'pointerup', p.x, p.y);
+    viewer.tick(2);
+    assert.ok(
+      same(api.inspected(), target),
+      `${label}: a click opens its card`,
+    );
+    assert.ok(
+      same(events.at(-1), target),
+      `${label}: listeners hear the card open`,
+    );
+    if (target.kind === 'person')
+      assert.equal(
+        api.activity.getState().follow,
+        target.id,
+        `${label}: followed`,
+      );
+    api.inspect(null);
+    assert.equal(events.at(-1), null, `${label}: closing is heard`);
+    pointer(canvas, 'pointerleave', p.x, p.y);
+    viewer.tick(12);
+  };
+  const level = model.levels.find((l) => l.elevation === 0) ?? model.levels[0];
+  const interior = {
+    ...defaultState,
+    level: level.id,
+    exterior: false,
+    roof: false,
+    walls: 'cutaway',
+  };
+  api.update(interior);
+  api.activity.setOptions({ playing: false, follow: null });
+  // The area of the level with the most furniture, framed at once.
+  const counts = {};
+  for (const o of model.objects)
+    if (
+      (o.layer ?? 'furniture') === 'furniture' &&
+      o.levelId === level.id &&
+      o.zoneId !== 'site'
+    )
+      counts[o.zoneId] = (counts[o.zoneId] || 0) + 1;
+  const zone = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+  api.focus(zone, null, true);
+  viewer.tick(2);
+  const furniture = find(
+    model.objects
+      .filter(
+        (o) => o.zoneId === zone && (o.layer ?? 'furniture') === 'furniture',
+      )
+      .map((o) => ({ kind: 'object', id: o.id })),
+  );
+  assert.ok(
+    furniture,
+    `${model.id}: furniture in ${zone} is picked where it is drawn`,
+  );
+  hoverAndClick(furniture, `${model.id} ${furniture.target.id}`);
+  const person = find(
+    api.activity.actors
+      .filter((a) => a.root.visible)
+      .map((a) => ({ kind: 'person', id: a.spec.id })),
+  );
+  assert.ok(person, `${model.id}: a person on screen is picked`);
+  hoverAndClick(person, `${model.id} ${person.target.id}`);
+  api.activity.setOptions({ follow: null });
+  const { x, y } = furniture.p;
+  api.update({ ...interior, sectionAxis: 'x', section: 1 });
+  assert.ok(
+    !same(api.pickAt(x, y), furniture.target),
+    `${model.id}: nothing is picked where the section cuts`,
+  );
+  api.update({ ...interior, furniture: false });
+  assert.ok(
+    !same(api.pickAt(x, y), furniture.target),
+    `${model.id}: hidden furniture is not picked`,
+  );
+  api.update(interior);
+  api.setShowcase(true);
+  pointer(canvas, 'pointermove', x, y);
+  viewer.tick(2);
+  assert.equal(api.hovered(), null, `${model.id}: no hover in the showcase`);
+  api.setShowcase(false);
+  let checked = 2;
+  // Every facility stamped on a community pad (one merged drawing each) is
+  // picked through its instance's pick index.
+  for (const setting of api.community?.settings ?? []) {
+    const stamped = api.community.instance(setting.id);
+    if (!stamped) continue;
+    const frame = api.community.frame(setting.id);
+    api.update({ ...defaultState, community: true });
+    api.setShot({
+      target: frame.target,
+      zoom: frame.zoom * 1.6,
+      azimuth: frame.azimuth ?? 0.58,
+      elevation: 0.85,
+    });
+    viewer.tick(2);
+    const instance = find(
+      stamped.picks.map((p) => ({
+        kind: 'object',
+        id: p.object.id,
+        settingId: setting.id,
+      })),
+    );
+    assert.ok(
+      instance,
+      `${model.id}: furniture of ${setting.id} is picked on its pad`,
+    );
+    hoverAndClick(instance, `${model.id} ${setting.id} ${instance.target.id}`);
+    checked++;
+  }
+  return checked;
+}
+
 async function smokeTest() {
   countConstruction();
   const knownSeen = {};
@@ -734,6 +923,7 @@ async function smokeTest() {
       ),
       `${model.id}: camera stays finite`,
     );
+    const inspected = inspectionChecks(viewer, api, model, host, defaultState);
     await new Promise((done) => setTimeout(done, 0));
     assert.deepEqual(
       harness.missingTextures,
@@ -795,7 +985,7 @@ async function smokeTest() {
       `${model.id}: no frame scheduled after dispose`,
     );
     console.log(
-      `${model.id}: 10 frames; ${usedGeometries} geometries and ${used.length - usedGeometries} materials reached the renderer (of ${s.created.geometries} and ${s.created.materials} constructed), ${knownLeaks ? `all disposed but ${knownLeaks} known leaks` : 'all disposed'}; ${harness.textureRequests.length} textures loaded; no listeners, elements or frames left.`,
+      `${model.id}: 10 frames, then hover and click on ${inspected} items; ${usedGeometries} geometries and ${used.length - usedGeometries} materials reached the renderer (of ${s.created.geometries} and ${s.created.materials} constructed), ${knownLeaks ? `all disposed but ${knownLeaks} known leaks` : 'all disposed'}; ${harness.textureRequests.length} textures loaded; no listeners, elements or frames left.`,
     );
   }
   for (const k of KNOWN_LEAKS) {

@@ -300,6 +300,67 @@ export function sampleActor(actor: ActorSpec, time: number): ActorSample {
     fraction = (t - s.start) / (s.end - s.start || 1);
   return { ...sampleSegment(s, fraction), segmentIndex, fraction };
 }
+/** What one person is doing at a moment of the loop (`describeActor`). */
+export type ActorMoment = {
+  /** The segment the person is in, with its window in loop seconds. */
+  segment: Segment;
+  start: number;
+  end: number;
+  /**
+   * The next activity: the next segment round the loop that is not a walk
+   * between places and has another title, with its start in loop seconds;
+   * null when the person does one thing all day.
+   */
+  next: { segment: Segment; start: number } | null;
+  /** The shortest interaction under way that names the person. */
+  interaction: Interaction | null;
+};
+/**
+ * The person's current segment, next activity and interaction at `time`
+ * (loop seconds), read from the source alone: no engine state, so cards,
+ * tests and reports get the same answer for the same time.
+ */
+export function describeActor(
+  data: ActivityData,
+  actor: ActorSpec,
+  time: number,
+): ActorMoment {
+  const d = data.duration,
+    wrap = (t: number) => ((t % d) + d) % d,
+    local = wrap(time + actor.offset),
+    n = actor.segments.length;
+  let i = actor.segments.findIndex((s) => local >= s.start && local < s.end);
+  if (i < 0) i = n - 1;
+  const segment = actor.segments[i],
+    start = wrap(segment.start - actor.offset);
+  let next: ActorMoment['next'] = null;
+  for (let k = 1; k < n && !next; k++) {
+    const s = actor.segments[(i + k) % n];
+    if (!MOVING_ACTIONS.has(s.action) && s.title !== segment.title)
+      next = { segment: s, start: wrap(s.start - actor.offset) };
+  }
+  const now = wrap(time),
+    under = (x: Interaction) =>
+      x.end - x.start >= d ||
+      (x.end <= d
+        ? now >= x.start && now < x.end
+        : now >= x.start || now < x.end - d);
+  let interaction: Interaction | null = null;
+  for (const it of data.interactions)
+    if (
+      it.actorIds.includes(actor.id) &&
+      under(it) &&
+      (!interaction || it.end - it.start < interaction.end - interaction.start)
+    )
+      interaction = it;
+  return {
+    segment,
+    start,
+    end: start + segment.end - segment.start,
+    next,
+    interaction,
+  };
+}
 export function dayTime(time: number) {
   const minutes =
       activityData.dayStartMinutes +
@@ -828,6 +889,21 @@ export function createActivity(
     },
     actorSample(id: string) {
       return actorMap.get(id)?.sample;
+    },
+    /**
+     * `describeActor` for one person of the source at `time` (default: the
+     * clock now), with their spec and the sample of the last tick (zone,
+     * position, vehicle seat).
+     */
+    describeActor(id: string, time = options.time) {
+      const a = actorMap.get(id);
+      return a
+        ? {
+            spec: a.spec,
+            sample: a.sample,
+            ...describeActor(data, a.spec, time),
+          }
+        : null;
     },
     async exportCast() {
       const exportScene = new T.Scene(),
