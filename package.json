@@ -39,7 +39,10 @@
     "preview:story": "vite preview --config vite.story.config.ts",
     "dev:viewer": "vite --config vite.viewer.config.ts",
     "build:viewer": "vite build --config vite.viewer.config.ts",
-    "preview:viewer": "vite preview --config vite.viewer.config.ts"
+    "preview:viewer": "vite preview --config vite.viewer.config.ts",
+    "dev:live": "vite --config vite.live.config.ts",
+    "build:live": "vite build --config vite.live.config.ts",
+    "preview:live": "vite preview --config vite.live.config.ts"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",

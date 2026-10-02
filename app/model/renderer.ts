@@ -391,6 +391,16 @@ export type ViewerOptions = {
    * fetch the root-relative URL.
    */
   loadFacility?: (url: string) => Promise<Facility>;
+  /**
+   * An extra scene layer built once the scene and material factory exist and
+   * ticked every frame with the real elapsed seconds (the live lot view adds
+   * its vehicles this way, driven by data from outside the page).
+   */
+  layer?: (ctx: {
+    scene: T.Scene;
+    model: Facility;
+    material: (id: string) => T.MeshStandardMaterial;
+  }) => { tick(dt: number): void; dispose?(): void };
 };
 const SHOT_DISTANCE = 150;
 export function createViewer(
@@ -922,6 +932,7 @@ export function createViewer(
       })
     : null;
   if (community) context.add(community.root);
+  const layer = options.layer?.({ scene, model, material: (id) => mat(id) });
   const furnitureRoots: T.Group[] = [];
   const exteriorAssets: T.Group[] = [],
     roofAssets: T.Group[] = [];
@@ -2098,6 +2109,7 @@ export function createViewer(
     activity.tick(typeof document !== 'undefined' && document.hidden ? 0 : dt);
     neighborhood.tick(activity.getState().time);
     community?.tick(activity.getState().time);
+    layer?.tick(dt);
     // Entry leaves open for approaching transport parties, even with the design door toggle shut.
     if (model.contextStyle) {
       const travelers = activity.root.visible
@@ -2390,6 +2402,7 @@ export function createViewer(
       community?.dispose();
       stopRecording?.();
       disposed = true;
+      layer?.dispose?.();
       cancelAnimationFrame(frame);
       observer.disconnect();
       controls.dispose();
