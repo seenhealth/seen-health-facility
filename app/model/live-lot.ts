@@ -86,8 +86,8 @@ const ALIGHT_GAP = { walk: 2.4, wheelchair: 4.2, linger: 2.5 };
 /** Walking speeds on the lot (m/s): seniors on foot, a wheelchair, and anyone on a ramp. */
 const WALK = { foot: 1.0, wheelchair: 0.8, ramp: 0.5 };
 /** Label plate in metres at the default zoom; `setLabelScale` keeps it the same size on screen when the camera zooms. */
-const LABEL_W = 11,
-  LABEL_H = 2.75;
+const LABEL_W = 14,
+  LABEL_H = 3.5;
 /** Canvas pixels per metre of label; the plate grows in width with the crew it carries. */
 const LABEL_PX = 1024 / LABEL_W;
 const RING_COLOR = {
@@ -478,6 +478,9 @@ export function createLiveLot(ctx: {
   let clock = '';
   let capacity = 0;
   let labelScale = 1;
+  /** The camera's azimuth and elevation, for keeping label plates clear of each other on screen. */
+  let viewAz = -2.35,
+    viewEl = 0.9;
   let night = 0;
   /** The lobby's sliding leaves (arrival.ts), opened for walkers; found once the scene has them. */
   let leaves: T.Object3D[] | null = null;
@@ -702,10 +705,13 @@ export function createLiveLot(ctx: {
       return;
     }
     l.leaveWhenClosed = false;
-    if (l.mode === 'parked' && l.spot !== null && l.spot < BAYS) {
-      const legs = fleetRoutes.bayToAway(l.spot);
+    const bayLegs =
+      l.mode === 'parked' && l.spot !== null && l.spot < BAYS
+        ? bayRoute(l.spot)
+        : null;
+    if (bayLegs) {
       releaseSpot(l);
-      start(l, legs, 'leaving');
+      start(l, bayLegs, 'leaving');
     } else if (
       l.mode === 'docked' ||
       (l.mode === 'arriving' && l.s > l.drive!.length - 1)
@@ -715,11 +721,42 @@ export function createLiveLot(ctx: {
         [...fleetRoutes.dockReverse(), ...fleetRoutes.dockToAway()],
         'leaving',
       );
-    } else {
+    } else if (!exitFrom(l)) {
       releaseSpot(l);
       l.drive = null;
       l.mode = 'gone';
     }
+  }
+  /** The fleet's own route out of a bay or curb spot; null when the planner cannot build one from that spot (it throws). */
+  function bayRoute(index: number): FleetLeg[] | null {
+    try {
+      return fleetRoutes.bayToAway(index);
+    } catch {
+      return null;
+    }
+  }
+  /**
+   * A vehicle anywhere else on the lot (an overflow spot on the aisle, on its way to a bay, waiting at the drop-off)
+   * leaves by joining the drop-off's exit route at the point nearest to where it stands: down the aisle, over to the
+   * exit lane, out of the driveway and up the alley until it fades at the edge. False when it is nowhere near it.
+   */
+  function exitFrom(l: Live): boolean {
+    const legs = fleetRoutes.dockToAway();
+    const d = drive(legs);
+    const { x, z } = l.body.object.position;
+    let best = { s: 0, dist: Infinity };
+    for (let s = 0; s <= d.length; s += 0.5) {
+      const p = pathAt(d.pieces, s);
+      const dist = Math.hypot(p.x - x, p.z - z);
+      if (dist < best.dist) best = { s, dist };
+    }
+    if (best.dist > 6) return false;
+    releaseSpot(l);
+    start(l, legs, 'leaving');
+    l.s = best.s;
+    l.opacity = 1;
+    pose(l);
+    return true;
   }
 
   /** Move along the drive toward `targetS`: pull away at ACCEL, hold the leg's speed, brake to stop exactly at the target. */
@@ -824,6 +861,43 @@ export function createLiveLot(ctx: {
     }
   }
 
+  /**
+   * Label plates float above their vehicle; a car with its door open carries its plate higher, clear of the door,
+   * the ramp and the people at them. Plates that would overlap on screen (judged in the camera's frame: across the
+   * view for width, along the view and up for height) are stacked, each taking the first clear height, so cars
+   * parked side by side or queued at the drop-off keep every crew readable.
+   */
+  function placeLabels() {
+    const sa = Math.sin(viewAz),
+      ca = Math.cos(viewAz),
+      se = Math.sin(viewEl),
+      ce = Math.cos(viewEl);
+    const h = LABEL_H * labelScale;
+    const placed: { across: number; along: number; y: number; w: number }[] =
+      [];
+    const items = Array.from(live.values())
+      .filter((l) => l.opacity > 0.3)
+      .sort((a, b) => a.body.object.position.z - b.body.object.position.z);
+    for (const l of items) {
+      const { x, z } = l.body.object.position;
+      const across = x * ca - z * sa,
+        along = x * sa + z * ca;
+      const w = (l.label.userData.widthM as number) * labelScale;
+      let y = 3.6 + 1.2 * labelScale + (l.door > 0.01 ? 2.6 : 0);
+      for (let tries = 0; tries < 8; tries++) {
+        const clash = placed.some(
+          (p) =>
+            Math.abs(p.across - across) < ((p.w + w) / 2) * 0.92 &&
+            Math.abs((p.along - along) * se + (p.y - y) * ce) < h * 1.02,
+        );
+        if (!clash) break;
+        y += h * 1.08;
+      }
+      placed.push({ across, along, y, w });
+      l.label.position.set(x, y, z);
+    }
+  }
+
   function tick(dt: number) {
     if (!hidStaticVans) {
       // The renderer shows the model's display vans whenever the care-day cast is off; take them out of the scene instead.
@@ -867,7 +941,7 @@ export function createLiveLot(ctx: {
         advance(l, dt);
         if (l.s >= l.drive.length - 1e-6) l.mode = 'gone';
       } else if (l.mode === 'gone') {
-        l.opacity = Math.max(0, l.opacity - dt);
+        l.opacity = Math.max(0, l.opacity - dt * 0.5);
         if (l.opacity <= 0) {
           remove(l);
           continue;
@@ -925,17 +999,6 @@ export function createLiveLot(ctx: {
         });
         l.labelText = text;
       }
-      // Cars parked side by side alternate label heights so their crews do not overlap; a car with its door open
-      // carries its plate higher still, clear of the door, the ramp and the people at them.
-      const lift =
-        (l.mode === 'parked' && l.spot !== null && l.spot % 2
-          ? 1.5 * labelScale
-          : 0) + (l.door > 0.01 ? 2.6 : 0);
-      l.label.position.set(
-        l.body.object.position.x,
-        3.6 + 1.2 * labelScale + lift,
-        l.body.object.position.z,
-      );
       l.label.scale.set(
         (l.label.userData.widthM as number) * labelScale,
         LABEL_H * labelScale,
@@ -944,6 +1007,7 @@ export function createLiveLot(ctx: {
       l.label.visible = l.opacity > 0.3;
       (l.label.material as T.SpriteMaterial).opacity = l.opacity;
     }
+    placeLabels();
     walkers.tick(dt);
     // The lobby's sliding doors part for anyone on foot coming up to them (the care-day's door logic is idle on this page).
     if (walkers.count > 0 || entryOpen > 0) {
@@ -983,13 +1047,46 @@ export function createLiveLot(ctx: {
     setLabelScale(k: number) {
       labelScale = Math.min(3, Math.max(0.5, k));
     },
+    /** The camera's angles, so the plate layout judges overlap the way it shows on screen. */
+    setViewAngles(azimuth: number, elevation: number) {
+      viewAz = azimuth;
+      viewEl = elevation;
+    },
     /** 0 = day, 1 = night: lamps and headlight beams on the vehicles. */
     setNight(k: number) {
       night = Math.min(1, Math.max(0, k));
     },
+    /** Debug view of every vehicle's state (`?debug=1` exposes the lot as `window.seenLot`). */
+    inspect() {
+      return Array.from(live.values()).map((l) => ({
+        id: l.v.id,
+        mode: l.mode,
+        spot: l.spot,
+        s: +l.s.toFixed(1),
+        length: l.drive ? +l.drive.length.toFixed(1) : null,
+        door: +l.door.toFixed(2),
+        ramp: +l.ramp.toFixed(2),
+        leaveWhenClosed: l.leaveWhenClosed,
+        at: [
+          +l.body.object.position.x.toFixed(1),
+          +l.body.object.position.z.toFixed(1),
+        ],
+      }));
+    },
     /** People on foot right now, for the HUD. */
     get onFoot() {
       return walkers.count;
+    },
+    /** The id of the drawn vehicle under `ray` (nearest hit on a body or its label plate), or null. */
+    pick(ray: T.Raycaster): string | null {
+      let best: { id: string; d: number } | null = null;
+      for (const l of live.values()) {
+        if (l.mode === 'gone' || l.opacity <= 0.3) continue;
+        const hit = ray.intersectObjects([l.body.object, l.label], true)[0];
+        if (hit && (!best || hit.distance < best.d))
+          best = { id: l.v.id, d: hit.distance };
+      }
+      return best?.id ?? null;
     },
     dispose() {
       ctx.scene.remove(root);

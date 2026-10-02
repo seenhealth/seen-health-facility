@@ -13,7 +13,10 @@ import { createNightLights } from '../../app/model/night-lights';
  * (app/model/live-lot.ts); this page answers `{ type: 'seen-live-lot-ready' }`
  * once the scene is up so the parent sends the current state. A message with
  * `follow: <vehicle id>` centres the camera on that car and keeps it centred as
- * it moves; `follow: null` returns to the whole-lot shot. The scene is lit by
+ * it moves; `follow: null` returns to the whole-lot shot. Camera moves glide
+ * (eased over ~0.8 s; following tracks the car smoothly). A click on a car
+ * posts `{ type: 'seen-live-lot-pick', id }` to the parent, a click on nothing
+ * posts `{ id: null }`, so the parent can show the car's details or clear them. The scene is lit by
  * the real sun over the center (app/model/daylight.ts), refreshed every
  * minute; `?at=HH:MM` or `?at=<ISO date>` lights it for another moment. After
  * dusk the street lamps, wall packs, entrance lights and lit windows come on
@@ -31,13 +34,21 @@ async function main() {
   const viewer = createViewer(host, model, () => {}, {
     interactive: true,
     labels: false,
+    pick: (ray) => {
+      const id = lot?.pick(ray) ?? null;
+      window.parent?.postMessage({ type: 'seen-live-lot-pick', id }, '*');
+      return true;
+    },
     layer: (ctx) => {
       // `?debug=1` exposes the scene for inspection from the console.
       if (new URLSearchParams(location.search).has('debug'))
         (window as unknown as { seenScene?: unknown }).seenScene = ctx.scene;
       daylight = createDaylight(ctx.scene);
       nightLights = createNightLights(ctx.scene, ctx.material);
-      return (lot = createLiveLot(ctx));
+      lot = createLiveLot(ctx);
+      if (new URLSearchParams(location.search).has('debug'))
+        (window as unknown as { seenLot?: unknown }).seenLot = lot;
+      return lot;
     },
   });
   // Real sun and sky for the moment being shown; `?at=` pins another moment for review.
@@ -110,39 +121,82 @@ async function main() {
     if (off) viewer.setShot(SHOT);
   }, 250);
   setTimeout(() => clearInterval(hold), 20_000);
-  // Labels keep their on-screen size whatever the zoom.
-  setInterval(
-    () => lot?.setLabelScale(SHOT.zoom / Math.max(0.2, viewer.getShot().zoom)),
-    250,
-  );
-  // Follow one vehicle: the camera's target tracks the car while it moves, keeping whatever zoom and angle the person has set,
-  // so they can still orbit a parked car. The first follow zooms in; clearing it restores the lot shot.
+  // Labels keep their on-screen size whatever the zoom, and their layout follows the camera's angles.
+  setInterval(() => {
+    const s = viewer.getShot();
+    lot?.setLabelScale(SHOT.zoom / Math.max(0.2, s.zoom));
+    lot?.setViewAngles(s.azimuth, s.elevation);
+  }, 250);
+  // Camera moves glide: a transition eases every part of the shot over `GLIDE_MS`; while following, the target then
+  // tracks the car with exponential smoothing each frame, keeping whatever zoom and angle the person has set, so they
+  // can still orbit a parked car. The first follow zooms in; clearing it glides back to the lot shot.
   const FOLLOW_ZOOM = 2.6;
+  const GLIDE_MS = 800;
+  type Shot = ReturnType<typeof viewer.getShot>;
   let follow: string | null = null;
-  let followAt: [number, number] | null = null;
+  let glide: { from: Shot; to: Shot; start: number } | null = null;
+  const ease = (t: number) =>
+    t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+  const lerpAngle = (a: number, b: number, k: number) => {
+    let d = (b - a) % (Math.PI * 2);
+    if (d > Math.PI) d -= Math.PI * 2;
+    if (d < -Math.PI) d += Math.PI * 2;
+    return a + d * k;
+  };
+  const glideTo = (to: Shot) => {
+    glide = { from: viewer.getShot(), to, start: performance.now() };
+  };
   const setFollow = (id: string | null) => {
     if (id === follow) return;
     follow = id;
-    followAt = null;
     touched = true; // a follow is the person's own framing; the start-up hold must not undo it
-    if (!id) viewer.setShot(SHOT);
+    if (!id) glideTo(SHOT);
+    else {
+      const at = lot?.positionOf(id);
+      const s = viewer.getShot();
+      if (at)
+        glideTo({
+          target: [at[0], 0, at[1]],
+          zoom: Math.max(s.zoom, FOLLOW_ZOOM),
+          azimuth: s.azimuth,
+          elevation: s.elevation,
+        });
+    }
   };
-  setInterval(() => {
+  let lastFrame = performance.now();
+  const camera = () => {
+    requestAnimationFrame(camera);
+    const now = performance.now();
+    const dt = Math.min(0.1, (now - lastFrame) / 1000);
+    lastFrame = now;
+    if (glide) {
+      const k = ease(Math.min(1, (now - glide.start) / GLIDE_MS));
+      const { from, to } = glide;
+      viewer.setShot({
+        target: [0, 1, 2].map(
+          (i) => from.target[i] + (to.target[i] - from.target[i]) * k,
+        ) as [number, number, number],
+        zoom: from.zoom + (to.zoom - from.zoom) * k,
+        azimuth: lerpAngle(from.azimuth, to.azimuth, k),
+        elevation: from.elevation + (to.elevation - from.elevation) * k,
+      });
+      if (k >= 1) glide = null;
+      return;
+    }
     if (!follow || !lot) return;
     const at = lot.positionOf(follow);
     if (!at) return;
-    const first = !followAt;
-    if (!first && Math.hypot(at[0] - followAt![0], at[1] - followAt![1]) < 0.05)
-      return;
-    followAt = at;
     const s = viewer.getShot();
+    const dx = at[0] - s.target[0],
+      dz = at[1] - s.target[2];
+    if (Math.hypot(dx, dz) < 0.01) return;
+    const k = 1 - Math.exp(-dt * 7);
     viewer.setShot({
-      target: [at[0], 0, at[1]],
-      zoom: first ? Math.max(s.zoom, FOLLOW_ZOOM) : s.zoom,
-      azimuth: s.azimuth,
-      elevation: s.elevation,
+      ...s,
+      target: [s.target[0] + dx * k, 0, s.target[2] + dz * k],
     });
-  }, 100);
+  };
+  requestAnimationFrame(camera);
   let pending: LiveMessage | null = null;
   const onMessage = (e: MessageEvent) => {
     const msg = e.data as LiveMessage | undefined;

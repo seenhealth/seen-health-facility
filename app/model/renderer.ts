@@ -401,6 +401,12 @@ export type ViewerOptions = {
     model: Facility;
     material: (id: string) => T.MeshStandardMaterial;
   }) => { tick(dt: number): void; dispose?(): void };
+  /**
+   * Runs first on a click (a pointer-up within 5 px of its pointer-down) with the
+   * ray through the pointer; return true to claim the click so the viewer's own
+   * zone and room selection does not run (the live lot picks its vehicles this way).
+   */
+  pick?: (ray: T.Raycaster) => boolean;
 };
 const SHOT_DISTANCE = 150;
 export function createViewer(
@@ -1735,6 +1741,7 @@ export function createViewer(
       ),
       camera,
     );
+    if (options.pick?.(ray)) return;
     if (activity.root.visible) {
       const person = ray.intersectObject(activity.root, true).find((hit) => {
         for (let o: T.Object3D | null = hit.object; o; o = o.parent)
