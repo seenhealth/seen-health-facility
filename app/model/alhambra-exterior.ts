@@ -2,6 +2,17 @@ import * as T from 'three';
 import type { Facility } from './schema';
 import { exteriorPrimitives } from './exterior-primitives';
 
+/**
+ * Rear court planters (Street View, Google Earth) as [x0, z0, x1, z1]: a
+ * curbed island with a tall fan palm west of the stall row, and a palm
+ * cluster at its east end. The delivery trucks keep clear of both
+ * (validate-traffic).
+ */
+export const REAR_COURT_PLANTERS = [
+  [1.0, -21.4, 4.0, -18.2],
+  [13.2, -24.0, 16.4, -20.4],
+] as const;
+
 /** 2022 offering brochure exterior photographs, fitted to the existing plan footprint. */
 export function buildAlhambraExterior(model: Facility) {
   if (model.exteriorAppearance !== 'alhambra-brochure') return null;
@@ -535,13 +546,9 @@ export function buildAlhambraExterior(model: Facility) {
     0.035,
     bronze,
   );
-  // Rear court planters (Street View, Google Earth): a curbed island with a
-  // tall fan palm west of the stall row, and a palm cluster at its east end.
+  // Rear court planters (REAR_COURT_PLANTERS).
   const court = group(site, 'rear-court-planters');
-  for (const [x0, z0, x1, z1] of [
-    [1.0, -21.4, 4.0, -18.2],
-    [13.2, -24.0, 16.4, -20.4],
-  ]) {
+  for (const [x0, z0, x1, z1] of REAR_COURT_PLANTERS) {
     box(
       court,
       (x0 + x1) / 2,

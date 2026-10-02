@@ -60,24 +60,6 @@ const body = (p, kind) => ({
   halfWidth: DIMENSIONS[kind][0],
   halfLength: DIMENSIONS[kind][1],
 });
-const parkedCars = [
-  [3240, 857, 0.78],
-  [3290, 1520, 0.78],
-].map(([x, z, heading]) =>
-  body(
-    {
-      position: new Vector3(
-        (x - model.calibration.sourcePixelOrigin[0]) /
-          model.calibration.pixelsPerMeter,
-        0,
-        (z - model.calibration.sourcePixelOrigin[1]) /
-          model.calibration.pixelsPerMeter,
-      ),
-      heading,
-    },
-    'car',
-  ),
-);
 const others = (time) => [
   ...Array.from({ length: 8 }, (_, i) => ({
     id: fleetVanId(i),
@@ -92,7 +74,6 @@ const others = (time) => [
     street: true,
     ...body(sampleStreetCar(i, time), 'car'),
   })),
-  ...parkedCars.map((c, i) => ({ id: `parked-${i}`, ...c })),
 ];
 const mine = (time) =>
   communityVehicles.map((v) => ({

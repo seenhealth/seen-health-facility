@@ -84,7 +84,8 @@ Every vehicle route is a chain of straight runs and circular arcs of the
 vehicle's centre (`app/model/vehicle-path.ts`: the `Pen` turtle, `roundedPath`
 for corner-point data, `pathAt`), so turning radii are exact: 4 m in the fleet
 lot and at the Olympic and Alveare bays, 4.5 m for the delivery trucks (which
-back straight out of receiving before pulling away) and 6.4 m
+back out of receiving round onto the drive aisle, clear of the rear court's
+planters, before pulling away) and 6.4 m
 (`STREET_CORNER_RADIUS`) at the ring-street corners for street cars, fleet and
 community vehicles. Speeds blend with the shared `easeDistance`
 (`app/model/traffic-routes.ts`). `npm run validate:traffic` checks nose-first

@@ -55,12 +55,13 @@ const RECEIVE_AT = [9.75, 2.05],
 /** From the kitchen station down the west aisle to the trolley. */
 const AISLE = [9.75, 4.55];
 /**
- * On foot from the side of the parked truck, up the receiving ramp to just
- * inside the door, with the ramp heights (scripts/add-delivery-people.py).
+ * On foot from the east side of the parked truck (the package truck parks on
+ * its west side), up the receiving ramp to just inside the door, with the
+ * ramp heights (scripts/add-delivery-people.py).
  */
 const stop = deliveries.deliveryStops.find((s) => s.id === DELIVERY);
-const DOCK = [7.35, -21.8],
-  OUTSIDE = [DOCK, [7.3, -18.3], [8.8, -16.1], [...stop.door], [8.8, -13.9]],
+const DOCK = [10.25, -21.8],
+  OUTSIDE = [DOCK, [10.3, -18.3], [8.8, -16.1], [...stop.door], [8.8, -13.9]],
   OUTSIDE_HEIGHTS = [-0.23, -0.23, -0.115, 0, 0];
 /**
  * Indoors: across the receiving room to the corridor east of the laundry

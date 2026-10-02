@@ -1127,7 +1127,7 @@ npm run validate:community
 ```
 
 Over the whole day at 50 Hz: community vehicles keep ≥ 0.5 m from the fleet
-vans, delivery trucks, parked cars and each other and ≥ 0.85 m from the street
+vans, delivery trucks and each other and ≥ 0.85 m from the street
 cars; drive nose-first with no reversing or hairpins (radius over any 3 m of
 travel ≥ 5 m; the designed arcs are ≥ 6.2 m); keep doors and ramps shut while
 moving; are periodic and continuous across the loop seam; every vehicle has a

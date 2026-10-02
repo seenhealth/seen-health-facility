@@ -282,7 +282,7 @@ export function buildNeighborhood(model: Facility) {
       0.2,
       max[1] - min[1],
       SITE.street,
-    );
+    ).name = 'street-roadway';
   const { x: farX, z: farZ } = STREET_EXTENT;
   const curbs = siteCurbs(model);
   curbs.sidewalks.forEach((p, i) =>
@@ -313,7 +313,12 @@ export function buildNeighborhood(model: Facility) {
       c,
     );
     o.rotation.y = -Math.atan2(dz, dx);
+    return o;
   };
+  // Parking-stall lines, kept off the street roadways and the pads' drive
+  // stubs (validate-traffic).
+  const stall = (a: Vec2, b: Vec2) =>
+    (strip(a, b, 0.1, SITE.marking).name = 'parking-stall-line');
   // Centre-line dashes, continued along the extensions (east of x 56.5 they
   // keep the phase of the pads' own street stubs).
   const dashes = (
@@ -455,12 +460,7 @@ export function buildNeighborhood(model: Facility) {
   // and stall at its south end, and a row of slightly angled stalls along the
   // building north of the drop-off.
   for (let k = 0; k < 8; k++)
-    strip(
-      [-31.0, -23.05 + 2.8 * k],
-      [-24.9, -23.05 + 2.8 * k],
-      0.1,
-      SITE.marking,
-    );
+    stall([-31.0, -23.05 + 2.8 * k], [-24.9, -23.05 + 2.8 * k]);
   for (let x = -30.6; x < -26.6; x += 0.9)
     strip([x, -3.3], [x + 1.6, -1.2], 0.08, SITE.accessible);
   for (const z of [-3.45, -1.05, 1.45])
@@ -475,34 +475,27 @@ export function buildNeighborhood(model: Facility) {
   );
   isaRing.rotation.x = -Math.PI / 2;
   for (let k = 0; k < 6; k++)
-    strip(
-      [-20.4, -19.5 + 2.7 * k],
-      [-15.0, -21.5 + 2.7 * k],
-      0.1,
-      SITE.marking,
-    );
+    stall([-20.4, -19.5 + 2.7 * k], [-15.0, -21.5 + 2.7 * k]);
   // The rear court behind the east block (Street View and Google Earth): a
-  // row of stalls nosed into the building's north faces, and perpendicular
-  // stalls along the north edge of the strip in front of the 1300 building.
+  // row of stalls nosed into the building's rear (south) faces. Across the
+  // alley, perpendicular stalls entered from it along the north edge of the
+  // paved strip in front of the 1300 building, south of the alley's curb line
+  // (z −35.8), not on its lanes; the row stops short of the partner day
+  // center's drive stub (x −3.9 to 13.6), which crosses the strip.
   for (let k = 0; k <= 6; k++) {
     const x = 0.4 + 2.45 * k,
       face = x > 5.2 && x < 11.8 ? -15.2 : -12.5;
-    strip([x, face], [x, face - 5.0], 0.1, SITE.marking);
+    stall([x, face], [x, face - 5.0]);
   }
-  for (let k = 0; k <= 15; k++)
-    strip(
-      [-30.5 + 2.5 * k, -35.8],
-      [-30.5 + 2.5 * k, -31.5],
-      0.1,
-      SITE.marking,
-    );
+  box(-18.0, -0.432, -38.2, 26.0, 0.2, 4.8, SITE.asphalt).name =
+    'strip-1300-building';
+  for (let k = 0; k <= 10; k++)
+    stall([-30.5 + 2.5 * k, -35.8], [-30.5 + 2.5 * k, -40.1]);
   // The neighbour's lot: angled stalls along the dialysis center and along our
   // east wall, one-way north up the aisle (arrows), the hatched accessible
   // stall at the Valley end.
-  for (let z = -17; z <= 12; z += 3)
-    strip([45.1, z], [39.7, z + 2.4], 0.1, SITE.marking);
-  for (let z = -6; z <= 15; z += 3)
-    strip([30.3, z], [35.5, z - 2.4], 0.1, SITE.marking);
+  for (let z = -17; z <= 12; z += 3) stall([45.1, z], [39.7, z + 2.4]);
+  for (let z = -6; z <= 15; z += 3) stall([30.3, z], [35.5, z - 2.4]);
   for (let x = 30.6; x < 35.2; x += 0.9)
     strip([x, 15.4], [x + 1.4, 17.4], 0.08, SITE.accessible);
   box(34.6, -0.208, 14.2, 1.0, 0.012, 1.0, SITE.accessible);
@@ -637,7 +630,9 @@ export function buildNeighborhood(model: Facility) {
       'neighbor-planting',
     );
   }
-  // Simplified, softly rounded vehicles: stone bodies with dark glazing.
+  // Simplified, softly rounded vehicles: stone bodies with dark glazing, for
+  // the street cars (no parked cars: the lots read by their striping and
+  // planters).
   function car(id: string, x: number, z: number, angle: number, color: string) {
     const g = new T.Group();
     g.name = id;
@@ -672,11 +667,6 @@ export function buildNeighborhood(model: Facility) {
       box(sx, 0.62, 1.955, 0.32, 0.1, 0.03, SITE.headlight, g);
     return g;
   }
-  // No parked cars: the lots read by their striping and planters.
-  ([] as number[][]).forEach((p, i) => {
-    const [x, z] = px(p[0], p[1]);
-    car(`parked-car-${i}`, x, z, p[2], SITE.cars[i]);
-  });
   const traffic = [
     car('street-car-1', 0, 39.4, Math.PI / 2, SITE.cars[3]),
     car('street-car-2', 0, 43.4, -Math.PI / 2, SITE.cars[1]),
