@@ -335,7 +335,7 @@
             "walkTitle": "Walk to the mat table",
             "window": [
               208,
-              240
+              232
             ],
             "roomId": "rehab-open",
             "anchor": [
@@ -395,19 +395,19 @@
             "walkTitle": "Walk to the day room",
             "window": [
               240,
-              290
+              287
             ],
             "roomId": "day-open",
             "anchor": [
-              -7.9,
-              12.25
+              -8.4,
+              11.7
             ],
             "heading": 3.1416,
             "action": "exercise",
             "approach": [
               [
-                -8.8,
-                11.35
+                -10.45,
+                11.7
               ]
             ],
             "followProgram": true,

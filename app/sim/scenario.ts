@@ -24,6 +24,7 @@ import type { Action, CharacterRole } from '../model/characters';
 import type { Facility, Vec2 } from '../model/schema';
 import careTeam from '../data/care-team.json';
 import program from '../data/day-program.json';
+import { floorPrograms, MOVEMENT_ACTIONS as MOVEMENT } from '../model/day-program';
 import { CARE_DAY } from './clock';
 import {
   mergeTracks,
@@ -491,14 +492,14 @@ function walk(
 /** Split a dwell by day-program session, taking the standing participant's action. */
 function programActions(start: number, end: number) {
   const out: { start: number; end: number; action: Action; title: string }[] = [];
-  for (const s of program.programs) {
+  for (const s of floorPrograms) {
     const a = Math.max(start, s.start),
       b = Math.min(end, s.end);
     if (b - a > 1e-6)
       out.push({
         start: a,
         end: b,
-        action: (['exercise', 'dance', 'tai-chi'].includes(s.action)
+        action: (MOVEMENT.has(s.action)
           ? s.action
           : 'listen') as Action,
         title: s.label,

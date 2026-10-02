@@ -15,13 +15,14 @@ import { COMMUNITY_SOURCE_ID } from '../work/validation/community-people.mjs';
 import { buildNeighborhood } from '../work/validation/neighborhood.mjs';
 import { sampleVan, vanWindows, ARRIVAL } from '../work/validation/arrival.mjs';
 import { dayProgram, programAt } from '../work/validation/day-room.mjs';
+import { floorPrograms } from '../work/validation/day-program.mjs';
 import { createCharacter } from '../work/validation/characters.mjs';
 const m = JSON.parse(
   readFileSync('public/models/seen-alhambra-planning.json', 'utf8'),
 );
 // The engine plays its source as given; the viewer gives it the composed
-// Alhambra source: the 167-person loop, the fleet crew (177) and the
-// community cast (241: 23 hand-authored, 41 generated inside facility
+// Alhambra source: the 184-person loop, the fleet crew (194) and the
+// community cast (258: 23 hand-authored, 41 generated inside facility
 // instances, 33 in the partner day center, 6 in the Wongs' home and 2 in Mrs.
 // Lin's), with the community vehicles registered so their riders' seats
 // resolve.
@@ -35,8 +36,8 @@ const scene = new T.Scene(),
   ),
   neighborhood = buildNeighborhood(m);
 scene.add(neighborhood.root);
-assert.equal(activity.actors.length, 241);
-assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 167);
+assert.equal(activity.actors.length, 258);
+assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 184);
 for (const role of [
   'doctor',
   'nurse',
@@ -48,6 +49,7 @@ for (const role of [
   'coordinator',
   'social-worker',
   'activities',
+  'instructor',
   'nutrition',
   'participant',
 ])
@@ -218,11 +220,11 @@ const communityIds = new Set(
 );
 assert.equal(communityIds.size, 64, 'the community layer brings its cast');
 activity.updateView(allView);
-assert.equal(activity.getState().people, 241);
+assert.equal(activity.getState().people, activity.actors.length);
 activity.updateView({ ...allView, hiddenSources: [COMMUNITY_SOURCE_ID] });
 assert.equal(
   activity.getState().people,
-  177,
+  activity.actors.length - communityIds.size,
   'people count without the community layer',
 );
 assert.ok(
@@ -402,18 +404,19 @@ assert.deepEqual(
   'Seek restores vans and ramps exactly',
 );
 console.log(
-  `Arrival checks: ${boardingSamples} van-ramp samples, ${entranceSamples} doorway samples, two desk staff, ${activityData.interactions.length} interaction tracks and 167 stable person templates.`,
+  `Arrival checks: ${boardingSamples} van-ramp samples, ${entranceSamples} doorway samples, two desk staff, ${activityData.interactions.length} interaction tracks and ${activityData.actors.length} stable person templates.`,
 );
 // The flexible layout and repertoire stay in sync with animation, accessibility and scrubbing.
-assert.equal(dayProgram.programs.length, 10);
-assert.equal(dayProgram.removedObjectIds.length, 15);
+assert.equal(floorPrograms.length, 10);
+assert.equal(dayProgram.programs.length, 17);
+assert.equal(dayProgram.removedObjectIds.length, 42);
 assert.ok(
   dayProgram.removedObjectIds.every((id) => m.objects.some((o) => o.id === id)),
 );
 assert.ok(!dayProgram.removedObjectIds.includes('day-diamond-table-04'));
 const groupIds = new Set(dayProgram.stations.map((s) => s.actorId));
 const signatures = new Set();
-for (const session of dayProgram.programs) {
+for (const session of floorPrograms) {
   const at = session.start + 12;
   activity.setOptions({ time: at, playing: false, filter: 'all' });
   assert.equal(programAt(at).id, session.id);
@@ -455,8 +458,20 @@ assert.ok(
   'The repertoire has distinct motion/gesture states',
 );
 assert.equal(programAt(720).id, programAt(0).id);
-// Passing traffic must stay outside the stationary activity group and its chairs.
-for (const a of activityData.actors.filter((a) => !groupIds.has(a.id)))
+// Every session in every zone has its interaction track.
+for (const session of dayProgram.programs)
+  assert.ok(
+    activityData.interactions.some(
+      (i) =>
+        i.id === 'day-' + session.id &&
+        i.start === session.start &&
+        i.end === session.end,
+    ),
+    `${session.id} has an interaction track`,
+  );
+// Passing traffic keeps outside the open floor, where the class rearranges between layouts.
+const [[ax0, az0], [ax1, az1]] = dayProgram.floor.area;
+for (const a of activityData.actors.filter((a) => !groupIds.has(a.id) && a.levelId === 'ground'))
   for (const s of a.segments.filter((s) =>
     ['walk', 'roll'].includes(s.action),
   )) {
@@ -466,16 +481,14 @@ for (const a of activityData.actors.filter((a) => !groupIds.has(a.id)))
           s.path[i - 1][0] + ((s.path[i][0] - s.path[i - 1][0]) * j) / 20;
         const z =
           s.path[i - 1][1] + ((s.path[i][1] - s.path[i - 1][1]) * j) / 20;
-        for (const station of dayProgram.stations)
-          assert.ok(
-            Math.hypot(x - station.position[0], z - station.position[1]) >=
-              0.63,
-            `${a.id} crosses activity seating`,
-          );
+        assert.ok(
+          x < ax0 - 0.25 || x > ax1 + 0.25 || z < az0 - 0.25 || z > az1 + 0.25,
+          `${a.id} crosses the open floor at ${x},${z}`,
+        );
       }
   }
 console.log(
-  'Day room checks: ten sessions, cleared front tables, seated and wheelchair modes, activity props, seek/repeat and protected circulation.',
+  'Day room checks: ten open-floor sessions and seven zone sessions, cleared front tables, seated and wheelchair modes, activity props, seek/repeat and protected circulation.',
 );
 globalThis.FileReader = class {
   readAsArrayBuffer(blob) {
@@ -500,8 +513,12 @@ assert.ok(
 assert.equal(buffer.readUInt32LE(0), 0x46546c67);
 const n = buffer.readUInt32LE(12),
   gltf = JSON.parse(buffer.subarray(20, 20 + n).toString());
-assert.equal(gltf.skins.length, 16);
-assert.equal(gltf.animations.length, 288);
+// One rig per role of the composed source (the loop's roles plus the
+// community's family) and the three mobility aids, each with every action clip.
+const rigs = alhambraSource(m).roles.length + 3,
+  clipsPerRig = createCharacter({ id: 'clip-count', role: 'nurse', variant: 0 }).clips().length;
+assert.equal(gltf.skins.length, rigs);
+assert.equal(gltf.animations.length, rigs * clipsPerRig);
 assert.ok(gltf.animations.some((a) => a.name === 'cast-doctor:walk'));
 // The checked cast is written to work/ so validation leaves the tree clean;
 // `--out public/models` publishes it.
@@ -511,6 +528,6 @@ const out = process.argv.includes('--out')
 mkdirSync(out, { recursive: true });
 writeFileSync(`${out}/seen-health-animated-cast.glb`, buffer);
 console.log(
-  `Validated ${activity.actors.length} actors, ${activityData.roles.length} roles, ${samples} path samples, ${minWall.toFixed(3)}m minimum wall clearance; pause, repeat, seek, speed, synchronized pairs, levels and 3D context. Exported 16 rigs and 288 clips (${(buffer.length / 1024 / 1024).toFixed(2)} MB) to ${out}/.`,
+  `Validated ${activity.actors.length} actors, ${activityData.roles.length} roles, ${samples} path samples, ${minWall.toFixed(3)}m minimum wall clearance; pause, repeat, seek, speed, synchronized pairs, levels and 3D context. Exported ${rigs} rigs and ${rigs * clipsPerRig} clips (${(buffer.length / 1024 / 1024).toFixed(2)} MB) to ${out}/.`,
 );
 activity.dispose();

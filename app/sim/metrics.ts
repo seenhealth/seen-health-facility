@@ -98,6 +98,11 @@ const CARE_ACTIONS = new Set([
   'clap',
   'dance',
   'tai-chi',
+  'qigong',
+  'fan-dance',
+  'opera',
+  'erhu',
+  'tea',
   'device',
   'write',
   'craft',
@@ -517,6 +522,7 @@ export function computeMetrics(
     reception: 'Front desk',
     nutrition: 'Food service',
     coordinator: roleNames.coordinator || 'Care coordinator',
+    instructor: 'Guest instructor',
   });
   // Staff time by role describes the center's staff; partner staff who only
   // appear at a home or partner site are in occupancy and the trace instead.

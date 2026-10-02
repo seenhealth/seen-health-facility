@@ -1,4 +1,4 @@
-import program from '../data/day-program.json';
+import { floorPrograms } from './day-program';
 import { addSiteArrivalPeople } from './site-arrival-people';
 import {
   activityData,
@@ -453,12 +453,12 @@ export function buildSiteActivityData(model: Facility): ActivityData {
         title: title || `${roleNames[person.role]} · ${r.name}`,
       });
       const segments: Segment[] = person.program
-        ? program.programs.map((s) =>
+        ? floorPrograms.map((s) =>
             stationary(
               s.start,
               s.end,
               (person.role === 'activities'
-                ? s.leaderAction
+                ? (s.leaderAction ?? s.action)
                 : s.action) as Action,
               p,
               s.label,
@@ -555,7 +555,7 @@ export function buildSiteActivityData(model: Facility): ActivityData {
     .filter((a) => a.roomId === dayRoomId)
     .map((a) => a.id);
   interactions.push(
-    ...program.programs.map((p) => ({
+    ...floorPrograms.map((p) => ({
       id: `day-${p.id}`,
       label: p.label,
       category: 'activities',

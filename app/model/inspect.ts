@@ -72,6 +72,16 @@ const ACTIONS: Record<Action, string> = {
   wii: 'Playing Wii',
   mahjong: 'Playing mahjong',
   karaoke: 'Singing',
+  qigong: 'Qigong',
+  'fan-dance': 'Fan dancing',
+  opera: 'Cantonese opera',
+  erhu: 'Playing the erhu',
+  tea: 'Having tea',
+  'board-game': 'Playing a board game',
+  watch: 'Watching',
+  knit: 'Knitting',
+  cards: 'Playing cards',
+  read: 'Reading',
   phone: 'On the phone',
 };
 const MOBILITY = {

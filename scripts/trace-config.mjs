@@ -10,10 +10,10 @@ export const TRACE_OPTIONS = {
   encounterGapSeconds: 3,
 };
 /**
- * Size bound for the published trace JSON (bytes). Group interactions list
- * every other member on each member's start and end events, so the file grows
- * with the square of group size.
+ * Size bound for the published trace JSON (bytes), with headroom. Group
+ * interactions list every other member on each member's start and end events,
+ * so the file grows with the square of group size.
  */
-export const TRACE_SIZE_LIMIT = 3_500_000;
+export const TRACE_SIZE_LIMIT = 4_000_000;
 /** The published trace, relative to the repository root. */
 export const TRACE_FILE = 'public/models/touchpoint-trace.json';

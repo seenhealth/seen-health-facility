@@ -52,7 +52,7 @@ Wiring: `alhambraSource(model, base)` composes the Alhambra care day once,
 loop. The renderer, the Measure panel (metrics and trace), the story scenario
 (`composedStorySource`), `scripts/sim-report.mjs` and `scripts/validate-trace.mjs`
 all read it, so every count, trace and report describes the people the scene
-animates (241 in the base loop: the center's 167, the fleet crew's 10 and the
+animates (258 in the base loop: the center's 184, the fleet crew's 10 and the
 community's 64, of whom 41 are generated inside facility instances: 33 in the
 partner day center, 6 in the Wongs' home and 2 in Mrs. Lin's). When
 the played source carries the `community` view, `renderer.ts` passes
@@ -66,7 +66,7 @@ Layers) shows or hides the layer. The pads live in the site context, so they
 also hide with **Street & parking context** and stay out of Plan. The engine
 hides the layer's people through its view (`hiddenSources`, matched against
 `ActorSpec.sourceId`), so the activity panel's people count (the snapshot's
-`people`: 241 with the layer, 177 without), walking-path lines and follow
+`people`: 258 with the layer, 194 without), walking-path lines and follow
 targets follow the toggle; site-level people (the community cast and the fleet
 drivers) show only with the site context, at every level.
 

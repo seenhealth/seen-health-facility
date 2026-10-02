@@ -231,16 +231,17 @@ export function validateTracks(sim, model, scenario, result) {
   }
   assert.ok(boarding > 20, 'Hero uses the van ramp on arrival and departure');
   report.vanRampSamples = boarding;
-  // Day-room stations stay protected from new walking routes.
-  for (const a of mine)
-    for (const s of a.segments.filter((s) => s.action === 'walk' && s.visible !== false && a.levelId === 'ground'))
-      for (let i = 1; i < s.path.length; i++)
-        for (let j = 0; j <= 20; j++) {
-          const x = s.path[i - 1][0] + ((s.path[i][0] - s.path[i - 1][0]) * j) / 20,
-            z = s.path[i - 1][1] + ((s.path[i][1] - s.path[i - 1][1]) * j) / 20;
-          for (const st of sim.dayProgram.stations)
-            assert.ok(Math.hypot(x - st.position[0], z - st.position[1]) >= 0.63, `${a.id} crosses activity seating`);
-        }
+  // New walking routes never pass through the open-floor class as it rearranges.
+  const cohort = sim.dayProgram.stations.map((s) => byId.get(s.actorId)).filter(Boolean);
+  for (const a of mine.filter((a) => a.levelId === 'ground'))
+    for (let t = 0; t < duration; t += 0.25) {
+      const p = sim.sampleActor(a, t);
+      if (p.visible === false || !['walk', 'roll'].includes(p.action)) continue;
+      for (const c of cohort) {
+        const q = sim.sampleActor(c, t);
+        assert.ok(Math.hypot(p.x - q.x, p.z - q.z) >= 0.5, `${a.id} walks through ${c.id} at ${t}`);
+      }
+    }
   // Furniture: report walking samples that pass through furniture footprints
   // (shrunk by 0.1 m; sitting down onto a seat is expected at a stage end).
   const furniture = ground.obstacles.filter(

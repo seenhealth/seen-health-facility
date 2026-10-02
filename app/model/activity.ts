@@ -11,7 +11,7 @@ import type { Facility, Vec2 } from './schema';
 import { fleetVanId, fleetVanLabel } from './alhambra-fleet';
 import { buildArrival } from './arrival';
 import { buildSiteArrival } from './site-arrival';
-import { buildDayRoom } from './day-room';
+import { buildDayRoom, type DayHighlight } from './day-room';
 import { buildDeliveries, deliveryStops, sampleDelivery } from './deliveries';
 
 export type Segment = {
@@ -614,8 +614,12 @@ export function createActivity(
   }));
   actors.forEach((a) => root.add(a.root));
   const dayRoom = data.siteSpecific
-    ? { root: new T.Group(), tick: (_time: number) => {} }
-    : buildDayRoom(actors);
+    ? {
+        root: new T.Group(),
+        tick: (_time: number) => {},
+        highlights: (): DayHighlight[] => [],
+      }
+    : buildDayRoom(actors, model);
   scene.add(dayRoom.root);
   const actorMap = new Map(actors.map((a) => [a.spec.id, a]));
   const groundZones = model.zones.filter((z) => z.levelId === 'ground');

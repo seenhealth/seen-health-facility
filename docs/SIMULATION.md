@@ -158,7 +158,7 @@ food truck's runs or the kitchen, then `npm run build:scenario`.
 A TypeScript port of the grid in `scripts/build-activity.py`, with identical
 results: 0.2 m cells; 0.21 m wall clearance; furniture footprints (including
 `navigationFootprints`) inflated by 0.19 m; cleared day-program furniture; the
-reserved group stations and presentation screen; 8-connected A* without corner
+reserved open-floor class area (with a lane to the story slot); 8-connected A* without corner
 cutting; collinear simplification. `navGrid(model, dayProgramNavOptions(true))`
 reproduces the Python grid exactly (22,063 walkable cells; 20,099 at cane
 clearance) and builds in about 0.4 s in Node, cached per model and options.
@@ -248,8 +248,10 @@ disappears (`visible: false` off duty); `exit` optionally differs.
   0.2 m wall clearance.
 - `join` / `leave` time companions relative to the hero's arrival/departure
   (defaults −3 s and +1 s: they wait for her and see her off).
-- `followProgram: true` takes the day-room program's standing action for each
-  session the hero overlaps.
+- `followProgram: true` takes the open-floor program's standing action for each
+  session the hero overlaps (movement sessions are copied; others become
+  listening). The long arts table and tea corner run concurrently and are not
+  followed.
 - `minDwell` overrides the minimum seconds at a stop.
 - `duties` (with absolute `window`s) attach companions to steps where the hero
   follows copied tracks, e.g. the center manager at check-in.
@@ -480,8 +482,8 @@ per participant.
 `npm run sim:report` (or `npm run trace:report` for the trace alone) traces the
 base loop and the story source, both composed as the viewer plays them, at 1 s
 and writes `public/models/touchpoint-trace.json`: `{ sources: { base, story } }`,
-each with a `summary` and one event per line, about 3.1 MB for ~10,200 events
-(241 people in the base loop, 256 in the story), under the 3.5 MB bound.
+each with a `summary` and one event per line, about 3.7 MB for ~11,800 events
+(258 people in the base loop, 273 in the story), under the 4 MB bound.
 Compactness comes from coalescing encounters, not from short keys. The console
 prints events by kind, participants covered per category and the hero's
 discipline coverage. `npm run validate:trace` recomputes the trace and asserts

@@ -1,6 +1,6 @@
 {
-  "version": "1.0",
-  "source": "Owner-requested day-center activity repertoire and flexible front-of-room layout, September 2026. Illustrative rotation, not a verified daily timetable. Monday’s ten sessions are the base loop; Tuesday to Friday rotate a culturally specific repertoire into the same ten 72-second slots.",
+  "version": "3.1",
+  "source": "Owner-requested day-center activity repertoire and flexible front-of-room layout, September 2026; concurrent Chinese-American cultural zones with guest instructors, October 2026. Illustrative rotation, not a verified daily timetable. Monday’s ten open-floor sessions are the baked loop; Tuesday to Friday rotate a culturally specific repertoire into the same ten 72-second slots, each program in the slot of the floor session it is like.",
   "removedObjectIds": [
     "day-diamond-table-01",
     "day-diamond-table-01-chair-1",
@@ -16,127 +16,303 @@
     "day-diamond-table-03-chair-1",
     "day-diamond-table-03-chair-2",
     "day-diamond-table-03-chair-3",
-    "day-diamond-table-03-chair-4"
+    "day-diamond-table-03-chair-4",
+    "daily-top-day-communal-table",
+    "daily-top-day-banquette-table-01",
+    "daily-top-day-banquette-table-02",
+    "daily-top-day-banquette-table-03",
+    "day-north-table-1",
+    "day-north-table-1-side",
+    "day-north-table-1-south",
+    "day-north-table-2",
+    "day-north-table-2-side",
+    "day-north-table-2-south",
+    "daily-top-day-north-table-1",
+    "daily-top-day-north-table-2",
+    "daily-top-day-diamond-table-04",
+    "daily-top-day-diamond-table-05",
+    "daily-top-day-diamond-table-06",
+    "daily-top-day-diamond-table-07",
+    "daily-top-day-diamond-table-08",
+    "daily-top-day-diamond-table-09",
+    "daily-top-day-tree-table-1",
+    "daily-top-day-tree-table-2",
+    "daily-top-day-tree-table-3",
+    "daily-top-day-tree-table-4",
+    "daily-top-day-banquette-table-04",
+    "daily-top-day-banquette-table-05",
+    "daily-top-day-banquette-table-06",
+    "daily-top-day-banquette-table-07",
+    "daily-top-day-photo-lounge-table"
   ],
-  "layoutNote": "Three front tables and their twelve chairs are cleared for a flexible activity floor. The original furniture plan remains in the source comparison. Other tables remain for small groups and quieter participation.",
+  "layoutNote": "Three front tables, the two small north tables and their chairs are cleared for a flexible activity floor that changes layout by session, and static tabletop sets give way to session props. The original furniture plan remains in the source comparison.",
   "stations": [
     {
       "actorId": "activities-lead",
-      "position": [
-        -7,
-        10.6
-      ],
-      "heading": 0,
       "mode": "leader"
     },
     {
       "actorId": "member-group-01",
-      "position": [
-        -9,
-        12.25
-      ],
-      "heading": 3.141592653589793,
       "mode": "standing"
     },
     {
       "actorId": "member-group-02",
-      "position": [
-        -6.8,
-        12.25
-      ],
-      "heading": 3.141592653589793,
       "mode": "chair"
     },
     {
       "actorId": "member-wheelchair",
-      "position": [
-        -4.5,
-        12.25
-      ],
-      "heading": 3.141592653589793,
       "mode": "wheelchair"
     },
     {
       "actorId": "care-aide-03",
-      "position": [
-        -3.4,
-        12.1
-      ],
-      "heading": -1.5707963267948966,
       "mode": "support"
+    },
+    {
+      "actorId": "floor-member-01",
+      "mode": "standing"
+    },
+    {
+      "actorId": "floor-member-02",
+      "mode": "standing"
+    },
+    {
+      "actorId": "floor-member-03",
+      "mode": "standing"
+    },
+    {
+      "actorId": "floor-member-04",
+      "mode": "chair"
+    },
+    {
+      "actorId": "floor-member-05",
+      "mode": "standing"
+    },
+    {
+      "actorId": "floor-member-06",
+      "mode": "standing"
+    },
+    {
+      "actorId": "floor-member-07",
+      "mode": "chair"
+    },
+    {
+      "actorId": "floor-member-08",
+      "mode": "standing"
+    }
+  ],
+  "zones": [
+    {
+      "id": "floor",
+      "label": "Open floor",
+      "anchor": [
+        -6.9,
+        11.0
+      ],
+      "labelHeight": 2.75
+    },
+    {
+      "id": "arts-table",
+      "label": "Long arts table",
+      "anchor": [
+        -12.01,
+        14.95
+      ],
+      "labelHeight": 2.1,
+      "instructorSpot": {
+        "position": [
+          -12.007418,
+          12.261813
+        ],
+        "heading": 0,
+        "seatId": "day-communal-north"
+      },
+      "participants": [
+        "daily-member-01",
+        "daily-member-02",
+        "daily-member-03",
+        "daily-member-04",
+        "daily-member-05",
+        "daily-member-06",
+        "daily-member-08",
+        "daily-member-09",
+        "daily-member-10",
+        "daily-member-11",
+        "daily-member-12",
+        "daily-member-13",
+        "daily-member-14"
+      ]
+    },
+    {
+      "id": "tea-corner",
+      "label": "Tea corner",
+      "anchor": [
+        -1.55,
+        13.1
+      ],
+      "labelHeight": 2.1,
+      "instructorSpot": {
+        "position": [
+          -0.6,
+          13.1
+        ],
+        "heading": -1.5707963267948966,
+        "seated": true
+      },
+      "participants": [
+        "daily-member-15",
+        "daily-member-16",
+        "daily-member-17",
+        "daily-member-18",
+        "daily-member-19",
+        "daily-member-20"
+      ]
+    }
+  ],
+  "instructors": [
+    {
+      "id": "instructor-opera",
+      "name": "Ms. Leung",
+      "specialty": "Cantonese opera performer",
+      "attire": "Opera costume with water sleeves and headdress"
+    },
+    {
+      "id": "instructor-qigong",
+      "name": "Mr. Zhou",
+      "specialty": "Qigong teacher",
+      "attire": "Celadon practice silks"
+    },
+    {
+      "id": "instructor-dance",
+      "name": "Ms. Tang",
+      "specialty": "Folk dance teacher",
+      "attire": "Red qipao with gold piping"
+    },
+    {
+      "id": "instructor-taichi",
+      "name": "Mr. Wong",
+      "specialty": "Tai chi teacher",
+      "attire": "White silk tai chi uniform"
+    },
+    {
+      "id": "instructor-erhu",
+      "name": "Mr. Lam",
+      "specialty": "Erhu musician",
+      "attire": "Navy Tang jacket"
+    },
+    {
+      "id": "instructor-tcm",
+      "name": "Dr. Ho",
+      "specialty": "Traditional Chinese medicine practitioner",
+      "attire": "White mandarin-collar coat"
+    },
+    {
+      "id": "instructor-calligraphy",
+      "name": "Mr. Chan",
+      "specialty": "Calligraphy and ink-painting teacher",
+      "attire": "Maroon Tang jacket"
+    },
+    {
+      "id": "instructor-papercut",
+      "name": "Mrs. Yip",
+      "specialty": "Paper-cutting artist",
+      "attire": "Crimson Tang jacket"
+    },
+    {
+      "id": "instructor-tea",
+      "name": "Mrs. Liu",
+      "specialty": "Tea host",
+      "attire": "Jade qipao"
     }
   ],
   "programs": [
     {
       "id": "performance",
-      "label": "Performances",
+      "zone": "floor",
       "start": 0,
       "end": 72,
+      "label": "Cantonese opera",
+      "labelZh": "粵劇",
+      "instructorId": "instructor-opera",
+      "instructorAction": "opera",
       "leaderAction": "perform",
       "action": "clap",
-      "title": "Familiar songs & community performances",
-      "culture": "Songs and stories chosen with participants; a bilingual host invites requests.",
+      "title": "Cantonese opera & familiar songs",
+      "culture": "A guest performer in full opera costume sings Cantonese opera excerpts; water-sleeve gestures and familiar songs invite requests from the room.",
       "access": "Watch, clap or join in from a chair, wheelchair or standing position.",
+      "decor": [
+        "lanterns"
+      ],
+      "formation": "audience",
       "cultures": [
-        "Multicultural"
+        "Chinese"
       ],
       "languages": [
         "Cantonese",
-        "Mandarin",
         "English"
       ],
       "format": "group"
     },
     {
-      "id": "language",
-      "label": "Language circle",
+      "id": "qigong",
+      "zone": "floor",
       "start": 72,
       "end": 144,
-      "leaderAction": "present",
-      "action": "conversation",
-      "title": "Language & conversation",
-      "culture": "Picture prompts, familiar sayings and conversation in preferred languages; Mandarin, Cantonese and English are example options.",
-      "access": "Listen, point to a picture or speak at your own pace.",
+      "label": "Baduanjin qigong",
+      "labelZh": "八段錦",
+      "instructorId": "instructor-qigong",
+      "instructorAction": "qigong",
+      "leaderAction": "qigong",
+      "action": "qigong",
+      "title": "Baduanjin qigong · the Eight Brocades",
+      "culture": "Eight slow, named movements such as 'holding up the heavens', led by a qigong teacher in practice silks.",
+      "access": "Every movement has a seated version; rest whenever needed.",
+      "decor": [],
+      "formation": "grid",
+      "cultures": [
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin"
+      ],
+      "format": "group"
+    },
+    {
+      "id": "devices",
+      "zone": "floor",
+      "start": 144,
+      "end": 216,
+      "label": "Device class",
+      "leaderAction": "device",
+      "action": "device",
+      "title": "Everyday device skills",
+      "culture": "Practice WeChat and video calls with family, photos and larger text using step-by-step visual prompts.",
+      "access": "One-to-one help, a supported tablet and repeatable small steps.",
+      "decor": [],
+      "formation": "small-groups",
       "cultures": [
         "Multicultural"
       ],
       "languages": [
-        "Mandarin",
         "Cantonese",
+        "Mandarin",
         "English"
       ],
       "format": "small-group"
     },
     {
-      "id": "devices",
-      "label": "Device class",
-      "start": 144,
-      "end": 216,
-      "leaderAction": "device",
-      "action": "device",
-      "title": "Everyday device skills",
-      "culture": "Practice video calls, photos and larger text using step-by-step visual prompts.",
-      "access": "One-to-one help, a supported tablet and repeatable small steps.",
-      "cultures": [
-        "Multicultural"
-      ],
-      "languages": [
-        "Cantonese",
-        "Mandarin",
-        "English"
-      ],
-      "format": "one-to-one"
-    },
-    {
       "id": "exercise",
-      "label": "Exercise",
+      "zone": "floor",
       "start": 216,
       "end": 288,
+      "label": "Exercise",
       "leaderAction": "exercise",
       "action": "exercise",
       "title": "Everyday movement",
       "culture": "A staff-led group with familiar music and easy-to-follow demonstrations.",
       "access": "Standing, chair-based or wheelchair upper-body movement; rest whenever needed.",
+      "decor": [],
+      "formation": "grid",
       "cultures": [
         "Multicultural"
       ],
@@ -149,34 +325,47 @@
     },
     {
       "id": "dance",
-      "label": "Dance",
+      "zone": "floor",
       "start": 288,
       "end": 360,
-      "leaderAction": "dance",
-      "action": "dance",
-      "title": "Music & dance",
-      "culture": "Participant-selected music, familiar rhythms and a simple shared sequence.",
-      "access": "Standing steps or seated rhythm and arm movements.",
+      "label": "Fan dance",
+      "labelZh": "扇子舞",
+      "instructorId": "instructor-dance",
+      "instructorAction": "fan-dance",
+      "leaderAction": "fan-dance",
+      "action": "fan-dance",
+      "title": "Fan dance",
+      "culture": "Silk folding fans open, turn and flutter to Chinese folk music, led by a dance teacher in a qipao.",
+      "access": "Standing steps or seated fan and arm movements.",
+      "decor": [
+        "lanterns"
+      ],
+      "formation": "grid",
       "cultures": [
-        "Multicultural"
+        "Chinese"
       ],
       "languages": [
-        "Cantonese",
         "Mandarin",
-        "English"
+        "Cantonese"
       ],
       "format": "group"
     },
     {
       "id": "tai-chi",
-      "label": "Tai chi",
+      "zone": "floor",
       "start": 360,
       "end": 432,
+      "label": "Tai chi",
+      "labelZh": "太極拳",
+      "instructorId": "instructor-taichi",
+      "instructorAction": "tai-chi",
       "leaderAction": "tai-chi",
       "action": "tai-chi",
       "title": "Tai chi together",
-      "culture": "Slow, flowing gestures with a visible leader and time to follow.",
+      "culture": "Yang-style 'cloud hands' and slow weight shifts, led by a teacher in white practice silks.",
       "access": "A seated version mirrors the upper-body sequence; a care aide stays nearby.",
+      "decor": [],
+      "formation": "grid",
       "cultures": [
         "Chinese"
       ],
@@ -187,108 +376,294 @@
       "format": "group"
     },
     {
-      "id": "calligraphy",
-      "label": "Calligraphy",
+      "id": "language",
+      "zone": "floor",
       "start": 432,
       "end": 504,
-      "leaderAction": "write",
-      "action": "write",
-      "title": "Calligraphy & brushwork",
-      "culture": "Explore personally meaningful characters and brush strokes, with large sample cards.",
-      "access": "Thick-handled brushes, supported paper and hand-over-hand help when requested.",
+      "label": "Language circle",
+      "labelZh": "猜燈謎",
+      "leaderAction": "present",
+      "action": "conversation",
+      "title": "Language circle & lantern riddles",
+      "culture": "Riddles hung on red lanterns and familiar sayings in Cantonese, Mandarin and English; a bilingual host reads each one aloud.",
+      "access": "Listen, point to a picture or speak at your own pace.",
+      "decor": [
+        "riddle-lanterns"
+      ],
+      "formation": "circle",
+      "cultures": [
+        "Chinese",
+        "Multicultural"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin",
+        "English"
+      ],
+      "format": "group"
+    },
+    {
+      "id": "ribbon",
+      "zone": "floor",
+      "start": 504,
+      "end": 576,
+      "label": "Ribbon dance",
+      "labelZh": "彩帶舞",
+      "instructorId": "instructor-dance",
+      "instructorAction": "dance",
+      "leaderAction": "dance",
+      "action": "dance",
+      "title": "Silk ribbon dance",
+      "culture": "Long silk ribbons trace circles and waves to folk melodies.",
+      "access": "Short ribbons and seated arm patterns are available.",
+      "decor": [],
+      "formation": "grid-small",
+      "cultures": [
+        "Chinese"
+      ],
+      "languages": [
+        "Mandarin",
+        "Cantonese"
+      ],
+      "format": "group"
+    },
+    {
+      "id": "instruments",
+      "zone": "floor",
+      "start": 576,
+      "end": 648,
+      "label": "Erhu & sing-along",
+      "labelZh": "二胡",
+      "instructorId": "instructor-erhu",
+      "instructorAction": "erhu",
+      "leaderAction": "music",
+      "action": "music",
+      "title": "Erhu & sing-along",
+      "culture": "A two-string erhu leads favorite folk songs; participants keep time with shakers and a hand drum.",
+      "access": "Lightweight shakers and a supported hand drum; listening is welcome.",
+      "decor": [],
+      "formation": "audience",
       "cultures": [
         "Chinese"
       ],
       "languages": [
         "Cantonese",
-        "Mandarin",
-        "English"
-      ],
-      "format": "small-group"
-    },
-    {
-      "id": "crafts",
-      "label": "Arts & crafts",
-      "start": 504,
-      "end": 576,
-      "leaderAction": "craft",
-      "action": "craft",
-      "title": "Seasonal arts & crafts",
-      "culture": "Paper, color and collage inspired by the group’s interests and celebrations.",
-      "access": "Choose, arrange or create with large pieces and individual assistance.",
-      "cultures": [
-        "Multicultural"
-      ],
-      "languages": [
-        "Cantonese",
-        "Mandarin",
-        "English"
-      ],
-      "format": "small-group"
-    },
-    {
-      "id": "instruments",
-      "label": "Instruments",
-      "start": 576,
-      "end": 648,
-      "leaderAction": "music",
-      "action": "music",
-      "title": "Rhythm & instruments",
-      "culture": "Simple percussion, listening and shared rhythms around favorite songs.",
-      "access": "Lightweight shakers and a supported hand drum; listening is welcome.",
-      "cultures": [
-        "Multicultural"
-      ],
-      "languages": [
-        "Cantonese",
-        "Mandarin",
-        "English"
+        "Mandarin"
       ],
       "format": "group"
     },
     {
       "id": "tcm",
-      "label": "TCM talk",
+      "zone": "floor",
       "start": 648,
       "end": 720,
+      "label": "TCM talk",
+      "labelZh": "中醫養生",
+      "instructorId": "instructor-tcm",
+      "instructorAction": "present",
       "leaderAction": "present",
       "action": "listen",
-      "title": "TCM & cultural wellness talks",
-      "culture": "A hosted educational conversation about traditional Chinese medicine, with bilingual discussion and questions.",
+      "title": "TCM & seasonal wellness talk",
+      "culture": "A TCM practitioner explains seasonal foods, herbal teas and acupressure points with a wall chart; the host interprets questions.",
       "access": "Seated listening, visual prompts and time for questions; a quiet table option stays available.",
+      "decor": [
+        "herb-chart"
+      ],
+      "formation": "rows",
       "cultures": [
         "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "English"
+      ],
+      "format": "group"
+    },
+    {
+      "id": "calligraphy",
+      "zone": "arts-table",
+      "start": 0,
+      "end": 144,
+      "label": "Calligraphy",
+      "labelZh": "書法",
+      "instructorId": "instructor-calligraphy",
+      "instructorAction": "write",
+      "action": "write",
+      "title": "Calligraphy & brushwork",
+      "culture": "Brush, ink stone and rice paper: practising personally meaningful characters with a calligraphy teacher.",
+      "access": "Thick-handled brushes, supported paper and hand-over-hand help when requested.",
+      "decor": [
+        "couplets"
+      ],
+      "cultures": [
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin"
+      ],
+      "format": "small-group"
+    },
+    {
+      "id": "paper-cutting",
+      "zone": "arts-table",
+      "start": 144,
+      "end": 288,
+      "label": "Paper-cutting",
+      "labelZh": "剪紙",
+      "instructorId": "instructor-papercut",
+      "instructorAction": "craft",
+      "action": "craft",
+      "title": "Paper-cutting",
+      "culture": "Folding and cutting red paper into window flowers and the character 福, good fortune.",
+      "access": "Pre-drawn patterns, spring-loaded scissors, or tearing instead of cutting.",
+      "decor": [
+        "paper-cuts"
+      ],
+      "cultures": [
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin"
+      ],
+      "format": "small-group"
+    },
+    {
+      "id": "ink-painting",
+      "zone": "arts-table",
+      "start": 288,
+      "end": 432,
+      "label": "Ink painting",
+      "labelZh": "國畫",
+      "instructorId": "instructor-calligraphy",
+      "instructorAction": "write",
+      "action": "write",
+      "title": "Ink painting",
+      "culture": "Bamboo, plum blossom and orchid in black ink, one brushstroke at a time.",
+      "access": "Large brushes and pre-printed outlines.",
+      "decor": [
+        "scroll-paintings"
+      ],
+      "cultures": [
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin"
+      ],
+      "format": "small-group"
+    },
+    {
+      "id": "lanterns",
+      "zone": "arts-table",
+      "start": 432,
+      "end": 576,
+      "label": "Lantern making",
+      "labelZh": "紮燈籠",
+      "instructorId": "instructor-papercut",
+      "instructorAction": "craft",
+      "action": "craft",
+      "title": "Lantern making",
+      "culture": "Folding red paper lanterns for the next festival; finished lanterns hang over the activity floor.",
+      "access": "Pre-cut pieces and glue sticks; work in pairs.",
+      "decor": [
+        "table-lanterns"
+      ],
+      "cultures": [
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin"
+      ],
+      "format": "small-group",
+      "season": "Mid-Autumn · Lunar New Year"
+    },
+    {
+      "id": "couplets",
+      "zone": "arts-table",
+      "start": 576,
+      "end": 720,
+      "label": "Spring couplets",
+      "labelZh": "春聯",
+      "instructorId": "instructor-calligraphy",
+      "instructorAction": "write",
+      "action": "write",
+      "title": "Spring couplets",
+      "culture": "Writing paired good-wish verses on red paper, as families do for Lunar New Year.",
+      "access": "Thick-handled brushes, supported paper and hand-over-hand help when requested.",
+      "decor": [
+        "couplets"
+      ],
+      "cultures": [
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin"
+      ],
+      "format": "small-group",
+      "season": "Lunar New Year"
+    },
+    {
+      "id": "morning-tea",
+      "zone": "tea-corner",
+      "start": 0,
+      "end": 360,
+      "label": "Morning tea & papers",
+      "labelZh": "早茶·讀報",
+      "instructorId": "instructor-tea",
+      "instructorAction": "tea",
+      "action": "read",
+      "title": "Morning tea & Chinese newspapers",
+      "culture": "Jasmine and oolong tea with Chinese-language newspapers; the tea host refills cups and starts conversations about the day's news.",
+      "access": "Large-print papers; reading aloud is welcome.",
+      "decor": [
+        "tea-set",
+        "newspapers"
+      ],
+      "cultures": [
+        "Chinese American"
       ],
       "languages": [
         "Cantonese",
         "Mandarin",
         "English"
       ],
-      "format": "group"
+      "format": "small-group"
+    },
+    {
+      "id": "gongfu-tea",
+      "zone": "tea-corner",
+      "start": 360,
+      "end": 720,
+      "label": "Gongfu tea",
+      "labelZh": "功夫茶",
+      "instructorId": "instructor-tea",
+      "instructorAction": "tea",
+      "action": "tea",
+      "title": "Gongfu tea",
+      "culture": "Small-pot gongfu tea poured in rounds, with time to talk about family, food and festivals.",
+      "access": "Light cups with handles; caffeine-free chrysanthemum tea on request.",
+      "decor": [
+        "tea-set"
+      ],
+      "cultures": [
+        "Chinese"
+      ],
+      "languages": [
+        "Cantonese",
+        "Mandarin"
+      ],
+      "format": "small-group"
     }
   ],
   "repertoire": [
     {
-      "id": "cantonese-opera",
-      "label": "Cantonese opera",
-      "leaderAction": "perform",
-      "action": "clap",
-      "title": "Cantonese opera appreciation",
-      "culture": "Recorded and live excerpts from well-loved Cantonese opera; the story of each scene is introduced in Cantonese and English before it plays.",
-      "access": "Listen from any seat with large-print lyric sheets; clapping or humming along is welcome.",
-      "cultures": [
-        "Cantonese"
-      ],
-      "languages": [
-        "Cantonese",
-        "English"
-      ],
-      "format": "group",
-      "propsLike": "performance"
-    },
-    {
       "id": "tea-social",
       "label": "Tea & dim sum social",
+      "labelZh": "飲茶",
       "leaderAction": "serve",
       "action": "conversation",
       "title": "Morning tea & dim sum social",
@@ -304,87 +679,13 @@
         "English"
       ],
       "format": "small-group",
-      "propsLike": "language"
-    },
-    {
-      "id": "xiangqi-go",
-      "label": "Xiangqi & go",
-      "leaderAction": "tabletop",
-      "action": "tabletop",
-      "title": "Xiangqi & go tables",
-      "culture": "Chinese chess and go on large boards, with experienced players paired with newcomers and a game clock nobody enforces.",
-      "access": "Oversized pieces, boards raised to wheelchair height and a staff partner for anyone who prefers to watch a game unfold.",
-      "cultures": [
-        "Chinese"
-      ],
-      "languages": [
-        "Cantonese",
-        "Mandarin",
-        "English"
-      ],
-      "format": "small-group",
-      "propsLike": "crafts"
-    },
-    {
-      "id": "qigong",
-      "label": "Qigong",
-      "leaderAction": "tai-chi",
-      "action": "tai-chi",
-      "title": "Qigong · Ba Duan Jin",
-      "culture": "The eight brocades sequence, cued in Cantonese and Mandarin by an instructor who faces the group so each movement can be mirrored.",
-      "access": "Every form has a seated version; a care aide stays within reach of anyone standing.",
-      "cultures": [
-        "Chinese"
-      ],
-      "languages": [
-        "Cantonese",
-        "Mandarin"
-      ],
-      "format": "group",
-      "propsLike": "tai-chi"
-    },
-    {
-      "id": "brush-painting",
-      "label": "Brush painting",
-      "leaderAction": "write",
-      "action": "write",
-      "title": "Brush painting · bamboo, plum & birds",
-      "culture": "Ink and wash on rice paper, beginning with bamboo and plum-blossom strokes and moving on to subjects participants suggest.",
-      "access": "Weighted brush handles, taped-down paper and hand-over-hand help when asked for.",
-      "cultures": [
-        "Chinese"
-      ],
-      "languages": [
-        "Cantonese",
-        "Mandarin",
-        "English"
-      ],
-      "format": "small-group",
-      "propsLike": "calligraphy"
-    },
-    {
-      "id": "paper-cutting",
-      "label": "Paper cutting & lanterns",
-      "leaderAction": "craft",
-      "action": "craft",
-      "title": "Paper cutting & lantern making",
-      "culture": "Window flowers, double-happiness cuts and lanterns for Mid-Autumn and Lunar New Year, following patterns participants remember from home.",
-      "access": "Spring-loaded scissors, pre-scored folds and large templates; finished pieces decorate the day room.",
-      "cultures": [
-        "Chinese"
-      ],
-      "languages": [
-        "Cantonese",
-        "Mandarin",
-        "English"
-      ],
-      "format": "small-group",
-      "propsLike": "crafts",
-      "season": "Mid-Autumn · Lunar New Year"
+      "propsLike": "devices",
+      "decor": []
     },
     {
       "id": "dumpling-demo",
       "label": "Dumpling & bao demo",
+      "labelZh": "包餃子",
       "leaderAction": "serve",
       "action": "tabletop",
       "title": "Dumpling & bao making with the dietitian",
@@ -399,11 +700,13 @@
         "English"
       ],
       "format": "small-group",
-      "propsLike": "crafts"
+      "propsLike": "devices",
+      "decor": []
     },
     {
       "id": "chinese-knotting",
       "label": "Chinese knotting",
+      "labelZh": "中國結",
       "leaderAction": "craft",
       "action": "craft",
       "title": "Chinese knotting",
@@ -418,11 +721,13 @@
         "English"
       ],
       "format": "small-group",
-      "propsLike": "crafts"
+      "propsLike": "devices",
+      "decor": []
     },
     {
       "id": "sing-along",
       "label": "Cantopop & Mandopop",
+      "labelZh": "懷舊金曲",
       "leaderAction": "music",
       "action": "clap",
       "title": "Cantopop & Mandopop sing-along",
@@ -437,29 +742,17 @@
         "Mandarin"
       ],
       "format": "group",
-      "propsLike": "instruments"
-    },
-    {
-      "id": "fan-dance",
-      "label": "Fan dance",
-      "leaderAction": "dance",
-      "action": "dance",
-      "title": "Fan dance",
-      "culture": "Folk fan-dance steps set to familiar melodies, led slowly enough to learn the opening and closing of the fan together.",
-      "access": "Seated arm and fan movements mirror the standing steps; lightweight fans are provided.",
-      "cultures": [
-        "Chinese"
+      "propsLike": "instruments",
+      "decor": [
+        "lanterns"
       ],
-      "languages": [
-        "Cantonese",
-        "Mandarin"
-      ],
-      "format": "group",
-      "propsLike": "dance"
+      "instructorId": "instructor-erhu",
+      "instructorAction": "erhu"
     },
     {
       "id": "story-circle",
       "label": "Story circle",
+      "labelZh": "講古",
       "leaderAction": "conversation",
       "action": "conversation",
       "title": "Reminiscence & story circle",
@@ -476,11 +769,13 @@
         "Mandarin"
       ],
       "format": "small-group",
-      "propsLike": "language"
+      "propsLike": "language",
+      "decor": []
     },
     {
       "id": "bilingual-news",
       "label": "Bilingual news",
+      "labelZh": "雙語新聞",
       "leaderAction": "present",
       "action": "listen",
       "title": "Bilingual news & current events",
@@ -495,11 +790,13 @@
         "English"
       ],
       "format": "group",
-      "propsLike": "tcm"
+      "propsLike": "tcm",
+      "decor": []
     },
     {
       "id": "planter-gardening",
       "label": "Planter gardening",
+      "labelZh": "園藝",
       "leaderAction": "craft",
       "action": "craft",
       "title": "Planter gardening · bok choy, chives & herbs",
@@ -516,12 +813,14 @@
         "English"
       ],
       "format": "small-group",
-      "propsLike": "crafts",
-      "season": "Spring through autumn"
+      "season": "Spring through autumn",
+      "propsLike": "devices",
+      "decor": []
     },
     {
       "id": "mindfulness",
       "label": "Mindfulness",
+      "labelZh": "靜心",
       "leaderAction": "present",
       "action": "listen",
       "title": "Mindfulness & meditation",
@@ -537,11 +836,13 @@
         "English"
       ],
       "format": "group",
-      "propsLike": "tcm"
+      "propsLike": "tcm",
+      "decor": []
     },
     {
       "id": "birthday",
       "label": "Birthday of the month",
+      "labelZh": "生日會",
       "leaderAction": "perform",
       "action": "clap",
       "title": "Birthday of the month",
@@ -556,11 +857,15 @@
         "English"
       ],
       "format": "group",
-      "propsLike": "performance"
+      "propsLike": "performance",
+      "decor": [
+        "lanterns"
+      ]
     },
     {
       "id": "school-visit",
       "label": "School visit",
+      "labelZh": "學生探訪",
       "leaderAction": "conversation",
       "action": "conversation",
       "title": "Intergenerational visit from a local school",
@@ -576,7 +881,8 @@
         "Spanish"
       ],
       "format": "small-group",
-      "propsLike": "language"
+      "propsLike": "language",
+      "decor": []
     },
     {
       "id": "vietnamese-songs",
@@ -593,7 +899,8 @@
         "Vietnamese"
       ],
       "format": "group",
-      "propsLike": "instruments"
+      "propsLike": "instruments",
+      "decor": []
     },
     {
       "id": "language-circles",
@@ -614,11 +921,13 @@
         "Tagalog"
       ],
       "format": "small-group",
-      "propsLike": "language"
+      "propsLike": "language",
+      "decor": []
     },
     {
       "id": "fall-prevention",
       "label": "Fall-prevention talk",
+      "labelZh": "防跌講座",
       "leaderAction": "present",
       "action": "listen",
       "title": "Fall-prevention health talk in Chinese",
@@ -632,11 +941,13 @@
         "Mandarin"
       ],
       "format": "group",
-      "propsLike": "tcm"
+      "propsLike": "tcm",
+      "decor": []
     },
     {
       "id": "tea-appreciation",
       "label": "Tea appreciation",
+      "labelZh": "品茶",
       "leaderAction": "serve",
       "action": "conversation",
       "title": "Tea appreciation · gongfu cha",
@@ -651,92 +962,1059 @@
         "English"
       ],
       "format": "small-group",
-      "propsLike": "tcm"
-    },
-    {
-      "id": "mahjong",
-      "label": "Mahjong strategy",
-      "leaderAction": "tabletop",
-      "action": "tabletop",
-      "title": "Mahjong strategy hour",
-      "culture": "Hands, discards and defence talked through at a demonstration table, then open play with Cantonese or Taiwanese rules chosen by each table.",
-      "access": "Large-character tiles, a tile rack for one-handed play and a seat for anyone who prefers to watch.",
-      "cultures": [
-        "Cantonese",
-        "Taiwanese",
-        "Chinese"
-      ],
-      "languages": [
-        "Cantonese",
-        "Mandarin",
-        "English"
-      ],
-      "format": "small-group",
-      "propsLike": "crafts"
+      "propsLike": "tcm",
+      "decor": []
     }
   ],
   "rotations": {
     "mon": [
       "performance",
-      "language",
+      "qigong",
       "devices",
       "exercise",
       "dance",
       "tai-chi",
-      "calligraphy",
-      "crafts",
+      "language",
+      "ribbon",
       "instruments",
       "tcm"
     ],
     "tue": [
-      "tea-social",
-      "story-circle",
-      "xiangqi-go",
-      "exercise",
-      "fan-dance",
+      "birthday",
       "qigong",
-      "brush-painting",
-      "paper-cutting",
+      "tea-social",
+      "exercise",
+      "dance",
+      "tai-chi",
+      "story-circle",
+      "ribbon",
       "sing-along",
       "fall-prevention"
     ],
     "wed": [
-      "cantonese-opera",
-      "language-circles",
-      "devices",
+      "performance",
+      "qigong",
+      "chinese-knotting",
       "exercise",
       "dance",
-      "mindfulness",
-      "calligraphy",
-      "chinese-knotting",
+      "tai-chi",
+      "language-circles",
+      "ribbon",
       "vietnamese-songs",
-      "bilingual-news"
+      "mindfulness"
     ],
     "thu": [
       "birthday",
-      "school-visit",
-      "mahjong",
-      "exercise",
-      "fan-dance",
-      "tai-chi",
-      "brush-painting",
+      "qigong",
       "planter-gardening",
+      "exercise",
+      "dance",
+      "tai-chi",
+      "school-visit",
+      "ribbon",
       "instruments",
       "tea-appreciation"
     ],
     "fri": [
       "performance",
-      "language",
-      "dumpling-demo",
       "qigong",
+      "dumpling-demo",
+      "exercise",
       "dance",
-      "mindfulness",
-      "calligraphy",
-      "crafts",
+      "tai-chi",
+      "language",
+      "ribbon",
       "sing-along",
-      "tcm"
+      "bilingual-news"
     ]
   },
+  "floor": {
+    "note": "The open floor between the north corridor and the tree tables. Walking routes keep outside the area; the class rearranges between layouts during the first seconds of each session.",
+    "area": [
+      [
+        -9.85,
+        9.0
+      ],
+      [
+        -3.95,
+        12.85
+      ]
+    ],
+    "board": [
+      -6.9,
+      9.05
+    ],
+    "transition": 6,
+    "formations": {
+      "grid": {
+        "label": "Class grid",
+        "board": false,
+        "lead": [
+          -6.9,
+          9.5,
+          0
+        ],
+        "cohost": [
+          -8.9,
+          9.6,
+          0.4
+        ],
+        "aide": [
+          -4.4,
+          9.65,
+          -0.5
+        ],
+        "slots": [
+          {
+            "at": [
+              -9.15,
+              10.65
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -7.65,
+              10.65
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -6.15,
+              10.65
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -4.65,
+              10.65
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -8.4,
+              11.7
+            ],
+            "heading": 3.142,
+            "reserved": "hero"
+          },
+          {
+            "at": [
+              -6.9,
+              11.7
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -5.4,
+              11.7
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -4.25,
+              11.7
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -9.15,
+              12.75
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -7.65,
+              12.75
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -6.15,
+              12.75
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -4.65,
+              12.75
+            ],
+            "heading": 3.142
+          }
+        ]
+      },
+      "grid-small": {
+        "label": "Small dance group",
+        "board": false,
+        "lead": [
+          -6.9,
+          9.5,
+          0
+        ],
+        "cohost": [
+          -8.9,
+          9.6,
+          0.4
+        ],
+        "aide": [
+          -4.0,
+          9.5,
+          -0.5
+        ],
+        "slots": [
+          {
+            "at": [
+              -9.0,
+              10.8
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -7.4,
+              10.8
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -5.8,
+              10.8
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -8.2,
+              12.15
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -6.6,
+              12.15
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -5.0,
+              12.15
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -4.35,
+              10.3
+            ],
+            "heading": -1.131,
+            "group": "side",
+            "action": "clap"
+          },
+          {
+            "at": [
+              -4.35,
+              11.1
+            ],
+            "heading": -1.415,
+            "group": "side",
+            "action": "clap"
+          },
+          {
+            "at": [
+              -4.35,
+              11.9
+            ],
+            "heading": -1.726,
+            "group": "side",
+            "action": "clap"
+          },
+          {
+            "at": [
+              -4.35,
+              12.7
+            ],
+            "heading": -2.011,
+            "group": "side",
+            "action": "clap"
+          },
+          {
+            "at": [
+              -9.5,
+              12.7
+            ],
+            "heading": 2.003,
+            "group": "side",
+            "action": "clap"
+          }
+        ]
+      },
+      "audience": {
+        "label": "Audience around the performer",
+        "board": false,
+        "lead": [
+          -6.9,
+          9.55,
+          0
+        ],
+        "cohost": [
+          -9.1,
+          9.65,
+          0.6
+        ],
+        "aide": [
+          -4.5,
+          9.6,
+          -0.6
+        ],
+        "slots": [
+          {
+            "at": [
+              -8.892,
+              10.5
+            ],
+            "heading": 2.094
+          },
+          {
+            "at": [
+              -8.252,
+              11.211
+            ],
+            "heading": 2.513
+          },
+          {
+            "at": [
+              -7.378,
+              11.6
+            ],
+            "heading": 2.932
+          },
+          {
+            "at": [
+              -6.422,
+              11.6
+            ],
+            "heading": -2.932
+          },
+          {
+            "at": [
+              -5.548,
+              11.211
+            ],
+            "heading": -2.513
+          },
+          {
+            "at": [
+              -4.908,
+              10.5
+            ],
+            "heading": -2.094
+          },
+          {
+            "at": [
+              -9.814,
+              10.899
+            ],
+            "heading": 2.059
+          },
+          {
+            "at": [
+              -9.079,
+              11.828
+            ],
+            "heading": 2.42
+          },
+          {
+            "at": [
+              -8.065,
+              12.438
+            ],
+            "heading": 2.781
+          },
+          {
+            "at": [
+              -6.9,
+              12.65
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -5.735,
+              12.438
+            ],
+            "heading": -2.781
+          },
+          {
+            "at": [
+              -4.721,
+              11.828
+            ],
+            "heading": -2.42
+          },
+          {
+            "at": [
+              -3.986,
+              10.899
+            ],
+            "heading": -2.059
+          }
+        ]
+      },
+      "rows": {
+        "label": "Talk rows facing the board",
+        "board": true,
+        "lead": [
+          -5.4,
+          9.6,
+          -0.4
+        ],
+        "cohost": [
+          -8.4,
+          9.6,
+          0.4
+        ],
+        "aide": [
+          -4.25,
+          10.15,
+          -1.2
+        ],
+        "slots": [
+          {
+            "at": [
+              -9.1,
+              10.85
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -8.0,
+              10.85
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -6.9,
+              10.85
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -5.8,
+              10.85
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -4.7,
+              10.85
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -9.4,
+              12.05
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -8.35,
+              12.05
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -7.3,
+              12.05
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -6.25,
+              12.05
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -5.2,
+              12.05
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -4.15,
+              12.05
+            ],
+            "heading": 3.142
+          }
+        ]
+      },
+      "circle": {
+        "label": "Conversation circle",
+        "board": false,
+        "lead": [
+          -6.9,
+          9.15,
+          0
+        ],
+        "cohost": [
+          -6.9,
+          9.15,
+          0
+        ],
+        "aide": [
+          -4.3,
+          11.05,
+          -1.571
+        ],
+        "slots": [
+          {
+            "at": [
+              -7.8,
+              9.391
+            ],
+            "heading": 0.524
+          },
+          {
+            "at": [
+              -8.459,
+              10.05
+            ],
+            "heading": 1.047
+          },
+          {
+            "at": [
+              -8.7,
+              10.95
+            ],
+            "heading": 1.571
+          },
+          {
+            "at": [
+              -8.459,
+              11.85
+            ],
+            "heading": 2.094
+          },
+          {
+            "at": [
+              -7.8,
+              12.509
+            ],
+            "heading": 2.618
+          },
+          {
+            "at": [
+              -6.9,
+              12.75
+            ],
+            "heading": 3.142
+          },
+          {
+            "at": [
+              -6.0,
+              12.509
+            ],
+            "heading": -2.618
+          },
+          {
+            "at": [
+              -5.341,
+              11.85
+            ],
+            "heading": -2.094
+          },
+          {
+            "at": [
+              -5.1,
+              10.95
+            ],
+            "heading": -1.571
+          },
+          {
+            "at": [
+              -5.341,
+              10.05
+            ],
+            "heading": -1.047
+          },
+          {
+            "at": [
+              -6.0,
+              9.391
+            ],
+            "heading": -0.524
+          }
+        ]
+      },
+      "small-groups": {
+        "label": "Device table and a chat circle",
+        "board": true,
+        "lead": [
+          -7.9,
+          9.5,
+          0
+        ],
+        "cohost": [
+          -7.9,
+          9.5,
+          0
+        ],
+        "aide": [
+          -4.3,
+          9.9,
+          -0.6
+        ],
+        "slots": [
+          {
+            "at": [
+              -9.156,
+              10.425
+            ],
+            "heading": 2.094,
+            "group": "devices"
+          },
+          {
+            "at": [
+              -8.625,
+              10.956
+            ],
+            "heading": 2.618,
+            "group": "devices"
+          },
+          {
+            "at": [
+              -7.9,
+              11.15
+            ],
+            "heading": 3.142,
+            "group": "devices"
+          },
+          {
+            "at": [
+              -7.175,
+              10.956
+            ],
+            "heading": -2.618,
+            "group": "devices"
+          },
+          {
+            "at": [
+              -6.644,
+              10.425
+            ],
+            "heading": -2.094,
+            "group": "devices"
+          },
+          {
+            "at": [
+              -5.1,
+              12.75
+            ],
+            "heading": 3.142,
+            "group": "chat",
+            "action": "conversation"
+          },
+          {
+            "at": [
+              -4.234,
+              12.25
+            ],
+            "heading": -2.094,
+            "group": "chat",
+            "action": "conversation"
+          },
+          {
+            "at": [
+              -4.234,
+              11.25
+            ],
+            "heading": -1.047,
+            "group": "chat",
+            "action": "conversation"
+          },
+          {
+            "at": [
+              -5.1,
+              10.75
+            ],
+            "heading": 0.0,
+            "group": "chat",
+            "action": "conversation"
+          },
+          {
+            "at": [
+              -5.966,
+              11.25
+            ],
+            "heading": 1.047,
+            "group": "chat",
+            "action": "conversation"
+          },
+          {
+            "at": [
+              -5.966,
+              12.25
+            ],
+            "heading": 2.094,
+            "group": "chat",
+            "action": "conversation"
+          }
+        ]
+      }
+    }
+  },
+  "tableActivities": {
+    "xiangqi": {
+      "label": "Chinese chess",
+      "labelZh": "象棋",
+      "players": 2,
+      "play": "board-game",
+      "others": "watch"
+    },
+    "go": {
+      "label": "Go",
+      "labelZh": "圍棋",
+      "players": 2,
+      "play": "board-game",
+      "others": "watch"
+    },
+    "checkers": {
+      "label": "Chinese checkers",
+      "labelZh": "跳棋",
+      "players": 3,
+      "play": "board-game",
+      "others": "watch"
+    },
+    "mahjong": {
+      "label": "Mahjong",
+      "labelZh": "麻將",
+      "players": 4,
+      "play": "mahjong",
+      "others": "watch"
+    },
+    "cards": {
+      "label": "Big Two cards",
+      "labelZh": "鋤大D",
+      "players": 4,
+      "play": "cards",
+      "others": "watch"
+    },
+    "dominoes": {
+      "label": "Dominoes",
+      "labelZh": "骨牌",
+      "players": 4,
+      "play": "board-game",
+      "others": "watch"
+    },
+    "puzzle": {
+      "label": "Jigsaw puzzle",
+      "labelZh": "拼圖",
+      "play": "board-game",
+      "others": "conversation"
+    },
+    "origami": {
+      "label": "Origami",
+      "labelZh": "摺紙",
+      "play": "craft",
+      "others": "conversation"
+    },
+    "watercolor": {
+      "label": "Watercolor",
+      "labelZh": "水彩畫",
+      "play": "write",
+      "others": "write"
+    },
+    "coloring": {
+      "label": "Coloring",
+      "labelZh": "填色",
+      "play": "write",
+      "others": "conversation"
+    },
+    "knitting": {
+      "label": "Knitting",
+      "labelZh": "編織",
+      "play": "knit",
+      "others": "conversation"
+    },
+    "flowers": {
+      "label": "Flower arranging",
+      "labelZh": "插花",
+      "play": "craft",
+      "others": "conversation"
+    },
+    "albums": {
+      "label": "Photo albums",
+      "labelZh": "相簿",
+      "play": "read",
+      "others": "conversation"
+    },
+    "newspapers": {
+      "label": "Newspapers",
+      "labelZh": "讀報",
+      "play": "read",
+      "others": "read"
+    },
+    "snacks": {
+      "label": "Tea & snacks",
+      "labelZh": "茶點",
+      "play": "tea",
+      "others": "conversation"
+    }
+  },
+  "tables": [
+    {
+      "id": "day-diamond-table-04",
+      "schedule": [
+        {
+          "activity": "watercolor",
+          "start": 0,
+          "end": 240
+        },
+        {
+          "activity": "origami",
+          "start": 240,
+          "end": 480
+        },
+        {
+          "activity": "coloring",
+          "start": 480,
+          "end": 720
+        }
+      ]
+    },
+    {
+      "id": "day-diamond-table-05",
+      "schedule": [
+        {
+          "activity": "xiangqi",
+          "start": 0,
+          "end": 240
+        },
+        {
+          "activity": "checkers",
+          "start": 240,
+          "end": 480
+        },
+        {
+          "activity": "xiangqi",
+          "start": 480,
+          "end": 720
+        }
+      ]
+    },
+    {
+      "id": "day-diamond-table-06",
+      "schedule": [
+        {
+          "activity": "mahjong",
+          "start": 0,
+          "end": 360
+        },
+        {
+          "activity": "cards",
+          "start": 360,
+          "end": 720
+        }
+      ]
+    },
+    {
+      "id": "day-diamond-table-07",
+      "schedule": [
+        {
+          "activity": "go",
+          "start": 0,
+          "end": 240
+        },
+        {
+          "activity": "dominoes",
+          "start": 240,
+          "end": 480
+        },
+        {
+          "activity": "go",
+          "start": 480,
+          "end": 720
+        }
+      ]
+    },
+    {
+      "id": "day-diamond-table-08",
+      "schedule": [
+        {
+          "activity": "puzzle",
+          "start": 0,
+          "end": 240
+        },
+        {
+          "activity": "knitting",
+          "start": 240,
+          "end": 480
+        },
+        {
+          "activity": "flowers",
+          "start": 480,
+          "end": 720
+        }
+      ]
+    },
+    {
+      "id": "day-diamond-table-09",
+      "schedule": [
+        {
+          "activity": "checkers",
+          "start": 0,
+          "end": 240
+        },
+        {
+          "activity": "xiangqi",
+          "start": 240,
+          "end": 480
+        },
+        {
+          "activity": "cards",
+          "start": 480,
+          "end": 720
+        }
+      ]
+    },
+    {
+      "id": "day-tree-table-1",
+      "schedule": [
+        {
+          "activity": "albums",
+          "start": 0,
+          "end": 360
+        },
+        {
+          "activity": "origami",
+          "start": 360,
+          "end": 720
+        }
+      ]
+    },
+    {
+      "id": "day-tree-table-2",
+      "schedule": [
+        {
+          "activity": "xiangqi",
+          "start": 0,
+          "end": 360
+        },
+        {
+          "activity": "snacks",
+          "start": 360,
+          "end": 720
+        }
+      ]
+    },
+    {
+      "id": "day-tree-table-3",
+      "schedule": [
+        {
+          "activity": "knitting",
+          "start": 0,
+          "end": 360
+        },
+        {
+          "activity": "go",
+          "start": 360,
+          "end": 720
+        }
+      ]
+    },
+    {
+      "id": "day-banquette-table-04",
+      "schedule": [
+        {
+          "activity": "coloring",
+          "start": 0,
+          "end": 360
+        },
+        {
+          "activity": "knitting",
+          "start": 360,
+          "end": 720
+        }
+      ]
+    },
+    {
+      "id": "day-banquette-table-05",
+      "schedule": [
+        {
+          "activity": "albums",
+          "start": 0,
+          "end": 360
+        },
+        {
+          "activity": "origami",
+          "start": 360,
+          "end": 720
+        }
+      ]
+    },
+    {
+      "id": "day-banquette-table-06",
+      "schedule": [
+        {
+          "activity": "snacks",
+          "start": 0,
+          "end": 360
+        },
+        {
+          "activity": "puzzle",
+          "start": 360,
+          "end": 720
+        }
+      ]
+    },
+    {
+      "id": "day-banquette-table-07",
+      "schedule": [
+        {
+          "activity": "newspapers",
+          "start": 0,
+          "end": 360
+        },
+        {
+          "activity": "flowers",
+          "start": 360,
+          "end": 720
+        }
+      ]
+    },
+    {
+      "id": "day-photo-lounge-table",
+      "schedule": [
+        {
+          "activity": "albums",
+          "start": 0,
+          "end": 720
+        }
+      ]
+    }
+  ],
   "lunch": {
     "source": "Illustrative weekly lunch menu planned with the dietitian, not a published menu or a nutrition analysis. Local San Gabriel Valley kitchens cook it; it reaches the center’s kitchen before service and is checked there against each participant’s diet order.",
     "delivery": "kitchen-lunch-delivery",
