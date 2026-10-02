@@ -1084,7 +1084,7 @@
       "label": "Hospital discharge",
       "kicker": "1:35 PM \u00b7 Community hospital",
       "title": "Two nurses, one phone call.",
-      "body": "Before Mr. Wong leaves the hospital, its discharge nurse calls Seen\u2019s nurse. Medicines, a home health visit, meals and a van at 2:10 are set before he\u2019s out the door.",
+      "body": "Before Mr. Wong leaves, the hospital\u2019s discharge nurse calls Seen\u2019s nurse at the center. Medicines, a home health visit, meals and a van at 2:10 are set before he\u2019s out the door.",
       "settingId": "hospital",
       "interactionIds": [
         "hospital-discharge-call"
@@ -1127,16 +1127,17 @@
     {
       "id": "after-hours",
       "label": "After-hours care & emergency transport",
-      "kicker": "8:45 AM \u00b7 Emergency department",
+      "kicker": "8:55 AM \u00b7 Emergency department",
       "title": "Day or night, someone answers.",
-      "body": "A Seen nurse is on call around the clock. When it\u2019s an emergency, the ambulance is on its way and the hospital already knows who to call.",
+      "body": "When it\u2019s an emergency, the ambulance crew hands over at the ED and the hospitalist calls Seen\u2019s on-call nurse, who answers day or night and already knows the participant.",
       "settingId": "hospital",
       "interactionIds": [
-        "hospital-ed-arrival"
+        "hospital-ed-arrival",
+        "hospital-ed-call"
       ],
       "window": [
-        64,
-        94
+        80,
+        106
       ],
       "roles": [
         "rn",
@@ -1150,16 +1151,16 @@
     {
       "id": "pers",
       "label": "Personal emergency response",
-      "kicker": "8:10 AM \u00b7 The Wongs\u2019 home",
+      "kicker": "8:20 AM \u00b7 The Wongs\u2019 home",
       "title": "One press, and help is on the line.",
-      "body": "Mrs. Wong presses her pendant. The response center answers through the console and brings in Seen\u2019s nurse, who stays on until her aide arrives.",
+      "body": "Light-headed and alone, Mrs. Wong presses her pendant. The response center answers through the console and brings in Seen\u2019s 24/7 nurse, who stays on the line until her aide arrives.",
       "settingId": "home-wong",
       "interactionIds": [
         "home-pers-call"
       ],
       "window": [
-        10,
-        30
+        24,
+        38
       ],
       "roles": [
         "rn",

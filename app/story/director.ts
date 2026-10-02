@@ -337,22 +337,51 @@ export function createDirector(opts: {
     const id = b.step?.interactionIds?.[0] || b.highlight?.interactionIds[0];
     return id ? viewer.activity.actorPosition(`interaction:${id}`) : null;
   }
+  /**
+   * The middle of a phone call's span: the mean of its ends (members more
+   * than 8 m apart), from their sampled positions, so an end on a hidden
+   * upper floor still counts. Null if the interaction is not a live call.
+   */
+  function callMiddle(id: string | undefined): [number, number, number] | null {
+    if (!viewer || !id) return null;
+    const call = viewer.activity.data.interactions.find((i) => i.id === id);
+    if (call?.channel !== 'phone') return null;
+    const ends: [number, number][] = [];
+    for (const a of call.actorIds) {
+      const s = viewer.activity.actorSample(a);
+      if (!s || ends.some((e) => Math.hypot(e[0] - s.x, e[1] - s.z) < 8)) continue;
+      ends.push([s.x, s.z]);
+    }
+    if (ends.length < 2) return null;
+    const x = ends.reduce((v, e) => v + e[0], 0) / ends.length,
+      z = ends.reduce((v, e) => v + e[1], 0) / ends.length;
+    return [x, 2, z];
+  }
   function shotFor(i: number, p: number, t: number): Shot {
     const b = beats[i],
       spec = specFor(i);
+    const pp = b.kind === 'cta' ? 1 : p;
     const target = anchorFor(b, spec, t);
+    // A call reveal: hold on the caller, then ease over to the call's middle.
+    let revealed = 0;
+    if (spec.reveal === 'call') {
+      const mid = callMiddle(b.highlight?.interactionIds[0] || b.step?.interactionIds?.[0]);
+      if (mid) {
+        revealed = easeInOut(clamp01((pp - 0.12) / 0.72));
+        for (let k = 0; k < 3; k++) target[k] += (mid[k] - target[k]) * revealed;
+      }
+    }
     const h = spec.follow ? subjectOf(b) : null;
     // Far-off subjects are ignored (the nurse line's call is split between
     // the center and the home, so its centroid sits between them).
     if (h && spec.follow) {
       const d = Math.hypot(h.x - target[0], h.z - target[2]),
         r = spec.radius || 8,
-        w = spec.follow * (1 - smoothstep(r * 0.7, r, d));
+        w = spec.follow * (1 - smoothstep(r * 0.7, r, d)) * (1 - revealed);
       target[0] += (h.x - target[0]) * w;
       target[1] += (h.y - target[1]) * w;
       target[2] += (h.z - target[2]) * w;
     }
-    const pp = b.kind === 'cta' ? 1 : p;
     // The network shot's zoom is a factor on the layer's own framing, so the
     // whole network stays in view as settings are added.
     const place = placeOf(b, spec),

@@ -32,8 +32,15 @@ export type ShotSpec = {
    * (`frame(setting)`). Cutaways default to their own setting's pad.
    */
   place?: 'network' | { setting: string; room?: string; anchor?: string };
-  /** Zoom multiplier reached at the end of the beat (slow push-in). */
+  /** Zoom multiplier reached at the end of the beat (slow push-in; below 1 pulls back). */
   push?: number;
+  /**
+   * `call`: a reveal for a phone call. The beat opens on the caller (the
+   * anchor) and, after a short hold, eases the target to the middle of the
+   * featured call's two ends while `push` pulls back, so the arc and the
+   * place it reaches come into view together.
+   */
+  reveal?: 'call';
   /** Azimuth drift across the beat. */
   drift?: number;
 };
@@ -240,15 +247,18 @@ export const HIGHLIGHT_SHOTS: Record<string, ShotSpec> = {
     push: 1.16,
     drift: -0.08,
   },
+  // On the hospital's discharge nurse at her phone spot, then back and over
+  // to the middle of the call: the arc to Seen's nurse at the center.
   discharge: {
-    place: { setting: 'hospital', anchor: 'patient' },
-    zoom: 3.2,
-    azimuth: 0.12,
-    elevation: 0.5,
-    follow: 0.4,
-    radius: 10,
-    push: 1.14,
-    drift: 0.14,
+    place: { setting: 'hospital', anchor: 'rnPhone' },
+    zoom: 3.6,
+    azimuth: 0.55,
+    elevation: 0.6,
+    follow: 0.3,
+    radius: 8,
+    push: 0.3,
+    drift: 0.08,
+    reveal: 'call',
   },
   'home-mods': {
     place: { setting: 'home-wong', room: 'home-bath', anchor: 'door' },
@@ -260,25 +270,30 @@ export const HIGHLIGHT_SHOTS: Record<string, ShotSpec> = {
     push: 1.12,
     drift: 0.12,
   },
+  // The ambulance crew's handoff at the ED, then the hospitalist's call to
+  // Seen's on-call nurse rising off the sidewalk.
   'after-hours': {
-    place: { setting: 'hospital', anchor: 'edBay' },
-    zoom: 3.0,
-    azimuth: 0.36,
-    elevation: 0.5,
+    place: { setting: 'hospital', anchor: 'edPhone' },
+    zoom: 4.2,
+    azimuth: 0.55,
+    elevation: 0.56,
     follow: 0.35,
-    radius: 12,
-    push: 1.14,
-    drift: -0.14,
+    radius: 10,
+    push: 1.12,
+    drift: -0.12,
   },
+  // Mrs. Wong at the foot of her bed on her pendant, then back and over to
+  // the middle of the call: the arc to the nurse line at the center.
   pers: {
     place: { setting: 'home-wong', room: 'home-primary', anchor: 'door' },
-    zoom: 5.0,
-    azimuth: 0.9,
-    elevation: 1.0,
-    follow: 0.45,
+    zoom: 5.4,
+    azimuth: 0.62,
+    elevation: 0.66,
+    follow: 0.4,
     radius: 7,
-    push: 1.12,
-    drift: 0.1,
+    push: 0.2,
+    drift: 0.08,
+    reveal: 'call',
   },
 };
 /** Highlights without an entry in HIGHLIGHT_SHOTS: their setting's pad. */

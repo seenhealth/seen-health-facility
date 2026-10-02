@@ -92,6 +92,7 @@ The story moves on two clocks: scroll (camera, sim time, card fades and parallax
 - **Kinetic type.** Every headline is split into words (`Words` in `story-experience.tsx`, with the full sentence kept for screen readers). When its section becomes the active beat, each word rises out of its own mask on an exponential ease-out, 55 ms after the one before (`--stagger`; the display lines of the opening and the close wait for each other through `--d`). The rest of the card follows in a short cascade: kicker, body (300 ms), chips and lists one by one (45 ms apart).
 - **Highlights.** A lower-third card over the scene: an outlined two-digit numeral that slides in ahead of everything else, the service in small capitals, the title, one sentence, the time and place, and who was involved. A segmented bar at the foot of the stage fills with scroll across all nine (`--hl`).
 - **The cut.** The shutter and the settle described under *Cuts* above.
+- **Call reveals.** Highlights built on a phone call (`reveal: 'call'` in their shot) open on the caller, hold for a moment, then ease the target to the middle of the call’s two ends while the shot pulls back (`push` below 1), so the arc drawn between the callers (`app/model/call-arcs.ts`: it draws on from the caller, carries a pulse each way while they talk and retracts when they hang up) and the place it reaches come into view together: the hospital’s discharge nurse and Seen’s nurse at the center; Mrs. Wong’s pendant and the nurse line.
 - **The close.** The three display lines resolve from a 14 px blur one after another (about a second apart), the lede last; a warm soft-light wash (`--glow`) settles over the stage, and a paper wash at the top keeps the lines legible.
 - **Small things.** Mrs. Lin’s name tag springs up from its stem; legend and network lists stagger in; the swimlane draws column by column.
 
@@ -117,10 +118,10 @@ A step with `placement.mode: 'cutaway'` compiles no hero tracks. It features int
 | 3 | `specialists` | Hospital specialists | 208–238 | 10:18–10:38 AM | `specialist` · `examSeat` | `specialist-visit` |
 | 4 | `optometry` | Optometry | 334–360 | 11:43 AM–12:00 PM | `specialist` · `optoSeat` | `optometry-exam` (slit lamp, then refraction) |
 | 5 | `imaging` | Imaging | 452–482 | 1:01–1:21 PM | `specialist` · `imagingTable` | `imaging-scan` (positioning, then the technologist at the console) |
-| 6 | `discharge` | Hospital discharge | 497–523 | 1:31–1:48 PM | `hospital` · `patient` | `hospital-discharge-call` (the hospital’s discharge nurse and Seen’s nurse, by phone) |
+| 6 | `discharge` | Hospital discharge | 497–523 | 1:31–1:48 PM | `hospital` · `rnPhone` (reveal) | `hospital-discharge-call`: the hospital’s discharge nurse phones Seen’s care-transitions nurse at the center |
 | 7 | `home-mods` | Home modifications | 522–540 | 1:48–2:00 PM | `home-wong` · room `home-bath` | `home-grab-bar` |
-| 8 | `after-hours` | After-hours care & emergency transport | 64–94 | 8:43–9:03 AM | `hospital` · `edBay` | `hospital-ed-arrival` |
-| 9 | `pers` | Personal emergency response | 10–30 | 8:07–8:20 AM | `home-wong` · room `home-primary` | `home-pers-call` |
+| 8 | `after-hours` | After-hours care & emergency transport | 80–106 | 8:53–9:11 AM | `hospital` · `edPhone` | `hospital-ed-arrival` (the ambulance crew’s handoff), `hospital-ed-call` (the hospitalist phones Seen’s on-call nurse) |
+| 9 | `pers` | Personal emergency response | 24–38 | 8:16–8:25 AM | `home-wong` · room `home-primary` (reveal) | `home-pers-call`: Mrs. Wong’s pendant reaches the response center and Seen’s 24/7 nurse line |
 
 `build-scenario` checks each highlight like a cutaway (featured interactions exist at its setting, overlap the window by at least 4 s and cover 60 % of it; the kicker time lies inside the window; roles are IDT ids; ids are unique), but places no timeline constraint on it: highlights are not part of her day.
 
