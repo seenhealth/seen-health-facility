@@ -3,8 +3,9 @@ import * as T from 'three';
 /**
  * Real daylight for the live lot: the sun's actual direction and height over
  * the center, and the sky's brightness through dawn, day, dusk and night.
- * World axes: +x east, +z south (the lot lies north-west of the building,
- * Ethel Avenue is the west street, the alley is north).
+ * World axes: +x east, +z north (Valley Blvd is the north street, Ethel
+ * Avenue the west street, the alley the south street; the fleet code's
+ * NORTH heading is 0 = +z).
  */
 export const CENTER = { lat: 34.0777588, lng: -118.1440427 };
 
@@ -103,7 +104,7 @@ export function createDaylight(scene: T.Scene) {
         sun.position.set(
           Math.sin(az) * Math.cos(el) * sunDistance,
           Math.sin(el) * sunDistance,
-          -Math.cos(az) * Math.cos(el) * sunDistance,
+          Math.cos(az) * Math.cos(el) * sunDistance,
         );
         sun.intensity = DAY.sun * key;
         // Warmer and dimmer near the horizon, the usual low-sun look.

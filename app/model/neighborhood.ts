@@ -367,11 +367,13 @@ export function buildNeighborhood(model: Facility) {
       }
     });
   };
-  // STOP at the driveway's mouth onto the north strip (aerial), read by a van
-  // heading north, with its stop bar across the driveway ahead of it and the
-  // one-way arrow behind it.
-  roadText('STOP', -22.5, -22.6, Math.PI);
-  box(-22.5, -0.206, -24.5, 3.6, 0.012, 0.45, SITE.marking);
+  // STOP at the driveway's mouth onto the alley (aerial), read by a van
+  // heading south, with its stop bar across the driveway ahead of it and the
+  // one-way arrow behind it. The mouth runs from the bay row's curb island
+  // (east edge x −27.0) to the palm island (west edge x −20.2), so both are
+  // centred on x −23.6; the lanes themselves sit a little east of centre.
+  roadText('STOP', -23.6, -22.6, Math.PI);
+  box(-23.6, -0.206, -24.5, 6.2, 0.012, 0.45, SITE.marking);
   dashes(
     74,
     farX,
