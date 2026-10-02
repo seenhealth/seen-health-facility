@@ -755,7 +755,8 @@ export function buildAlhambraExterior(model: Facility) {
     pergEdge = '#5f80ab',
     alu = '#b9bcbe',
     glassDark = '#2a3338';
-  const FACE_X = 15.264;
+  // The plan wall here is centred on x 15.31 and 0.2 m thick, so its outer face is at 15.42; overlays sit on that.
+  const FACE_X = 15.42;
   // The plan's door opening on this wall is at z −2.34 → −0.36; the canopy's north end is 1.3 m past it.
   const doorW = 1.9,
     doorZ = -1.35;
