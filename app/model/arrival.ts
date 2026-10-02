@@ -2,9 +2,11 @@ import * as T from 'three';
 import { buildAsset } from './assets';
 import {
   fleetParking,
+  fleetVanLetter,
   extraVanWindows,
   sampleFleetVan,
 } from './alhambra-fleet';
+import { FLEET_VAN_CAB_DOOR, FLEET_VAN_RAMP } from './photo-assets';
 import type { Facility, Vec2 } from './schema';
 export const ARRIVAL = {
   dock: [-20.5, 1.5] as Vec2,
@@ -15,12 +17,15 @@ export const ARRIVAL = {
   streetY: -0.23,
   vanFloorY: 0.35,
 };
+// Unload windows close once the last rider is off the ramp and the driver has
+// stowed it, so the driver is back in the cab before the outbound trip starts
+// (fleet-crew.ts times the ramp duty against these door/ramp curves).
 export const vanWindows = [
   {
     id: 'van-a',
     name: 'Van A',
     inbound: [0, 36],
-    unload: [42, 108],
+    unload: [42, 96],
     outbound: [112, 142],
     returning: [510, 546],
     boarding: [552, 590],
@@ -30,7 +35,7 @@ export const vanWindows = [
     id: 'van-b',
     name: 'Van B',
     inbound: [146, 166],
-    unload: [172, 238],
+    unload: [172, 226],
     outbound: [242, 272],
     returning: [628, 656],
     boarding: [662, 702],
@@ -64,8 +69,7 @@ export function buildArrival(
   const stone = mat('#e2ddd3'),
     silver = mat('#c4c7c4'),
     teal = mat('#1f4d3a'),
-    glass = mat('#d4e0df', 0.36),
-    black = mat('#34393a');
+    glass = mat('#d4e0df', 0.36);
   const box = (
     parent: T.Object3D,
     x: number,
@@ -148,16 +152,21 @@ export function buildArrival(
         roughness: 0.75,
       }));
   const vans = fleetParking.map((_, i) => {
-    const van = buildArrivalVan(model, i, materialFor);
+    const van = buildArrivalVan(model, fleetVanLetter(i), materialFor);
     root.add(van.root);
     return van;
   });
-  // Paint real 6.9m van stalls around the parked vehicle footprints.
+  // Paint real 6.9m van stalls around the parked vehicle footprints, in each
+  // bay's own frame (local +z is the rear of the parked van).
   for (const bay of fleetParking) {
-    for (const z of [bay.z - 1.4, bay.z + 1.4])
-      box(root, -28.1, -0.208, z, 6.9, 0.012, 0.07, mat('#ebe9dc'));
-    box(root, -31.55, -0.208, bay.z, 0.07, 0.012, 2.8, mat('#ebe9dc'));
-    box(root, -30.8, -0.19, bay.z, 0.14, 0.09, 1.8, mat('#d7c389'));
+    const stall = new T.Group();
+    stall.position.set(bay.x, 0, bay.z);
+    stall.rotation.y = bay.heading;
+    root.add(stall);
+    for (const x of [-1.4, 1.4])
+      box(stall, x, -0.208, 0, 0.07, 0.012, 6.9, mat('#ebe9dc'));
+    box(stall, 0, -0.208, 3.45, 2.8, 0.012, 0.07, mat('#ebe9dc'));
+    box(stall, 0, -0.19, 2.7, 1.8, 0.09, 0.14, mat('#d7c389'));
   }
   let doorOpen = 0;
   function tick(
@@ -191,29 +200,45 @@ export function buildArrival(
   };
 }
 
-// Shared fleet body, sliding passenger doors and folding ramp for every site.
+/**
+ * Shared fleet body, sliding passenger doors and folding ramp for every site,
+ * in the livery of `variant` (a letter: 'A' for the first fleet van; see
+ * `fleetVanLetter`). Van A uses the model's `fleet-van-a` spec, every other
+ * letter `fleet-van-b` when the model has one.
+ */
 export function buildArrivalVan(
   model: Facility,
-  index: number,
+  variant: string,
   material: (id: string) => T.MeshStandardMaterial,
 ) {
+  const letter = variant.toUpperCase();
   const spec =
-    model.assets[`fleet-van-${index ? 'b' : 'a'}`] ||
+    model.assets[`fleet-van-${letter === 'A' ? 'a' : 'b'}`] ||
     model.assets['fleet-van-a'];
   const root = buildAsset(
     {
       ...spec,
-      parameters: {
-        ...spec.parameters,
-        variant: String.fromCharCode(65 + index),
-        operable: true,
-      },
+      parameters: { ...spec.parameters, variant: letter, operable: true },
     },
     material,
   );
-  root.name = `animated-van-${String.fromCharCode(97 + index)}`;
+  root.name = `animated-van-${letter.toLowerCase()}`;
+  // Own copies of the body materials, so one van can fade out at the map edge
+  // without touching the others (the renderer's section clones key on these).
+  const copies = new Map<T.Material, T.Material>();
+  const own = (m: T.Material) => {
+    if (!copies.has(m)) copies.set(m, m.clone());
+    return copies.get(m)!;
+  };
+  root.traverse((o) => {
+    if (o instanceof T.Mesh)
+      o.material = Array.isArray(o.material)
+        ? o.material.map(own)
+        : own(o.material);
+  });
+  const ramp = FLEET_VAN_RAMP;
   const pivot = new T.Group();
-  pivot.position.set(1.035, 0.58, -0.19);
+  pivot.position.set(...ramp.hinge);
   pivot.name = 'vehicle-ramp-hinge';
   root.add(pivot);
   const box = (
@@ -234,11 +259,14 @@ export function buildArrivalVan(
     pivot.add(mesh);
     return mesh;
   };
-  box(1.48, -0.04, 0, 2.96, 0.055, 1.02, '#a8bab8').name =
+  const half = ramp.length / 2,
+    edge = ramp.width / 2 + 0.01;
+  box(half, -0.04, 0, ramp.length, 0.055, ramp.width, '#a8bab8').name =
     'deployable-wheelchair-ramp';
-  for (const z of [-0.52, 0.52]) box(1.48, 0, z, 2.96, 0.055, 0.035, '#25777c');
-  for (let x = 0.15; x < 2.94; x += 0.17)
-    box(x, 0.016, 0, 0.026, 0.006, 0.91, '#243f49');
+  for (const z of [-edge, edge])
+    box(half, 0, z, ramp.length, 0.055, 0.035, '#25777c');
+  for (let x = 0.15; x < ramp.length - 0.02; x += 0.17)
+    box(x, 0.016, 0, 0.026, 0.006, ramp.width - 0.11, '#243f49');
   return {
     root,
     pivot,
@@ -246,20 +274,66 @@ export function buildArrivalVan(
       root.getObjectByName('passenger-door-0')!,
       root.getObjectByName('passenger-door-1')!,
     ],
+    cabDoor: root.getObjectByName('driver-door') ?? null,
   };
+}
+/** What a van body needs from a vehicle sampler; fleet vans also fade and open the driver's door. */
+export type VanPose = {
+  position: T.Vector3;
+  heading: number;
+  visible: boolean;
+  door: number;
+  ramp: number;
+  phase?: string;
+  opacity?: number;
+  cabDoor?: number;
+};
+/**
+ * Fade a vehicle body toward `opacity` as it enters or leaves the map. The
+ * body must own its materials (the fleet van copies them, community cars
+ * build their own), so only that vehicle fades; shadows drop while it is
+ * see-through. Shared by every vehicle that fades.
+ */
+export function fadeVehicle(body: T.Object3D, opacity: number) {
+  if ((body.userData.opacity ?? 1) === opacity) return;
+  body.userData.opacity = opacity;
+  const fading = opacity < 1;
+  body.traverse((o) => {
+    if (!(o instanceof T.Mesh)) return;
+    o.userData.castShadow ??= o.castShadow;
+    o.castShadow = !fading && o.userData.castShadow;
+    for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
+      const base = (m.userData.fade ??= {
+        opacity: m.opacity,
+        transparent: m.transparent,
+        depthWrite: m.depthWrite,
+      });
+      m.opacity = base.opacity * opacity;
+      m.depthWrite = fading ? false : base.depthWrite;
+      const transparent = base.transparent || fading;
+      if (m.transparent !== transparent) {
+        m.transparent = transparent;
+        m.needsUpdate = true;
+      }
+    }
+  });
 }
 export function updateArrivalVan(
   van: ReturnType<typeof buildArrivalVan>,
-  sample: Omit<ReturnType<typeof sampleVan>, 'reverse'>,
+  sample: VanPose,
   enabled: boolean,
-  rampAngle = -Math.atan2(0.58, 2.9),
+  rampAngle = -Math.atan2(FLEET_VAN_RAMP.rise, FLEET_VAN_RAMP.run),
 ) {
   van.root.position.copy(sample.position);
   van.root.rotation.y = sample.heading;
   van.root.visible = enabled && sample.visible;
+  fadeVehicle(van.root, sample.opacity ?? 1);
   van.pivot.visible = sample.ramp > 0.001;
   van.pivot.rotation.z = T.MathUtils.lerp(Math.PI / 2, rampAngle, sample.ramp);
   van.doors.forEach(
     (door, i) => (door.position.z = (i ? 1 : -1) * 0.6 * sample.door),
   );
+  if (van.cabDoor)
+    van.cabDoor.rotation.y =
+      -FLEET_VAN_CAB_DOOR.openAngle * (sample.cabDoor ?? 0);
 }

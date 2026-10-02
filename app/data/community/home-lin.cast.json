@@ -1,0 +1,1322 @@
+{
+  "version": 1,
+  "setting": "home-lin",
+  "facility": "seen-home-wong",
+  "notes": [
+    "The Wongs' ADL day inside seen-home-wong (HOME-PLAN §5.2), for scripts/build-community-tracks.mjs (schema: docs/COMMUNITY.md, Cast files). Loop seconds (720 s = 8 AM-4 PM).",
+    "Positions are facility-local (plan frame P, +x east, +z north, metres); headings follow three.js (heading h faces (sin h, cos h)). `at` is a seat object (chairs and benches: seatPose) or a point with `heading`; `seat` names the furniture a seated point sits on, exempt from the furniture-clearance check.",
+    "Each stop is a stationary hold over `window`; the gap to the next stop (or to an away/leave time) is the walk at the person's `gait` (metres per loop second), with 1.5-2 s of slack so the generator can stagger people. Consecutive stops at the same place change only the action or title.",
+    "`arrive`/`leave` are front-door passes (the `door` anchor), staggered at least 2 s apart; `away` windows go out and back through it. Mrs. Wong arrives at her bed at 0.5 s (the loop seam out of sight) and leaves at 720 s (present to the end); Mr. Wong rolls in at 672 s. Time outside is a hole filled by HOLE_LEGS in community-people.ts (the clinic trip, the aide's car and porch, the visitors' arrivals, Mr. Wong's hospital day).",
+    "An `interaction` is defined once, on one stop: actors = the person plus `with`; `window` defaults to the stop window. Ids kept stable: home-personal-care (30-72), home-health-visit (683.5-700), after-hours-call (690-708), home-return, home-meals, home-mods, home-discharge-arrival. home-van-boarding and home-pill-drop stay outdoors in community-people.ts.",
+    "Mr. Wong keeps his wheelchair all day (no per-segment mobility override yet), so the nurse checks his transfer technique beside the armchair instead of moving him into it."
+  ],
+  "people": [
+    {
+      "id": "home-participant",
+      "role": "participant",
+      "variant": 3,
+      "label": "Mrs. Wong · at home",
+      "mobility": "walker",
+      "gait": 1.1,
+      "arrive": {
+        "t": 0.5,
+        "anchor": [
+          -4.6,
+          3.3
+        ]
+      },
+      "leave": {
+        "t": 720,
+        "anchor": "door"
+      },
+      "away": [
+        [
+          80.5,
+          370
+        ]
+      ],
+      "stops": [
+        {
+          "window": [
+            0.5,
+            4
+          ],
+          "roomId": "home-primary",
+          "at": [
+            -4.6,
+            3.3
+          ],
+          "heading": 3.142,
+          "seat": "home-primary-bed",
+          "action": "seated",
+          "seated": true,
+          "title": "Awake on her side of the bed, walker at hand"
+        },
+        {
+          "window": [
+            11.5,
+            14
+          ],
+          "roomId": "home-bath",
+          "at": [
+            -5.15,
+            -0.45
+          ],
+          "heading": 0,
+          "seat": "home-bath-toilet",
+          "action": "seated",
+          "seated": true,
+          "title": "Toilets on her own: raised seat, side and vertical bars"
+        },
+        {
+          "window": [
+            17.5,
+            19
+          ],
+          "roomId": "home-bath",
+          "at": [
+            -3.35,
+            -0.1
+          ],
+          "heading": 3.142,
+          "action": "tabletop",
+          "title": "Washes at the roll-under basin, mirror set low"
+        },
+        {
+          "window": [
+            27,
+            30.5
+          ],
+          "roomId": "home-primary",
+          "at": "home-primary-chair",
+          "action": "seated",
+          "seated": true,
+          "title": "Dresses her top half, seated in the dressing chair",
+          "with": [
+            "home-pca"
+          ],
+          "interaction": {
+            "id": "home-personal-care",
+            "category": "home",
+            "label": "Mrs. Wong · morning personal care at home",
+            "description": "She toilets, washes and dresses her top half on her own in the accessible bath and bedroom; her aide arrives at 8:29, checks how she slept and gets her breakfast and morning pills at the seated worktop before her stockings, shoes and the van. An illustrative composite: in another care plan the aide could start at 8:00.",
+            "window": [
+              30,
+              72
+            ]
+          }
+        },
+        {
+          "window": [
+            45,
+            52
+          ],
+          "roomId": "home-kitchen",
+          "at": "home-kitchen-chair",
+          "action": "seated",
+          "seated": true,
+          "title": "Waits at the seated kitchen worktop"
+        },
+        {
+          "window": [
+            52,
+            56
+          ],
+          "roomId": "home-kitchen",
+          "at": "home-kitchen-chair",
+          "action": "conversation",
+          "seated": true,
+          "title": "Morning check-in with her aide"
+        },
+        {
+          "window": [
+            56,
+            64
+          ],
+          "roomId": "home-kitchen",
+          "at": "home-kitchen-chair",
+          "action": "tabletop",
+          "seated": true,
+          "title": "Breakfast and morning pills at the 0.76 m worktop"
+        },
+        {
+          "window": [
+            71.7,
+            74
+          ],
+          "roomId": "home-living",
+          "at": "home-living-entry-bench",
+          "action": "seated",
+          "seated": true,
+          "title": "Stockings and shoes on the entry bench"
+        },
+        {
+          "window": [
+            374.5,
+            381
+          ],
+          "roomId": "home-living",
+          "at": "home-living-entry-bench",
+          "action": "seated",
+          "seated": true,
+          "title": "Resting on the entry bench after the clinic",
+          "with": [
+            "home-pca",
+            "community-driver"
+          ],
+          "interaction": {
+            "id": "home-return",
+            "category": "home",
+            "label": "Mrs. Wong · home from the clinic",
+            "description": "The van ramp comes down at 11:40, her aide walks beside her across the drive and up the ramp, and she comes in over the flush threshold to rest on the entry bench.",
+            "window": [
+              330,
+              373
+            ]
+          }
+        },
+        {
+          "window": [
+            381,
+            385
+          ],
+          "roomId": "home-living",
+          "at": "home-living-entry-bench",
+          "action": "greet",
+          "seated": true,
+          "title": "Wellness check with the meals driver at the door"
+        },
+        {
+          "window": [
+            397,
+            399.5
+          ],
+          "roomId": "home-bath",
+          "at": [
+            -5.15,
+            -0.45
+          ],
+          "heading": 0,
+          "seat": "home-bath-toilet",
+          "action": "seated",
+          "seated": true,
+          "title": "Toileting, her aide at the door",
+          "with": [
+            "home-pca"
+          ],
+          "interaction": {
+            "id": "home-toileting",
+            "category": "home",
+            "label": "Mrs. Wong · toileting help and transfer",
+            "description": "She manages her own clothing on the raised toilet; the aide waits at the door, helps her stand with the grab bars and guards the turn to the shower seat.",
+            "window": [
+              397,
+              404
+            ]
+          }
+        },
+        {
+          "window": [
+            404,
+            411
+          ],
+          "roomId": "home-bath",
+          "at": [
+            -5.184,
+            1.63
+          ],
+          "heading": 1.571,
+          "seat": "home-bath-shower",
+          "action": "seated",
+          "seated": true,
+          "title": "Assisted shower on the fold-down seat",
+          "with": [
+            "home-pca"
+          ],
+          "interaction": {
+            "id": "home-bathing",
+            "category": "home",
+            "label": "Mrs. Wong · assisted shower",
+            "description": "In the curbless roll-in shower: the aide tests the water, hands her the hand shower for her face and front, washes her back, legs and feet, checks heels and skin folds, then dries her on the seat."
+          }
+        },
+        {
+          "window": [
+            419.5,
+            425.5
+          ],
+          "roomId": "home-primary",
+          "at": "home-primary-chair",
+          "action": "seated",
+          "seated": true,
+          "title": "Dressing in the bedroom chair",
+          "with": [
+            "home-pca"
+          ],
+          "interaction": {
+            "id": "home-dressing-pm",
+            "category": "home",
+            "label": "Mrs. Wong · dressing in the bedroom",
+            "description": "Clean home clothes from the wardrobe, socks and slippers, hair combed and hearing aids back in, seated in the armchair-height dressing chair."
+          }
+        },
+        {
+          "window": [
+            438.5,
+            458
+          ],
+          "roomId": "home-dining",
+          "at": "home-dining-chair-n",
+          "action": "tabletop",
+          "seated": true,
+          "title": "Lunch at the dining table"
+        },
+        {
+          "window": [
+            458,
+            464
+          ],
+          "roomId": "home-dining",
+          "at": "home-dining-chair-n",
+          "action": "conversation",
+          "seated": true,
+          "title": "The OT explains her visit"
+        },
+        {
+          "window": [
+            464,
+            470
+          ],
+          "roomId": "home-dining",
+          "at": "home-dining-chair-n",
+          "action": "tabletop",
+          "seated": true,
+          "title": "Finishes lunch"
+        },
+        {
+          "window": [
+            479.5,
+            484
+          ],
+          "roomId": "home-bath",
+          "at": [
+            -5.15,
+            -0.45
+          ],
+          "heading": 0,
+          "seat": "home-bath-toilet",
+          "action": "seated",
+          "seated": true,
+          "title": "Dry-run toilet transfer with the OT"
+        },
+        {
+          "window": [
+            488.5,
+            493.5
+          ],
+          "roomId": "home-bath",
+          "at": [
+            -5.184,
+            1.63
+          ],
+          "heading": 1.571,
+          "seat": "home-bath-shower",
+          "action": "seated",
+          "seated": true,
+          "title": "Dry-run shower transfer: seat height and reach"
+        },
+        {
+          "window": [
+            500,
+            510.5
+          ],
+          "roomId": "home-primary",
+          "at": [
+            -4.6,
+            3.3
+          ],
+          "heading": 3.142,
+          "seat": "home-primary-bed",
+          "action": "listen",
+          "seated": true,
+          "title": "Listens as the OT checks Mr. Wong's side of the bed"
+        },
+        {
+          "window": [
+            521,
+            640
+          ],
+          "roomId": "home-living",
+          "at": [
+            1.7,
+            0.78
+          ],
+          "heading": 0,
+          "seat": "home-living-sofa",
+          "action": "listen",
+          "seated": true,
+          "title": "Resting on the sofa, the TV news on"
+        },
+        {
+          "window": [
+            640,
+            669
+          ],
+          "roomId": "home-living",
+          "at": [
+            1.7,
+            0.78
+          ],
+          "heading": 0,
+          "seat": "home-living-sofa",
+          "action": "listen",
+          "seated": true,
+          "title": "The home health nurse arrives and sets up"
+        },
+        {
+          "window": [
+            669,
+            676.5
+          ],
+          "roomId": "home-living",
+          "at": [
+            1.7,
+            0.78
+          ],
+          "heading": 0,
+          "seat": "home-living-sofa",
+          "action": "greet",
+          "seated": true,
+          "title": "Welcomes Mr. Wong home"
+        },
+        {
+          "window": [
+            676.5,
+            690
+          ],
+          "roomId": "home-living",
+          "at": [
+            1.7,
+            0.78
+          ],
+          "heading": 0,
+          "seat": "home-living-sofa",
+          "action": "listen",
+          "seated": true,
+          "title": "Beside him while the nurse works"
+        },
+        {
+          "window": [
+            690,
+            708
+          ],
+          "roomId": "home-living",
+          "at": [
+            1.7,
+            0.78
+          ],
+          "heading": 0,
+          "seat": "home-living-sofa",
+          "action": "listen",
+          "seated": true,
+          "title": "On the nurse-line call (speakerphone)"
+        },
+        {
+          "window": [
+            708,
+            720
+          ],
+          "roomId": "home-living",
+          "at": [
+            1.7,
+            0.78
+          ],
+          "heading": 0,
+          "seat": "home-living-sofa",
+          "action": "seated",
+          "seated": true,
+          "title": "Home together, the TV on"
+        }
+      ]
+    },
+    {
+      "id": "home-pca",
+      "role": "aide",
+      "variant": 2,
+      "label": "Personal care aide",
+      "gait": 1.5,
+      "arrive": {
+        "t": 44,
+        "anchor": "door"
+      },
+      "leave": {
+        "t": 450.5,
+        "anchor": "door"
+      },
+      "away": [
+        [
+          77,
+          152.5
+        ],
+        [
+          318.5,
+          372.5
+        ]
+      ],
+      "stops": [
+        {
+          "window": [
+            52,
+            53
+          ],
+          "roomId": "home-kitchen",
+          "at": [
+            -4.55,
+            -5.085
+          ],
+          "heading": -1.571,
+          "action": "conversation",
+          "title": "Morning check-in: sleep, pain, dizziness, ankles",
+          "with": [
+            "home-participant"
+          ]
+        },
+        {
+          "window": [
+            53,
+            54.2
+          ],
+          "roomId": "home-kitchen",
+          "at": [
+            -4.55,
+            -5.085
+          ],
+          "heading": -1.571,
+          "action": "serve",
+          "title": "Reheats congee on the front-control range"
+        },
+        {
+          "window": [
+            56.2,
+            58.2
+          ],
+          "roomId": "home-kitchen",
+          "at": [
+            -2.95,
+            -5.2
+          ],
+          "heading": 2.084,
+          "action": "serve",
+          "title": "Sets up breakfast and opens the morning blister",
+          "with": [
+            "home-participant"
+          ],
+          "interaction": {
+            "id": "home-meal-meds",
+            "category": "home",
+            "label": "Breakfast and morning pills",
+            "description": "The aide reheats congee on the front-control range, sets the bowl on a non-slip mat with a built-up spoon at the 0.76 m seated worktop, opens today's morning blister from the weekly pill pack and watches her take it with water.",
+            "window": [
+              52,
+              64
+            ]
+          }
+        },
+        {
+          "window": [
+            60,
+            64
+          ],
+          "roomId": "home-kitchen",
+          "at": [
+            -3.89,
+            -5.3
+          ],
+          "heading": 3.142,
+          "action": "serve",
+          "title": "Washes up and packs the clinic bag"
+        },
+        {
+          "window": [
+            71.7,
+            74.2
+          ],
+          "roomId": "home-living",
+          "at": [
+            2,
+            -1.55
+          ],
+          "heading": 2.179,
+          "action": "treat",
+          "title": "Stockings, Velcro shoes and jacket",
+          "with": [
+            "home-participant"
+          ],
+          "interaction": {
+            "id": "home-dressing-am",
+            "category": "home",
+            "label": "Mrs. Wong · stockings and shoes",
+            "description": "At the 0.45 m entry bench the aide puts on her compression stockings and Velcro shoes and helps with her jacket before the van."
+          }
+        },
+        {
+          "window": [
+            158.5,
+            165
+          ],
+          "roomId": "home-dining",
+          "at": [
+            1.6,
+            -5.55
+          ],
+          "heading": 3.142,
+          "action": "document",
+          "title": "Files next week's pill packs and logs this morning's blister",
+          "interaction": {
+            "id": "home-housekeeping",
+            "category": "home",
+            "label": "Housekeeping and laundry",
+            "description": "While Mrs. Wong is at the specialist the aide files the new weekly pill packs, remakes the bed for two, runs the laundry, cleans the bathroom and kitchen, and clears the route from the door to the armchair for Mr. Wong.",
+            "window": [
+              152.5,
+              316
+            ]
+          }
+        },
+        {
+          "window": [
+            176,
+            196
+          ],
+          "roomId": "home-primary",
+          "at": [
+            -3.65,
+            5.25
+          ],
+          "heading": -2.339,
+          "action": "serve",
+          "title": "Remakes the bed with fresh linen; night light on his side"
+        },
+        {
+          "window": [
+            207,
+            215
+          ],
+          "roomId": "home-laundry",
+          "at": [
+            -4,
+            -2.2
+          ],
+          "heading": 0,
+          "action": "serve",
+          "title": "Loads the washer (on a pedestal: no bending)"
+        },
+        {
+          "window": [
+            221,
+            250
+          ],
+          "roomId": "home-bath",
+          "at": [
+            -3,
+            0.6
+          ],
+          "heading": -2.025,
+          "action": "serve",
+          "title": "Cleans the bathroom: toilet, basin, bars, shower seat, dry floor"
+        },
+        {
+          "window": [
+            259,
+            285
+          ],
+          "roomId": "home-kitchen",
+          "at": [
+            -3.89,
+            -5.3
+          ],
+          "heading": 3.142,
+          "action": "serve",
+          "title": "Kitchen: dishes, counters, fridge; trash out the back door"
+        },
+        {
+          "window": [
+            291,
+            297
+          ],
+          "roomId": "home-laundry",
+          "at": [
+            -3.27,
+            -2.2
+          ],
+          "heading": 0,
+          "action": "serve",
+          "title": "Moves the wash to the dryer"
+        },
+        {
+          "window": [
+            303,
+            315
+          ],
+          "roomId": "home-living",
+          "at": [
+            1,
+            -1.4
+          ],
+          "heading": 0,
+          "action": "serve",
+          "title": "Vacuums and clears the route to the armchair"
+        },
+        {
+          "window": [
+            375.5,
+            378.5
+          ],
+          "roomId": "home-living",
+          "at": [
+            2,
+            -1.55
+          ],
+          "heading": 2.179,
+          "action": "serve",
+          "title": "Takes her jacket and bag; reads the after-visit note"
+        },
+        {
+          "window": [
+            381,
+            386
+          ],
+          "roomId": "home-living",
+          "at": [
+            2.45,
+            -0.4
+          ],
+          "heading": 1.571,
+          "action": "serve",
+          "title": "Takes the meal bag from the driver at the door",
+          "with": [
+            "meals-driver",
+            "home-participant"
+          ],
+          "interaction": {
+            "id": "home-meals",
+            "category": "home",
+            "label": "Meal hand-off at the door",
+            "description": "The meals driver passes the insulated lunch bag to the aide at the door and checks in with Mrs. Wong, who answers from the entry bench; anything unusual goes back to the care team."
+          }
+        },
+        {
+          "window": [
+            393,
+            393.5
+          ],
+          "roomId": "home-kitchen",
+          "at": [
+            -4.45,
+            -3.44
+          ],
+          "heading": -1.571,
+          "action": "serve",
+          "title": "Puts lunch in the fridge"
+        },
+        {
+          "window": [
+            401.5,
+            402.5
+          ],
+          "roomId": "home-bath",
+          "at": [
+            -3.85,
+            0.45
+          ],
+          "heading": -1.373,
+          "action": "consult",
+          "title": "Guards her turn from the toilet to the shower seat"
+        },
+        {
+          "window": [
+            405,
+            409.8
+          ],
+          "roomId": "home-bath",
+          "at": [
+            -4.3,
+            1.3
+          ],
+          "heading": -1.214,
+          "action": "treat",
+          "title": "Shower help: hand shower, back, legs and feet; dries her"
+        },
+        {
+          "window": [
+            412.5,
+            415
+          ],
+          "roomId": "home-bath",
+          "at": [
+            -3,
+            0.6
+          ],
+          "heading": -2.025,
+          "action": "idle",
+          "title": "Steps aside so she can walk ahead to the bedroom"
+        },
+        {
+          "window": [
+            419.5,
+            423
+          ],
+          "roomId": "home-primary",
+          "at": [
+            -2.55,
+            4.55
+          ],
+          "heading": 1.571,
+          "action": "treat",
+          "title": "Dressing: clothes, socks, slippers, hair, hearing aids"
+        },
+        {
+          "window": [
+            433,
+            435
+          ],
+          "roomId": "home-kitchen",
+          "at": [
+            -4.6,
+            -4.285
+          ],
+          "heading": -1.571,
+          "action": "serve",
+          "title": "Heats and plates the delivered lunch",
+          "with": [
+            "home-participant"
+          ],
+          "interaction": {
+            "id": "home-lunch",
+            "category": "home",
+            "label": "Lunch set-up",
+            "description": "The delivered lunch heated in the counter-height microwave, plated and cut up at the table with a built-up spoon and a full water glass, plus the midday blister if one is prescribed; then the aide logs the visit.",
+            "window": [
+              430.5,
+              446
+            ]
+          }
+        },
+        {
+          "window": [
+            440.5,
+            443.5
+          ],
+          "roomId": "home-dining",
+          "at": [
+            0.8,
+            -3.95
+          ],
+          "heading": -2.507,
+          "action": "serve",
+          "title": "Sets up lunch: containers open, chicken cut, water"
+        },
+        {
+          "window": [
+            443.5,
+            445.8
+          ],
+          "roomId": "home-dining",
+          "at": [
+            0.8,
+            -3.95
+          ],
+          "heading": -2.507,
+          "action": "document",
+          "title": "Logs the visit: ADLs, skin check, food and fluids"
+        }
+      ]
+    },
+    {
+      "id": "home-ot",
+      "role": "ot",
+      "variant": 1,
+      "label": "Occupational therapist",
+      "gait": 1.4,
+      "arrive": {
+        "t": 453,
+        "anchor": "door"
+      },
+      "leave": {
+        "t": 582.5,
+        "anchor": "door"
+      },
+      "away": [
+        [
+          520,
+          551
+        ]
+      ],
+      "stops": [
+        {
+          "window": [
+            458.5,
+            463.5
+          ],
+          "roomId": "home-dining",
+          "at": [
+            1.55,
+            -4.55
+          ],
+          "heading": -1.808,
+          "action": "conversation",
+          "title": "Explains the visit: bars and ramp before Mr. Wong is home",
+          "with": [
+            "home-installer",
+            "home-participant"
+          ],
+          "interaction": {
+            "id": "home-mods",
+            "category": "home",
+            "label": "OT home-safety check and grab bar",
+            "description": "The OT checks bar heights and watches dry-run toilet and shower transfers, the installer fits a swing-up bar and Mr. Wong's bed handle, and the OT checks his side of the bed and the ramp before he comes home.",
+            "window": [
+              453,
+              583
+            ]
+          }
+        },
+        {
+          "window": [
+            473,
+            476
+          ],
+          "roomId": "home-bath",
+          "at": [
+            -2.4,
+            1
+          ],
+          "heading": -2.056,
+          "action": "consult",
+          "title": "Checks the bar layout against the plan from the doorway"
+        },
+        {
+          "window": [
+            476,
+            488
+          ],
+          "roomId": "home-bath",
+          "at": [
+            -2.4,
+            1
+          ],
+          "heading": -2.056,
+          "action": "consult",
+          "title": "Watches her dry-run toilet transfer and turn"
+        },
+        {
+          "window": [
+            490,
+            492.5
+          ],
+          "roomId": "home-bath",
+          "at": [
+            -3.6,
+            0.85
+          ],
+          "heading": -1.112,
+          "action": "consult",
+          "title": "Checks the seat height, hand-shower reach and grip"
+        },
+        {
+          "window": [
+            498,
+            510.5
+          ],
+          "roomId": "home-primary",
+          "at": [
+            -3.65,
+            5.25
+          ],
+          "heading": -2.339,
+          "action": "consult",
+          "title": "Checks Mr. Wong's side: height, handle, turning circle, night light",
+          "interaction": {
+            "id": "home-ramp-check",
+            "category": "home",
+            "label": "Ramp check",
+            "description": "On the front ramp with a digital level: 0.35 m over 6.5 m is 1:18.6, gentler than the 1:12 maximum; rails on both sides, a level 2.6 m landing and a flush threshold at the door.",
+            "window": [
+              523,
+              548
+            ]
+          }
+        },
+        {
+          "window": [
+            558,
+            564
+          ],
+          "roomId": "home-bath",
+          "at": [
+            -3.85,
+            -0.05
+          ],
+          "heading": -2.084,
+          "action": "consult",
+          "title": "Checks the new bar and signs the work order",
+          "with": [
+            "home-installer"
+          ]
+        },
+        {
+          "window": [
+            571.5,
+            577
+          ],
+          "roomId": "home-dining",
+          "at": [
+            1.55,
+            -4.55
+          ],
+          "heading": -1.808,
+          "action": "document",
+          "title": "Writes the home-safety note; what Mr. Wong may need"
+        }
+      ]
+    },
+    {
+      "id": "home-installer",
+      "role": "aide",
+      "variant": 4,
+      "label": "Home-mods installer",
+      "gait": 1.4,
+      "arrive": {
+        "t": 456,
+        "anchor": "door"
+      },
+      "leave": {
+        "t": 572.5,
+        "anchor": "door"
+      },
+      "stops": [
+        {
+          "window": [
+            466,
+            514.5
+          ],
+          "roomId": "home-primary",
+          "at": [
+            -4.6,
+            5.3
+          ],
+          "heading": 3.142,
+          "action": "craft",
+          "title": "Fits Mr. Wong's bed handle; night lights bed to bath"
+        },
+        {
+          "window": [
+            522,
+            540
+          ],
+          "roomId": "home-bath",
+          "at": [
+            -4.3,
+            -0.55
+          ],
+          "heading": 3.142,
+          "action": "craft",
+          "title": "Fits the swing-up grab bar and hangs his weight on it",
+          "interaction": {
+            "id": "home-grab-bar",
+            "category": "home",
+            "label": "Swing-up grab bar fitted",
+            "description": "On the open side of the toilet the installer fits a swing-up grab bar into the blocking at the height the OT marked (top at 34 in, rated 250 lb) for Mr. Wong's wheelchair transfers."
+          }
+        },
+        {
+          "window": [
+            540,
+            551
+          ],
+          "roomId": "home-bath",
+          "at": [
+            -4.3,
+            -0.55
+          ],
+          "heading": 3.142,
+          "action": "craft",
+          "title": "Vacuums the drill dust and packs the kit"
+        },
+        {
+          "window": [
+            551,
+            558
+          ],
+          "roomId": "home-bath",
+          "at": [
+            -4.3,
+            -0.55
+          ],
+          "heading": 3.142,
+          "action": "idle",
+          "title": "Waits for the OT's sign-off"
+        },
+        {
+          "window": [
+            558,
+            565
+          ],
+          "roomId": "home-bath",
+          "at": [
+            -4.3,
+            -0.55
+          ],
+          "heading": 3.142,
+          "action": "consult",
+          "title": "Sign-off with the OT"
+        }
+      ]
+    },
+    {
+      "id": "home-rn",
+      "role": "nurse",
+      "variant": 5,
+      "label": "Home health nurse",
+      "gait": 1.35,
+      "arrive": {
+        "t": 642.5,
+        "anchor": "door"
+      },
+      "leave": {
+        "t": 708,
+        "anchor": "door"
+      },
+      "stops": [
+        {
+          "window": [
+            651,
+            653
+          ],
+          "roomId": "home-kitchen",
+          "at": [
+            -3.89,
+            -5.3
+          ],
+          "heading": 3.142,
+          "action": "serve",
+          "title": "Washes her hands"
+        },
+        {
+          "window": [
+            659,
+            665.5
+          ],
+          "roomId": "home-dining",
+          "at": [
+            0.8,
+            -3.95
+          ],
+          "heading": -2.507,
+          "action": "document",
+          "title": "Lays out BP cuff and oximeter; reads the discharge summary"
+        },
+        {
+          "window": [
+            669,
+            674
+          ],
+          "roomId": "home-living",
+          "at": [
+            1,
+            -1.4
+          ],
+          "heading": 0,
+          "action": "greet",
+          "title": "Meets Mr. Wong as he rolls in"
+        },
+        {
+          "window": [
+            677,
+            683.5
+          ],
+          "roomId": "home-living",
+          "at": [
+            2.12,
+            0.05
+          ],
+          "heading": 0.562,
+          "action": "consult",
+          "title": "Brakes on, footplates up: checks his stand-pivot technique",
+          "with": [
+            "hospital-participant"
+          ],
+          "interaction": {
+            "id": "home-transfer",
+            "category": "home",
+            "label": "Mr. Wong · wheelchair positioning and transfer check",
+            "description": "Beside his armchair, brakes on and footplates up, the nurse checks his stand-pivot technique. He stays in his wheelchair today: the armchair transfer waits for a per-segment mobility override.",
+            "window": [
+              674.5,
+              683.5
+            ]
+          }
+        },
+        {
+          "window": [
+            683.5,
+            692
+          ],
+          "roomId": "home-living",
+          "at": [
+            2.12,
+            0.05
+          ],
+          "heading": 0.562,
+          "action": "treat",
+          "title": "Vitals: blood pressure, pulse, oxygen, temperature; skin check",
+          "with": [
+            "hospital-participant",
+            "home-participant"
+          ],
+          "interaction": {
+            "id": "home-health-visit",
+            "category": "home",
+            "label": "Post-discharge home health visit",
+            "description": "A home health nurse checks his vitals and pressure points and reconciles the new medicines with the weekly pill pack on the day he comes home, then goes over the warning signs and the 24/7 nurse-line number.",
+            "window": [
+              683.5,
+              700
+            ]
+          }
+        },
+        {
+          "window": [
+            692,
+            698
+          ],
+          "roomId": "home-living",
+          "at": [
+            2.12,
+            0.05
+          ],
+          "heading": 0.562,
+          "action": "document",
+          "title": "Medication reconciliation with the pill pack; calls the pharmacy"
+        },
+        {
+          "window": [
+            698,
+            700
+          ],
+          "roomId": "home-living",
+          "at": [
+            2.12,
+            0.05
+          ],
+          "heading": 0.562,
+          "action": "conversation",
+          "title": "Warning signs and the 24/7 nurse-line number"
+        }
+      ]
+    },
+    {
+      "id": "hospital-participant",
+      "role": "participant",
+      "variant": 8,
+      "label": "Mr. Wong · inpatient, discharged home",
+      "mobility": "wheelchair",
+      "gait": 1,
+      "arrive": {
+        "t": 672,
+        "anchor": "door"
+      },
+      "leave": {
+        "t": 720,
+        "anchor": "door"
+      },
+      "stops": [
+        {
+          "window": [
+            675.5,
+            683.5
+          ],
+          "roomId": "home-living",
+          "at": [
+            2.58,
+            0.78
+          ],
+          "heading": -0.35,
+          "action": "seated",
+          "seated": true,
+          "title": "Parked beside his armchair, brakes on",
+          "with": [
+            "community-driver",
+            "home-participant",
+            "home-rn"
+          ],
+          "interaction": {
+            "id": "home-discharge-arrival",
+            "category": "home",
+            "label": "Mr. Wong · home after discharge",
+            "description": "The Seen van brings him home at 3:08; the driver wheels him down the van ramp, across the drive and up the porch ramp, and he rolls himself in over the flush threshold to his armchair while Mrs. Wong welcomes him from the sofa.",
+            "window": [
+              642,
+              683.5
+            ]
+          }
+        },
+        {
+          "window": [
+            683.5,
+            690
+          ],
+          "roomId": "home-living",
+          "at": [
+            2.58,
+            0.78
+          ],
+          "heading": -0.35,
+          "action": "seated",
+          "seated": true,
+          "title": "Vitals in his wheelchair"
+        },
+        {
+          "window": [
+            690,
+            708
+          ],
+          "roomId": "home-living",
+          "at": [
+            2.58,
+            0.78
+          ],
+          "heading": -0.35,
+          "action": "conversation",
+          "seated": true,
+          "title": "Nurse-line call on speakerphone",
+          "with": [
+            "nurse-line-rn",
+            "home-participant"
+          ],
+          "interaction": {
+            "id": "after-hours-call",
+            "category": "after-hours",
+            "label": "Nurse line call · evening plan",
+            "description": "24/7 nurse line and on-call coordination: from beside his armchair on speakerphone, the nurse confirms tonight's medicines and the re-packed blister with Mr. and Mrs. Wong, reminds them when to call, and confirms tomorrow's aide visit."
+          }
+        },
+        {
+          "window": [
+            708,
+            720
+          ],
+          "roomId": "home-living",
+          "at": [
+            2.58,
+            0.78
+          ],
+          "heading": -0.35,
+          "action": "seated",
+          "seated": true,
+          "title": "Home with Mrs. Wong, the TV on"
+        }
+      ]
+    }
+  ]
+}

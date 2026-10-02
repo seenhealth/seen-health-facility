@@ -39,10 +39,15 @@ import {
 } from './model/schema';
 import { defaultState, type ViewerState } from './model/renderer';
 import type { createViewer } from './model/renderer';
+import {
+  COMMUNITY_VIEW,
+  SETTING_ZONE_PREFIX,
+} from './model/community-settings';
 import { roomLabelCode } from './model/room-labels';
 import { JourneyPanel } from './components/journey-panel';
 import type { JourneyStep } from './model/journeys';
 import { ActivityPanel } from './components/activity-panel';
+import { isRotationDay, setProgramRotation } from './model/day-room';
 import { ShowcaseControls } from './components/showcase-controls';
 import { SiteMap } from './components/site-map';
 import { sites, type SiteId } from './data/sites';
@@ -56,6 +61,27 @@ const download = (data: Blob, name: string) => {
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 5000);
 };
+/**
+ * The distributed-care network view: the whole shell with the site context
+ * and the community layer on. One recipe for the view-bar button (from the
+ * current state) and for activity-panel touchpoints (from the default state).
+ */
+const communityState = (base: ViewerState): ViewerState => ({
+  ...base,
+  level: 'all',
+  selected: null,
+  room: null,
+  isolate: false,
+  plan: false,
+  exterior: true,
+  roof: true,
+  walls: 'full',
+  explode: 0,
+  stack: 0,
+  sectionAxis: 'none',
+  site: true,
+  community: true,
+});
 const jsonDownload = (data: unknown, name: string) =>
   download(
     new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }),
@@ -93,12 +119,30 @@ export default function Home() {
     [measureOpen, setMeasureOpen] = useState(false),
     [exporting, setExporting] = useState(false),
     [notice, setNotice] = useState(''),
+    // The viewer builds the community layer when its source carries one.
+    [hasCommunity, setHasCommunity] = useState(false),
     [dataTab, setDataTab] = useState<'overview' | 'assets'>('overview');
   const patch = (s: Partial<ViewerState>) => setState((p) => ({ ...p, ...s }));
   const getViewer = useCallback(() => viewer.current, []);
   const focusActivity = useCallback(
     (zoneId: string, actor?: string | null) => {
       if (!model || !viewer.current) return;
+      if (
+        viewer.current.community &&
+        (zoneId === COMMUNITY_VIEW.id || zoneId.startsWith(SETTING_ZONE_PREFIX))
+      ) {
+        // A distributed-care setting: whole shell, site context and the layer on.
+        const next = communityState(defaultState);
+        setState(next);
+        setView('community');
+        viewer.current.update(next);
+        viewer.current.view('community');
+        viewer.current.activity.setOptions({ enabled: true, follow: null });
+        if (zoneId.startsWith(SETTING_ZONE_PREFIX))
+          viewer.current.focusSetting(zoneId.slice(SETTING_ZONE_PREFIX.length));
+        if (actor) viewer.current.followActor(actor);
+        return;
+      }
       const activityRoom = model.rooms.find((r) => r.id === zoneId);
       const zone = model.zones.find(
         (z) => z.id === (activityRoom?.zoneId || zoneId),
@@ -198,6 +242,8 @@ export default function Home() {
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
     const id = sites.find((s) => s.id === p.get('site'))?.id || 'alhambra';
+    const program = p.get('program');
+    if (isRotationDay(program)) setProgramRotation(program);
     queueMicrotask(() => {
       selectSite(id);
       setClinicOption(id === 'olympic' && p.get('option') === 'clinic');
@@ -285,9 +331,14 @@ export default function Home() {
           }
         });
         viewer.current.update(state);
+        // Same console hook as the story (?debug=1): lets screenshot and
+        // tuning scripts drive the viewer without UI automation.
+        if (new URLSearchParams(window.location.search).get('debug') === '1')
+          (window as unknown as { __viewer: unknown }).__viewer = viewer.current;
         if (model.contextStyle) viewer.current.focus(null, null, true);
         else viewer.current.focus('day');
         if (state.exterior) viewer.current.view('exterior');
+        setHasCommunity(!!viewer.current.community);
         setReady(true);
       } catch (e) {
         console.error(e);
@@ -301,6 +352,17 @@ export default function Home() {
     };
   }, [model]);
   useEffect(() => viewer.current?.update(state), [state, ready]);
+  useEffect(() => {
+    // The weekly repertoire belongs to the Alhambra day room; site-specific
+    // models play their own baked Monday program, so ?program= does not
+    // follow the visitor there (and Alhambra starts from Monday again).
+    if (!model?.contextStyle) return;
+    setProgramRotation('mon');
+    const u = new URL(window.location.href);
+    if (!u.searchParams.has('program')) return;
+    u.searchParams.delete('program');
+    window.history.replaceState(null, '', u);
+  }, [model]);
   useEffect(() => {
     if (!ready || !viewer.current) return;
     if (showcase) {
@@ -431,6 +493,13 @@ export default function Home() {
     viewer.current?.update(next);
     viewer.current?.view(id === 'roof' ? 'exterior' : 'iso');
     viewer.current?.focus(null);
+  };
+  const showCommunity = () => {
+    setView('community');
+    const next = communityState(state);
+    setState(next);
+    viewer.current?.update(next);
+    viewer.current?.view('community');
   };
   const showBuilding = (rear = false) => {
     setView(rear ? 'rear' : 'building');
@@ -933,6 +1002,14 @@ export default function Home() {
           >
             Rear
           </button>
+          {ready && hasCommunity && (
+            <button
+              className={view === 'community' ? 'chosen' : ''}
+              onClick={showCommunity}
+            >
+              Community
+            </button>
+          )}
         </div>
         {activityOpen && ready && (
           <ActivityPanel
@@ -1214,8 +1291,11 @@ export default function Home() {
                 'roof',
                 'exterior',
                 'ceilings',
+                'community',
               ] as const
-            ).map((k) => (
+            )
+              .filter((k) => k !== 'community' || (ready && hasCommunity))
+              .map((k) => (
               <label key={k}>
                 <input
                   type="checkbox"
@@ -1231,6 +1311,7 @@ export default function Home() {
                       roof: 'Roof surfaces',
                       exterior: 'Exterior envelope',
                       ceilings: 'Ceilings & structure',
+                      community: 'Community sites (homes, pharmacy, hospital & partners)',
                     } as const
                   )[k]
                 }

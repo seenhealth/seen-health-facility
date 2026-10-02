@@ -95,7 +95,12 @@ export type StopPlacement = PlacementPoint & {
   description?: string;
 };
 export type StepPlacement = {
-  mode: 'meeting' | 'arrival' | 'checkin' | 'visit' | 'departure';
+  /**
+   * `cutaway`: a moment across the care network (a partner site or a home),
+   * without the hero. It adds no tracks; the step summary points the camera at
+   * the community interactions it features (`ScenarioStep.interactionIds`).
+   */
+  mode: 'meeting' | 'arrival' | 'checkin' | 'visit' | 'departure' | 'cutaway';
   category?: string;
   stops?: StopPlacement[];
   /** Duties at absolute times (used while the hero follows copied arrival tracks). */
@@ -114,6 +119,12 @@ export type ScenarioStep = {
   handoffs: { from: string; to: string; note: string }[];
   heroPresent: boolean;
   stops?: { roomId: string; window: Window; activity: string }[];
+  /** Cutaways: the care setting shown (`careSettings` id); its zone is `community:<id>`. */
+  settingId?: string;
+  /** Cutaways: the community interactions featured; the first is the camera's follow target. */
+  interactionIds?: string[];
+  /** External roles named on the card and in the swimlane (not IDT disciplines). */
+  partners?: string[];
   placement?: StepPlacement;
 };
 export type CompanionSpec = {
@@ -302,13 +313,15 @@ export function freeStandingPoint(g: NavGrid, p: Vec2): { point: Vec2; moved: bo
 type Place = { anchor: Vec2; approach: Vec2[] };
 /**
  * Walk from one placed point to another: leave along the reversed approach,
- * follow the navigation grid, then enter along the next approach.
+ * follow the navigation grid, then enter along the next approach. `avoid`
+ * blocks further grid cells (see `route`).
  */
 export function walkBetween(
   g: NavGrid,
   from: Place,
   to: Place,
   clearance: number,
+  avoid?: (p: Vec2) => boolean,
 ): Vec2[] {
   const head = dedupe([from.anchor, ...[...from.approach].reverse()]),
     tail = dedupe([...to.approach, to.anchor]);
@@ -317,8 +330,8 @@ export function walkBetween(
   let middle: Vec2[];
   if (same(a, b)) middle = [a];
   else {
-    const sa = snap(g, a, { clearance }),
-      sb = snap(g, b, { clearance });
+    const sa = snap(g, a, { clearance, avoid }),
+      sb = snap(g, b, { clearance, avoid });
     for (const [p, s] of [
       [a, sa],
       [b, sb],
@@ -327,7 +340,11 @@ export function walkBetween(
         throw new NavError(
           `Point ${p.join(',')} is ${distance(p, s).toFixed(2)} m from free floor; add approach waypoints`,
         );
-    middle = [a, ...(same(sa, sb) ? [sa] : route(g, sa, sb, clearance)), b];
+    middle = [
+      a,
+      ...(same(sa, sb) ? [sa] : route(g, sa, sb, clearance, avoid)),
+      b,
+    ];
   }
   const path = dedupe([...head, ...middle, ...tail]);
   const clear = pathWallClearanceAt(g, path);
@@ -485,6 +502,11 @@ function programActions(start: number, end: number) {
 export type CompileOptions = {
   /** Navigation options for the ground floor (defaults: day program + stairs blocked). */
   nav?: NavOptions;
+  /**
+   * Interactions of the composed source (the community layer), from which a
+   * cutaway's focus time is derived. Without it a cutaway focuses mid-window.
+   */
+  context?: Pick<ActivitySource, 'interactions'>;
 };
 export function compileScenario(
   model: Facility,
@@ -1085,6 +1107,7 @@ export function compileScenario(
   // 10. Steps summary for the story.
   const actorsOut: ActorSpec[] = [heroActor, ...(escort ? [escort] : []), ...companions, ...meetingActors];
   const steps: CompiledStep[] = scenario.steps.map((step) => {
+    if (step.placement?.mode === 'cutaway') return cutawaySummary(step, options.context);
     const own = compiledStops.filter((c) => c.stepId === step.id);
     const meeting = P.meeting.steps.includes(step.id);
     let focusTime: number, focusActorId: string;
@@ -1149,6 +1172,43 @@ export function compileScenario(
     notes,
   };
   return { source: mergeTracks(originalBase, tracks), heroId, steps, tracks };
+}
+
+/**
+ * Step summary of a cutaway: no hero, no stops, no companions. The focus time
+ * is the middle of the featured interactions' span inside the window, and the
+ * camera follows the first featured interaction.
+ */
+function cutawaySummary(
+  step: ScenarioStep,
+  context: CompileOptions['context'],
+): CompiledStep {
+  const ids = step.interactionIds || [];
+  if (!step.settingId || !ids.length)
+    throw new Error(`Cutaway ${step.id} needs a settingId and at least one interactionIds entry`);
+  const [w0, w1] = step.window;
+  const spans = (context?.interactions || [])
+    .filter((i) => ids.includes(i.id))
+    .map((i) => [Math.max(i.start, w0), Math.min(i.end, w1)])
+    .filter(([a, b]) => b > a);
+  const focusTime = spans.length
+    ? r4((Math.min(...spans.map((s) => s[0])) + Math.max(...spans.map((s) => s[1]))) / 2)
+    : r4((w0 + w1) / 2);
+  return {
+    id: step.id,
+    window: step.window,
+    heroPresent: false,
+    zoneId: step.zoneId,
+    roomId: null,
+    focusTime,
+    focusActorId: `interaction:${ids[0]}`,
+    stops: [],
+    companionIds: [],
+    interactionIds: ids,
+    handoffs: step.handoffs,
+    roles: step.roles,
+    settingId: step.settingId,
+  };
 }
 
 /**

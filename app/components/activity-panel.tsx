@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import {
   Download,
   Eye,
@@ -19,16 +19,20 @@ import {
   type ActivitySnapshot,
 } from '../model/activity';
 import { roleNames, roleColors, characterLibrary } from '../model/characters';
-import {
-  vanWindows as siteVanWindows,
-  alhambraVanWindows,
-} from '../model/arrival';
+import { alhambraVanWindows } from '../model/arrival';
 import {
   dayProgram,
   instructorOf,
+  programRotation,
+  rotationDays,
   sessionsAt,
+  setProgramRotation,
+  subscribeProgramRotation,
   zoneSessions,
+  type DaySession,
+  type RotationDay,
 } from '../model/day-program';
+import { COMMUNITY_CATEGORIES } from '../model/community-settings';
 import type { createViewer } from '../model/renderer';
 
 export const activityViews = [
@@ -48,7 +52,20 @@ const categories = [
   ['activities', 'Activities'],
   ['meals', 'Meals'],
   ['coordination', 'Coordination'],
+  ...COMMUNITY_CATEGORIES,
 ];
+const dayLabels: Record<RotationDay, string> = {
+  mon: 'Mon',
+  tue: 'Tue',
+  wed: 'Wed',
+  thu: 'Thu',
+  fri: 'Fri',
+};
+const formatLabels = {
+  group: 'Whole group',
+  'small-group': 'Small groups',
+  'one-to-one': 'One-to-one',
+};
 const palette: Record<string, string> = {
   walk: '#aec9bc',
   roll: '#aec9bc',
@@ -98,7 +115,15 @@ export function ActivityPanel({
 }) {
   const activityData = viewer?.activity.data || alhambraActivityData;
   const siteSpecific = !!activityData.siteSpecific;
-  const vanWindows = siteSpecific ? siteVanWindows : alhambraVanWindows;
+  // Site arrivals carry their own timetable; Alhambra's fleet uses its schedule.
+  const siteArrival = viewer?.activity.arrival;
+  const vanWindows = useMemo(
+    () =>
+      siteSpecific && siteArrival && 'windows' in siteArrival
+        ? siteArrival.windows
+        : alhambraVanWindows,
+    [siteSpecific, siteArrival],
+  );
   const dayRoomId = activityData.dayRoomId || 'day';
   const views = activityData.views || activityViews;
   const [state, setState] = useState<ActivitySnapshot | null>(null),
@@ -110,13 +135,22 @@ export function ActivityPanel({
     [search, setSearch] = useState(''),
     [activityView, setActivityView] = useState(!siteSpecific);
   useEffect(() => viewer?.activity.subscribe(setState), [viewer]);
+  // The cast in view: the community layer's people drop out with its toggle.
+  const people = state?.people ?? activityData.actors.length;
   const time = state?.time || 0,
     change = (p: Partial<ActivitySnapshot>) => viewer?.activity.setOptions(p);
+  const rotation = useSyncExternalStore(
+    subscribeProgramRotation,
+    programRotation,
+    () => 'mon' as RotationDay,
+  );
   // Alhambra runs three zones at once; the other sites share the open-floor rotation.
   const zones = dayProgram.zones.filter((z) => !siteSpecific || z.id === 'floor');
-  const followed = dayProgram.programs.find(
-    (p) => state?.follow === 'interaction:day-' + p.id,
-  );
+  // Floor interaction tracks are baked for the slot's Monday session.
+  const trackOf = (s: DaySession) => 'interaction:day-' + (s.baseId ?? s.id);
+  const followed = zones
+    .flatMap((z) => zoneSessions(z.id))
+    .find((p) => state?.follow === trackOf(p));
   const session = sessionsAt(time).find(
     ({ zone }) => zone.id === (followed?.zone || 'floor'),
   )!.session;
@@ -124,11 +158,19 @@ export function ActivityPanel({
     ? instructorOf(session)
     : undefined;
   const chooseSession = (id: string) => {
-    const p = dayProgram.programs.find((p) => p.id === id)!;
+    const p = zones.flatMap((z) => zoneSessions(z.id)).find((p) => p.id === id)!;
     change({ time: p.start + 3, enabled: true, filter: 'all' });
     setCategory('activities');
     setActivityView(true);
-    onScene(dayRoomId, 'interaction:day-' + p.id);
+    onScene(dayRoomId, trackOf(p));
+  };
+  const chooseRotation = (day: RotationDay) => {
+    setProgramRotation(day);
+    const u = new URL(window.location.href);
+    if (day === 'mon') u.searchParams.delete('program');
+    else u.searchParams.set('program', day);
+    window.history.replaceState(null, '', u);
+    change({ enabled: true });
   };
   const interactions = activityData.interactions.filter(
       (i) => category === 'all' || i.category === category,
@@ -215,7 +257,7 @@ export function ActivityPanel({
         ],
       })),
     ],
-    [activityData, siteSpecific],
+    [activityData, vanWindows],
   );
   const visible = tracks.filter(
     (t) =>
@@ -308,6 +350,22 @@ export function ActivityPanel({
       </div>
       {activityView && (
         <div className="day-program-panel">
+          {!siteSpecific && (
+            <div className="day-program-week">
+              <span>Weekly repertoire</span>
+              <div className="track-tabs">
+                {rotationDays.map((d) => (
+                  <button
+                    key={d}
+                    aria-pressed={rotation === d}
+                    onClick={() => chooseRotation(d)}
+                  >
+                    {dayLabels[d]}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="day-program-topline">
             <label htmlFor="day-session">Day room program</label>
             <select
@@ -341,6 +399,26 @@ export function ActivityPanel({
             {session.title}
             {guest && <span> · with {guest.name}</span>}
           </strong>
+          <div className="day-program-tags day-program-chips">
+            {session.cultures.map((c) => (
+              <span key={'culture:' + c} title="Culture">
+                {c}
+              </span>
+            ))}
+            {session.languages.map((l) => (
+              <span
+                key={'language:' + l}
+                className="chip-language"
+                title="Language"
+              >
+                {l}
+              </span>
+            ))}
+            <span className="chip-format">{formatLabels[session.format]}</span>
+            {session.season && (
+              <span className="chip-format">{session.season}</span>
+            )}
+          </div>
           <p>{session.culture}</p>
           <p className="day-program-access">{session.access}</p>
           <div className="day-program-tags">
@@ -352,7 +430,7 @@ export function ActivityPanel({
           <small>
             {siteSpecific
               ? 'Activities use the existing room furniture. Choose a session, then play or follow its interaction track.'
-              : 'Open floor, long arts table and tea corner run at once · Illustrative rotation · Choose a session, then play or follow its interaction track.'}
+              : 'Open floor, long arts table and tea corner run at once · Illustrative weekly repertoire · Choose a day and session, then play or follow its interaction track.'}
           </small>
         </div>
       )}
@@ -432,7 +510,9 @@ export function ActivityPanel({
         <div className="activity-follow">
           <Eye size={15} />
           <span>
-            <b>{selected.label}</b>
+            <b>
+              {selected.id === trackOf(session) ? session.title : selected.label}
+            </b>
             {currentStage?.title !== selected.label &&
               ` · ${currentStage?.title || 'Between activities'}`}
           </span>
@@ -599,9 +679,7 @@ export function ActivityPanel({
                   change({ filter: e.target.value, follow: null })
                 }
               >
-                <option value="all">
-                  All {activityData.actors.length} people
-                </option>
+                <option value="all">All {people} people</option>
                 <option value="staff">Staff only</option>
                 {activityData.roles.map((r) => (
                   <option key={r} value={r}>
@@ -717,8 +795,7 @@ export function ActivityPanel({
       )}
       <div className="activity-caption">
         <span>
-          Continuous loop · {activityData.actors.length} people ·{' '}
-          {activityData.roles.length} roles
+          Continuous loop · {people} people · {activityData.roles.length} roles
         </span>
         <span>Representative care day · illustrative times</span>
       </div>

@@ -5,6 +5,7 @@ import {
   dayProgram as program,
   floorPrograms,
   instructorOf,
+  zoneSessions,
   type DaySession,
   type DayZone,
 } from './day-program';
@@ -12,7 +13,17 @@ import type { ActorSpec, ActorSample } from './activity';
 import { ERHU, type Action, type createCharacter } from './characters';
 import type { Facility } from './schema';
 
-export { dayProgram, programAt } from './day-program';
+export {
+  dayProgram,
+  isRotationDay,
+  programAt,
+  programRotation,
+  resolveRotation,
+  rotationDays,
+  setProgramRotation,
+  subscribeProgramRotation,
+  type RotationDay,
+} from './day-program';
 type Person = ReturnType<typeof createCharacter> & {
   spec: ActorSpec;
   sample: ActorSample;
@@ -1916,7 +1927,7 @@ export function buildDayRoom(actors: Person[], model?: Facility) {
   // Zones run their own sessions side by side; the open floor comes first.
   const zones: ZoneState[] = program.zones.map((zone) => ({
     zone,
-    sessions: program.programs.filter((s) => s.zone === zone.id),
+    sessions: zoneSessions(zone.id),
     current: null,
     position: new T.Vector3(zone.anchor[0], zone.labelHeight, zone.anchor[1]),
   }));
@@ -2543,7 +2554,9 @@ export function buildDayRoom(actors: Person[], model?: Facility) {
     decor.push({ id, root: group });
     return group;
   };
-  const decorIds = new Set(program.programs.flatMap(decorOf));
+  const decorIds = new Set(
+    [...program.programs, ...program.repertoire].flatMap((s) => s.decor),
+  );
   // Festival lanterns: a stage row on the front truss, above the performer
   // and the first rows; for the riddle circle, a ring over the circle.
   const circleSlots = program.floor.formations.circle.slots,
@@ -3515,9 +3528,18 @@ export function buildDayRoom(actors: Person[], model?: Facility) {
     sway = new T.Euler();
   const titleOf = (label: string, labelZh?: string) =>
     labelZh ? `${labelZh} ${label}` : label;
+  const cohort = actors.filter((a) => a.spec.programMode);
+  const floorGuests = new Set(
+    floorPrograms.flatMap((s) => {
+      const g = s.instructorId ? byId.get(s.instructorId) : undefined;
+      return g ? [g] : [];
+    }),
+  );
+  const acting = new Map<Person, string>();
   function tick(time: number) {
     const t = ((time % DAY) + DAY) % DAY;
     let changed = false;
+    floor.sessions = zoneSessions('floor');
     for (const z of tracks) {
       let next = z.sessions[z.sessions.length - 1];
       for (const s of z.sessions)
@@ -3534,9 +3556,7 @@ export function buildDayRoom(actors: Person[], model?: Facility) {
     root.userData.programId = session.id;
     if (changed) {
       screen.visible = !!formationOf(session)?.board;
-      screenPanels.forEach(
-        (g, i) => (g.visible = floorPrograms[i].id === session.id),
-      );
+      screenPanels.forEach((g, i) => (g.visible = i === session.slot));
       for (const d of decor)
         d.root.visible = zones.some((z) => decorOf(z.current!).includes(d.id));
       for (const s of tableSetMeshes) s.root.visible = false;
@@ -3556,7 +3576,7 @@ export function buildDayRoom(actors: Person[], model?: Facility) {
             labelZh: s.labelZh,
             subtitle: guest ? `with ${guest.name}` : 'with the activities team',
             position,
-            follow: 'interaction:day-' + s.id,
+            follow: 'interaction:day-' + (s.baseId ?? s.id),
           };
         }),
         ...tables.map(({ tableId, current, position }): DayHighlight => {
@@ -3580,7 +3600,7 @@ export function buildDayRoom(actors: Person[], model?: Facility) {
     // Formation furniture arrives once the class has walked to its places.
     const settled = t >= session.start + transition;
     for (const l of layout)
-      l.root.visible = settled && l.sessions.includes(session.id);
+      l.root.visible = settled && l.sessions.includes(session.baseId!);
     // Each activity chair stands wherever its member sits down.
     for (const { actor, root: chair } of chairs) {
       chair.visible = actor.root.visible && !!actor.sample.seated;
@@ -3589,11 +3609,45 @@ export function buildDayRoom(actors: Person[], model?: Facility) {
       chair.rotation.y = actor.root.rotation.y;
       chair.scale.copy(actor.root.scale);
     }
+    // Other weekdays run repertoire programs in the baked floor slots: the
+    // class keeps its places and walks but takes the program's gestures, and
+    // a slot's guest instructor appears only for the program they lead.
+    acting.clear();
+    if (session.id !== session.baseId) {
+      const base = floorPrograms[session.slot!];
+      for (const a of cohort) {
+        const { action, seated } = a.sample,
+          mode = a.spec.programMode;
+        if (!a.root.visible || action === 'walk' || action === 'roll') continue;
+        const next =
+          mode === 'support'
+            ? null
+            : mode === 'leader'
+              ? action === base.leaderAction
+                ? session.leaderAction
+                : null
+              : session.action;
+        if (!next || next === action) continue;
+        a.pose(
+          next as Action,
+          time + a.spec.offset,
+          mode === 'wheelchair' ? 0.65 : 1,
+          seated,
+        );
+        acting.set(a, next);
+      }
+    }
+    for (const g of floorGuests)
+      if (g.spec.id !== session.instructorId) g.root.visible = false;
     for (const p of props)
       p.root.visible =
         (!p.world || p.actor.root.visible) &&
-        p.actions.includes(p.actor.sample.action) &&
-        (!p.sessions || p.sessions.includes(p.zone.current!.id));
+        p.actions.includes(acting.get(p.actor) ?? p.actor.sample.action) &&
+        (!p.sessions ||
+          p.sessions.includes(
+            (p.zone.current as Partial<DaySession>).propsLike ??
+              p.zone.current!.id,
+          ));
     // Pieces and cards change hands on the motion's own phase.
     for (const m of timed) {
       if (!m.root.visible) continue;

@@ -10,7 +10,10 @@ import {
 } from '../work/validation/activity.mjs';
 import {
   dayProgram,
+  floorPrograms,
+  rotationDays,
   sessionsAt,
+  setProgramRotation,
   zoneSessions,
 } from '../work/validation/day-program.mjs';
 import {
@@ -250,7 +253,50 @@ for (const session of dayProgram.programs) {
   for (const d of room.decor)
     assert.equal(d.root.visible, running.has(d.id), `${d.id} décor at ${at}`);
 }
+// 8. Other weekdays re-skin the floor slots: labels, guests, board and décor
+// follow the day's program while the class keeps its baked places.
+const floorGuests = new Set(floorPrograms.map((s) => s.instructorId).filter(Boolean)),
+  actorById = new Map(activity.actors.map((a) => [a.spec.id, a])),
+  catalogue = new Map(
+    [...dayProgram.programs, ...dayProgram.repertoire].map((p) => [p.id, p]),
+  );
+let reskinned = 0;
+for (const day of rotationDays.filter((d) => d !== 'mon')) {
+  setProgramRotation(day);
+  for (const session of zoneSessions('floor')) {
+    const at = session.start + SHIFT + 20;
+    activity.setOptions({ time: at, playing: false, enabled: true });
+    const label = room.highlights().find((h) => h.zoneId === 'floor');
+    assert.equal(label.sessionId, session.id, `${day}: ${session.id} is labeled`);
+    if (session.labelZh) assert.ok(label.title.includes(session.labelZh));
+    const guest = dayProgram.instructors.find((i) => i.id === session.instructorId);
+    assert.equal(
+      label.subtitle,
+      guest ? `with ${guest.name}` : 'with the activities team',
+      `${day}: ${session.id} credits its own lead`,
+    );
+    assert.equal(label.follow, 'interaction:day-' + session.baseId);
+    for (const id of floorGuests)
+      assert.equal(
+        actorById.get(id).root.visible,
+        id === session.instructorId,
+        `${day} ${session.id}: ${id} appears only for its own program`,
+      );
+    assert.equal(
+      room.root.getObjectByName('day-program-display').visible,
+      !!FORMATIONS[session.formation].board,
+      `${day}: board follows the ${session.baseId} slot layout`,
+    );
+    const running = new Set(
+      sessionsAt(at).flatMap(({ session: s }) => catalogue.get(s.id).decor),
+    );
+    for (const d of room.decor)
+      assert.equal(d.root.visible, running.has(d.id), `${day} ${d.id} décor`);
+    if (session.id !== session.baseId) reskinned++;
+  }
+}
+setProgramRotation('mon');
 activity.dispose();
 console.log(
-  `Cultural program: ${dayProgram.programs.length} sessions in ${dayProgram.zones.length} concurrent zones; ${dayProgram.instructors.length} guest instructors in distinct attire; ≥2 guest-led activities and ≥${minEngaged} engaged participants at all times; movements differ by ≥${closest.toFixed(2)} rad; ${layouts.size} floor layouts with groups of ${Math.min(...groupSizes)}–${Math.max(...groupSizes)}, class ≥${closestPair.toFixed(2)} m apart; ≥${fewestKinds} table activities at once; ${decorIds.size} décor sets, zone and table labels, board only when needed.`,
+  `Cultural program: ${dayProgram.programs.length} sessions in ${dayProgram.zones.length} concurrent zones; ${dayProgram.instructors.length} guest instructors in distinct attire; ≥2 guest-led activities and ≥${minEngaged} engaged participants at all times; movements differ by ≥${closest.toFixed(2)} rad; ${layouts.size} floor layouts with groups of ${Math.min(...groupSizes)}–${Math.max(...groupSizes)}, class ≥${closestPair.toFixed(2)} m apart; ≥${fewestKinds} table activities at once; ${decorIds.size} décor sets, zone and table labels, board only when needed; ${reskinned} Tue–Fri floor slots re-skinned with their own labels, guests and décor.`,
 );

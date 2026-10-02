@@ -8954,6 +8954,8 @@
             0,
             0,
             0,
+            0,
+            0,
             0
           ],
           "visible": true,
@@ -31678,7 +31680,6 @@
       "category": "activities",
       "actorIds": [
         "arrival-walker",
-        "instructor-papercut",
         "instructor-papercut"
       ],
       "start": 250.3696112679053,
@@ -31747,7 +31748,6 @@
       "actorIds": [
         "arrival-cane",
         "arrival-aide-a",
-        "instructor-papercut",
         "instructor-papercut"
       ],
       "start": 240.89213562373095,
@@ -31800,8 +31800,6 @@
       "category": "activities",
       "actorIds": [
         "arrival-independent",
-        "instructor-papercut",
-        "instructor-calligraphy",
         "instructor-papercut",
         "instructor-calligraphy"
       ],
@@ -31883,7 +31881,6 @@
       "actorIds": [
         "arrival-wheelchair",
         "arrival-aide-b",
-        "instructor-calligraphy",
         "instructor-calligraphy"
       ],
       "start": 400.8115530061469,

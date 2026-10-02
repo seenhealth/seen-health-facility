@@ -549,9 +549,19 @@ for a in loop['actors']:
         if not any(crosses_floor(p) for p in samples):
             continue
         s['path'] = route(s['path'][0], s['path'][-1])
+        if 'heights' in s:
+            # Floor reroutes stay on one level; keep a height per point.
+            assert len(set(s['heights'])) == 1, f"{a['id']} reroute changes level"
+            s['heights'] = [s['heights'][0]] * len(s['path'])
         length = sum(dist(p, q) for p, q in zip(s['path'], s['path'][1:]))
         rerouted.append((a['id'], round(length / (s['end'] - s['start']), 2)))
 assert all(speed <= 1.3 for _, speed in rerouted), f'Rerouted walks stay at a comfortable pace: {rerouted}'
+# Earlier reroutes left stale per-point heights; one level, so one height per point.
+for a in loop['actors']:
+    for s in a['segments']:
+        if 'heights' in s and len(s['heights']) != len(s['path']):
+            assert len(set(s['heights'])) == 1, f"{a['id']} {s['title']} changes level"
+            s['heights'] = [s['heights'][0]] * len(s['path'])
 
 # Escorts mirror their participant's itinerary; keep their copies in step.
 for escort in (a for a in loop['actors'] if a.get('escortFor')):
@@ -559,6 +569,8 @@ for escort in (a for a in loop['actors'] if a.get('escortFor')):
     for s, l in zip(escort['segments'], leader['segments']):
         if s['zoneId'] == 'day':
             s.update(action=l['action'], title=l['title'], path=l['path'])
+            if 'heights' in l:
+                s['heights'] = l['heights']
 for i in loop['interactions']:
     if not i['id'].startswith('arrival-') or '-visit-' not in i['id']:
         continue
@@ -568,7 +580,7 @@ for i in loop['interactions']:
         continue
     teachers = [s['instructorId'] for s in sessions('arts-table') if min(s['end'], i['end']) - max(s['start'], i['start']) > 1]
     i['label'] = ' · '.join(i['label'].split(' · ')[:-1] + ['Arts table visit'])
-    i['actorIds'] = [id for id in i['actorIds'] if id != 'activities-lead'] + list(dict.fromkeys(teachers))
+    i['actorIds'] = list(dict.fromkeys([id for id in i['actorIds'] if id != 'activities-lead'] + teachers))
 
 # ---- Interactions: one per zone session and one per table activity.
 for s in program['programs']:

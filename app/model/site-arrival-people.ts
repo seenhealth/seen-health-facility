@@ -1,8 +1,7 @@
 import type { Facility, Vec3 } from './schema';
 import type { ActorSpec, ActivityData, Segment } from './activity';
 import type { Action } from './characters';
-import { vanWindows } from './arrival';
-import { siteArrivalLayout } from './site-arrival';
+import { siteArrivalLayout, siteVanWindows } from './site-arrival';
 
 type Route = Vec3[];
 const length = (path: Route) =>
@@ -37,6 +36,7 @@ export function addSiteArrivalPeople(
   interactions: ActivityData['interactions'],
 ) {
   const layout = siteArrivalLayout(model),
+    vanWindows = siteVanWindows(model),
     olympic = model.contextStyle === 'olympic';
   const participants = actors.filter(
     (a) => a.roomId === 'ground-lobby' && a.role === 'participant',

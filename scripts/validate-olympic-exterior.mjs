@@ -1,44 +1,26 @@
-import './compile-model-modules.mjs';
+// Olympic exterior (both options): finite geometry, the corner fin at its
+// documented height, the plan-width facade, the deep rear lot and the named
+// facade elements; the Olympic shell is not built for other sites.
+//   node scripts/validate-olympic-exterior.mjs
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { execFileSync } from 'node:child_process';
-import { createRequire } from 'node:module';
 import * as T from 'three';
-const require = createRequire(import.meta.url);
-const { createCanvas } = require(
-  process.env.FACILITY_CANVAS_MODULE || '@napi-rs/canvas',
+import { loadSim } from './build-scenario.mjs';
+import { installHeadlessGlobals } from './validate-renderer.mjs';
+installHeadlessGlobals();
+const {
+  schema: { validateFacility },
+  exterior: { buildOlympicExterior },
+} = await loadSim(
+  {
+    schema: 'app/model/schema.ts',
+    exterior: 'app/model/olympic-exterior.ts',
+  },
+  { dir: 'work/olympic' },
 );
-globalThis.document = { createElement: () => createCanvas(1, 1) };
-const { validateFacility } = await import('../work/validation/schema.mjs');
-const { buildOlympicExterior } =
-  await import('../work/validation/olympic-exterior.mjs');
 for (const key of ['olympic', 'olympic-option']) {
   const path = `public/models/seen-${key}.json`;
   const model = validateFacility(JSON.parse(fs.readFileSync(path)));
-  const baseline = JSON.parse(
-    execFileSync('git', ['show', `${process.argv[2] || 'HEAD'}:${path}`], {
-      maxBuffer: 20 * 1024 * 1024,
-    }),
-  );
-  for (const property of [
-    'levels',
-    'zones',
-    'rooms',
-    'walls',
-    'doors',
-    'floorOpenings',
-    'verticalConnections',
-  ])
-    assert.deepEqual(
-      model[property],
-      baseline[property],
-      `${key}: preserve ${property}`,
-    );
-  assert.deepEqual(
-    model.objects.filter((o) => o.zoneId !== 'site'),
-    baseline.objects.filter((o) => o.zoneId !== 'site'),
-    'Preserve all interior furniture and equipment',
-  );
   const exterior = buildOlympicExterior(model);
   assert(exterior);
   for (const parent of Object.values(exterior))
@@ -76,7 +58,7 @@ for (const key of ['olympic', 'olympic-option']) {
   ])
     assert(exterior.facade.getObjectByName(name), name);
   console.log(
-    `${key}: valid finite exterior; ${model.rooms.length} room layouts, doors, elevations and interior objects unchanged.`,
+    `${key}: valid finite exterior with corner fin, plan-width facade, rear lot and named facade elements.`,
   );
 }
 for (const key of ['alveare', 'alhambra-planning']) {

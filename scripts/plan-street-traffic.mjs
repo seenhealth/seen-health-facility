@@ -8,7 +8,8 @@ import {
   streetTripProgress,
 } from '../work/validation/traffic-routes.mjs';
 import { vehicleGap } from '../work/validation/vehicle-clearance.mjs';
-const step = 0.1,
+// Sampled at the validator's 50 Hz so that a crossing judged clear here is clear there.
+const step = 0.02,
   duration = 720,
   tripDuration = 120,
   margin = 0.85;
@@ -22,7 +23,7 @@ const conflict = (a, b) =>
   Math.abs(a.position.x - b.position.x) < 12 &&
   Math.abs(a.position.z - b.position.z) < 12 &&
   vehicleGap(a, b) < margin;
-const fixed = Array.from({ length: 7201 }, (_, frame) => [
+const fixed = Array.from({ length: Math.round(duration / step) + 1 }, (_, frame) => [
   ...Array.from({ length: 8 }, (_, i) =>
     body(sampleVan(i, frame * step), 'van'),
   ),
@@ -36,7 +37,7 @@ for (let i = 0; i < 2; i++) {
   for (let frame = 0; frame < fixed.length; frame++)
     if (fixed[frame].some((p) => conflict(hold[i], p)))
       throw Error(`Unsafe holding point ${i} at ${frame * step}`);
-  const samples = Array.from({ length: 1201 }, (_, j) =>
+  const samples = Array.from({ length: Math.round(tripDuration / step) + 1 }, (_, j) =>
     body(streetRoute(i, streetTripProgress(j * step, tripDuration)), 'car'),
   );
   let earliest = 0;

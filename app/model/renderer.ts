@@ -20,11 +20,15 @@ import {
   PoissonDenoiseShader,
   generatePdSamplePointInitializer,
 } from 'three/addons/shaders/PoissonDenoiseShader.js';
-import {
-  mergeGeometries,
-  mergeVertices,
-} from 'three/addons/utils/BufferGeometryUtils.js';
 import { buildAsset } from './assets';
+import { mergeByMaterial } from './batch';
+import {
+  roomFinish,
+  wallMeshes,
+  zoneFloor,
+  zoneSlab,
+} from './facility-geometry';
+import { CUTAWAY_HEIGHT, PRESENTATION } from './presentation';
 import { buildEnvelopeWall, buildRoofGeometry } from './envelope';
 import { buildNeighborhood } from './neighborhood';
 import { createSiteActivity } from './site-activity';
@@ -34,6 +38,10 @@ import { buildAlhambraExterior } from './alhambra-exterior';
 import { buildAlveareExterior } from './alveare-exterior';
 import { buildRoomLabels } from './room-labels';
 import { createActivity, type ActivitySource } from './activity';
+import { alhambraSource } from './alhambra-source';
+import { COMMUNITY_SOURCE_ID, COMMUNITY_VIEW } from './community-settings';
+import { buildCommunityLayer } from './community-layer';
+import { registerCommunityVehicles } from './community-vehicles';
 import {
   center,
   type Facility,
@@ -43,72 +51,6 @@ import {
 
 /** Warm drawing-paper backdrop shared with the page behind the canvas. */
 export const PAPER = '#f3f0e9';
-/**
- * Presentation finishes for the architectural-model look: warm whites, light
- * oak, pale stone and muted accents. Hues follow the photographed interior;
- * the facility JSON keeps its source colors, so this is a rendering layer only.
- */
-const PRESENTATION: Record<string, Partial<MaterialSpec>> = {
-  wall: { color: '#f5f3ee', roughness: 0.92 },
-  tile: { color: '#ebe6dc', roughness: 0.55, pattern: 'stone' },
-  vinyl: { color: '#ece8e0', roughness: 0.6 },
-  wood: { color: '#e4d1b0', roughness: 0.6 },
-  sports: { color: '#decdaf', roughness: 0.6 },
-  carpet: { color: '#cdc6b8', roughness: 1 },
-  pattern: { color: '#e2ded5', roughness: 0.8 },
-  concrete: { color: '#dedad2', roughness: 0.95 },
-  oak: { color: '#dcc49c', roughness: 0.6 },
-  chair: { color: '#eee7d9', roughness: 0.8 },
-  table: { color: '#f5f3ee', roughness: 0.4 },
-  'clinical-blue': { color: '#a9b9ba' },
-  blue: { color: '#8ea9b3' },
-  metal: { color: '#c2c2bc', roughness: 0.35, metalness: 0.5 },
-  porcelain: { color: '#f4f3ee', roughness: 0.3 },
-  leaf: { color: '#8e9f7e', roughness: 0.95 },
-  cabinet: { color: '#ece8df' },
-  screen: { color: '#262c2e', roughness: 0.28 },
-  car: { color: '#d9d6cf' },
-  glass: { color: '#d3dfde', roughness: 0.08, metalness: 0.1, opacity: 0.42 },
-  frame: { color: '#5f6461' },
-  canopy: { color: '#5c7690' },
-  light: { color: '#f6efe0' },
-  'wet-tile': { color: '#d5dcd6', roughness: 0.5 },
-  'dining-chair': { color: '#936f53' },
-  'office-blue': { color: '#91a3a7' },
-  'lounge-blue': { color: '#8f9fb0' },
-  'grey-seat': { color: '#d4d1c9' },
-  'clinical-seat': { color: '#d5dbce' },
-  'photo-carpet': { color: '#d9d2c3' },
-  'photo-teal': { color: '#88aba9' },
-  'photo-tan-mesh': { color: '#bb9f7e' },
-  'photo-blue-grey': { color: '#b4c0bc' },
-  'photo-blue-seat': { color: '#b5ccc9' },
-  'photo-chair-wood': { color: '#a47d57' },
-  'photo-brown-counter': { color: '#aa9587' },
-  'photo-mustard': { color: '#c6ad73' },
-  'photo-yellow': { color: '#e8ddbd' },
-  'photo-lattice-blue': { color: '#6f9fb1' },
-  'photo-landscape-red': { color: '#ab6a53' },
-  'photo-landscape-ochre': { color: '#c9a579' },
-  'photo-moss': { color: '#5e7752' },
-  'photo-teal-tile': { color: '#bccdc8' },
-  'photo-facade': { color: '#e4dbcc' },
-  'photo-black': { color: '#2e3130' },
-  'photo-red-cart': { color: '#b4675c' },
-  'upperfit-floor': { color: '#d8cebe' },
-  'upperfit-wall': { color: '#ece5d8' },
-  'upperfit-blue': { color: '#b3c5c5' },
-  'upperfit-divider': { color: '#b6b7b1' },
-  'upperfit-wood': { color: '#cfb086' },
-  'upperfit-mesh': { color: '#c2b79e' },
-  'fleet-teal': { color: '#174a49' },
-  'fleet-glass': { color: '#2b3335', roughness: 0.25 },
-  'rehab-blue': { color: '#8199a9' },
-  '#e4e5df': { color: '#f0eee9', roughness: 0.9 },
-  '#dfdfd8': { color: '#ebe8e2', roughness: 0.9 },
-};
-/** Thin, slightly darker coping on cut interior walls: a drawn section line. */
-const WALL_CAP = '#b9b1a4';
 /** 'high' adds ambient occlusion and larger soft shadows; 'balanced' renders directly. */
 export type ViewerQuality = 'high' | 'balanced';
 const prefersBalanced = () =>
@@ -386,6 +328,11 @@ export type ViewerState = {
   ceilings: boolean;
   sectionAxis: 'none' | 'x' | 'y' | 'z';
   section: number;
+  /**
+   * The distributed-care settings around the center (homes, pharmacy,
+   * hospital, partners). Shown with the site context; undefined means shown.
+   */
+  community?: boolean;
 };
 export const defaultState: ViewerState = {
   selected: null,
@@ -406,6 +353,7 @@ export const defaultState: ViewerState = {
   ceilings: false,
   sectionAxis: 'none',
   section: 0.5,
+  community: true,
 };
 /**
  * A declarative camera position for scripted views such as the scroll story.
@@ -437,6 +385,12 @@ export type ViewerOptions = {
   labels?: boolean;
   /** Keep the street and neighbors visible while levels are stacked apart. */
   keepSiteWhenStacked?: boolean;
+  /**
+   * Resolves community facility URLs (registry `facility.url`) to validated
+   * specifications; the story resolves them against its asset base. Default:
+   * fetch the root-relative URL.
+   */
+  loadFacility?: (url: string) => Promise<Facility>;
 };
 const SHOT_DISTANCE = 150;
 export function createViewer(
@@ -497,7 +451,9 @@ export function createViewer(
   // environment for material response and a warm, low-contrast key.
   scene.add(new T.HemisphereLight('#fbfaf6', '#d8d4cc', 1.1));
   const pmrem = new T.PMREMGenerator(renderer);
-  const environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  const roomEnvironment = new RoomEnvironment();
+  const environment = pmrem.fromScene(roomEnvironment, 0.04).texture;
+  roomEnvironment.dispose();
   pmrem.dispose();
   scene.environment = environment;
   scene.environmentIntensity = 0.45;
@@ -529,8 +485,11 @@ export function createViewer(
   const maxAnisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
   const textures: T.Texture[] = [],
     materials = new Map<string, T.MeshStandardMaterial>();
-  const finish = (id: string): MaterialSpec => ({
-    ...(model.materials[id] || {
+  // Finishes and materials resolve against a facility's own `materials`
+  // (the viewer's model by default, or a facility stamped on a community
+  // pad), then the presentation palette.
+  const finish = (id: string, source: Facility = model): MaterialSpec => ({
+    ...(source.materials[id] || {
       color: id.startsWith('#') ? id : '#dce1d8',
       roughness: 0.8,
     }),
@@ -677,9 +636,10 @@ export function createViewer(
     textures.push(tex);
     return tex;
   }
-  const mat = (id: string) => {
-    if (!materials.has(id)) {
-      const d = finish(id);
+  const mat = (id: string, source: Facility = model) => {
+    const key = source === model ? id : `${source.id}::${id}`;
+    if (!materials.has(key)) {
+      const d = finish(id, source);
       let surfaceMap: T.Texture | null = d.pattern ? pattern(d.pattern) : null;
       if (d.textureUrl) {
         materialLoads.push(
@@ -701,7 +661,7 @@ export function createViewer(
         );
       }
       materials.set(
-        id,
+        key,
         new T.MeshStandardMaterial({
           color: d.color,
           roughness: d.roughness,
@@ -714,7 +674,7 @@ export function createViewer(
         }),
       );
     }
-    return materials.get(id)!;
+    return materials.get(key)!;
   };
   const mesh = (
     g: T.Object3D,
@@ -796,29 +756,17 @@ export function createViewer(
       (z.elevationOffset || 0);
     scene.add(g);
     groups.set(z.id, g);
-    const sh = floorShapes(
-        z.polygon,
-        (model.floorOpenings || []).filter(
-          (o) => o.zoneId === z.id && o.levelId === z.levelId,
-        ),
-      ),
-      slab = new T.ExtrudeGeometry(sh, {
-        depth: z.slabDepth || 0.19,
-        bevelEnabled: false,
-      });
-    slab.rotateX(-Math.PI / 2);
-    mesh(g, slab, mat('concrete'), 0, -(z.slabDepth || 0.19) - 0.01, 0);
-    const geo = new T.ShapeGeometry(sh);
-    geo.rotateX(-Math.PI / 2);
-    const uv = geo.attributes.uv;
-    const p = geo.attributes.position;
-    for (let i = 0; i < p.count; i++) uv.setXY(i, p.getX(i) / 2, p.getZ(i) / 2);
-    const f = mesh(g, geo, mat(z.floorMaterial).clone());
+    const openings = (model.floorOpenings || []).filter(
+      (o) => o.zoneId === z.id && o.levelId === z.levelId,
+    );
+    g.add(zoneSlab(z, openings, mat('concrete')));
+    const f = zoneFloor(z, openings, mat(z.floorMaterial).clone());
+    g.add(f);
     f.name = `zone-floor-${z.id}`;
     f.userData = { zone: z.id };
     floorMap.set(z.id, f);
     pickables.push(f);
-    const ov = geo.clone();
+    const ov = f.geometry.clone();
     mapUV(ov, z.levelId);
     const overlay = mesh(
       g,
@@ -848,29 +796,14 @@ export function createViewer(
     labels.set(z.id, label);
   });
   model.rooms.forEach((r) => {
-    const geo = new T.ShapeGeometry(
-      floorShapes(
-        r.polygon,
-        (model.floorOpenings || []).filter(
-          (o) => o.zoneId === r.zoneId && o.levelId === r.levelId,
-        ),
-      ),
+    const openings = (model.floorOpenings || []).filter(
+      (o) => o.zoneId === r.zoneId && o.levelId === r.levelId,
     );
+    const geo = new T.ShapeGeometry(floorShapes(r.polygon, openings));
     geo.rotateX(-Math.PI / 2);
     if (r.floorMaterial) {
-      const floorGeo = geo.clone(),
-        uv = floorGeo.attributes.uv,
-        p = floorGeo.attributes.position;
-      for (let i = 0; i < p.count; i++)
-        uv.setXY(i, p.getX(i) / 2, p.getZ(i) / 2);
-      const finish = mesh(
-        groups.get(r.zoneId)!,
-        floorGeo,
-        mat(r.floorMaterial),
-        0,
-        0.004,
-        0,
-      );
+      const finish = roomFinish(r, openings, mat(r.floorMaterial));
+      groups.get(r.zoneId)!.add(finish);
       finish.name = `room-finish-${r.id}`;
       finish.userData = { zone: r.zoneId, room: r.id };
       roomFinishes.push(finish);
@@ -894,8 +827,6 @@ export function createViewer(
     pickables.unshift(m);
   });
   model.walls.forEach((w) => {
-    const dx = w.b[0] - w.a[0],
-      dz = w.b[1] - w.a[1];
     // The traced Alhambra plan also contains solid perimeter strokes. Let
     // the opening-aware envelope replace those strokes in assembled views.
     const perimeter =
@@ -919,40 +850,10 @@ export function createViewer(
             );
           });
         }));
-    const g = wallGroups.get(w.zoneId)!;
-    const m = box(
-      g,
-      (w.a[0] + w.b[0]) / 2,
-      0,
-      (w.a[1] + w.b[1]) / 2,
-      Math.hypot(dx, dz),
-      w.height,
-      w.thickness,
-      w.material,
-    );
-    m.rotation.y = -Math.atan2(dz, dx);
-    m.userData = {
-      id: w.id,
-      height: w.height,
-      perimeter,
-    };
-    const cap = box(
-      g,
-      (w.a[0] + w.b[0]) / 2,
-      w.height,
-      (w.a[1] + w.b[1]) / 2,
-      Math.hypot(dx, dz) + 0.004,
-      0.02,
-      w.thickness + 0.006,
-      WALL_CAP,
-    );
-    cap.castShadow = false;
-    cap.rotation.y = m.rotation.y;
-    cap.userData = {
-      cap: true,
-      height: w.height,
-      perimeter,
-    };
+    const [m, cap] = wallMeshes(w, mat);
+    m.userData.perimeter = perimeter;
+    cap.userData.perimeter = perimeter;
+    wallGroups.get(w.zoneId)!.add(m, cap);
   });
   const context = new T.Group();
   context.name = 'site-context';
@@ -994,9 +895,33 @@ export function createViewer(
   if (olympicExterior) context.add(olympicExterior.site);
   if (alhambraExterior) context.add(alhambraExterior.site);
   if (alveareExterior) context.add(alveareExterior.site);
-  const activity = model.contextStyle
-    ? createSiteActivity(model, scene, mat)
-    : createActivity(model, scene, mat, options.activity);
+  // Models without a bespoke context style (Alhambra) play the composed
+  // Alhambra source (alhambra-source.ts): the care-day loop, the fleet crew
+  // and the distributed-care layer. When that source carries the community
+  // view, its vehicles register with the engine (so riders sit in them) and
+  // the layer's pads and vehicle bodies are built.
+  const source = model.contextStyle
+    ? null
+    : alhambraSource(model, options.activity);
+  const withCommunity = !!source?.views?.some(
+    (v) => v.id === COMMUNITY_VIEW.id,
+  );
+  const activity = source
+    ? createActivity(
+        model,
+        scene,
+        mat,
+        source,
+        withCommunity ? registerCommunityVehicles : undefined,
+      )
+    : createSiteActivity(model, scene, mat);
+  const community = withCommunity
+    ? buildCommunityLayer(model, mat, {
+        loadFacility: options.loadFacility,
+        materialFor: (f) => (id) => mat(id, f),
+      })
+    : null;
+  if (community) context.add(community.root);
   const furnitureRoots: T.Group[] = [];
   const exteriorAssets: T.Group[] = [],
     roofAssets: T.Group[] = [];
@@ -1217,7 +1142,7 @@ export function createViewer(
     // Full shell is a global assembled layer; these independent copies follow
     // zone explosion and level visibility in interior inspection modes.
     const wall = buildEnvelopeWall({ ...w, detailIds: undefined }, mat);
-    const cut = buildEnvelopeWall(w, mat, 1.2);
+    const cut = buildEnvelopeWall(w, mat, CUTAWAY_HEIGHT);
     interior.add(wall, cut);
     interiorShells.push({ full: wall, cut, zoneId: w.zoneId });
   }
@@ -1266,35 +1191,6 @@ export function createViewer(
   );
   scene.add(roomOutline);
   roomOutline.visible = false;
-  // Group geometry by material inside each instance: keeps IDs and future swaps independent.
-  function batch(group: T.Group) {
-    const meshes: T.Mesh[] = [];
-    group.traverse((o) => {
-      if (o instanceof T.Mesh && !Array.isArray(o.material)) meshes.push(o);
-    });
-    group.updateWorldMatrix(true, true);
-    const inverse = group.matrixWorld.clone().invert(),
-      buckets = new Map<T.Material, T.BufferGeometry[]>();
-    for (const m of meshes) {
-      const geo = m.geometry
-        .clone()
-        .applyMatrix4(inverse.clone().multiply(m.matrixWorld));
-      const key = m.material as T.Material;
-      (buckets.get(key) || buckets.set(key, []).get(key)!).push(
-        geo.index ? geo.toNonIndexed() : geo,
-      );
-    }
-    group.clear();
-    buckets.forEach((gs, ma) => {
-      const geo = mergeGeometries(gs);
-      if (geo) {
-        mesh(group, mergeVertices(geo, 0.000001), ma);
-        geo.dispose();
-      }
-      gs.forEach((g) => g.dispose());
-    });
-    meshes.forEach((m) => m.geometry.dispose());
-  }
   const sharedFurniture = new Map<string, T.Object3D[]>();
   furnitureRoots.forEach((g) => {
     const spec = model.assets[g.userData.assetId];
@@ -1328,7 +1224,8 @@ export function createViewer(
       g.clear();
       g.add(...cached.map((o) => o.clone()));
     } else {
-      batch(g);
+      // Group geometry by material inside each instance: keeps IDs and future swaps independent.
+      mergeByMaterial(g);
       if (reusable)
         sharedFurniture.set(
           g.userData.assetId,
@@ -1389,7 +1286,10 @@ export function createViewer(
   };
   function update(next: ViewerState) {
     state = next;
-    activity.updateView(next);
+    activity.updateView({
+      ...next,
+      hiddenSources: next.community === false ? [COMMUNITY_SOURCE_ID] : [],
+    });
     ground.visible = state.plan;
     neighborhood.root.visible = !state.plan;
     if (siteMassing)
@@ -1534,7 +1434,7 @@ export function createViewer(
             state.walls === 'hidden' || sourceOverlay
               ? 0
               : state.walls === 'cutaway'
-                ? Math.min(1.2, h)
+                ? Math.min(CUTAWAY_HEIGHT, h)
                 : h;
         if (o.userData.cap) o.position.y = cut - 0.004;
         else {
@@ -1584,6 +1484,23 @@ export function createViewer(
         state.stack > 0.05 &&
         !options.keepSiteWhenStacked
       );
+    if (community) {
+      // Like the ring streets, the 3D pads stay out of the flat plan view.
+      community.root.visible = state.community !== false && !state.plan;
+      // The network's pads receive shadows only while the layer is on screen;
+      // otherwise the map keeps its finer building shadows.
+      const extent =
+        context.visible && community.root.visible ? community.shadowExtent : 65;
+      if (sun.shadow.camera.right !== extent) {
+        Object.assign(sun.shadow.camera, {
+          left: -extent,
+          right: extent,
+          top: extent,
+          bottom: -extent,
+        });
+        sun.shadow.camera.updateProjectionMatrix();
+      }
+    }
     facade.visible =
       state.exterior &&
       !state.plan &&
@@ -1655,6 +1572,35 @@ export function createViewer(
     zoomTarget = T.MathUtils.clamp(30 / Math.max(size.x, size.y), 1.35, 8);
     finishFocus(instant);
   }
+  /**
+   * Frame the whole distributed-care network, or one setting's pad. When the
+   * camera looks at a pad's back, it first orbits round (keeping elevation
+   * and distance) so the pad's front, where the drop-off happens, faces it.
+   */
+  function focusSetting(id?: string) {
+    const framing = community?.frame(id);
+    if (!framing) {
+      focus(null);
+      return;
+    }
+    if (framing.azimuth !== undefined) {
+      const offset = camera.position.clone().sub(controls.target),
+        current = Math.atan2(offset.x, offset.z),
+        off = Math.atan2(
+          Math.sin(current - framing.azimuth),
+          Math.cos(current - framing.azimuth),
+        );
+      if (Math.abs(off) > 1.2)
+        offset.applyAxisAngle(
+          new T.Vector3(0, 1, 0),
+          framing.azimuth + Math.sign(off) * 0.6 - current,
+        );
+      camera.position.copy(controls.target).add(offset);
+      controls.update();
+    }
+    focusTarget = new T.Vector3(...framing.target);
+    zoomTarget = framing.zoom;
+  }
   function focusSiteObjects(ids: string[], instant = false) {
     scene.updateMatrixWorld(true);
     const bounds = new T.Box3();
@@ -1693,6 +1639,7 @@ export function createViewer(
       camera.position.copy(c).add(new T.Vector3(48, 19, 95));
     else camera.position.copy(c).add(new T.Vector3(65, 85, 100));
     controls.update();
+    if (mode === 'community') focusSetting();
   }
   let tiltComposer: EffectComposer | null = null;
   let tiltHorizontal: ShaderPass | null = null,
@@ -2026,7 +1973,7 @@ export function createViewer(
           sub = document.createElement('span');
         el.type = 'button';
         el.className = 'day-highlight' + (h.kind === 'table' ? ' table' : '');
-        el.dataset.zone = h.zoneId || h.tableId || h.id;
+        el.setAttribute('data-zone', h.zoneId || h.tableId || h.id);
         el.style.display = 'none';
         title.className = 'day-highlight-title';
         zh.className = 'day-highlight-zh';
@@ -2150,6 +2097,7 @@ export function createViewer(
     }
     activity.tick(typeof document !== 'undefined' && document.hidden ? 0 : dt);
     neighborhood.tick(activity.getState().time);
+    community?.tick(activity.getState().time);
     // Entry leaves open for approaching transport parties, even with the design door toggle shut.
     if (model.contextStyle) {
       const travelers = activity.root.visible
@@ -2241,6 +2189,8 @@ export function createViewer(
     update,
     focus,
     focusSiteObjects,
+    focusSetting,
+    community,
     focusArrival: () => {
       focusTarget = activity.arrival.focus.clone();
       // Keep the stop and front desk above the care-day controls.
@@ -2265,9 +2215,10 @@ export function createViewer(
     followActor: (id: string | null) => {
       activity.setOptions({ follow: id });
       if (id) {
+        // A vehicle (any the engine registered) gets a wider frame than a person.
         zoomTarget = id.startsWith('interaction:')
           ? 4.5
-          : id.startsWith('van-')
+          : activity.vehicles.has(id)
             ? 3.3
             : 9;
         const p = activity.actorPosition(id);
@@ -2410,6 +2361,7 @@ export function createViewer(
       exportScene.add(f);
       const siteCopy = context.clone();
       siteCopy.visible = true;
+      siteCopy.getObjectByName('community-layer')?.removeFromParent();
       const sourcePlan = siteCopy.getObjectByName('source-plan-context');
       if (sourcePlan) sourcePlan.visible = false;
       const neighborhoodCopy = siteCopy.getObjectByName('neighborhood-3d');
@@ -2436,6 +2388,7 @@ export function createViewer(
       dimensions: model.dimensions.length,
     }),
     dispose: () => {
+      community?.dispose();
       stopRecording?.();
       disposed = true;
       cancelAnimationFrame(frame);
@@ -2463,9 +2416,9 @@ export function createViewer(
         m.dispose();
       });
       textures.forEach((t) => t.dispose());
+      // EffectComposer.dispose() frees its render targets, not its passes.
+      tiltComposer?.passes.forEach((pass) => pass.dispose());
       tiltComposer?.dispose();
-      tiltHorizontal?.dispose();
-      tiltVertical?.dispose();
       post?.dispose();
       environment.dispose();
       renderer.dispose();
