@@ -34436,11 +34436,11 @@
           },
           {
             "id": "shell-therapy-north-opening-2",
-            "offset": 8.6,
-            "width": 2.4,
-            "sill": 0.95,
-            "height": 1.5,
-            "kind": "window",
+            "offset": 8.1,
+            "width": 3.6,
+            "sill": 0,
+            "height": 2.3,
+            "kind": "door",
             "material": "om-glass"
           }
         ],

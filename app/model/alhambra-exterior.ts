@@ -318,11 +318,12 @@ export function buildAlhambraExterior(model: Facility) {
   // Lot-side door of the two-storey wing: navy awning, three steps down to the lot
   // and a block planter wall beside them (Street View, May 2025).
   const lotDoor = group(facade, 'therapy-lot-door-awning-and-steps');
-  // Street View (May 2025): the awning door at x ≈ -27.4 on the wing's lot face.
-  // A split-face block wall stands 1.8 m clear of the face, from the lobby
-  // corner west to the stairs; behind it a raised walkway at door level, and at
-  // the wall's west end four steps rise from the lot into that gap, a pipe
-  // handrail hooked onto the wall and another on the building side.
+  // Street View (May 2025): on the wing's lot face, a glass double door
+  // (1839 W Valley Blvd) and, west of it, the awning door. A split-face block
+  // wall stands 1.8 m clear of the face from the ramp's turn landing west to
+  // just past the awning door, with a door-level walkway behind it; at the
+  // wall's west end four steps descend toward Ethel, pipe handrail on the lot
+  // side.
   const doorX = -31.18 + 3.25 + 0.55;
   const brick = '#c49a6c',
     brickJoint = '#b58a5e';
@@ -330,47 +331,42 @@ export function buildAlhambraExterior(model: Facility) {
   box(lotDoor, doorX, 2.28, 8.35, 2.6, 0.05, 1.0, '#eeeee7');
   const landTop = 0.5,
     wallZ = 7.0,
-    wallX0 = -25.8,
+    wallX0 = doorX - 1.5,
     wallX1 = -18.1;
-  // Walkway at door level from the door east behind the wall.
   box(
     lotDoor,
-    (doorX - 1.2 + wallX1) / 2,
+    (wallX0 + wallX1) / 2,
     -0.23,
-    8.0,
-    wallX1 - (doorX - 1.2),
+    8.1,
+    wallX1 - wallX0,
     landTop + 0.23,
-    1.8,
+    1.6,
     '#c5c8c2',
   );
-  const stairX = (wallX0 + doorX - 1.2) / 2 + 0.05,
-    stairW = wallX0 - (doorX - 1.2) - 0.1,
-    run = 0.3,
+  const run = 0.35,
     riseStep = (landTop + 0.23) / 4;
   for (let i = 0; i < 4; i++)
     box(
       lotDoor,
-      stairX,
+      wallX0 - run / 2 - run * i,
       -0.23,
-      wallZ + 0.1 - run / 2 - run * i,
-      stairW,
-      landTop + 0.23 - riseStep * (i + 1),
+      8.1,
       run,
+      landTop + 0.23 - riseStep * (i + 1),
+      1.6,
       '#c5c8c2',
     );
-  const stairFootZ = wallZ + 0.1 - run * 4;
-  for (const xx of [wallX0 - 0.05, doorX - 1.2 + 0.05]) {
-    box(lotDoor, xx, -0.23, stairFootZ, 0.035, 0.95, 0.035, steel);
-    box(lotDoor, xx, landTop, wallZ + 0.1, 0.035, 0.95, 0.035, steel);
-    beam(
-      lotDoor,
-      [xx, 0.72, stairFootZ],
-      [xx, landTop + 0.95, wallZ + 0.1],
-      0.035,
-      0.035,
-      steel,
-    );
-  }
+  const stairFoot = wallX0 - run * 4;
+  box(lotDoor, wallX0 - 0.05, landTop, 7.35, 0.035, 0.95, 0.035, steel);
+  box(lotDoor, stairFoot + 0.05, -0.23, 7.35, 0.035, 0.95, 0.035, steel);
+  beam(
+    lotDoor,
+    [wallX0 - 0.05, landTop + 0.95, 7.35],
+    [stairFoot + 0.05, -0.23 + 0.95, 7.35],
+    0.035,
+    0.035,
+    steel,
+  );
   box(
     lotDoor,
     (wallX0 + wallX1) / 2,
