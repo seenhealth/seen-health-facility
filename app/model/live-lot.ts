@@ -50,6 +50,8 @@ export type LiveMessage = {
   vehicles: LiveVehicle[];
   capacity?: number;
   clock?: string;
+  /** Vehicle id the camera should centre on and follow; absent or null for the whole-lot shot. */
+  follow?: string | null;
 };
 
 /** An inbound vehicle this many minutes out waits, faint, at the south end of the west street. */
@@ -638,6 +640,12 @@ export function createLiveLot(ctx: {
     },
     get clock() {
       return clock;
+    },
+    /** Where a vehicle's body is right now (x, z in site metres), or null when it is not drawn. */
+    positionOf(id: string): [number, number] | null {
+      const l = live.get(id);
+      if (!l || l.mode === 'gone' || l.opacity <= 0.05) return null;
+      return [l.body.object.position.x, l.body.object.position.z];
     },
     /** Multiplier on the label plates, so the parent can keep them readable as the camera zooms out. */
     setLabelScale(k: number) {

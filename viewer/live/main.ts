@@ -9,7 +9,9 @@ import { createLiveLot, type LiveMessage } from '../../app/model/live-lot';
  * Static page that shows Seen's real vehicles on the Alhambra lot. A parent
  * page embeds it and posts `{ type: 'seen-live-lot', vehicles, capacity, clock }`
  * (app/model/live-lot.ts); this page answers `{ type: 'seen-live-lot-ready' }`
- * once the scene is up so the parent sends the current state.
+ * once the scene is up so the parent sends the current state. A message with
+ * `follow: <vehicle id>` centres the camera on that car and keeps it centred as
+ * it moves; `follow: null` returns to the whole-lot shot.
  */
 async function main() {
   const host = document.getElementById('root')!;
@@ -85,12 +87,40 @@ async function main() {
     () => lot?.setLabelScale(SHOT.zoom / Math.max(0.2, viewer.getShot().zoom)),
     250,
   );
+  // Follow one vehicle: the camera's target tracks the car while it moves, keeping whatever zoom and angle the person has set,
+  // so they can still orbit a parked car. The first follow zooms in; clearing it restores the lot shot.
+  const FOLLOW_ZOOM = 2.6;
+  let follow: string | null = null;
+  let followAt: [number, number] | null = null;
+  const setFollow = (id: string | null) => {
+    if (id === follow) return;
+    follow = id;
+    followAt = null;
+    touched = true; // a follow is the person's own framing; the start-up hold must not undo it
+    if (!id) viewer.setShot(SHOT);
+  };
+  setInterval(() => {
+    if (!follow || !lot) return;
+    const at = lot.positionOf(follow);
+    if (!at) return;
+    const first = !followAt;
+    if (!first && Math.hypot(at[0] - followAt![0], at[1] - followAt![1]) < 0.05) return;
+    followAt = at;
+    const s = viewer.getShot();
+    viewer.setShot({
+      target: [at[0], 0, at[1]],
+      zoom: first ? Math.max(s.zoom, FOLLOW_ZOOM) : s.zoom,
+      azimuth: s.azimuth,
+      elevation: s.elevation,
+    });
+  }, 100);
   let pending: LiveMessage | null = null;
   const onMessage = (e: MessageEvent) => {
     const msg = e.data as LiveMessage | undefined;
     if (!msg || msg.type !== 'seen-live-lot') return;
     if (lot) lot.apply(msg);
     else pending = msg;
+    setFollow(msg.follow ?? null);
     const n = lot?.onLot ?? 0;
     hud.innerHTML = `<b>${n}</b> / ${msg.capacity ?? '?'} on the lot${msg.clock ? ` · ${msg.clock}` : ''} · ${msg.vehicles.filter((v) => v.state === 'inbound').length} inbound`;
   };
