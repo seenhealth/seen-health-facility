@@ -12,6 +12,13 @@ export function buildAlhambraExterior(model: Facility) {
   roof.name = 'alhambra-brochure-roof';
   site.name = 'alhambra-brochure-street-edge';
   const { box, beam, group, mesh, batch } = exteriorPrimitives();
+  const L_STREET = -0.23;
+  // Streetscape group and palette, declared up front because the wing's palm
+  // island (built with the facade) shares the palm and colours.
+  const street = group(site, 'ethel-and-valley-streetscape');
+  const lawn = '#9db87c',
+    red = '#b8403a',
+    yellow = '#e6c03c';
   const stone = '#d0c3a7',
     joint = '#b9b7ac',
     steel = '#b8bdbb',
@@ -312,25 +319,117 @@ export function buildAlhambraExterior(model: Facility) {
   // and a block planter wall beside them (Street View, May 2025).
   const lotDoor = group(facade, 'therapy-lot-door-awning-and-steps');
   const doorX = -31.18 + 5.0 + 0.55;
+  const brick = '#c49a6c',
+    brickJoint = '#b58a5e';
   box(lotDoor, doorX, 2.32, 8.35, 2.7, 0.14, 1.1, '#2d4a74');
   box(lotDoor, doorX, 2.28, 8.35, 2.6, 0.05, 1.0, '#eeeee7');
-  for (let i = 0; i < 3; i++)
+  // Raised landing at the door, four steps down toward the lot with a pipe handrail.
+  box(lotDoor, doorX, -0.23, 8.4, 2.4, 0.73, 1.0, '#c5c8c2');
+  for (let i = 0; i < 4; i++)
     box(
       lotDoor,
       doorX,
       -0.23,
-      8.9 - 0.2 - 0.4 * i,
+      7.9 - 0.18 - 0.36 * i,
       1.6,
-      0.23 - 0.077 * i,
+      0.73 - 0.1825 * (i + 1),
+      0.36,
+      '#c5c8c2',
+    );
+  for (const s of [-1, 1]) {
+    const xx = doorX + s * 0.78;
+    box(lotDoor, xx, 0.5, 7.75, 0.035, 0.95, 0.035, steel);
+    box(lotDoor, xx, -0.23, 6.55, 0.035, 0.95, 0.035, steel);
+    beam(lotDoor, [xx, 1.42, 7.75], [xx, 0.7, 6.55], 0.035, 0.035, steel);
+  }
+  // Split-face block wall from the landing east along the wing, as in the photo.
+  box(lotDoor, doorX + 3.9, -0.23, 8.5, 5.4, 1.35, 0.3, brick);
+  for (let y = 0.05; y < 1.3; y += 0.2)
+    box(lotDoor, doorX + 3.9, y, 8.34, 5.4, 0.012, 0.01, brickJoint);
+  for (let xx = doorX + 1.6; xx < doorX + 6.6; xx += 0.4)
+    box(lotDoor, xx, -0.23, 8.34, 0.01, 1.35, 0.01, brickJoint);
+  // Curbed palm island in front of the wall.
+  const island = group(site, 'wing-palm-island');
+  box(island, -21.2, -0.23, 6.45, 4.6, 0.18, 2.3, '#dcd7cd');
+  box(island, -21.2, -0.23, 5.3, 4.6, 0.2, 0.07, red);
+  box(island, -21.2, -0.05, 6.45, 4.3, 0.02, 2.0, '#8c7a5c');
+  for (const [x, z, h] of [
+    [-22.6, 6.0, 2.4],
+    [-21.0, 7.0, 2.9],
+    [-19.6, 6.1, 2.2],
+  ])
+    palm(x, z, h, 1.3);
+  for (let xx = -23.1; xx < -19.2; xx += 0.75) {
+    const tuft = mesh(island, new T.IcosahedronGeometry(0.28, 1), '#7f9a5f');
+    tuft.position.set(xx, 0.14, 6.45 + (xx % 1.5 > 0.75 ? 0.6 : -0.6));
+    tuft.scale.set(1, 0.7, 1);
+  }
+  // Drop-off landing along the lobby wall across the glass door, window and
+  // side door at floor level, with short steps at its north end and the
+  // accessible ramp dropping toward the wing; bronze rails on the lot side and
+  // along the ramp (Street View, May 2025).
+  const landing = group(site, 'lobby-landing-and-ramp');
+  const LAND = { x: -15.5, w: 1.3, z0: -2.0, z1: 3.6, top: 0 };
+  const rise = LAND.top - L_STREET;
+  box(
+    landing,
+    LAND.x,
+    L_STREET,
+    (LAND.z0 + LAND.z1) / 2,
+    LAND.w,
+    rise,
+    LAND.z1 - LAND.z0,
+    '#c5c8c2',
+  );
+  for (let i = 0; i < 2; i++)
+    box(
+      landing,
+      LAND.x,
+      L_STREET,
+      LAND.z0 - 0.2 - 0.4 * i,
+      LAND.w,
+      rise - (rise / 3) * (i + 1),
       0.4,
       '#c5c8c2',
     );
-  box(lotDoor, doorX - 0.85, -0.23, 8.3, 0.035, 1.1, 1.2, steel);
-  box(lotDoor, doorX + 2.9, -0.23, 8.3, 3.6, 1.1, 0.8, '#c4a07c');
-  for (let xx = doorX + 1.4; xx < doorX + 4.6; xx += 0.7) {
-    const plant = mesh(lotDoor, new T.IcosahedronGeometry(0.38, 1), '#668257');
-    plant.position.set(xx, 1.15, 8.3);
-    plant.scale.y = 1.3;
+  const rampLen = 5.0;
+  const rampSlab = box(
+    landing,
+    LAND.x,
+    L_STREET + rise / 2 - 0.06,
+    LAND.z1 + rampLen / 2,
+    LAND.w,
+    0.12,
+    rampLen,
+    '#c5c8c2',
+  );
+  rampSlab.rotation.x = Math.atan2(rise, rampLen);
+  const bronze = '#6b5845';
+  const walkY = (z: number) =>
+    z <= LAND.z1 ? LAND.top : LAND.top - (rise * (z - LAND.z1)) / rampLen;
+  for (const x of [LAND.x - LAND.w / 2 - 0.05, LAND.x + LAND.w / 2 + 0.05]) {
+    const zStart = x < LAND.x ? LAND.z0 - 0.8 : LAND.z1;
+    for (let z = zStart; z <= LAND.z1 + rampLen + 0.01; z += 1.5)
+      box(landing, x, walkY(z), z, 0.035, 0.95, 0.035, bronze);
+    for (const y of [0.45, 0.65, 0.85, 1.0]) {
+      if (zStart < LAND.z1)
+        beam(
+          landing,
+          [x, LAND.top + y, zStart],
+          [x, LAND.top + y, LAND.z1],
+          0.03,
+          0.03,
+          bronze,
+        );
+      beam(
+        landing,
+        [x, LAND.top + y, LAND.z1],
+        [x, L_STREET + y, LAND.z1 + rampLen],
+        0.03,
+        0.03,
+        bronze,
+      );
+    }
   }
   // Rear loading door on the alley: flat canopy over the roll-up and a gated enclosure beside it.
   const rear = group(facade, 'clinic-rear-loading-canopy-and-gate');
@@ -343,10 +442,6 @@ export function buildAlhambraExterior(model: Facility) {
   // beside the wing, the palm island at the alley corner, the FDC on the wing's
   // corner, the utility pole with its transformers, bottlebrush trees and a
   // hydrant on the Valley Blvd frontage.
-  const street = group(site, 'ethel-and-valley-streetscape');
-  const lawn = '#9db87c',
-    red = '#b8403a',
-    yellow = '#e6c03c';
   for (const [z0, z1] of [
     [-23.5, -1.2],
     [4.5, 27.4],
@@ -371,7 +466,7 @@ export function buildAlhambraExterior(model: Facility) {
         .position.set(x + dx, 0.4, z);
   }
   hydrant(-35.9, -18.6);
-  hydrant(-36.3, 32.5);
+  hydrant(-35.6, 31.6);
   function palm(x: number, z: number, h: number, crown: number) {
     const g = group(street, 'fan-palm');
     const trunk = mesh(g, new T.CylinderGeometry(0.11, 0.17, h, 10), '#8a7254');
