@@ -3,20 +3,39 @@
  * a parent page (the dispatch app's VTC view). Each vehicle is a fleet van,
  * a lift van, an SUV or a sedan body; it drives in from the south end of the
  * west street as its ETA counts down, turns in through the Ethel Avenue curb
- * cut, unloads at the drop-off, backs into a bay, waits, and pulls out by the
- * alley driveway and fades when the dispatch app says it is gone.
+ * cut, stops at the drop-off, opens up (sliding door, then the ramp on a lift
+ * van, the driver's door while the ramp is out), lets its riders off one by
+ * one (each a figure who walks, or rolls up the accessible ramp, into the
+ * lobby), closes up, backs into a bay, waits, and pulls out by the alley
+ * driveway and fades when the dispatch app says it is gone. Riders marked as
+ * boarding walk out of the lobby to a parked car, whose door opens for them.
+ * Vehicles accelerate and brake rather than start and stop dead, their wheels
+ * turn, and at night their lamps and headlight beams come on while they move.
  * Positions come from the fleet's own route pieces, so the manoeuvres are the
  * reviewed ones (4 m arcs, back-in stalls, one driveway).
  */
 import * as T from 'three';
-import { buildArrivalVan, fadeVehicle, updateArrivalVan } from './arrival';
+import {
+  ARRIVAL,
+  buildArrivalVan,
+  fadeVehicle,
+  updateArrivalVan,
+} from './arrival';
 import {
   FLEET_LOT,
   fleetParking,
   fleetRoutes,
   type FleetLeg,
 } from './alhambra-fleet';
-import { buildCommunityVehicleBody } from './community-vehicles';
+import {
+  addVanLamps,
+  buildLiveCar,
+  setLamps,
+  type LiveCar,
+  type VehicleLamps,
+} from './live-vehicles';
+import { createWalkers, type WalkPoint } from './live-walkers';
+import { FLEET_VAN_RAMP } from './photo-assets';
 import type { Facility } from './schema';
 import { Pen, pathAt, type Piece } from './vehicle-path';
 
@@ -57,7 +76,15 @@ export type LiveMessage = {
 /** An inbound vehicle this many minutes out waits, faint, at the south end of the west street. */
 const HORIZON_MIN = 12;
 const SPEED = { street: 9, lot: 3, reverse: 1.8 };
-const DOCK_SECONDS = 14;
+/** m/s² pulling away and braking; braking is firmer, as it is in a car. */
+const ACCEL = 1.4,
+  DECEL = 1.9;
+/** Door, ramp and cab-door travel per second (fraction of open). */
+const RATE = { door: 0.85, ramp: 0.42, cab: 1.1, entry: 2.4 };
+/** Seconds between riders stepping onto the ramp, and the pause before closing up after the last one. */
+const ALIGHT_GAP = { walk: 2.4, wheelchair: 4.2, linger: 2.5 };
+/** Walking speeds on the lot (m/s): seniors on foot, a wheelchair, and anyone on a ramp. */
+const WALK = { foot: 1.0, wheelchair: 0.8, ramp: 0.5 };
 /** Label plate in metres at the default zoom; `setLabelScale` keeps it the same size on screen when the camera zooms. */
 const LABEL_W = 11,
   LABEL_H = 2.75;
@@ -78,6 +105,9 @@ function photoOf(
   if (photos.has(url)) return photos.get(url) ?? null;
   photos.set(url, null);
   const img = new Image();
+  // Same-origin bytes are expected (the dispatch app serves the photo itself); a cross-origin host without CORS
+  // then fails to load and falls back to initials instead of tainting the label canvas, which WebGL would refuse.
+  img.crossOrigin = 'anonymous';
   img.onload = () => {
     photos.set(url, img);
     onLoad();
@@ -92,9 +122,54 @@ const EAST = Math.PI / 2;
 const BAYS = fleetParking.length; // five bays, then the three curb spots
 /** When every spot is taken: along the aisle, nose south, 7 m apart from the dock southward. */
 const overflowSpot = (n: number) => ({ x: L.aisle, z: -4 - 7 * n, heading: 0 });
+const smooth = (a: number, b: number, x: number) => {
+  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+};
+const tween = (v: number, target: number, rate: number, dt: number) =>
+  v < target
+    ? Math.min(target, v + rate * dt)
+    : Math.max(target, v - rate * dt);
+
+/** Heights on the way in: the lot, the accessible ramp's middle landing, and the lobby landing at floor level. */
+const GROUND = L.streetY,
+  MID = -0.115,
+  LANDING = 0;
+/** Inside the lobby doors, where a walker vanishes or appears. */
+const INSIDE: WalkPoint = {
+  x: ARRIVAL.door[0] + 0.55,
+  z: ARRIVAL.door[1],
+  y: LANDING,
+};
+const DOOR: WalkPoint = { x: ARRIVAL.door[0], z: ARRIVAL.door[1], y: LANDING };
+/** On foot: through the doors, along the landing, down its south step and out into the lot (fleet-crew.ts OFFICE.exit). */
+const STEPS_IN: WalkPoint[] = [
+  { x: -16.7, z: -2.9, y: GROUND },
+  { x: -15.35, z: -2.4, y: GROUND },
+  { x: -15.35, z: -1.3, y: LANDING, speed: 0.7 },
+  DOOR,
+  INSIDE,
+];
+/** Wheelchair: the switchback ramp, lower run up to the middle landing, upper run up to the lobby landing, then the door. */
+const RAMP_IN: WalkPoint[] = [
+  { x: -17.15, z: 2.2, y: GROUND },
+  { x: -17.15, z: 7.6, y: MID, speed: 0.6 },
+  { x: -16.45, z: 8.2, y: MID },
+  { x: -15.5, z: 7.6, y: MID },
+  { x: -15.5, z: 3.6, y: LANDING, speed: 0.6 },
+  { x: -15.45, z: -1.0, y: LANDING },
+  DOOR,
+  INSIDE,
+];
 
 type Mode =
-  'waiting' | 'arriving' | 'docked' | 'toBay' | 'parked' | 'leaving' | 'gone';
+  | 'waiting'
+  | 'arriving'
+  | 'docked'
+  | 'toBay'
+  | 'parked'
+  | 'leaving'
+  | 'gone';
 type Drive = {
   pieces: Piece[];
   length: number;
@@ -103,6 +178,22 @@ type Drive = {
 type Body = {
   object: T.Object3D;
   van: ReturnType<typeof buildArrivalVan> | null;
+  car: LiveCar | null;
+  lamps: VehicleLamps;
+  wheels: T.Object3D[];
+  wheelRadius: number;
+  /** Local (x, z) of the passenger door sill and of a standing spot a step out from it. */
+  sill: [number, number];
+  foot: [number, number];
+  /** Height of the sill above the ground: a lift van's floor, a step, a car's sill. */
+  sillRise: number;
+  hasRamp: boolean;
+};
+type Dock = {
+  phase: 'open' | 'unload' | 'close';
+  timer: number;
+  queue: LivePerson[];
+  n: number;
 };
 type Live = {
   v: LiveVehicle;
@@ -113,9 +204,27 @@ type Live = {
   drive: Drive | null;
   s: number;
   targetS: number;
+  vel: number;
   spot: number | null;
-  timer: number;
   opacity: number;
+  /** Open fractions and where each is heading. */
+  door: number;
+  ramp: number;
+  cab: number;
+  doorTarget: number;
+  rampTarget: number;
+  cabTarget: number;
+  /** The riders seen on board while inbound: the party that alights at the drop-off. */
+  arriving: LivePerson[];
+  dock: Dock | null;
+  /** Riders who have already walked out to this parked car. */
+  boarded: Set<string>;
+  boardTimer: number;
+  /** Seconds since the last boarder vanished into the car with nobody else pending; closes up at 1.5. */
+  closeTimer: number;
+  leaveWhenClosed: boolean;
+  braking: boolean;
+  reversing: boolean;
 };
 
 function drive(legs: FleetLeg[]): Drive {
@@ -333,6 +442,23 @@ const KIND_ACCENT: Record<LiveKind, string> = {
   sedan: '#5b6fc0',
 };
 
+/** The fleet van body's tyres and rims: cylinders laid on their side (the open half-cylinder arch flares are left alone). */
+function vanWheels(root: T.Object3D): T.Object3D[] {
+  const out: T.Object3D[] = [];
+  root.traverse((o) => {
+    if (!(o instanceof T.Mesh) || o.geometry.type !== 'CylinderGeometry')
+      return;
+    const p = (o.geometry as T.CylinderGeometry).parameters;
+    if (
+      Math.abs(o.rotation.z - Math.PI / 2) < 0.01 &&
+      !p.openEnded &&
+      p.radiusTop <= 0.4
+    )
+      out.push(o);
+  });
+  return out;
+}
+
 export function createLiveLot(ctx: {
   scene: T.Scene;
   model: Facility;
@@ -341,6 +467,10 @@ export function createLiveLot(ctx: {
   const root = new T.Group();
   root.name = 'live-lot';
   ctx.scene.add(root);
+  const people = new T.Group();
+  people.name = 'live-lot-people';
+  root.add(people);
+  const walkers = createWalkers(people);
   const live = new Map<string, Live>();
   const spots = new Map<number, string>();
   let letters = 0;
@@ -348,6 +478,10 @@ export function createLiveLot(ctx: {
   let clock = '';
   let capacity = 0;
   let labelScale = 1;
+  let night = 0;
+  /** The lobby's sliding leaves (arrival.ts), opened for walkers; found once the scene has them. */
+  let leaves: T.Object3D[] | null = null;
+  let entryOpen = 0;
 
   function body(kind: LiveKind, index: number): Body {
     if (kind === 'van' || kind === 'wav') {
@@ -356,11 +490,35 @@ export function createLiveLot(ctx: {
         String.fromCharCode(65 + (index % 8)),
         ctx.material,
       );
-      return { object: van.root, van };
+      return {
+        object: van.root,
+        van,
+        car: null,
+        lamps: addVanLamps(van.root),
+        wheels: vanWheels(van.root),
+        wheelRadius: 0.36,
+        sill: FLEET_VAN_RAMP.sill,
+        foot:
+          kind === 'wav'
+            ? FLEET_VAN_RAMP.foot
+            : [FLEET_VAN_RAMP.sill[0] + 0.9, FLEET_VAN_RAMP.sill[1]],
+        sillRise: FLEET_VAN_RAMP.rise,
+        hasRamp: kind === 'wav',
+      };
     }
-    const object = buildCommunityVehicleBody('car', KIND_ACCENT[kind]);
-    if (kind === 'suv') object.scale.set(1.08, 1.22, 1.1);
-    return { object, van: null };
+    const car = buildLiveCar(kind, KIND_ACCENT[kind]);
+    return {
+      object: car.root,
+      van: null,
+      car,
+      lamps: car.lamps,
+      wheels: car.wheels,
+      wheelRadius: car.wheelRadius,
+      sill: car.sill,
+      foot: car.foot,
+      sillRise: 0.2,
+      hasRamp: false,
+    };
   }
   function freeSpot(): number | null {
     for (let i = 0; i < BAYS + 6; i++) if (!spots.has(i)) return i;
@@ -393,6 +551,7 @@ export function createLiveLot(ctx: {
   function start(l: Live, legs: FleetLeg[] | null, mode: Mode) {
     l.drive = legs ? drive(legs) : null;
     l.s = 0;
+    l.vel = 0;
     l.targetS = l.drive?.length ?? 0;
     l.mode = mode;
     if (l.drive) pose(l);
@@ -404,6 +563,7 @@ export function createLiveLot(ctx: {
     const sp = i === null ? overflowSpot(9) : spotPose(i);
     place(l.body.object, sp.x, sp.z, sp.heading);
     l.drive = null;
+    l.vel = 0;
     l.mode = 'parked';
     l.opacity = 1;
   }
@@ -413,6 +573,7 @@ export function createLiveLot(ctx: {
   }
   function remove(l: Live) {
     releaseSpot(l);
+    for (const id of walkers.ids(`${l.v.id}|`)) walkers.remove(id);
     root.remove(l.body.object);
     root.remove(l.label);
     live.delete(l.v.id);
@@ -421,6 +582,39 @@ export function createLiveLot(ctx: {
     const eta = v.etaMinutes ?? HORIZON_MIN;
     const f = Math.min(1, Math.max(0, 1 - eta / HORIZON_MIN));
     return f * d.length;
+  }
+  /** World (x, z) of a point in the vehicle's frame, as it stands now. */
+  function world(l: Live, local: [number, number]) {
+    l.body.object.updateMatrixWorld(true);
+    const p = l.body.object.localToWorld(new T.Vector3(local[0], 0, local[1]));
+    return { x: p.x, z: p.z };
+  }
+  /** From the vehicle's door into the lobby: down the ramp or a step, across the lot, up the steps or the accessible ramp. */
+  function alightPath(l: Live, wheelchair: boolean): WalkPoint[] {
+    const sill = world(l, l.body.sill),
+      foot = world(l, l.body.foot);
+    const rampLeg: WalkPoint[] = [
+      { x: sill.x, z: sill.z, y: GROUND + l.body.sillRise },
+      { x: foot.x, z: foot.z, y: GROUND, speed: WALK.ramp },
+    ];
+    return [...rampLeg, ...(wheelchair ? RAMP_IN : STEPS_IN)];
+  }
+  /** Out of the lobby to the vehicle's door: the alighting route in reverse, ending a step out from the sill and then on it. */
+  function boardPath(l: Live, wheelchair: boolean): WalkPoint[] {
+    const sill = world(l, l.body.sill),
+      foot = world(l, l.body.foot),
+      out = world(l, [l.body.foot[0] + 1.6, l.body.foot[1]]);
+    const back = (pts: WalkPoint[]) =>
+      [...pts].reverse().map((p, i, arr) => ({
+        ...p,
+        speed: arr[i + 1]?.speed ?? (wheelchair ? WALK.wheelchair : WALK.foot),
+      }));
+    return [
+      ...back(wheelchair ? RAMP_IN : STEPS_IN),
+      { x: out.x, z: out.z, y: GROUND },
+      { x: foot.x, z: foot.z, y: GROUND },
+      { x: sill.x, z: sill.z, y: GROUND + l.body.sillRise, speed: WALK.ramp },
+    ];
   }
 
   function apply(msg: LiveMessage) {
@@ -445,9 +639,23 @@ export function createLiveLot(ctx: {
           drive: null,
           s: 0,
           targetS: 0,
+          vel: 0,
           spot: null,
-          timer: 0,
           opacity: 0,
+          door: 0,
+          ramp: 0,
+          cab: 0,
+          doorTarget: 0,
+          rampTarget: 0,
+          cabTarget: 0,
+          arriving: v.state === 'inbound' ? (v.riders ?? []) : [],
+          dock: null,
+          boarded: new Set(),
+          boardTimer: 0,
+          closeTimer: 0,
+          leaveWhenClosed: false,
+          braking: false,
+          reversing: false,
         };
         live.set(v.id, l);
         if (v.state === 'inbound') {
@@ -458,6 +666,7 @@ export function createLiveLot(ctx: {
       } else {
         l.v = v;
         if (v.state === 'inbound') {
+          l.arriving = v.riders ?? [];
           if (l.mode === 'arriving')
             l.targetS = Math.max(l.s, approachTarget(v, l.drive!));
           else if (
@@ -466,6 +675,7 @@ export function createLiveLot(ctx: {
             l.mode === 'waiting'
           ) {
             releaseSpot(l);
+            l.boarded.clear();
             start(l, fleetRoutes.awayToDock(), 'arriving');
             l.targetS = approachTarget(v, l.drive!);
           }
@@ -484,6 +694,14 @@ export function createLiveLot(ctx: {
   }
   function leave(l: Live) {
     if (l.mode === 'leaving' || l.mode === 'gone') return;
+    l.doorTarget = l.rampTarget = l.cabTarget = 0;
+    l.dock = null;
+    if (l.door > 0.01 || l.ramp > 0.01) {
+      // Close up first; the departure starts once the doors are shut.
+      l.leaveWhenClosed = true;
+      return;
+    }
+    l.leaveWhenClosed = false;
     if (l.mode === 'parked' && l.spot !== null && l.spot < BAYS) {
       const legs = fleetRoutes.bayToAway(l.spot);
       releaseSpot(l);
@@ -501,6 +719,108 @@ export function createLiveLot(ctx: {
       releaseSpot(l);
       l.drive = null;
       l.mode = 'gone';
+    }
+  }
+
+  /** Move along the drive toward `targetS`: pull away at ACCEL, hold the leg's speed, brake to stop exactly at the target. */
+  function advance(l: Live, dt: number) {
+    if (!l.drive) return 0;
+    const span = legAt(l.drive, l.s);
+    const reverse = reverseLeg(span.leg);
+    const cap = reverse
+      ? SPEED.reverse
+      : span.leg.lot
+        ? SPEED.lot
+        : SPEED.street;
+    const remaining = Math.max(0, l.targetS - l.s);
+    const goal = Math.min(cap, Math.sqrt(2 * DECEL * remaining));
+    l.vel =
+      goal > l.vel
+        ? Math.min(goal, l.vel + ACCEL * dt)
+        : Math.max(goal, l.vel - DECEL * 1.4 * dt);
+    const ds = Math.min(remaining, l.vel * dt);
+    l.s += ds;
+    l.braking =
+      goal < l.vel - 0.02 ||
+      (remaining < 0.02 && l.vel < 0.02 && l.mode !== 'parked');
+    l.reversing = reverse && l.vel > 0.02;
+    const turn = (reverse ? -ds : ds) / l.body.wheelRadius;
+    for (const w of l.body.wheels) w.rotateY(turn);
+    pose(l);
+    return remaining - ds;
+  }
+
+  /** The drop-off: open up, let the party off one at a time, close up, then find a bay. */
+  function dockTick(l: Live, dt: number) {
+    const d = l.dock!;
+    const wantsRamp = l.body.hasRamp && d.queue.length > 0;
+    if (d.phase === 'open') {
+      l.doorTarget = 1;
+      if (wantsRamp) l.rampTarget = 1;
+      if (l.body.van) l.cabTarget = wantsRamp ? 1 : 0;
+      if (l.door >= 0.99 && (!wantsRamp || l.ramp >= 0.99)) {
+        d.phase = 'unload';
+        d.timer = 0.5;
+      }
+      return;
+    }
+    if (d.phase === 'unload') {
+      d.timer -= dt;
+      if (d.timer > 0) return;
+      const p = d.queue.shift();
+      if (p) {
+        const wheelchair = !!p.wheelchair;
+        walkers.spawn(`${l.v.id}|out|${d.n++}`, p, alightPath(l, wheelchair));
+        d.timer = wheelchair ? ALIGHT_GAP.wheelchair : ALIGHT_GAP.walk;
+      } else {
+        d.phase = 'close';
+        d.timer = ALIGHT_GAP.linger;
+      }
+      return;
+    }
+    d.timer -= dt;
+    if (d.timer > 0) return;
+    l.rampTarget = 0;
+    l.cabTarget = 0;
+    if (l.ramp <= 0.01) l.doorTarget = 0;
+    if (l.door <= 0.01 && l.ramp <= 0.01 && l.cab <= 0.01) {
+      l.dock = null;
+      const i = freeSpot();
+      const legs = i !== null && i < BAYS ? dockToBay(i) : null;
+      if (legs && i !== null) {
+        l.spot = i;
+        spots.set(i, l.v.id);
+        start(l, legs, 'toBay');
+      } else parkAt(l);
+    }
+  }
+
+  /** A parked car: riders flagged as boarding walk out from the lobby; the door (and a lift van's ramp) opens for them and closes after the last. */
+  function boardingTick(l: Live, dt: number) {
+    const pending = (l.v.riders ?? []).filter(
+      (p) => p.boarding && !l.boarded.has(p.name),
+    );
+    const prefix = `${l.v.id}|in|`;
+    const walking = walkers.ids(prefix).length;
+    if (pending.length) {
+      l.doorTarget = 1;
+      const wheelchair = pending.some((p) => p.wheelchair);
+      if (l.body.hasRamp && wheelchair) l.rampTarget = 1;
+      l.closeTimer = 0;
+      l.boardTimer -= dt;
+      if (l.boardTimer <= 0 && l.door >= 0.99) {
+        const p = pending[0];
+        l.boarded.add(p.name);
+        walkers.spawn(`${prefix}${p.name}`, p, boardPath(l, !!p.wheelchair));
+        l.boardTimer = p.wheelchair ? 3.0 : 1.8;
+      }
+    } else if (walking === 0 && (l.door > 0.01 || l.ramp > 0.01) && !l.dock) {
+      l.closeTimer += dt;
+      if (l.closeTimer > 1.5) {
+        l.rampTarget = 0;
+        l.cabTarget = 0;
+        if (l.ramp <= 0.01) l.doorTarget = 0;
+      }
     }
   }
 
@@ -522,51 +842,29 @@ export function createLiveLot(ctx: {
       for (const o of stale) o.removeFromParent();
       hidStaticVans = true;
     }
-    for (const l of [...live.values()]) {
+    for (const l of Array.from(live.values())) {
+      l.braking = false;
+      l.reversing = false;
+      if (l.leaveWhenClosed && l.door <= 0.01 && l.ramp <= 0.01) leave(l);
       if (l.mode === 'arriving' && l.drive) {
-        const span = legAt(l.drive, l.s);
-        const speed = span.leg.lot ? SPEED.lot : SPEED.street;
-        l.s = Math.min(l.targetS, l.s + speed * dt);
-        pose(l);
-        if (l.s >= l.drive.length - 1e-6) {
+        advance(l, dt);
+        if (l.s >= l.drive.length - 1e-6 && l.vel < 0.05) {
           l.mode = 'docked';
-          l.timer = DOCK_SECONDS;
+          l.vel = 0;
+          l.dock = { phase: 'open', timer: 0, queue: [...l.arriving], n: 0 };
         }
       } else if (l.mode === 'docked') {
-        l.timer -= dt;
-        if (l.timer <= 0) {
-          const i = freeSpot();
-          const legs = i !== null && i < BAYS ? dockToBay(i) : null;
-          if (legs && i !== null) {
-            l.spot = i;
-            spots.set(i, l.v.id);
-            start(l, legs, 'toBay');
-          } else parkAt(l);
-        }
+        l.braking = true;
+        if (l.dock) dockTick(l, dt);
       } else if (l.mode === 'toBay' && l.drive) {
-        const span = legAt(l.drive, l.s);
-        l.s = Math.min(
-          l.drive.length,
-          l.s + (reverseLeg(span.leg) ? SPEED.reverse : SPEED.lot) * dt,
-        );
-        pose(l);
-        if (l.s >= l.drive.length - 1e-6) {
+        advance(l, dt);
+        if (l.s >= l.drive.length - 1e-6 && l.vel < 0.05) {
           l.mode = 'parked';
           l.drive = null;
+          l.vel = 0;
         }
       } else if (l.mode === 'leaving' && l.drive) {
-        const span = legAt(l.drive, l.s);
-        l.s = Math.min(
-          l.drive.length,
-          l.s +
-            (reverseLeg(span.leg)
-              ? SPEED.reverse
-              : span.leg.lot
-                ? SPEED.lot
-                : SPEED.street) *
-              dt,
-        );
-        pose(l);
+        advance(l, dt);
         if (l.s >= l.drive.length - 1e-6) l.mode = 'gone';
       } else if (l.mode === 'gone') {
         l.opacity = Math.max(0, l.opacity - dt);
@@ -574,9 +872,17 @@ export function createLiveLot(ctx: {
           remove(l);
           continue;
         }
-      } else if (l.mode === 'parked') l.opacity = Math.min(1, l.opacity + dt);
-      // Body, fade, doors and label.
-      const docked = l.mode === 'docked';
+      } else if (l.mode === 'parked') {
+        l.opacity = Math.min(1, l.opacity + dt);
+        boardingTick(l, dt);
+      }
+      // Doors: the ramp only unfolds once the sliding door is fully open, and the door only shuts once the ramp is stowed.
+      const doorGoal = l.ramp > 0.01 ? 1 : l.doorTarget;
+      l.door = tween(l.door, doorGoal, RATE.door, dt);
+      const rampGoal = l.door < 0.99 && l.ramp < 0.01 ? 0 : l.rampTarget;
+      l.ramp = tween(l.ramp, rampGoal, RATE.ramp, dt);
+      l.cab = tween(l.cab, l.cabTarget, RATE.cab, dt);
+      // Body, fade, doors, lamps and label.
       if (l.body.van)
         updateArrivalVan(
           l.body.van,
@@ -584,8 +890,9 @@ export function createLiveLot(ctx: {
             position: l.body.object.position.clone(),
             heading: l.body.object.rotation.y,
             visible: l.opacity > 0.01,
-            door: docked ? 1 : 0,
-            ramp: docked && l.v.kind === 'wav' ? 1 : 0,
+            door: l.door,
+            ramp: l.body.hasRamp ? l.ramp : 0,
+            cabDoor: l.cab,
             opacity: l.opacity,
           },
           true,
@@ -593,7 +900,17 @@ export function createLiveLot(ctx: {
       else {
         l.body.object.visible = l.opacity > 0.01;
         fadeVehicle(l.body.object, l.opacity);
+        if (l.body.car)
+          l.body.car.door.rotation.y =
+            l.body.car.doorOpenAngle * smooth(0, 1, l.door);
       }
+      setLamps(l.body.lamps, {
+        night,
+        driving: l.vel > 0.1,
+        braking: l.braking,
+        reversing: l.reversing,
+        on: l.mode !== 'parked' && l.mode !== 'waiting' && l.opacity > 0.3,
+      });
       const text = JSON.stringify([
         l.v.label,
         l.v.detail ?? '',
@@ -608,11 +925,12 @@ export function createLiveLot(ctx: {
         });
         l.labelText = text;
       }
-      // Cars parked side by side alternate label heights so their crews do not overlap.
+      // Cars parked side by side alternate label heights so their crews do not overlap; a car with its door open
+      // carries its plate higher still, clear of the door, the ramp and the people at them.
       const lift =
-        l.mode === 'parked' && l.spot !== null && l.spot % 2
+        (l.mode === 'parked' && l.spot !== null && l.spot % 2
           ? 1.5 * labelScale
-          : 0;
+          : 0) + (l.door > 0.01 ? 2.6 : 0);
       l.label.position.set(
         l.body.object.position.x,
         3.6 + 1.2 * labelScale + lift,
@@ -625,6 +943,20 @@ export function createLiveLot(ctx: {
       );
       l.label.visible = l.opacity > 0.3;
       (l.label.material as T.SpriteMaterial).opacity = l.opacity;
+    }
+    walkers.tick(dt);
+    // The lobby's sliding doors part for anyone on foot coming up to them (the care-day's door logic is idle on this page).
+    if (walkers.count > 0 || entryOpen > 0) {
+      leaves ??= ['-1', '1']
+        .map((s) => ctx.scene.getObjectByName(`sliding-entry-leaf-${s}`))
+        .filter((o): o is T.Object3D => !!o);
+      const near = walkers.nearest(ARRIVAL.door[0], ARRIVAL.door[1]);
+      entryOpen = tween(entryOpen, 1 - smooth(0.7, 2.6, near), RATE.entry, dt);
+      leaves.forEach(
+        (g, i) =>
+          (g.position.z =
+            ARRIVAL.door[1] + (i ? 1 : -1) * (0.315 + entryOpen * 0.65)),
+      );
     }
   }
   return {
@@ -650,6 +982,14 @@ export function createLiveLot(ctx: {
     /** Multiplier on the label plates, so the parent can keep them readable as the camera zooms out. */
     setLabelScale(k: number) {
       labelScale = Math.min(3, Math.max(0.5, k));
+    },
+    /** 0 = day, 1 = night: lamps and headlight beams on the vehicles. */
+    setNight(k: number) {
+      night = Math.min(1, Math.max(0, k));
+    },
+    /** People on foot right now, for the HUD. */
+    get onFoot() {
+      return walkers.count;
     },
     dispose() {
       ctx.scene.remove(root);

@@ -5,6 +5,7 @@ import { validateFacility } from '../../app/model/schema';
 import { createViewer, defaultState } from '../../app/model/renderer';
 import { createLiveLot, type LiveMessage } from '../../app/model/live-lot';
 import { createDaylight } from '../../app/model/daylight';
+import { createNightLights } from '../../app/model/night-lights';
 
 /**
  * Static page that shows Seen's real vehicles on the Alhambra lot. A parent
@@ -14,7 +15,9 @@ import { createDaylight } from '../../app/model/daylight';
  * `follow: <vehicle id>` centres the camera on that car and keeps it centred as
  * it moves; `follow: null` returns to the whole-lot shot. The scene is lit by
  * the real sun over the center (app/model/daylight.ts), refreshed every
- * minute; `?at=HH:MM` or `?at=<ISO date>` lights it for another moment.
+ * minute; `?at=HH:MM` or `?at=<ISO date>` lights it for another moment. After
+ * dusk the street lamps, wall packs, entrance lights and lit windows come on
+ * (app/model/night-lights.ts) and the vehicles drive with their lamps lit.
  */
 async function main() {
   const host = document.getElementById('root')!;
@@ -24,6 +27,7 @@ async function main() {
   );
   let lot: ReturnType<typeof createLiveLot> | null = null;
   let daylight: ReturnType<typeof createDaylight> | null = null;
+  let nightLights: ReturnType<typeof createNightLights> | null = null;
   const viewer = createViewer(host, model, () => {}, {
     interactive: true,
     labels: false,
@@ -32,6 +36,7 @@ async function main() {
       if (new URLSearchParams(location.search).has('debug'))
         (window as unknown as { seenScene?: unknown }).seenScene = ctx.scene;
       daylight = createDaylight(ctx.scene);
+      nightLights = createNightLights(ctx.scene, ctx.material);
       return (lot = createLiveLot(ctx));
     },
   });
@@ -45,7 +50,12 @@ async function main() {
     d.setHours(Number(hm[1]), Number(hm[2]), 0, 0);
     return d;
   };
-  const relight = () => daylight?.apply(momentNow());
+  const relight = () => {
+    const st = daylight?.apply(momentNow());
+    if (!st) return;
+    nightLights?.apply(st.night);
+    lot?.setNight(st.night);
+  };
   relight();
   setInterval(relight, 60_000);
   // No care-day cast and no community pads: only the center, its streets and the live vehicles.
@@ -122,7 +132,8 @@ async function main() {
     const at = lot.positionOf(follow);
     if (!at) return;
     const first = !followAt;
-    if (!first && Math.hypot(at[0] - followAt![0], at[1] - followAt![1]) < 0.05) return;
+    if (!first && Math.hypot(at[0] - followAt![0], at[1] - followAt![1]) < 0.05)
+      return;
     followAt = at;
     const s = viewer.getShot();
     viewer.setShot({
@@ -209,6 +220,12 @@ async function main() {
     setTimeout(() => window.postMessage(demo(6, 'inbound'), '*'), 500);
     setTimeout(() => window.postMessage(demo(0, 'inbound'), '*'), 9000);
     setTimeout(() => window.postMessage(demo(null, 'on-lot'), '*'), 16000);
+    // Then the SUV's second rider checks in and walks out to board.
+    setTimeout(() => {
+      const m = demo(null, 'on-lot');
+      m.vehicles[1].riders![1].boarding = true;
+      window.postMessage(m, '*');
+    }, 40000);
   }
   // Keep the HUD's lot count fresh while vehicles animate between states.
   setInterval(() => {
