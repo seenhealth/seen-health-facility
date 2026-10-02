@@ -14281,8 +14281,8 @@
     "photo-front-sign": {
       "kind": "sign",
       "dimensions": [
-        7.8,
-        0.98,
+        8.8,
+        1.15,
         0.025
       ],
       "material": "photo-sign-front"
@@ -20647,8 +20647,8 @@
       "zoneId": "rehab",
       "levelId": "ground",
       "position": [
-        -24.218352,
-        5.15,
+        -25.9,
+        5.5,
         27.321965
       ],
       "rotation": 0,
@@ -35673,7 +35673,7 @@
         "openings": [
           {
             "id": "shell-day-front-om-0",
-            "offset": 1.65,
+            "offset": 4.5,
             "width": 3.55,
             "sill": 0.35,
             "height": 2.78,
@@ -35682,7 +35682,7 @@
           },
           {
             "id": "shell-day-front-om-1",
-            "offset": 8.85,
+            "offset": 11.1,
             "width": 3.55,
             "sill": 0.35,
             "height": 2.78,

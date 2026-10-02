@@ -74,7 +74,7 @@ export function buildAlhambraExterior(model: Facility) {
   box(canopy, -7.3, 0, 28.23, 0.2, 4.12, 0.19, dark);
   // Deep pale entrance portals distinguish the two recessed doors from the blue infill.
   const portals = group(facade, 'valley-entry-portals');
-  for (const x of [-10.9, -3.7]) {
+  for (const x of [-12.9, -6.3]) {
     box(portals, x, 3.15, 25.37, 4.15, 0.32, 0.35, '#eeeee7');
     for (const xx of [x - 1.93, x + 1.93])
       box(portals, xx, 0.35, 25.37, 0.3, 2.8, 0.35, '#eeeee7');
@@ -135,20 +135,63 @@ export function buildAlhambraExterior(model: Facility) {
   const edge = group(site, 'valley-entry-terrace-and-rails');
   box(edge, -7.3, -0.15, 26.73, 14.9, 0.55, 2.75, stone);
   for (let i = 0; i < 4; i++)
-    box(edge, -7.3, -0.22, 29.1 - i * 0.36, 4.4, 0.155 * (i + 1), 0.4, stone);
-  for (const [a, b] of [
-    [-31.1, -9.6],
-    [-5.0, 2.8],
-  ]) {
-    for (let x = a; x <= b; x += 1.65)
-      box(edge, x, 0.25, 28.45, 0.035, 0.95, 0.035, steel);
+    box(edge, -9.7, -0.22, 29.1 - i * 0.36, 3.2, 0.155 * (i + 1), 0.4, stone);
+  // The accessible ramp runs along the wing's front, rising from the Ethel end
+  // to the terrace at the annex, with cable rails on both sides; the terrace
+  // edge carries the same rail either side of the stairs (photo, 2026).
+  const RAMP = { x0: -29.8, x1: -14.75, y0: -0.05, y1: 0.4, z: 28.3, w: 1.3 };
+  const rampY = (x: number) =>
+    RAMP.y0 + ((x - RAMP.x0) * (RAMP.y1 - RAMP.y0)) / (RAMP.x1 - RAMP.x0);
+  const slope = Math.atan2(RAMP.y1 - RAMP.y0, RAMP.x1 - RAMP.x0);
+  const ramp = box(
+    edge,
+    (RAMP.x0 + RAMP.x1) / 2,
+    (RAMP.y0 + RAMP.y1) / 2 - 0.12,
+    RAMP.z,
+    RAMP.x1 - RAMP.x0,
+    0.12,
+    RAMP.w,
+    stone,
+  );
+  ramp.rotation.z = slope;
+  function rail(
+    x0: number,
+    x1: number,
+    z: number,
+    base: (x: number) => number,
+  ) {
+    for (let x = x0; x <= x1 + 0.01; x += 1.65)
+      box(
+        edge,
+        Math.min(x, x1),
+        base(Math.min(x, x1)),
+        z,
+        0.035,
+        0.95,
+        0.035,
+        steel,
+      );
     for (const y of [0.62, 0.85, 1.12])
-      box(edge, (a + b) / 2, y, 28.45, b - a, 0.028, 0.035, steel);
+      beam(
+        edge,
+        [x0, base(x0) + y, z],
+        [x1, base(x1) + y, z],
+        0.028,
+        0.035,
+        steel,
+      );
   }
+  for (const z of [RAMP.z - 0.68, RAMP.z + 0.68])
+    rail(RAMP.x0, RAMP.x1, z, rampY);
+  for (const [a, b] of [
+    [-14.75, -11.4],
+    [-8.0, 2.8],
+  ])
+    rail(a, b, 28.45, () => RAMP.y1);
   const planters = group(site, 'frontage-low-planters');
   for (const [x, z, w] of [
     [7.8, 27.35, 10.6],
-    [-27, 28.7, 5.7],
+    [-22.3, 29.65, 13.4],
     [28.9, 24.5, 1.1],
   ]) {
     box(planters, x, -0.1, z, w, 0.4, 0.8, stone);
@@ -156,7 +199,7 @@ export function buildAlhambraExterior(model: Facility) {
       const plant = mesh(
         planters,
         new T.IcosahedronGeometry(0.38, 1),
-        '#668257',
+        z > 29 ? (Math.round(xx / 0.6) % 2 ? '#d4c04e' : '#8ea25a') : '#668257',
       );
       plant.position.set(xx, 0.56, z);
       plant.scale.y = 1.2;
@@ -306,7 +349,7 @@ export function buildAlhambraExterior(model: Facility) {
         .position.set(x + dx, 0.4, z);
   }
   hydrant(-35.9, -18.6);
-  hydrant(-34.6, 30.8);
+  hydrant(-36.3, 32.5);
   function palm(x: number, z: number, h: number, crown: number) {
     const g = group(street, 'fan-palm');
     const trunk = mesh(g, new T.CylinderGeometry(0.11, 0.17, h, 10), '#8a7254');
@@ -364,6 +407,8 @@ export function buildAlhambraExterior(model: Facility) {
     );
     curb.rotation.y = -Math.atan2(bz - az, bx - ax);
   }
+  palm(-27.6, 29.65, 1.6, 1.0);
+  palm(-19.2, 29.65, 1.6, 1.0);
   // Fire department connection at the wing's west corner.
   const fdc = group(street, 'fire-department-connection');
   mesh(fdc, new T.CylinderGeometry(0.06, 0.06, 0.8, 8), red).position.set(
@@ -391,8 +436,9 @@ export function buildAlhambraExterior(model: Facility) {
     ).position.set(-37.7 + dx, 7.5, -27.2);
   // Bottlebrush street trees on Valley Blvd: red bloom over green.
   for (const [x, z] of [
-    [-8, 30.2],
-    [11, 30.2],
+    [-11, 30.2],
+    [1, 30.2],
+    [9, 30.2],
   ]) {
     const g = group(street, 'bottlebrush-tree');
     box(g, x, 0, z, 0.16, 2.6, 0.16, '#6f5a47');

@@ -26,7 +26,12 @@ async function main() {
   viewer.update({ ...defaultState, labels: false, community: false });
   // The lot with the approach streets. The viewer re-frames the site once its textures load, so the shot is held for
   // the first seconds unless the person has started orbiting or zooming themselves.
-  const SHOT = { target: [-30, 0, -19] as [number, number, number], zoom: 1.6, azimuth: -2.35, elevation: 0.72 };
+  // `?shot=x,z,zoom,azimuth,elevation` overrides the lot shot, for reviewing other sides of the center.
+  const override = new URLSearchParams(location.search).get('shot')?.split(',').map(Number);
+  const SHOT =
+    override && override.length === 5 && override.every((n) => Number.isFinite(n))
+      ? { target: [override[0], 0, override[1]] as [number, number, number], zoom: override[2], azimuth: override[3], elevation: override[4] }
+      : { target: [-30, 0, -19] as [number, number, number], zoom: 1.6, azimuth: -2.35, elevation: 0.72 };
   viewer.setShot(SHOT);
   let touched = false;
   host.addEventListener('pointerdown', () => { touched = true; }, { once: true });
