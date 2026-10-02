@@ -204,8 +204,8 @@ hospital's callers step out from under a roof first, so the arc rises clear.
 The community layer draws every call as an arc (`call-arcs.ts`; the renderer
 passes it the played source's interactions and the engine's people): a cubic
 curve from just above the caller's head to just above the other end, its
-crown `lift` × the span above the higher end (about 20 m between the hospital
-and the center, 93 m apart) and its ends rising steeply, so a close shot of
+crown `lift` × the span above the higher end (about 24 m between the hospital
+and the center, 110 m apart) and its ends rising steeply, so a close shot of
 one end shows it climbing out of the frame toward the other. Members within
 8 m of each other share an end (the Wongs on speakerphone). The line draws on
 from the caller over the call's first 4 loop seconds (eased out, its tip

@@ -250,7 +250,11 @@ export const HIGHLIGHT_SHOTS: Record<string, ShotSpec> = {
     drift: -0.08,
   },
   // On the hospital's discharge nurse at her phone spot, then back and over
-  // to the middle of the call: the arc to Seen's nurse at the center.
+  // to the middle of the call: the arc to Seen's nurse at the center. The
+  // pull-back ends with both ends and the arc's crown in frame (on a
+  // 1440 × 900 stage the hospital end ≈50 px inside the right edge, the crown
+  // in the top fifth); it scales with 1 / the call's span, now 110 m (0.27
+  // framed the 93 m call alike before the block was re-measured).
   discharge: {
     place: { setting: 'hospital', anchor: 'rnPhone' },
     zoom: 3.6,
@@ -258,7 +262,7 @@ export const HIGHLIGHT_SHOTS: Record<string, ShotSpec> = {
     elevation: 0.6,
     follow: 0.3,
     radius: 8,
-    push: 0.27,
+    push: 0.22,
     drift: 0.08,
     reveal: 'call',
   },
