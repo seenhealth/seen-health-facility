@@ -13,7 +13,7 @@ bpy.ops.mesh.primitive_plane_add(size=30)
 cam = bpy.data.cameras.new('c'); cam.lens = 40; co = bpy.data.objects.new('c', cam); sc.collection.objects.link(co); sc.camera = co
 tint = {'car-suv': (0.06, 0.12, 0.10, 1), 'car-sedan': (0.08, 0.10, 0.25, 1)}
 roots = [o for o in sc.objects if o.name.startswith('car-')]
-views = {'front34': (4.5, 1.8, -6.0), 'rear34': (-4.5, 2.0, 6.0), 'kerb': (8.5, 1.2, 0.0), 'front': (0, 1.2, -8.5)}
+views = {'front34': (4.5, 1.8, -6.0), 'rear34': (-4.5, 2.0, 6.0), 'kerb': (8.5, 1.2, 0.0), 'front': (0, 1.2, -8.5), 'sideclose': (4.2, 1.5, 0.6)}
 for r in roots:
     for o in roots:
         for c in [o, *o.children_recursive]:

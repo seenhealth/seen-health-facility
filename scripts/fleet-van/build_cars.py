@@ -3,7 +3,7 @@
     Blender -b -P build_cars.py -- <out.glb>
 
 No brand: the SUV has the proportions of a Suburban / Yukon XL / Expedition MAX class body (5.7 m, boxy upright
-greenhouse, big chrome grille, roof rails, running boards), the sedan those of a 7 Series / S-Class class body
+greenhouse, big chrome grille, running boards), the sedan those of a 7 Series / S-Class class body
 (5.25 m, long hood, fastback C-pillar, slim lamps, a light bar across the tail). One GLB, two roots: `car-suv`,
 `car-sedan`. Frame as the van's (three.js): nose at -z, kerb side +x, y up, tyre soles at y 0. Nodes the scene
 drives, prefixed with the kind so names stay unique in the file (`suv-…`, `sedan-…`): `<kind>-passenger-door`
@@ -141,7 +141,7 @@ SPECS = {
                  (-1.30, 1.25), (-0.55, 1.84), (-0.40, 1.91), (2.45, 1.92), (2.70, 1.885), (2.84, 1.70),
                  (2.86, 1.10), (2.875, 0.60), (2.80, 0.34)],
         windshield=(-1.30, -0.45), rearGlass=('z', 2.6, 9),
-        windows=[(-1.18, -0.10), (0.00, 1.04), (1.16, 2.52)], pillars=[(-0.10, 0.00), (1.04, 1.16)],
+        windows=[(-1.18, -0.10), (0.00, 1.04), (1.16, 1.95), (2.03, 2.56)], pillars=[(-0.10, 0.00), (1.04, 1.16), (1.95, 2.03)],
         seams=[-1.27, -0.05, 1.10], door=[(0.0, 0.40), (1.10, 0.40), (1.10, 0.86), (1.03, 0.96), (1.10, 1.87), (0.0, 1.87)],
         hinge=0.0, handles=[(-0.42, 1.06), (0.62, 1.06)], mirror=(-1.16, -0.96, 1.22, 1.42),
         bevel=0.14, shieldTop=1.8, floor=0.55, cabin=(-1.25, 2.75), seats=(-0.35, [0.7, 1.8]), seatH=0.74, dash=-1.05),
@@ -151,7 +151,7 @@ SPECS = {
                  (-0.95, 0.96), (-0.25, 1.42), (0.00, 1.48), (0.75, 1.47), (1.35, 1.30), (1.85, 1.04),
                  (2.45, 1.00), (2.58, 0.92), (2.63, 0.70), (2.62, 0.40), (2.55, 0.24)],
         windshield=(-0.95, -0.20), rearGlass=('band', 0.80, 1.84),
-        windows=[(-0.82, 0.05), (0.15, 1.28)], pillars=[(0.05, 0.15)],
+        windows=[(-0.82, 0.05), (0.15, 1.0), (1.08, 1.34)], pillars=[(0.05, 0.15), (1.0, 1.08)],
         seams=[-0.90, 0.10, 1.20], door=[(0.10, 0.30), (1.20, 0.30), (1.20, 0.80), (1.13, 0.90), (1.20, 1.36), (1.10, 1.40), (0.10, 1.47)],
         hinge=0.10, handles=[(-0.30, 0.86), (0.66, 0.86)], mirror=(-0.82, -0.64, 0.97, 1.11),
         bevel=0.13, shieldTop=1.41, floor=0.36, cabin=(-0.9, 1.4), seats=(-0.1, [0.9]), seatH=0.56, dash=-0.75),
@@ -170,7 +170,10 @@ def build(kind, S):
         if abs(abs(a.x) - HW) < 1e-4 and abs(abs(b.x) - HW) < 1e-4 and a.x * b.x > 0 and max(a.y, b.y) > 0.45:
             edges.append(e)
     bmesh.ops.bevel(bm, geom=edges, offset=S['bevel'], segments=5, affect='EDGES', profile=0.5, clamp_overlap=True)
-    cuts = [('y', belt), ('y', winTop)] + [('z', z) for span in S['windows'] + S['pillars'] for z in span] + \
+    # also at the side windows' top line (a bevel's width under the roof), so the black pillars stop there
+    cuts = [('y', belt), ('y', winTop), ('y', min(winTop, roof - S['bevel'] - 0.02))]
+    # and every 3 cm through the window band, so the pillars' black stops at the sloping window line
+    cuts += [('y', belt + 0.03 * i) for i in range(1, int((winTop - belt) / 0.03))] + [('z', z) for span in S['windows'] + S['pillars'] for z in span] + \
            [('z', z) for z in S['windshield']]
     for axis, v in cuts:
         co = B(0, v, 0) if axis == 'y' else B(0, 0, v)
@@ -185,6 +188,35 @@ def build(kind, S):
     for zc in S['axles']:
         for s in (-1, 1):
             c = new_obj('well', cylinder_x(WR, zc, WR + 0.07, *sorted((s * (HW - 0.32), s * (HW + 0.3))), seg=28), slots=[])
+            boolean(body, c); remove(c)
+    # ---- side windows: each a recess cut 3.5 cm into the body along the tumblehome, its outline following the
+    # roofline (kept a bevel's width below it), so the glass sits back behind a black seal
+    taperK = lambda y: 1 - S['taper'] * min(1, max(0, y - belt) / (roof - belt))
+    def roofY(z):
+        ys = []
+        for (za, ya), (zb, yb) in zip(prof, prof[1:] + prof[:1]):
+            if min(za, zb) <= z <= max(za, zb) and za != zb:
+                ys.append(ya + (yb - ya) * (z - za) / (zb - za))
+        return max(ys) if ys else roof
+    def window_outline(z0, z1, m=0.0):
+        yb = belt + 0.035 + m
+        top = lambda z: max(yb + 0.06, min(winTop - m, roofY(z) - S['bevel'] - 0.02 - m))
+        zs = [z0 + m + (z1 - z0 - 2 * m) * i / 8 for i in range(9)]
+        return [(z0 + m, yb), (z1 - m, yb)] + [(z, top(z)) for z in reversed(zs)]
+    S['_outline'] = window_outline
+    S['_taper'] = taperK
+    S['_roofY'] = roofY
+    for s in (-1, 1):
+        for z0, z1 in S['windows']:
+            pts = window_outline(z0, z1)
+            cb = bmesh.new()
+            inner = [cb.verts.new(B(s * (HW * taperK(y) - 0.035), y, z)) for z, y in pts]
+            outer = [cb.verts.new(B(s * (HW * taperK(y) + 0.3), y, z)) for z, y in pts]
+            cb.faces.new(inner); cb.faces.new(list(reversed(outer)))
+            for i in range(len(pts)):
+                j = (i + 1) % len(pts); cb.faces.new([inner[i], inner[j], outer[j], outer[i]])
+            bmesh.ops.recalc_face_normals(cb, faces=cb.faces)
+            c = new_obj('win', cb, slots=[])
             boolean(body, c); remove(c)
     classify(body, S)
     smooth(body)
@@ -257,7 +289,15 @@ def build(kind, S):
         kTop = 1 - S['taper'] * min(1, (winTop - belt) / (roof - belt))
         w0, w1 = S['windows'][0][0], S['windows'][-1][1]
         box(*xs(HW - 0.005, HW + 0.012), belt - 0.012, belt + 0.012, w0, w1, chrome)
-        box(*xs(HW * kTop - 0.01, HW * kTop + 0.008), winTop - 0.01, winTop + 0.012, w0 + 0.1, w1 - (0.25 if kind == 'sedan' else 0.02), chrome)
+        # one chrome strip along the whole window line, over the pillars too, as a luxury car's DLO trim
+        wz0, wz1 = S['windows'][0][0], S['windows'][-1][1]
+        lineY = lambda z: max(belt + 0.1, min(winTop, S['_roofY'](z) - S['bevel'] - 0.02))
+        zs = [wz0 + (wz1 - wz0) * i / 40 for i in range(41)]
+        for za, zb in zip(zs, zs[1:]):
+            ya, yb = lineY(za), lineY(zb)
+            q = [chrome.verts.new(B(s * (HW * S['_taper'](yy) + 0.004), yy + dy, zz)) for zz, yy, dy in
+                 ((za, ya, 0.002), (zb, yb, 0.002), (zb, yb, 0.026), (za, ya, 0.026))]
+            f = chrome.faces.new(q if s < 0 else list(reversed(q))); f.material_index = SI['chrome']
         # side marker and fuel door
         box(*xs(HW - 0.003, HW + 0.004), belt - 0.33, belt - 0.29, S['axles'][0] - 0.78, S['axles'][0] - 0.64, chrome)
         for i, (zh, yh) in enumerate(S['handles']):
@@ -292,9 +332,6 @@ def build(kind, S):
             box(*sorted((s * 0.80, s * 0.97)), 1.06, 1.20, 2.85, 2.875, lamps['reverse'], 'interior')
             # running boards, roof rails on posts
             box(*sorted((s * (HW - 0.10), s * (HW + 0.13))), 0.38, 0.43, -1.30, 1.12, trim)
-            box(*sorted((s * 0.66, s * 0.72)), roof + 0.05, roof + 0.09, -0.25, 2.40, trim)
-            for z in (-0.20, 1.10, 2.35):
-                box(*sorted((s * 0.66, s * 0.72)), roof - 0.01, roof + 0.06, z - 0.05, z + 0.05, trim)
         box(-0.55, 0.55, 1.30, 1.34, 2.865, 2.89, chrome)
         box(-0.30, 0.30, 1.86, 1.885, 2.70, 2.85, trim)                     # roof spoiler lip
         box(-0.012, 0.012, 1.45, 1.75, 2.88, 2.9, trim)                     # rear wiper
@@ -353,22 +390,25 @@ def classify(o, S):
             k = 'trim'
         elif n.y < -0.5:
             k = 'trim'
+        elif c.y > belt + 0.003 and c.y < winTop + 0.02 and abs(c.x) < HW * S['_taper'](c.y) - 0.02 and abs(n.x) > 0.45:
+            k = 'glass'                       # the recessed glass of a side window
+        elif c.y > belt + 0.003 and c.y < winTop + 0.02 and abs(c.x) < HW * S['_taper'](c.y) - 0.002 and abs(n.x) <= 0.45 \
+                and any(a - 0.01 < c.z < b + 0.01 for a, b in S['windows']):
+            k = 'trim'                        # the window recess's black seal
         elif c.y > belt + 0.003 and abs(n.x) > 0.45:
-            if c.y < winTop - 0.003:
-                if any(a < c.z < b for a, b in S['pillars']):
-                    k = 'trim'
-                elif any(a < c.z < b for a, b in S['windows']):
-                    k = 'glass'
+            # black B / C pillars between the windows, up to the window line (not into the roof)
+            if c.y < min(winTop, S['_roofY'](c.z) - S['bevel'] - 0.02) and any(a < c.z < b for a, b in S['pillars']):
+                k = 'trim'
         elif c.y > belt + 0.02 and abs(n.x) <= 0.45:
             w0, w1 = S['windshield']
             mode, r0, r1 = S['rearGlass']
             # the smoothed roof curves into the screens, so each screen stops at its top edge (and the rear glass
             # where the roof starts to fall away), else the roof's leading and trailing curves read as glass
-            if w0 < c.z < w1 and n.z < -0.25 and c.y < S['shieldTop']:
+            if w0 < c.z < w1 and n.z < -0.25 and c.y < S['shieldTop'] and abs(c.x) < HW - 0.18:
                 k = 'glass'
             elif mode == 'z' and c.z > r0 and n.z > 0.3 and c.y < winTop + 0.02:
                 k = 'glass'
-            elif mode == 'band' and r0 < c.z < r1 and n.y < 0.95 and c.y < S['shieldTop']:
+            elif mode == 'band' and r0 < c.z < r1 and n.y < 0.95 and n.z > 0.15 and c.y < S['shieldTop'] and abs(c.x) < HW - 0.18:
                 k = 'glass'
         f.material_index = SI[k]
     bm.to_mesh(o.data); bm.free()
