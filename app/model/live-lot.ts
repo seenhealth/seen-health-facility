@@ -740,8 +740,8 @@ export function createLiveLot(ctx: {
         van,
         car: null,
         lamps: addVanLamps(van.root),
-        wheels: vanWheels(van.root),
-        wheelRadius: 0.36,
+        wheels: van.wheels.length ? van.wheels : vanWheels(van.root),
+        wheelRadius: van.wheelRadius,
         sill: FLEET_VAN_RAMP.sill,
         foot:
           kind === 'wav'

@@ -87,6 +87,25 @@ export function aimBeams(
  */
 export function addVanLamps(root: T.Object3D): VehicleLamps {
   const lamps = makeLamps();
+  // The photo-textured van (fleet-van-model.ts) has its own lamp meshes: light those instead of adding pads.
+  const own: [string, T.MeshStandardMaterial][] = [
+    ['lamp-head', lamps.head],
+    ['lamp-tail', lamps.tail],
+    ['lamp-brake', lamps.brake],
+    ['lamp-reverse', lamps.reverse],
+  ];
+  let lit = 0;
+  for (const [name, m] of own) {
+    const mesh = root.getObjectByName(name);
+    if (mesh instanceof T.Mesh) {
+      mesh.material = m;
+      lit++;
+    }
+  }
+  if (lit === own.length) {
+    aimBeams(root, lamps, -FLEET_VAN.halfLength - 0.02, 0.9, 0.78);
+    return lamps;
+  }
   const nose = -FLEET_VAN.halfLength - 0.02,
     rear = FLEET_VAN.halfLength + 0.02;
   const pad = (

@@ -6,6 +6,7 @@ import { createViewer, defaultState } from '../../app/model/renderer';
 import { createLiveLot, type LiveMessage } from '../../app/model/live-lot';
 import { createDaylight } from '../../app/model/daylight';
 import { createNightLights } from '../../app/model/night-lights';
+import { preloadFleetVanModel } from '../../app/model/fleet-van-model';
 
 /**
  * Static page that shows Seen's real vehicles on the Alhambra lot. A parent
@@ -31,9 +32,13 @@ import { createNightLights } from '../../app/model/night-lights';
 async function main() {
   const host = document.getElementById('root')!;
   const hud = document.getElementById('hud')!;
-  const model = validateFacility(
-    await (await fetch('/models/seen-alhambra-planning.json')).json(),
-  );
+  const [model] = await Promise.all([
+    fetch('/models/seen-alhambra-planning.json')
+      .then((r) => r.json())
+      .then(validateFacility),
+    // The photo-textured fleet van; vans fall back to the procedural body if it fails.
+    preloadFleetVanModel(),
+  ]);
   let lot: ReturnType<typeof createLiveLot> | null = null;
   let daylight: ReturnType<typeof createDaylight> | null = null;
   let nightLights: ReturnType<typeof createNightLights> | null = null;

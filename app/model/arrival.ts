@@ -8,6 +8,7 @@ import {
   sampleFleetVan,
 } from './alhambra-fleet';
 import { FLEET_VAN_CAB_DOOR, FLEET_VAN_RAMP } from './photo-assets';
+import { FLEET_VAN_MODEL, fleetVanModel } from './fleet-van-model';
 import type { Facility, Vec2 } from './schema';
 /** Van-local (x, z) → world for the van docked at the drop-off, to the millimetre. */
 const atDock = ([x, z]: Vec2): Vec2 => {
@@ -171,7 +172,9 @@ export function buildArrival(
  * Shared fleet body, sliding passenger doors and folding ramp for every site,
  * in the livery of `variant` (a letter: 'A' for the first fleet van; see
  * `fleetVanLetter`). Van A uses the model's `fleet-van-a` spec, every other
- * letter `fleet-van-b` when the model has one.
+ * letter `fleet-van-b` when the model has one. Once the photo-textured van
+ * (fleet-van-model.ts) has loaded, every letter uses it instead: the fleet is
+ * one livery on the real van.
  */
 export function buildArrivalVan(
   model: Facility,
@@ -182,13 +185,16 @@ export function buildArrivalVan(
   const spec =
     model.assets[`fleet-van-${letter === 'A' ? 'a' : 'b'}`] ||
     model.assets['fleet-van-a'];
-  const root = buildAsset(
-    {
-      ...spec,
-      parameters: { ...spec.parameters, variant: letter, operable: true },
-    },
-    material,
-  );
+  const photoVan = fleetVanModel();
+  const root = photoVan
+    ? new T.Group().add(photoVan)
+    : buildAsset(
+        {
+          ...spec,
+          parameters: { ...spec.parameters, variant: letter, operable: true },
+        },
+        material,
+      );
   root.name = `animated-van-${letter.toLowerCase()}`;
   // Own copies of the body materials, so one van can fade out at the map edge
   // without touching the others (the renderer's section clones key on these).
@@ -242,6 +248,13 @@ export function buildArrivalVan(
       root.getObjectByName('passenger-door-1')!,
     ],
     cabDoor: root.getObjectByName('driver-door') ?? null,
+    /** Wheels of the photo model (local y is the axle); empty for the procedural body. */
+    wheels: photoVan
+      ? ['fl', 'fr', 'rl', 'rr'].map((k) => root.getObjectByName(`wheel-${k}`)!)
+      : [],
+    wheelRadius: photoVan ? FLEET_VAN_MODEL.wheelRadius : 0.36,
+    /** Slide of each passenger-door leaf when fully open. */
+    doorSlide: photoVan ? FLEET_VAN_MODEL.doorSlide : 0.6,
   };
 }
 /** What a van body needs from a vehicle sampler; fleet vans also fade and open the driver's door. */
@@ -295,10 +308,23 @@ export function updateArrivalVan(
   van.root.rotation.y = sample.heading;
   van.root.visible = enabled && sample.visible;
   fadeVehicle(van.root, sample.opacity ?? 1);
+  // Slide-out ramp: stowed telescoped to a third of its length under the floor,
+  // it runs out level from under the door sill over the first 65% of `ramp`,
+  // extending as it goes, then its outer end tips down to the ground about the sill.
+  const ramp = FLEET_VAN_RAMP,
+    run = smooth(0, 0.65, sample.ramp),
+    tip = smooth(0.65, 1, sample.ramp),
+    stretch = T.MathUtils.lerp(0.32, 1, run);
   van.pivot.visible = sample.ramp > 0.001;
-  van.pivot.rotation.z = T.MathUtils.lerp(Math.PI / 2, rampAngle, sample.ramp);
+  van.pivot.scale.x = stretch;
+  van.pivot.position.set(
+    ramp.hinge[0] - ramp.length * stretch * (1 - run),
+    ramp.hinge[1] - 0.07 * (1 - tip),
+    ramp.hinge[2],
+  );
+  van.pivot.rotation.z = rampAngle * tip;
   van.doors.forEach(
-    (door, i) => (door.position.z = (i ? 1 : -1) * 0.6 * sample.door),
+    (door, i) => (door.position.z = (i ? 1 : -1) * van.doorSlide * sample.door),
   );
   if (van.cabDoor)
     van.cabDoor.rotation.y =

@@ -12,7 +12,7 @@ import { defineConfig, type Plugin } from 'vite';
 
 const here = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 const FACILITY = 'models/seen-alhambra-planning.json';
-const STATIC = ['brand/seen-health-horizontal.png', 'favicon.svg', 'reference/fleet/final-vans.png', 'models/seen-home-wong.json'];
+const STATIC = ['brand/seen-health-horizontal.png', 'favicon.svg', 'reference/fleet/final-vans.png', 'models/seen-home-wong.json', 'models/fleet-van.glb'];
 
 type Facility = { site?: { image?: string }; levels?: { planImage?: string }[]; materials?: Record<string, { textureUrl?: string }>; assets?: Record<string, { modelUrl?: string }> };
 
