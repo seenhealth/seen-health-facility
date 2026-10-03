@@ -1182,13 +1182,12 @@ export function buildAlhambraExterior(model: Facility) {
   // (the envelope's shell-lobby-west-opening-3, z −1.746 to 0.004, 2.3 m high) with the door operator's band
   // across its top (maker's label at the left) under a slim header (motion sensor), stucco showing between it and
   // the canopy; the leaves themselves are arrival.ts's (ENTRY_DOORS). Past the door, two windows in deep white
-  // surrounds, the second with a pale curtain behind the glass, over the envelope's window and side-door openings
-  // (stuccoed over: the photo shows neither as drawn there), a red notice between them, the accessibility sign
+  // surrounds with the doors' clear glass (the envelope's openings 2 and 1, sized to the photo), the second with a
+  // pale curtain inside, the no-smoking notice between them, the accessible-entrance plate and the door keypad
   // beside the portal, an alarm box and a camera dome to its left. The canopy's four tie rods run from plates on
   // the wall down to its front edge.
   const LOBBY_X = -14.653 - 0.125;
   const sash = '#d6d4cc',
-    stucco = '#d0c3a7',
     surround = '#ecebe6',
     bronzeRod = '#6b5845';
   const opZ0 = -1.746,
@@ -1202,9 +1201,17 @@ export function buildAlhambraExterior(model: Facility) {
   box(lobby, LOBBY_X - 0.1, 2.15, ldZ, 0.2, ldH - 2.15, ldW, sash);
   box(lobby, LOBBY_X - 0.203, 2.2, opZ0 + 0.22, 0.004, 0.025, 0.16, '#77797a');
   box(lobby, LOBBY_X - 0.33, 2.36, opZ1 - 0.3, 0.06, 0.06, 0.24, '#1d1f21');
-  // Stucco over the envelope's window (z 0.204..1.604) and side-door (2.154..3.254) openings, then the windows.
-  box(lobby, LOBBY_X - 0.03, 0.6, 0.904, 0.03, 1.75, 1.42, stucco);
-  box(lobby, LOBBY_X - 0.03, 0, 2.704, 0.03, 2.25, 1.12, stucco);
+  // The two windows (the envelope's openings 2 and 1, sized to them): deep white surrounds, the sliding doors'
+  // clear dark glass (lit at night with them, night-lights.ts), a pale curtain inside the second.
+  const winGlass = new T.MeshStandardMaterial({
+    color: '#0e1417',
+    roughness: 0.12,
+    metalness: 0.35,
+    transparent: true,
+    opacity: 0.9,
+    depthWrite: false,
+  });
+  const panes = group(lobby, 'lobby-window-glass');
   for (const [zc, w, curtain] of [
     [1.1, 0.96, false],
     [2.35, 0.85, true],
@@ -1216,34 +1223,58 @@ export function buildAlhambraExterior(model: Facility) {
     box(lobby, LOBBY_X - 0.1, y0, zc + w / 2 - rim / 2, 0.14, h, rim, surround);
     box(lobby, LOBBY_X - 0.1, y0 + h - rim, zc, 0.14, rim, w, surround);
     box(lobby, LOBBY_X - 0.1, y0, zc, 0.16, rim, w + 0.04, surround);
-    box(
-      lobby,
-      LOBBY_X - 0.06,
-      y0 + rim,
-      zc,
-      0.012,
-      h - 2 * rim,
-      w - 2 * rim,
-      '#1f2a33',
+    const pane = new T.Mesh(
+      new T.BoxGeometry(0.012, h - 2 * rim, w - 2 * rim),
+      winGlass,
     );
+    pane.position.set(LOBBY_X + 0.06, y0 + h / 2, zc);
+    pane.renderOrder = 2;
+    panes.add(pane);
     if (curtain)
       box(
         lobby,
-        LOBBY_X - 0.053,
-        y0 + rim + 0.05,
+        LOBBY_X + 0.22,
+        y0 + rim + 0.04,
         zc + 0.08,
-        0.004,
-        h - 2 * rim - 0.1,
+        0.01,
+        h - 2 * rim - 0.08,
         w - 2 * rim - 0.25,
         '#bfd8d2',
       );
   }
-  box(lobby, LOBBY_X - 0.008, 1.32, 1.76, 0.012, 0.24, 0.2, '#f1efe9');
-  box(lobby, LOBBY_X - 0.016, 1.36, 1.76, 0.004, 0.14, 0.16, '#c73a32');
-  // Accessibility sign and a small device right of the portal; an alarm box left of it.
-  box(lobby, LOBBY_X - 0.008, 1.22, 0.3, 0.012, 0.16, 0.16, '#2f62b3');
-  box(lobby, LOBBY_X - 0.014, 1.27, 0.3, 0.004, 0.06, 0.04, '#f8f6f1');
-  box(lobby, LOBBY_X - 0.025, 0.95, 0.38, 0.05, 0.1, 0.07, '#3a3d3f');
+  // Signs on the stucco (scripts/lobby-door-decals.py): the no-smoking notice between the windows and the
+  // accessible-entrance plate beside the portal, with the door's keypad below it.
+  const signMaterial = (url: string) => {
+    if (typeof document === 'undefined') return null;
+    const map = new T.TextureLoader().load(url);
+    map.colorSpace = T.SRGBColorSpace;
+    map.anisotropy = 4;
+    return new T.MeshStandardMaterial({ map, alphaTest: 0.5, roughness: 0.7 });
+  };
+  for (const [url, w, h, y, z] of [
+    ['/reference/photos/lobby-no-smoking.png', 0.28, 0.2, 1.45, 1.752],
+    ['/reference/photos/lobby-access-sign.png', 0.15, 0.15, 1.3, 0.33],
+  ] as [string, number, number, number, number][]) {
+    const m = signMaterial(url);
+    if (!m) continue;
+    const plate = new T.Mesh(new T.PlaneGeometry(w, h), m);
+    plate.rotation.y = -Math.PI / 2;
+    plate.position.set(LOBBY_X - 0.012, y, z);
+    lobby.add(plate);
+  }
+  box(lobby, LOBBY_X - 0.03, 0.88, 0.36, 0.06, 0.15, 0.09, '#1c1e20');
+  for (let r = 0; r < 4; r++)
+    for (let c = 0; c < 3; c++)
+      box(
+        lobby,
+        LOBBY_X - 0.062,
+        0.9 + r * 0.028,
+        0.335 + c * 0.025,
+        0.006,
+        0.016,
+        0.016,
+        '#e9e9e6',
+      );
   box(lobby, LOBBY_X - 0.035, 1.78, opZ0 - 0.95, 0.07, 0.16, 0.13, '#ecebe6');
   box(lobby, LOBBY_X - 0.072, 1.86, opZ0 - 0.95, 0.006, 0.04, 0.07, '#c8322c');
   // Canopy tie rods: plates on the wall a metre above the canopy, rods down to its front edge.

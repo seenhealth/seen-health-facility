@@ -34493,19 +34493,19 @@
         "openings": [
           {
             "id": "shell-lobby-west-opening-1",
-            "offset": 5.65,
-            "width": 1.1,
-            "sill": 0,
-            "height": 2.2,
-            "kind": "door",
-            "material": "photo-white"
+            "offset": 6.1288,
+            "width": 0.85,
+            "sill": 0.88,
+            "height": 1.4,
+            "kind": "window",
+            "material": "om-glass"
           },
           {
             "id": "shell-lobby-west-opening-2",
-            "offset": 7.3,
-            "width": 1.4,
-            "sill": 0.65,
-            "height": 1.65,
+            "offset": 7.3238,
+            "width": 0.96,
+            "sill": 0.88,
+            "height": 1.4,
             "kind": "window",
             "material": "om-glass"
           },

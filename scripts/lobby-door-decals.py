@@ -86,3 +86,39 @@ def stickers():
 
 decal(); stickers()
 print('wrote lobby-door-decal.png, lobby-door-stickers.png')
+
+
+def wall_signs():
+    """Signs on the stucco beside the entrance (photos 2026-10-03), at 2 px per mm."""
+    # No-smoking notice between the windows: white plate, red lettering, a red band at the foot.
+    w, h = 560, 400
+    im = Image.new('RGBA', (w, h), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+    red = (190, 32, 40, 255)
+    d.rounded_rectangle((0, 0, w - 1, h - 1), 18, fill=(250, 250, 247, 255))
+    d.rectangle((22, 22, w - 23, h - 23), outline=red, width=4)
+    def centred(y, text, f, fill):
+        d.text(((w - d.textlength(text, font=f)) / 2, y), text, font=f, fill=fill)
+    centred(36, 'NO', bold(78), red)
+    centred(116, 'SMOKING', bold(84), red)
+    centred(214, 'WITHIN 25 FEET OF', font(HN, 34, 0), red)
+    centred(254, 'BUILDING ENTRANCE', font(HN, 34, 0), red)
+    d.rectangle((26, 300, w - 27, h - 27), fill=red)
+    centred(306, 'PLEASE DO NOT THROW', bold(30), (255, 255, 255, 255))
+    centred(340, 'BUTTS ON GROUND', bold(30), (255, 255, 255, 255))
+    im.save(os.path.join(OUT, 'lobby-no-smoking.png'))
+    # Accessible-entrance plate beside the door: the symbol of access in white on a grey plate.
+    n = 256
+    im = Image.new('RGBA', (n, n), (112, 115, 118, 255)); d = ImageDraw.Draw(im)
+    W = (246, 246, 244, 255)
+    def stroke(pts, width):
+        d.line(pts, fill=W, width=width, joint='curve')
+        for x, y in pts:
+            d.ellipse((x - width / 2, y - width / 2, x + width / 2, y + width / 2), fill=W)
+    d.ellipse((104 - 20, 48 - 20, 104 + 20, 48 + 20), fill=W)
+    stroke([(100, 82), (100, 150), (160, 150), (184, 204), (212, 204)], 22)
+    stroke([(100, 108), (148, 108)], 16)
+    d.arc((112 - 58, 176 - 58, 112 + 58, 176 + 58), -48, 228, fill=W, width=16)
+    im.save(os.path.join(OUT, 'lobby-access-sign.png'))
+
+wall_signs()
+print('wrote lobby-no-smoking.png, lobby-access-sign.png')

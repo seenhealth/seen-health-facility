@@ -1,6 +1,15 @@
 import * as T from 'three';
 import type { EnvelopeWall, Facility, Vec2 } from './schema';
 
+/**
+ * Openings glazed elsewhere: the lobby's sliding doors (arrival.ts ENTRY_DOORS) and the two windows beside them,
+ * which take the doors' clear dark glass (alhambra-exterior.ts).
+ */
+const OWN_GLAZING = new Set([
+  'shell-lobby-west-opening-3',
+  'shell-lobby-west-opening-2',
+  'shell-lobby-west-opening-1',
+]);
 export function buildEnvelopeWall(
   w: EnvelopeWall,
   material: (id: string) => T.Material,
@@ -68,7 +77,7 @@ export function buildEnvelopeWall(
   for (const o of w.openings) {
     const height = Math.min(o.height, h - o.sill);
     if (height <= 0) continue;
-    if (!o.operable && o.id !== 'shell-lobby-west-opening-3')
+    if (!o.operable && !OWN_GLAZING.has(o.id))
       block(o.offset, o.sill, o.width, height, 0.055, o.material, o.id);
     const frame = 0.045;
     block(o.offset, o.sill, frame, height, w.thickness + 0.035, 'frame');

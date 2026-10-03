@@ -279,7 +279,8 @@ export function createNightLights(
       if (!(o instanceof T.Mesh)) return;
       if (o.material === glass) o.material = glow;
       else if (
-        (o.parent?.name ?? '').startsWith('sliding-entry-leaf-') &&
+        ((o.parent?.name ?? '').startsWith('sliding-entry-leaf-') ||
+          o.parent?.name === 'lobby-window-glass') &&
         (o.material as T.Material).transparent
       )
         o.material = leafGlow;
