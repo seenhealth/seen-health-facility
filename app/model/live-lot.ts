@@ -74,6 +74,11 @@ export type LiveVehicle = {
   state: LiveState;
   /** Minutes to the center while inbound; drives how far along the approach the vehicle is drawn. */
   etaMinutes?: number | null;
+  /**
+   * A new inbound vehicle drives into view instead of appearing where its ETA puts it: with an ETA it comes in from
+   * the edge of the map up the street, with none (or 0) from just short of the lot entrance (the simulator's).
+   */
+  fromOutside?: boolean;
   highlight?: boolean;
 };
 export type LiveMessage = {
@@ -983,7 +988,13 @@ export function createLiveLot(ctx: {
         live.set(v.id, l);
         if (v.state === 'inbound') {
           start(l, fleetRoutes.awayToFrontDock(), 'arriving');
-          l.s = l.targetS = approachTarget(v, l.drive!);
+          l.targetS = approachTarget(v, l.drive!);
+          if (v.fromOutside) {
+            const entry = l.drive!.legs.find((g) => g.leg.id === 'entry-in');
+            const arriving = !v.etaMinutes;
+            l.s = arriving && entry ? Math.max(0, entry.start - 12) : 0;
+            l.vel = arriving ? SPEED.lot : SPEED.street;
+          } else l.s = l.targetS;
           pose(l);
         } else parkAt(l);
       } else {

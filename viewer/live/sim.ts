@@ -12,8 +12,9 @@ import type {
  * next to the real ones (main.ts), so on the VTC page they share the lot with
  * live traffic. Nothing leaves the page: the dispatch app never sees them.
  *
- * A vehicle arrives `inbound` (ETA 0 drives straight to the drop-off, more
- * waits up the street), unloads at the drop-off and backs into a bay on its
+ * A vehicle arrives `inbound` and drives into view (`fromOutside`): with ETA 0
+ * from just short of the lot entrance straight to the drop-off, with an ETA in
+ * from the edge of the map to wait up the street, unloads at the drop-off and backs into a bay on its
  * own; Board sets it `on-lot` with its riders walking out to it (a lift van
  * deploys its ramp for a wheelchair rider); Away sends it off.
  */
@@ -132,6 +133,7 @@ export function createSimPanel(opts: {
         lines: ['Simulated vehicle (?debug)'],
         state: 'inbound',
         etaMinutes: eta,
+        fromOutside: true,
         driver: { name: `Sim ${n}`, initials: `S${n}` },
         riders,
       },
