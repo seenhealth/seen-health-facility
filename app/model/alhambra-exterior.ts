@@ -79,8 +79,9 @@ export const DROP_OFF = (() => {
       z1: lower.z1,
       y: lowerY,
     },
+    // In line with the lower run's west rail, which it continues round the turn landing.
     turn: {
-      x: turn.x0 + 0.05,
+      x: lower.x - width / 2 - 0.05,
       z0: turn.z0,
       z1: turn.z1 - 0.05,
       y: () => midTop,
@@ -626,28 +627,6 @@ export function buildAlhambraExterior(model: Facility) {
       stepsW,
       paving,
     );
-  // A bronze handrail down each side of the steps (photo 2026-10-02), looping back at the foot.
-  for (const sz of [steps.z0 + 0.05, steps.z1 - 0.05]) {
-    box(landing, steps.x1 - 0.05, LAND.top, sz, 0.035, 0.95, 0.035, bronze);
-    box(landing, steps.x0, L_STREET, sz, 0.035, 0.95, 0.035, bronze);
-    for (const dy of [0.95, 0.6])
-      beam(
-        landing,
-        [steps.x1 - 0.05, LAND.top + dy, sz],
-        [steps.x0, L_STREET + dy, sz],
-        0.03,
-        0.03,
-        bronze,
-      );
-    beam(
-      landing,
-      [steps.x0, L_STREET + 0.95, sz],
-      [steps.x0 - 0.3, L_STREET + 0.6, sz],
-      0.03,
-      0.03,
-      bronze,
-    );
-  }
   const upperLen = upper.z1 - upper.z0,
     lowerLen = lower.z1 - lower.z0;
   const upperSlab = box(
@@ -682,76 +661,111 @@ export function buildAlhambraExterior(model: Facility) {
     paving,
   );
   lowerSlab.rotation.x = Math.atan2(rise / 2, lowerLen);
-  const railRun = ({
-    x,
-    z0,
-    z1,
-    y,
-  }: {
-    x: number;
-    z0: number;
-    z1: number;
-    y: (z: number) => number;
-  }) => {
-    for (let z = z0; z <= z1 + 0.01; z += 1.4)
-      box(
-        landing,
-        x,
-        y(Math.min(z, z1)),
-        Math.min(z, z1),
-        0.035,
-        0.95,
-        0.035,
-        bronze,
-      );
-    box(landing, x, y(z1), z1, 0.035, 0.95, 0.035, bronze);
-    for (const dy of [0.45, 0.65, 0.85, 1.0])
-      beam(
-        landing,
-        [x, y(z0) + dy, z0],
-        [x, y(z1) + dy, z1],
-        0.03,
-        0.03,
-        bronze,
-      );
-  };
-  // The landing's guard (photo 2026-10-02): nine bars under a top rail, posts bolted to the landing's face on
-  // bronze brackets; the same guard runs along its −z edge above the bike rack, wall to the head of the steps.
+  // Guards (photos 2026-10-02/03): nine bars under a heavier top rail on posts bolted to the slab's face on bronze
+  // brackets, one continuous run along the landing, up the upper ramp run, round the turn landing and down the
+  // lower run; the same guard along the landing's −z edge above the bike rack.
   const guardBars = [
     0.12, 0.225, 0.33, 0.435, 0.54, 0.645, 0.75, 0.855, 0.96, 1.05,
   ];
-  {
-    const r = rails.landing;
-    for (let z = r.z0; z <= r.z1 + 0.01; z += 1.4) {
-      const zz = Math.min(z, r.z1);
-      box(landing, r.x, LAND.top - 0.2, zz, 0.04, 1.27, 0.04, bronze);
-      box(landing, r.x + 0.03, LAND.top - 0.2, zz, 0.025, 0.13, 0.2, bronze);
+  const guardRun = (
+    r: { x: number; z0: number; z1: number; y: (z: number) => number },
+    toward: number,
+    startPost = true,
+  ) => {
+    const n = Math.max(1, Math.ceil((r.z1 - r.z0) / 1.4));
+    for (let i = startPost ? 0 : 1; i <= n; i++) {
+      const z = r.z0 + ((r.z1 - r.z0) * i) / n;
+      box(landing, r.x, r.y(z) - 0.2, z, 0.04, 1.27, 0.04, bronze);
+      box(
+        landing,
+        r.x + toward * 0.03,
+        r.y(z) - 0.2,
+        z,
+        0.025,
+        0.13,
+        0.2,
+        bronze,
+      );
     }
     for (const dy of guardBars)
       beam(
         landing,
-        [r.x, LAND.top + dy, r.z0],
-        [r.x, LAND.top + dy, r.z1],
+        [r.x, r.y(r.z0) + dy, r.z0],
+        [r.x, r.y(r.z1) + dy, r.z1],
         0.03,
         dy > 1 ? 0.045 : 0.03,
         bronze,
       );
-    const gz = LAND.z0 - 0.05,
-      gx0 = LAND.x + LAND.w / 2 - 0.05,
-      gx1 = LAND.x - LAND.w / 2;
-    for (const x of [gx0, (gx0 + gx1) / 2, gx1]) {
-      box(landing, x, LAND.top - 0.2, gz, 0.04, 1.27, 0.04, bronze);
-      box(landing, x, LAND.top - 0.2, gz + 0.03, 0.2, 0.13, 0.025, bronze);
-    }
-    for (const dy of guardBars)
-      beam(
-        landing,
-        [gx0, LAND.top + dy, gz],
-        [gx1, LAND.top + dy, gz],
-        dy > 1 ? 0.045 : 0.03,
-        0.03,
-        bronze,
-      );
+  };
+  guardRun(rails.landing, 1);
+  guardRun(rails.upper, 1, false);
+  guardRun(rails.lowerEast, -1);
+  guardRun(rails.lowerWest, 1);
+  guardRun(rails.turn, 1, false);
+  const gz = LAND.z0 - 0.05,
+    gx0 = LAND.x + LAND.w / 2 - 0.05,
+    gx1 = LAND.x - LAND.w / 2;
+  for (const x of [gx0, (gx0 + gx1) / 2, gx1]) {
+    box(landing, x, LAND.top - 0.2, gz, 0.04, 1.27, 0.04, bronze);
+    box(landing, x, LAND.top - 0.2, gz + 0.03, 0.2, 0.13, 0.025, bronze);
+  }
+  for (const dy of guardBars)
+    beam(
+      landing,
+      [gx0, LAND.top + dy, gz],
+      [gx1, LAND.top + dy, gz],
+      dy > 1 ? 0.045 : 0.03,
+      0.03,
+      bronze,
+    );
+  // Stair handrails: each leaves the top of a guard post at the head of the steps (the bike-side guard's front post,
+  // the landing guard's first post), runs down over the nosings to a post at the foot and returns in a loop.
+  const handrail = (z: number, xTop: number) => {
+    const top = LAND.top + 1.05,
+      foot = L_STREET + 0.92,
+      xb = steps.x0 - 0.05;
+    box(landing, xb, L_STREET, z, 0.04, 0.92, 0.04, bronze);
+    beam(landing, [xTop, top, z], [xb, foot, z], 0.045, 0.045, bronze);
+    beam(landing, [xb, foot, z], [xb - 0.3, foot, z], 0.045, 0.045, bronze);
+    beam(
+      landing,
+      [xb - 0.3, foot, z],
+      [xb - 0.3, foot - 0.22, z],
+      0.04,
+      0.04,
+      bronze,
+    );
+    beam(
+      landing,
+      [xb - 0.3, foot - 0.22, z],
+      [xb, foot - 0.22, z],
+      0.04,
+      0.04,
+      bronze,
+    );
+  };
+  handrail(gz, gx1);
+  handrail(rails.landing.z0, rails.landing.x);
+  // The lower run's guards run on past its toe and loop back, as the stairs' do.
+  for (const r of [rails.lowerEast, rails.lowerWest]) {
+    const t = r.y(r.z0) + 1.05;
+    beam(landing, [r.x, t, r.z0], [r.x, t, r.z0 - 0.3], 0.045, 0.045, bronze);
+    beam(
+      landing,
+      [r.x, t, r.z0 - 0.3],
+      [r.x, t - 0.22, r.z0 - 0.3],
+      0.04,
+      0.04,
+      bronze,
+    );
+    beam(
+      landing,
+      [r.x, t - 0.22, r.z0 - 0.3],
+      [r.x, t - 0.22, r.z0],
+      0.04,
+      0.04,
+      bronze,
+    );
   }
   // Yellow nosings on the steps and the landing's edge above them, and the yellow tactile paving at their foot
   // that turns along the walk toward the ramp's toe.
@@ -792,20 +806,6 @@ export function buildAlhambraExterior(model: Facility) {
     lower.z0 - steps.z1 - 0.6,
     '#d8b23a',
   );
-  railRun(rails.upper);
-  railRun(rails.lowerEast);
-  railRun(rails.lowerWest);
-  // The turn landing's rail runs on from the lower run's west rail: no post at its start.
-  for (const dy of [0.45, 0.65, 0.85, 1.0])
-    beam(
-      landing,
-      [rails.turn.x, midTop + dy, rails.turn.z0],
-      [rails.turn.x, midTop + dy, rails.turn.z1],
-      0.03,
-      0.03,
-      bronze,
-    );
-  box(landing, rails.turn.x, midTop, rails.turn.z1, 0.035, 0.95, 0.035, bronze);
   // Rear court planters (REAR_COURT_PLANTERS).
   const court = group(site, 'rear-court-planters');
   for (const [x0, z0, x1, z1] of REAR_COURT_PLANTERS) {
