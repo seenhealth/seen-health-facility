@@ -1278,66 +1278,75 @@ export function buildAlhambraExterior(model: Facility) {
     );
     box(court2, FACE_X + 0.04, py + 1.33, sz, 0.06, 0.16, 0.16, '#9a9fa0');
   }
-  // Aluminium-framed glass double door, 1.9 m wide, 1.3 m in from the canopy's north end; a camera above its north jamb.
-  box(court2, FACE_X + 0.03, 0, doorZ, 0.1, 2.45, doorW + 0.2, alu);
-  box(court2, FACE_X + 0.07, 0.03, doorZ, 0.04, 2.35, doorW, glassDark);
-  box(court2, FACE_X + 0.1, 0.03, doorZ, 0.02, 2.35, 0.06, alu);
+  // The door and both windows share one deep light-grey surround (photo 2026-10-03): 0.14 m wide and 0.12 m proud
+  // of the wall on every side (no sill under the door). Windows are 1.3 m tall with their tops level with the
+  // door's (2.45 m): the square one under the canopy south of the door, the wider one past the canopy's south end
+  // (the envelope's shell-rear-east-opening-1, z -11.04 to -9.72).
+  const rearSurround = '#d3d5d3',
+    rim = 0.14,
+    proud = 0.12;
+  const frameAround = (
+    z0: number,
+    z1: number,
+    y0: number,
+    y1: number,
+    sill: boolean,
+  ) => {
+    for (const z of [z0 - rim / 2, z1 + rim / 2])
+      box(
+        court2,
+        FACE_X + proud / 2,
+        sill ? y0 - rim : 0,
+        z,
+        proud,
+        y1 + rim - (sill ? y0 - rim : 0),
+        rim,
+        rearSurround,
+      );
+    box(
+      court2,
+      FACE_X + proud / 2,
+      y1,
+      (z0 + z1) / 2,
+      proud,
+      rim,
+      z1 - z0 + 2 * rim,
+      rearSurround,
+    );
+    if (sill)
+      box(
+        court2,
+        FACE_X + proud / 2,
+        y0 - rim,
+        (z0 + z1) / 2,
+        proud,
+        rim,
+        z1 - z0 + 2 * rim,
+        rearSurround,
+      );
+  };
+  // Glass double door, 1.9 m wide, 1.3 m in from the canopy's north end; a camera above its north jamb.
+  frameAround(doorZ - doorW / 2, doorZ + doorW / 2, 0, 2.45, false);
+  box(court2, FACE_X + 0.03, 0, doorZ, 0.04, 2.45, doorW, glassDark);
+  box(court2, FACE_X + 0.06, 0, doorZ, 0.03, 2.45, 0.07, rearSurround);
   for (const sz of [doorZ - 0.6, doorZ + 0.6])
-    box(court2, FACE_X + 0.1, 1.0, sz, 0.02, 0.9, 0.04, alu);
+    box(court2, FACE_X + 0.07, 1.0, sz, 0.02, 0.9, 0.04, alu);
   box(
     court2,
     FACE_X + 0.12,
-    2.65,
+    2.75,
     doorZ + doorW / 2 + 0.45,
     0.14,
     0.14,
     0.14,
     '#cfd2d3',
   );
-  // Two windows in silver frames, both 1.3 m tall with their tops level with the door's (2.45 m, photo
-  // 2026-10-03): the square one under the canopy, south of the door, and the wider one past the canopy's south end
-  // (the envelope's shell-rear-east-opening-1, z -11.04 to -9.72, given the same frame).
   const winZ = pz0 + 2.5 + 0.65,
     winTop = 2.45,
     winH = 1.3;
-  box(
-    court2,
-    FACE_X + 0.03,
-    winTop - winH - 0.05,
-    winZ,
-    0.08,
-    winH + 0.1,
-    1.4,
-    alu,
-  );
-  box(court2, FACE_X + 0.085, winTop - winH, winZ, 0.02, winH, 1.3, glassDark);
-  {
-    const z0 = -11.04,
-      z1 = -9.72,
-      rim = 0.1;
-    for (const z of [z0 - rim / 2, z1 + rim / 2])
-      box(
-        court2,
-        FACE_X + 0.03,
-        winTop - winH - rim,
-        z,
-        0.08,
-        winH + 2 * rim,
-        rim,
-        alu,
-      );
-    for (const y of [winTop - winH - rim, winTop])
-      box(
-        court2,
-        FACE_X + 0.03,
-        y,
-        (z0 + z1) / 2,
-        0.08,
-        rim,
-        z1 - z0 + 2 * rim,
-        alu,
-      );
-  }
+  frameAround(winZ - 0.65, winZ + 0.65, winTop - winH, winTop, true);
+  box(court2, FACE_X + 0.02, winTop - winH, winZ, 0.02, winH, 1.3, glassDark);
+  frameAround(-11.04, -9.72, winTop - winH, winTop, true);
   // Raised concrete landing along the wall in front of the door and window, two steps up from the lot.
   const landW = 2.1,
     landZ0 = pz0 + 0.4,
