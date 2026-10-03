@@ -812,7 +812,7 @@ outside is a hole leg.
 13.0 × 9.0 m (117 m², 1,259 sq ft), two bedrooms and one bath on one floor,
 behind the existing 8.0 × 2.6 m porch and ramp. Plan frame P: metres, origin at
 the centre of the house-plus-porch footprint, +x east (the front door and the
-street), +z north, y = 0 the finished floor (`PORCH_Y` on the pad). P is
+street), +z south, y = 0 the finished floor (`PORCH_Y` on the pad). P is
 world-aligned: world = P + (−92.0, 12.0).
 
 | Room (id) | Size (m) | m² | What it holds |

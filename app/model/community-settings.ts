@@ -493,7 +493,7 @@ export const careSettings: CareSetting[] = [
     ],
     accent: '#c98f5a',
     // The Wongs' bungalow (public/models/seen-home-wong.json). Its plan frame
-    // is world-aligned (+x east, +z north): world = P + (−92.0, 12). The front
+    // is world-aligned (+x east, +z south): world = P + (−92.0, 12). The front
     // wall's outer face (P x 3.2) lies on the porch slab's back edge (local
     // z −7.6) and the front door's opening on the `door` anchor; the porch
     // zone is left to the pad, which already draws it (validate-home.mjs).

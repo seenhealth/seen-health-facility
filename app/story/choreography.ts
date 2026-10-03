@@ -3,11 +3,11 @@ import type { Step } from './data';
 /**
  * Declarative camera direction for every beat of the story.
  *
- * World axes: +x east, +z north, y up (metres). Angles are radians. Azimuth
- * is measured around +y from +z: the camera sits at target + (sin a, ·, cos a),
- * so 0 puts it north of the subject looking south, π/2 east of it looking
- * west, and the renderer's default iso (~0.576) sees the north and east
- * faces. Elevation is the angle above the ground plane. Zoom is the
+ * World axes: +x east, +z south, y up (metres; frame.ts COMPASS). Angles are
+ * radians. Azimuth is measured around +y from +z: the camera sits at target +
+ * (sin a, ·, cos a), so 0 puts it south of the subject looking north, π/2 east
+ * of it looking west, and the renderer's default iso (~0.576) sees the south
+ * and east faces. Elevation is the angle above the ground plane. Zoom is the
  * orthographic zoom (1 shows 80 m of stage height; 0.9 frames the whole site,
  * ~2-3 a zone, ~5-9 a person).
  */

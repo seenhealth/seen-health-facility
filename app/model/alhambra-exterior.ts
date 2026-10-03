@@ -834,8 +834,10 @@ export function buildAlhambraExterior(model: Facility) {
     }
   }
   // Rear court (photos and the dispatcher's annotated screenshots, 2026-10-02).
-  // Note the model's +x runs toward the lot (screen-left in the lot shot), so
-  // "west" below means larger x. The staff entrance is on the wing's EAST
+  // The model's +x is east and +z south (frame.ts COMPASS); "north" and
+  // "south" below follow the code's street names, where Valley Blvd is the
+  // north street (+z), so they are the compass's south and north. The staff
+  // entrance is on the wing's EAST
   // face (x 15.26, the long wall between the garage corner at z −12.5 and the
   // adjacent block at z 3.5): a cable-hung pergola of powder-blue slats on a
   // steel-blue frame over the glass double door at its north end, a dark
