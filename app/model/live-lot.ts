@@ -827,6 +827,73 @@ export function createLiveLot(ctx: {
     root.remove(l.label);
     live.delete(l.v.id);
   }
+  /**
+   * What the plate shows, kept in step with what the lot is doing rather than with the feed's text (which says
+   * "arriving · 2 riders" until the next update): arriving with everyone aboard; getting off with only those still
+   * aboard; parking; parked (the feed's next-departure line, for a car the feed has on the lot); getting on, counting
+   * who is aboard; departing with whoever boarded.
+   */
+  function onPlate(l: Live): LiveVehicle {
+    const v = l.v,
+      all = v.riders ?? [],
+      plural = (n: number) => `${n} rider${n === 1 ? '' : 's'}`;
+    if (l.mode === 'docked') {
+      const d = l.dock,
+        n = l.arriving.length,
+        aboard = d ? d.queue : [],
+        off = n - aboard.length;
+      const detail = !n
+        ? 'at the drop-off'
+        : !d
+          ? 'everyone off'
+          : d.phase === 'open'
+            ? `getting off · ${plural(n)}`
+            : d.phase === 'unload'
+              ? `getting off · ${off} of ${n} off`
+              : 'everyone off';
+      return { ...v, detail, riders: aboard };
+    }
+    if (l.mode === 'toBay') return { ...v, detail: 'parking', riders: [] };
+    if (l.mode === 'parked') {
+      const boarding = all.filter((p) => p.boarding);
+      const walking = walkers.ids(`${v.id}|in|`).length;
+      if (
+        boarding.length &&
+        (boarding.some((p) => !l.boarded.has(p.name)) || walking)
+      ) {
+        const on = Math.max(0, l.boarded.size - walking);
+        return {
+          ...v,
+          detail: `getting on · ${on} of ${boarding.length} on`,
+          riders: boarding,
+        };
+      }
+      if (boarding.length && l.boarded.size)
+        return {
+          ...v,
+          detail: `parked · ${plural(l.boarded.size)} aboard`,
+          riders: boarding,
+        };
+      const next = v.state === 'on-lot' && v.detail ? ` · ${v.detail}` : '';
+      return {
+        ...v,
+        detail: `parked${next}`,
+        riders: v.state === 'on-lot' ? all : [],
+      };
+    }
+    if (l.mode === 'leaving') {
+      const aboard = all.filter((p) => l.boarded.has(p.name));
+      return {
+        ...v,
+        detail: aboard.length
+          ? `departing · ${plural(aboard.length)}`
+          : 'departing',
+        riders: aboard,
+      };
+    }
+    if (l.mode === 'arriving') return { ...v, riders: l.arriving };
+    return v;
+  }
   function approachTarget(v: LiveVehicle, d: Drive) {
     const eta = v.etaMinutes ?? HORIZON_MIN;
     const f = Math.min(1, Math.max(0, 1 - eta / HORIZON_MIN));
@@ -1341,21 +1408,22 @@ export function createLiveLot(ctx: {
         on: l.mode !== 'parked' && l.mode !== 'waiting' && l.opacity > 0.3,
       });
       const expanded = l.v.id === expandedId;
+      const shownV = onPlate(l);
       const text = JSON.stringify([
-        l.v.label,
-        l.v.detail ?? '',
-        !!l.v.highlight,
-        l.v.driver,
-        l.v.riders,
+        shownV.label,
+        shownV.detail ?? '',
+        !!shownV.highlight,
+        shownV.driver,
+        shownV.riders,
         expanded,
-        expanded ? l.v.lines : null,
+        expanded ? shownV.lines : null,
       ]);
       if (text !== l.labelText) {
-        const v = l.v;
+        const v = shownV;
         const wasExpanded = l.drawnExpanded;
         l.drawnExpanded = expanded;
         paintLabel(l.label, v, expanded, () => {
-          if (l.v === v) l.labelText = '';
+          l.labelText = '';
         });
         l.labelText = text;
         const boost = expanded ? EXPAND_BOOST : 1;
@@ -1537,6 +1605,8 @@ export function createLiveLot(ctx: {
         door: +l.door.toFixed(2),
         ramp: +l.ramp.toFixed(2),
         leaveWhenClosed: l.leaveWhenClosed,
+        plate: onPlate(l).detail ?? '',
+        riders: (onPlate(l).riders ?? []).map((p) => p.name),
         at: [
           +l.body.object.position.x.toFixed(1),
           +l.body.object.position.z.toFixed(1),
