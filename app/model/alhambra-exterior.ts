@@ -294,7 +294,7 @@ export function buildAlhambraExterior(model: Facility) {
 
   // Glass wraps the Valley / Ethel corner inside one deep light-grey frame (Street View, May 2025): a top band and
   // a sill standing 0.3 m proud of the wall along both faces, round the corner, with a jamb at each far end; the
-  // Ethel glazing (ethel-corner-return-glazing, z 23.77 to 27.12) and the first Valley window
+  // Ethel glazing (ethel-corner-return-glazing, z 24.6 to 27.12, clear as the Valley storefront's) and the first Valley window
   // (shell-therapy-front-opening-7, x -31.15 to -28.86) sit inside it, split by thin silver mullions and meeting
   // at a mullion on the corner.
   const corner = group(facade, 'ethel-glazed-corner');
@@ -302,7 +302,7 @@ export function buildAlhambraExterior(model: Facility) {
     const cx = -31.189,
       cz = 27.169,
       d = 0.3,
-      ethelEnd = 23.62,
+      ethelEnd = 24.45,
       valleyEnd = -28.72,
       frame = '#e4e3dd',
       top = 2.76,
@@ -350,13 +350,45 @@ export function buildAlhambraExterior(model: Facility) {
     );
     box(corner, cx - d / 2, 0, ethelEnd + 0.08, d, top, 0.16, frame);
     box(corner, valleyEnd - 0.08, 0, cz + d / 2, 0.16, top, d, frame);
-    for (const z of [24.62, 25.47, 26.31])
+    for (const z of [25.44, 26.28])
       box(corner, cx - 0.05, 0.52, z, 0.05, 2.24, 0.04, steel);
+    const clear = new T.MeshStandardMaterial({
+      color: '#7fabb7',
+      roughness: 0.22,
+      metalness: 0.15,
+      transparent: true,
+      opacity: 0.62,
+      depthWrite: false,
+    });
+    const panes = group(corner, 'corner-window-glass');
+    const pane = new T.Mesh(new T.BoxGeometry(0.02, 2.24, 2.52), clear);
+    pane.position.set(cx, 0.52 + 1.12, 27.119 - 1.26);
+    pane.renderOrder = 2;
+    panes.add(pane);
     for (const x of [-30.38, -29.62])
       box(corner, x, 0.52, cz + 0.05, 0.04, 2.24, 0.05, steel);
     box(corner, cx - 0.04, 0.52, cz + 0.04, 0.08, 2.24, 0.08, steel);
   }
 
+  // Ethel face (Street View, Jun 2022): two wall lights at the panel line and the fire-alarm bell near the corner.
+  for (const z of [9.4, 20.9])
+    box(corner, -31.25, 2.8, z, 0.1, 0.12, 0.26, '#5d6163');
+  {
+    const bell = mesh(
+      corner,
+      new T.CylinderGeometry(0.11, 0.11, 0.08, 16),
+      '#c8322c',
+    );
+    bell.rotation.z = Math.PI / 2;
+    bell.position.set(-31.23, 3.62, 23.3);
+    const dot = mesh(
+      corner,
+      new T.CylinderGeometry(0.04, 0.04, 0.09, 12),
+      '#efefea',
+    );
+    dot.rotation.z = Math.PI / 2;
+    dot.position.set(-31.24, 3.62, 23.3);
+  }
   const edge = group(site, 'valley-entry-terrace-and-rails');
   box(edge, -7.3, -0.15, 26.73, 14.9, 0.55, 2.75, stone);
   // Street-facing stairs: five steps the width of the photo's flight up to the

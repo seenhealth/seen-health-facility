@@ -280,7 +280,8 @@ export function createNightLights(
       if (o.material === glass) o.material = glow;
       else if (
         ((o.parent?.name ?? '').startsWith('sliding-entry-leaf-') ||
-          o.parent?.name === 'lobby-window-glass') &&
+          o.parent?.name === 'lobby-window-glass' ||
+          o.parent?.name === 'corner-window-glass') &&
         (o.material as T.Material).transparent
       )
         o.material = leafGlow;

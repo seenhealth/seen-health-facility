@@ -35347,20 +35347,38 @@
         "material": "om-stone",
         "openings": [
           {
-            "id": "shell-therapy-west-opening-1",
-            "offset": 4.019432,
-            "width": 1.170215,
-            "sill": 0,
-            "height": 2.15,
-            "kind": "door",
-            "material": "photo-white"
-          },
-          {
             "id": "ethel-corner-return-glazing",
             "offset": 0.05,
-            "width": 3.35,
+            "width": 2.52,
             "sill": 0.52,
             "height": 2.24,
+            "kind": "window",
+            "material": "om-glass"
+          },
+          {
+            "id": "shell-therapy-west-opening-2",
+            "offset": 2.0493,
+            "width": 0.44,
+            "sill": 3.28,
+            "height": 1.74,
+            "kind": "window",
+            "material": "om-glass"
+          },
+          {
+            "id": "shell-therapy-west-opening-3",
+            "offset": 16.2793,
+            "width": 0.44,
+            "sill": 3.28,
+            "height": 1.74,
+            "kind": "window",
+            "material": "om-glass"
+          },
+          {
+            "id": "shell-therapy-west-opening-4",
+            "offset": 16.2793,
+            "width": 0.44,
+            "sill": 1.57,
+            "height": 1.63,
             "kind": "window",
             "material": "om-glass"
           }

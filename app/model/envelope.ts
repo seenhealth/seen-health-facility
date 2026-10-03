@@ -3,12 +3,14 @@ import type { EnvelopeWall, Facility, Vec2 } from './schema';
 
 /**
  * Openings glazed elsewhere: the lobby's sliding doors (arrival.ts ENTRY_DOORS) and the two windows beside them,
- * which take the doors' clear dark glass (alhambra-exterior.ts).
+ * which take the doors' clear dark glass, and the Ethel side of the street corner, clear like the Valley storefront
+ * (alhambra-exterior.ts).
  */
 const OWN_GLAZING = new Set([
   'shell-lobby-west-opening-3',
   'shell-lobby-west-opening-2',
   'shell-lobby-west-opening-1',
+  'ethel-corner-return-glazing',
 ]);
 export function buildEnvelopeWall(
   w: EnvelopeWall,
