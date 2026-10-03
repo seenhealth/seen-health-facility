@@ -13,10 +13,13 @@ import type {
  * live traffic. Nothing leaves the page: the dispatch app never sees them.
  *
  * A vehicle arrives `inbound` and drives into view (`fromOutside`): with ETA 0
- * from just short of the lot entrance straight to the drop-off, with an ETA in
- * from the edge of the map to wait up the street, unloads at the drop-off and backs into a bay on its
- * own; Board sets it `on-lot` with its riders walking out to it (a lift van
- * deploys its ramp for a wheelchair rider); Away sends it off.
+ * from just short of the lot entrance to the drop-off (or to the back of the
+ * queue for it), with an ETA in from the edge of the map to wait up the
+ * street; it unloads at the drop-off and parks in a space on its own. Board
+ * sets it `on-lot` with its riders walking out to it (a lift van deploys its
+ * ramp for a wheelchair rider); Away sends it off. Vehicles take the drop-off
+ * and the aisle one at a time, so a full lot takes minutes: the speed control
+ * runs the lot up to 8 times faster.
  */
 type Sim = { v: LiveVehicle; riders: LivePerson[] };
 
@@ -32,6 +35,8 @@ export function createSimPanel(opts: {
   onChange: (vehicles: LiveVehicle[]) => void;
   /** Centre the camera on a vehicle (null: the whole lot). */
   follow: (id: string | null) => void;
+  /** Run the lot this many times faster than real time. */
+  speed: (times: number) => void;
 }) {
   const sims: Sim[] = [];
   let next = 1;
@@ -55,7 +60,10 @@ export function createSimPanel(opts: {
   panel.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center">
       <b style="font-size:13px">Simulate vehicles</b>
-      <button type="button" data-act="clear" title="Remove every simulated vehicle">Clear</button>
+      <span style="display:flex;gap:4px">
+        <select data-f="speed" title="How fast the lot runs: vehicles queue for the drop-off and park one at a time, so a full lot takes minutes at 1×">${[1, 2, 4, 8].map((k) => `<option value="${k}">${k}×</option>`).join('')}</select>
+        <button type="button" data-act="clear" title="Remove every simulated vehicle">Clear</button>
+      </span>
     </div>
     <div class="row">
       <select data-f="kind">${KINDS.map(([k, n]) => `<option value="${k}">${n}</option>`).join('')}</select>
@@ -76,6 +84,15 @@ export function createSimPanel(opts: {
     value: string;
   };
   const list = panel.querySelector<HTMLDivElement>('[data-list]')!;
+  const speedSelect = panel.querySelector(
+    'select[data-f="speed"]',
+  ) as unknown as {
+    value: string;
+    addEventListener: (type: 'change', fn: () => void) => void;
+  };
+  speedSelect.addEventListener('change', () =>
+    opts.speed(Number(speedSelect.value) || 1),
+  );
 
   const emit = () => {
     opts.onChange(sims.map((s) => s.v));
@@ -188,6 +205,12 @@ export function createSimPanel(opts: {
       if (id === followed) return;
       followed = id;
       render();
+    },
+    /** Set the speed control (and the lot's speed with it). */
+    setSpeed(times: number) {
+      const k = Math.min(16, Math.max(1, Math.round(times)));
+      speedSelect.value = String([1, 2, 4, 8].includes(k) ? k : 1);
+      opts.speed(k);
     },
     get vehicles() {
       return sims.map((s) => s.v);

@@ -45,6 +45,8 @@ async function main() {
     preloadLiveCarModels(),
   ]);
   let lot: ReturnType<typeof createLiveLot> | null = null;
+  /** How many times real time the lot runs (the simulator's speed control; `?speed=4` with `?debug` starts faster). */
+  let speed = 1;
   let daylight: ReturnType<typeof createDaylight> | null = null;
   let nightLights: ReturnType<typeof createNightLights> | null = null;
   const viewer = createViewer(host, model, () => {}, {
@@ -68,10 +70,18 @@ async function main() {
         (window as unknown as { seenScene?: unknown }).seenScene = ctx.scene;
       daylight = createDaylight(ctx.scene);
       nightLights = createNightLights(ctx.scene, ctx.material);
-      lot = createLiveLot(ctx);
+      const made = createLiveLot(ctx);
+      lot = made;
       if (new URLSearchParams(location.search).has('debug'))
         (window as unknown as { seenLot?: unknown }).seenLot = lot;
-      return lot;
+      // The simulator can run the lot faster than real time: each frame's step is taken `speed` times, so the motion
+      // stays as fine as at 1×.
+      return {
+        tick: (dt: number) => {
+          for (let i = 0; i < speed; i++) made.tick(dt);
+        },
+        dispose: () => made.dispose(),
+      };
     },
   });
   // `?debug=1` also exposes the viewer (setShot, getShot) for scripted close-ups and lets the wheel zoom in much
@@ -345,8 +355,15 @@ async function main() {
       ? createSimPanel({
           onChange: () => show(lastReal),
           follow: (id) => setFollow(id),
+          speed: (times) => {
+            speed = Math.min(16, Math.max(1, Math.round(times)));
+          },
         })
       : null;
+  if (sim) {
+    const start = Number(new URLSearchParams(location.search).get('speed'));
+    if (start > 1) sim.setSpeed(start);
+  }
   if (sim) onFollowChange = (id) => sim.setFollowed(id);
   const show = (real: LiveMessage | null) => {
     const base: LiveMessage = real ?? {

@@ -1,18 +1,26 @@
 /**
  * Live lot: Seen's real vehicles on the Alhambra lot, driven by messages from
  * a parent page (the dispatch app's VTC view). Each vehicle is a fleet van,
- * a lift van, an SUV or a sedan body; it drives in from the south end of the
- * west street as its ETA counts down, turns in through the Ethel Avenue curb
- * cut, stops at the drop-off, opens up (sliding door, then the ramp on a lift
+ * a lift van, an SUV or a sedan body; it waits up the west street while its
+ * ETA counts down, drives in through the Ethel Avenue curb cut when it is
+ * due, stops at the drop-off, opens up (sliding door, then the ramp on a lift
  * van, the driver's door while the ramp is out), lets its riders off one by
  * one (each a figure who walks, or rolls up the accessible ramp, into the
- * lobby), closes up, backs into a bay, waits, and pulls out by the alley
- * driveway and fades when the dispatch app says it is gone. Riders marked as
- * boarding walk out of the lobby to a parked car, whose door opens for them.
+ * lobby), closes up, parks in one of the lot's twelve spaces (a van reverses
+ * into the west row, a car noses into an angled stall along the building),
+ * waits, and pulls out by the alley driveway and fades when the dispatch app
+ * says it is gone. Riders marked as boarding walk out of the lobby to a parked
+ * car, whose door opens for them.
+ *
+ * Nothing drives through anything: one vehicle stands at the drop-off at a
+ * time and the rest queue behind it, one vehicle manoeuvres in the aisle at a
+ * time, and each way into and out of a space is planned against the vehicles
+ * standing on the lot at that moment (live-lot-traffic.ts). With every space
+ * taken a vehicle unloads, drives off, and comes back in when one frees.
+ *
  * Vehicles accelerate and brake rather than start and stop dead, their wheels
  * turn, and at night their lamps and headlight beams come on while they move.
- * Positions come from the fleet's own route pieces, so the manoeuvres are the
- * reviewed ones (4 m arcs, back-in stalls, one driveway).
+ * The way in from the street is the fleet's own route (alhambra-fleet.ts).
  */
 import * as T from 'three';
 import {
@@ -22,16 +30,19 @@ import {
   fadeVehicle,
   updateArrivalVan,
 } from './arrival';
+import { FLEET_LOT, FLEET_VAN, fleetRoutes } from './alhambra-fleet';
 import {
-  ANGLED,
-  angledApproach,
-  FLEET_LOT,
-  FLEET_VAN,
-  WEST_STALLS,
-  fleetParking,
-  fleetRoutes,
-  type FleetLeg,
-} from './alhambra-fleet';
+  createLotTraffic,
+  DOCK_FOOTPRINT,
+  fitsStall,
+  footprintGap,
+  isAngled,
+  needsDockClear,
+  stallOrder,
+  stallPose,
+  type Footprint as LotFootprint,
+  type LotLeg,
+} from './live-lot-traffic';
 import {
   addVanLamps,
   buildLiveCar,
@@ -140,14 +151,23 @@ function photoOf(
 }
 const L = FLEET_LOT;
 /**
- * The lot's twelve spaces (no street parking: the fleet's curb spots on Ethel are its own): 0-4 the fleet's back-in
- * bays, 5-6 the west row's two stalls north of them, 7-11 the angled stalls along the building, which take cars only.
- * Vans fill the bays first, cars the angled stalls first. With none free a vehicle leaves rather than park off the lot.
+ * Traffic on the lot. One vehicle stands at the drop-off at a time: the others queue behind it, the first of them held
+ * on the entrance lane short of the turn down to the drop-off (`HOLD_X`), the rest `QUEUE_GAP` m nose to tail back along
+ * the lane and the street, none of them standing across the mouth of the alley, where departures turn out. One vehicle
+ * moves in the aisle at a time: a vehicle that has unloaded waits at the drop-off, and a parked one in its space, until
+ * the one manoeuvring is parked or out on the street. Where each parks and the way in and out: live-lot-traffic.ts.
  */
-const BAYS = 5;
-const SPOTS = BAYS + WEST_STALLS.length + ANGLED.centres.length;
-const isWest = (i: number) => i >= BAYS && i < BAYS + WEST_STALLS.length;
-const angledIndex = (i: number) => i - BAYS - WEST_STALLS.length;
+const QUEUE_GAP = 1.5;
+/** Where the first vehicle in the queue waits: its centre on the entrance lane, a van's nose 1.5 m short of the drop-off's side. */
+const HOLD_X = -27.6;
+/** A vehicle has left the drop-off once it is this far from where a van stands there. */
+const DOCK_CLEAR = 0.6;
+/** Turning rate cap (rad/s): tight arcs are driven slower, so a vehicle swings into a space rather than spins. */
+const TURN_RATE = 0.55;
+/** The stretch of the street (z) a standing vehicle's centre keeps off, either side of the alley's mouth. */
+const ALLEY_MOUTH_Z: [number, number] = [L.westbound - 8.5, L.westbound + 6.7];
+/** A departure waits at the alley's end while an arrival is within `yield` m short of its mouth, and claims the crossing from `claim` m before its turn. */
+const CROSSING = { yield: 35, claim: 8 };
 const smooth = (a: number, b: number, x: number) => {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
   return t * t * (3 - 2 * t);
@@ -190,17 +210,13 @@ const RAMP_IN: WalkPoint[] = [
 ];
 
 type Mode =
-  | 'waiting'
-  | 'arriving'
-  | 'docked'
-  | 'toBay'
-  | 'parked'
-  | 'leaving'
-  | 'gone';
+  'waiting' | 'arriving' | 'docked' | 'toBay' | 'parked' | 'leaving' | 'gone';
 type Drive = {
   pieces: Piece[];
   length: number;
-  legs: { start: number; end: number; leg: FleetLeg }[];
+  legs: { start: number; end: number; leg: LotLeg }[];
+  /** Where the vehicle stands for a moment on the way (it changes direction, or waits at the STOP bar) and for how long. */
+  stops: { s: number; wait: number }[];
 };
 type Body = {
   object: T.Object3D;
@@ -248,6 +264,21 @@ type Live = {
   drive: Drive | null;
   s: number;
   targetS: number;
+  /** How far along the approach the feed's ETA puts it; the queue and the drop-off can hold it short of that. */
+  wantS: number;
+  /** The next stop of its drive, and how long it has stood there. */
+  stopAt: number;
+  stood: number;
+  /** What it does once the aisle is its own: park after unloading, or leave. */
+  pending: 'park' | 'leave' | null;
+  /** Sent away while coming in across the lot: it drives through the drop-off without opening up. */
+  through: boolean;
+  /** Sent away while parking: it leaves once it is parked. */
+  leaveOnceParked: boolean;
+  /** Coming back in for a space after driving off from a full lot: it has already unloaded, so it only parks. */
+  returning: boolean;
+  /** The feed no longer lists it. */
+  dropped: boolean;
   vel: number;
   spot: number | null;
   opacity: number;
@@ -270,36 +301,38 @@ type Live = {
   /** Seconds since the last boarder vanished into the car with nobody else pending; closes up at 1.5. */
   closeTimer: number;
   leaveWhenClosed: boolean;
-  /** No space was free after unloading, so it is driving off. */
+  /** No space was free for it, so it drives off (or was never drawn) and stays out of sight until one frees. */
   lotFull?: boolean;
   braking: boolean;
   reversing: boolean;
 };
 
-function drive(legs: FleetLeg[]): Drive {
+function drive(legs: LotLeg[]): Drive {
   const pieces: Piece[] = [];
   const spans: Drive['legs'] = [];
+  const stops: Drive['stops'] = [];
   let at = 0;
   for (const leg of legs) {
     spans.push({ start: at, end: at + leg.length, leg });
     pieces.push(...leg.pieces);
     at += leg.length;
+    if (leg.stop) stops.push({ s: at, wait: leg.stop });
   }
-  return { pieces, length: at, legs: spans };
+  return { pieces, length: at, legs: spans, stops };
 }
-const reverseLeg = (leg: FleetLeg) =>
+/** Curvature (1/m) of the piece `s` metres along a chain. */
+function curvatureAt(pieces: Piece[], s: number) {
+  let local = Math.max(0, s);
+  for (const p of pieces) {
+    if (local <= p.length) return p.curvature;
+    local -= p.length;
+  }
+  return pieces.at(-1)?.curvature ?? 0;
+}
+const reverseLeg = (leg: LotLeg) =>
   leg.id === 'dock-reverse' || leg.id === 'back-in' || leg.id === 'back-out';
 const legAt = (d: Drive, s: number) =>
   d.legs.find((l) => s <= l.end) ?? d.legs.at(-1)!;
-
-/** Drop-off → bay: on down the aisle, onto the bay's aisle line, south past the bay, reverse in. Null when the planner cannot build it. */
-function dockToBay(index: number): FleetLeg[] | null {
-  try {
-    return [...fleetRoutes.frontDockToBay(index), ...fleetRoutes.backIn(index)];
-  } catch {
-    return null;
-  }
-}
 
 function makeLabel(): T.Sprite {
   const canvas = document.createElement('canvas');
@@ -714,6 +747,45 @@ export function createLiveLot(ctx: {
   const walkers = createWalkers(people);
   const live = new Map<string, Live>();
   const spots = new Map<number, string>();
+  const traffic = createLotTraffic(ctx.model);
+  /** The approach every arrival drives, where the head of the queue holds on it, and where the lot begins. */
+  const approach = drive(fleetRoutes.awayToFrontDock());
+  const laneIn = approach.legs.find((g) => g.leg.id === 'front-dock-in')!;
+  const HOLD_S = laneIn.start + (HOLD_X - laneIn.leg.pieces[0].x);
+  const ON_LOT_S = laneIn.start;
+  /**
+   * Stretches of the approach (metres along it) where nobody stands and waits: across the alley's mouth (the approach
+   * runs up the street from its far end, so a place on the street is that far along it), and on the turn in across the
+   * sidewalk, from the street until a van's tail is clear of the walk on the entrance lane.
+   */
+  const ALLEY_MOUTH = ALLEY_MOUTH_Z.map((z) => z - L.vanishSouth) as [
+    number,
+    number,
+  ];
+  const turnIn = approach.legs.find((g) => g.leg.id === 'entry-in')!;
+  const KEEP_CLEAR: [number, number][] = [
+    ALLEY_MOUTH,
+    [turnIn.start + 0.3, HOLD_S - 1.3],
+  ];
+  /** Where a vehicle that is still some minutes out waits at the nearest: on the street, just past the alley's mouth. */
+  const WAIT_S = ALLEY_MOUTH[1] + 0.5;
+  /** As far along the approach as `s` without standing in a stretch that is kept clear. */
+  const standAt = (s: number) => {
+    for (const [from, to] of KEEP_CLEAR) if (s > from && s < to) return from;
+    return s;
+  };
+  /** Who has the drop-off and who the aisle, and who is waiting for each. */
+  let dockHolder: string | null = null,
+    aisleHolder: string | null = null;
+  const dockQueue: string[] = [],
+    aisleQueue: string[] = [];
+  /**
+   * Spaces whose manoeuvres are still to be worked out for a size of vehicle seen on the lot: one a tick, while the
+   * vehicle is still on its way in, so choosing its space later does not stall a frame.
+   */
+  const toPrepare: { stall: number; halfWidth: number; halfLength: number }[] =
+    [];
+  const sizesSeen = new Set<string>();
   let letters = 0;
   let hidStaticVans = false;
   let clock = '';
@@ -780,55 +852,34 @@ export function createLiveLot(ctx: {
       halfLength: car.halfLength,
     };
   }
-  const order = (l: Live) => {
-    const all = Array.from({ length: SPOTS }, (_, i) => i);
-    return l.body.van
-      ? all.filter((i) => i < BAYS + WEST_STALLS.length)
-      : [
-          ...all.slice(BAYS + WEST_STALLS.length),
-          ...all.slice(BAYS, BAYS + WEST_STALLS.length),
-          ...all.slice(0, BAYS),
-        ];
-  };
-  function freeSpot(l: Live): number | null {
-    return order(l).find((i) => !spots.has(i)) ?? null;
-  }
-  const spotPose = (i: number, l: Live) => {
-    if (i < BAYS)
-      return {
-        x: fleetParking[i].x,
-        z: fleetParking[i].z,
-        heading: fleetParking[i].heading,
-      };
-    if (isWest(i))
-      return {
-        x: fleetParking[0].x,
-        z: WEST_STALLS[i - BAYS],
-        heading: fleetParking[0].heading,
-      };
-    const a = angledApproach(angledIndex(i), l.body.halfLength);
-    return { x: a.cx, z: a.cz, heading: ANGLED.dir + Math.PI };
-  };
-  /** The way from the drop-off into spot `i`, and out of it off site; null when the planner cannot build one. */
-  function spotIn(i: number, l: Live): FleetLeg[] | null {
-    if (i < BAYS) return dockToBay(i);
-    try {
-      return isWest(i)
-        ? fleetRoutes.frontDockToStall(WEST_STALLS[i - BAYS])
-        : fleetRoutes.frontDockToAngled(angledIndex(i), l.body.halfLength);
-    } catch {
-      return null;
-    }
-  }
-  function spotOut(i: number, l: Live): FleetLeg[] | null {
-    if (i < BAYS) return bayRoute(i);
-    try {
-      return isWest(i)
-        ? fleetRoutes.stallToAway(WEST_STALLS[i - BAYS])
-        : fleetRoutes.angledToAway(angledIndex(i), l.body.halfLength);
-    } catch {
-      return null;
-    }
+  const sizeOf = (l: Live) => ({
+    halfWidth: l.body.halfWidth,
+    halfLength: l.body.halfLength,
+  });
+  /** A vehicle as the route planner takes it: where it stands and the way its nose points. */
+  const footprintOf = (l: Live): LotFootprint => ({
+    x: l.body.object.position.x,
+    z: l.body.object.position.z,
+    dir: l.body.object.rotation.y + Math.PI,
+    ...sizeOf(l),
+  });
+  /** Everything standing on the lot besides `l`: parked, at the drop-off, or waiting at the head of the queue. */
+  const standing = (l: Live) =>
+    [...live.values()]
+      .filter(
+        (o) =>
+          o !== l &&
+          (o.mode === 'parked' ||
+            o.mode === 'docked' ||
+            (o.mode === 'arriving' && o.s >= ON_LOT_S - 12)),
+      )
+      .map(footprintOf);
+  /** The first free space, in the order this vehicle is offered them, that it fits. */
+  function freeStall(l: Live): number | null {
+    const size = sizeOf(l);
+    return (
+      stallOrder(size).find((i) => !spots.has(i) && fitsStall(i, size)) ?? null
+    );
   }
   function place(o: T.Object3D, x: number, z: number, heading: number) {
     o.position.set(x, L.streetY, z);
@@ -846,9 +897,11 @@ export function createLiveLot(ctx: {
     else if (span.leg.fade === 'out') l.opacity = Math.max(0, left / L.fade);
     else l.opacity = 1;
   }
-  function start(l: Live, legs: FleetLeg[] | null, mode: Mode) {
+  function start(l: Live, legs: LotLeg[] | null, mode: Mode) {
     l.drive = legs ? drive(legs) : null;
     l.s = 0;
+    l.stopAt = 0;
+    l.stood = 0;
     l.vel = 0;
     l.targetS = l.drive?.length ?? 0;
     l.mode = mode;
@@ -856,19 +909,21 @@ export function createLiveLot(ctx: {
     if (l.drive) pose(l);
   }
   function parkAt(l: Live) {
-    const i = freeSpot(l);
+    const i = freeStall(l);
     l.spot = i;
     l.drive = null;
     l.vel = 0;
     if (i === null) {
-      // The feed has it on the lot but every space is taken: not drawn rather than parked off the lot.
+      // The feed has it on the lot but every space is taken: not drawn rather than parked off the lot, and it
+      // drives in once a space is free (`controlTraffic`).
       l.mode = 'gone';
+      l.lotFull = true;
       l.opacity = 0;
       return;
     }
     spots.set(i, l.v.id);
-    const sp = spotPose(i, l);
-    place(l.body.object, sp.x, sp.z, sp.heading);
+    const sp = stallPose(i, sizeOf(l));
+    place(l.body.object, sp.x, sp.z, sp.dir + Math.PI);
     l.mode = 'parked';
     l.opacity = 1;
   }
@@ -876,8 +931,26 @@ export function createLiveLot(ctx: {
     if (l.spot !== null) spots.delete(l.spot);
     l.spot = null;
   }
+  /** Give up the drop-off and the aisle, and any place in the queues for them. */
+  function forget(l: Live) {
+    const id = l.v.id;
+    if (dockHolder === id) dockHolder = null;
+    if (aisleHolder === id) aisleHolder = null;
+    for (const q of [dockQueue, aisleQueue]) {
+      const i = q.indexOf(id);
+      if (i >= 0) q.splice(i, 1);
+    }
+    l.pending = null;
+  }
+  /** Ask for the aisle, to park or to leave; `go` starts the move when it is this vehicle's turn. */
+  function request(l: Live, what: 'park' | 'leave') {
+    l.pending = what;
+    if (aisleHolder !== l.v.id && !aisleQueue.includes(l.v.id))
+      aisleQueue.push(l.v.id);
+  }
   function remove(l: Live) {
     releaseSpot(l);
+    forget(l);
     for (const id of walkers.ids(`${l.v.id}|`)) walkers.remove(id);
     root.remove(l.body.object);
     root.remove(l.label);
@@ -910,6 +983,17 @@ export function createLiveLot(ctx: {
       return { ...v, detail, riders: aboard };
     }
     if (l.mode === 'toBay') return { ...v, detail: 'parking', riders: [] };
+    if (l.mode === 'parked' && l.pending === 'leave') {
+      // Sent away, waiting for the aisle to be clear before it pulls out.
+      const aboard = all.filter((p) => l.boarded.has(p.name));
+      return {
+        ...v,
+        detail: aboard.length
+          ? `departing · ${plural(aboard.length)}`
+          : 'departing',
+        riders: aboard,
+      };
+    }
     if (l.mode === 'parked') {
       const boarding = all.filter((p) => p.boarding);
       const walking = walkers.ids(`${v.id}|in|`).length;
@@ -949,14 +1033,38 @@ export function createLiveLot(ctx: {
         riders: aboard,
       };
     }
-    if (l.mode === 'arriving') return { ...v, riders: l.arriving };
+    if (l.mode === 'arriving' && l.returning)
+      return { ...v, detail: 'back for a space', riders: [] };
+    if (l.mode === 'arriving') {
+      // Due, but standing in the queue for the drop-off: say so instead of "arriving".
+      const waiting = due(l) && l.vel < 0.05 && l.wantS > l.s + 1 && l.s > 1;
+      return waiting
+        ? {
+            ...v,
+            detail: l.arriving.length
+              ? `waiting · ${plural(l.arriving.length)}`
+              : 'waiting',
+            riders: l.arriving,
+          }
+        : { ...v, riders: l.arriving };
+    }
     return v;
   }
-  function approachTarget(v: LiveVehicle, d: Drive) {
+  /**
+   * How far along the approach the feed puts a vehicle: one that is due, all the way to the drop-off; one still some
+   * minutes out, up the street in proportion to its ETA but no nearer than `WAIT_S`, so the vehicles that are not
+   * here yet wait in a line on the street, short of the lot, and never stand in the way on it.
+   */
+  function approachTarget(v: LiveVehicle) {
     const eta = v.etaMinutes ?? HORIZON_MIN;
-    const f = Math.min(1, Math.max(0, 1 - eta / HORIZON_MIN));
-    return f * d.length;
+    if (eta <= 0) return approach.length;
+    return Math.min(
+      WAIT_S,
+      Math.max(0, 1 - eta / HORIZON_MIN) * approach.length,
+    );
   }
+  /** Due at the drop-off now, as against waiting up the street for its ETA. */
+  const due = (l: Live) => l.wantS > WAIT_S + 1;
   /** World (x, z) of a point in the vehicle's frame, as it stands now. */
   function world(l: Live, local: [number, number]) {
     l.body.object.updateMatrixWorld(true);
@@ -1025,8 +1133,8 @@ export function createLiveLot(ctx: {
   function boardPath(l: Live, wheelchair: boolean): WalkPoint[] {
     // While the ramp is out (a wheelchair rider in the party) everyone boards up it, not just the wheelchair:
     // round the standing vehicles to a stride beyond its foot, then straight up it. Otherwise round them to just
-    // in front of the nose, then down the car's door side in the lane a bay leaves between cars (0.28 m off the
-    // body: mid-gap in the 2.8 m back-in bays) to the door.
+    // in front of the nose, then down the car's door side in the lane a space leaves between cars (0.28 m off the
+    // body: mid-gap in the west row's 2.8 m spaces) to the door.
     const onRamp = l.body.hasRamp && (wheelchair || l.rampTarget > 0),
       doorZ = l.body.sill[1],
       sill = world(l, l.body.sill);
@@ -1058,8 +1166,10 @@ export function createLiveLot(ctx: {
         up,
       ];
     }
-    const lane = l.body.halfWidth + 0.28,
-      front = ground([lane, -l.body.halfLength - 0.7]);
+    // A car nosed into an angled stall is reached from the aisle behind it; one backed into the west row from in front.
+    const noseIn = l.spot !== null && isAngled(l.spot),
+      lane = l.body.halfWidth + 0.28,
+      front = ground([lane, (noseIn ? 1 : -1) * (l.body.halfLength + 0.7)]);
     return [...lobby, ...detour(last, front), front, ground([lane, doorZ]), up];
   }
 
@@ -1091,6 +1201,14 @@ export function createLiveLot(ctx: {
           drive: null,
           s: 0,
           targetS: 0,
+          wantS: 0,
+          stopAt: 0,
+          stood: 0,
+          pending: null,
+          through: false,
+          leaveOnceParked: false,
+          returning: false,
+          dropped: false,
           vel: 0,
           spot: null,
           opacity: 0,
@@ -1111,46 +1229,86 @@ export function createLiveLot(ctx: {
           reversing: false,
         };
         live.set(v.id, l);
+        const sizeKey = `${b.halfWidth}|${b.halfLength}`;
+        if (!sizesSeen.has(sizeKey)) {
+          sizesSeen.add(sizeKey);
+          for (const stall of stallOrder(b))
+            toPrepare.push({
+              stall,
+              halfWidth: b.halfWidth,
+              halfLength: b.halfLength,
+            });
+        }
         if (v.state === 'inbound') {
           start(l, fleetRoutes.awayToFrontDock(), 'arriving');
-          l.targetS = approachTarget(v, l.drive!);
-          if (v.fromOutside) {
-            const entry = l.drive!.legs.find((g) => g.leg.id === 'entry-in');
-            const arriving = !v.etaMinutes;
-            l.s = arriving && entry ? Math.max(0, entry.start - 12) : 0;
-            l.vel = arriving ? SPEED.lot : SPEED.street;
-          } else l.s = l.targetS;
+          l.wantS = approachTarget(v);
+          // A vehicle driving into view starts at the map's edge, or just short of the lot's entrance when it is
+          // due now; any other appears where its ETA puts it. Either way behind whoever is already in the queue.
+          const dueNow = !v.etaMinutes,
+            from = !v.fromOutside
+              ? l.wantS
+              : dueNow
+                ? Math.max(0, turnIn.start - 12)
+                : 0;
+          l.s = behindQueue(l, from);
+          l.vel =
+            !v.fromOutside || l.s < from
+              ? 0
+              : dueNow
+                ? SPEED.lot
+                : SPEED.street;
+          l.targetS = l.s;
           pose(l);
         } else parkAt(l);
       } else {
         l.v = v;
+        l.dropped = false;
         if (v.state !== 'inbound') l.visited = false;
         if (v.state === 'inbound' && !l.visited) {
           l.arriving = v.riders ?? [];
-          if (l.mode === 'arriving')
-            l.targetS = Math.max(l.s, approachTarget(v, l.drive!));
-          else if (
+          if (l.mode === 'arriving') {
+            // An ETA that slips does not pull the vehicle up short where it is: it keeps the place it was heading for.
+            l.wantS = Math.max(l.wantS, approachTarget(v));
+            l.through = false;
+          } else if (
             l.mode === 'parked' ||
             l.mode === 'gone' ||
             l.mode === 'waiting'
           ) {
             releaseSpot(l);
+            forget(l);
             l.boarded.clear();
             start(l, fleetRoutes.awayToFrontDock(), 'arriving');
-            l.targetS = approachTarget(v, l.drive!);
+            l.wantS = approachTarget(v);
+            l.through = false;
           }
         } else if (v.state === 'on-lot') {
-          if (l.mode === 'arriving') l.targetS = l.drive!.length;
+          // Back on the lot after being sent away: whatever it was about to do to leave is called off.
+          l.through = false;
+          l.leaveOnceParked = false;
+          l.leaveWhenClosed = false;
+          if (l.mode === 'arriving') l.wantS = l.drive!.length;
           else if (
             l.mode === 'leaving' ||
             l.mode === 'gone' ||
             l.mode === 'waiting'
-          )
-            parkAt(l);
+          ) {
+            // One that drove off from a full lot stays out until a space frees, then drives back in.
+            if (!l.lotFull) {
+              forget(l);
+              parkAt(l);
+            }
+          } else if (l.mode === 'parked' && l.pending === 'leave') forget(l);
+          else if (l.mode === 'docked' && l.pending === 'leave')
+            l.pending = 'park';
         } else if (v.state === 'away') leave(l);
       }
     }
-    for (const l of live.values()) if (!seen.has(l.v.id)) leave(l);
+    for (const l of live.values())
+      if (!seen.has(l.v.id)) {
+        l.dropped = true;
+        leave(l);
+      }
   }
   function leave(l: Live) {
     if (l.mode === 'leaving' || l.mode === 'gone') return;
@@ -1162,65 +1320,291 @@ export function createLiveLot(ctx: {
       return;
     }
     l.leaveWhenClosed = false;
-    const bayLegs =
-      l.mode === 'parked' && l.spot !== null ? spotOut(l.spot, l) : null;
-    if (bayLegs) {
+    // Parked or at the drop-off: out through the aisle, when it is clear.
+    if (l.mode === 'parked' || l.mode === 'docked') request(l, 'leave');
+    // Backing into a space: it finishes, then leaves.
+    else if (l.mode === 'toBay') l.leaveOnceParked = true;
+    // Already turning in or on the lot on its way in: on through the drop-off without opening up.
+    else if (l.mode === 'arriving' && l.s > turnIn.start) {
+      l.through = true;
+      l.wantS = l.drive!.length;
+    } else {
+      // Still out on the street: it never comes in.
       releaseSpot(l);
-      start(l, bayLegs, 'leaving');
-    } else if (
-      l.mode === 'docked' ||
-      (l.mode === 'arriving' && l.s > l.drive!.length - 1)
-    ) {
-      start(l, fleetRoutes.frontDockToAway(), 'leaving');
-    } else if (!exitFrom(l)) {
-      releaseSpot(l);
+      forget(l);
       l.drive = null;
       l.mode = 'gone';
     }
   }
-  /** The fleet's own route out of a bay or curb spot; null when the planner cannot build one from that spot (it throws). */
-  function bayRoute(index: number): FleetLeg[] | null {
-    try {
-      return fleetRoutes.bayToAway(index);
-    } catch {
-      return null;
-    }
-  }
   /**
-   * A vehicle anywhere else on the lot (an overflow spot on the aisle, on its way to a bay, waiting at the drop-off)
-   * leaves by joining the drop-off's exit route at the point nearest to where it stands: down the aisle, over to the
-   * exit lane, out of the driveway and up the alley until it fades at the edge. False when it is nowhere near it.
+   * `s` on the approach for a vehicle appearing on it, or as far back as it takes to be clear of every vehicle already
+   * there, of the drop-off while it is taken, and of the stretches that are kept clear.
    */
-  function exitFrom(l: Live): boolean {
-    const legs = fleetRoutes.frontDockToAway();
-    const d = drive(legs);
-    const { x, z } = l.body.object.position;
-    let best = { s: 0, dist: Infinity };
-    for (let s = 0; s <= d.length; s += 0.5) {
-      const p = pathAt(d.pieces, s);
-      const dist = Math.hypot(p.x - x, p.z - z);
-      if (dist < best.dist) best = { s, dist };
+  function behindQueue(l: Live, s: number) {
+    const room = (o: Live) => o.body.halfLength + l.body.halfLength + QUEUE_GAP;
+    const others = [...live.values()].filter(
+      (o) => o !== l && (o.mode === 'arriving' || o.mode === 'docked'),
+    );
+    const ahead = others
+      .map((o) => ({
+        s: o.mode === 'docked' ? approach.length : o.s,
+        room: room(o),
+      }))
+      .sort((a, b) => b.s - a.s);
+    let at = dockHolder || ahead.length ? Math.min(s, HOLD_S) : s;
+    // One that is due joins the back of the line of those that are due: nobody cuts in where the line has a gap.
+    if (due(l))
+      for (const o of others)
+        if (o.mode === 'arriving' && due(o)) at = Math.min(at, o.s - room(o));
+    // Back past each vehicle it would overlap, and out of the stretches kept clear, until it stands clear of both.
+    for (let moved = true, tries = 0; moved && tries < 40; tries++) {
+      moved = false;
+      for (const o of ahead)
+        if (Math.abs(at - o.s) < o.room - 1e-6) {
+          at = o.s - o.room;
+          moved = true;
+        }
+      if (standAt(at) !== at) {
+        at = standAt(at);
+        moved = true;
+      }
     }
-    if (best.dist > 6) return false;
-    releaseSpot(l);
-    start(l, legs, 'leaving');
-    l.s = best.s;
-    l.opacity = 1;
-    pose(l);
-    return true;
+    return Math.max(0, at);
+  }
+  /** The aisle is this vehicle's: park (in the space that can be driven into clear of everything standing there), or leave. */
+  function go(l: Live) {
+    const what = l.pending;
+    l.pending = null;
+    if (l.mode === 'docked' && what === 'park') {
+      const pick = traffic.chooseStall(
+        sizeOf(l),
+        stallOrder(sizeOf(l)),
+        (i) => spots.has(i),
+        standing(l),
+      );
+      if (pick) {
+        l.spot = pick.stall;
+        spots.set(pick.stall, l.v.id);
+        start(l, pick.plan.legs, 'toBay');
+      } else {
+        // Lot full: on out of the lot rather than park in the aisle or the street.
+        l.lotFull = true;
+        start(l, traffic.planDockOut(), 'leaving');
+      }
+    } else if (l.mode === 'docked') start(l, traffic.planDockOut(), 'leaving');
+    else if (l.mode === 'parked' && l.spot !== null) {
+      const plan = traffic.planOut(
+        l.spot,
+        sizeOf(l),
+        standing(l),
+        needsDockClear(l.spot),
+      );
+      releaseSpot(l);
+      if (plan) start(l, plan.legs, 'leaving');
+      else {
+        l.drive = null;
+        l.mode = 'gone';
+      }
+    }
+    if (l.mode !== 'toBay' && l.mode !== 'leaving') forget(l);
+  }
+  const onLeg = (l: Live, id: string) =>
+    !!l.drive && legAt(l.drive, l.s).leg.id === id;
+  const legSpan = (l: Live, id: string) =>
+    l.drive?.legs.find((g) => g.leg.id === id);
+  /**
+   * Who may move, worked out before anyone does: hand the drop-off and the aisle on, hold each arrival behind the one
+   * ahead of it and short of the drop-off until it is free, and keep arrivals and departures from crossing at the
+   * alley's mouth.
+   */
+  function controlTraffic() {
+    // The drop-off is free once whoever had it is parked, gone, or clear of it on its way.
+    const dh = dockHolder ? live.get(dockHolder) : null;
+    if (
+      dockHolder &&
+      (!dh ||
+        dh.mode === 'gone' ||
+        dh.mode === 'waiting' ||
+        (dh.mode === 'parked' && dh.pending !== 'leave') ||
+        ((dh.mode === 'toBay' || dh.mode === 'leaving') &&
+          !onLeg(dh, 'back-out') &&
+          footprintGap(footprintOf(dh), DOCK_FOOTPRINT) >= DOCK_CLEAR))
+    )
+      dockHolder = null;
+    // The aisle, once whoever had it is parked, or out of the alley onto the street.
+    const ah = aisleHolder ? live.get(aisleHolder) : null;
+    if (
+      aisleHolder &&
+      (!ah ||
+        (ah.mode !== 'toBay' && ah.mode !== 'leaving') ||
+        (ah.mode === 'leaving' &&
+          ah.s >= (legSpan(ah, 'corner-south')?.end ?? 0)))
+    )
+      aisleHolder = null;
+
+    const arrivals = [...live.values()]
+      .filter((l) => l.mode === 'arriving' && l.drive)
+      .sort((a, b) => b.s - a.s);
+    const docked = [...live.values()].find((l) => l.mode === 'docked');
+    if (!dockHolder) {
+      while (dockQueue.length && !live.get(dockQueue[0])?.pending)
+        dockQueue.shift();
+      const head = arrivals.find(due);
+      // Whoever stands there has it; then a parked car waiting to back out across it; then the next arrival.
+      if (docked) dockHolder = docked.v.id;
+      else if (dockQueue.length) dockHolder = dockQueue.shift()!;
+      else if (head && head.s >= HOLD_S - 12) dockHolder = head.v.id;
+    }
+    if (!aisleHolder) {
+      for (let i = aisleQueue.length - 1; i >= 0; i--)
+        if (!live.get(aisleQueue[i])?.pending) aisleQueue.splice(i, 1);
+      /** A car in the stall beside the drop-off can only back out once the drop-off is its own. */
+      const ready = (q: Live) =>
+        !(
+          q.mode === 'parked' &&
+          q.spot !== null &&
+          needsDockClear(q.spot) &&
+          dockHolder !== q.v.id
+        );
+      let pick: string | null = null;
+      for (const id of aisleQueue) {
+        const q = live.get(id)!;
+        if (!ready(q)) {
+          if (!dockQueue.includes(id)) dockQueue.push(id);
+          continue;
+        }
+        // One that holds the drop-off for its departure goes first, so the drop-off is not held up.
+        if (q.mode === 'parked' && dockHolder === id) {
+          pick = id;
+          break;
+        }
+        // A vehicle with nowhere to park lets a parked one that is waiting to leave out first: its space may be the one.
+        const stuck =
+          q.pending === 'park' &&
+          freeStall(q) === null &&
+          aisleQueue.some((o) => {
+            const w = live.get(o)!;
+            return o !== id && w.mode === 'parked' && ready(w);
+          });
+        if (!stuck) pick ??= id;
+      }
+      if (pick) {
+        aisleQueue.splice(aisleQueue.indexOf(pick), 1);
+        aisleHolder = pick;
+        go(live.get(pick)!);
+      }
+    }
+
+    // A vehicle that drove off because the lot was full comes back in once there is a space no one else is after.
+    let claims = [...live.values()].filter(
+      (l) =>
+        (l.mode === 'arriving' && due(l) && !l.through) ||
+        (l.mode === 'docked' && l.pending !== 'leave'),
+    ).length;
+    for (const l of live.values()) {
+      if (
+        l.mode !== 'gone' ||
+        !l.lotFull ||
+        l.dropped ||
+        l.v.state === 'away' ||
+        l.opacity > 0
+      )
+        continue;
+      const size = sizeOf(l);
+      const free = stallOrder(size).filter(
+        (i) => !spots.has(i) && fitsStall(i, size),
+      ).length;
+      if (free <= claims) continue;
+      claims++;
+      start(l, fleetRoutes.awayToFrontDock(), 'arriving');
+      l.returning = true;
+      l.arriving = [];
+      l.wantS = approach.length;
+      const from = Math.max(0, turnIn.start - 12);
+      l.s = behindQueue(l, from);
+      l.vel = l.s < from ? 0 : SPEED.lot;
+      l.targetS = l.s;
+      pose(l);
+    }
+
+    // Departures turning out of the alley and arrivals passing its mouth take turns.
+    const leaving = [...live.values()].filter(
+      (l) => l.mode === 'leaving' && l.drive,
+    );
+    let turningOut = false;
+    for (const l of leaving) {
+      const corner = legSpan(l, 'corner-south');
+      l.targetS = l.drive!.length;
+      if (!corner || l.s >= corner.end) continue;
+      if (l.s > corner.start + 0.01) {
+        turningOut = true;
+        continue;
+      }
+      // Still short of the corner: it waits there for an arrival on its way past, else it claims the crossing as it
+      // comes up to it, so an arrival short of the mouth holds back.
+      const crossing = arrivals.some(
+        (a) =>
+          a.s > ALLEY_MOUTH[0] - CROSSING.yield &&
+          a.s < ALLEY_MOUTH[1] &&
+          (a.vel > 0.1 || a.targetS > a.s + 0.5),
+      );
+      if (crossing) l.targetS = corner.start;
+      else if (l.s > corner.start - CROSSING.claim) turningOut = true;
+    }
+    // Each arrival: as far as its ETA puts it, behind the one ahead, and short of the drop-off unless it is its own.
+    // One that is due is not held behind one still waiting up the street for its ETA (it is not really there yet).
+    arrivals.forEach((l, i) => {
+      let limit = l.wantS;
+      if (dockHolder !== l.v.id) limit = Math.min(limit, HOLD_S);
+      let ahead: { s: number; half: number } | null = docked
+        ? { s: approach.length, half: docked.body.halfLength }
+        : null;
+      for (let k = i - 1; k >= 0; k--) {
+        const o = arrivals[k];
+        if (!due(l) || due(o) || o.s > WAIT_S + 1) {
+          ahead = { s: o.s, half: o.body.halfLength };
+          break;
+        }
+      }
+      if (ahead)
+        limit = Math.min(
+          limit,
+          ahead.s - ahead.half - l.body.halfLength - QUEUE_GAP,
+        );
+      // It drives past one that is waiting for its ETA, but it does not stop on top of it: short of it instead.
+      if (due(l))
+        for (const o of arrivals) {
+          if (o === l || due(o) || o.s > WAIT_S + 1 || o.s <= l.s) continue;
+          const room = o.body.halfLength + l.body.halfLength + QUEUE_GAP;
+          if (limit > o.s - room && limit < o.s + room)
+            limit = Math.min(limit, o.s - room);
+        }
+      // A departure is turning out of the alley: short of its mouth, if it can still stop there.
+      if (
+        turningOut &&
+        l.s + (l.vel * l.vel) / (2 * DECEL * 1.4) <= ALLEY_MOUTH[0] + 1e-3
+      )
+        limit = Math.min(limit, ALLEY_MOUTH[0]);
+      l.targetS = Math.max(l.s, standAt(limit));
+    });
   }
 
-  /** Move along the drive toward `targetS`: pull away at ACCEL, hold the leg's speed, brake to stop exactly at the target. */
+  /**
+   * Move along the drive toward `targetS`: pull away at ACCEL, hold the leg's speed (less on a tight arc), brake to
+   * stop exactly at the target, and stand for a moment wherever the drive has a stop (changing direction, the STOP bar).
+   */
   function advance(l: Live, dt: number) {
     if (!l.drive) return 0;
     const span = legAt(l.drive, l.s);
     const reverse = reverseLeg(span.leg);
-    const cap = reverse
-      ? SPEED.reverse
-      : span.leg.lot
-        ? SPEED.lot
-        : SPEED.street;
-    const remaining = Math.max(0, l.targetS - l.s);
+    const curve = Math.abs(curvatureAt(l.drive.pieces, l.s));
+    const cap = Math.min(
+      reverse ? SPEED.reverse : span.leg.lot ? SPEED.lot : SPEED.street,
+      curve > 1e-6 ? TURN_RATE / curve : Infinity,
+    );
+    const stop = l.drive.stops[l.stopAt];
+    const target = stop ? Math.min(l.targetS, stop.s) : l.targetS;
+    const remaining = Math.max(0, target - l.s);
     const goal = Math.min(cap, Math.sqrt(2 * DECEL * remaining));
     l.vel =
       goal > l.vel
@@ -1228,9 +1612,16 @@ export function createLiveLot(ctx: {
         : Math.max(goal, l.vel - DECEL * 1.4 * dt);
     const ds = Math.min(remaining, l.vel * dt);
     l.s += ds;
+    if (stop && l.s >= stop.s - 1e-3 && l.vel < 0.05) {
+      l.stood += dt;
+      if (l.stood >= stop.wait) {
+        l.stopAt++;
+        l.stood = 0;
+      }
+    }
     l.braking =
       goal < l.vel - 0.02 ||
-      (remaining < 0.02 && l.vel < 0.02 && l.mode !== 'parked');
+      (remaining - ds < 0.02 && l.vel < 0.02 && l.mode !== 'parked');
     l.reversing = reverse && l.vel > 0.02;
     const turn = (reverse ? -ds : ds) / l.body.wheelRadius;
     for (const w of l.body.wheels) w.rotateY(turn);
@@ -1238,7 +1629,7 @@ export function createLiveLot(ctx: {
     return remaining - ds;
   }
 
-  /** The drop-off: open up, let the party off one at a time, close up, then find a bay. */
+  /** The drop-off: open up, let the party off one at a time, close up, then ask for the aisle to go and park. */
   function dockTick(l: Live, dt: number) {
     const d = l.dock!;
     // A wheelchair rider always gets the ramp; a lift van puts it out for any party.
@@ -1277,18 +1668,9 @@ export function createLiveLot(ctx: {
     l.cabTarget = 0;
     if (l.ramp <= 0.01) l.doorTarget = 0;
     if (l.door <= 0.01 && l.ramp <= 0.01 && l.cab <= 0.01) {
+      // Closed up: off to a space as soon as the aisle is clear (`go`).
       l.dock = null;
-      const i = freeSpot(l);
-      const legs = i !== null ? spotIn(i, l) : null;
-      if (legs && i !== null) {
-        l.spot = i;
-        spots.set(i, l.v.id);
-        start(l, legs, 'toBay');
-      } else {
-        // Lot full: on out of the lot rather than park in the aisle or the street.
-        l.lotFull = true;
-        start(l, fleetRoutes.frontDockToAway(), 'leaving');
-      }
+      request(l, 'park');
     }
   }
 
@@ -1394,17 +1776,33 @@ export function createLiveLot(ctx: {
       for (const o of stale) o.removeFromParent();
       hidStaticVans = true;
     }
+    const next = toPrepare.shift();
+    if (next) traffic.prepare(next.stall, next);
+    for (const l of live.values())
+      if (l.leaveWhenClosed && l.door <= 0.01 && l.ramp <= 0.01) leave(l);
+    controlTraffic();
     for (const l of Array.from(live.values())) {
       l.braking = false;
       l.reversing = false;
-      if (l.leaveWhenClosed && l.door <= 0.01 && l.ramp <= 0.01) leave(l);
       if (l.mode === 'arriving' && l.drive) {
         advance(l, dt);
         if (l.s >= l.drive.length - 1e-6 && l.vel < 0.05) {
           l.mode = 'docked';
           l.vel = 0;
           l.visited = true;
-          l.dock = { phase: 'open', timer: 0, queue: [...l.arriving], n: 0 };
+          if (l.through) {
+            // Sent away on its way in: straight on out, without opening up.
+            l.through = false;
+            l.returning = false;
+            l.dock = null;
+            request(l, 'leave');
+          } else if (l.returning) {
+            // Back for a space after a full lot: nobody to let off.
+            l.returning = false;
+            l.dock = null;
+            request(l, 'park');
+          } else
+            l.dock = { phase: 'open', timer: 0, queue: [...l.arriving], n: 0 };
         }
       } else if (l.mode === 'docked') {
         l.braking = true;
@@ -1415,13 +1813,22 @@ export function createLiveLot(ctx: {
           l.mode = 'parked';
           l.drive = null;
           l.vel = 0;
+          // The aisle is free again (before a vehicle sent away meanwhile asks for it back to leave).
+          if (aisleHolder === l.v.id) aisleHolder = null;
+          if (l.leaveOnceParked) {
+            l.leaveOnceParked = false;
+            leave(l);
+          }
         }
       } else if (l.mode === 'leaving' && l.drive) {
         advance(l, dt);
         if (l.s >= l.drive.length - 1e-6) l.mode = 'gone';
       } else if (l.mode === 'gone') {
         l.opacity = Math.max(0, l.opacity - dt * 0.5);
-        if (l.opacity <= 0) {
+        // Gone for good once the feed says so. One that only drove off from a full lot is kept, out of sight, so the
+        // feed's next update does not bring it in to unload a second time; it returns when a space frees.
+        const waitingOut = l.lotFull && !l.dropped && l.v.state !== 'away';
+        if (l.opacity <= 0 && !waitingOut) {
           remove(l);
           continue;
         }
@@ -1671,6 +2078,20 @@ export function createLiveLot(ctx: {
           +l.body.object.position.x.toFixed(1),
           +l.body.object.position.z.toFixed(1),
         ],
+        /** Exact footprint: centre x, z, scene heading (the nose points along −sin, −cos), half width and half length. */
+        pose: [
+          l.body.object.position.x,
+          l.body.object.position.z,
+          l.body.object.rotation.y,
+          l.body.halfWidth,
+          l.body.halfLength,
+        ],
+        opacity: +l.opacity.toFixed(2),
+        pending: l.pending,
+        lotFull: !!l.lotFull,
+        holds:
+          (dockHolder === l.v.id ? 'dock ' : '') +
+          (aisleHolder === l.v.id ? 'aisle' : ''),
       }));
     },
     /** People on foot right now, for the HUD. */
