@@ -23,6 +23,7 @@ import {
 } from './arrival';
 import {
   FLEET_LOT,
+  FLEET_VAN,
   fleetParking,
   fleetRoutes,
   type FleetLeg,
@@ -38,6 +39,7 @@ import { createWalkers, type WalkPoint } from './live-walkers';
 import { FLEET_VAN_RAMP } from './photo-assets';
 import type { Facility } from './schema';
 import { Pen, pathAt, type Piece } from './vehicle-path';
+import { routeAround, type Footprint } from './walk-route';
 
 export type LiveKind = 'van' | 'wav' | 'suv' | 'sedan';
 export type LiveState = 'inbound' | 'on-lot' | 'away';
@@ -202,6 +204,9 @@ type Body = {
   rampFoot: [number, number] | null;
   /** A lift van puts the ramp out for every party; a van only when someone uses a wheelchair. */
   rampForAll: boolean;
+  /** Half the body's width and length, for walkers to keep clear of it. */
+  halfWidth: number;
+  halfLength: number;
 };
 type Dock = {
   phase: 'open' | 'unload' | 'close';
@@ -761,6 +766,8 @@ export function createLiveLot(ctx: {
         hasRamp: true,
         rampFoot: FLEET_VAN_RAMP.foot,
         rampForAll: kind === 'wav',
+        halfWidth: FLEET_VAN.halfWidth,
+        halfLength: FLEET_VAN.halfLength,
       };
     }
     const car = buildLiveCar(kind, KIND_ACCENT[kind]);
@@ -777,6 +784,9 @@ export function createLiveLot(ctx: {
       hasRamp: false,
       rampFoot: null,
       rampForAll: false,
+      // Sedan 4.7 x 1.82 m, SUV 4.9 x 1.92 m (live-vehicles.ts), mirrors included.
+      halfWidth: kind === 'suv' ? 1.05 : 1.0,
+      halfLength: kind === 'suv' ? 2.45 : 2.35,
     };
   }
   function freeSpot(): number | null {
@@ -855,17 +865,44 @@ export function createLiveLot(ctx: {
   }
   /** Clear of the ramp: a stride straight on from the foot, so riders leave the ramp before they turn. */
   const CLEAR = { ramp: 1.4, step: 0.6 };
+  /** The vehicles standing on the lot (parked or at the drop-off), as walkers see them. */
+  function footprints(): Footprint[] {
+    const out: Footprint[] = [];
+    for (const o of live.values()) {
+      if (o.mode !== 'parked' && o.mode !== 'docked') continue;
+      const b = o.body.object;
+      out.push({
+        x: b.position.x,
+        z: b.position.z,
+        heading: b.rotation.y,
+        halfWidth: o.body.halfWidth,
+        halfLength: o.body.halfLength,
+      });
+    }
+    return out;
+  }
+  /** Ground-level points that take a walk from `a` to `b` round the standing vehicles instead of through them. */
+  function detour(a: WalkPoint, b: WalkPoint): WalkPoint[] {
+    return routeAround([a.x, a.z], [b.x, b.z], footprints()).map(([x, z]) => ({
+      x,
+      z,
+      y: GROUND,
+    }));
+  }
   function alightPath(l: Live, wheelchair: boolean): WalkPoint[] {
     const onRamp = l.rampTarget > 0 && !!l.body.rampFoot,
       f = footOf(l, onRamp),
       sill = world(l, l.body.sill),
       foot = world(l, f),
-      clear = world(l, [f[0] + (onRamp ? CLEAR.ramp : CLEAR.step), f[1]]);
+      clear = world(l, [f[0] + (onRamp ? CLEAR.ramp : CLEAR.step), f[1]]),
+      inside = wheelchair ? RAMP_IN : STEPS_IN,
+      off: WalkPoint = { x: clear.x, z: clear.z, y: GROUND };
     return [
       { x: sill.x, z: sill.z, y: GROUND + l.body.sillRise },
       { x: foot.x, z: foot.z, y: GROUND, speed: WALK.ramp },
-      { x: clear.x, z: clear.z, y: GROUND },
-      ...(wheelchair ? RAMP_IN : STEPS_IN),
+      off,
+      ...detour(off, inside[0]),
+      ...inside,
     ];
   }
   /** Nobody on the ramp or within reach of it, so it can slide back in (and the doors shut) without hitting anyone. */
@@ -881,19 +918,28 @@ export function createLiveLot(ctx: {
   }
   /** Out of the lobby to the vehicle's door: the alighting route in reverse, ending a step out from the sill and then on it. */
   function boardPath(l: Live, wheelchair: boolean): WalkPoint[] {
-    const f = footOf(l, wheelchair && l.body.hasRamp),
+    // Round the standing vehicles to just in front of the nose, then down the car's door side in the lane a bay
+    // leaves between cars (0.28 m off the body: mid-gap in the 2.8 m back-in bays), to the ramp's foot or the door.
+    const onRamp = wheelchair && l.body.hasRamp,
+      lane = l.body.halfWidth + 0.28,
+      doorZ = l.body.sill[1],
       sill = world(l, l.body.sill),
-      foot = world(l, f),
-      out = world(l, [f[0] + 1.6, f[1]]);
+      foot = world(l, onRamp ? l.body.rampFoot! : [lane, doorZ]),
+      side = world(l, [lane, doorZ]),
+      out = world(l, [lane, -l.body.halfLength - 0.7]);
     const back = (pts: WalkPoint[]) =>
       [...pts].reverse().map((p, i, arr) => ({
         ...p,
         speed: arr[i + 1]?.speed ?? (wheelchair ? WALK.wheelchair : WALK.foot),
       }));
+    const lobby = back(wheelchair ? RAMP_IN : STEPS_IN),
+      front: WalkPoint = { x: out.x, z: out.z, y: GROUND };
     return [
-      ...back(wheelchair ? RAMP_IN : STEPS_IN),
-      { x: out.x, z: out.z, y: GROUND },
-      { x: foot.x, z: foot.z, y: GROUND },
+      ...lobby,
+      ...detour(lobby[lobby.length - 1], front),
+      front,
+      { x: side.x, z: side.z, y: GROUND },
+      ...(onRamp ? [{ x: foot.x, z: foot.z, y: GROUND }] : []),
       { x: sill.x, z: sill.z, y: GROUND + l.body.sillRise, speed: WALK.ramp },
     ];
   }

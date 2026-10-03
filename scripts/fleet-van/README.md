@@ -1,8 +1,8 @@
 # Fleet van model
 
 `public/models/fleet-van.glb`: low-poly RAM ProMaster 3500 159" EXT high roof in Seen's livery, textured from
-photos of the real van (`sources/fleet-van/photos`, taken 2026-10-02; like the rest of `sources/` they stay local and out of git: driver-side, kerb-side, rear, front and two quarter views, 2856 px wide). ~1,900 triangles, one 2048 × 2304 atlas,
-1.1 MB. `app/model/fleet-van-model.ts` loads it; `buildArrivalVan` uses it once loaded and keeps the procedural
+photos of the real van (`sources/fleet-van/photos`, taken 2026-10-02; like the rest of `sources/` they stay local and out of git: driver-side, kerb-side, rear, front and two quarter views, 2856 px wide). ~5,800 triangles, one 2048 × 2304 atlas,
+1.4 MB. `app/model/fleet-van-model.ts` loads it; `buildArrivalVan` uses it once loaded and keeps the procedural
 `fleet-van` asset as the fallback.
 
 ```bash
