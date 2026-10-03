@@ -83,7 +83,7 @@ export type LiveVehicle = {
   label: string;
   /** Second line: ETA, riders, next departure. */
   detail?: string;
-  /** Detail lines shown when the vehicle's plate is opened (`setExpanded`): phone, device, runs, next departure, shift, advice. */
+  /** Detail lines shown when the vehicle's plate is opened (on hover): phone, device, runs, next departure, shift, advice. */
   lines?: string[];
   state: LiveState;
   /** Minutes to the center while inbound; drives how far along the approach the vehicle is drawn. */
@@ -801,6 +801,10 @@ export function createLiveLot(ctx: {
   /** The vehicle under the pointer (every other one is dimmed) and the one whose plate is opened. */
   let hoverId: string | null = null,
     expandedId: string | null = null;
+  /** The bubble opens while its car or plate is hovered and stays open this long after the pointer leaves, so moving
+   * from the car up to its bubble (across the gap between them) does not collapse it. */
+  const EXPAND_GRACE = 0.4;
+  let expandHold = 0;
   /** The rider whose avatar the pointer is over in the opened bubble, and the card drawn for them. */
   let hoverPerson: { l: Live; rect: AvatarRect } | null = null;
   const personCard = makeLabel();
@@ -1759,6 +1763,13 @@ export function createLiveLot(ctx: {
   }
 
   function tick(dt: number) {
+    if (hoverId) {
+      expandedId = hoverId;
+      expandHold = EXPAND_GRACE;
+    } else if (expandedId) {
+      expandHold -= dt;
+      if (expandHold <= 0) expandedId = null;
+    }
     if (!hidStaticVans) {
       // The renderer shows the model's display vans whenever the care-day cast is off; take them out of the scene instead.
       for (const o of ctx.model.objects)
@@ -2056,7 +2067,9 @@ export function createLiveLot(ctx: {
     },
     /** Open one vehicle's plate into its details bubble (null closes it). */
     setExpanded(id: string | null) {
+      // The bubble follows the hover; this only opens one directly (e.g. from the console) until the next hover.
       expandedId = id;
+      expandHold = id ? EXPAND_GRACE : 0;
     },
     get expanded() {
       return expandedId;

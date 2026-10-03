@@ -18,8 +18,9 @@ import { createSimPanel } from './sim';
  * (app/model/live-lot.ts); this page answers `{ type: 'seen-live-lot-ready' }`
  * once the scene is up so the parent sends the current state. A message with
  * `follow: <vehicle id>` centres the camera on that car and keeps it centred as
- * it moves and opens its plate into a details bubble; `follow: null` returns
- * to the whole-lot shot and closes it. Camera moves glide (eased over ~0.8 s;
+ * it moves; `follow: null` returns to the whole-lot shot. Hovering a car or
+ * its plate opens the plate into a details bubble (closing shortly after the
+ * pointer leaves). Camera moves glide (eased over ~0.8 s;
  * following tracks the car smoothly). A click on a car or its plate posts
  * `{ type: 'seen-live-lot-pick', id }` to the parent, a click on nothing posts
  * `{ id: null }`, so the parent decides what to follow (standalone, the page
@@ -210,7 +211,6 @@ async function main() {
     if (id === follow) return;
     follow = id;
     onFollowChange?.(id);
-    lot?.setExpanded(id);
     touched = true; // a follow is the person's own framing; the start-up hold must not undo it
     if (!id) glideTo(SHOT);
     else {
