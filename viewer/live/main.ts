@@ -195,9 +195,11 @@ async function main() {
   const glideTo = (to: Shot) => {
     glide = { from: viewer.getShot(), to, start: performance.now() };
   };
+  let onFollowChange: ((id: string | null) => void) | null = null;
   const setFollow = (id: string | null) => {
     if (id === follow) return;
     follow = id;
+    onFollowChange?.(id);
     lot?.setExpanded(id);
     touched = true; // a follow is the person's own framing; the start-up hold must not undo it
     if (!id) glideTo(SHOT);
@@ -337,6 +339,7 @@ async function main() {
   // `?debug=true`: the vehicle simulator (sim.ts). Its vehicles ride along with every update from the dispatch board.
   const debugParam = new URLSearchParams(location.search).get('debug');
   let lastReal: LiveMessage | null = null;
+  let lastParentFollow: string | null = null;
   const sim =
     debugParam !== null && !/^(0|false|no)$/i.test(debugParam)
       ? createSimPanel({
@@ -344,6 +347,7 @@ async function main() {
           follow: (id) => setFollow(id),
         })
       : null;
+  if (sim) onFollowChange = (id) => sim.setFollowed(id);
   const show = (real: LiveMessage | null) => {
     const base: LiveMessage = real ?? {
       type: 'seen-live-lot',
@@ -363,7 +367,11 @@ async function main() {
     if (!msg || msg.type !== 'seen-live-lot') return;
     lastReal = msg;
     show(msg);
-    setFollow(msg.follow ?? null);
+    // Only a change of the parent's follow moves the camera: the board re-posts its (unchanged) follow with every
+    // update, which would otherwise drop a follow started here (a click on a car, the simulator's Follow).
+    const parentFollow = msg.follow ?? null;
+    if (parentFollow !== lastParentFollow) setFollow(parentFollow);
+    lastParentFollow = parentFollow;
   };
   window.addEventListener('message', onMessage);
   const ready = () => {

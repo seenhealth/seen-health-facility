@@ -35,6 +35,8 @@ export function createSimPanel(opts: {
 }) {
   const sims: Sim[] = [];
   let next = 1;
+  /** The vehicle the camera follows (kept in step by main.ts, a click on a car follows it too). */
+  let followed: string | null = null;
   const panel = document.createElement('div');
   panel.id = 'sim';
   panel.style.cssText =
@@ -98,7 +100,7 @@ export function createSimPanel(opts: {
           ${s.v.state === 'inbound' && s.v.etaMinutes ? '<button type="button" data-act="now">Arrive now</button>' : ''}
           ${s.v.state !== 'away' ? `<button type="button" data-act="board" title="Riders walk out from the lobby and board">Board${s.riders.length ? ` ${s.riders.length}` : ''}</button>` : ''}
           ${s.v.state !== 'away' ? '<button type="button" data-act="away">Away</button>' : '<button type="button" data-act="back">Arrive again</button>'}
-          <button type="button" data-act="follow">Follow</button>
+          <button type="button" data-act="follow">${followed === s.v.id ? 'Unfollow' : 'Follow'}</button>
           <button type="button" data-act="remove" title="Remove">✕</button>
         </div></div>`,
       )
@@ -172,12 +174,21 @@ export function createSimPanel(opts: {
         detail: 'arriving',
         riders: s.riders,
       };
-    else if (act === 'follow') return opts.follow(s.v.id);
-    else if (act === 'remove') sims.splice(i, 1);
+    else if (act === 'follow') {
+      followed = followed === s.v.id ? null : s.v.id;
+      opts.follow(followed);
+      return render();
+    } else if (act === 'remove') sims.splice(i, 1);
     emit();
   });
   render();
   return {
+    /** Follow changed elsewhere (a click on a car, the background, the dispatch board): relabel the buttons. */
+    setFollowed(id: string | null) {
+      if (id === followed) return;
+      followed = id;
+      render();
+    },
     get vehicles() {
       return sims.map((s) => s.v);
     },
