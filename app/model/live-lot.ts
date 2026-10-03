@@ -892,30 +892,44 @@ export function createLiveLot(ctx: {
   }
   /** Out of the lobby to the vehicle's door: the alighting route in reverse, ending a step out from the sill and then on it. */
   function boardPath(l: Live, wheelchair: boolean): WalkPoint[] {
-    // Round the standing vehicles to just in front of the nose, then down the car's door side in the lane a bay
-    // leaves between cars (0.28 m off the body: mid-gap in the 2.8 m back-in bays), to the ramp's foot or the door.
-    const onRamp = wheelchair && l.body.hasRamp,
-      lane = l.body.halfWidth + 0.28,
+    // While the ramp is out (a wheelchair rider in the party) everyone boards up it, not just the wheelchair:
+    // round the standing vehicles to a stride beyond its foot, then straight up it. Otherwise round them to just
+    // in front of the nose, then down the car's door side in the lane a bay leaves between cars (0.28 m off the
+    // body: mid-gap in the 2.8 m back-in bays) to the door.
+    const onRamp = l.body.hasRamp && (wheelchair || l.rampTarget > 0),
       doorZ = l.body.sill[1],
-      sill = world(l, l.body.sill),
-      foot = world(l, onRamp ? l.body.rampFoot! : [lane, doorZ]),
-      side = world(l, [lane, doorZ]),
-      out = world(l, [lane, -l.body.halfLength - 0.7]);
+      sill = world(l, l.body.sill);
     const back = (pts: WalkPoint[]) =>
       [...pts].reverse().map((p, i, arr) => ({
         ...p,
         speed: arr[i + 1]?.speed ?? (wheelchair ? WALK.wheelchair : WALK.foot),
       }));
     const lobby = back(wheelchair ? RAMP_IN : STEPS_IN),
-      front: WalkPoint = { x: out.x, z: out.z, y: GROUND };
-    return [
-      ...lobby,
-      ...detour(lobby[lobby.length - 1], front),
-      front,
-      { x: side.x, z: side.z, y: GROUND },
-      ...(onRamp ? [{ x: foot.x, z: foot.z, y: GROUND }] : []),
-      { x: sill.x, z: sill.z, y: GROUND + l.body.sillRise, speed: WALK.ramp },
-    ];
+      last = lobby[lobby.length - 1],
+      ground = (local: [number, number]): WalkPoint => {
+        const p = world(l, local);
+        return { x: p.x, z: p.z, y: GROUND };
+      },
+      up: WalkPoint = {
+        x: sill.x,
+        z: sill.z,
+        y: GROUND + l.body.sillRise,
+        speed: WALK.ramp,
+      };
+    if (onRamp && l.body.rampFoot) {
+      const [fx] = l.body.rampFoot,
+        approach = ground([fx + CLEAR.ramp, doorZ]);
+      return [
+        ...lobby,
+        ...detour(last, approach),
+        approach,
+        ground([fx, doorZ]),
+        up,
+      ];
+    }
+    const lane = l.body.halfWidth + 0.28,
+      front = ground([lane, -l.body.halfLength - 0.7]);
+    return [...lobby, ...detour(last, front), front, ground([lane, doorZ]), up];
   }
 
   function apply(msg: LiveMessage) {
