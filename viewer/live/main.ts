@@ -7,6 +7,7 @@ import { createLiveLot, type LiveMessage } from '../../app/model/live-lot';
 import { createDaylight } from '../../app/model/daylight';
 import { createNightLights } from '../../app/model/night-lights';
 import { preloadFleetVanModel } from '../../app/model/fleet-van-model';
+import { createSimPanel } from './sim';
 
 /**
  * Static page that shows Seen's real vehicles on the Alhambra lot. A parent
@@ -319,14 +320,36 @@ async function main() {
   )
     setProjection(true);
   let pending: LiveMessage | null = null;
+  // `?debug=true`: the vehicle simulator (sim.ts). Its vehicles ride along with every update from the dispatch board.
+  const debugParam = new URLSearchParams(location.search).get('debug');
+  let lastReal: LiveMessage | null = null;
+  const sim =
+    debugParam !== null && !/^(0|false|no)$/i.test(debugParam)
+      ? createSimPanel({
+          onChange: () => show(lastReal),
+          follow: (id) => setFollow(id),
+        })
+      : null;
+  const show = (real: LiveMessage | null) => {
+    const base: LiveMessage = real ?? {
+      type: 'seen-live-lot',
+      vehicles: [],
+      capacity: 12,
+    };
+    const msg: LiveMessage = sim
+      ? { ...base, vehicles: [...base.vehicles, ...sim.vehicles] }
+      : base;
+    if (lot) lot.apply(msg);
+    else pending = msg;
+    const n = lot?.onLot ?? 0;
+    hud.innerHTML = `<b>${n}</b> / ${msg.capacity ?? '?'} on the lot${msg.clock ? ` · ${msg.clock}` : ''} · ${msg.vehicles.filter((v) => v.state === 'inbound').length} inbound${sim?.vehicles.length ? ` · ${sim.vehicles.length} simulated` : ''}`;
+  };
   const onMessage = (e: MessageEvent) => {
     const msg = e.data as LiveMessage | undefined;
     if (!msg || msg.type !== 'seen-live-lot') return;
-    if (lot) lot.apply(msg);
-    else pending = msg;
+    lastReal = msg;
+    show(msg);
     setFollow(msg.follow ?? null);
-    const n = lot?.onLot ?? 0;
-    hud.innerHTML = `<b>${n}</b> / ${msg.capacity ?? '?'} on the lot${msg.clock ? ` · ${msg.clock}` : ''} · ${msg.vehicles.filter((v) => v.state === 'inbound').length} inbound`;
   };
   window.addEventListener('message', onMessage);
   const ready = () => {

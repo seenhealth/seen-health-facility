@@ -722,7 +722,7 @@ export function buildAlhambraExterior(model: Facility) {
   // Streetscape from the lot-side and Valley Blvd photographs (May 2025 Street
   // View and the 2026 photo): the Ethel Avenue parkway lawn with its yellow
   // hydrant, red-curbed planters with fan palms along the lot's west edge and
-  // beside the wing, the palm island at the alley corner, the FDC on the wing's
+  // beside the wing, the palm island at the alley corner (plain curb), the FDC on the wing's
   // corner, the utility pole with its transformers, bottlebrush trees and a
   // hydrant on the Valley Blvd frontage.
   for (const [z0, z1] of [
@@ -789,24 +789,7 @@ export function buildAlhambraExterior(model: Facility) {
     }
   box(street, -30.95, -0.23, -13.8, 0.07, 0.2, 19.4, red);
   box(street, -31.48, -0.23, 17.3, 0.07, 0.2, 20, red);
-  for (const [[ax, az], [bx, bz]] of [
-    [
-      [-21.0, -22.2],
-      [-16.2, -24.7],
-    ],
-  ]) {
-    const curb = box(
-      street,
-      (ax + bx) / 2,
-      -0.23,
-      (az + bz) / 2,
-      Math.hypot(bx - ax, bz - az),
-      0.2,
-      0.07,
-      red,
-    );
-    curb.rotation.y = -Math.atan2(bz - az, bx - ax);
-  }
+  // The palm island at the alley corner has a plain curb (no red paint beside the STOP marking).
   palm(-27.6, 29.65, 1.6, 1.0);
   palm(-19.2, 29.65, 1.6, 1.0);
   // Fire department connection at the wing's west corner.
