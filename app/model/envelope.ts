@@ -1,6 +1,17 @@
 import * as T from 'three';
 import type { EnvelopeWall, Facility, Vec2 } from './schema';
 
+/**
+ * Openings glazed elsewhere: the lobby's sliding doors (arrival.ts ENTRY_DOORS) and the two windows beside them,
+ * which take the doors' clear dark glass, and the Ethel side of the street corner, clear like the Valley storefront
+ * (alhambra-exterior.ts).
+ */
+const OWN_GLAZING = new Set([
+  'shell-lobby-west-opening-3',
+  'shell-lobby-west-opening-2',
+  'shell-lobby-west-opening-1',
+  'ethel-corner-return-glazing',
+]);
 export function buildEnvelopeWall(
   w: EnvelopeWall,
   material: (id: string) => T.Material,
@@ -68,7 +79,7 @@ export function buildEnvelopeWall(
   for (const o of w.openings) {
     const height = Math.min(o.height, h - o.sill);
     if (height <= 0) continue;
-    if (!o.operable && o.id !== 'shell-lobby-west-opening-3')
+    if (!o.operable && !OWN_GLAZING.has(o.id))
       block(o.offset, o.sill, o.width, height, 0.055, o.material, o.id);
     const frame = 0.045;
     block(o.offset, o.sill, frame, height, w.thickness + 0.035, 'frame');
@@ -91,7 +102,13 @@ export function buildEnvelopeWall(
         w.thickness + 0.035,
         'frame',
       );
-    if (o.kind === 'door' && !o.operable && o.width > 1.3)
+    // The lobby's sliding doors (arrival.ts ENTRY_DOORS) meet in the middle; no fixed mullion there.
+    if (
+      o.kind === 'door' &&
+      !o.operable &&
+      o.width > 1.3 &&
+      o.id !== 'shell-lobby-west-opening-3'
+    )
       block(
         o.offset + o.width / 2 - frame / 2,
         o.sill,

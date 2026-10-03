@@ -124,9 +124,13 @@ export function createNightLights(
     );
   }
   // Valley Blvd runs along the north; the trees stand at z 30.2, the lamps just past them with the arm over the road.
-  for (const x of [-27, -4, 20]) streetLamp(x, 31.2, [0, 1]);
+  // The one by the Ethel corner (Street View, May 2025) stands a little back from the curb, just east of the hydrant.
+  streetLamp(-26.6, 30.75, [0, 1]);
+  // On the sidewalk 0.45 m in from the curb (z 31.19), not on the curb line.
+  for (const x of [-4, 20]) streetLamp(x, 30.75, [0, 1]);
   // Ethel Avenue on the west, behind the parkway lawn.
-  for (const z of [-15, 12]) streetLamp(-35.6, z, [-1, 0]);
+  // On the walk 0.35 m in from the curb (x -35.21), between the parkway trees (z -15.5, -9.5 ... 8, 20.5).
+  for (const z of [-12.5, 14.3]) streetLamp(-34.85, z, [-1, 0]);
   // The alley's utility pole carries a street light on a short arm.
   {
     const g = new T.Group();
@@ -279,7 +283,9 @@ export function createNightLights(
       if (!(o instanceof T.Mesh)) return;
       if (o.material === glass) o.material = glow;
       else if (
-        (o.parent?.name ?? '').startsWith('sliding-entry-leaf-') &&
+        ((o.parent?.name ?? '').startsWith('sliding-entry-leaf-') ||
+          o.parent?.name === 'lobby-window-glass' ||
+          o.parent?.name === 'corner-window-glass') &&
         (o.material as T.Material).transparent
       )
         o.material = leafGlow;

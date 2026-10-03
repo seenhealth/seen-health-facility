@@ -12,7 +12,8 @@ const SITE = {
   curb: '#dcd7cd',
   planting: '#b4bea2',
   marking: '#f8f6f1',
-  accessible: '#a3b6bf',
+  /** Accessible-parking blue (hatching and the symbol's ground), as painted on the lot (photo 2026-10-03). */
+  accessible: '#2f62b3',
   trunk: '#8f8472',
   canopy: ['#a9b598', '#9fad8d', '#b3bda3'],
   pole: '#a3a5a0',
@@ -225,6 +226,61 @@ export function buildNeighborhood(model: Facility) {
     c: string,
     p: T.Object3D = root,
   ) => add(new T.BoxGeometry(w, h, d), c, x, y + h / 2, z, p);
+  /**
+   * The International Symbol of Access painted in a stall: the white wheelchair figure on a blue square, `size` m
+   * across, its head toward `up` (the scene heading the figure's top points to, as a rotation about y). Drawn to a
+   * canvas in the browser; headless (the validators) it is the blue square alone.
+   */
+  function accessSymbol(x: number, z: number, size: number, up: number) {
+    if (typeof document === 'undefined') {
+      box(x, -0.208, z, size, 0.012, size, SITE.accessible);
+      return;
+    }
+    const n = 256,
+      canvas = document.createElement('canvas');
+    canvas.width = canvas.height = n;
+    const g = canvas.getContext('2d')!;
+    g.fillStyle = SITE.accessible;
+    g.fillRect(0, 0, n, n);
+    g.strokeStyle = g.fillStyle = '#f8f6f1';
+    g.lineCap = g.lineJoin = 'round';
+    g.lineWidth = 6;
+    g.strokeRect(10, 10, n - 20, n - 20);
+    // Head, back and seat, the arm, the leg to the footrest, and the open wheel round the seat.
+    g.beginPath();
+    g.arc(104, 48, 20, 0, Math.PI * 2);
+    g.fill();
+    g.lineWidth = 22;
+    g.beginPath();
+    g.moveTo(100, 82);
+    g.lineTo(100, 150);
+    g.lineTo(160, 150);
+    g.lineTo(184, 204);
+    g.lineTo(212, 204);
+    g.stroke();
+    g.lineWidth = 16;
+    g.beginPath();
+    g.moveTo(100, 108);
+    g.lineTo(148, 108);
+    g.stroke();
+    // The wheel, open at the top behind the back.
+    g.beginPath();
+    g.arc(112, 176, 58, (-48 * Math.PI) / 180, (228 * Math.PI) / 180);
+    g.stroke();
+    const map = new T.CanvasTexture(canvas);
+    map.colorSpace = T.SRGBColorSpace;
+    map.anisotropy = 4;
+    const geo = new T.PlaneGeometry(size, size);
+    geo.rotateX(-Math.PI / 2);
+    const m = new T.Mesh(
+      geo,
+      new T.MeshStandardMaterial({ map, roughness: 0.85 }),
+    );
+    m.position.set(x, -0.195, z);
+    m.rotation.y = up;
+    m.receiveShadow = true;
+    root.add(m);
+  }
   const px = (x: number, z: number): Vec2 => [
     (x - model.calibration.sourcePixelOrigin[0]) /
       model.calibration.pixelsPerMeter,
@@ -459,21 +515,15 @@ export function buildNeighborhood(model: Facility) {
   // planter (the fleet's bays, at their pitch), the hatched accessible aisle
   // and stall at its south end, and a row of slightly angled stalls along the
   // building north of the drop-off.
-  for (let k = 0; k < 8; k++)
+  // Seven white stall lines; the eighth line (z −3.45) is the accessible aisle's blue edge, not drawn twice. The
+  // aisle and stall lines run the full stall length, as the white ones do.
+  for (let k = 0; k < 7; k++)
     stall([-31.0, -23.05 + 2.8 * k], [-24.9, -23.05 + 2.8 * k]);
-  for (let x = -30.6; x < -26.6; x += 0.9)
+  for (let x = -30.9; x + 1.6 <= -24.95; x += 0.9)
     strip([x, -3.3], [x + 1.6, -1.2], 0.08, SITE.accessible);
   for (const z of [-3.45, -1.05, 1.45])
-    strip([-31.0, z], [-26.5, z], 0.1, SITE.accessible);
-  box(-27.9, -0.208, 0.2, 1.1, 0.012, 1.1, SITE.accessible);
-  const isaRing = add(
-    new T.TorusGeometry(0.28, 0.035, 6, 32),
-    SITE.marking,
-    -27.9,
-    -0.191,
-    0.2,
-  );
-  isaRing.rotation.x = -Math.PI / 2;
+    strip([-31.0, z], [-24.9, z], 0.1, SITE.accessible);
+  accessSymbol(-27.9, 0.2, 1.1, Math.PI / 2);
   for (let k = 0; k < 6; k++)
     stall([-20.4, -19.5 + 2.7 * k], [-15.0, -21.5 + 2.7 * k]);
   // The rear court behind the east block (Street View and Google Earth): a
@@ -498,7 +548,7 @@ export function buildNeighborhood(model: Facility) {
   for (let z = -6; z <= 15; z += 3) stall([30.3, z], [35.5, z - 2.4]);
   for (let x = 30.6; x < 35.2; x += 0.9)
     strip([x, 15.4], [x + 1.4, 17.4], 0.08, SITE.accessible);
-  box(34.6, -0.208, 14.2, 1.0, 0.012, 1.0, SITE.accessible);
+  accessSymbol(34.6, 14.2, 1.0, Math.PI / 2);
   // Abstract model trees: a slender trunk under soft, smooth canopy volumes.
   const canopyGeometry = new T.SphereGeometry(1, 28, 18);
   function tree(x: number, z: number, r: number, h: number, i: number) {
@@ -555,12 +605,9 @@ export function buildNeighborhood(model: Facility) {
     [4152, 671, 2.6, 4.8],
     [4152, 1064, 2.3, 4.4],
     [4152, 1693, 2.5, 4.6],
-    [464, 2334, 0.55, 1.6],
-    [551, 2334, 0.55, 1.6],
   ].forEach((p, i) => tree(p[0], p[1], p[2], p[3], i));
+  // (The Valley street lamp at x -4 is night-lights.ts's; no second pole there.)
   for (const [x, z] of [
-    [-31.2, 29.6],
-    [-4, 31],
     [30, 29],
     [63.6, -24],
     [-34.4, -21.4],

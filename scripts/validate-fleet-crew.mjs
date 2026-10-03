@@ -6,7 +6,7 @@
 // through the driver's door), cabin walks and ramp escorts continuous, the
 // driver close behind each rider's party on the ramp, and the new lobby waits
 // clear of walls, and everyone on foot at the drop-off clear of its rails and
-// planter and on its walking surfaces. Runs over the base loop and the story
+// bike rack and on its walking surfaces. Runs over the base loop and the story
 // source, as the viewer plays them.
 //
 //   npm run validate:fleet
@@ -399,8 +399,8 @@ for (const [name, source] of sources) {
 }
 // The drop-off (DROP_OFF in alhambra-exterior.ts): everyone on foot, as the
 // viewer plays the day with the community layer, keeps their route clearance
-// (nav.ts; escorts and staff the wall clearance) from its rails and the palm
-// planter, never steps across a rail, and on the landing, the switchback's
+// (nav.ts; escorts and staff the wall clearance) from its rails and the bike
+// rack, never steps across a rail, and on the landing, the switchback's
 // runs and the turn landing walks at the surface's height (on the steps,
 // between a tread and the one above it). Between the docked van's nose and
 // the lobby wall (the passage round the nose, the switchback and the landing,
@@ -408,7 +408,7 @@ for (const [name, source] of sources) {
 const { DROP_OFF } = exterior;
 const dropOffEdges = [
   ...Object.entries(DROP_OFF.rails).map(([id, r]) => ({ id: `${id} rail`, a: [r.x, r.z0], b: [r.x, r.z1] })),
-  ...DROP_OFF.planterOutline.map((a, i, all) => ({ id: 'palm planter', a, b: all[(i + 1) % all.length] })),
+  ...DROP_OFF.bikeRackOutline.map((a, i, all) => ({ id: 'bike rack', a, b: all[(i + 1) % all.length] })),
 ];
 const edgeGap = (p, { a, b }) => {
   const dx = b[0] - a[0],
@@ -419,8 +419,10 @@ const edgeGap = (p, { a, b }) => {
 const side = (p, q, r) => Math.sign((q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0]));
 const crossesEdge = (p, q, { a, b }) => side(p, q, a) * side(p, q, b) < 0 && side(a, b, p) * side(a, b, q) < 0;
 const riser = (DROP_OFF.top - DROP_OFF.street) / (DROP_OFF.steps.count + 1);
-const onSteps = ([x, z]) =>
-  Math.abs(x - DROP_OFF.landing.x) <= DROP_OFF.width / 2 && z >= DROP_OFF.steps.z0 && z < DROP_OFF.landing.z0;
+const onSteps = ([x, z]) => {
+  const st = DROP_OFF.steps;
+  return x >= st.x0 && x < st.x1 && z >= st.z0 && z <= st.z1;
+};
 const near = { x0: -26, x1: -13, z0: -9, z1: 11 };
 const nearDropOff = ([x, z]) => x > near.x0 && x < near.x1 && z > near.z0 && z < near.z1;
 assert.ok(Math.abs(-Math.sin(fleet.FLEET_LOT.dockHeading) - 1) < 1e-9, 'the docked van faces +x, toward the switchback');
@@ -449,7 +451,7 @@ for (const [name, base] of [
       if (!onFoot || !nearDropOff(p)) continue;
       dropOff.samples++;
       for (const e of dropOffEdges) {
-        const gap = e.id === 'palm planter' && inside(p, DROP_OFF.planterOutline) ? 0 : edgeGap(p, e);
+        const gap = e.id === 'bike rack' && inside(p, DROP_OFF.bikeRackOutline) ? 0 : edgeGap(p, e);
         if (gap < dropOff.railGap) {
           dropOff.railGap = gap;
           dropOff.railGapAt = `${a.id} to the ${e.id} at ${tt.toFixed(2)} (${name})`;
@@ -483,5 +485,5 @@ for (const [name, base] of [
 assert.ok(dropOff.people.size >= 6, `riders walk the drop-off's switchback (${[...dropOff.people].join(', ')})`);
 
 console.log(
-  `Fleet crew: ${arrivals} drop-off arrivals set off out of sight, ${totals.outOfView} seated people appearing or vanishing only with their van out of sight, ${totals.officeWalks} driver walks between the fleet office and a parked van (nearest person ${officeGap.toFixed(2)} m), ${totals.rampEscorts} ramp descents escorted by the driver, ${totals.rampAscents} ascents attended (${totals.escortedUp} escorted up the ramp, the rest steadied from its foot), ${driverDoorCrossings} cab-door passages through the open driver's door, ${slidingDoorCrossings} passages through the open sliding door, ${dropOff.people.size} people on the drop-off's landing and ramp (${dropOff.onSurface.toLocaleString()} samples at its surface height; nearest rail or planter ${dropOff.railGap.toFixed(2)} m, ${dropOff.railGapAt}; closest two people outside one party ${dropOff.spacing.toFixed(2)} m, ${dropOff.spacingAt}), ${totals.fadeHidden} seated people hidden by the engine in vans below ${activity.SEATED_MIN_OPACITY} opacity, ${totals.samples.toLocaleString()} placement samples; cabin walks, seat visibility, driver-in-cab and wall clearance passed.`,
+  `Fleet crew: ${arrivals} drop-off arrivals set off out of sight, ${totals.outOfView} seated people appearing or vanishing only with their van out of sight, ${totals.officeWalks} driver walks between the fleet office and a parked van (nearest person ${officeGap.toFixed(2)} m), ${totals.rampEscorts} ramp descents escorted by the driver, ${totals.rampAscents} ascents attended (${totals.escortedUp} escorted up the ramp, the rest steadied from its foot), ${driverDoorCrossings} cab-door passages through the open driver's door, ${slidingDoorCrossings} passages through the open sliding door, ${dropOff.people.size} people on the drop-off's landing and ramp (${dropOff.onSurface.toLocaleString()} samples at its surface height; nearest rail or bike rack ${dropOff.railGap.toFixed(2)} m, ${dropOff.railGapAt}; closest two people outside one party ${dropOff.spacing.toFixed(2)} m, ${dropOff.spacingAt}), ${totals.fadeHidden} seated people hidden by the engine in vans below ${activity.SEATED_MIN_OPACITY} opacity, ${totals.samples.toLocaleString()} placement samples; cabin walks, seat visibility, driver-in-cab and wall clearance passed.`,
 );

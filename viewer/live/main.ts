@@ -6,6 +6,11 @@ import { createViewer, defaultState } from '../../app/model/renderer';
 import { createLiveLot, type LiveMessage } from '../../app/model/live-lot';
 import { createDaylight } from '../../app/model/daylight';
 import { createNightLights } from '../../app/model/night-lights';
+import {
+  preloadFleetVanModel,
+  preloadLiveCarModels,
+} from '../../app/model/fleet-van-model';
+import { createSimPanel } from './sim';
 
 /**
  * Static page that shows Seen's real vehicles on the Alhambra lot. A parent
@@ -31,10 +36,17 @@ import { createNightLights } from '../../app/model/night-lights';
 async function main() {
   const host = document.getElementById('root')!;
   const hud = document.getElementById('hud')!;
-  const model = validateFacility(
-    await (await fetch('/models/seen-alhambra-planning.json')).json(),
-  );
+  const [model] = await Promise.all([
+    fetch('/models/seen-alhambra-planning.json')
+      .then((r) => r.json())
+      .then(validateFacility),
+    // The photo-textured fleet van; vans fall back to the procedural body if it fails.
+    preloadFleetVanModel(),
+    preloadLiveCarModels(),
+  ]);
   let lot: ReturnType<typeof createLiveLot> | null = null;
+  /** How many times real time the lot runs (the simulator's speed control; `?speed=4` with `?debug` starts faster). */
+  let speed = 1;
   let daylight: ReturnType<typeof createDaylight> | null = null;
   let nightLights: ReturnType<typeof createNightLights> | null = null;
   const viewer = createViewer(host, model, () => {}, {
@@ -58,12 +70,26 @@ async function main() {
         (window as unknown as { seenScene?: unknown }).seenScene = ctx.scene;
       daylight = createDaylight(ctx.scene);
       nightLights = createNightLights(ctx.scene, ctx.material);
-      lot = createLiveLot(ctx);
+      const made = createLiveLot(ctx);
+      lot = made;
       if (new URLSearchParams(location.search).has('debug'))
         (window as unknown as { seenLot?: unknown }).seenLot = lot;
-      return lot;
+      // The simulator can run the lot faster than real time: each frame's step is taken `speed` times, so the motion
+      // stays as fine as at 1×.
+      return {
+        tick: (dt: number) => {
+          for (let i = 0; i < speed; i++) made.tick(dt);
+        },
+        dispose: () => made.dispose(),
+      };
     },
   });
+  // `?debug=1` also exposes the viewer (setShot, getShot) for scripted close-ups and lets the wheel zoom in much
+  // further (to the decals on the door).
+  if (new URLSearchParams(location.search).has('debug')) {
+    (window as unknown as { seenViewer?: unknown }).seenViewer = viewer;
+    viewer.setMaxZoom(150);
+  }
   // Real sun and sky for the moment being shown; `?at=` pins another moment for review, and the time slider in the
   // controls panel overrides both until Now is pressed.
   const parseAt = (at: string | null): Date | null => {
@@ -179,9 +205,11 @@ async function main() {
   const glideTo = (to: Shot) => {
     glide = { from: viewer.getShot(), to, start: performance.now() };
   };
+  let onFollowChange: ((id: string | null) => void) | null = null;
   const setFollow = (id: string | null) => {
     if (id === follow) return;
     follow = id;
+    onFollowChange?.(id);
     lot?.setExpanded(id);
     touched = true; // a follow is the person's own framing; the start-up hold must not undo it
     if (!id) glideTo(SHOT);
@@ -247,7 +275,11 @@ async function main() {
   const PAN = 10; // metres at zoom 1
   const on = (id: string, fn: () => void) =>
     document.getElementById(id)!.addEventListener('click', fn);
-  on('ctl-zoom-in', () => nudge((s) => ({ zoom: Math.min(8, s.zoom * 1.3) })));
+  // `?debug` lets the button zoom on in to the building's details, as the wheel does.
+  const zoomCap = new URLSearchParams(location.search).has('debug') ? 150 : 8;
+  on('ctl-zoom-in', () =>
+    nudge((s) => ({ zoom: Math.min(zoomCap, s.zoom * 1.3) })),
+  );
   on('ctl-zoom-out', () =>
     nudge((s) => ({ zoom: Math.max(0.4, s.zoom / 1.3) })),
   );
@@ -314,14 +346,49 @@ async function main() {
   )
     setProjection(true);
   let pending: LiveMessage | null = null;
+  // `?debug=true`: the vehicle simulator (sim.ts). Its vehicles ride along with every update from the dispatch board.
+  const debugParam = new URLSearchParams(location.search).get('debug');
+  let lastReal: LiveMessage | null = null;
+  let lastParentFollow: string | null = null;
+  const sim =
+    debugParam !== null && !/^(0|false|no)$/i.test(debugParam)
+      ? createSimPanel({
+          onChange: () => show(lastReal),
+          follow: (id) => setFollow(id),
+          speed: (times) => {
+            speed = Math.min(16, Math.max(1, Math.round(times)));
+          },
+        })
+      : null;
+  if (sim) {
+    const start = Number(new URLSearchParams(location.search).get('speed'));
+    if (start > 1) sim.setSpeed(start);
+  }
+  if (sim) onFollowChange = (id) => sim.setFollowed(id);
+  const show = (real: LiveMessage | null) => {
+    const base: LiveMessage = real ?? {
+      type: 'seen-live-lot',
+      vehicles: [],
+      capacity: 12,
+    };
+    const msg: LiveMessage = sim
+      ? { ...base, vehicles: [...base.vehicles, ...sim.vehicles] }
+      : base;
+    if (lot) lot.apply(msg);
+    else pending = msg;
+    const n = lot?.onLot ?? 0;
+    hud.innerHTML = `<b>${n}</b> / ${msg.capacity ?? '?'} on the lot${msg.clock ? ` · ${msg.clock}` : ''} · ${msg.vehicles.filter((v) => v.state === 'inbound').length} inbound${sim?.vehicles.length ? ` · ${sim.vehicles.length} simulated` : ''}`;
+  };
   const onMessage = (e: MessageEvent) => {
     const msg = e.data as LiveMessage | undefined;
     if (!msg || msg.type !== 'seen-live-lot') return;
-    if (lot) lot.apply(msg);
-    else pending = msg;
-    setFollow(msg.follow ?? null);
-    const n = lot?.onLot ?? 0;
-    hud.innerHTML = `<b>${n}</b> / ${msg.capacity ?? '?'} on the lot${msg.clock ? ` · ${msg.clock}` : ''} · ${msg.vehicles.filter((v) => v.state === 'inbound').length} inbound`;
+    lastReal = msg;
+    show(msg);
+    // Only a change of the parent's follow moves the camera: the board re-posts its (unchanged) follow with every
+    // update, which would otherwise drop a follow started here (a click on a car, the simulator's Follow).
+    const parentFollow = msg.follow ?? null;
+    if (parentFollow !== lastParentFollow) setFollow(parentFollow);
+    lastParentFollow = parentFollow;
   };
   window.addEventListener('message', onMessage);
   const ready = () => {

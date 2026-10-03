@@ -39,6 +39,8 @@ type Walker = {
   marks: number[];
   s: number;
   walked: number;
+  /** A wheelchair's tilt along the slope it is on (radians, nose down positive), eased between legs. */
+  pitch: number;
   done: boolean;
   onDone?: () => void;
 };
@@ -67,13 +69,24 @@ export function createWalkers(root: T.Object3D) {
       y: a.y + (b.y - a.y) * t,
       z: a.z + (b.z - a.z) * t,
       heading: Math.atan2(b.x - a.x, b.z - a.z),
+      /** Grade of the leg: rise over run, negative downhill. */
+      grade: len > 1e-6 ? (b.y - a.y) / len : 0,
       speed: b.speed ?? (w.wheelchair ? 0.8 : 1.0),
     };
   }
-  function pose(w: Walker) {
+  function pose(w: Walker, dt = 0) {
     const p = at(w, w.s);
     w.figure.root.position.set(p.x, p.y, p.z);
     w.figure.root.rotation.y = p.heading;
+    // A wheelchair rolls with its wheels on the slope (a van's ramp, the switchback) instead of level through it;
+    // people on foot stay upright.
+    if (w.wheelchair) {
+      const target = -Math.atan(p.grade);
+      w.pitch = dt
+        ? w.pitch + (target - w.pitch) * Math.min(1, dt * 8)
+        : target;
+      w.figure.root.rotation.x = w.pitch;
+    }
     w.figure.pose(w.wheelchair ? 'roll' : 'walk', w.walked / GAIT, 1);
   }
   return {
@@ -106,9 +119,11 @@ export function createWalkers(root: T.Object3D) {
         marks: lengths(path),
         s: 0,
         walked: 0,
+        pitch: 0,
         done: false,
         onDone,
       };
+      figure.root.rotation.order = 'YXZ';
       walkers.set(id, w);
       pose(w);
     },
@@ -124,7 +139,7 @@ export function createWalkers(root: T.Object3D) {
         const speed = at(w, Math.min(end, w.s + 0.01)).speed;
         w.s = Math.min(end, w.s + speed * dt);
         w.walked += speed * dt;
-        pose(w);
+        pose(w, dt);
         if (w.s >= end - 1e-6 && !w.done) {
           w.done = true;
           this.remove(w.id);

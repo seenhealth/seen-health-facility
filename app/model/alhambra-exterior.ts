@@ -16,13 +16,15 @@ export const REAR_COURT_PLANTERS = [
 /**
  * The drop-off at the lobby's sliding entrance (Street View, May 2025), in
  * plan (x, z) with the heights people walk at. A landing runs along the lobby
- * wall across the glass door, window and side door at floor level, with two
- * short steps down at its −z end. The accessible ramp is a switchback: the
+ * wall across the glass door, window and side door at floor level; at its −z
+ * end, left of the glass door, three steps run down away from the wall to the
+ * lot (photo 2026-10-02). The accessible ramp is a switchback: the
  * upper run descends from the landing along the wall toward the wing, turns
  * on a landing beside the block wall, and the lower run comes back in front
  * of it down to the lot. Bronze rails line the lot side of the landing and
  * the upper run, both sides of the lower run and the turn landing's west
- * edge. A low curbed palm planter stands just beyond the foot of the steps.
+ * edge. Beyond the steps, against the wall, a bike rack stands on a low
+ * concrete pad (it replaced a palm planter, photo 2026-10-02).
  *
  * `buildAlhambraExterior` draws the drop-off from these numbers; the routes
  * people take over it (scripts/apply-drop-off-route.mjs, fleet-crew.ts) and
@@ -34,15 +36,27 @@ export const DROP_OFF = (() => {
     rise = top - street,
     midTop = top - rise / 2,
     width = 1.3;
-  const landing = { x: -15.5, z0: -2.0, z1: 3.6 },
+  const landing = { x: -15.5, z0: -2.95, z1: 3.6 },
     upper = { x: landing.x, z0: landing.z1, z1: 7.6 },
     turn = { x0: -17.95, x1: -14.85, z0: 7.6, z1: 8.75 },
     lower = { x: -17.15, z0: 2.9, z1: 7.6 };
-  /** Steps down from the landing's −z end to `z0`: `count` treads `depth` deep, equal risers to the lot. */
-  // Three treads 0.3 m deep (photo 2026-10-02).
+  /**
+   * Steps off the landing's lot side at its −z end, down toward the lot (−x):
+   * `count` treads `depth` deep between x0 (the foot) and x1 (the landing's
+   * edge), spanning z0..z1, equal risers to the lot. Three treads 0.3 m deep,
+   * ending at the glass door's frame (photo 2026-10-02).
+   */
   const count = 3,
     depth = 0.3,
-    steps = { count, depth, z0: landing.z0 - count * depth };
+    stepsX1 = landing.x - width / 2,
+    steps = {
+      count,
+      depth,
+      x0: stepsX1 - count * depth,
+      x1: stepsX1,
+      z0: landing.z0,
+      z1: -1.65,
+    };
   const riser = rise / (steps.count + 1);
   const upperY = (z: number) =>
     top - ((rise / 2) * (z - upper.z0)) / (upper.z1 - upper.z0);
@@ -51,7 +65,7 @@ export const DROP_OFF = (() => {
   const lotSide = landing.x - width / 2 - 0.05;
   /** Rail lines at constant x from z0 to z1, standing on the surface at height y(z). */
   const rails = {
-    landing: { x: lotSide, z0: landing.z0, z1: landing.z1, y: () => top },
+    landing: { x: lotSide, z0: steps.z1 + 0.05, z1: landing.z1, y: () => top },
     upper: { x: lotSide, z0: upper.z0, z1: upper.z1, y: upperY },
     lowerEast: {
       x: lower.x + width / 2 + 0.05,
@@ -65,15 +79,16 @@ export const DROP_OFF = (() => {
       z1: lower.z1,
       y: lowerY,
     },
+    // In line with the lower run's west rail, which it continues round the turn landing.
     turn: {
-      x: turn.x0 + 0.05,
+      x: lower.x - width / 2 - 0.05,
       z0: turn.z0,
       z1: turn.z1 - 0.05,
       y: () => midTop,
     },
   };
-  /** Planter centre and size; its curb faces the lot. */
-  const planter = { x: -16.35, z: -4.7, w: 2.3, d: 3.4 };
+  /** The bike rack's pad against the wall beyond the steps: centre and size, one riser high. */
+  const bikeRack = { x: -15.7, z: -3.75, w: 1.9, d: 1.5 };
   const rect = (x0: number, z0: number, x1: number, z1: number): Vec2[] => [
     [x0, z0],
     [x1, z0],
@@ -84,11 +99,10 @@ export const DROP_OFF = (() => {
     Math.abs(x - centre) <= width / 2 + 1e-9;
   /** Height of the walking surface at (x, z) on the landing, its steps, the runs or the turn landing; null elsewhere. */
   function surface(x: number, z: number): number | null {
-    if (within(x, landing.x) && z >= steps.z0 && z <= upper.z1) {
-      if (z > landing.z1) return upperY(z);
-      if (z >= landing.z0) return top;
-      return top - riser * Math.ceil((landing.z0 - z) / steps.depth - 1e-9);
-    }
+    if (within(x, landing.x) && z >= landing.z0 && z <= upper.z1)
+      return z > landing.z1 ? upperY(z) : top;
+    if (x >= steps.x0 && x < steps.x1 && z >= steps.z0 && z <= steps.z1)
+      return top - riser * Math.ceil((steps.x1 - x) / steps.depth - 1e-9);
     if (x >= turn.x0 && x <= turn.x1 && z >= turn.z0 && z <= turn.z1)
       return midTop;
     if (within(x, lower.x) && z >= lower.z0 && z <= lower.z1) return lowerY(z);
@@ -127,21 +141,22 @@ export const DROP_OFF = (() => {
     turn,
     lower,
     rails,
-    planter,
+    bikeRack,
     surface,
     ascent,
-    /** Plan outlines: the landing with its steps and the upper run, the turn landing, the lower run. */
+    /** Plan outlines: the landing and the upper run, the turn landing, the lower run, the steps. */
     outlines: [
-      rect(landing.x - width / 2, steps.z0, landing.x + width / 2, upper.z1),
+      rect(landing.x - width / 2, landing.z0, landing.x + width / 2, upper.z1),
       rect(turn.x0, turn.z0, turn.x1, turn.z1),
       rect(lower.x - width / 2, lower.z0, lower.x + width / 2, lower.z1),
+      rect(steps.x0, steps.z0, steps.x1, steps.z1),
     ],
-    /** The planter's footprint. */
-    planterOutline: rect(
-      planter.x - planter.w / 2,
-      planter.z - planter.d / 2,
-      planter.x + planter.w / 2,
-      planter.z + planter.d / 2,
+    /** The bike rack pad's footprint. */
+    bikeRackOutline: rect(
+      bikeRack.x - bikeRack.w / 2,
+      bikeRack.z - bikeRack.d / 2,
+      bikeRack.x + bikeRack.w / 2,
+      bikeRack.z + bikeRack.d / 2,
     ),
   };
 })();
@@ -253,23 +268,49 @@ export function buildAlhambraExterior(model: Facility) {
   shade('1841-entry-blue-sunshade', -16.7, 2.95, 27.34, 3.0, 0.72);
   // Concrete panel joints, restrained wall lights and metal coping on every visible flat wing.
   const surface = group(facade, 'concrete-panel-joints-and-coping');
-  for (const [x0, x1, z, h] of [
-    [-31.18, -14.66, 27.32, 6.2],
-    [3.2, 15.26, 26.81, 6.65],
-    [15.57, 29.71, 26.97, 6.65],
+  // Every flat wing's coping is a flush metal cap on its parapet (Street View, May 2025): set back over the wall,
+  // 1.5 cm proud of the face, rather than a ledge standing out over the street; panel joints sit on the face.
+  // Faces are the envelope walls' outer faces (0.24 m thick walls): shell-therapy-*, shell-admin-front,
+  // shell-adjacent-front / -east, shell-rear-east.
+  const capDepth = 0.27,
+    capRise = 0.015;
+  for (const [x0, x1, face, h] of [
+    [-31.309, -14.66, 27.289, 6.2],
+    [3.2, 15.38, 26.78, 6.65],
+    [15.45, 29.83, 26.933, 6.65],
   ]) {
-    box(surface, (x0 + x1) / 2, h - 0.07, z, x1 - x0, 0.09, 0.32, steel);
+    box(
+      surface,
+      (x0 + x1) / 2,
+      h - 0.06,
+      face + capRise - capDepth / 2,
+      x1 - x0,
+      0.07,
+      capDepth,
+      steel,
+    );
+    const z = face + 0.005;
     for (let x = x0 + 0.7; x < x1; x += 3.4)
       box(surface, x, 0, z, 0.017, h, 0.016, joint);
     for (const y of [3.0, 5.55])
       box(surface, (x0 + x1) / 2, y, z, x1 - x0, 0.016, 0.016, joint);
   }
-  for (const [x, z0, z1, h] of [
-    [-31.33, 8.9, 27.17, 6.2],
-    [29.86, 3.51, 26.81, 6.65],
-    [15.4, -12.46, 3.2, 6.65],
+  for (const [face, out, z0, z1, h] of [
+    [-31.309, -1, 8.9, 27.289, 6.2],
+    [29.833, 1, 3.51, 26.933, 6.65],
+    [15.384, 1, -12.46, 3.2, 6.65],
   ]) {
-    box(surface, x, h - 0.07, (z0 + z1) / 2, 0.32, 0.09, z1 - z0, steel);
+    box(
+      surface,
+      face + out * (capRise - capDepth / 2),
+      h - 0.06,
+      (z0 + z1) / 2,
+      capDepth,
+      0.07,
+      z1 - z0,
+      steel,
+    );
+    const x = face + out * 0.005;
     for (let z = z0 + 2; z < z1; z += 4.5) {
       box(surface, x, 0, z, 0.016, h, 0.018, joint);
       box(surface, x, 3.4, z, 0.23, 0.11, 0.43, stone);
@@ -277,12 +318,104 @@ export function buildAlhambraExterior(model: Facility) {
     box(surface, x, 3.0, (z0 + z1) / 2, 0.015, 0.018, z1 - z0, joint);
   }
 
-  // Glass wraps the Ethel corner; silver mullions and shallow canopy make the showcase legible.
+  // Glass wraps the Valley / Ethel corner inside one deep light-grey frame (Street View, May 2025): a top band and
+  // a sill standing 0.3 m proud of the wall along both faces, round the corner, with a jamb at each far end; the
+  // Ethel glazing (ethel-corner-return-glazing, z 24.6 to 27.12, clear as the Valley storefront's) and the first Valley window
+  // (shell-therapy-front-opening-7, x -31.15 to -28.86) sit inside it, split by thin silver mullions and meeting
+  // at a mullion on the corner.
   const corner = group(facade, 'ethel-glazed-corner');
-  box(corner, -31.36, 2.88, 25.48, 0.65, 0.15, 3.65, steel);
-  for (const z of [23.72, 24.85, 26.05, 27.13])
-    box(corner, -31.34, 0.52, z, 0.12, 2.25, 0.06, steel);
+  {
+    const cx = -31.189,
+      cz = 27.169,
+      d = 0.3,
+      ethelEnd = 24.45,
+      valleyEnd = -28.72,
+      frame = '#e4e3dd',
+      top = 2.76,
+      band = 0.34;
+    // Ethel face (x = cx, the frame out toward -x), then the Valley face (z = cz, out toward +z), meeting at the corner.
+    box(
+      corner,
+      cx - d / 2,
+      top,
+      (ethelEnd + cz + d) / 2,
+      d,
+      band,
+      cz + d - ethelEnd,
+      frame,
+    );
+    box(
+      corner,
+      (cx - d + valleyEnd) / 2,
+      top,
+      cz + d / 2,
+      valleyEnd - cx + d,
+      band,
+      d,
+      frame,
+    );
+    // The sill runs down to the ground as the frame's base (Street View: no gap under the frame).
+    box(
+      corner,
+      cx - d / 2,
+      -0.05,
+      (ethelEnd + cz + d) / 2,
+      d,
+      0.57,
+      cz + d - ethelEnd,
+      frame,
+    );
+    box(
+      corner,
+      (cx - d + valleyEnd) / 2,
+      -0.05,
+      cz + d / 2,
+      valleyEnd - cx + d,
+      0.57,
+      d,
+      frame,
+    );
+    box(corner, cx - d / 2, 0, ethelEnd + 0.08, d, top, 0.16, frame);
+    box(corner, valleyEnd - 0.08, 0, cz + d / 2, 0.16, top, d, frame);
+    for (const z of [25.44, 26.28])
+      box(corner, cx - 0.05, 0.52, z, 0.05, 2.24, 0.04, steel);
+    const clear = new T.MeshStandardMaterial({
+      color: '#7fabb7',
+      roughness: 0.22,
+      metalness: 0.15,
+      transparent: true,
+      opacity: 0.62,
+      depthWrite: false,
+    });
+    const panes = group(corner, 'corner-window-glass');
+    const pane = new T.Mesh(new T.BoxGeometry(0.02, 2.24, 2.52), clear);
+    pane.position.set(cx, 0.52 + 1.12, 27.119 - 1.26);
+    pane.renderOrder = 2;
+    panes.add(pane);
+    for (const x of [-30.38, -29.62])
+      box(corner, x, 0.52, cz + 0.05, 0.04, 2.24, 0.05, steel);
+    box(corner, cx - 0.04, 0.52, cz + 0.04, 0.08, 2.24, 0.08, steel);
+  }
 
+  // Ethel face (Street View, Jun 2022): two wall lights at the panel line and the fire-alarm bell near the corner.
+  for (const z of [9.4, 20.9])
+    box(corner, -31.25, 2.8, z, 0.1, 0.12, 0.26, '#5d6163');
+  {
+    const bell = mesh(
+      corner,
+      new T.CylinderGeometry(0.11, 0.11, 0.08, 16),
+      '#c8322c',
+    );
+    bell.rotation.z = Math.PI / 2;
+    bell.position.set(-31.23, 3.62, 23.3);
+    const dot = mesh(
+      corner,
+      new T.CylinderGeometry(0.04, 0.04, 0.09, 12),
+      '#efefea',
+    );
+    dot.rotation.z = Math.PI / 2;
+    dot.position.set(-31.24, 3.62, 23.3);
+  }
   const edge = group(site, 'valley-entry-terrace-and-rails');
   box(edge, -7.3, -0.15, 26.73, 14.9, 0.55, 2.75, stone);
   // Street-facing stairs: five steps the width of the photo's flight up to the
@@ -307,46 +440,161 @@ export function buildAlhambraExterior(model: Facility) {
   const rampY = (x: number) =>
     RAMP.y0 + ((x - RAMP.x0) * (RAMP.y1 - RAMP.y0)) / (RAMP.x1 - RAMP.x0);
   const slope = Math.atan2(RAMP.y1 - RAMP.y0, RAMP.x1 - RAMP.x0);
-  const ramp = box(
-    edge,
-    (RAMP.x0 + RAMP.x1) / 2,
-    (RAMP.y0 + RAMP.y1) / 2 - 0.12,
-    RAMP.z,
-    RAMP.x1 - RAMP.x0,
-    0.12,
-    RAMP.w,
-    stone,
-  );
-  ramp.rotation.z = slope;
+  // Street View (May 2025): a solid concrete ramp with a raised curb along its street edge, a concrete apron at its
+  // foot joining the corner's sidewalk, and silver rails both sides: a handrail and a lower rail on posts, both
+  // carried 0.3 m past the foot and looped back.
+  {
+    const shape = new T.Shape();
+    shape.moveTo(RAMP.x0, -0.23);
+    shape.lineTo(RAMP.x1, -0.23);
+    shape.lineTo(RAMP.x1, RAMP.y1);
+    shape.lineTo(RAMP.x0, RAMP.y0);
+    shape.closePath();
+    const geo = new T.ExtrudeGeometry(shape, {
+      depth: RAMP.w,
+      bevelEnabled: false,
+    });
+    geo.translate(0, 0, RAMP.z - RAMP.w / 2);
+    const concrete = '#d6d2c9',
+      walk = '#e4e0d7';
+    mesh(edge, geo, concrete).receiveShadow = true;
+    const curb = mesh(
+      edge,
+      new T.BoxGeometry(
+        Math.hypot(RAMP.x1 - RAMP.x0, RAMP.y1 - RAMP.y0),
+        0.12,
+        0.15,
+      ),
+      concrete,
+    );
+    curb.position.set(
+      (RAMP.x0 + RAMP.x1) / 2,
+      (RAMP.y0 + RAMP.y1) / 2 + 0.06,
+      RAMP.z + RAMP.w / 2 - 0.075,
+    );
+    curb.rotation.z = slope;
+    // Flush with the sidewalk (top −0.05): the apron at the ramp's foot, from the wall out to the ramp's street
+    // edge, and the strip between the storefront wall and the ramp along its length; a mulch bed fills the corner
+    // between the wall and the two sidewalks (no ground drawn there before), behind a concrete edge.
+    const wallZ = 27.289;
+    box(
+      edge,
+      (-31.309 + RAMP.x0) / 2,
+      -0.23,
+      (wallZ + RAMP.z + RAMP.w / 2) / 2,
+      RAMP.x0 + 31.309,
+      0.18,
+      RAMP.z + RAMP.w / 2 - wallZ,
+      walk,
+    );
+    box(
+      edge,
+      (RAMP.x0 + RAMP.x1) / 2,
+      -0.23,
+      (wallZ + RAMP.z - RAMP.w / 2) / 2,
+      RAMP.x1 - RAMP.x0,
+      0.18,
+      RAMP.z - RAMP.w / 2 - wallZ,
+      walk,
+    );
+    box(
+      edge,
+      (-32.51 - 31.309) / 2,
+      -0.23,
+      (26.8 + 28.29) / 2,
+      32.51 - 31.309,
+      0.15,
+      28.29 - 26.8,
+      '#5a4635',
+    );
+    box(
+      edge,
+      -32.44,
+      -0.23,
+      (26.8 + 28.29) / 2,
+      0.14,
+      0.2,
+      28.29 - 26.8,
+      concrete,
+    );
+  }
   function rail(
     x0: number,
     x1: number,
     z: number,
     base: (x: number) => number,
+    returns = false,
   ) {
-    for (let x = x0; x <= x1 + 0.01; x += 1.65)
-      box(
-        edge,
-        Math.min(x, x1),
-        base(Math.min(x, x1)),
-        z,
-        0.035,
-        0.95,
-        0.035,
-        steel,
-      );
-    for (const y of [0.62, 0.85, 1.12])
+    const n = Math.max(1, Math.ceil((x1 - x0) / 1.65));
+    for (let i = 0; i <= n; i++) {
+      const x = x0 + ((x1 - x0) * i) / n;
+      box(edge, x, base(x), z, 0.04, 0.92, 0.04, steel);
+    }
+    for (const y of [0.45, 0.92])
       beam(
         edge,
         [x0, base(x0) + y, z],
         [x1, base(x1) + y, z],
-        0.028,
+        0.035,
         0.035,
         steel,
       );
+    if (returns) {
+      const y0 = base(x0);
+      beam(
+        edge,
+        [x0, y0 + 0.92, z],
+        [x0 - 0.3, y0 + 0.92, z],
+        0.035,
+        0.035,
+        steel,
+      );
+      beam(
+        edge,
+        [x0 - 0.3, y0 + 0.92, z],
+        [x0 - 0.3, y0 + 0.45, z],
+        0.035,
+        0.035,
+        steel,
+      );
+      beam(
+        edge,
+        [x0 - 0.3, y0 + 0.45, z],
+        [x0, y0 + 0.45, z],
+        0.035,
+        0.035,
+        steel,
+      );
+    }
   }
-  for (const z of [RAMP.z - 0.68, RAMP.z + 0.68])
-    rail(RAMP.x0, RAMP.x1, z, rampY);
+  for (const z of [RAMP.z - 0.6, RAMP.z + 0.56])
+    rail(RAMP.x0, RAMP.x1, z, (x) => rampY(x) + (z > RAMP.z ? 0.12 : 0), true);
+  // The planting bed between the ramp and the Valley sidewalk: dark mulch behind a concrete edge, pygmy date palms
+  // and grasses (it was a row of round shrubs on a raised box).
+  {
+    const bz0 = RAMP.z + RAMP.w / 2,
+      bz1 = 29.75,
+      bx0 = RAMP.x0,
+      bx1 = -14.9;
+    box(
+      edge,
+      (bx0 + bx1) / 2,
+      -0.07,
+      (bz0 + bz1) / 2,
+      bx1 - bx0,
+      0.04,
+      bz1 - bz0,
+      '#5a4635',
+    );
+    box(edge, (bx0 + bx1) / 2, -0.1, bz1 + 0.07, bx1 - bx0, 0.14, 0.14, stone);
+    for (const x of [-27.6, -25.0, -21.6, -19.3, -16.9])
+      palm(x, (bz0 + bz1) / 2, 1.5, 1.0);
+    for (let x = bx0 + 0.5; x < bx1; x += 0.95) {
+      const tuft = mesh(edge, new T.IcosahedronGeometry(0.22, 1), '#7f9a5f');
+      tuft.position.set(x, 0.05, bz0 + 0.25 + (Math.round(x * 3) % 2) * 0.35);
+      tuft.scale.set(1, 0.65, 1);
+    }
+  }
   for (const [a, b] of [
     [-14.75, -11.7],
     [-7.1, 0.2],
@@ -354,8 +602,6 @@ export function buildAlhambraExterior(model: Facility) {
     rail(a, b, 28.45, () => RAMP.y1);
   // Sidewalk tree wells: a square of soil at the foot of every street tree on Valley Blvd.
   for (const [x, z] of [
-    [-29.6, 29.1],
-    [-27.4, 29.1],
     [-11, 30.2],
     [1, 30.2],
     [9, 30.2],
@@ -364,7 +610,6 @@ export function buildAlhambraExterior(model: Facility) {
   const planters = group(site, 'frontage-low-planters');
   for (const [x, z, w] of [
     [7.8, 27.35, 10.6],
-    [-22.3, 29.65, 13.4],
     [28.9, 24.5, 1.1],
   ]) {
     box(planters, x, -0.1, z, w, 0.4, 0.8, stone);
@@ -536,23 +781,49 @@ export function buildAlhambraExterior(model: Facility) {
     for (let xx = wallX0 + 0.3; xx < wallX1; xx += 0.4)
       box(lotDoor, xx, -0.23, zz, 0.01, 1.5, 0.01, brickJoint);
   }
-  // Low curbed planter against the lobby wall just north of the drop-off
-  // landing (aerial): short pygmy palms and shrubs.
-  const island = group(site, 'lobby-wall-palm-planter'),
-    bed = DROP_OFF.planter;
-  box(island, bed.x, -0.23, bed.z, bed.w, 0.18, bed.d, '#dcd7cd');
-  box(island, bed.x - bed.w / 2, -0.23, bed.z, 0.07, 0.2, bed.d, red);
-  box(island, bed.x, -0.05, bed.z, bed.w - 0.3, 0.02, bed.d - 0.3, '#8c7a5c');
-  for (const [x, z, h] of [
-    [-16.9, -5.9, 1.3],
-    [-15.9, -4.6, 1.6],
-    [-16.7, -3.5, 1.2],
-  ])
-    palm(x, z, h, 1.0);
-  for (let z = -6.0; z < -3.2; z += 0.75) {
-    const tuft = mesh(island, new T.IcosahedronGeometry(0.28, 1), '#7f9a5f');
-    tuft.position.set(bed.x + (z % 1.5 > 0.75 ? 0.6 : -0.6), 0.12, z);
-    tuft.scale.set(1, 0.7, 1);
+  // Beyond the drop-off steps, against the lobby wall: a low concrete pad with
+  // a black serpentine bike rack, its loops running out from the wall (photo
+  // 2026-10-02; a palm planter stood here before).
+  const rackPad = group(site, 'lobby-bike-rack'),
+    pad = DROP_OFF.bikeRack,
+    padRise = (DROP_OFF.top - L_STREET) / (DROP_OFF.steps.count + 1);
+  box(rackPad, pad.x, L_STREET, pad.z, pad.w, padRise, pad.d, '#c5c8c2');
+  {
+    // One bent black tube: three tall loops in a row running out from the wall, a base plate at each end.
+    const foot = L_STREET + padRise,
+      xs = pad.x + pad.w / 2 - 0.22,
+      rz = pad.z - 0.2,
+      pitch = 0.27,
+      loops = 3,
+      pts: T.Vector3[] = [new T.Vector3(xs, foot, rz)];
+    for (let i = 0; i < loops; i++) {
+      const x = xs - i * pitch;
+      pts.push(
+        new T.Vector3(x, foot + 0.78, rz),
+        new T.Vector3(x - pitch / 2, foot + 0.9, rz),
+      );
+      if (i < loops - 1)
+        pts.push(
+          new T.Vector3(x - pitch, foot + 0.78, rz),
+          new T.Vector3(x - pitch * 1.5, foot + 0.3, rz),
+        );
+    }
+    const xe = xs - (loops - 1) * pitch - pitch;
+    pts.push(new T.Vector3(xe, foot + 0.78, rz), new T.Vector3(xe, foot, rz));
+    const tube = mesh(
+      rackPad,
+      new T.TubeGeometry(
+        new T.CatmullRomCurve3(pts, false, 'centripetal'),
+        120,
+        0.024,
+        8,
+        false,
+      ),
+      '#16181a',
+    );
+    tube.castShadow = true;
+    for (const x of [xs, xe])
+      box(rackPad, x, foot, rz, 0.16, 0.012, 0.16, '#4a4c4e');
   }
   // Drop-off landing along the lobby wall, its steps and the switchback ramp
   // (`DROP_OFF`).
@@ -572,39 +843,20 @@ export function buildAlhambraExterior(model: Facility) {
     LAND.z1 - LAND.z0,
     paving,
   );
+  // Steps off the landing's lot side, down toward the lot (−x).
+  const stepsZ = (steps.z0 + steps.z1) / 2,
+    stepsW = steps.z1 - steps.z0;
   for (let i = 0; i < steps.count; i++)
     box(
       landing,
-      LAND.x,
+      steps.x1 - steps.depth / 2 - steps.depth * i,
       L_STREET,
-      LAND.z0 - steps.depth / 2 - steps.depth * i,
-      LAND.w,
-      rise - (rise / (steps.count + 1)) * (i + 1),
+      stepsZ,
       steps.depth,
+      rise - (rise / (steps.count + 1)) * (i + 1),
+      stepsW,
       paving,
     );
-  // A bronze handrail down each side of the steps (photo 2026-10-02), looping back at the foot.
-  for (const sx of [LAND.x - LAND.w / 2 - 0.05, LAND.x + LAND.w / 2 + 0.05]) {
-    box(landing, sx, LAND.top, LAND.z0 + 0.05, 0.035, 0.95, 0.035, bronze);
-    box(landing, sx, L_STREET, steps.z0, 0.035, 0.95, 0.035, bronze);
-    for (const dy of [0.95, 0.6])
-      beam(
-        landing,
-        [sx, LAND.top + dy, LAND.z0 + 0.05],
-        [sx, L_STREET + dy, steps.z0],
-        0.03,
-        0.03,
-        bronze,
-      );
-    beam(
-      landing,
-      [sx, L_STREET + 0.95, steps.z0],
-      [sx, L_STREET + 0.6, steps.z0 - 0.3],
-      0.03,
-      0.03,
-      bronze,
-    );
-  }
   const upperLen = upper.z1 - upper.z0,
     lowerLen = lower.z1 - lower.z0;
   const upperSlab = box(
@@ -639,54 +891,151 @@ export function buildAlhambraExterior(model: Facility) {
     paving,
   );
   lowerSlab.rotation.x = Math.atan2(rise / 2, lowerLen);
-  const railRun = ({
-    x,
-    z0,
-    z1,
-    y,
-  }: {
-    x: number;
-    z0: number;
-    z1: number;
-    y: (z: number) => number;
-  }) => {
-    for (let z = z0; z <= z1 + 0.01; z += 1.4)
+  // Guards (photos 2026-10-02/03): nine bars under a heavier top rail on posts bolted to the slab's face on bronze
+  // brackets, one continuous run along the landing, up the upper ramp run, round the turn landing and down the
+  // lower run; the same guard along the landing's −z edge above the bike rack.
+  const guardBars = [
+    0.12, 0.225, 0.33, 0.435, 0.54, 0.645, 0.75, 0.855, 0.96, 1.05,
+  ];
+  const guardRun = (
+    r: { x: number; z0: number; z1: number; y: (z: number) => number },
+    toward: number,
+    startPost = true,
+  ) => {
+    const n = Math.max(1, Math.ceil((r.z1 - r.z0) / 1.4));
+    for (let i = startPost ? 0 : 1; i <= n; i++) {
+      const z = r.z0 + ((r.z1 - r.z0) * i) / n;
+      box(landing, r.x, r.y(z) - 0.2, z, 0.04, 1.27, 0.04, bronze);
       box(
         landing,
-        x,
-        y(Math.min(z, z1)),
-        Math.min(z, z1),
-        0.035,
-        0.95,
-        0.035,
+        r.x + toward * 0.03,
+        r.y(z) - 0.2,
+        z,
+        0.025,
+        0.13,
+        0.2,
         bronze,
       );
-    box(landing, x, y(z1), z1, 0.035, 0.95, 0.035, bronze);
-    for (const dy of [0.45, 0.65, 0.85, 1.0])
+    }
+    for (const dy of guardBars)
       beam(
         landing,
-        [x, y(z0) + dy, z0],
-        [x, y(z1) + dy, z1],
+        [r.x, r.y(r.z0) + dy, r.z0],
+        [r.x, r.y(r.z1) + dy, r.z1],
         0.03,
-        0.03,
+        dy > 1 ? 0.045 : 0.03,
         bronze,
       );
   };
-  railRun(rails.landing);
-  railRun(rails.upper);
-  railRun(rails.lowerEast);
-  railRun(rails.lowerWest);
-  // The turn landing's rail runs on from the lower run's west rail: no post at its start.
-  for (const dy of [0.45, 0.65, 0.85, 1.0])
+  guardRun(rails.landing, 1);
+  guardRun(rails.upper, 1, false);
+  guardRun(rails.lowerEast, -1);
+  guardRun(rails.lowerWest, 1);
+  guardRun(rails.turn, 1, false);
+  const gz = LAND.z0 - 0.05,
+    gx0 = LAND.x + LAND.w / 2 - 0.05,
+    gx1 = LAND.x - LAND.w / 2;
+  for (const x of [gx0, (gx0 + gx1) / 2, gx1]) {
+    box(landing, x, LAND.top - 0.2, gz, 0.04, 1.27, 0.04, bronze);
+    box(landing, x, LAND.top - 0.2, gz + 0.03, 0.2, 0.13, 0.025, bronze);
+  }
+  for (const dy of guardBars)
     beam(
       landing,
-      [rails.turn.x, midTop + dy, rails.turn.z0],
-      [rails.turn.x, midTop + dy, rails.turn.z1],
-      0.03,
+      [gx0, LAND.top + dy, gz],
+      [gx1, LAND.top + dy, gz],
+      dy > 1 ? 0.045 : 0.03,
       0.03,
       bronze,
     );
-  box(landing, rails.turn.x, midTop, rails.turn.z1, 0.035, 0.95, 0.035, bronze);
+  // Stair handrails: each leaves the top of a guard post at the head of the steps (the bike-side guard's front post,
+  // the landing guard's first post), runs down over the nosings to a post at the foot and returns in a loop.
+  const handrail = (z: number, xTop: number) => {
+    const top = LAND.top + 1.05,
+      foot = L_STREET + 0.92,
+      xb = steps.x0 - 0.05;
+    box(landing, xb, L_STREET, z, 0.04, 0.92, 0.04, bronze);
+    beam(landing, [xTop, top, z], [xb, foot, z], 0.045, 0.045, bronze);
+    beam(landing, [xb, foot, z], [xb - 0.3, foot, z], 0.045, 0.045, bronze);
+    beam(
+      landing,
+      [xb - 0.3, foot, z],
+      [xb - 0.3, foot - 0.22, z],
+      0.04,
+      0.04,
+      bronze,
+    );
+    beam(
+      landing,
+      [xb - 0.3, foot - 0.22, z],
+      [xb, foot - 0.22, z],
+      0.04,
+      0.04,
+      bronze,
+    );
+  };
+  handrail(gz, gx1);
+  handrail(rails.landing.z0, rails.landing.x);
+  // The lower run's guards run on past its toe and loop back, as the stairs' do.
+  for (const r of [rails.lowerEast, rails.lowerWest]) {
+    const t = r.y(r.z0) + 1.05;
+    beam(landing, [r.x, t, r.z0], [r.x, t, r.z0 - 0.3], 0.045, 0.045, bronze);
+    beam(
+      landing,
+      [r.x, t, r.z0 - 0.3],
+      [r.x, t - 0.22, r.z0 - 0.3],
+      0.04,
+      0.04,
+      bronze,
+    );
+    beam(
+      landing,
+      [r.x, t - 0.22, r.z0 - 0.3],
+      [r.x, t - 0.22, r.z0],
+      0.04,
+      0.04,
+      bronze,
+    );
+  }
+  // Yellow nosings on the steps and the landing's edge above them, and the yellow tactile paving at their foot
+  // that turns along the walk toward the ramp's toe.
+  const nosing = '#d9a92a';
+  for (let i = 0; i <= steps.count; i++) {
+    const h = rise - (rise / (steps.count + 1)) * i,
+      xf = steps.x1 - steps.depth * i;
+    box(
+      landing,
+      xf - 0.035,
+      L_STREET + h,
+      stepsZ,
+      0.05,
+      0.006,
+      stepsW - 0.04,
+      nosing,
+    );
+  }
+  // Laid on the lot's surface at the painted markings' height (neighborhood.ts paints at −0.206).
+  const tactileY = -0.205;
+  box(
+    landing,
+    steps.x0 - 0.45,
+    tactileY,
+    stepsZ + 0.3,
+    0.9,
+    0.012,
+    stepsW + 0.6,
+    '#d8b23a',
+  );
+  box(
+    landing,
+    steps.x0 - 0.1,
+    tactileY,
+    (steps.z1 + 0.6 + lower.z0) / 2,
+    0.6,
+    0.012,
+    lower.z0 - steps.z1 - 0.6,
+    '#d8b23a',
+  );
   // Rear court planters (REAR_COURT_PLANTERS).
   const court = group(site, 'rear-court-planters');
   for (const [x0, z0, x1, z1] of REAR_COURT_PLANTERS) {
@@ -722,7 +1071,7 @@ export function buildAlhambraExterior(model: Facility) {
   // Streetscape from the lot-side and Valley Blvd photographs (May 2025 Street
   // View and the 2026 photo): the Ethel Avenue parkway lawn with its yellow
   // hydrant, red-curbed planters with fan palms along the lot's west edge and
-  // beside the wing, the palm island at the alley corner, the FDC on the wing's
+  // beside the wing, the palm island at the alley corner (plain curb), the FDC on the wing's
   // corner, the utility pole with its transformers, bottlebrush trees and a
   // hydrant on the Valley Blvd frontage.
   for (const [z0, z1] of [
@@ -749,7 +1098,8 @@ export function buildAlhambraExterior(model: Facility) {
         .position.set(x + dx, 0.4, z);
   }
   hydrant(-34.5, -23.2);
-  hydrant(-32.6, 28.8);
+  // On the Valley curb, just west of the street lamp by the corner (Street View, May 2025).
+  hydrant(-27.5, 30.85);
   function palm(x: number, z: number, h: number, crown: number) {
     const g = group(street, 'fan-palm');
     const trunk = mesh(g, new T.CylinderGeometry(0.11, 0.17, h, 10), '#8a7254');
@@ -789,24 +1139,7 @@ export function buildAlhambraExterior(model: Facility) {
     }
   box(street, -30.95, -0.23, -13.8, 0.07, 0.2, 19.4, red);
   box(street, -31.48, -0.23, 17.3, 0.07, 0.2, 20, red);
-  for (const [[ax, az], [bx, bz]] of [
-    [
-      [-21.0, -22.2],
-      [-16.2, -24.7],
-    ],
-  ]) {
-    const curb = box(
-      street,
-      (ax + bx) / 2,
-      -0.23,
-      (az + bz) / 2,
-      Math.hypot(bx - ax, bz - az),
-      0.2,
-      0.07,
-      red,
-    );
-    curb.rotation.y = -Math.atan2(bz - az, bx - ax);
-  }
+  // The palm island at the alley corner has a plain curb (no red paint beside the STOP marking).
   palm(-27.6, 29.65, 1.6, 1.0);
   palm(-19.2, 29.65, 1.6, 1.0);
   // Fire department connection at the wing's west corner.
@@ -945,26 +1278,75 @@ export function buildAlhambraExterior(model: Facility) {
     );
     box(court2, FACE_X + 0.04, py + 1.33, sz, 0.06, 0.16, 0.16, '#9a9fa0');
   }
-  // Aluminium-framed glass double door, 1.9 m wide, 1.3 m in from the canopy's north end; a camera above its north jamb.
-  box(court2, FACE_X + 0.03, 0, doorZ, 0.1, 2.45, doorW + 0.2, alu);
-  box(court2, FACE_X + 0.07, 0.03, doorZ, 0.04, 2.35, doorW, glassDark);
-  box(court2, FACE_X + 0.1, 0.03, doorZ, 0.02, 2.35, 0.06, alu);
+  // The door and both windows share one deep light-grey surround (photo 2026-10-03): 0.14 m wide and 0.12 m proud
+  // of the wall on every side (no sill under the door). Windows are 1.3 m tall with their tops level with the
+  // door's (2.45 m): the square one under the canopy south of the door, the wider one past the canopy's south end
+  // (the envelope's shell-rear-east-opening-1, z -11.04 to -9.72).
+  const rearSurround = '#d3d5d3',
+    rim = 0.14,
+    proud = 0.12;
+  const frameAround = (
+    z0: number,
+    z1: number,
+    y0: number,
+    y1: number,
+    sill: boolean,
+  ) => {
+    for (const z of [z0 - rim / 2, z1 + rim / 2])
+      box(
+        court2,
+        FACE_X + proud / 2,
+        sill ? y0 - rim : 0,
+        z,
+        proud,
+        y1 + rim - (sill ? y0 - rim : 0),
+        rim,
+        rearSurround,
+      );
+    box(
+      court2,
+      FACE_X + proud / 2,
+      y1,
+      (z0 + z1) / 2,
+      proud,
+      rim,
+      z1 - z0 + 2 * rim,
+      rearSurround,
+    );
+    if (sill)
+      box(
+        court2,
+        FACE_X + proud / 2,
+        y0 - rim,
+        (z0 + z1) / 2,
+        proud,
+        rim,
+        z1 - z0 + 2 * rim,
+        rearSurround,
+      );
+  };
+  // Glass double door, 1.9 m wide, 1.3 m in from the canopy's north end; a camera above its north jamb.
+  frameAround(doorZ - doorW / 2, doorZ + doorW / 2, 0, 2.45, false);
+  box(court2, FACE_X + 0.03, 0, doorZ, 0.04, 2.45, doorW, glassDark);
+  box(court2, FACE_X + 0.06, 0, doorZ, 0.03, 2.45, 0.07, rearSurround);
   for (const sz of [doorZ - 0.6, doorZ + 0.6])
-    box(court2, FACE_X + 0.1, 1.0, sz, 0.02, 0.9, 0.04, alu);
+    box(court2, FACE_X + 0.07, 1.0, sz, 0.02, 0.9, 0.04, alu);
   box(
     court2,
     FACE_X + 0.12,
-    2.65,
+    2.75,
     doorZ + doorW / 2 + 0.45,
     0.14,
     0.14,
     0.14,
     '#cfd2d3',
   );
-  // Square window with a silver frame, sill 1.3 m up, south of the door.
-  const winZ = pz0 + 2.5 + 0.65;
-  box(court2, FACE_X + 0.03, 1.25, winZ, 0.08, 1.4, 1.4, alu);
-  box(court2, FACE_X + 0.085, 1.3, winZ, 0.02, 1.3, 1.3, glassDark);
+  const winZ = pz0 + 2.5 + 0.65,
+    winTop = 2.45,
+    winH = 1.3;
+  frameAround(winZ - 0.65, winZ + 0.65, winTop - winH, winTop, true);
+  box(court2, FACE_X + 0.02, winTop - winH, winZ, 0.02, winH, 1.3, glassDark);
+  frameAround(-11.04, -9.72, winTop - winH, winTop, true);
   // Raised concrete landing along the wall in front of the door and window, two steps up from the lot.
   const landW = 2.1,
     landZ0 = pz0 + 0.4,
@@ -1076,31 +1458,125 @@ export function buildAlhambraExterior(model: Facility) {
   // to its south; a camera dome high on the wall north of the door and a small sconce beside it. The bronze canopy,
   // its channel letters and the switchback ramp are drawn elsewhere.
   const lobby = group(facade, 'lobby-entry-portal-and-windows');
+  // Lobby entrance from the lot (photos 2026-10-02/03): a satin-aluminium portal round the sliding doors' opening
+  // (the envelope's shell-lobby-west-opening-3, z −1.746 to 0.004, 2.3 m high) with the door operator's band
+  // across its top (maker's label at the left) under a slim header (motion sensor), stucco showing between it and
+  // the canopy; the leaves themselves are arrival.ts's (ENTRY_DOORS). Past the door, two windows in deep white
+  // surrounds with the doors' clear glass (the envelope's openings 2 and 1, sized to the photo), the second with a
+  // pale curtain inside, the no-smoking notice between them, the accessible-entrance plate and the door keypad
+  // beside the portal, an alarm box and a camera dome to its left. The canopy's four tie rods run from plates on
+  // the wall down to its front edge.
   const LOBBY_X = -14.653 - 0.125;
-  const aluBright = '#c3c6c8';
-  const ldZ = -0.6,
-    ldW = 2.2,
-    ldH = 2.5;
-  for (const sz of [ldZ - ldW / 2 - 0.16, ldZ + ldW / 2 + 0.16])
-    box(lobby, LOBBY_X - 0.15, 0, sz, 0.3, ldH + 0.32, 0.32, aluBright);
-  box(lobby, LOBBY_X - 0.15, ldH, ldZ, 0.3, 0.32, ldW + 0.64, aluBright);
-  box(lobby, LOBBY_X - 0.02, 0.02, ldZ, 0.03, ldH - 0.04, ldW, '#2a3338');
-  for (const sz of [ldZ, ldZ - ldW / 4, ldZ + ldW / 4])
-    box(lobby, LOBBY_X - 0.035, 0.02, sz, 0.02, ldH - 0.04, 0.05, aluBright);
-  box(lobby, LOBBY_X - 0.045, 1.85, ldZ - 0.55, 0.01, 0.1, 0.62, '#f3efe4');
-  box(lobby, LOBBY_X - 0.045, 1.7, ldZ - 0.55, 0.01, 0.1, 0.62, '#f3efe4');
-  for (const wz of [2.0, 3.5]) {
-    box(lobby, LOBBY_X - 0.045, 0.95, wz, 0.09, 1.55, 1.05, aluBright);
-    box(lobby, LOBBY_X - 0.1, 1.0, wz, 0.02, 1.45, 0.95, '#2a3338');
+  const sash = '#d6d4cc',
+    surround = '#ecebe6',
+    bronzeRod = '#6b5845';
+  const opZ0 = -1.746,
+    opZ1 = 0.004,
+    ldZ = (opZ0 + opZ1) / 2,
+    ldW = opZ1 - opZ0,
+    ldH = 2.3;
+  for (const sz of [opZ0 - 0.08, opZ1 + 0.08])
+    box(lobby, LOBBY_X - 0.15, 0, sz, 0.3, ldH + 0.15, 0.16, sash);
+  box(lobby, LOBBY_X - 0.15, ldH, ldZ, 0.3, 0.15, ldW + 0.32, sash);
+  box(lobby, LOBBY_X - 0.1, 2.15, ldZ, 0.2, ldH - 2.15, ldW, sash);
+  box(lobby, LOBBY_X - 0.203, 2.2, opZ0 + 0.22, 0.004, 0.025, 0.16, '#77797a');
+  box(lobby, LOBBY_X - 0.33, 2.36, opZ1 - 0.3, 0.06, 0.06, 0.24, '#1d1f21');
+  // The two windows (the envelope's openings 2 and 1, sized to them): deep white surrounds, the sliding doors'
+  // clear dark glass (lit at night with them, night-lights.ts), a pale curtain inside the second.
+  const winGlass = new T.MeshStandardMaterial({
+    color: '#0e1417',
+    roughness: 0.12,
+    metalness: 0.35,
+    transparent: true,
+    opacity: 0.9,
+    depthWrite: false,
+  });
+  const panes = group(lobby, 'lobby-window-glass');
+  for (const [zc, w, curtain] of [
+    [1.1, 0.96, false],
+    [2.35, 0.85, true],
+  ] as [number, number, boolean][]) {
+    const y0 = 0.88,
+      h = 1.4,
+      rim = 0.09;
+    box(lobby, LOBBY_X - 0.1, y0, zc - w / 2 + rim / 2, 0.14, h, rim, surround);
+    box(lobby, LOBBY_X - 0.1, y0, zc + w / 2 - rim / 2, 0.14, h, rim, surround);
+    box(lobby, LOBBY_X - 0.1, y0 + h - rim, zc, 0.14, rim, w, surround);
+    box(lobby, LOBBY_X - 0.1, y0, zc, 0.16, rim, w + 0.04, surround);
+    const pane = new T.Mesh(
+      new T.BoxGeometry(0.012, h - 2 * rim, w - 2 * rim),
+      winGlass,
+    );
+    pane.position.set(LOBBY_X + 0.06, y0 + h / 2, zc);
+    pane.renderOrder = 2;
+    panes.add(pane);
+    if (curtain)
+      box(
+        lobby,
+        LOBBY_X + 0.22,
+        y0 + rim + 0.04,
+        zc + 0.08,
+        0.01,
+        h - 2 * rim - 0.08,
+        w - 2 * rim - 0.25,
+        '#bfd8d2',
+      );
+  }
+  // Signs on the stucco (scripts/lobby-door-decals.py): the no-smoking notice between the windows and the
+  // accessible-entrance plate beside the portal, with the door's keypad below it.
+  const signMaterial = (url: string) => {
+    if (typeof document === 'undefined') return null;
+    const map = new T.TextureLoader().load(url);
+    map.colorSpace = T.SRGBColorSpace;
+    map.anisotropy = 4;
+    return new T.MeshStandardMaterial({ map, alphaTest: 0.5, roughness: 0.7 });
+  };
+  for (const [url, w, h, y, z] of [
+    ['/reference/photos/lobby-no-smoking.png', 0.28, 0.2, 1.45, 1.752],
+    ['/reference/photos/lobby-access-sign.png', 0.15, 0.15, 1.3, 0.33],
+  ] as [string, number, number, number, number][]) {
+    const m = signMaterial(url);
+    if (!m) continue;
+    const plate = new T.Mesh(new T.PlaneGeometry(w, h), m);
+    plate.rotation.y = -Math.PI / 2;
+    plate.position.set(LOBBY_X - 0.012, y, z);
+    lobby.add(plate);
+  }
+  box(lobby, LOBBY_X - 0.03, 0.88, 0.36, 0.06, 0.15, 0.09, '#1c1e20');
+  for (let r = 0; r < 4; r++)
+    for (let c = 0; c < 3; c++)
+      box(
+        lobby,
+        LOBBY_X - 0.062,
+        0.9 + r * 0.028,
+        0.335 + c * 0.025,
+        0.006,
+        0.016,
+        0.016,
+        '#e9e9e6',
+      );
+  box(lobby, LOBBY_X - 0.035, 1.78, opZ0 - 0.95, 0.07, 0.16, 0.13, '#ecebe6');
+  box(lobby, LOBBY_X - 0.072, 1.86, opZ0 - 0.95, 0.006, 0.04, 0.07, '#c8322c');
+  // Canopy tie rods: plates on the wall a metre above the canopy, rods down to its front edge.
+  for (const rz of [-3.25, -0.77, 1.42, 3.62]) {
+    box(lobby, LOBBY_X - 0.02, 3.86, rz, 0.04, 0.14, 0.12, bronzeRod);
+    beam(
+      lobby,
+      [LOBBY_X - 0.04, 3.92, rz],
+      [-16.28, 2.97, rz],
+      0.025,
+      0.025,
+      bronzeRod,
+    );
   }
   const dome = mesh(
     lobby,
     new T.SphereGeometry(0.11, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2),
     '#e8eaea',
   );
-  dome.position.set(LOBBY_X - 0.06, 2.9, ldZ - 2.4);
+  dome.position.set(LOBBY_X - 0.06, 2.45, ldZ - 2.25);
   dome.rotation.z = Math.PI / 2;
-  box(lobby, LOBBY_X - 0.05, 2.1, ldZ - 1.9, 0.08, 0.14, 0.16, '#9a9fa0');
+
   // The garage wall (the wing's court face): rolling door under the grey hood, the electricity-room gate beside it,
   // the louvred vent and the meter panel.
   const gFace = BUMP_Z - 0.03;
