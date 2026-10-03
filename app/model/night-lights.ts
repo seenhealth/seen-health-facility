@@ -6,7 +6,8 @@ import { ARRIVAL } from './arrival';
  * Ethel Avenue, a light on the alley's utility pole, wall packs on the lot
  * faces of the building, a fixture over every entrance, and the building's
  * own windows and glass doors glowing with the interior lit, with a spill of
- * light out of the lobby door and the Valley Blvd portals onto the paving.
+ * light out of the lobby door and the Valley Blvd portals onto the paving, and
+ * the SEEN HEALTH channel letters over the drop-off and on Valley Blvd lit from inside.
  * `apply(night)` fades it all in as the daylight module's night factor rises
  * from 0 (day) to 1 (past civil dusk); by day every light is off and skipped
  * by the renderer. Axes: +x east, +z south (frame.ts COMPASS), ground at y = −0.23.
@@ -234,6 +235,43 @@ export function createNightLights(
     emissive: COLOR.interior,
     emissiveIntensity: 0,
   });
+  // The two SEEN HEALTH 见心颐养 signs (channel letters over the drop-off canopy and on the Valley Blvd face) are lit
+  // from inside at night: their lettering layers (the cut-out planes with alphaTest, not the printed shadow) get a
+  // glowing copy of their material whose emission is the lettering texture itself, so only the letters and the mark glow.
+  // The photo assets arrive after the first night frame, so this keeps looking for a minute until both signs are lit.
+  const SIGNS = ['dropoff-bilingual-sign', 'valley-bilingual-sign'];
+  const signGlows = new Map<T.Material, T.MeshStandardMaterial>();
+  const litSigns = new Set<string>();
+  let signTries = 0;
+  function lightSigns() {
+    for (const name of SIGNS) {
+      if (litSigns.has(name)) continue;
+      const sign = scene.getObjectByName(name);
+      if (!sign) continue;
+      litSigns.add(name);
+      sign.traverse((o) => {
+        if (!(o instanceof T.Mesh)) return;
+        const m = o.material as T.MeshStandardMaterial;
+        if (
+          !(m instanceof T.MeshStandardMaterial) ||
+          !m.map ||
+          m.alphaTest < 0.5
+        )
+          return;
+        let lit = signGlows.get(m);
+        if (!lit) {
+          lit = m.clone();
+          lit.emissive = new T.Color('#fff4dc');
+          lit.emissiveMap = m.map;
+          lit.emissiveIntensity = 0;
+          signGlows.set(m, lit);
+        }
+        o.material = lit;
+      });
+    }
+    if (litSigns.size < SIGNS.length && signTries++ < 120)
+      setTimeout(lightSigns, 500);
+  }
   let reglazed = false;
   function reglaze() {
     reglazed = true;
@@ -246,6 +284,7 @@ export function createNightLights(
       )
         o.material = leafGlow;
     });
+    lightSigns();
   }
 
   let last = -1;
@@ -263,6 +302,7 @@ export function createNightLights(
       lens.emissiveIntensity = 2.2 * k;
       glow.emissiveIntensity = 1.7 * k;
       leafGlow.emissiveIntensity = 1.3 * k;
+      for (const lit of signGlows.values()) lit.emissiveIntensity = 2.6 * k;
       // Lit glass reads brighter and warmer than the daytime sky reflection.
       glow.opacity = T.MathUtils.lerp(glass.opacity, 0.88, k);
     },

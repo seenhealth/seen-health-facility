@@ -19,7 +19,8 @@ import { createNightLights } from '../../app/model/night-lights';
  * `{ type: 'seen-live-lot-pick', id }` to the parent, a click on nothing posts
  * `{ id: null }`, so the parent decides what to follow (standalone, the page
  * follows the car itself). Hovering a car or plate dims every other one to
- * half. A controls button in the corner unfolds zoom, pan, rotate and tilt
+ * half. A controls button in the corner unfolds zoom, pan, rotate, tilt and a
+ * Perspective toggle (flat drawing or a camera's view), plus
  * buttons and a time-of-day slider. The scene is lit by the real sun over the
  * center (app/model/daylight.ts), refreshed every minute; `?at=HH:MM` or
  * `?at=<ISO date>` lights it for another moment, and the slider overrides
@@ -282,6 +283,36 @@ async function main() {
     touched = true;
     glideTo(SHOT);
   });
+  // Perspective: the lot drawn as a camera sees it, with depth, instead of the flat orthographic shot. Zoom, pan and
+  // the follow carry over. Remembered per browser; `?view=perspective` starts in it.
+  const perspBtn = document.getElementById('ctl-persp')!;
+  const PROJECTION_KEY = 'seen-live-lot-projection';
+  const setProjection = (perspective: boolean) => {
+    viewer.setProjection(perspective ? 'perspective' : 'orthographic');
+    perspBtn.setAttribute('aria-pressed', String(perspective));
+    try {
+      localStorage.setItem(
+        PROJECTION_KEY,
+        perspective ? 'perspective' : 'orthographic',
+      );
+    } catch {
+      // Private window or storage blocked: the choice just does not persist.
+    }
+  };
+  perspBtn.addEventListener('click', () =>
+    setProjection(perspBtn.getAttribute('aria-pressed') !== 'true'),
+  );
+  let savedProjection: string | null = null;
+  try {
+    savedProjection = localStorage.getItem(PROJECTION_KEY);
+  } catch {
+    savedProjection = null;
+  }
+  if (
+    savedProjection === 'perspective' ||
+    new URLSearchParams(location.search).get('view') === 'perspective'
+  )
+    setProjection(true);
   let pending: LiveMessage | null = null;
   const onMessage = (e: MessageEvent) => {
     const msg = e.data as LiveMessage | undefined;
