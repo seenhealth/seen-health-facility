@@ -20,6 +20,7 @@
       #ctl .btns { display: flex; gap: 4px; }
       #ctl button { height: 26px; min-width: 26px; padding: 0 6px; border: 1px solid rgba(31,42,42,.2); border-radius: 6px; background: #fff; color: #1f2a2a; font: 13px system-ui, sans-serif; cursor: pointer; }
       #ctl button:hover { background: #eef3f1; }
+      #ctl button[aria-pressed=true] { background: #2f6b62; border-color: #2f6b62; color: #fff; }
       #ctl .pad { display: grid; grid-template-columns: repeat(3, 26px); grid-template-rows: repeat(2, 26px); gap: 3px; }
       #ctl .pad button:nth-child(1) { grid-column: 2; grid-row: 1; }
       #ctl .pad button:nth-child(2) { grid-column: 1; grid-row: 2; }
@@ -43,6 +44,7 @@
       <div class="row"><span>Rotate</span><div class="btns"><button id="ctl-rot-l" type="button" title="Rotate left">↺</button><button id="ctl-rot-r" type="button" title="Rotate right">↻</button></div></div>
       <div class="row"><span>Tilt</span><div class="btns"><button id="ctl-tilt-up" type="button" title="Look from higher">⤒</button><button id="ctl-tilt-down" type="button" title="Look from lower">⤓</button></div></div>
       <div class="row"><span>Pan</span><div class="pad"><button id="ctl-pan-up" type="button" title="Pan up">↑</button><button id="ctl-pan-left" type="button" title="Pan left">←</button><button id="ctl-pan-down" type="button" title="Pan down">↓</button><button id="ctl-pan-right" type="button" title="Pan right">→</button></div></div>
+      <div class="row"><span>View</span><div class="btns"><button id="ctl-persp" type="button" aria-pressed="false" title="Perspective: the lot as a camera sees it, with depth. Off: the flat drawing.">Perspective</button></div></div>
       <button id="ctl-reset" type="button" class="wide" title="Back to the whole-lot shot">Whole lot</button>
       <div class="time">
         <div class="head"><span>Time of day</span><b id="ctl-time-label">--:--</b></div>
