@@ -7590,7 +7590,7 @@
       "offDuty": 0.4300925925925926
      },
      "onFloorSeconds": 4924,
-     "meanWalkMeters": 98.7962943280507
+     "meanWalkMeters": 98.99947482750382
     }
    ],
    "participants": [
@@ -18064,7 +18064,7 @@
       "offDuty": 0.4305555555555556
      },
      "onFloorSeconds": 4920,
-     "meanWalkMeters": 101.87742317542056
+     "meanWalkMeters": 102.08060367487367
     },
     {
      "role": "dietitian",
