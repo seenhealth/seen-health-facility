@@ -2560,6 +2560,10 @@ export function createViewer(
         y: r.top + ((1 - p.y) / 2) * r.height,
       };
     },
+    /** How far the person may zoom in (the live lot's `?debug` raises it for close-ups of the building). */
+    setMaxZoom(zoom: number) {
+      controls.maxZoom = zoom;
+    },
     /** Place the camera exactly; cancels any in-flight focus animation. */
     setShot(shot: CameraShot) {
       focusTarget = null;

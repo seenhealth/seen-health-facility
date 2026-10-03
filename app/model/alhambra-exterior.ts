@@ -1178,68 +1178,94 @@ export function buildAlhambraExterior(model: Facility) {
   // to its south; a camera dome high on the wall north of the door and a small sconce beside it. The bronze canopy,
   // its channel letters and the switchback ramp are drawn elsewhere.
   const lobby = group(facade, 'lobby-entry-portal-and-windows');
-  // Lobby entrance from the lot (photos 2026-10-02): a satin-aluminium portal round the sliding doors' opening
+  // Lobby entrance from the lot (photos 2026-10-02/03): a satin-aluminium portal round the sliding doors' opening
   // (the envelope's shell-lobby-west-opening-3, z −1.746 to 0.004, 2.3 m high) with the door operator's band
-  // across its top (maker's label at the left) under the portal header (motion sensor); the leaves themselves
-  // are arrival.ts's (ENTRY_DOORS). Beside it on the stucco: the fire-alarm strobe to the left, a card reader
-  // on the right-hand jamb, then two tall, narrow silver-framed windows (in the envelope's window opening,
-  // z 0.204 to 1.604, with a pier between them) and a small red notice past them.
+  // across its top (maker's label at the left) under a slim header (motion sensor), stucco showing between it and
+  // the canopy; the leaves themselves are arrival.ts's (ENTRY_DOORS). Past the door, two windows in deep white
+  // surrounds, the second with a pale curtain behind the glass, over the envelope's window and side-door openings
+  // (stuccoed over: the photo shows neither as drawn there), a red notice between them, the accessibility sign
+  // beside the portal, an alarm box and a camera dome to its left. The canopy's four tie rods run from plates on
+  // the wall down to its front edge.
   const LOBBY_X = -14.653 - 0.125;
   const sash = '#d6d4cc',
-    stucco = '#d0c3a7';
+    stucco = '#d0c3a7',
+    surround = '#ecebe6',
+    bronzeRod = '#6b5845';
   const opZ0 = -1.746,
     opZ1 = 0.004,
     ldZ = (opZ0 + opZ1) / 2,
     ldW = opZ1 - opZ0,
     ldH = 2.3;
   for (const sz of [opZ0 - 0.08, opZ1 + 0.08])
-    box(lobby, LOBBY_X - 0.15, 0, sz, 0.3, ldH + 0.3, 0.16, sash);
-  box(lobby, LOBBY_X - 0.15, ldH, ldZ, 0.3, 0.3, ldW + 0.32, sash);
+    box(lobby, LOBBY_X - 0.15, 0, sz, 0.3, ldH + 0.15, 0.16, sash);
+  box(lobby, LOBBY_X - 0.15, ldH, ldZ, 0.3, 0.15, ldW + 0.32, sash);
   box(lobby, LOBBY_X - 0.1, 2.15, ldZ, 0.2, ldH - 2.15, ldW, sash);
   box(lobby, LOBBY_X - 0.203, 2.2, opZ0 + 0.22, 0.004, 0.025, 0.16, '#77797a');
-  box(lobby, LOBBY_X - 0.33, 2.36, opZ1 - 0.3, 0.06, 0.07, 0.24, '#1d1f21');
-  box(lobby, LOBBY_X - 0.035, 2.12, opZ0 - 0.7, 0.07, 0.2, 0.18, '#ecebe6');
-  box(lobby, LOBBY_X - 0.072, 2.24, opZ0 - 0.7, 0.006, 0.05, 0.09, '#c8322c');
-  box(lobby, LOBBY_X - 0.32, 1.06, opZ1 + 0.08, 0.04, 0.16, 0.08, '#3a3d3f');
-  const win0 = 0.204,
-    win1 = 1.604,
-    pier = [0.83, 0.98];
-  box(
-    lobby,
-    LOBBY_X - 0.02,
-    0.65,
-    (pier[0] + pier[1]) / 2,
-    0.04,
-    1.65,
-    pier[1] - pier[0],
-    stucco,
-  );
-  for (const [a, b] of [
-    [win0, pier[0]],
-    [pier[1], win1],
-  ]) {
-    box(lobby, LOBBY_X - 0.045, 0.65, (a + b) / 2, 0.09, 1.65, b - a, sash);
+  box(lobby, LOBBY_X - 0.33, 2.36, opZ1 - 0.3, 0.06, 0.06, 0.24, '#1d1f21');
+  // Stucco over the envelope's window (z 0.204..1.604) and side-door (2.154..3.254) openings, then the windows.
+  box(lobby, LOBBY_X - 0.03, 0.6, 0.904, 0.03, 1.75, 1.42, stucco);
+  box(lobby, LOBBY_X - 0.03, 0, 2.704, 0.03, 2.25, 1.12, stucco);
+  for (const [zc, w, curtain] of [
+    [1.1, 0.96, false],
+    [2.35, 0.85, true],
+  ] as [number, number, boolean][]) {
+    const y0 = 0.88,
+      h = 1.4,
+      rim = 0.09;
+    box(lobby, LOBBY_X - 0.1, y0, zc - w / 2 + rim / 2, 0.14, h, rim, surround);
+    box(lobby, LOBBY_X - 0.1, y0, zc + w / 2 - rim / 2, 0.14, h, rim, surround);
+    box(lobby, LOBBY_X - 0.1, y0 + h - rim, zc, 0.14, rim, w, surround);
+    box(lobby, LOBBY_X - 0.1, y0, zc, 0.16, rim, w + 0.04, surround);
     box(
       lobby,
-      LOBBY_X - 0.095,
-      0.71,
-      (a + b) / 2,
-      0.02,
-      1.53,
-      b - a - 0.12,
-      '#2a3338',
+      LOBBY_X - 0.06,
+      y0 + rim,
+      zc,
+      0.012,
+      h - 2 * rim,
+      w - 2 * rim,
+      '#1f2a33',
+    );
+    if (curtain)
+      box(
+        lobby,
+        LOBBY_X - 0.053,
+        y0 + rim + 0.05,
+        zc + 0.08,
+        0.004,
+        h - 2 * rim - 0.1,
+        w - 2 * rim - 0.25,
+        '#bfd8d2',
+      );
+  }
+  box(lobby, LOBBY_X - 0.008, 1.32, 1.76, 0.012, 0.24, 0.2, '#f1efe9');
+  box(lobby, LOBBY_X - 0.016, 1.36, 1.76, 0.004, 0.14, 0.16, '#c73a32');
+  // Accessibility sign and a small device right of the portal; an alarm box left of it.
+  box(lobby, LOBBY_X - 0.008, 1.22, 0.3, 0.012, 0.16, 0.16, '#2f62b3');
+  box(lobby, LOBBY_X - 0.014, 1.27, 0.3, 0.004, 0.06, 0.04, '#f8f6f1');
+  box(lobby, LOBBY_X - 0.025, 0.95, 0.38, 0.05, 0.1, 0.07, '#3a3d3f');
+  box(lobby, LOBBY_X - 0.035, 1.78, opZ0 - 0.95, 0.07, 0.16, 0.13, '#ecebe6');
+  box(lobby, LOBBY_X - 0.072, 1.86, opZ0 - 0.95, 0.006, 0.04, 0.07, '#c8322c');
+  // Canopy tie rods: plates on the wall a metre above the canopy, rods down to its front edge.
+  for (const rz of [-3.25, -0.77, 1.42, 3.62]) {
+    box(lobby, LOBBY_X - 0.02, 3.86, rz, 0.04, 0.14, 0.12, bronzeRod);
+    beam(
+      lobby,
+      [LOBBY_X - 0.04, 3.92, rz],
+      [-16.28, 2.97, rz],
+      0.025,
+      0.025,
+      bronzeRod,
     );
   }
-  box(lobby, LOBBY_X - 0.008, 1.42, 1.88, 0.012, 0.28, 0.2, '#f1efe9');
-  box(lobby, LOBBY_X - 0.016, 1.47, 1.88, 0.004, 0.18, 0.16, '#c73a32');
   const dome = mesh(
     lobby,
     new T.SphereGeometry(0.11, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2),
     '#e8eaea',
   );
-  dome.position.set(LOBBY_X - 0.06, 2.9, ldZ - 2.4);
+  dome.position.set(LOBBY_X - 0.06, 2.45, ldZ - 2.25);
   dome.rotation.z = Math.PI / 2;
-  box(lobby, LOBBY_X - 0.05, 2.1, ldZ - 1.9, 0.08, 0.14, 0.16, '#9a9fa0');
+
   // The garage wall (the wing's court face): rolling door under the grey hood, the electricity-room gate beside it,
   // the louvred vent and the meter panel.
   const gFace = BUMP_Z - 0.03;

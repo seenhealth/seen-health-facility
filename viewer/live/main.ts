@@ -74,9 +74,12 @@ async function main() {
       return lot;
     },
   });
-  // `?debug=1` also exposes the viewer (setShot, getShot) for scripted close-ups.
-  if (new URLSearchParams(location.search).has('debug'))
+  // `?debug=1` also exposes the viewer (setShot, getShot) for scripted close-ups and lets the wheel zoom in much
+  // further (to the decals on the door).
+  if (new URLSearchParams(location.search).has('debug')) {
     (window as unknown as { seenViewer?: unknown }).seenViewer = viewer;
+    viewer.setMaxZoom(150);
+  }
   // Real sun and sky for the moment being shown; `?at=` pins another moment for review, and the time slider in the
   // controls panel overrides both until Now is pressed.
   const parseAt = (at: string | null): Date | null => {
@@ -260,7 +263,11 @@ async function main() {
   const PAN = 10; // metres at zoom 1
   const on = (id: string, fn: () => void) =>
     document.getElementById(id)!.addEventListener('click', fn);
-  on('ctl-zoom-in', () => nudge((s) => ({ zoom: Math.min(8, s.zoom * 1.3) })));
+  // `?debug` lets the button zoom on in to the building's details, as the wheel does.
+  const zoomCap = new URLSearchParams(location.search).has('debug') ? 150 : 8;
+  on('ctl-zoom-in', () =>
+    nudge((s) => ({ zoom: Math.min(zoomCap, s.zoom * 1.3) })),
+  );
   on('ctl-zoom-out', () =>
     nudge((s) => ({ zoom: Math.max(0.4, s.zoom / 1.3) })),
   );

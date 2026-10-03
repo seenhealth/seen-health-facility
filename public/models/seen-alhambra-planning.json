@@ -718,7 +718,7 @@
       "levelId": "basement",
       "polygon": [
         [
-          -1e-06,
+          -0.000001,
           -15.27138
         ],
         [
@@ -738,7 +738,7 @@
           26.492967
         ],
         [
-          -1e-06,
+          -0.000001,
           26.492967
         ]
       ],
@@ -873,7 +873,7 @@
       "levelId": "basement",
       "polygon": [
         [
-          -1e-06,
+          -0.000001,
           -15.27138
         ],
         [
@@ -893,7 +893,7 @@
           26.492967
         ],
         [
-          -1e-06,
+          -0.000001,
           26.492967
         ]
       ],
@@ -4718,7 +4718,7 @@
       "zoneId": "basement",
       "levelId": "basement",
       "a": [
-        -1e-06,
+        -0.000001,
         -15.27138
       ],
       "b": [
@@ -4806,7 +4806,7 @@
         26.492967
       ],
       "b": [
-        -1e-06,
+        -0.000001,
         26.492967
       ],
       "height": 2.7,
@@ -4823,11 +4823,11 @@
       "zoneId": "basement",
       "levelId": "basement",
       "a": [
-        -1e-06,
+        -0.000001,
         26.492967
       ],
       "b": [
-        -1e-06,
+        -0.000001,
         -15.27138
       ],
       "height": 2.7,
@@ -4844,7 +4844,7 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "a": [
-        -1e-06,
+        -0.000001,
         8.810744
       ],
       "b": [
@@ -4890,7 +4890,7 @@
         26.492967
       ],
       "b": [
-        -1e-06,
+        -0.000001,
         26.492967
       ],
       "height": 2.9,
@@ -4907,11 +4907,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "a": [
-        -1e-06,
+        -0.000001,
         26.492967
       ],
       "b": [
-        -1e-06,
+        -0.000001,
         8.810744
       ],
       "height": 2.9,
@@ -20687,13 +20687,13 @@
       "levelId": "ground",
       "position": [
         -16.33,
-        3.21,
-        0.8
+        2.96,
+        0.45
       ],
       "rotation": -1.5707963267948966,
       "scale": [
-        1,
-        1,
+        1.1,
+        1.1,
         1
       ],
       "roomId": null,
@@ -20701,7 +20701,7 @@
         109
       ],
       "status": "photo-informed / dimensions-estimated",
-      "notes": "Current sign over the drop-off door (photo 2026-10-02): white SEEN HEALTH 见心颐养 channel letters, no mark, standing on top of the bronze canopy over the sliding door, along its front edge (placement corrected by the dispatcher, 2026-10-02); the backing is drawn in the canopy bronze so it reads as a low sign band on the canopy. Placement is registered to the plan; dimensions estimated without a measured drawing.",
+      "notes": "Current sign over the drop-off door (photos 2026-10-02/03): white SEEN HEALTH 见心颐养 channel letters, no mark, standing directly on top of the bronze canopy along its front edge, from above the door portal's left jamb to past the first window; the backing is drawn in the canopy bronze so it reads as a low sign band on the canopy. Dimensions estimated from the photo.",
       "layer": "exterior"
     },
     {
@@ -31405,13 +31405,13 @@
       "color": "#ffffff",
       "roughness": 0.6,
       "textureUrl": "/reference/photos/front-sign.png",
-      "opacity": 1.0
+      "opacity": 1
     },
     "photo-sign-dropoff": {
       "color": "#ffffff",
       "roughness": 0.6,
       "textureUrl": "/reference/photos/dropoff-sign.png",
-      "opacity": 1.0
+      "opacity": 1
     },
     "photo-sign-clinic": {
       "color": "#ffffff",
@@ -32805,7 +32805,7 @@
         -29.153605
       ],
       [
-        65.0,
+        65,
         37.701259
       ]
     ],
@@ -33155,13 +33155,13 @@
       "id": "west-entry-canopy",
       "position": [
         -15.568941,
-        2.8,
-        0.8
+        2.84,
+        0.35
       ],
       "dimensions": [
         1.5772456412452331,
-        0.16,
-        5.6
+        0.12,
+        8.7
       ],
       "material": "photo-bronze",
       "surface": "exterior",
@@ -33171,7 +33171,7 @@
         0
       ],
       "zoneId": null,
-      "status": "image-inferred",
+      "status": "photo-informed",
       "referencePages": [
         109,
         92
@@ -33181,13 +33181,13 @@
       "id": "west-entry-canopy-fascia",
       "position": [
         -16.3,
-        2.24,
-        0.8
+        2.68,
+        0.35
       ],
       "dimensions": [
         0.14,
-        0.72,
-        5.6
+        0.28,
+        8.7
       ],
       "material": "photo-bronze",
       "surface": "exterior",
@@ -34588,7 +34588,7 @@
             "offset": 7.6,
             "width": 3.2,
             "sill": 0,
-            "height": 3.0,
+            "height": 3,
             "kind": "door",
             "material": "om-rollup"
           }

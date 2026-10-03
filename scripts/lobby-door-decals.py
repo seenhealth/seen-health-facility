@@ -2,8 +2,8 @@
 
     python3 scripts/lobby-door-decals.py      # needs pillow; macOS system fonts
 
-lobby-door-decal.png: the right-hand leaf's upper glass, white vinyl: the street number, the Seen Health mark
-and wordmark, the center's name and address, phone numbers, opening hours and the no-smoking / no-firearms
+lobby-door-decal.png: the right-hand leaf's upper glass, all white vinyl: the street number, the Seen Health wordmark
+(SeenCentral's public/branding/seen-wordmark.svg, rendered white to lobby-door-assets/seen-wordmark-white.png) with 见心颐养, the center's name and address, phone numbers, opening hours and the no-smoking / no-firearms
 lines. The door shows the old name 见康颐养 and mark; this uses the current ones (见心颐养, the four-petal mark).
 lobby-door-stickers.png: the left-hand leaf's upper glass, the door maker's STAND CLEAR label and a NO
 SOLICITING / THANK YOU sticker.
@@ -13,7 +13,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, '..', 'public', 'reference', 'photos')
-LOGO = '/Users/johnzheng/Developer/SeenHealth/Resource/seen_logo_color.png'
+WORDMARK = os.path.join(HERE, 'lobby-door-assets', 'seen-wordmark-white.png')
 W, H = 680, 960   # upper glass of one leaf: 0.68 x 0.96 m
 HN = '/System/Library/Fonts/HelveticaNeue.ttc'
 AV = '/System/Library/Fonts/Avenir Next.ttc'
@@ -43,13 +43,11 @@ def decal():
     for i, line in enumerate(('1839 W', 'Valley Blvd')):
         f = bold(92)
         d.text(((W - d.textlength(line, font=f)) / 2, 22 + i * 102), line, font=f, fill=WHITE)
-    # mark + wordmark
-    logo = Image.open(LOGO).convert('RGBA').resize((84, 84), Image.LANCZOS)
-    a = logo.split()[3]
-    mono = Image.new('RGBA', logo.size, MINT); mono.putalpha(a)
-    im.alpha_composite(mono, (58, 262))
-    d.text((158, 258), 'Seen Health', font=av_b(40), fill=MINT)
-    d.text((160, 304), '见心颐养', font=pf_b(34), fill=MINT)
+    # the wordmark (mark + SEEN / HEALTH), 见心颐养 beside it
+    mark = Image.open(WORDMARK).convert('RGBA')
+    mark = mark.resize((270, round(270 * mark.height / mark.width)), Image.LANCZOS)
+    im.alpha_composite(mark, (58, 262))
+    d.text((352, 284), '见心颐养', font=pf_b(40), fill=WHITE)
     y = 384
     d.text((60, y), 'Seen Health San Gabriel Valley', font=av_b(27), fill=WHITE); y += 36
     for line in ('1839 W Valley Blvd', 'Alhambra, CA 91803'):
