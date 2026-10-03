@@ -16,13 +16,15 @@ export const REAR_COURT_PLANTERS = [
 /**
  * The drop-off at the lobby's sliding entrance (Street View, May 2025), in
  * plan (x, z) with the heights people walk at. A landing runs along the lobby
- * wall across the glass door, window and side door at floor level, with two
- * short steps down at its −z end. The accessible ramp is a switchback: the
+ * wall across the glass door, window and side door at floor level; at its −z
+ * end, left of the glass door, three steps run down away from the wall to the
+ * lot (photo 2026-10-02). The accessible ramp is a switchback: the
  * upper run descends from the landing along the wall toward the wing, turns
  * on a landing beside the block wall, and the lower run comes back in front
  * of it down to the lot. Bronze rails line the lot side of the landing and
  * the upper run, both sides of the lower run and the turn landing's west
- * edge. A low curbed palm planter stands just beyond the foot of the steps.
+ * edge. Beyond the steps, against the wall, a bike rack stands on a low
+ * concrete pad (it replaced a palm planter, photo 2026-10-02).
  *
  * `buildAlhambraExterior` draws the drop-off from these numbers; the routes
  * people take over it (scripts/apply-drop-off-route.mjs, fleet-crew.ts) and
@@ -34,15 +36,27 @@ export const DROP_OFF = (() => {
     rise = top - street,
     midTop = top - rise / 2,
     width = 1.3;
-  const landing = { x: -15.5, z0: -2.0, z1: 3.6 },
+  const landing = { x: -15.5, z0: -2.95, z1: 3.6 },
     upper = { x: landing.x, z0: landing.z1, z1: 7.6 },
     turn = { x0: -17.95, x1: -14.85, z0: 7.6, z1: 8.75 },
     lower = { x: -17.15, z0: 2.9, z1: 7.6 };
-  /** Steps down from the landing's −z end to `z0`: `count` treads `depth` deep, equal risers to the lot. */
-  // Three treads 0.3 m deep (photo 2026-10-02).
+  /**
+   * Steps off the landing's lot side at its −z end, down toward the lot (−x):
+   * `count` treads `depth` deep between x0 (the foot) and x1 (the landing's
+   * edge), spanning z0..z1, equal risers to the lot. Three treads 0.3 m deep,
+   * ending at the glass door's frame (photo 2026-10-02).
+   */
   const count = 3,
     depth = 0.3,
-    steps = { count, depth, z0: landing.z0 - count * depth };
+    stepsX1 = landing.x - width / 2,
+    steps = {
+      count,
+      depth,
+      x0: stepsX1 - count * depth,
+      x1: stepsX1,
+      z0: landing.z0,
+      z1: -1.65,
+    };
   const riser = rise / (steps.count + 1);
   const upperY = (z: number) =>
     top - ((rise / 2) * (z - upper.z0)) / (upper.z1 - upper.z0);
@@ -51,7 +65,7 @@ export const DROP_OFF = (() => {
   const lotSide = landing.x - width / 2 - 0.05;
   /** Rail lines at constant x from z0 to z1, standing on the surface at height y(z). */
   const rails = {
-    landing: { x: lotSide, z0: landing.z0, z1: landing.z1, y: () => top },
+    landing: { x: lotSide, z0: steps.z1 + 0.05, z1: landing.z1, y: () => top },
     upper: { x: lotSide, z0: upper.z0, z1: upper.z1, y: upperY },
     lowerEast: {
       x: lower.x + width / 2 + 0.05,
@@ -72,8 +86,8 @@ export const DROP_OFF = (() => {
       y: () => midTop,
     },
   };
-  /** Planter centre and size; its curb faces the lot. */
-  const planter = { x: -16.35, z: -4.7, w: 2.3, d: 3.4 };
+  /** The bike rack's pad against the wall beyond the steps: centre and size, one riser high. */
+  const bikeRack = { x: -15.7, z: -3.75, w: 1.9, d: 1.5 };
   const rect = (x0: number, z0: number, x1: number, z1: number): Vec2[] => [
     [x0, z0],
     [x1, z0],
@@ -84,11 +98,10 @@ export const DROP_OFF = (() => {
     Math.abs(x - centre) <= width / 2 + 1e-9;
   /** Height of the walking surface at (x, z) on the landing, its steps, the runs or the turn landing; null elsewhere. */
   function surface(x: number, z: number): number | null {
-    if (within(x, landing.x) && z >= steps.z0 && z <= upper.z1) {
-      if (z > landing.z1) return upperY(z);
-      if (z >= landing.z0) return top;
-      return top - riser * Math.ceil((landing.z0 - z) / steps.depth - 1e-9);
-    }
+    if (within(x, landing.x) && z >= landing.z0 && z <= upper.z1)
+      return z > landing.z1 ? upperY(z) : top;
+    if (x >= steps.x0 && x < steps.x1 && z >= steps.z0 && z <= steps.z1)
+      return top - riser * Math.ceil((steps.x1 - x) / steps.depth - 1e-9);
     if (x >= turn.x0 && x <= turn.x1 && z >= turn.z0 && z <= turn.z1)
       return midTop;
     if (within(x, lower.x) && z >= lower.z0 && z <= lower.z1) return lowerY(z);
@@ -127,21 +140,22 @@ export const DROP_OFF = (() => {
     turn,
     lower,
     rails,
-    planter,
+    bikeRack,
     surface,
     ascent,
-    /** Plan outlines: the landing with its steps and the upper run, the turn landing, the lower run. */
+    /** Plan outlines: the landing and the upper run, the turn landing, the lower run, the steps. */
     outlines: [
-      rect(landing.x - width / 2, steps.z0, landing.x + width / 2, upper.z1),
+      rect(landing.x - width / 2, landing.z0, landing.x + width / 2, upper.z1),
       rect(turn.x0, turn.z0, turn.x1, turn.z1),
       rect(lower.x - width / 2, lower.z0, lower.x + width / 2, lower.z1),
+      rect(steps.x0, steps.z0, steps.x1, steps.z1),
     ],
-    /** The planter's footprint. */
-    planterOutline: rect(
-      planter.x - planter.w / 2,
-      planter.z - planter.d / 2,
-      planter.x + planter.w / 2,
-      planter.z + planter.d / 2,
+    /** The bike rack pad's footprint. */
+    bikeRackOutline: rect(
+      bikeRack.x - bikeRack.w / 2,
+      bikeRack.z - bikeRack.d / 2,
+      bikeRack.x + bikeRack.w / 2,
+      bikeRack.z + bikeRack.d / 2,
     ),
   };
 })();
@@ -536,23 +550,60 @@ export function buildAlhambraExterior(model: Facility) {
     for (let xx = wallX0 + 0.3; xx < wallX1; xx += 0.4)
       box(lotDoor, xx, -0.23, zz, 0.01, 1.5, 0.01, brickJoint);
   }
-  // Low curbed planter against the lobby wall just north of the drop-off
-  // landing (aerial): short pygmy palms and shrubs.
-  const island = group(site, 'lobby-wall-palm-planter'),
-    bed = DROP_OFF.planter;
-  box(island, bed.x, -0.23, bed.z, bed.w, 0.18, bed.d, '#dcd7cd');
-  box(island, bed.x - bed.w / 2, -0.23, bed.z, 0.07, 0.2, bed.d, red);
-  box(island, bed.x, -0.05, bed.z, bed.w - 0.3, 0.02, bed.d - 0.3, '#8c7a5c');
-  for (const [x, z, h] of [
-    [-16.9, -5.9, 1.3],
-    [-15.9, -4.6, 1.6],
-    [-16.7, -3.5, 1.2],
-  ])
-    palm(x, z, h, 1.0);
-  for (let z = -6.0; z < -3.2; z += 0.75) {
-    const tuft = mesh(island, new T.IcosahedronGeometry(0.28, 1), '#7f9a5f');
-    tuft.position.set(bed.x + (z % 1.5 > 0.75 ? 0.6 : -0.6), 0.12, z);
-    tuft.scale.set(1, 0.7, 1);
+  // Beyond the drop-off steps, against the lobby wall: a low concrete pad with
+  // a black serpentine bike rack, its loops running out from the wall (photo
+  // 2026-10-02; a palm planter stood here before).
+  const rackPad = group(site, 'lobby-bike-rack'),
+    pad = DROP_OFF.bikeRack,
+    padRise = (DROP_OFF.top - L_STREET) / (DROP_OFF.steps.count + 1);
+  box(rackPad, pad.x, L_STREET, pad.z, pad.w, padRise, pad.d, '#c5c8c2');
+  {
+    const rackBlack = '#1f2224',
+      loops = 4,
+      rz = pad.z - 0.25,
+      x0 = pad.x + pad.w / 2 - 0.25,
+      top = L_STREET + padRise + 0.85;
+    // Hoops 0.25 m apart along x, each a pair of posts joined by a rounded top.
+    for (let i = 0; i < loops; i++) {
+      const x = x0 - i * 0.25;
+      for (const dz of [-0.11, 0.11])
+        box(
+          rackPad,
+          x,
+          L_STREET + padRise,
+          rz + dz,
+          0.03,
+          0.72,
+          0.03,
+          rackBlack,
+        );
+      beam(
+        rackPad,
+        [x, top - 0.13, rz - 0.11],
+        [x, top, rz],
+        0.03,
+        0.03,
+        rackBlack,
+      );
+      beam(
+        rackPad,
+        [x, top, rz],
+        [x, top - 0.13, rz + 0.11],
+        0.03,
+        0.03,
+        rackBlack,
+      );
+    }
+    box(
+      rackPad,
+      x0 - ((loops - 1) * 0.25) / 2,
+      L_STREET + padRise + 0.1,
+      rz,
+      (loops - 1) * 0.25 + 0.03,
+      0.03,
+      0.03,
+      rackBlack,
+    );
   }
   // Drop-off landing along the lobby wall, its steps and the switchback ramp
   // (`DROP_OFF`).
@@ -572,34 +623,37 @@ export function buildAlhambraExterior(model: Facility) {
     LAND.z1 - LAND.z0,
     paving,
   );
+  // Steps off the landing's lot side, down toward the lot (−x).
+  const stepsZ = (steps.z0 + steps.z1) / 2,
+    stepsW = steps.z1 - steps.z0;
   for (let i = 0; i < steps.count; i++)
     box(
       landing,
-      LAND.x,
+      steps.x1 - steps.depth / 2 - steps.depth * i,
       L_STREET,
-      LAND.z0 - steps.depth / 2 - steps.depth * i,
-      LAND.w,
-      rise - (rise / (steps.count + 1)) * (i + 1),
+      stepsZ,
       steps.depth,
+      rise - (rise / (steps.count + 1)) * (i + 1),
+      stepsW,
       paving,
     );
   // A bronze handrail down each side of the steps (photo 2026-10-02), looping back at the foot.
-  for (const sx of [LAND.x - LAND.w / 2 - 0.05, LAND.x + LAND.w / 2 + 0.05]) {
-    box(landing, sx, LAND.top, LAND.z0 + 0.05, 0.035, 0.95, 0.035, bronze);
-    box(landing, sx, L_STREET, steps.z0, 0.035, 0.95, 0.035, bronze);
+  for (const sz of [steps.z0 + 0.05, steps.z1 - 0.05]) {
+    box(landing, steps.x1 - 0.05, LAND.top, sz, 0.035, 0.95, 0.035, bronze);
+    box(landing, steps.x0, L_STREET, sz, 0.035, 0.95, 0.035, bronze);
     for (const dy of [0.95, 0.6])
       beam(
         landing,
-        [sx, LAND.top + dy, LAND.z0 + 0.05],
-        [sx, L_STREET + dy, steps.z0],
+        [steps.x1 - 0.05, LAND.top + dy, sz],
+        [steps.x0, L_STREET + dy, sz],
         0.03,
         0.03,
         bronze,
       );
     beam(
       landing,
-      [sx, L_STREET + 0.95, steps.z0],
-      [sx, L_STREET + 0.6, steps.z0 - 0.3],
+      [steps.x0, L_STREET + 0.95, sz],
+      [steps.x0 - 0.3, L_STREET + 0.6, sz],
       0.03,
       0.03,
       bronze,

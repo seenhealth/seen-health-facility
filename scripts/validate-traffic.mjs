@@ -96,7 +96,7 @@ for (let i = 0; i < VANS; i++)
   }
 
 // Lot obstacles a van must keep clear of: the building, the drop-off's
-// landing, switchback ramp, their rails and the palm planter at the foot of
+// landing, switchback ramp, their rails and the bike rack beyond the foot of
 // its steps (alhambra-exterior.ts DROP_OFF), the curb islands and the west
 // sidewalk (vans cross the south sidewalk only at the driveway).
 const rect = (x0, z0, x1, z1) => [
@@ -108,9 +108,9 @@ const rect = (x0, z0, x1, z1) => [
 const curbs = siteCurbs(m);
 const obstacles = [
   ['building', m.site.buildingOutline],
-  ...['drop-off landing and upper run', 'ramp turn landing', 'ramp lower run'].map((name, i) => [name, DROP_OFF.outlines[i]]),
+  ...['drop-off landing and upper run', 'ramp turn landing', 'ramp lower run', 'drop-off steps'].map((name, i) => [name, DROP_OFF.outlines[i]]),
   ...Object.entries(DROP_OFF.rails).map(([id, r]) => [`drop-off ${id} rail`, [[r.x, r.z0], [r.x, r.z1]]]),
-  ['lobby palm planter', DROP_OFF.planterOutline],
+  ['lobby bike rack', DROP_OFF.bikeRackOutline],
   ['west sidewalk', curbs.sidewalks[0]],
   ...curbs.islands.map((p, i) => [`curb island ${i}`, p]),
 ];

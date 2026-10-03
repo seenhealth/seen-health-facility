@@ -36,6 +36,7 @@ import {
   type VehicleLamps,
 } from './live-vehicles';
 import { createWalkers, type WalkPoint } from './live-walkers';
+import { DROP_OFF } from './alhambra-exterior';
 import { FLEET_VAN_RAMP } from './photo-assets';
 import type { Facility } from './schema';
 import { Pen, pathAt, type Piece } from './vehicle-path';
@@ -154,11 +155,12 @@ const INSIDE: WalkPoint = {
   y: LANDING,
 };
 const DOOR: WalkPoint = { x: ARRIVAL.door[0], z: ARRIVAL.door[1], y: LANDING };
-/** On foot: through the doors, along the landing, down its south step and out into the lot (fleet-crew.ts OFFICE.exit). */
+/** On foot: up the landing's steps from the lot (they face away from the wall), along the landing and through the doors (fleet-crew.ts OFFICE.exit). */
+const STEPS_Z = (DROP_OFF.steps.z0 + DROP_OFF.steps.z1) / 2;
 const STEPS_IN: WalkPoint[] = [
-  { x: -16.7, z: -2.9, y: GROUND },
-  { x: -15.35, z: -2.4, y: GROUND },
-  { x: -15.35, z: -1.3, y: LANDING, speed: 0.7 },
+  { x: DROP_OFF.steps.x0 - 0.35, z: STEPS_Z, y: GROUND },
+  { x: DROP_OFF.steps.x1, z: STEPS_Z, y: LANDING, speed: 0.7 },
+  { x: -15.35, z: -1.3, y: LANDING },
   DOOR,
   INSIDE,
 ];
