@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Seen Health · Live lot</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="%BASE_URL%favicon.svg" type="image/svg+xml" />
+    <style>
+      html, body { margin: 0; height: 100%; background: #e5eae7; overflow: hidden; }
+      #root { position: absolute; inset: 0; }
+      #hud { position: absolute; left: 12px; top: 12px; z-index: 5; font: 13px/1.3 system-ui, sans-serif; color: #1f2a2a; background: rgba(255,255,255,.85); border: 1px solid rgba(31,42,42,.15); border-radius: 8px; padding: 6px 10px; pointer-events: none; }
+      #hud b { font-size: 18px; font-variant-numeric: tabular-nums; }
+      #ctl-toggle { position: absolute; right: 12px; bottom: 12px; z-index: 6; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(31,42,42,.2); border-radius: 50%; background: rgba(255,255,255,.9); color: #1f2a2a; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.15); padding: 0; }
+      #ctl-toggle:hover { background: #fff; }
+      #ctl { position: absolute; right: 12px; bottom: 56px; z-index: 6; display: none; flex-direction: column; gap: 8px; width: 196px; padding: 10px; font: 12px/1.3 system-ui, sans-serif; color: #1f2a2a; background: rgba(255,255,255,.92); border: 1px solid rgba(31,42,42,.15); border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.18); }
+      #ctl.open { display: flex; }
+      #ctl .row { display: grid; grid-template-columns: 52px 1fr; align-items: center; gap: 6px; }
+      #ctl .row span { color: #4a5a58; }
+      #ctl .btns { display: flex; gap: 4px; }
+      #ctl button { height: 26px; min-width: 26px; padding: 0 6px; border: 1px solid rgba(31,42,42,.2); border-radius: 6px; background: #fff; color: #1f2a2a; font: 13px system-ui, sans-serif; cursor: pointer; }
+      #ctl button:hover { background: #eef3f1; }
+      #ctl .pad { display: grid; grid-template-columns: repeat(3, 26px); grid-template-rows: repeat(2, 26px); gap: 3px; }
+      #ctl .pad button:nth-child(1) { grid-column: 2; grid-row: 1; }
+      #ctl .pad button:nth-child(2) { grid-column: 1; grid-row: 2; }
+      #ctl .pad button:nth-child(3) { grid-column: 2; grid-row: 2; }
+      #ctl .pad button:nth-child(4) { grid-column: 3; grid-row: 2; }
+      #ctl .time { display: flex; flex-direction: column; gap: 4px; border-top: 1px solid rgba(31,42,42,.12); padding-top: 8px; }
+      #ctl .time .head { display: flex; align-items: center; justify-content: space-between; }
+      #ctl .time b { font-variant-numeric: tabular-nums; }
+      #ctl input[type=range] { width: 100%; margin: 0; accent-color: #2f6b62; }
+      #ctl .wide { width: 100%; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <div id="hud">Waiting for the dispatch board…</div>
+    <button id="ctl-toggle" type="button" aria-label="View controls" aria-expanded="false" aria-controls="ctl" title="View controls">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="9" cy="6" r="2" fill="#fff"/><circle cx="15" cy="12" r="2" fill="#fff"/><circle cx="7" cy="18" r="2" fill="#fff"/></svg>
+    </button>
+    <div id="ctl" role="group" aria-label="View controls">
+      <div class="row"><span>Zoom</span><div class="btns"><button id="ctl-zoom-out" type="button" title="Zoom out">−</button><button id="ctl-zoom-in" type="button" title="Zoom in">+</button></div></div>
+      <div class="row"><span>Rotate</span><div class="btns"><button id="ctl-rot-l" type="button" title="Rotate left">↺</button><button id="ctl-rot-r" type="button" title="Rotate right">↻</button></div></div>
+      <div class="row"><span>Tilt</span><div class="btns"><button id="ctl-tilt-up" type="button" title="Look from higher">⤒</button><button id="ctl-tilt-down" type="button" title="Look from lower">⤓</button></div></div>
+      <div class="row"><span>Pan</span><div class="pad"><button id="ctl-pan-up" type="button" title="Pan up">↑</button><button id="ctl-pan-left" type="button" title="Pan left">←</button><button id="ctl-pan-down" type="button" title="Pan down">↓</button><button id="ctl-pan-right" type="button" title="Pan right">→</button></div></div>
+      <button id="ctl-reset" type="button" class="wide" title="Back to the whole-lot shot">Whole lot</button>
+      <div class="time">
+        <div class="head"><span>Time of day</span><b id="ctl-time-label">--:--</b></div>
+        <input id="ctl-time" type="range" min="0" max="1439" step="5" value="720" aria-label="Time of day" />
+        <button id="ctl-now" type="button" class="wide" title="Light the scene for the current time">Now</button>
+      </div>
+    </div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

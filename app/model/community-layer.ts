@@ -32,7 +32,7 @@ export type Framing = {
   zoom: number;
   azimuth?: number;
 };
-/** Orthographic zoom × metres of extent: five pads and the site ≈ 0.42. */
+/** Orthographic zoom × metres of extent: six pads and the site ≈ 0.38. */
 const NETWORK_ZOOM = 88;
 /** Orthographic zoom × pad size: a 30 m home pad ≈ 2.2. */
 const PAD_ZOOM = 66;

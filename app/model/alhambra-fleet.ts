@@ -22,9 +22,13 @@ import { vehicleGap } from './vehicle-clearance';
  * driveway lane passes the bay noses 1.3 m off, lane changes use 8 m arcs)
  * and by scheduling where it cannot: a maneuver that sweeps near a parking
  * spot or the drop-off is booked only while that spot is empty (see
- * `tripNeeds`). Vans leave the map along the west street and fade out over
- * its last metres, short of the end of the drawn street (`STREET_EXTENT`), so
- * a fading van never hangs over bare ground; they come back the same way.
+ * `tripNeeds`). The lot is one way: vans turn in from the west street (S Ethel
+ * Ave) through the curb cut beside the two-storey wing, which lines up with
+ * the drop-off, run south down the aisle, and leave by the driveway onto the
+ * south street (the alley). Vans leave the map along the west street and fade
+ * out over its last metres, short of the end of the drawn street
+ * (`STREET_EXTENT`), so a fading van never hangs over bare ground; they come
+ * back the same way.
  * Every drop-off arrival comes in from off site, so riders are picked up out
  * of view, and between runs the timetabled vans stay on their rounds instead
  * of parking (see `fleetPlan`). Times are loop seconds (1 s = 40 clock
@@ -34,21 +38,23 @@ import { vehicleGap } from './vehicle-clearance';
 // ---------------------------------------------------------------------------
 // Parking
 // ---------------------------------------------------------------------------
-const BAY = { x: -28.1, firstZ: -21.65, pitch: 2.8 },
-  CURB_X = -39.1,
+const BAY = { x: -27.4, firstZ: -21.65, pitch: 2.8 },
+  CURB_X = -37.1,
   AISLE_X = -20.8,
   DRIVEWAY_X = -22.5;
 /**
  * Five back-in bays line the west side of the lot (nose toward the aisle),
- * starting one stall north of the curb island so that the drop-off swing-in
- * has room north of the row. Van F and the two spares park at the west-street
+ * starting one stall north of the curb island; the drop-off and the entrance
+ * lane sit north of the row. Van F and the two spares park at the west-street
  * curb, nose north with the traffic beside them.
  *
  * `aisleX` is where a van pulling straight out of its bay finishes its 4 m
  * turn: far enough east that its inner side clears the neighbouring bay's
  * nose. The southernmost bay turns straight onto the driveway lane instead,
  * which keeps its nose clear of the curb island's tip; it may do so only
- * while the bay north of it is empty, which the planner enforces.
+ * while the bay north of it is empty, which the planner enforces. Backing in
+ * runs the other way: a van pulls south past its bay on the same line and
+ * reverses in, so it needs the bay south of it empty.
  */
 export const fleetParking: {
   x: number;
@@ -62,7 +68,7 @@ export const fleetParking: {
     heading: -Math.PI / 2,
     aisleX,
   })),
-  ...[3.5, -11.5, -19].map((z) => ({ x: CURB_X, z, heading: Math.PI })),
+  ...[12.5, -11.5, -19].map((z) => ({ x: CURB_X, z, heading: Math.PI })),
 ];
 const atCurb = (index: number) => fleetParking[index].x === CURB_X;
 /** Livery letter of fleet van `index` ('A' for the first). */
@@ -116,8 +122,25 @@ export const FLEET_LOOP = 720;
 // Lot geometry (metres, street level)
 // ---------------------------------------------------------------------------
 export const FLEET_LOT = {
-  dock: [-20.5, 1.5] as Vec2,
+  /**
+   * The docked van's centre. Its nose stops 0.9 m short of the switchback's
+   * lower run (its west rail at x −17.85, `DROP_OFF` in alhambra-exterior.ts):
+   * the way from the van's ramp to the ramp's toe passes in front of the nose,
+   * wide enough for a wheelchair and its escort.
+   */
+  dock: [-21.925, 1.5] as Vec2,
   dockHeading: -Math.PI / 2,
+  /**
+   * The lot entrance: the curb cut on the west street beside the two-storey
+   * wing (Street View, May 2025), with the low palm planter on its north side,
+   * so the lane runs beside the wing and an arrival drifts over to the
+   * drop-off's line before the ramp.
+   */
+  entry: 4.3,
+  /** The turn in from the northbound lane is wide, so the tail does not swing into the southbound lane as a departing van passes. */
+  entryRadius: 7.5,
+  /** Metres of the west street before the turn in, from the lot's exit junction, treated as lot time. */
+  approach: 20,
   streetY: -0.23,
   /** Aisle east of the bay noses, where bay pull-outs and back-ins turn. */
   aisle: AISLE_X,
@@ -129,6 +152,10 @@ export const FLEET_LOT = {
    * 0.3 m.
    */
   exitLane: DRIVEWAY_X - 0.5,
+  /** A departing van stops with its nose at the STOP bar across the driveway's mouth (aerial), centre here. */
+  exitStopZ: -24.5 + 3.2,
+  /** Seconds a departing van stands at the STOP bar. */
+  exitStop: 2,
   /**
    * Lot arcs; lane changes; the long drift from the drop-off exit to the exit
    * lane (gentle enough that the van's front corner stays 0.5 m off the bay
@@ -137,10 +164,10 @@ export const FLEET_LOT = {
   turnRadius: 4,
   laneChangeRadius: 8,
   driftRadius: 20,
-  curbRadius: 6,
+  curbRadius: 10,
   streetRadius: STREET_CORNER_RADIUS,
-  /** A departing van backs straight out of the drop-off to here before pulling away. */
-  dockBackTo: -23.5,
+  /** A departing van backs straight out of the drop-off, 3 m, to here before pulling away. */
+  dockBackTo: -24.925,
   /** Straight run before a forward arc that starts from standstill. */
   lead: 0.6,
   /**
@@ -210,14 +237,9 @@ const L = FLEET_LOT,
   WEST = -Math.PI / 2,
   NORTH = 0,
   SOUTH = Math.PI;
-/** Drop-off swing-in from northbound at `x`: a left arc then a right arc into the dock heading east. */
-function swingFrom(x: number) {
-  const a = Math.acos((L.dock[0] - x + R) / (2 * R));
-  return { angle: a, startZ: L.dock[1] - R - 2 * R * Math.sin(a) };
-}
 const aisleOf = (index: number) => fleetParking[index].aisleX ?? L.aisle;
-/** Where a van stops on its bay's aisle line before backing in: the end of the pull-out turn. */
-const backInStop = (index: number) => fleetParking[index].z + R;
+/** Where a van stops on its bay's aisle line before backing in: one turn radius south of the bay, having pulled past it. */
+const backInStop = (index: number) => fleetParking[index].z - R;
 /**
  * Where a van waits while off site: its own spot well beyond the street's
  * end, so that hidden vans never share a place. Nothing drives while hidden:
@@ -269,68 +291,72 @@ export const fleetRoutes = {
       ...drivewayToAway(pen),
     ];
   },
-  /** Off site → drop-off: north on the west street, east on the south street, up the driveway lane into the swing-in. */
+  /** Off site → drop-off: north on the west street, in through the entrance beside the wing, over to the drop-off's line and east to the ramp. */
   awayToDock(): FleetLeg[] {
     const pen = new Pen(L.northbound, L.vanishSouth, NORTH);
-    return [...awayToDriveway(pen), ...laneToDock(pen)];
-  },
-  /** Off site → bay: up the driveway lane, over to the bay's aisle line and past the bay, ready to back in. */
-  awayToBay(index: number): FleetLeg[] {
-    if (atCurb(index)) return awayToCurb(index);
-    const pen = new Pen(L.northbound, L.vanishSouth, NORTH),
-      lateral = aisleOf(index) - L.driveway,
-      stop = backInStop(index),
-      change = lateral ? jogLength(lateral, LC) + L.lead : 0;
     return [
-      ...awayToDriveway(pen),
-      leg(pen, 'driveway-north', 'Driving to assigned bay', LOT, (p) =>
-        p.lineToZ(stop - change),
-      ),
-      leg(pen, 'pull-past', 'Pulling past assigned bay', LOT, (p) =>
-        p.jog(lateral, LC).lineToZ(stop),
+      ...awayToEntry(pen),
+      leg(pen, 'dock-in', 'Arriving at drop-off', LOT, (p) =>
+        p
+          .lineToX(L.dock[0] - 1.0 - jogLength(L.entry - L.dock[1], R))
+          .jog(L.entry - L.dock[1], R)
+          .lineToX(L.dock[0]),
       ),
     ];
   },
-  /** Reverse along the pull-out turn and straight back into the bay (the bays are back-in stalls). */
+  /** Off site → bay: in through the entrance, right onto the bay's aisle line and south past the bay, ready to back in. */
+  awayToBay(index: number): FleetLeg[] {
+    if (atCurb(index)) return awayToCurb(index);
+    const pen = new Pen(L.northbound, L.vanishSouth, NORTH),
+      aisleX = aisleOf(index),
+      stop = backInStop(index);
+    return [
+      ...awayToEntry(pen),
+      leg(pen, 'entry-east', 'Driving to assigned bay', LOT, (p) =>
+        p.lineToX(aisleX - R),
+      ),
+      leg(pen, 'aisle-turn', 'Turning down the aisle', LOT, (p) =>
+        p.arc(R, Math.PI / 2),
+      ),
+      leg(pen, 'pull-past', 'Pulling past assigned bay', LOT, (p) =>
+        p.lineToZ(stop),
+      ),
+    ];
+  },
+  /** From south of the bay, reverse through a left-hand turn and straight back into it (the bays are back-in stalls, nose east). */
   backIn(index: number): FleetLeg[] {
     const b = fleetParking[index],
-      pen = new Pen(aisleOf(index), backInStop(index), SOUTH);
+      pen = new Pen(aisleOf(index), backInStop(index), NORTH);
     return [
       leg(pen, 'back-in', 'Reversing into assigned bay', REVERSE, (p) =>
-        p.arc(R, Math.PI / 2).lineToX(b.x),
+        p.arc(R, -Math.PI / 2).lineToX(b.x),
       ),
     ];
   },
 };
-/** North on the current lane to the swing-in, then into the drop-off heading east. */
-function laneToDock(pen: Pen): FleetLeg[] {
-  const swing = swingFrom(pen.x);
-  return [
-    leg(pen, 'aisle-north', 'Driving to the drop-off', LOT, (p) =>
-      p.lineToZ(swing.startZ),
-    ),
-    leg(pen, 'dock-in', 'Arriving at drop-off', LOT, (p) =>
-      p.arc(R, -swing.angle).arc(R, swing.angle + Math.PI / 2),
-    ),
-  ];
-}
 /** Southbound on the exit lane, out onto the street and off site to the south. */
 function drivewayToAway(pen: Pen): FleetLeg[] {
   return [
-    leg(pen, 'aisle-south', 'Driving to the street', LOT, (p) =>
+    // A van whose lane change already carried it past the bar stops where it is.
+    leg(pen, 'to-stop', 'Driving to the exit', LOT, (p) =>
+      p.lineToZ(Math.min(p.z, L.exitStopZ)),
+    ),
+    leg(pen, 'aisle-south', 'Leaving the lot', LOT, (p) =>
       p.lineToZ(L.westbound + R),
     ),
-    leg(pen, 'driveway-out', 'Turning onto the south street', LOT, (p) =>
+    leg(pen, 'driveway-out', 'Turning onto the alley', LOT, (p) =>
       p.arc(R, Math.PI / 2),
     ),
-    leg(pen, 'street-west', 'Westbound on the south street', STREET, (p) =>
+    leg(pen, 'street-west', 'Westbound on the alley', STREET, (p) =>
       p.lineToX(L.southbound + L.streetRadius),
     ),
+    // The corner onto the west street counts as lot time, so the next
+    // arrival is booked only once the departing van has cleared the junction.
     leg(
       pen,
       'corner-south',
       'Turning south onto the west street',
-      CORNER,
+      { ...CORNER, lot: true },
       (p) => p.arc(L.streetRadius, -Math.PI / 2),
     ),
     leg(pen, 'street-south', 'Southbound to the neighborhood', STREET, (p) =>
@@ -341,8 +367,8 @@ function drivewayToAway(pen: Pen): FleetLeg[] {
     ),
   ];
 }
-/** From the south end of the west street: north, right onto the south street, left into the driveway lane. */
-function awayToDriveway(pen: Pen): FleetLeg[] {
+/** From the south end of the west street: north to the entrance, then left through the curb cut heading east. */
+function awayToEntry(pen: Pen): FleetLeg[] {
   return [
     leg(
       pen,
@@ -352,16 +378,19 @@ function awayToDriveway(pen: Pen): FleetLeg[] {
       (p) => p.line(L.fade),
     ),
     leg(pen, 'street-north', 'Returning from the neighborhood', STREET, (p) =>
-      p.lineToZ(L.eastbound - L.streetRadius),
+      p.lineToZ(L.entry - L.entryRadius - L.approach),
     ),
-    leg(pen, 'corner-east', 'Turning onto the south street', CORNER, (p) =>
-      p.arc(L.streetRadius, Math.PI / 2),
+    // The last stretch past the lot's exit counts as lot time, so an arrival is
+    // booked only once a departing van has cleared the junction ahead of it.
+    leg(
+      pen,
+      'street-approach',
+      'Returning from the neighborhood',
+      { ...STREET, lot: true },
+      (p) => p.lineToZ(L.entry - L.entryRadius),
     ),
-    leg(pen, 'street-east', 'Returning eastbound', STREET, (p) =>
-      p.lineToX(L.driveway - R),
-    ),
-    leg(pen, 'driveway-in', 'Turning into the driveway', LOT, (p) =>
-      p.arc(R, -Math.PI / 2),
+    leg(pen, 'entry-in', 'Turning into the lot', LOT, (p) =>
+      p.arc(L.entryRadius, Math.PI / 2),
     ),
   ];
 }
@@ -547,6 +576,16 @@ const pause = (seconds: number, phase: string, visible = true): Move => ({
   visible,
 });
 const r = fleetRoutes;
+/** A departure stops at the STOP bar across the driveway's mouth before pulling out. */
+function withExitStop(legs: FleetLeg[]): Move[] {
+  const i = legs.findIndex((l) => l.id === 'aisle-south');
+  if (i < 0) return [drive(legs, true, false)];
+  return [
+    drive(legs.slice(0, i), true, true),
+    pause(L.exitStop, 'Stopped at the exit'),
+    drive(legs.slice(i), true, false),
+  ];
+}
 function buildMoves(kind: FleetTripKind, index: number): Move[] {
   // Drop-off arrivals always come in from off site, where the riders board.
   if (kind === 'toDock') return [drive(r.awayToDock(), false, true)];
@@ -554,9 +593,9 @@ function buildMoves(kind: FleetTripKind, index: number): Move[] {
     return [
       drive(r.dockReverse(), true, true, true),
       pause(0.6, 'Stopped to pull away'),
-      drive(r.dockToAway(), true, false),
+      ...withExitStop(r.dockToAway()),
     ];
-  if (kind === 'out') return [drive(r.bayToAway(index), true, false)];
+  if (kind === 'out') return withExitStop(r.bayToAway(index));
   if (atCurb(index)) return [drive(r.awayToBay(index), false, true)];
   return [
     drive(r.awayToBay(index), false, true),
@@ -771,7 +810,7 @@ export type FleetReservation = {
  */
 const NEIGHBORHOOD_RUNS = [
   { van: 4, requested: 304, away: 100 },
-  { van: 5, requested: 24, away: 20 },
+  { van: 5, requested: 36, away: 20 },
   { van: 5, requested: 520, away: 20 },
 ];
 /** Driveway clearance between consecutive maneuvers on the lot. */
@@ -801,7 +840,7 @@ function fleetPlan(windows: Window[]): FleetPlan {
   planCache.set(windows, plan);
   return plan;
 }
-/** The trips fixed by the passenger timetable; their windows reserve the driveway for their whole span. */
+/** The trips fixed by the passenger timetable; each reserves the driveway for the time it is actually on the lot. */
 function timetabledTrips(windows: Window[]): FleetPlan {
   const trips: Trip[][] = fleetParking.map(() => []);
   const reservations: FleetReservation[] = [];
@@ -845,14 +884,16 @@ function timetabledTrips(windows: Window[]): FleetPlan {
         ),
       );
     }
-    for (const span of [w.inbound, w.outbound, w.returning, w.leaving])
-      if (span[0] >= 0)
+    for (const trip of trips[van]) {
+      const lot = tripLot(trip);
+      if (lot)
         reservations.push({
           van,
-          start: span[0],
-          end: span[1],
-          requested: span[0],
+          start: lot[0],
+          end: lot[1],
+          requested: trip.requested,
         });
+    }
   });
   return { trips, reservations };
 }
@@ -880,6 +921,8 @@ function bookDay(plan: FleetPlan): FleetPlan {
   }: Booking) => {
     const moves = tripMoves(kind, van),
       seconds = naturalSeconds(moves);
+    const why = { busy: 0, driveway: 0, neighbour: 0 };
+    let lastConflict = '';
     for (let start = requested; start + seconds <= deadline; start += 0.5) {
       const trip: Trip = {
         van,
@@ -894,10 +937,20 @@ function bookDay(plan: FleetPlan): FleetPlan {
         requested,
       };
       const lot = tripLot(trip);
-      if (busy(van, trip.start, trip.end) || (lot && !lotFree(lot))) continue;
+      if (busy(van, trip.start, trip.end)) {
+        why.busy++;
+        continue;
+      }
+      if (lot && !lotFree(lot)) {
+        why.driveway++;
+        continue;
+      }
       trips[van].push(trip);
-      if (neighbourConflict(trips)) {
+      const conflict = neighbourConflict(trips);
+      if (conflict) {
         trips[van].pop();
+        why.neighbour++;
+        lastConflict = conflict;
         continue;
       }
       if (lot)
@@ -905,7 +958,7 @@ function bookDay(plan: FleetPlan): FleetPlan {
       return trip;
     }
     throw new Error(
-      `No clear slot for van ${van} (${kind}) between ${requested} and ${deadline}`,
+      `No clear slot for van ${van} (${kind}) between ${requested} and ${deadline}: ${why.busy} starts had the van busy, ${why.driveway} the driveway reserved, ${why.neighbour} a neighbour in the way${lastConflict ? ` (last: ${lastConflict})` : ''}`,
     );
   };
   for (const run of NEIGHBORHOOD_RUNS) {

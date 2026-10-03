@@ -16,7 +16,7 @@
     "validate:partner-adhc": "node scripts/build-partner-adhc.mjs --check && node scripts/validate-partner-adhc.mjs",
     "validate:day-program": "node scripts/validate-day-program.mjs && node scripts/validate-cultural-program.mjs",
     "validate:traffic": "node scripts/compile-model-modules.mjs && node scripts/validate-traffic.mjs",
-    "validate:fleet": "node scripts/validate-fleet-crew.mjs",
+    "validate:fleet": "node scripts/apply-drop-off-route.mjs --check && node scripts/validate-fleet-crew.mjs",
     "validate:community": "node scripts/compile-model-modules.mjs && node scripts/validate-community-traffic.mjs",
     "plan:traffic": "node scripts/compile-model-modules.mjs && node scripts/plan-street-traffic.mjs && npm run validate:traffic",
     "prebuild": "node scripts/prepare-public-models.mjs && node scripts/validate-public-assets.mjs",
@@ -40,7 +40,10 @@
     "preview:story": "vite preview --config vite.story.config.ts",
     "dev:viewer": "vite --config vite.viewer.config.ts",
     "build:viewer": "vite build --config vite.viewer.config.ts",
-    "preview:viewer": "vite preview --config vite.viewer.config.ts"
+    "preview:viewer": "vite preview --config vite.viewer.config.ts",
+    "dev:live": "vite --config vite.live.config.ts",
+    "build:live": "vite build --config vite.live.config.ts",
+    "preview:live": "vite preview --config vite.live.config.ts"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",

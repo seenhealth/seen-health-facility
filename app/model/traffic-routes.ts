@@ -11,10 +11,10 @@ import { pathAt, pathLength, roundedPath } from './vehicle-path';
  * street, northbound/+z on the west street); outer lanes run the other way.
  */
 export const STREET_LANES = {
-  north: 39.4,
+  north: 33.6,
   south: -30.7,
-  east: 52.2,
-  west: -43.8,
+  east: 67.8,
+  west: -40.2,
   offset: 3.3,
 };
 export type StreetSide = 'north' | 'south' | 'east' | 'west';
@@ -83,7 +83,10 @@ const circuits = ([0, 1] as const).map((lane) => {
   return { pieces, length: pathLength(pieces) };
 });
 const holding = circuits.map(({ pieces, length }, i) => {
-  const [tx, tz] = i ? [laneLine('west', 1), -20] : [42, laneLine('south', 0)];
+  // Holds sit on each circuit where neither the fleet nor the community
+  // vehicles drive: car 0 on Campbell's inner lane north of the dialysis
+  // center's stub, car 1 on Valley's outer lane in front of the center.
+  const [tx, tz] = i ? [58, laneLine('north', 1)] : [laneLine('east', 0), -20];
   let best = 0,
     distance = Infinity;
   for (let j = 0; j < 3000; j++) {

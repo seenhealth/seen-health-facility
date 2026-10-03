@@ -83,7 +83,7 @@ A single animation loop (`app/story/director.ts`) reads `window.scrollY`, works 
 
 `prefers-reduced-motion` cuts between shots without the shutter, removes parallax, kinetic type and draw-on animation, and shows final states. Without WebGL the stage shows a soft gradient and every text, overlay and navigation element still works.
 
-Camera angles: world axes are +x east, +z north, y up. The camera sits at target + (sin azimuth, ·, cos azimuth), so azimuth 0 puts it north of the subject looking south, π/2 east of it looking west, and the renderer’s default iso (≈ 0.58) sees the north and east faces, which is where the care settings’ fronts face.
+Camera angles: world axes are +x east, +z south, y up (`COMPASS` in `app/model/frame.ts`; the center is on the north side of Valley Blvd, which the code calls the north street). The camera sits at target + (sin azimuth, ·, cos azimuth), so azimuth 0 puts it south of the subject looking north, π/2 east of it looking west, and the renderer’s default iso (≈ 0.58) sees the south and east faces, which is where the care settings’ fronts face.
 
 ## Motion
 

@@ -718,7 +718,7 @@
       "levelId": "basement",
       "polygon": [
         [
-          -0.000001,
+          -1e-06,
           -15.27138
         ],
         [
@@ -738,7 +738,7 @@
           26.492967
         ],
         [
-          -0.000001,
+          -1e-06,
           26.492967
         ]
       ],
@@ -873,7 +873,7 @@
       "levelId": "basement",
       "polygon": [
         [
-          -0.000001,
+          -1e-06,
           -15.27138
         ],
         [
@@ -893,7 +893,7 @@
           26.492967
         ],
         [
-          -0.000001,
+          -1e-06,
           26.492967
         ]
       ],
@@ -4718,7 +4718,7 @@
       "zoneId": "basement",
       "levelId": "basement",
       "a": [
-        -0.000001,
+        -1e-06,
         -15.27138
       ],
       "b": [
@@ -4806,7 +4806,7 @@
         26.492967
       ],
       "b": [
-        -0.000001,
+        -1e-06,
         26.492967
       ],
       "height": 2.7,
@@ -4823,11 +4823,11 @@
       "zoneId": "basement",
       "levelId": "basement",
       "a": [
-        -0.000001,
+        -1e-06,
         26.492967
       ],
       "b": [
-        -0.000001,
+        -1e-06,
         -15.27138
       ],
       "height": 2.7,
@@ -4844,7 +4844,7 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "a": [
-        -0.000001,
+        -1e-06,
         8.810744
       ],
       "b": [
@@ -4890,7 +4890,7 @@
         26.492967
       ],
       "b": [
-        -0.000001,
+        -1e-06,
         26.492967
       ],
       "height": 2.9,
@@ -4907,11 +4907,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "a": [
-        -0.000001,
+        -1e-06,
         26.492967
       ],
       "b": [
-        -0.000001,
+        -1e-06,
         8.810744
       ],
       "height": 2.9,
@@ -14281,20 +14281,34 @@
     "photo-front-sign": {
       "kind": "sign",
       "dimensions": [
-        7.8,
-        0.98,
-        0.025
+        8.8,
+        1.05,
+        0.18
       ],
-      "material": "photo-sign-front"
+      "material": "photo-sign-front",
+      "materials": {
+        "backing": "om-stone",
+        "shadow": "photo-sign-front-shadow"
+      },
+      "parameters": {
+        "relief": 0.1
+      }
     },
     "photo-dropoff-sign": {
       "kind": "sign",
       "dimensions": [
-        5.3,
-        0.55,
-        0.025
+        4.4,
+        0.5,
+        0.18
       ],
-      "material": "photo-sign-dropoff"
+      "material": "photo-sign-dropoff",
+      "materials": {
+        "backing": "photo-bronze",
+        "shadow": "photo-sign-dropoff-shadow"
+      },
+      "parameters": {
+        "relief": 0.1
+      }
     },
     "photo-clinic-sign": {
       "kind": "sign",
@@ -20647,7 +20661,7 @@
       "zoneId": "rehab",
       "levelId": "ground",
       "position": [
-        -24.218352,
+        -25.9,
         5.15,
         27.321965
       ],
@@ -20663,7 +20677,7 @@
         111
       ],
       "status": "photo-informed / dimensions-estimated",
-      "notes": "Appearance follows the referenced photograph. Placement is registered to the plan; dimensions estimated without a measured drawing.",
+      "notes": "Current sign (2026 photo supplied 2026-10-01): ginkgo mark then dark SEEN HEALTH 见心颐养 lettering; Google Street View (May 2025) still shows the earlier white sign. Placement is registered to the plan; dimensions estimated without a measured drawing.",
       "layer": "exterior"
     },
     {
@@ -20672,9 +20686,9 @@
       "zoneId": "lobby",
       "levelId": "ground",
       "position": [
-        -16.586519,
-        2.82,
-        1.780761
+        -16.33,
+        3.21,
+        0.8
       ],
       "rotation": -1.5707963267948966,
       "scale": [
@@ -20687,7 +20701,7 @@
         109
       ],
       "status": "photo-informed / dimensions-estimated",
-      "notes": "Appearance follows the referenced photograph. Placement is registered to the plan; dimensions estimated without a measured drawing.",
+      "notes": "Current sign over the drop-off door (photo 2026-10-02): white SEEN HEALTH 见心颐养 channel letters, no mark, standing on top of the bronze canopy over the sliding door, along its front edge (placement corrected by the dispatcher, 2026-10-02); the backing is drawn in the canopy bronze so it reads as a low sign band on the canopy. Placement is registered to the plan; dimensions estimated without a measured drawing.",
       "layer": "exterior"
     },
     {
@@ -31362,7 +31376,7 @@
       "pattern": "tile"
     },
     "photo-facade": {
-      "color": "#d8cbb6",
+      "color": "#d0c3a7",
       "roughness": 0.9
     },
     "photo-bronze": {
@@ -31390,12 +31404,14 @@
     "photo-sign-front": {
       "color": "#ffffff",
       "roughness": 0.6,
-      "textureUrl": "/reference/photos/front-sign.png"
+      "textureUrl": "/reference/photos/front-sign.png",
+      "opacity": 1.0
     },
     "photo-sign-dropoff": {
       "color": "#ffffff",
       "roughness": 0.6,
-      "textureUrl": "/reference/photos/dropoff-sign.png"
+      "textureUrl": "/reference/photos/dropoff-sign.png",
+      "opacity": 1.0
     },
     "photo-sign-clinic": {
       "color": "#ffffff",
@@ -31456,13 +31472,13 @@
       "roughness": 0.75
     },
     "om-stone": {
-      "name": "Light concrete exterior - brochure",
-      "color": "#d9d5ca",
+      "name": "Tan stucco exterior - Street View May 2025",
+      "color": "#d0c3a7",
       "roughness": 0.88
     },
     "om-blue": {
-      "name": "Blue standing-seam entry",
-      "color": "#3f6d7e",
+      "name": "Navy entry wall under the folded standing-seam roof",
+      "color": "#22395c",
       "roughness": 0.72
     },
     "om-glass": {
@@ -31470,6 +31486,24 @@
       "color": "#7b9294",
       "roughness": 0.27,
       "metalness": 0.16
+    },
+    "om-rollup": {
+      "name": "Tan roll-up loading door - Street View",
+      "color": "#b9aa89",
+      "roughness": 0.7,
+      "metalness": 0.2
+    },
+    "photo-sign-front-shadow": {
+      "color": "#ffffff",
+      "roughness": 1,
+      "opacity": 0.6,
+      "textureUrl": "/reference/photos/front-sign-shadow.png"
+    },
+    "photo-sign-dropoff-shadow": {
+      "color": "#ffffff",
+      "roughness": 1,
+      "opacity": 0.6,
+      "textureUrl": "/reference/photos/dropoff-sign-shadow.png"
     }
   },
   "programs": [
@@ -32771,7 +32805,7 @@
         -29.153605
       ],
       [
-        49.250767,
+        65.0,
         37.701259
       ]
     ],
@@ -32877,12 +32911,12 @@
       110,
       111
     ],
-    "notes": "Plan-derived site geometry, refined using the exterior photographs and aerials in the supplied 1819-1841 W Valley brochure. Current Seen fit-out and fleet retained; historical tenant signs omitted. Heights and concealed rear details remain estimates."
+    "notes": "Plan-derived site geometry, refined using the exterior photographs and aerials in the supplied 1819-1841 W Valley brochure. Current Seen fit-out and fleet retained; historical tenant signs omitted. Heights and concealed rear details remain estimates. Streets, sidewalks, both parking lots and the neighbour to the east re-measured on 2026-10-02 from the high-resolution aerial: Ethel curb 4 m west of the lot with lawn and sidewalk, Valley curb at z 31.2 with rounded returns, S Campbell curb at x 65 with the dialysis center at x 45-63."
   },
   "roofSections": [
     {
       "id": "central",
-      "kind": "barrel",
+      "kind": "flat",
       "bounds": [
         [
           -14.780318,
@@ -32894,7 +32928,7 @@
         ]
       ],
       "eaveHeight": 4.15,
-      "rise": 2.1,
+      "rise": 0,
       "referencePages": [
         92,
         19,
@@ -33122,12 +33156,12 @@
       "position": [
         -15.568941,
         2.8,
-        1.780761
+        0.8
       ],
       "dimensions": [
         1.5772456412452331,
         0.16,
-        9.565231630777543
+        5.6
       ],
       "material": "photo-bronze",
       "surface": "exterior",
@@ -33144,446 +33178,28 @@
       ]
     },
     {
-      "id": "west-entry-ramp",
+      "id": "west-entry-canopy-fascia",
       "position": [
-        -15.518062,
-        -0.16,
-        1.780761
+        -16.3,
+        2.24,
+        0.8
       ],
       "dimensions": [
-        1.271972291326801,
-        0.13,
-        9.158200497552967
-      ],
-      "material": "concrete",
-      "surface": "site",
-      "rotation": [
-        0.03,
-        0,
-        0
-      ],
-      "zoneId": null,
-      "status": "image-inferred",
-      "referencePages": [
-        66,
-        67,
-        69
-      ]
-    },
-    {
-      "id": "entry-rail-0",
-      "position": [
-        -16.433882,
-        0.82,
-        1.780761
-      ],
-      "dimensions": [
-        0.035,
-        0.035,
-        9.158200497552967
+        0.14,
+        0.72,
+        5.6
       ],
       "material": "photo-bronze",
-      "surface": "site",
+      "surface": "exterior",
       "rotation": [
         0,
         0,
         0
       ],
       "zoneId": null,
-      "status": "image-inferred",
+      "status": "photo-informed",
       "referencePages": [
-        109,
-        92
-      ]
-    },
-    {
-      "id": "entry-post-0-0",
-      "position": [
-        -16.433882,
-        -0.18,
-        -2.798339
-      ],
-      "dimensions": [
-        0.03,
-        1,
-        0.03
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "zoneId": null,
-      "status": "image-inferred",
-      "referencePages": [
-        109,
-        92
-      ]
-    },
-    {
-      "id": "entry-post-0-1",
-      "position": [
-        -16.433882,
-        -0.18,
-        -1.271972
-      ],
-      "dimensions": [
-        0.03,
-        1,
-        0.03
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "zoneId": null,
-      "status": "image-inferred",
-      "referencePages": [
-        109,
-        92
-      ]
-    },
-    {
-      "id": "entry-post-0-2",
-      "position": [
-        -16.433882,
-        -0.18,
-        0.254394
-      ],
-      "dimensions": [
-        0.03,
-        1,
-        0.03
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "zoneId": null,
-      "status": "image-inferred",
-      "referencePages": [
-        109,
-        92
-      ]
-    },
-    {
-      "id": "entry-post-0-3",
-      "position": [
-        -16.433882,
-        -0.18,
-        1.780761
-      ],
-      "dimensions": [
-        0.03,
-        1,
-        0.03
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "zoneId": null,
-      "status": "image-inferred",
-      "referencePages": [
-        109,
-        92
-      ]
-    },
-    {
-      "id": "entry-post-0-4",
-      "position": [
-        -16.433882,
-        -0.18,
-        3.307128
-      ],
-      "dimensions": [
-        0.03,
-        1,
-        0.03
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "zoneId": null,
-      "status": "image-inferred",
-      "referencePages": [
-        109,
-        92
-      ]
-    },
-    {
-      "id": "entry-post-0-5",
-      "position": [
-        -16.433882,
-        -0.18,
-        4.833495
-      ],
-      "dimensions": [
-        0.03,
-        1,
-        0.03
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "zoneId": null,
-      "status": "image-inferred",
-      "referencePages": [
-        109,
-        92
-      ]
-    },
-    {
-      "id": "entry-post-0-6",
-      "position": [
-        -16.433882,
-        -0.18,
-        6.359861
-      ],
-      "dimensions": [
-        0.03,
-        1,
-        0.03
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "zoneId": null,
-      "status": "image-inferred",
-      "referencePages": [
-        109,
-        92
-      ]
-    },
-    {
-      "id": "entry-rail-1",
-      "position": [
-        -14.805757,
-        0.82,
-        1.780761
-      ],
-      "dimensions": [
-        0.035,
-        0.035,
-        9.158200497552967
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "zoneId": null,
-      "status": "image-inferred",
-      "referencePages": [
-        109,
-        92
-      ]
-    },
-    {
-      "id": "entry-post-1-0",
-      "position": [
-        -14.805757,
-        -0.18,
-        -2.798339
-      ],
-      "dimensions": [
-        0.03,
-        1,
-        0.03
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "zoneId": null,
-      "status": "image-inferred",
-      "referencePages": [
-        109,
-        92
-      ]
-    },
-    {
-      "id": "entry-post-1-1",
-      "position": [
-        -14.805757,
-        -0.18,
-        -1.271972
-      ],
-      "dimensions": [
-        0.03,
-        1,
-        0.03
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "zoneId": null,
-      "status": "image-inferred",
-      "referencePages": [
-        109,
-        92
-      ]
-    },
-    {
-      "id": "entry-post-1-2",
-      "position": [
-        -14.805757,
-        -0.18,
-        0.254394
-      ],
-      "dimensions": [
-        0.03,
-        1,
-        0.03
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "zoneId": null,
-      "status": "image-inferred",
-      "referencePages": [
-        109,
-        92
-      ]
-    },
-    {
-      "id": "entry-post-1-3",
-      "position": [
-        -14.805757,
-        -0.18,
-        1.780761
-      ],
-      "dimensions": [
-        0.03,
-        1,
-        0.03
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "zoneId": null,
-      "status": "image-inferred",
-      "referencePages": [
-        109,
-        92
-      ]
-    },
-    {
-      "id": "entry-post-1-4",
-      "position": [
-        -14.805757,
-        -0.18,
-        3.307128
-      ],
-      "dimensions": [
-        0.03,
-        1,
-        0.03
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "zoneId": null,
-      "status": "image-inferred",
-      "referencePages": [
-        109,
-        92
-      ]
-    },
-    {
-      "id": "entry-post-1-5",
-      "position": [
-        -14.805757,
-        -0.18,
-        4.833495
-      ],
-      "dimensions": [
-        0.03,
-        1,
-        0.03
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "zoneId": null,
-      "status": "image-inferred",
-      "referencePages": [
-        109,
-        92
-      ]
-    },
-    {
-      "id": "entry-post-1-6",
-      "position": [
-        -14.805757,
-        -0.18,
-        6.359861
-      ],
-      "dimensions": [
-        0.03,
-        1,
-        0.03
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "zoneId": null,
-      "status": "image-inferred",
-      "referencePages": [
-        109,
-        92
+        109
       ]
     },
     {
@@ -34687,198 +34303,6 @@
       ]
     },
     {
-      "id": "photo-dropoff-horizontal-rail-0-0",
-      "position": [
-        -16.433882,
-        0.47,
-        1.780761
-      ],
-      "dimensions": [
-        0.033,
-        0.03,
-        9.158200497552967
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "status": "photograph geometry / heights estimated",
-      "referencePages": [
-        109
-      ]
-    },
-    {
-      "id": "photo-dropoff-horizontal-rail-0-1",
-      "position": [
-        -16.433882,
-        0.65,
-        1.780761
-      ],
-      "dimensions": [
-        0.033,
-        0.03,
-        9.158200497552967
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "status": "photograph geometry / heights estimated",
-      "referencePages": [
-        109
-      ]
-    },
-    {
-      "id": "photo-dropoff-horizontal-rail-0-2",
-      "position": [
-        -16.433882,
-        0.83,
-        1.780761
-      ],
-      "dimensions": [
-        0.033,
-        0.03,
-        9.158200497552967
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "status": "photograph geometry / heights estimated",
-      "referencePages": [
-        109
-      ]
-    },
-    {
-      "id": "photo-dropoff-horizontal-rail-0-3",
-      "position": [
-        -16.433882,
-        1.02,
-        1.780761
-      ],
-      "dimensions": [
-        0.033,
-        0.03,
-        9.158200497552967
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "status": "photograph geometry / heights estimated",
-      "referencePages": [
-        109
-      ]
-    },
-    {
-      "id": "photo-dropoff-horizontal-rail-1-0",
-      "position": [
-        -14.805757,
-        0.47,
-        1.780761
-      ],
-      "dimensions": [
-        0.033,
-        0.03,
-        9.158200497552967
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "status": "photograph geometry / heights estimated",
-      "referencePages": [
-        109
-      ]
-    },
-    {
-      "id": "photo-dropoff-horizontal-rail-1-1",
-      "position": [
-        -14.805757,
-        0.65,
-        1.780761
-      ],
-      "dimensions": [
-        0.033,
-        0.03,
-        9.158200497552967
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "status": "photograph geometry / heights estimated",
-      "referencePages": [
-        109
-      ]
-    },
-    {
-      "id": "photo-dropoff-horizontal-rail-1-2",
-      "position": [
-        -14.805757,
-        0.83,
-        1.780761
-      ],
-      "dimensions": [
-        0.033,
-        0.03,
-        9.158200497552967
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "status": "photograph geometry / heights estimated",
-      "referencePages": [
-        109
-      ]
-    },
-    {
-      "id": "photo-dropoff-horizontal-rail-1-3",
-      "position": [
-        -14.805757,
-        1.02,
-        1.780761
-      ],
-      "dimensions": [
-        0.033,
-        0.03,
-        9.158200497552967
-      ],
-      "material": "photo-bronze",
-      "surface": "site",
-      "rotation": [
-        0,
-        0,
-        0
-      ],
-      "status": "photograph geometry / heights estimated",
-      "referencePages": [
-        109
-      ]
-    },
-    {
       "id": "east-roof-step",
       "position": [
         0,
@@ -35028,19 +34452,19 @@
         "openings": [
           {
             "id": "shell-therapy-north-opening-1",
-            "offset": 3.765038,
-            "width": 4.222948,
+            "offset": 3.25,
+            "width": 1.1,
             "sill": 0,
-            "height": 2.35,
+            "height": 2.2,
             "kind": "door",
             "material": "om-glass"
           },
           {
             "id": "shell-therapy-north-opening-2",
-            "offset": 8.395017,
-            "width": 4.477342,
+            "offset": 8.1,
+            "width": 3.6,
             "sill": 0,
-            "height": 2.35,
+            "height": 2.3,
             "kind": "door",
             "material": "om-glass"
           }
@@ -35069,17 +34493,17 @@
         "openings": [
           {
             "id": "shell-lobby-west-opening-1",
-            "offset": 5.647557,
-            "width": 1.475488,
-            "sill": 0.65,
-            "height": 1.65,
-            "kind": "window",
-            "material": "om-glass"
+            "offset": 5.65,
+            "width": 1.1,
+            "sill": 0,
+            "height": 2.2,
+            "kind": "door",
+            "material": "photo-white"
           },
           {
             "id": "shell-lobby-west-opening-2",
-            "offset": 7.479197,
-            "width": 1.526367,
+            "offset": 7.3,
+            "width": 1.4,
             "sill": 0.65,
             "height": 1.65,
             "kind": "window",
@@ -35087,10 +34511,10 @@
           },
           {
             "id": "shell-lobby-west-opening-3",
-            "offset": 9.259958,
-            "width": 1.271972,
+            "offset": 8.9,
+            "width": 1.75,
             "sill": 0,
-            "height": 2.2,
+            "height": 2.3,
             "kind": "door",
             "material": "om-glass"
           }
@@ -35161,136 +34585,18 @@
         "openings": [
           {
             "id": "shell-clinic-north-opening-1",
-            "offset": 8.547654,
-            "width": 1.119336,
+            "offset": 7.6,
+            "width": 3.2,
             "sill": 0,
-            "height": 2.15,
+            "height": 3.0,
             "kind": "door",
-            "material": "photo-white"
+            "material": "om-rollup"
           }
         ],
         "status": "plan-traced perimeter / inferred elevation and opening heights",
         "referencePages": [
           92,
           19
-        ],
-        "profile": [
-          [
-            0,
-            4.15
-          ],
-          [
-            0.527869,
-            4.385125
-          ],
-          [
-            1.055737,
-            4.617294
-          ],
-          [
-            1.583606,
-            4.843586
-          ],
-          [
-            2.111474,
-            5.061156
-          ],
-          [
-            2.639343,
-            5.267267
-          ],
-          [
-            3.167211,
-            5.459329
-          ],
-          [
-            3.69508,
-            5.634924
-          ],
-          [
-            4.222948,
-            5.791846
-          ],
-          [
-            4.750817,
-            5.928121
-          ],
-          [
-            5.278685,
-            6.042035
-          ],
-          [
-            5.806554,
-            6.132155
-          ],
-          [
-            6.334422,
-            6.197349
-          ],
-          [
-            6.862291,
-            6.236796
-          ],
-          [
-            7.390159,
-            6.25
-          ],
-          [
-            7.918028,
-            6.236796
-          ],
-          [
-            8.445896,
-            6.197349
-          ],
-          [
-            8.973765,
-            6.132155
-          ],
-          [
-            9.501633,
-            6.042035
-          ],
-          [
-            10.029502,
-            5.928121
-          ],
-          [
-            10.55737,
-            5.791846
-          ],
-          [
-            11.085239,
-            5.634924
-          ],
-          [
-            11.613107,
-            5.459329
-          ],
-          [
-            12.140976,
-            5.267267
-          ],
-          [
-            12.668844,
-            5.061156
-          ],
-          [
-            13.196713,
-            4.843586
-          ],
-          [
-            13.724581,
-            4.617294
-          ],
-          [
-            14.25245,
-            4.385125
-          ],
-          [
-            14.780318,
-            4.15
-          ]
         ]
       },
       {
@@ -35785,7 +35091,7 @@
         "openings": [
           {
             "id": "shell-day-front-om-0",
-            "offset": 1.65,
+            "offset": 4.5,
             "width": 3.55,
             "sill": 0.35,
             "height": 2.78,
@@ -35794,7 +35100,7 @@
           },
           {
             "id": "shell-day-front-om-1",
-            "offset": 8.85,
+            "offset": 11.1,
             "width": 3.55,
             "sill": 0.35,
             "height": 2.78,
@@ -36244,7 +35550,7 @@
         ]
       }
     ],
-    "notes": "Two continuous plan-registered perimeter loops. Rear elevations and opening heights are best-effort inferred; no unseen windows or furnishings are claimed as measured. Photo-informed therapy frontage is retained. Closed opening panels remain individually swappable by material and dimensions."
+    "notes": "Two continuous plan-registered perimeter loops. Rear elevations and opening heights are best-effort inferred; no unseen windows or furnishings are claimed as measured. Photo-informed therapy frontage is retained. Closed opening panels remain individually swappable by material and dimensions. Lot-side openings, flat roofs and tan stucco checked against Google Street View (May 2025 imagery) on 2026-10-01."
   },
   "upstairsSurvey": {
     "date": "2026-09-19",

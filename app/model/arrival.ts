@@ -1,6 +1,7 @@
 import * as T from 'three';
 import { buildAsset } from './assets';
 import {
+  FLEET_LOT,
   fleetParking,
   fleetVanLetter,
   extraVanWindows,
@@ -8,12 +9,25 @@ import {
 } from './alhambra-fleet';
 import { FLEET_VAN_CAB_DOOR, FLEET_VAN_RAMP } from './photo-assets';
 import type { Facility, Vec2 } from './schema';
+/** Van-local (x, z) → world for the van docked at the drop-off, to the millimetre. */
+const atDock = ([x, z]: Vec2): Vec2 => {
+  const [dx, dz] = FLEET_LOT.dock,
+    c = Math.cos(FLEET_LOT.dockHeading),
+    s = Math.sin(FLEET_LOT.dockHeading),
+    mm = (v: number) => Math.round(v * 1000) / 1000;
+  return [mm(dx + x * c + z * s), mm(dz - x * s + z * c)];
+};
+/**
+ * The drop-off: where the vans dock, the docked van's deployed ramp (sill at
+ * its sliding door, foot on the lot) and the sliding entrance. The landing
+ * and switchback ramp up to the entrance are the exterior's (`DROP_OFF` in
+ * alhambra-exterior.ts).
+ */
 export const ARRIVAL = {
-  dock: [-20.5, 1.5] as Vec2,
+  dock: FLEET_LOT.dock,
   door: [-14.653121, -0.992] as Vec2,
-  rampX: -15.518,
-  rampBottomZ: 5.5,
-  rampTopZ: -0.992,
+  sill: atDock(FLEET_VAN_RAMP.sill),
+  foot: atDock(FLEET_VAN_RAMP.foot),
   streetY: -0.23,
   vanFloorY: 0.35,
 };
@@ -65,9 +79,8 @@ export function buildArrival(
       opacity,
       depthWrite: opacity === 1,
     });
-  // Pale concrete ramp, satin rails and a deep-green entrance header.
-  const stone = mat('#e2ddd3'),
-    silver = mat('#c4c7c4'),
+  // Satin door frames and a deep-green entrance header.
+  const silver = mat('#c4c7c4'),
     teal = mat('#1f4d3a'),
     glass = mat('#d4e0df', 0.36);
   const box = (
@@ -86,51 +99,6 @@ export function buildArrival(
     parent.add(o);
     return o;
   };
-  const rod = (
-    a: T.Vector3,
-    b: T.Vector3,
-    parent: T.Object3D,
-    m = silver,
-    r = 0.018,
-  ) => {
-    const o = new T.Mesh(new T.CylinderGeometry(r, r, a.distanceTo(b), 12), m);
-    o.position.copy(a).add(b).multiplyScalar(0.5);
-    o.quaternion.setFromUnitVectors(
-      new T.Vector3(0, 1, 0),
-      b.clone().sub(a).normalize(),
-    );
-    o.castShadow = true;
-    parent.add(o);
-  };
-  // A sloping approach and a level right-hand landing align with the existing west entrance.
-  const length = ARRIVAL.rampBottomZ - ARRIVAL.rampTopZ,
-    c = ARRIVAL.rampX;
-  const ramp = box(
-    entry,
-    c,
-    -0.29,
-    (ARRIVAL.rampTopZ + ARRIVAL.rampBottomZ) / 2,
-    1.28,
-    0.1,
-    Math.hypot(length, 0.23),
-    stone,
-  );
-  ramp.position.y = -0.165;
-  ramp.rotation.x = Math.atan2(0.23, length);
-  ramp.name = 'main-wheelchair-ramp';
-  box(entry, -15.13, -0.1, -0.992, 2.06, 0.1, 1.28, stone);
-  for (const x of [c - 0.61, c + 0.61]) {
-    const z1 = 5.5,
-      z2 = x > c ? 0.25 : -0.99,
-      y2 = -0.23 + (0.23 * (5.5 - z2)) / length;
-    rod(new T.Vector3(x, 0.68, z1), new T.Vector3(x, y2 + 0.91, z2), entry);
-    for (let i = 0; i <= 5; i++) {
-      const z = z1 + ((z2 - z1) * i) / 5,
-        y = -0.23 + (0.23 * (5.5 - z)) / length;
-      rod(new T.Vector3(x, y, z), new T.Vector3(x, y + 0.91, z), entry);
-    }
-  }
-  // East rail ends at the landing so the right turn into the door stays open.
   box(entry, -14.653, 2.2, -0.992, 0.16, 0.14, 1.49, teal);
   const leaves: T.Group[] = [];
   for (const sign of [-1, 1]) {
@@ -156,16 +124,15 @@ export function buildArrival(
     root.add(van.root);
     return van;
   });
-  // Paint real 6.9m van stalls around the parked vehicle footprints, in each
-  // bay's own frame (local +z is the rear of the parked van).
+  // A wheel stop at the rear of each lot bay, in the bay's own frame (local +z
+  // is the rear of the parked van). The stall lines are the site's (the aerial's
+  // stripes in neighborhood.ts), and the curb spots on Ethel get nothing.
   for (const bay of fleetParking) {
+    if (bay.heading !== -Math.PI / 2) continue;
     const stall = new T.Group();
     stall.position.set(bay.x, 0, bay.z);
     stall.rotation.y = bay.heading;
     root.add(stall);
-    for (const x of [-1.4, 1.4])
-      box(stall, x, -0.208, 0, 0.07, 0.012, 6.9, mat('#ebe9dc'));
-    box(stall, 0, -0.208, 3.45, 2.8, 0.012, 0.07, mat('#ebe9dc'));
     box(stall, 0, -0.19, 2.7, 1.8, 0.09, 0.14, mat('#d7c389'));
   }
   let doorOpen = 0;

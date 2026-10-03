@@ -1,14 +1,18 @@
 // Run after compile-model-modules.mjs. Checks the distributed-care layer over
-// the whole 720 s day: community vehicles keep clear of the fleet, the delivery
-// trucks, the street cars and each other at 50 Hz; drive nose-first with no
-// hairpins or reversing; keep doors and ramps shut while moving; and the
-// community cast's tracks are contiguous, walk at human speeds on the drawn
-// pads, stubs or the center's site, ride only in registered seats and never
-// stand in each other.
+// the whole 720 s day: every pad's access stub joins its street at the near
+// edge and stays off the streets; community vehicles keep clear of the fleet,
+// the delivery trucks, the street cars and each other at 50 Hz; drive
+// nose-first with no hairpins or reversing; keep doors and ramps shut while
+// moving; and the community cast's tracks are contiguous, walk at human
+// speeds on the drawn pads, stubs or the center's site, ride only in
+// registered seats and never stand in each other.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { Vector3 } from 'three';
 import { sampleVan } from '../work/validation/arrival.mjs';
+import { streetSlabs } from '../work/validation/neighborhood.mjs';
+import { STUB_SIDEWALK } from '../work/validation/community-pads.mjs';
+import { REAR_COURT_PLANTERS } from '../work/validation/alhambra-exterior.mjs';
 import {
   fleetParking,
   fleetVanId,
@@ -34,6 +38,7 @@ import {
   settingZone,
   streetZ,
   toLocal,
+  toWorld,
 } from '../work/validation/community-settings.mjs';
 import {
   activityData,
@@ -56,24 +61,6 @@ const body = (p, kind) => ({
   halfWidth: DIMENSIONS[kind][0],
   halfLength: DIMENSIONS[kind][1],
 });
-const parkedCars = [
-  [3240, 857, 0.78],
-  [3290, 1520, 0.78],
-].map(([x, z, heading]) =>
-  body(
-    {
-      position: new Vector3(
-        (x - model.calibration.sourcePixelOrigin[0]) /
-          model.calibration.pixelsPerMeter,
-        0,
-        (z - model.calibration.sourcePixelOrigin[1]) /
-          model.calibration.pixelsPerMeter,
-      ),
-      heading,
-    },
-    'car',
-  ),
-);
 const others = (time) => [
   ...Array.from({ length: 8 }, (_, i) => ({
     id: fleetVanId(i),
@@ -88,13 +75,93 @@ const others = (time) => [
     street: true,
     ...body(sampleStreetCar(i, time), 'car'),
   })),
-  ...parkedCars.map((c, i) => ({ id: `parked-${i}`, ...c })),
 ];
 const mine = (time) =>
   communityVehicles.map((v) => ({
     id: v.id,
     ...body(sampleCommunityVehicle(v.id, time), v.kind),
   }));
+
+// --- Access stubs -----------------------------------------------------------
+// A pad's stub runs along its centre-line from the edge of the street it
+// joins (`road.from`: street just beyond it, none on the pad's side) to the
+// pad's front edge (`road.to`). Drawn from the front edge to `road.from`, its
+// drive legs and the raised sidewalk beside the entry leg (community-pads.ts)
+// never lie on a street, and the walk's street-end anchors stand on that
+// sidewalk. The streets are the slabs the scene draws (neighborhood.ts
+// `streetSlabs`).
+const slabs = streetSlabs();
+const onStreet = ([x, z]) =>
+  slabs.some(
+    ({ min, max }) => x > min[0] && x < max[0] && z > min[1] && z < max[1],
+  );
+const at = (p) => `(${p.map((v) => v.toFixed(1)).join(', ')})`;
+let stubs = 0;
+for (const s of careSettings) {
+  const [fromX, fromZ] = toLocal(s, s.road.from),
+    [toX, toZ] = toLocal(s, s.road.to),
+    front = frontZ(s);
+  assert(
+    Math.abs(fromX) < 1e-6 && Math.abs(toX) < 1e-6,
+    `${s.id}: the access stub ${at(s.road.from)} → ${at(s.road.to)} is off the pad's centre-line`,
+  );
+  const beyond = onStreet(toWorld(s, [0, fromZ + 0.01])),
+    padSide = onStreet(toWorld(s, [0, fromZ - 0.01]));
+  assert(
+    beyond && !padSide,
+    `${s.id}: road.from ${at(s.road.from)} is not on the near edge of the street it joins (${
+      padSide && !beyond
+        ? 'it is on the far edge, so the stub crosses the street'
+        : padSide
+          ? 'it is inside the street'
+          : 'there is no street beyond it'
+    })`,
+  );
+  assert(
+    Math.abs(toZ - front) < 1e-6,
+    `${s.id}: road.to ${at(s.road.to)} is ${(toZ - front).toFixed(2)} m from the pad's front edge`,
+  );
+  const r = laneRadius(s, s.drive.lanes - 1) + LANE / 2,
+    walk = [
+      r + STUB_SIDEWALK.offset - STUB_SIDEWALK.width / 2,
+      r + STUB_SIDEWALK.offset + STUB_SIDEWALK.width / 2,
+    ],
+    corners = [
+      [-r, front],
+      [walk[1], front],
+      [walk[1], fromZ],
+      [-r, fromZ],
+    ].map((p) => toWorld(s, p)),
+    xs = corners.map((p) => p[0]),
+    zs = corners.map((p) => p[1]),
+    [x0, x1, z0, z1] = [
+      Math.min(...xs),
+      Math.max(...xs),
+      Math.min(...zs),
+      Math.max(...zs),
+    ],
+    crossed = slabs.find(
+      ({ min, max }) =>
+        x0 < max[0] - 1e-6 &&
+        x1 > min[0] + 1e-6 &&
+        z0 < max[1] - 1e-6 &&
+        z1 > min[1] + 1e-6,
+    );
+  assert(
+    !crossed,
+    crossed &&
+      `${s.id}: the access stub (x ${x0.toFixed(1)}–${x1.toFixed(1)}, z ${z0.toFixed(1)}–${z1.toFixed(1)}) lies on the street slab ${at(crossed.min)}–${at(crossed.max)}`,
+  );
+  for (const [name, p] of Object.entries(s.anchors)) {
+    if (!name.startsWith('sidewalkEnd')) continue;
+    const [x, z] = toLocal(s, p);
+    assert(
+      x >= walk[0] && x <= walk[1] && z >= front && z <= fromZ + 1e-6,
+      `${s.id}: ${name} ${at(p)} is off the stub's sidewalk`,
+    );
+  }
+  stubs++;
+}
 
 // --- Vehicles ---------------------------------------------------------------
 // Presentation comes from the registry: every van wears its own livery letter
@@ -356,6 +423,25 @@ const groundOrSite = activityData.actors.filter(
 );
 const nearCenter = (p) =>
   p.x >= siteX0 - 2 && p.x <= siteX1 + 2 && p.z >= siteZ0 - 2 && p.z <= siteZ1 + 2;
+// On the center's site, people on foot stay out of the building (its plan
+// outline) and a body's width clear of the rear court's planters.
+const building = model.site.buildingOutline;
+const inBuilding = (p) => {
+  let odd = false;
+  for (let i = 0, j = building.length - 1; i < building.length; j = i++) {
+    const [ax, az] = building[i],
+      [bx, bz] = building[j];
+    if (az > p.z !== bz > p.z && p.x < ((bx - ax) * (p.z - az)) / (bz - az) + ax)
+      odd = !odd;
+  }
+  return odd;
+};
+const BODY = 0.25;
+const inPlanter = (p) =>
+  REAR_COURT_PLANTERS.some(
+    ([x0, z0, x1, z1]) =>
+      p.x > x0 - BODY && p.x < x1 + BODY && p.z > z0 - BODY && p.z < z1 + BODY,
+  );
 let samples = 0,
   nearest = Infinity;
 for (let t = 0; t < 720; t += 0.5) {
@@ -373,6 +459,16 @@ for (let t = 0; t < 720; t += 0.5) {
       check(
         d >= 0.55,
         `${a.id} and ${b.id} are ${d.toFixed(2)} m apart at ${t}s ("${p.title}" / "${q.title}")`,
+      );
+    }
+    if (a.levelId === 'site' && !p.inVehicle && nearCenter(p)) {
+      check(
+        !inBuilding(p),
+        `${a.id} walks through the center's building at (${p.x.toFixed(2)}, ${p.z.toFixed(2)}), ${t}s ("${p.title}")`,
+      );
+      check(
+        !inPlanter(p),
+        `${a.id} walks through a rear court planter at (${p.x.toFixed(2)}, ${p.z.toFixed(2)}), ${t}s ("${p.title}")`,
       );
     }
     if (a.levelId === 'site' && !p.inVehicle && nearCenter(p))
@@ -400,6 +496,6 @@ const radii = [...motion.entries()]
   )
   .join('; ');
 console.log(
-  `Community traffic: ${pairs.toLocaleString()} vehicle-pair checks over 12 minutes at 50 Hz; minimum gap ${closest.toFixed(2)} m (street traffic ${streetClosest.toFixed(2)} m). Turn radii and top speeds: ${radii}. ` +
+  `Community traffic: ${stubs} access stubs join their streets at the near edge and stay off them. ${pairs.toLocaleString()} vehicle-pair checks over 12 minutes at 50 Hz; minimum gap ${closest.toFixed(2)} m (street traffic ${streetClosest.toFixed(2)} m). Turn radii and top speeds: ${radii}. ` +
     `Cast: ${source.actors.length} people, ${source.interactions.length} touchpoints, ${walks} walks (max ${maxGait.toFixed(2)} m/s), ${samples.toLocaleString()} placement samples, nearest ${nearest.toFixed(2)} m.`,
 );

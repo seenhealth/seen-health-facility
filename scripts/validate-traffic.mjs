@@ -1,12 +1,12 @@
 // Run after compile-model-modules.mjs; checks the complete repeating day at 50 Hz.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { Vector3 } from 'three';
+import { Box3, Vector3 } from 'three';
 import {
   sampleVan,
   alhambraVanWindows,
-  ARRIVAL,
 } from '../work/validation/arrival.mjs';
+import { DROP_OFF } from '../work/validation/alhambra-exterior.mjs';
 import {
   FLEET_LOT,
   fleetParking,
@@ -16,12 +16,30 @@ import {
 } from '../work/validation/alhambra-fleet.mjs';
 import {
   deliveryStops,
+  receivingRamp,
   sampleDelivery,
 } from '../work/validation/deliveries.mjs';
+import {
+  buildAlhambraExterior,
+  REAR_COURT_PLANTERS,
+} from '../work/validation/alhambra-exterior.mjs';
 import { sampleStreetCar } from '../work/validation/traffic-routes.mjs';
 import { vehicleGap } from '../work/validation/vehicle-clearance.mjs';
 import { buildSiteArrival } from '../work/validation/site-arrival.mjs';
-import { siteCurbs, STREET_EXTENT } from '../work/validation/neighborhood.mjs';
+import {
+  buildNeighborhood,
+  siteCurbs,
+  STREET_EXTENT,
+} from '../work/validation/neighborhood.mjs';
+import {
+  careSettings,
+  frontZ,
+  LANE,
+  laneRadius,
+  streetZ,
+  toWorld,
+  worldDir,
+} from '../work/validation/community-settings.mjs';
 import { validateFacility } from '../work/validation/schema.mjs';
 
 const body = (p, kind) => ({
@@ -43,22 +61,6 @@ assert(Math.abs(vehicleGap(box(0, 0), box(5, 0, Math.PI / 2)) - 1) < 1e-10);
 const m = JSON.parse(
   fs.readFileSync('public/models/seen-alhambra-planning.json'),
 );
-const parkedCars = [
-  [3240, 857, 0.78],
-  [3290, 1520, 0.78],
-].map(([x, z, heading]) =>
-  body(
-    {
-      position: new Vector3(
-        (x - m.calibration.sourcePixelOrigin[0]) / m.calibration.pixelsPerMeter,
-        0,
-        (z - m.calibration.sourcePixelOrigin[1]) / m.calibration.pixelsPerMeter,
-      ),
-      heading,
-    },
-    'car',
-  ),
-);
 const VANS = fleetParking.length;
 /**
  * Every moving vehicle: fleet vans, delivery trucks and street cars. `nose` is
@@ -70,10 +72,8 @@ const movers = [
   ...deliveryStops.map((stop, i) => ({ name: `Truck ${stop.id}`, kind: 'truck', nose: -1, sample: (t) => sampleDelivery(i, t) })),
   ...[0, 1].map((i) => ({ name: `Street car ${i}`, kind: 'car', nose: 1, sample: (t) => sampleStreetCar(i, t) })),
 ];
-const samples = (time) => [...movers.map((v) => body(v.sample(time), v.kind)), ...parkedCars];
-/** Name of entry `i` of `samples(time)`: a mover, or one of the parked cars after them. */
-const vehicleName = (i) => movers[i]?.name ?? `Parked car ${i - movers.length + 1}`;
-const streetCar = (i) => movers[i]?.kind === 'car';
+const samples = (time) => movers.map((v) => body(v.sample(time), v.kind));
+const streetCar = (i) => movers[i].kind === 'car';
 
 // Driveway: one maneuver on the lot at a time, four seconds apart.
 const reservations = fleetReservations(alhambraVanWindows);
@@ -95,9 +95,10 @@ for (let i = 0; i < VANS; i++)
     if (s.kind === 'parked') assert(v.phase.startsWith('Parked'), `${fleetVanLabel(i)} parked at ${(s.start + s.end) / 2}`);
   }
 
-// Lot obstacles a van must keep clear of: the building, the entrance ramp and
-// its landing, the curb islands and the west sidewalk (vans cross the south
-// sidewalk only at the driveway).
+// Lot obstacles a van must keep clear of: the building, the drop-off's
+// landing, switchback ramp, their rails and the palm planter at the foot of
+// its steps (alhambra-exterior.ts DROP_OFF), the curb islands and the west
+// sidewalk (vans cross the south sidewalk only at the driveway).
 const rect = (x0, z0, x1, z1) => [
   [x0, z0],
   [x1, z0],
@@ -107,12 +108,44 @@ const rect = (x0, z0, x1, z1) => [
 const curbs = siteCurbs(m);
 const obstacles = [
   ['building', m.site.buildingOutline],
-  [
-    'entrance ramp',
-    rect(ARRIVAL.rampX - 0.64, ARRIVAL.rampTopZ, ARRIVAL.rampX + 0.64, ARRIVAL.rampBottomZ),
-  ],
-  ['ramp landing', rect(-16.16, -1.632, -14.1, -0.352)],
+  ...['drop-off landing and upper run', 'ramp turn landing', 'ramp lower run'].map((name, i) => [name, DROP_OFF.outlines[i]]),
+  ...Object.entries(DROP_OFF.rails).map(([id, r]) => [`drop-off ${id} rail`, [[r.x, r.z0], [r.x, r.z1]]]),
+  ['lobby palm planter', DROP_OFF.planterOutline],
   ['west sidewalk', curbs.sidewalks[0]],
+  ...curbs.islands.map((p, i) => [`curb island ${i}`, p]),
+];
+// What the exterior draws in the rear court up to a truck's roof (the staff
+// entrance's landing and pergola, the garage wall, its hood and gate, the
+// utility pole), read from the drawn meshes so the check follows the court
+// as its photographs refine it.
+const TRUCK_ROOF = 3.2;
+const rearCourtSolids = (() => {
+  const { facade } = buildAlhambraExterior(m);
+  facade.updateMatrixWorld(true);
+  const court = facade.getObjectByName('rear-court-staff-entrance-and-loading'),
+    found = [],
+    b = new Box3();
+  court?.traverse((o) => {
+    if (!o.isMesh) return;
+    b.setFromObject(o);
+    if (b.min.y < TRUCK_ROOF && b.max.y > 0.05)
+      found.push([`rear court exterior ${found.length}`, rect(b.min.x, b.min.z, b.max.x, b.max.z)]);
+  });
+  assert(found.length > 5, "the exterior draws the rear court's staff entrance, garage wall and pole");
+  return found;
+})();
+// Obstacles a delivery truck must keep clear of on its way in and out of the
+// rear court: the building and its receiving ramps, the court's planters and
+// exterior, and every curb island and sidewalk of the site.
+const truckObstacles = [
+  ['building', m.site.buildingOutline],
+  ...deliveryStops.map((s) => {
+    const r = receivingRamp(s);
+    return [`${s.kind} receiving ramp`, rect(r.x0, r.z0, r.x1, r.z1)];
+  }),
+  ...REAR_COURT_PLANTERS.map((r, i) => [`rear court planter ${i}`, rect(...r)]),
+  ...rearCourtSolids,
+  ...curbs.sidewalks.map((p, i) => [`sidewalk ${i}`, p]),
   ...curbs.islands.map((p, i) => [`curb island ${i}`, p]),
 ];
 const inside = (p, poly) => {
@@ -159,8 +192,8 @@ const footprint = (v) => {
     [-1, -1],
     [-1, 1],
   ].map(([a, b]) => [
-    v.position.x + fx * 3.175 * a + fz * 1.125 * b,
-    v.position.z + fz * 3.175 * a - fx * 1.125 * b,
+    v.position.x + fx * v.halfLength * a + fz * v.halfWidth * b,
+    v.position.z + fz * v.halfLength * a - fx * v.halfWidth * b,
   ]);
 };
 const LOT_CLEARANCE = 0.3;
@@ -213,6 +246,7 @@ function checkMotion(name, kind, nose, a, later, time) {
 let closest = Infinity,
   streetClosest = Infinity,
   lotClosest = Infinity,
+  courtClosest = Infinity,
   pairs = 0;
 for (let frame = 0; frame < 36000; frame++) {
   const time = frame / 50,
@@ -228,16 +262,22 @@ for (let frame = 0; frame < 36000; frame++) {
       const margin = streetCar(i) || streetCar(j) ? 0.85 : 0.5;
       assert(
         gap >= margin,
-        `${vehicleName(i)} and ${vehicleName(j)} have only ${gap.toFixed(3)} m at ${time}s`,
+        `${movers[i].name} and ${movers[j].name} have only ${gap.toFixed(3)} m at ${time}s`,
       );
       closest = Math.min(closest, gap);
       if (margin === 0.85) streetClosest = Math.min(streetClosest, gap);
       pairs++;
     }
-    if (i >= movers.length) continue;
     const mover = movers[i],
       later = mover.sample(time + 0.02);
     checkMotion(mover.name, mover.kind, mover.nose, a, later, time);
+    // Delivery trucks: rear-court obstacles, ten times a second.
+    if (mover.kind === 'truck' && frame % 5 === 0)
+      for (const [name, poly] of truckObstacles) {
+        const gap = polygonGap(footprint(a), poly);
+        courtClosest = Math.min(courtClosest, gap);
+        assert(gap >= LOT_CLEARANCE, `${mover.name} is ${gap.toFixed(2)} m from the ${name} at ${time}s ("${a.phase}")`);
+      }
     if (i >= VANS) continue;
     const next = sampleVan(i, time + 0.002);
     const movement = next.position.clone().sub(a.position);
@@ -287,6 +327,39 @@ for (let frame = 0; frame < 36000; frame++) {
     }
   }
 }
+// Parking stalls are painted off the street roadways and across no pad's drive
+// stub (its two legs, the island between them and its sidewalk), so no vehicle
+// drives over them: every drawn stall line against every drawn roadway slab
+// and every stub, as oriented boxes (the vehicles' footprint test).
+const asBox = (mesh) => {
+  const { width, depth } = mesh.geometry.parameters,
+    r = mesh.rotation.y;
+  return { position: mesh.position, heading: Math.atan2(Math.cos(r), -Math.sin(r)), halfLength: width / 2, halfWidth: depth / 2 };
+};
+const drawn = (root, name) => {
+  const found = [];
+  root.traverse((o) => o.name === name && found.push(asBox(o)));
+  return found;
+};
+const { root: neighborhood } = buildNeighborhood(m);
+const stallLines = drawn(neighborhood, 'parking-stall-line');
+const paved = [
+  ...drawn(neighborhood, 'street-roadway').map((b) => ['street roadway', b]),
+  ...careSettings.map((s) => {
+    const rOut = laneRadius(s, s.drive.lanes - 1) + LANE / 2,
+      [x0, x1] = [-rOut, rOut + 1.65],
+      [z0, z1] = [frontZ(s), streetZ(s)],
+      [cx, cz] = toWorld(s, [(x0 + x1) / 2, (z0 + z1) / 2]),
+      [dx, dz] = worldDir(s, [0, 1]);
+    return [`${s.id} drive stub`, { position: new Vector3(cx, 0, cz), heading: Math.atan2(dx, dz), halfLength: (z1 - z0) / 2, halfWidth: (x1 - x0) / 2 }];
+  }),
+];
+assert(stallLines.length > 40 && paved.length > 10, 'the neighborhood draws its stall lines and roadways');
+for (const line of stallLines)
+  for (const [name, box] of paved) {
+    const gap = vehicleGap(line, box);
+    assert(gap > -0.001, `A stall line at (${line.position.x.toFixed(1)}, ${line.position.z.toFixed(1)}) is painted ${(-gap).toFixed(2)} m into the ${name}`);
+  }
 // Deterministic sampling preserves the same collision-free schedule at any speed,
 // when scrubbing backward, and when the animation repeats.
 for (const t of [0, 130.8, 280.76, 460.74, 489.56, 719.98])
@@ -311,5 +384,5 @@ const radii = [...tightest]
   .map(([kind, { radius, at }]) => `${kind} ${radius.toFixed(2)} m (${at})`)
   .join('; ');
 console.log(
-  `${pairs.toLocaleString()} vehicle-pair checks passed over 12 minutes at 50 Hz; minimum gap ${closest.toFixed(2)} m, street-traffic gap ${streetClosest.toFixed(2)} m, lot obstacles ${lotClosest.toFixed(2)} m. Fades stay on the drawn street: van centres at |z| ${fadeBand.from.toFixed(1)}–${fadeBand.to.toFixed(1)} m, bodies to ${fadeBand.reach.toFixed(1)} m (street drawn to ${STREET_EXTENT.z} m). Driveway yielding, parking, orientation, doors, reverse, fades and loop continuity passed. Every fleet van, delivery truck, street car and the Olympic/Alveare vans (${siteSamples.toLocaleString()} site samples) drive nose-first outside reversing phases, never jump and turn no tighter than ${MIN_TURN_RADIUS} m; tightest: ${radii}.`,
+  `${pairs.toLocaleString()} vehicle-pair checks passed over 12 minutes at 50 Hz; minimum gap ${closest.toFixed(2)} m, street-traffic gap ${streetClosest.toFixed(2)} m, lot obstacles ${lotClosest.toFixed(2)} m, delivery trucks' rear-court obstacles ${courtClosest.toFixed(2)} m. Fades stay on the drawn street: van centres at |z| ${fadeBand.from.toFixed(1)}–${fadeBand.to.toFixed(1)} m, bodies to ${fadeBand.reach.toFixed(1)} m (street drawn to ${STREET_EXTENT.z} m). Driveway yielding, parking, orientation, doors, reverse, fades and loop continuity passed; ${stallLines.length} stall lines clear of the street roadways and the pads' drive stubs. Every fleet van, delivery truck, street car and the Olympic/Alveare vans (${siteSamples.toLocaleString()} site samples) drive nose-first outside reversing phases, never jump and turn no tighter than ${MIN_TURN_RADIUS} m; tightest: ${radii}.`,
 );

@@ -14,8 +14,8 @@ import {
  * Distributed-care settings around the Seen center: the registry that the
  * pads (geometry), vehicles (routes), people (tracks) and camera framings all
  * read. Data only, no three.js. Metres, +x east, +z toward the viewer; the
- * ring streets are at z≈41.3 / z≈-32.3 / x≈-44.4 / x≈54 and every pad sits on
- * the paper ground beyond them.
+ * ring streets are neighborhood.ts `STREET_BEDS` and every pad sits on the
+ * paper ground beyond them.
  *
  * Each setting has its own local frame: the pad centre is the origin, local +z
  * points at the access road (the "front"), local +x is to the right when
@@ -85,7 +85,11 @@ export type CareSetting = {
   heading: number;
   /** `back` extends the pad behind its origin (local −z) without moving the front edge. */
   pad: { w: number; d: number; back?: number };
-  /** Access stub centre-line from the ring-street edge to the pad edge. */
+  /**
+   * Access stub centre-line: from the near edge of the ring street it joins
+   * (`from`) to the pad's front edge (`to`), as validate-community-traffic.mjs
+   * checks.
+   */
   road: { from: Vec2; to: Vec2 };
   drive: DriveLoop;
   /** Paved apron under the drop-off apex (local z extent behind the apex). */
@@ -471,12 +475,12 @@ export const careSettings: CareSetting[] = [
     name: "The Wongs' home",
     short: 'Home',
     subtitle: 'Home care · home health · pill packs · meals · home mods',
-    position: [-84, 12],
+    position: [-81.2, 12],
     heading: Math.PI / 2,
     // The owner allows the pad to grow 8 m west (behind the house) for the
     // deeper plan and its yard; front edge, drive and anchors stay put.
     pad: { w: 30, d: 28, back: 8 },
-    road: { from: [-48.4, 12], to: [-70, 12] },
+    road: { from: [-46.2, 12], to: [-67.2, 12] },
     drive: { depth: 7, radius: 6.2, lanes: 2 },
     apron: { w: 0, d: 0 },
     services: [
@@ -489,7 +493,7 @@ export const careSettings: CareSetting[] = [
     ],
     accent: '#c98f5a',
     // The Wongs' bungalow (public/models/seen-home-wong.json). Its plan frame
-    // is world-aligned (+x east, +z north): world = P + (−94.8, 12). The front
+    // is world-aligned (+x east, +z south): world = P + (−92.0, 12). The front
     // wall's outer face (P x 3.2) lies on the porch slab's back edge (local
     // z −7.6) and the front door's opening on the `door` anchor; the porch
     // zone is left to the pad, which already draws it (validate-home.mjs).
@@ -583,10 +587,10 @@ export const careSettings: CareSetting[] = [
     name: 'Partner pharmacy · pill packs',
     short: 'Pharmacy',
     subtitle: 'Weekly blister packs prepared and couriered',
-    position: [-84, -22],
+    position: [-81.2, -22],
     heading: Math.PI / 2,
     pad: { w: 24, d: 22 },
-    road: { from: [-48.4, -22], to: [-73, -22] },
+    road: { from: [-46.2, -22], to: [-70.2, -22] },
     drive: { depth: 6, radius: 6.2, lanes: 1 },
     apron: { w: 9, d: 2.4 },
     services: ['pill-packs'],
@@ -616,15 +620,15 @@ export const careSettings: CareSetting[] = [
     name: "Mrs. Lin's home",
     short: 'Lin home',
     subtitle: 'Lives with her daughter · Seen van door to door',
-    position: [-84, -56],
+    position: [-81.2, -56],
     heading: Math.PI / 2,
     pad: { w: 30, d: 28, back: 8 },
-    road: { from: [-48.4, -56], to: [-70, -56] },
+    road: { from: [-46.2, -56], to: [-67.2, -56] },
     drive: { depth: 7, radius: 6.2, lanes: 2 },
     apron: { w: 0, d: 0 },
     services: ['transport'],
     accent: '#9b7a96',
-    // The Wongs' plan (public/models/seen-home-wong.json): world = P + (−94.8, −56).
+    // The Wongs' plan (public/models/seen-home-wong.json): world = P + (−92.0, −56).
     facility: {
       id: 'seen-home-wong',
       url: '/models/seen-home-wong.json',
@@ -675,10 +679,10 @@ export const careSettings: CareSetting[] = [
     name: 'Community hospital · ED & inpatient',
     short: 'Hospital',
     subtitle: 'Admission, rounds and discharge coordination',
-    position: [94, 14],
+    position: [110.3, 8.2],
     heading: 0,
     pad: { w: 36, d: 30 },
-    road: { from: [94, 36.3], to: [94, 29] },
+    road: { from: [110.3, 31.2], to: [110.3, 23.2] },
     drive: { depth: 8, radius: 7, lanes: 1 },
     apron: { w: 10, d: 4.6 },
     services: ['ed', 'discharge'],
@@ -721,13 +725,13 @@ export const careSettings: CareSetting[] = [
     name: 'Specialty clinic · cardiology, optometry & imaging',
     short: 'Specialty clinic',
     subtitle: 'Specialist visits, eye exams and X-rays with a Seen escort',
-    position: [84, -56],
+    position: [100.3, -56],
     heading: 0,
     // Wide for the ground floor's row of rooms behind the open front, from
     // west to east: cardiology exam room, lobby (the entrance faces the
     // drive), optometry and imaging (community-pads.ts `buildSpecialist`).
     pad: { w: 44, d: 26 },
-    road: { from: [84, -35.8], to: [84, -43] },
+    road: { from: [100.3, -35.8], to: [100.3, -43] },
     drive: { depth: 6, radius: 6.2, lanes: 1 },
     apron: { w: 10, d: 4.6 },
     services: ['specialist', 'optometry', 'imaging'],

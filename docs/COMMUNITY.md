@@ -136,11 +136,11 @@ instance summary's `platforms`).
 
 | id | kind | position | services |
 | --- | --- | --- | --- |
-| `home-wong` | home | The Wongs' home (`home-lin` until October 2026): (−84, 12), two-lane drive; the aide's car uses the north street's western reach; `facility` seen-home-wong (below), `pad.back` 8 | home-care, home-health, pill-packs, meals, home-mods, after-hours |
-| `pharmacy` | pharmacy | (−84, −22) | pill-packs |
-| `home-lin` | home | Mrs. Lin's home, "Lives with her daughter · Seen van door to door" (short "Lin home"): (−84, −56), heading π/2, stub from the west street's southern reach; the Wongs' pad, drive, porch anchors and `facility` (seen-home-wong) | transport |
-| `hospital` | hospital | (94, 14), stub from the north street | ed, discharge |
-| `specialist` | specialist | Specialty clinic · cardiology, optometry & imaging: (84, −56), 44 × 26 m pad, stub from the south street (below) | specialist, optometry, imaging |
+| `home-wong` | home | The Wongs' home (`home-lin` until October 2026): (−81.2, 12), two-lane drive; the aide's car uses the north street's western reach; `facility` seen-home-wong (below), `pad.back` 8 | home-care, home-health, pill-packs, meals, home-mods, after-hours |
+| `pharmacy` | pharmacy | (−81.2, −22) | pill-packs |
+| `home-lin` | home | Mrs. Lin's home, "Lives with her daughter · Seen van door to door" (short "Lin home"): (−81.2, −56), heading π/2, stub from the west street's southern reach; the Wongs' pad, drive, porch anchors and `facility` (seen-home-wong) | transport |
+| `hospital` | hospital | (110.3, 8.2), stub from the north street | ed, discharge |
+| `specialist` | specialist | Specialty clinic · cardiology, optometry & imaging: (100.3, −56), 44 × 26 m pad, stub from the south street (below) | specialist, optometry, imaging |
 | `partner-adc` | partner-adc | Partner adult day center: (4, −68), its own 484 m² adult day health care center (`facility` seen-partner-adhc, below) on a 34 × 40 m pad | day-program |
 
 ## The day (care-day clock, 1 loop second = 40 clock seconds)
@@ -204,8 +204,8 @@ hospital's callers step out from under a roof first, so the arc rises clear.
 The community layer draws every call as an arc (`call-arcs.ts`; the renderer
 passes it the played source's interactions and the engine's people): a cubic
 curve from just above the caller's head to just above the other end, its
-crown `lift` × the span above the higher end (about 20 m between the hospital
-and the center, 93 m apart) and its ends rising steeply, so a close shot of
+crown `lift` × the span above the higher end (about 24 m between the hospital
+and the center, 110 m apart) and its ends rising steeply, so a close shot of
 one end shows it climbing out of the frame toward the other. Members within
 8 m of each other share an end (the Wongs on speakerphone). The line draws on
 from the caller over the call's first 4 loop seconds (eased out, its tip
@@ -812,8 +812,8 @@ outside is a hole leg.
 13.0 × 9.0 m (117 m², 1,259 sq ft), two bedrooms and one bath on one floor,
 behind the existing 8.0 × 2.6 m porch and ramp. Plan frame P: metres, origin at
 the centre of the house-plus-porch footprint, +x east (the front door and the
-street), +z north, y = 0 the finished floor (`PORCH_Y` on the pad). P is
-world-aligned: world = P + (−94.8, 12.0).
+street), +z south, y = 0 the finished floor (`PORCH_Y` on the pad). P is
+world-aligned: world = P + (−92.0, 12.0).
 
 | Room (id) | Size (m) | m² | What it holds |
 | --- | --- | --- | --- |
@@ -937,7 +937,7 @@ STEADI *Check for Safety*; PACE (42 CFR 460) and CAPABLE.
 
 Mrs. Lin, the story's participant, lives here with her daughter; a Seen van
 takes her to the center and brings her home. The `home-lin` pad sits south of
-the pharmacy at (−84, −56), heading π/2 (front to the west street), its stub
+the pharmacy at (−81.2, −56), heading π/2 (front to the west street), its stub
 on the west street's southern reach, which only the fleet's off-site runs
 share. It is the Wongs' bungalow again: the registry entry repeats home-wong's
 `facility` exactly (seen-home-wong, frame `{ position: [0, −10.8], heading:
@@ -946,7 +946,7 @@ plates, margin 1.6 m) on the same 30 × 28 m pad (`back` 8) and two-lane drive
 with the same porch, ramp and crossing anchors, so the site builder draws the
 same porch, ramp and garden (the home-mods crate and the visitor's stall only
 where a home has `crate` and `stall` anchors) and `validate-home.mjs` carries
-the registry checks over. Plan frame P → world: world = P + (−94.8, −56). The
+the registry checks over. Plan frame P → world: world = P + (−92.0, −56). The
 plan's own name never surfaces: the zone is "Mrs. Lin's home", rooms read
 "Lin home · Kitchen", "Lin home · Second bedroom (family)", plates "Living
 room", "Kitchen", "Bath".
@@ -982,7 +982,7 @@ Door passes and the legs that fill the holes (`HOLE_LEGS`):
 
 | Who | In / out at the front door (s) | Outside (hole legs) |
 | --- | --- | --- |
-| Mrs. Lin | out 24.1, in 659 | `linDayLeg`: across the porch and down the ramp, her daughter 0.9 m behind, and along the drive (1.45 m/s) to the van ramp at 41.3; up it ahead of the driver, on board 43.7–62 (out of sight at her seat while the van is off the map: "Her day at the Seen center"), on board again 620–637; down the van ramp, along the drive with the driver behind her, met by her daughter at the porch-ramp foot (649.5–650.5), up the ramp and in |
+| Mrs. Lin | out 24.1, in 659 | `linDayLeg`: across the porch and down the ramp, her daughter 0.9 m behind, and along the drive (1.45 m/s) to the van ramp at 41.3; up it ahead of the driver, on board 43.7–62 (out of sight at her seat while the van is off the map: "Her day at the Seen center"), on board again 624–637; down the van ramp, along the drive with the driver behind her, met by her daughter at the porch-ramp foot (649.5–650.5), up the ramp and in |
 | Daughter | out 22.9, in 57; out 614, in 661 | Out ahead to the porch, falling in behind her mother there and walking her to the van, seeing her off and back in by the porch step; out on the porch watching for the van, down the ramp to `rampFootSouth`, up it behind her mother and in |
 
 Both have a `before 0–0.5` hole with no leg (the placeholder stays hidden).
@@ -995,29 +995,32 @@ and walks back (666.3).
 
 The van is `van-lin`, "Seen van · door to door", on the fleet body in livery J
 (the Wongs' is I; the fleet's A–H). It comes in from the south end of the west
-street on its inner lane (fading in from 12.5 s), round the drive to the inner
+street on its inner lane (fading in from 11 s), round the drive to the inner
 apex (22.5–50: door 24.5–47.7, ramp 26.5–47.2) and out along the outer lane,
-off the map by 62; back 620–630, at the apex 630–667.5 (door 632–644, ramp
-634–643), off the map by 679.5. On that reach it follows Van A's first arrival
-in (Van A there 11–18 s; nearest fleet van 1.04 m, Van B on the other lane at
-15 s), and in the afternoon it comes back on as Van A leaves the map with the
-center's Mrs. Lin (622.5 s) and turns into the drive before Van B comes in
-(631 s); street cars never use the reach.
+off the map by 62; back 624–631, at the apex 631–667.5 (door 632–644, ramp
+634–643), off the map by 679.5. On that reach it comes in ahead of Van A's
+first arrival (on the reach from 15.8 s) and crosses the outer lane into the
+drive before Van B, out of the lot's exit, comes south past it (16.7 s). In
+the afternoon it comes back on only once Van A has left the map with the
+center's Mrs. Lin (faded out by 624 s), so the 69 m in take 7 s instead of
+the morning's 11.5 (at most 11.3 m/s; the fleet vans reach 9.6 m/s on that
+street), and it is at the apex before Van B comes back on (635.8 s); street
+cars never use the reach.
 
 Two actors represent Mrs. Lin in the composed day: the center's
 (`arrival-cane` in the base loop, `hero-lin` in the story) and the network's
 `lin-at-home`. They share the profile, so she is drawn the same, but Measure
-and the trace count them as two participants: from 11.5 s (Van A brings the
+and the trace count them as two participants: from 15.8 s (Van A brings the
 center's Mrs. Lin in from off site) to 62 s (her own van leaves the map) both
 are in sight, so one merged timeline would put her in two places at once. In
-the afternoon the hand-over is already clean: Van A leaves the map with her at
-622 s as her own van comes back on at 620–622 s.
+the afternoon the hand-over is clean: Van A has left the map with her by 624 s,
+when her own van starts back on.
 
-Places for framing her home (world x, z): pad centre (−88, −56); front door
-(−91.6, −56.4), porch (−90.3, −56.4), porch ramp top (−90.3, −59.4) and foot
-(−90.3, −65.9); the van at the apex (−83.2, −56) with its ramp foot (−87.1,
-−55.8); dining table (−94.7, −60.9); the sofa, Mrs. Lin (−93.1, −55.2) and her
-daughter (−94.2, −55.2); bed (−99.4, −52.7). Through the layer:
+Places for framing her home (world x, z): pad centre (−85.2, −56); front door
+(−88.8, −56.4), porch (−87.5, −56.4), porch ramp top (−87.5, −59.4) and foot
+(−87.5, −65.9); the van at the apex (−80.4, −56) with its ramp foot (−84.3,
+−55.8); dining table (−91.9, −60.9); the sofa, Mrs. Lin (−90.3, −55.2) and her
+daughter (−91.4, −55.2); bed (−96.6, −52.7). Through the layer:
 `frame('home-lin')` and `instance('home-lin').roomCenter('home-living' |
 'home-dining' | 'home-kitchen' | 'home-primary' | 'home-bedroom-2')`, or the
 registry anchors `door`, `porch`, `rampTop`, `rampFoot`.
@@ -1065,11 +1068,11 @@ call reveal reads the call's two ends from its members' sampled positions.
 **A setting.** Add a `define({...})` entry to `careSettings` with local
 anchors, and a builder in `community-pads.ts` (`BUILDERS[kind]`) if it is a new
 kind. The drive, plinth, stub, sidewalk and label come for free. Keep the pad
-outside the ring streets (north z≈41.3, south z≈−32.3, west x≈−44.4, east x≈54)
+outside the ring streets (north z≈36.2, south z≈−32.3, west x≈−40.7, east x≈69.1)
 and reach it from a lane that flows the right way (`ring(side)` in
 `community-vehicles.ts`, built from `laneLine`/`laneFlow` in
 `traffic-routes.ts`). The ring streets are drawn out to `STREET_EXTENT`
-(x ±130, z ±95, `neighborhood.ts`), past every pad, so a stub joins a drawn
+(x ±150, z ±95, `neighborhood.ts`), past every pad, so a stub joins a drawn
 street wherever it meets the ring. Turn it (`heading`) so its front faces +x or +z; the
 framing, the label plate and the shadow camera follow from the registry.
 
@@ -1124,7 +1127,7 @@ npm run validate:community
 ```
 
 Over the whole day at 50 Hz: community vehicles keep ≥ 0.5 m from the fleet
-vans, delivery trucks, parked cars and each other and ≥ 0.85 m from the street
+vans, delivery trucks and each other and ≥ 0.85 m from the street
 cars; drive nose-first with no reversing or hairpins (radius over any 3 m of
 travel ≥ 5 m; the designed arcs are ≥ 6.2 m); keep doors and ramps shut while
 moving; are periodic and continuous across the loop seam; every vehicle has a

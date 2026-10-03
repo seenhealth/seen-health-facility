@@ -1136,10 +1136,43 @@ export function buildPhotoAsset(
       box(x, 0, d * 0.35, 0.055, h, 0.08, wood);
   } else if (spec.kind === 'sign') {
     const geo = new T.PlaneGeometry(w, h);
-    const m = add(geo, spec.material, 0, h / 2, d / 2);
-    m.material.side = T.DoubleSide;
-    // Thin backing supplies a nonzero depth for the portable dimension normalization.
-    box(0, 0, 0, w, h, d * 0.05, palette('backing', spec.material));
+    // `relief` (m) makes channel letters: the lettering is stacked through that
+    // depth, standing off the wall by the rest of `d`, over a soft shadow
+    // (`materials.shadow`) printed on the wall below and to the right.
+    const relief = Number(p.relief ?? 0);
+    if (relief > 0) {
+      const shadow = spec.materials?.shadow;
+      if (shadow) {
+        const s = add(geo, shadow, 0.05, h / 2 - 0.07, 0.004);
+        s.material.side = T.DoubleSide;
+        s.material.depthWrite = false;
+        s.material.alphaTest = 0.02;
+        s.castShadow = false;
+      }
+      const standoff = Math.max(0.02, d - relief),
+        layers = 10;
+      for (let i = 0; i <= layers; i++) {
+        const m = add(
+          geo,
+          spec.material,
+          0,
+          h / 2,
+          standoff + (relief * i) / layers,
+        );
+        m.material.side = T.DoubleSide;
+        // Cut the lettering out of the plane: clear texels neither write depth
+        // (which would read as a board to the screen-space shading) nor shadow.
+        m.material.alphaTest = 0.5;
+        m.castShadow = false;
+      }
+    } else {
+      const m = add(geo, spec.material, 0, h / 2, d / 2);
+      m.material.side = T.DoubleSide;
+    }
+    // Thin backing supplies a nonzero depth for the portable dimension
+    // normalization; relief lettering already has depth and shows the wall.
+    if (!(relief > 0))
+      box(0, 0, 0, w, h, d * 0.05, palette('backing', spec.material));
   }
   return g;
 }

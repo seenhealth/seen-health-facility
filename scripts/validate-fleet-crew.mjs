@@ -5,8 +5,9 @@
 // the vans parked on the lot walk to and from the fleet office and in and out
 // through the driver's door), cabin walks and ramp escorts continuous, the
 // driver close behind each rider's party on the ramp, and the new lobby waits
-// clear of walls. Runs over the base loop and the story source, as the viewer
-// plays them.
+// clear of walls, and everyone on foot at the drop-off clear of its rails and
+// planter and on its walking surfaces. Runs over the base loop and the story
+// source, as the viewer plays them.
 //
 //   npm run validate:fleet
 import assert from 'node:assert/strict';
@@ -14,9 +15,10 @@ import { readFileSync } from 'node:fs';
 import * as T from 'three';
 import { loadSim } from './build-scenario.mjs';
 
-const { sim, activity, crew, story, deliveries, fleet, body, arrival } = await loadSim({
+const { sim, activity, crew, story, deliveries, fleet, body, arrival, exterior } = await loadSim({
   sim: 'app/sim/index.ts',
   arrival: 'app/model/arrival.ts',
+  exterior: 'app/model/alhambra-exterior.ts',
   activity: 'app/model/activity.ts',
   crew: 'app/model/fleet-crew.ts',
   story: 'app/sim/story-source.ts',
@@ -395,6 +397,91 @@ for (const [name, source] of sources) {
   totals.riders += crewIds.length - drivers.length;
   console.log(`${name}: ${source.actors.length} actors, ${drivers.length} drivers, ${crewIds.length - drivers.length} riders seated.`);
 }
+// The drop-off (DROP_OFF in alhambra-exterior.ts): everyone on foot, as the
+// viewer plays the day with the community layer, keeps their route clearance
+// (nav.ts; escorts and staff the wall clearance) from its rails and the palm
+// planter, never steps across a rail, and on the landing, the switchback's
+// runs and the turn landing walks at the surface's height (on the steps,
+// between a tread and the one above it). Between the docked van's nose and
+// the lobby wall (the passage round the nose, the switchback and the landing,
+// all single file) people outside one party keep half a metre apart.
+const { DROP_OFF } = exterior;
+const dropOffEdges = [
+  ...Object.entries(DROP_OFF.rails).map(([id, r]) => ({ id: `${id} rail`, a: [r.x, r.z0], b: [r.x, r.z1] })),
+  ...DROP_OFF.planterOutline.map((a, i, all) => ({ id: 'palm planter', a, b: all[(i + 1) % all.length] })),
+];
+const edgeGap = (p, { a, b }) => {
+  const dx = b[0] - a[0],
+    dz = b[1] - a[1],
+    t = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dz) / (dx * dx + dz * dz || 1)));
+  return Math.hypot(a[0] + dx * t - p[0], a[1] + dz * t - p[1]);
+};
+const side = (p, q, r) => Math.sign((q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0]));
+const crossesEdge = (p, q, { a, b }) => side(p, q, a) * side(p, q, b) < 0 && side(a, b, p) * side(a, b, q) < 0;
+const riser = (DROP_OFF.top - DROP_OFF.street) / (DROP_OFF.steps.count + 1);
+const onSteps = ([x, z]) =>
+  Math.abs(x - DROP_OFF.landing.x) <= DROP_OFF.width / 2 && z >= DROP_OFF.steps.z0 && z < DROP_OFF.landing.z0;
+const near = { x0: -26, x1: -13, z0: -9, z1: 11 };
+const nearDropOff = ([x, z]) => x > near.x0 && x < near.x1 && z > near.z0 && z < near.z1;
+assert.ok(Math.abs(-Math.sin(fleet.FLEET_LOT.dockHeading) - 1) < 1e-9, 'the docked van faces +x, toward the switchback');
+const pastNose = fleet.FLEET_LOT.dock[0] + fleet.FLEET_VAN.halfLength,
+  SINGLE_FILE_GAP = 0.5;
+const levelElevation = (id) => model.levels.find((l) => l.id === id)?.elevation || 0;
+const dropOff = { samples: 0, onSurface: 0, people: new Set(), railGap: Infinity, railGapAt: '', spacing: Infinity, spacingAt: '' };
+for (const [name, base] of [
+  ['base loop', activity.activityData],
+  ['story', story.storyActivitySource().source],
+]) {
+  const source = sim.alhambraSource(model, base),
+    byId = new Map(source.actors.map((a) => [a.id, a]));
+  const visitors = source.actors
+    .filter((a) => a.levelId !== 'upper' && a.segments.some((s) => s.action !== 'ride' && s.path.some(nearDropOff)))
+    .map((a) => ({ a, clearance: a.escortFor || !a.mobility ? sim.WALL_CLEARANCE : sim.MOBILITY_CLEARANCE[a.mobility], prev: null }));
+  for (let t = 0; t <= DURATION + 1e-9; t += 0.05) {
+    const tt = t % DURATION,
+      here = [];
+    for (const v of visitors) {
+      const { a, clearance, prev } = v,
+        f = place(source, byId, a, tt);
+      const onFoot = f.visible !== false && !f.seat && !f.seatedIn;
+      const p = [f.x, f.z];
+      v.prev = onFoot ? p : null;
+      if (!onFoot || !nearDropOff(p)) continue;
+      dropOff.samples++;
+      for (const e of dropOffEdges) {
+        const gap = e.id === 'palm planter' && inside(p, DROP_OFF.planterOutline) ? 0 : edgeGap(p, e);
+        if (gap < dropOff.railGap) {
+          dropOff.railGap = gap;
+          dropOff.railGapAt = `${a.id} to the ${e.id} at ${tt.toFixed(2)} (${name})`;
+        }
+        assert.ok(gap >= clearance - 1e-6, `${name}: ${a.id} is ${gap.toFixed(2)} m from the drop-off's ${e.id} at ${tt.toFixed(2)} (needs ${clearance}; "${f.title}" at ${p.map((x) => x.toFixed(2)).join(', ')})`);
+        if (prev) assert.ok(!crossesEdge(prev, p, e), `${name}: ${a.id} steps across the drop-off's ${e.id} at ${tt.toFixed(2)} ("${f.title}")`);
+      }
+      const surface = DROP_OFF.surface(p[0], p[1]);
+      if (surface !== null) {
+        const y = f.y ?? levelElevation(a.levelId) + (model.zones.find((z) => z.id === f.zoneId)?.elevationOffset || 0);
+        const ok = onSteps(p) ? y >= surface - 0.01 && y <= surface + riser + 0.01 : Math.abs(y - surface) <= 0.01;
+        assert.ok(ok, `${name}: ${a.id} walks at y ${y.toFixed(3)} on the drop-off at ${p.map((x) => x.toFixed(2)).join(', ')}, where the surface is at ${surface.toFixed(3)} (${tt.toFixed(2)}, "${f.title}")`);
+        dropOff.onSurface++;
+        dropOff.people.add(a.id);
+      }
+      if (p[0] > pastNose && p[0] < arrival.ARRIVAL.door[0]) here.push({ a, p, title: f.title });
+    }
+    for (let i = 0; i < here.length; i++)
+      for (let k = i + 1; k < here.length; k++) {
+        const [m, n] = [here[i], here[k]];
+        if (m.a.escortFor === n.a.id || n.a.escortFor === m.a.id) continue;
+        const gap = Math.hypot(m.p[0] - n.p[0], m.p[1] - n.p[1]);
+        if (gap < dropOff.spacing) {
+          dropOff.spacing = gap;
+          dropOff.spacingAt = `${m.a.id}/${n.a.id} at ${tt.toFixed(2)} (${name})`;
+        }
+        assert.ok(gap >= SINGLE_FILE_GAP, `${name}: ${m.a.id} and ${n.a.id} pass ${gap.toFixed(2)} m apart at the drop-off at ${tt.toFixed(2)} ("${m.title}" / "${n.title}")`);
+      }
+  }
+}
+assert.ok(dropOff.people.size >= 6, `riders walk the drop-off's switchback (${[...dropOff.people].join(', ')})`);
+
 console.log(
-  `Fleet crew: ${arrivals} drop-off arrivals set off out of sight, ${totals.outOfView} seated people appearing or vanishing only with their van out of sight, ${totals.officeWalks} driver walks between the fleet office and a parked van (nearest person ${officeGap.toFixed(2)} m), ${totals.rampEscorts} ramp descents escorted by the driver, ${totals.rampAscents} ascents attended (${totals.escortedUp} escorted up the ramp, the rest steadied from its foot), ${driverDoorCrossings} cab-door passages through the open driver's door, ${slidingDoorCrossings} passages through the open sliding door, ${totals.fadeHidden} seated people hidden by the engine in vans below ${activity.SEATED_MIN_OPACITY} opacity, ${totals.samples.toLocaleString()} placement samples; cabin walks, seat visibility, driver-in-cab and wall clearance passed.`,
+  `Fleet crew: ${arrivals} drop-off arrivals set off out of sight, ${totals.outOfView} seated people appearing or vanishing only with their van out of sight, ${totals.officeWalks} driver walks between the fleet office and a parked van (nearest person ${officeGap.toFixed(2)} m), ${totals.rampEscorts} ramp descents escorted by the driver, ${totals.rampAscents} ascents attended (${totals.escortedUp} escorted up the ramp, the rest steadied from its foot), ${driverDoorCrossings} cab-door passages through the open driver's door, ${slidingDoorCrossings} passages through the open sliding door, ${dropOff.people.size} people on the drop-off's landing and ramp (${dropOff.onSurface.toLocaleString()} samples at its surface height; nearest rail or planter ${dropOff.railGap.toFixed(2)} m, ${dropOff.railGapAt}; closest two people outside one party ${dropOff.spacing.toFixed(2)} m, ${dropOff.spacingAt}), ${totals.fadeHidden} seated people hidden by the engine in vans below ${activity.SEATED_MIN_OPACITY} opacity, ${totals.samples.toLocaleString()} placement samples; cabin walks, seat visibility, driver-in-cab and wall clearance passed.`,
 );

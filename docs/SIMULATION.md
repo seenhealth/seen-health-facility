@@ -84,7 +84,8 @@ Every vehicle route is a chain of straight runs and circular arcs of the
 vehicle's centre (`app/model/vehicle-path.ts`: the `Pen` turtle, `roundedPath`
 for corner-point data, `pathAt`), so turning radii are exact: 4 m in the fleet
 lot and at the Olympic and Alveare bays, 4.5 m for the delivery trucks (which
-back straight out of receiving before pulling away) and 6.4 m
+back out of receiving round onto the drive aisle, clear of the rear court's
+planters, before pulling away) and 6.4 m
 (`STREET_CORNER_RADIUS`) at the ring-street corners for street cars, fleet and
 community vehicles. Speeds blend with the shared `easeDistance`
 (`app/model/traffic-routes.ts`). `npm run validate:traffic` checks nose-first
@@ -124,8 +125,9 @@ the foot, then back in through the driver's door before departure. Vans A–D
 never park between runs (every drop-off arrival comes in from off site, its
 riders seated as it sets off out of sight); the drivers of vans E (bay) and F
 (curb) wait in the fleet office inside the center, walk out through the
-sliding entrance and across the lot to the parked van, get in through the
-driver's door and, after the run, get out and walk back. Vans C and D, which arrive
+sliding entrance, down the drop-off landing's steps past the palm planter and
+across the lot to the parked van, get in through the driver's door and, after
+the run, get out and walk back. Vans C and D, which arrive
 without actors, get two mid-day riders each who walk the base loop's walking
 arrival's ramp, entrance and lobby routes, check in behind the front-desk queue,
 wait in the lobby and ride home on Van A or Van B.
@@ -152,6 +154,38 @@ trolley's corners against walls and furniture), keeps the new tracks 0.5 m
 from the rest of the cast and leaves every other number in the file as
 written; `--check` fails when the loop is stale. Rerun it after changing the
 food truck's runs or the kitchen, then `npm run build:scenario`.
+
+### Drop-off (`DROP_OFF` in `app/model/alhambra-exterior.ts`)
+
+The landing along the lobby wall, its two steps and the switchback ramp
+(upper run along the wall, turn landing beside the block wall, lower run back
+down to the lot, bronze rails) are drawn from `DROP_OFF`, which also gives the
+walking surface's height anywhere on them (`surface`) and the accessible way
+up (`ascent`). A van docks nose-first 0.9 m short of the lower run
+(`FLEET_LOT.dock`), so its riders walk from the van's ramp round its nose and
+under the end of the lower run's west rail to the toe, up the lower run,
+across the turn landing and up the upper run, and turn in at the sliding
+entrance; departures walk the same way down.
+
+`scripts/apply-drop-off-route.mjs` writes these legs of the base loop's six
+van arrivals into both copies of the loop from `DROP_OFF`, the dock and the
+van's ramp. Each arrival keeps when it steps off the van's ramp and when it
+is inside, walking between at one pace; each departure keeps its boarding time
+and the 0.64 m/s escorted pace, and sets off earlier. Every other number in
+the file keeps its text; `--check` (part of `npm run validate:fleet`) fails
+when the loop no longer matches the geometry. The mid-day riders take the same
+legs from the walking arrival, and the story's hero re-derives her departure
+from Lin's, walking out at `boardingSpeed` (1.05 m/s) so that she leaves the
+farewell when she did. Rerun it after changing the drop-off, the dock or the
+van's ramp, then `npm run build:scenario`.
+
+`npm run validate:fleet` checks everyone on foot there as the viewer plays the
+day (base loop and story, with the community layer): clear of the rails and
+the planter by their route clearance (`MOBILITY_CLEARANCE`, else
+`WALL_CLEARANCE`), never stepping across a rail, at the surface's height on
+the landing, steps and runs, and half a metre apart between the docked van's
+nose and the lobby wall. `npm run validate:traffic` keeps every van 0.3 m off
+the landing, the runs, the turn landing, the rails and the planter.
 
 ## Navigation (`app/sim/nav.ts`)
 
@@ -195,7 +229,7 @@ shared contract.
     "arrivalThroughTitle": "Front desk greeting & check-in",
     "departureTitle": "Escorted departure · board van",
     "escortId": "arrival-aide-a", "escortLabel": "PCA · Alex",
-    "boardingSpeed": 0.64
+    "boardingSpeed": 1.05
   },
   "reservations": [ … ],            // extra areas new routes avoid
   "reserveBaseDwell": { "minSeconds": 40, "halfSize": 0.3 },

@@ -189,8 +189,8 @@ feeds). Keep simulation and platform speaking one schema:
   in a van hidden once it is below half opacity. A van leaves the drop-off by backing straight out 3 m,
   because a forward exit would sweep the entrance ramp's landing. Alhambra's unload windows were shortened
   to fit the loop; Olympic and Alveare keep their original van timetable, now their own data.
-- **Deliveries.** The trucks keep their nose-in stop at the rear receiving doors and back straight out
-  before turning away; they still appear and vanish on the south street east of the yard.
+- **Deliveries.** The trucks nose in at the rear receiving doors beside the rear court's palm planters,
+  then back round onto the drive aisle south of them and pull away east; they still appear and vanish on the south street east of the yard.
 - **Community timings** were shifted to clear fleet, truck and street-car movements (the van leaves the
   home 9:15, specialist visit 10:05, discharge pickup 2:23 PM, home-health visit 3:07 PM, nurse line
   3:40 PM). The discharged participant goes home and rolls in at the front door at 3:28 PM; the home's
