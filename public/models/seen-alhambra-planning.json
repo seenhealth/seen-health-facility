@@ -14303,7 +14303,7 @@
       ],
       "material": "photo-sign-dropoff",
       "materials": {
-        "backing": "om-stone",
+        "backing": "photo-bronze",
         "shadow": "photo-sign-dropoff-shadow"
       },
       "parameters": {
@@ -20686,8 +20686,8 @@
       "zoneId": "lobby",
       "levelId": "ground",
       "position": [
-        -16.37,
-        2.33,
+        -16.33,
+        3.21,
         0.8
       ],
       "rotation": -1.5707963267948966,
@@ -20701,7 +20701,7 @@
         109
       ],
       "status": "photo-informed / dimensions-estimated",
-      "notes": "Current sign over the drop-off door (photo 2026-10-02): white SEEN HEALTH 见心颐养 channel letters, no mark, on the front fascia of the bronze canopy over the sliding door. Placement is registered to the plan; dimensions estimated without a measured drawing.",
+      "notes": "Current sign over the drop-off door (photo 2026-10-02): white SEEN HEALTH 见心颐养 channel letters, no mark, standing on top of the bronze canopy over the sliding door, along its front edge (placement corrected by the dispatcher, 2026-10-02); the backing is drawn in the canopy bronze so it reads as a low sign band on the canopy. Placement is registered to the plan; dimensions estimated without a measured drawing.",
       "layer": "exterior"
     },
     {
