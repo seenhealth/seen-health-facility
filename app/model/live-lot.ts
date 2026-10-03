@@ -754,13 +754,13 @@ export function createLiveLot(ctx: {
       wheelRadius: car.wheelRadius,
       sill: car.sill,
       foot: car.foot,
-      sillRise: 0.2,
+      // The step up into the cabin: an SUV's floor sits higher than a sedan's.
+      sillRise: kind === 'suv' ? 0.42 : 0.3,
       hasRamp: false,
       rampFoot: null,
       rampForAll: false,
-      // Sedan 4.7 x 1.82 m, SUV 4.9 x 1.92 m (live-vehicles.ts), mirrors included.
-      halfWidth: kind === 'suv' ? 1.05 : 1.0,
-      halfLength: kind === 'suv' ? 2.45 : 2.35,
+      halfWidth: car.halfWidth,
+      halfLength: car.halfLength,
     };
   }
   function freeSpot(): number | null {

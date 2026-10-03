@@ -69,3 +69,59 @@ function prepare(scene: T.Object3D) {
   });
   return scene;
 }
+
+/**
+ * Generic full-size SUV and large sedan for the live lot (`live-cars.glb`,
+ * scripts/fleet-van/build_cars.py): same frame and conventions as the van,
+ * with nodes prefixed by kind (`suv-passenger-door`, `sedan-wheel-fl`, …) and
+ * a white `car-paint` material the scene tints per car.
+ */
+export const LIVE_CARS_URL = '/models/live-cars.glb';
+/** Body sizes and the rear kerb-side door of each model (local x, z of its sill), as built. */
+export const LIVE_CAR_MODEL = {
+  suv: {
+    halfWidth: 1.02,
+    halfLength: 2.875,
+    wheelRadius: 0.41,
+    doorZ: 0.55,
+    beltY: 1.2,
+    lampY: 1.0,
+  },
+  sedan: {
+    halfWidth: 0.97,
+    halfLength: 2.645,
+    wheelRadius: 0.355,
+    doorZ: 0.65,
+    beltY: 0.95,
+    lampY: 0.75,
+  },
+};
+let cars: T.Object3D | null = null;
+let carsPending: Promise<T.Object3D | null> | null = null;
+export function preloadLiveCarModels(
+  url = LIVE_CARS_URL,
+): Promise<T.Object3D | null> {
+  carsPending ??= import('three/addons/loaders/GLTFLoader.js').then(
+    async ({ GLTFLoader }) => {
+      try {
+        const gltf = await new GLTFLoader().loadAsync(url);
+        cars = prepare(gltf.scene);
+      } catch (error) {
+        console.warn(
+          'Live car models did not load; procedural cars kept.',
+          error,
+        );
+      }
+      return cars;
+    },
+  );
+  return carsPending;
+}
+/** A fresh copy of the `car-<kind>` model (geometry and materials shared), or null before it has loaded. */
+export function liveCarModel(kind: 'suv' | 'sedan'): T.Object3D | null {
+  const src = cars?.getObjectByName(`car-${kind}`);
+  if (!src) return null;
+  const copy = src.clone(true);
+  copy.position.set(0, 0, 0);
+  return copy;
+}

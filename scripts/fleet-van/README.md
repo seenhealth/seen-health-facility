@@ -20,3 +20,21 @@ Needs Blender 4.2+ (`BLENDER=`) and a python with numpy + pillow (`PYTHON=`). Pr
   front photo by height bands, or a flat swatch (trim, interior, tyres).
 - Frame and node names follow the procedural van so the scene code is unchanged: nose −z, kerb side +x, floor
   0.58, `passenger-door-0/1`, `driver-door` (pivot on its front edge), `wheel-*` (local y = axle), `lamp-*`.
+
+## Live-lot cars
+
+`public/models/live-cars.glb`: a generic full-size SUV (Suburban / Yukon XL / Expedition MAX class: 5.75 m,
+upright greenhouse, big chrome grille, roof rails, running boards) and a large sedan (7 Series / S-Class class:
+5.29 m, long hood, fastback C-pillar, slim lamps, light bar across the tail), no brand marks. About 4,300
+triangles each, no textures, 0.5 MB together. Roots `car-suv` / `car-sedan`; nodes prefixed by kind
+(`suv-passenger-door`, `sedan-wheel-fl`, `suv-lamp-head`, …) so the names stay unique in one file. The white
+`car-paint` material is tinted per car by `buildLiveCar` (live-vehicles.ts), which keeps the procedural cars as
+the fallback.
+
+```bash
+scripts/fleet-van/build-cars.sh   # build_cars.py -> render_cars.py previews (work/fleet-van/cars_*) -> public/models/
+```
+
+The body is the side profile extruded and bevelled, bisected at the belt, the window top and each pillar, then
+narrowed above the belt (tumblehome); each face is painted, glazed (dark tinted, opaque) or blacked out by where
+it sits. The rear kerb-side door is the body slab inside its outline on a pivot at its front edge.

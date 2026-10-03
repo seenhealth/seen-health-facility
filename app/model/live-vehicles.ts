@@ -1,6 +1,7 @@
 import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { FLEET_VAN } from './alhambra-fleet';
+import { LIVE_CAR_MODEL, liveCarModel } from './fleet-van-model';
 import type { Vec2 } from './schema';
 
 /**
@@ -34,6 +35,9 @@ export type LiveCar = {
   /** Local (x, z) of the door sill and of a standing spot one step out from it. */
   sill: Vec2;
   foot: Vec2;
+  /** Half the body's width and length, for walkers to keep clear of it. */
+  halfWidth: number;
+  halfLength: number;
 };
 
 const GLASS = '#5d7f8c',
@@ -130,7 +134,64 @@ export function addVanLamps(root: T.Object3D): VehicleLamps {
   return lamps;
 }
 
+/**
+ * The live lot's SUV or sedan: the generic full-size models (live-cars.glb) once they have loaded, painted
+ * `accent`, else the procedural body below.
+ */
 export function buildLiveCar(kind: LiveCarKind, accent: string): LiveCar {
+  const model = liveCarModel(kind);
+  return model
+    ? fromModel(kind, model, accent)
+    : buildProceduralCar(kind, accent);
+}
+function fromModel(
+  kind: LiveCarKind,
+  model: T.Object3D,
+  accent: string,
+): LiveCar {
+  const root = new T.Group();
+  root.name = `live-${kind}`;
+  root.add(model);
+  const spec = LIVE_CAR_MODEL[kind];
+  // Own copies of the materials, so one car can fade without the others; the paint takes the car's colour.
+  const copies = new Map<T.Material, T.MeshStandardMaterial>();
+  root.traverse((o) => {
+    if (!(o instanceof T.Mesh)) return;
+    const m = o.material as T.MeshStandardMaterial;
+    if (!copies.has(m)) {
+      const c = m.clone();
+      if (m.name === 'car-paint') c.color.set(accent);
+      copies.set(m, c);
+    }
+    o.material = copies.get(m)!;
+  });
+  const lamps = makeLamps();
+  for (const [k, m] of [
+    ['head', lamps.head],
+    ['tail', lamps.tail],
+    ['brake', lamps.brake],
+    ['reverse', lamps.reverse],
+  ] as const) {
+    const mesh = root.getObjectByName(`${kind}-lamp-${k}`);
+    if (mesh instanceof T.Mesh) mesh.material = m;
+  }
+  aimBeams(root, lamps, -spec.halfLength, spec.lampY, spec.halfWidth - 0.3);
+  return {
+    root,
+    door: root.getObjectByName(`${kind}-passenger-door`) as T.Group,
+    doorOpenAngle: 1.15,
+    wheels: ['fl', 'fr', 'rl', 'rr'].map((w) =>
+      root.getObjectByName(`${kind}-wheel-${w}`)!,
+    ),
+    wheelRadius: spec.wheelRadius,
+    lamps,
+    sill: [spec.halfWidth + 0.08, spec.doorZ],
+    foot: [spec.halfWidth + 0.9, spec.doorZ],
+    halfWidth: spec.halfWidth,
+    halfLength: spec.halfLength,
+  };
+}
+function buildProceduralCar(kind: LiveCarKind, accent: string): LiveCar {
   const root = new T.Group();
   root.name = `live-${kind}`;
   const cache = new Map<string, T.MeshStandardMaterial>();
@@ -369,6 +430,8 @@ export function buildLiveCar(kind: LiveCarKind, accent: string): LiveCar {
     lamps,
     sill: [W / 2 + 0.1, hingeZ + doorL / 2],
     foot: [W / 2 + 0.9, hingeZ + doorL / 2 + 0.1],
+    halfWidth: W / 2 + 0.09,
+    halfLength: L / 2,
   };
 }
 

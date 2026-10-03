@@ -6,7 +6,10 @@ import { createViewer, defaultState } from '../../app/model/renderer';
 import { createLiveLot, type LiveMessage } from '../../app/model/live-lot';
 import { createDaylight } from '../../app/model/daylight';
 import { createNightLights } from '../../app/model/night-lights';
-import { preloadFleetVanModel } from '../../app/model/fleet-van-model';
+import {
+  preloadFleetVanModel,
+  preloadLiveCarModels,
+} from '../../app/model/fleet-van-model';
 import { createSimPanel } from './sim';
 
 /**
@@ -39,6 +42,7 @@ async function main() {
       .then(validateFacility),
     // The photo-textured fleet van; vans fall back to the procedural body if it fails.
     preloadFleetVanModel(),
+    preloadLiveCarModels(),
   ]);
   let lot: ReturnType<typeof createLiveLot> | null = null;
   let daylight: ReturnType<typeof createDaylight> | null = null;
