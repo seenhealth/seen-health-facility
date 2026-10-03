@@ -261,7 +261,7 @@ type Live = {
   drawnExpanded: boolean;
   /** 1 while another vehicle is hovered, easing to 0.5: the dimmed look. */
   dim: number;
-  /** The plate's own visibility: eases to 0 while another vehicle's bubble is open, so only that one shows. */
+  /** The plate's own visibility: 1 only while this vehicle is hovered (its bubble open), else eased to 0. */
   plateFade: number;
   mode: Mode;
   drive: Drive | null;
@@ -1203,7 +1203,7 @@ export function createLiveLot(ctx: {
           plateT: 1,
           drawnExpanded: false,
           dim: 1,
-          plateFade: 1,
+          plateFade: 0,
           mode: 'waiting',
           drive: null,
           s: 0,
@@ -1727,7 +1727,9 @@ export function createLiveLot(ctx: {
     }[] = [];
     // The opened plate is placed first so it keeps the low spot and the others stack around it.
     const items = Array.from(live.values())
-      .filter((l) => l.opacity > 0.3 && l.plateFade > 0.3)
+      .filter(
+        (l) => l.opacity > 0.3 && (l.plateFade > 0.3 || l.v.id === expandedId),
+      )
       .sort(
         (a, b) =>
           Number(b.v.id === expandedId) - Number(a.v.id === expandedId) ||
@@ -1925,8 +1927,8 @@ export function createLiveLot(ctx: {
         (h0 + (l.plate[1] - h0) * k) * labelScale,
         1,
       );
-      // While a bubble is open the other plates fade out, so the details stand alone over the lot.
-      l.plateFade = tween(l.plateFade, expandedId && !expanded ? 0 : 1, 4, dt);
+      // Plates show on hover only: the hovered car's bubble fades in, every other plate stays hidden (2026-10-03).
+      l.plateFade = tween(l.plateFade, expanded ? 1 : 0, 4, dt);
       l.label.visible = l.opacity > 0.3 && l.plateFade > 0.01;
       // The opened bubble draws over every other plate.
       l.label.renderOrder = expanded ? 11 : 10;
