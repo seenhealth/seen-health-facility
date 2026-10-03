@@ -15880,6 +15880,37 @@
   },
   "objects": [
     {
+      "id": "rehab-basin-6",
+      "assetId": "basin",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -16.739155,
+        0,
+        9.28
+      ],
+      "rotation": 0,
+      "scale": [
+        0.8479815275512008,
+        1,
+        0.9158200497552967
+      ],
+      "roomId": "rehab-entry",
+      "referencePages": [
+        92
+      ],
+      "status": "image-traced-position-and-footprint / height-inferred",
+      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred. Moved 0.58 m north (2026-10-03): traced just outside the rehab wing's south wall, it stood on the drop-off ramp's turn landing; now against the wall inside the entry room.",
+      "sourcePixelPosition": [
+        485,
+        773.39392
+      ],
+      "sourcePixelFootprint": [
+        10.000000000000002,
+        9
+      ]
+    },
+    {
       "id": "clinic-west-office-chair-0",
       "assetId": "plan-clinical-chair",
       "zoneId": "clinic",
@@ -17767,37 +17798,6 @@
       "sourcePixelPosition": [
         414,
         927
-      ],
-      "sourcePixelFootprint": [
-        10.000000000000002,
-        9
-      ]
-    },
-    {
-      "id": "rehab-basin-6",
-      "assetId": "basin",
-      "zoneId": "rehab",
-      "levelId": "ground",
-      "position": [
-        -16.739155,
-        0,
-        8.70029
-      ],
-      "rotation": 0,
-      "scale": [
-        0.8479815275512008,
-        1,
-        0.9158200497552967
-      ],
-      "roomId": null,
-      "referencePages": [
-        92
-      ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        485,
-        762
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
@@ -35877,7 +35877,8 @@
       "rehab-basin-2",
       "rehab-basin-3",
       "rehab-basin-4",
-      "rehab-basin-5"
+      "rehab-basin-5",
+      "rehab-basin-6"
     ],
     "newObjectIds": [
       "day-landscape-wall",
