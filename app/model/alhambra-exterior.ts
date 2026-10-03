@@ -268,23 +268,49 @@ export function buildAlhambraExterior(model: Facility) {
   shade('1841-entry-blue-sunshade', -16.7, 2.95, 27.34, 3.0, 0.72);
   // Concrete panel joints, restrained wall lights and metal coping on every visible flat wing.
   const surface = group(facade, 'concrete-panel-joints-and-coping');
+  // The wing's coping is a flush metal cap on its parapet (Street View, May 2025): set back over the wall, 1.5 cm
+  // proud of the face, rather than a ledge standing out over the street; its joints sit on the wall's face
+  // (shell-therapy-front / -west, 0.24 m thick on z 27.169 and x -31.189).
+  const WING = { front: 27.169 + 0.12, west: -31.189 - 0.12 };
+  box(
+    surface,
+    (-31.189 - 14.66) / 2,
+    6.2 - 0.06,
+    WING.front - 0.12,
+    -14.66 + 31.189,
+    0.07,
+    0.27,
+    steel,
+  );
+  box(
+    surface,
+    WING.west + 0.12,
+    6.2 - 0.06,
+    (8.9 + 27.169) / 2,
+    0.27,
+    0.07,
+    27.169 - 8.9 + 0.135,
+    steel,
+  );
   for (const [x0, x1, z, h] of [
-    [-31.18, -14.66, 27.32, 6.2],
+    [-31.18, -14.66, WING.front + 0.005, 6.2],
     [3.2, 15.26, 26.81, 6.65],
     [15.57, 29.71, 26.97, 6.65],
   ]) {
-    box(surface, (x0 + x1) / 2, h - 0.07, z, x1 - x0, 0.09, 0.32, steel);
+    if (x0 > -31)
+      box(surface, (x0 + x1) / 2, h - 0.07, z, x1 - x0, 0.09, 0.32, steel);
     for (let x = x0 + 0.7; x < x1; x += 3.4)
       box(surface, x, 0, z, 0.017, h, 0.016, joint);
     for (const y of [3.0, 5.55])
       box(surface, (x0 + x1) / 2, y, z, x1 - x0, 0.016, 0.016, joint);
   }
   for (const [x, z0, z1, h] of [
-    [-31.33, 8.9, 27.17, 6.2],
+    [WING.west - 0.005, 8.9, 27.17, 6.2],
     [29.86, 3.51, 26.81, 6.65],
     [15.4, -12.46, 3.2, 6.65],
   ]) {
-    box(surface, x, h - 0.07, (z0 + z1) / 2, 0.32, 0.09, z1 - z0, steel);
+    if (x > -31)
+      box(surface, x, h - 0.07, (z0 + z1) / 2, 0.32, 0.09, z1 - z0, steel);
     for (let z = z0 + 2; z < z1; z += 4.5) {
       box(surface, x, 0, z, 0.016, h, 0.018, joint);
       box(surface, x, 3.4, z, 0.23, 0.11, 0.43, stone);
