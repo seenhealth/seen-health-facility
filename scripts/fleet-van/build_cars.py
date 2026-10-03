@@ -9,6 +9,11 @@ greenhouse, big chrome grille, roof rails, running boards), the sedan those of a
 drives, prefixed with the kind so names stay unique in the file (`suv-…`, `sedan-…`): `<kind>-passenger-door`
 (rear kerb-side door, pivot on its front edge), `<kind>-wheel-fl/fr/rl/rr` (local y is the axle),
 `<kind>-lamp-head/tail/brake/reverse`. The paint material `car-paint` is white and tinted per car by the scene.
+
+About 10-20k triangles a car: a smoothed side profile with wide rounded edges, shaded smooth below 35 degrees;
+see-through glass over a lined cabin with seats, dashboard, steering wheel and console; projector headlamps and
+LED strips; grille mesh, fog lamps, badges; chrome window trim; lathed wheels with a grooved tread, twin-spoke
+alloys over brake discs and calipers, lug nuts.
 """
 import bpy, bmesh, math, sys
 from mathutils import Vector, Matrix
@@ -38,7 +43,7 @@ def srgb(h):
 MAT = {
     'interior': principled('car-interior', srgb('#2a2d30'), 0.8),
     'paint': principled('car-paint', (1, 1, 1), 0.28, 0.45),
-    'glass': principled('car-glass', srgb('#121a20'), 0.06, 0.35),
+    'glass': principled('car-glass', srgb('#121a20'), 0.05, 0.4),
     'trim': principled('car-trim', srgb('#141618'), 0.45, 0.1),
     'chrome': principled('car-chrome', srgb('#d9dde0'), 0.14, 1.0),
     'tyre': principled('car-tyre', srgb('#1d1f21'), 0.9),
@@ -49,7 +54,16 @@ MAT = {
     'lamp-brake': principled('lamp-brake', srgb('#7e1a1a'), 0.3),
     'lamp-reverse': principled('lamp-reverse', srgb('#e9e7e0'), 0.3),
 }
-SLOTS = ['interior', 'paint', 'glass', 'trim', 'chrome', 'tyre', 'rim', 'plate']
+MAT['glass'].node_tree.nodes['Principled BSDF'].inputs['Alpha'].default_value = 0.5
+try:
+    MAT['glass'].surface_render_method = 'BLENDED'
+except Exception:
+    MAT['glass'].blend_method = 'BLEND'
+MAT['seat'] = principled('car-seat', srgb('#3a3632'), 0.7)
+MAT['caliper'] = principled('car-caliper', srgb('#9b2b22'), 0.4, 0.2)
+MAT['disc'] = principled('car-disc', srgb('#6e7174'), 0.45, 0.7)
+MAT['amber'] = principled('car-amber', srgb('#d4892a'), 0.3)
+SLOTS = ['interior', 'paint', 'glass', 'trim', 'chrome', 'tyre', 'rim', 'plate', 'seat', 'caliper', 'disc', 'amber']
 SI = {k: i for i, k in enumerate(SLOTS)}
 
 def new_obj(name, bm, parent=None, slots=SLOTS):
@@ -76,6 +90,37 @@ def cylinder_x(cy, cz, r, x0, x1, seg=24, bm=None, mat='trim'):
     pts = [(cz + r * math.cos(2 * math.pi * i / seg), cy + r * math.sin(2 * math.pi * i / seg)) for i in range(seg)]
     return prism(pts, x0, x1, bm, mat)
 
+def cylinder_z(cx, cy, r, z0, z1, seg=20, bm=None, mat='trim'):
+    """Cylinder along z (a lamp lens, a fog lamp, an exhaust tip)."""
+    bm = bm or bmesh.new()
+    a = [bm.verts.new(B(cx + r * math.cos(2 * math.pi * i / seg), cy + r * math.sin(2 * math.pi * i / seg), z0)) for i in range(seg)]
+    b = [bm.verts.new(B(cx + r * math.cos(2 * math.pi * i / seg), cy + r * math.sin(2 * math.pi * i / seg), z1)) for i in range(seg)]
+    fs = [bm.faces.new(a), bm.faces.new(list(reversed(b)))]
+    for i in range(seg):
+        j = (i + 1) % seg; fs.append(bm.faces.new([a[i], a[j], b[j], b[i]]))
+    for f in fs: f.material_index = SI.get(mat, 0)
+    bmesh.ops.recalc_face_normals(bm, faces=fs)
+    return bm
+def rounded(x0, x1, y0, y1, z0, z1, bm, mat, r=0.03, seg=2):
+    """A box with its edges rounded (seats, mirrors, consoles), merged into `bm`."""
+    tmp = box(x0, x1, y0, y1, z0, z1, None, mat)
+    bmesh.ops.bevel(tmp, geom=tmp.edges[:], offset=r, segments=seg, affect='EDGES', clamp_overlap=True)
+    me = bpy.data.meshes.new('tmp'); tmp.to_mesh(me); tmp.free(); bm.from_mesh(me); bpy.data.meshes.remove(me)
+    return bm
+def chaikin(points, iters=2):
+    """Corner-cut an open chain (endpoints kept): the profile's bumpers, hood, screen and roof round off."""
+    for _ in range(iters):
+        out = [points[0]]
+        for (za, ya), (zb, yb) in zip(points, points[1:]):
+            out += [(0.75 * za + 0.25 * zb, 0.75 * ya + 0.25 * yb), (0.25 * za + 0.75 * zb, 0.25 * ya + 0.75 * yb)]
+        out.append(points[-1]); points = out
+    return points
+def smooth(o, angle=35):
+    me = o.data
+    if hasattr(me, 'set_sharp_from_angle'):
+        me.set_sharp_from_angle(angle=math.radians(angle))
+    me.shade_smooth() if hasattr(me, 'shade_smooth') else None
+
 def boolean(target, cutter, op='DIFFERENCE'):
     m = target.modifiers.new('b', 'BOOLEAN'); m.object = cutter; m.operation = op; m.solver = 'EXACT'
     dg = bpy.context.evaluated_depsgraph_get()
@@ -99,7 +144,7 @@ SPECS = {
         windows=[(-1.18, -0.10), (0.00, 1.04), (1.16, 2.52)], pillars=[(-0.10, 0.00), (1.04, 1.16)],
         seams=[-1.27, -0.05, 1.10], door=[(0.0, 0.40), (1.10, 0.40), (1.10, 0.86), (1.03, 0.96), (1.10, 1.87), (0.0, 1.87)],
         hinge=0.0, handles=[(-0.42, 1.06), (0.62, 1.06)], mirror=(-1.16, -0.96, 1.22, 1.42),
-        bevel=0.13),
+        bevel=0.14, shieldTop=1.8, floor=0.55, cabin=(-1.25, 2.75), seats=(-0.35, [0.7, 1.8]), seatH=0.74, dash=-1.05),
     'sedan': dict(
         HW=0.97, WR=0.355, tyreW=0.245, axles=(-1.62, 1.53), belt=0.95, winTop=1.38, roof=1.48, taper=0.17,
         profile=[(-2.58, 0.24), (-2.63, 0.36), (-2.645, 0.58), (-2.60, 0.72), (-2.48, 0.80), (-1.30, 0.92),
@@ -109,20 +154,22 @@ SPECS = {
         windows=[(-0.82, 0.05), (0.15, 1.28)], pillars=[(0.05, 0.15)],
         seams=[-0.90, 0.10, 1.20], door=[(0.10, 0.30), (1.20, 0.30), (1.20, 0.80), (1.13, 0.90), (1.20, 1.36), (1.10, 1.40), (0.10, 1.47)],
         hinge=0.10, handles=[(-0.30, 0.86), (0.66, 0.86)], mirror=(-0.82, -0.64, 0.97, 1.11),
-        bevel=0.12),
+        bevel=0.13, shieldTop=1.41, floor=0.36, cabin=(-0.9, 1.4), seats=(-0.1, [0.9]), seatH=0.56, dash=-0.75),
 }
 
 def build(kind, S):
     HW, WR, belt, winTop, roof = S['HW'], S['WR'], S['belt'], S['winTop'], S['roof']
     root = bpy.data.objects.new(f'car-{kind}', None); scene.collection.objects.link(root)
     # ---- body: profile extrude, rounded on every edge of the silhouette, split for materials, tumblehome
-    bm = prism(S['profile'], -HW, HW, mat='paint')
+    prof = S['profile']
+    prof = chaikin(prof[:-1], 2) + [prof[-1]]   # the bottom run back to the front stays straight
+    bm = prism(prof, -HW, HW, mat='paint')
     edges = []
     for e in bm.edges:
         a, b = (T(v.co) for v in e.verts)
         if abs(abs(a.x) - HW) < 1e-4 and abs(abs(b.x) - HW) < 1e-4 and a.x * b.x > 0 and max(a.y, b.y) > 0.45:
             edges.append(e)
-    bmesh.ops.bevel(bm, geom=edges, offset=S['bevel'], segments=3, affect='EDGES', profile=0.5, clamp_overlap=True)
+    bmesh.ops.bevel(bm, geom=edges, offset=S['bevel'], segments=5, affect='EDGES', profile=0.5, clamp_overlap=True)
     cuts = [('y', belt), ('y', winTop)] + [('z', z) for span in S['windows'] + S['pillars'] for z in span] + \
            [('z', z) for z in S['windshield']]
     for axis, v in cuts:
@@ -140,11 +187,53 @@ def build(kind, S):
             c = new_obj('well', cylinder_x(WR, zc, WR + 0.07, *sorted((s * (HW - 0.32), s * (HW + 0.3))), seg=28), slots=[])
             boolean(body, c); remove(c)
     classify(body, S)
+    smooth(body)
+    # ---- cabin: an inward-facing lining so the glass shows a dark interior, then the furniture
+    # the lining follows the roofline 8 cm inside it, so it never shows through the screens or a sloping roof
+    def top(z):
+        ys = []
+        for (za, ya), (zb, yb) in zip(prof, prof[1:] + prof[:1]):
+            if min(za, zb) <= z <= max(za, zb) and za != zb:
+                ys.append(ya + (yb - ya) * (z - za) / (zb - za))
+        return max(ys) - 0.08
+    c0, c1 = S['cabin']
+    zs = [c0 + (c1 - c0) * i / 24 for i in range(25)]
+    outline = [(c0, S['floor']), (c1, S['floor'])] + [(z, max(S['floor'] + 0.2, top(z))) for z in reversed(zs)]
+    cab = prism(outline, -(HW - 0.14), HW - 0.14, None, 'interior')
+    bmesh.ops.reverse_faces(cab, faces=cab.faces[:])
+    for v in cab.verts:
+        p = T(v.co)
+        if p.y > belt:
+            k = 1 - S['taper'] * min(1, (p.y - belt) / (roof - belt))
+            v.co = B(p.x * k, p.y, p.z)
+    new_obj(f'{kind}-cabin', cab, root)
+    furn = bmesh.new()
+    fz, rz = S['seats']
+    sy = S['floor'] + 0.22
+    sh = S['seatH']
+    for x in (-0.42, 0.42):
+        rounded(x - 0.26, x + 0.26, sy, sy + 0.14, fz - 0.3, fz + 0.22, furn, 'seat', 0.05, 3)            # cushion
+        rounded(x - 0.25, x + 0.25, sy + 0.1, sy + sh, fz + 0.18, fz + 0.32, furn, 'seat', 0.05, 3)        # back
+        rounded(x - 0.13, x + 0.13, sy + sh + 0.02, sy + sh + 0.18, fz + 0.2, fz + 0.31, furn, 'seat', 0.04, 2)
+    for z in rz:
+        rounded(-0.75, 0.75, sy, sy + 0.14, z - 0.28, z + 0.22, furn, 'seat', 0.05, 3)
+        rounded(-0.74, 0.74, sy + 0.1, sy + sh - 0.04, z + 0.18, z + 0.3, furn, 'seat', 0.05, 3)
+        for x in (-0.45, 0.45):
+            rounded(x - 0.12, x + 0.12, sy + sh - 0.02, sy + sh + 0.12, z + 0.19, z + 0.29, furn, 'seat', 0.04, 2)
+    dz = S['dash']
+    rounded(-(HW - 0.16), HW - 0.16, belt - 0.32, belt + 0.02, dz - 0.25, dz + 0.12, furn, 'interior', 0.06, 3)
+    rounded(-0.12, 0.12, S['floor'], sy + 0.2, dz + 0.1, fz + 0.1, furn, 'interior', 0.05, 3)                # console
+    wheel_bm = bmesh.new()
+    bmesh.ops.create_cone(wheel_bm, cap_ends=False, segments=24, radius1=0.19, radius2=0.19, depth=0.035,
+                          matrix=Matrix.Translation(B(-0.42, belt + 0.02, dz + 0.32)) @ Matrix.Rotation(math.radians(-62), 4, 'X'))
+    for f in wheel_bm.faces: f.material_index = SI['trim']
+    me = bpy.data.meshes.new('tmp'); wheel_bm.to_mesh(me); wheel_bm.free(); furn.from_mesh(me); bpy.data.meshes.remove(me)
+    fo = new_obj(f'{kind}-interior', furn, root); smooth(fo, 50)
     # ---- rear kerb-side door: the body slab inside its outline, on a pivot at its front edge
     dc = new_obj('doorcut', prism(S['door'], HW - 0.09, HW + 0.4), slots=[])
     door_mesh = body.copy(); door_mesh.data = body.data.copy(); scene.collection.objects.link(door_mesh)
     boolean(door_mesh, dc, 'INTERSECT'); boolean(body, dc); remove(dc)
-    door_mesh.name = f'{kind}-door-panel'
+    door_mesh.name = f'{kind}-door-panel'; smooth(door_mesh)
     pivot = bpy.data.objects.new(f'{kind}-passenger-door', None); scene.collection.objects.link(pivot)
     pivot.parent = root; pivot.location = B(HW, 0, S['hinge'])
     reparent(door_mesh, pivot)
@@ -158,10 +247,19 @@ def build(kind, S):
         for zseam in S['seams']:
             box(*xs(HW - 0.004, HW + 0.004), 0.42 if kind == 'suv' else 0.33, belt - 0.02, zseam - 0.006, zseam + 0.006, trim)
         z0m, z1m, y0m, y1m = S['mirror']
-        mb = bmesh.new(); box(*xs(HW - 0.06, HW + 0.20), y0m, y1m, z0m, z1m, mb, 'paint')
-        bmesh.ops.bevel(mb, geom=mb.edges[:], offset=0.035, segments=2, affect='EDGES', clamp_overlap=True)
-        m_obj = new_obj(f'{kind}-mirror-{"r" if s > 0 else "l"}', mb, root)
-        box(*xs(HW - 0.03, HW + 0.02), y0m + 0.02, y0m + 0.07, z0m + 0.03, z1m - 0.03, trim)
+        mb = bmesh.new()
+        rounded(*xs(HW + 0.04, HW + 0.24), y0m, y1m, z0m, z1m, mb, 'paint', 0.045, 4)
+        rounded(*xs(HW - 0.04, HW + 0.07), y0m + 0.01, y0m + 0.07, z0m + 0.04, z1m - 0.06, mb, 'trim', 0.02, 2)
+        box(*xs(HW + 0.06, HW + 0.22), y0m + 0.025, y1m - 0.025, z1m - 0.004, z1m + 0.004, mb, 'chrome')     # glass
+        box(*xs(HW + 0.12, HW + 0.235), y0m + 0.01, y0m + 0.035, z0m + 0.02, z0m + 0.08, mb, 'amber')       # repeater
+        m_obj = new_obj(f'{kind}-mirror-{"r" if s > 0 else "l"}', mb, root); smooth(m_obj, 40)
+        # chrome window trim: the belt line and the top of the side glass, inset by the tumblehome
+        kTop = 1 - S['taper'] * min(1, (winTop - belt) / (roof - belt))
+        w0, w1 = S['windows'][0][0], S['windows'][-1][1]
+        box(*xs(HW - 0.005, HW + 0.012), belt - 0.012, belt + 0.012, w0, w1, chrome)
+        box(*xs(HW * kTop - 0.01, HW * kTop + 0.008), winTop - 0.01, winTop + 0.012, w0 + 0.1, w1 - (0.25 if kind == 'sedan' else 0.02), chrome)
+        # side marker and fuel door
+        box(*xs(HW - 0.003, HW + 0.004), belt - 0.33, belt - 0.29, S['axles'][0] - 0.78, S['axles'][0] - 0.64, chrome)
         for i, (zh, yh) in enumerate(S['handles']):
             if s > 0 and i == 1:
                 continue      # the rear kerb-side handle rides on the door
@@ -174,6 +272,15 @@ def build(kind, S):
         box(-0.61, 0.61, 0.65, 1.00, gz + 0.01, gz + 0.03, trim)
         for y in (0.74, 0.83, 0.92):
             box(-0.61, 0.61, y, y + 0.025, gz - 0.015, gz + 0.02, chrome)
+        # grille mesh behind the bars, a badge, projector headlamps with LED strips, round fog lamps
+        for gx in range(-11, 12):
+            box(gx * 0.05 - 0.006, gx * 0.05 + 0.006, 0.66, 0.99, gz + 0.0, gz + 0.012, trim)
+        cylinder_z(0, 0.875, 0.06, gz - 0.035, gz - 0.015, 20, chrome, 'chrome')
+        for s2 in (-1, 1):
+            for cx in (0.76, 0.88):
+                cylinder_z(s2 * cx, 1.015, 0.035, -2.885, -2.86, 16, lamps['head'], 'interior')
+            for cx in (0.72, 0.93):
+                cylinder_z(s2 * cx, 0.53, 0.04, -2.89, -2.86, 16, chrome, 'chrome')
         box(-0.95, 0.95, 0.34, 0.46, -2.84, -2.60, trim)
         for s in (-1, 1):
             box(*sorted((s * 0.68, s * 0.96)), 0.97, 1.06, -2.875, -2.85, lamps['head'], 'interior')
@@ -189,6 +296,9 @@ def build(kind, S):
             for z in (-0.20, 1.10, 2.35):
                 box(*sorted((s * 0.66, s * 0.72)), roof - 0.01, roof + 0.06, z - 0.05, z + 0.05, trim)
         box(-0.55, 0.55, 1.30, 1.34, 2.865, 2.89, chrome)
+        box(-0.30, 0.30, 1.86, 1.885, 2.70, 2.85, trim)                     # roof spoiler lip
+        box(-0.012, 0.012, 1.45, 1.75, 2.88, 2.9, trim)                     # rear wiper
+        cylinder_z(0, 1.18, 0.05, 2.875, 2.89, 20, chrome, 'chrome')        # tailgate badge
         box(-0.98, 0.98, 0.34, 0.52, 2.62, 2.86, trim)
         box(-0.26, 0.26, 0.62, 0.78, 2.875, 2.885, plate); box(-0.26, 0.26, 0.40, 0.56, -2.885, -2.875, plate)
     else:
@@ -199,6 +309,14 @@ def build(kind, S):
         box(-0.365, 0.365, 0.515, 0.70, gz + 0.005, gz + 0.02, trim)
         for i in range(-6, 7):
             box(i * 0.052 - 0.008, i * 0.052 + 0.008, 0.515, 0.70, gz - 0.01, gz + 0.02, chrome)
+        cylinder_z(0, 0.76, 0.045, -2.60, -2.585, 20, chrome, 'chrome')      # bonnet badge
+        cylinder_z(0, 0.97, 0.04, 2.505, 2.52, 20, chrome, 'chrome')         # trunk badge
+        box(-0.02, 0.02, 1.48, 1.54, 0.55, 0.75, trim)                       # roof fin
+        for s2 in (-1, 1):
+            for cx in (0.58, 0.70, 0.82):
+                cylinder_z(s2 * cx, 0.755, 0.026, -2.605, -2.585, 14, lamps['head'], 'interior')
+            for cx in (0.54, 0.66):
+                cylinder_z(s2 * cx, 0.305, 0.035, 2.60, 2.65, 16, chrome, 'chrome')
         for s in (-1, 1):
             box(*sorted((s * 0.46, s * 0.92)), 0.72, 0.79, -2.60, -2.57, lamps['head'], 'interior')
             box(*sorted((s * 0.55, s * 0.85)), 0.33, 0.43, -2.645, -2.62, trim)
@@ -244,53 +362,80 @@ def classify(o, S):
         elif c.y > belt + 0.02 and abs(n.x) <= 0.45:
             w0, w1 = S['windshield']
             mode, r0, r1 = S['rearGlass']
-            if w0 < c.z < w1 and n.z < -0.2:
+            # the smoothed roof curves into the screens, so each screen stops at its top edge (and the rear glass
+            # where the roof starts to fall away), else the roof's leading and trailing curves read as glass
+            if w0 < c.z < w1 and n.z < -0.25 and c.y < S['shieldTop']:
                 k = 'glass'
             elif mode == 'z' and c.z > r0 and n.z > 0.3 and c.y < winTop + 0.02:
                 k = 'glass'
-            elif mode == 'band' and r0 < c.z < r1 and n.y < 0.985:
+            elif mode == 'band' and r0 < c.z < r1 and n.y < 0.95 and c.y < S['shieldTop']:
                 k = 'glass'
         f.material_index = SI[k]
     bm.to_mesh(o.data); bm.free()
 
 def wheel(root, name, x, zc, WR, tw, outer_sign, spokes):
-    """Lathed tyre with shoulders, a recessed dark rim face with silver spokes, hub cap; local +Y is the axle."""
-    bmw = bmesh.new(); seg = 32; sd = outer_sign; hw = tw / 2
-    rimR = WR * 0.68
-    prof = [(rimR, hw * 0.95), (WR * 0.93, hw), (WR * 0.985, hw * 0.75), (WR, hw * 0.25), (WR, -hw * 0.25),
-            (WR * 0.985, -hw * 0.75), (WR * 0.93, -hw), (rimR, -hw * 0.95)]
-    rings = [[bmw.verts.new(Vector((r * math.cos(2 * math.pi * i / seg), r * math.sin(2 * math.pi * i / seg), h * sd)))
-              for i in range(seg)] for r, h in prof]
-    for ra, rb in zip(rings, rings[1:]):
+    """Lathed tyre with shoulders and tread grooves; a rim lip, twin spokes over a brake disc and caliper, hub and
+    lug nuts. Local +Y is the axle."""
+    bmw = bmesh.new(); seg = 36; sd = outer_sign; hw = tw / 2
+    rimR = WR * 0.7
+    def ring(r, h):
+        return [bmw.verts.new(Vector((r * math.cos(2 * math.pi * i / seg), r * math.sin(2 * math.pi * i / seg), h * sd))) for i in range(seg)]
+    def band(ra, rb, mat):
         for i in range(seg):
-            j = (i + 1) % seg; f = bmw.faces.new([ra[i], rb[i], rb[j], ra[j]]); f.material_index = SI['tyre']
-    # rim lip ring, dark recessed face, spokes and hub on the outer side
-    lip_o = rings[0]
-    lip_i = [bmw.verts.new(Vector((rimR * 0.92 * math.cos(2 * math.pi * i / seg), rimR * 0.92 * math.sin(2 * math.pi * i / seg), hw * 0.9 * sd))) for i in range(seg)]
-    face_c = bmw.verts.new(Vector((0, 0, hw * 0.55 * sd)))
-    for i in range(seg):
-        j = (i + 1) % seg
-        f = bmw.faces.new([lip_o[i], lip_o[j], lip_i[j], lip_i[i]] if sd > 0 else [lip_o[i], lip_i[i], lip_i[j], lip_o[j]]); f.material_index = SI['rim']
-        f = bmw.faces.new([lip_i[i], lip_i[j], face_c] if sd > 0 else [lip_i[j], lip_i[i], face_c]); f.material_index = SI['trim']
-    inner = rings[-1]; ic = bmw.verts.new(Vector((0, 0, -hw * 0.9 * sd)))
-    for i in range(seg):
-        j = (i + 1) % seg
-        f = bmw.faces.new([inner[j], inner[i], ic] if sd > 0 else [inner[i], inner[j], ic]); f.material_index = SI['trim']
+            j = (i + 1) % seg; f = bmw.faces.new([ra[i], rb[i], rb[j], ra[j]]); f.material_index = SI[mat]
+    def cap(rg, h, mat, flip):
+        c = bmw.verts.new(Vector((0, 0, h * sd)))
+        for i in range(seg):
+            j = (i + 1) % seg
+            f = bmw.faces.new([rg[i], rg[j], c] if flip else [rg[j], rg[i], c]); f.material_index = SI[mat]
+    # tyre: sidewall to shoulder, a tread with three grooves, shoulder, inner sidewall
+    g = 0.012
+    prof = [(rimR, hw * 0.95), (WR * 0.92, hw), (WR * 0.98, hw * 0.82), (WR, hw * 0.6), (WR - g, hw * 0.52), (WR - g, hw * 0.42),
+            (WR, hw * 0.34), (WR, hw * 0.06), (WR - g, -hw * 0.02), (WR - g, -hw * 0.1), (WR, -hw * 0.18), (WR, -hw * 0.6),
+            (WR * 0.98, -hw * 0.82), (WR * 0.92, -hw), (rimR, -hw * 0.95)]
+    rings = [ring(r, h) for r, h in prof]
+    for ra, rb in zip(rings, rings[1:]):
+        band(ra, rb, 'tyre')
+    # rim: lip from the tyre's bead in to a recessed barrel, the disc behind it
+    lip = ring(rimR * 0.94, hw * 0.98); barrel = ring(rimR * 0.9, hw * 0.35)
+    band(rings[0], lip, 'rim'); band(lip, barrel, 'rim')
+    disc_o = ring(rimR * 0.82, hw * 0.25); cap(disc_o, hw * 0.25, 'disc', sd > 0)
+    cap(rings[-1], -hw * 0.9, 'trim', sd < 0)
+    # caliper at the trailing top of the disc
+    for k in range(4):
+        a0, a1 = math.radians(60 + k * 9), math.radians(69 + k * 9)
+        r0, r1 = rimR * 0.62, rimR * 0.86
+        q = [Vector((r * math.cos(a), r * math.sin(a), h * sd)) for r, a, h in
+             ((r0, a0, hw * 0.28), (r1, a0, hw * 0.28), (r1, a1, hw * 0.28), (r0, a1, hw * 0.28),
+              (r0, a0, hw * 0.45), (r1, a0, hw * 0.45), (r1, a1, hw * 0.45), (r0, a1, hw * 0.45))]
+        v = [bmw.verts.new(c) for c in q]
+        for qq in ((0, 1, 2, 3), (4, 7, 6, 5), (0, 4, 5, 1), (1, 5, 6, 2), (2, 6, 7, 3), (3, 7, 4, 0)):
+            f = bmw.faces.new([v[n] for n in qq]); f.material_index = SI['caliper']
+    # twin spokes: each a pair of tapered bars from the hub to the lip, bowed outward at mid-span
     for i in range(spokes):
-        # a tapered spoke from the hub to the lip, standing proud of the dark face
-        a = 2 * math.pi * i / spokes
-        ca, sa = math.cos(a), math.sin(a)
-        def at(r, t, h):
-            return bmw.verts.new(Vector((r * ca - t * sa, r * sa + t * ca, h * sd)))
-        r0, r1, t0, t1, h0, h1 = 0.05, rimR * 0.9, 0.03, 0.018, hw * 0.62, hw * 0.88
-        v = [at(r0, -t0, h0), at(r1, -t1, h0), at(r1, t1, h0), at(r0, t0, h0),
-             at(r0, -t0, h1), at(r1, -t1, h1), at(r1, t1, h1), at(r0, t0, h1)]
-        for q in ((0, 1, 2, 3), (4, 7, 6, 5), (0, 4, 5, 1), (1, 5, 6, 2), (2, 6, 7, 3), (3, 7, 4, 0)):
-            f = bmw.faces.new([v[k] for k in q]); f.material_index = SI['rim']
-    hub = [bmw.verts.new(Vector((0.06 * math.cos(2 * math.pi * i / 12), 0.06 * math.sin(2 * math.pi * i / 12), hw * 0.85 * sd))) for i in range(12)]
+        for off in (-0.045, 0.045):
+            a = 2 * math.pi * i / spokes + off * (1.0 if spokes <= 6 else 0.6)
+            ca, sa = math.cos(a), math.sin(a)
+            def at(r, t, h):
+                return bmw.verts.new(Vector((r * ca - t * sa, r * sa + t * ca, h * sd)))
+            pts = [(0.07, 0.016, hw * 0.8), (rimR * 0.5, 0.013, hw * 0.92), (rimR * 0.92, 0.01, hw * 0.88)]
+            lay = [[at(r, -t, h - 0.02), at(r, t, h - 0.02), at(r, t, h), at(r, -t, h)] for r, t, h in pts]
+            for la, lb in zip(lay, lay[1:]):
+                for k in range(4):
+                    l = (k + 1) % 4
+                    f = bmw.faces.new([la[k], la[l], lb[l], lb[k]]); f.material_index = SI['rim']
+            for la, flip in ((lay[0], True), (lay[-1], False)):
+                f = bmw.faces.new(la if flip else list(reversed(la))); f.material_index = SI['rim']
+    # hub cap and five lug nuts
+    hub = [bmw.verts.new(Vector((0.075 * math.cos(2 * math.pi * i / 16), 0.075 * math.sin(2 * math.pi * i / 16), hw * 0.84 * sd))) for i in range(16)]
     hf = bmw.faces.new(hub if sd > 0 else list(reversed(hub))); hf.material_index = SI['chrome']
+    for k in range(5):
+        a = 2 * math.pi * k / 5
+        cx, cy = 0.05 * math.cos(a), 0.05 * math.sin(a)
+        nut = [bmw.verts.new(Vector((cx + 0.011 * math.cos(2 * math.pi * i / 6), cy + 0.011 * math.sin(2 * math.pi * i / 6), hw * 0.86 * sd))) for i in range(6)]
+        f = bmw.faces.new(nut if sd > 0 else list(reversed(nut))); f.material_index = SI['chrome']
     bmesh.ops.recalc_face_normals(bmw, faces=bmw.faces)
-    o = new_obj(name, bmw, root)
+    o = new_obj(name, bmw, root); smooth(o, 40)
     o.location = B(x, WR, zc)
     o.rotation_euler = (0, -math.pi / 2, 0)   # local Y (three) along x, as the van's wheels
 

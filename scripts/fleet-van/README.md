@@ -25,8 +25,9 @@ Needs Blender 4.2+ (`BLENDER=`) and a python with numpy + pillow (`PYTHON=`). Pr
 
 `public/models/live-cars.glb`: a generic full-size SUV (Suburban / Yukon XL / Expedition MAX class: 5.75 m,
 upright greenhouse, big chrome grille, roof rails, running boards) and a large sedan (7 Series / S-Class class:
-5.29 m, long hood, fastback C-pillar, slim lamps, light bar across the tail), no brand marks. About 4,300
-triangles each, no textures, 0.5 MB together. Roots `car-suv` / `car-sedan`; nodes prefixed by kind
+5.29 m, long hood, fastback C-pillar, slim lamps, light bar across the tail), no brand marks. About 11,700
+triangles each (smoothed bodies, see-through glass over a lined cabin with seats and dashboard, projector lamps,
+grille mesh, chrome window trim, twin-spoke alloys over brake discs and calipers), no textures, 1.2 MB together. Roots `car-suv` / `car-sedan`; nodes prefixed by kind
 (`suv-passenger-door`, `sedan-wheel-fl`, `suv-lamp-head`, …) so the names stay unique in one file. The white
 `car-paint` material is tinted per car by `buildLiveCar` (live-vehicles.ts), which keeps the procedural cars as
 the fallback.
