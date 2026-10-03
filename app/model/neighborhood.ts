@@ -515,12 +515,14 @@ export function buildNeighborhood(model: Facility) {
   // planter (the fleet's bays, at their pitch), the hatched accessible aisle
   // and stall at its south end, and a row of slightly angled stalls along the
   // building north of the drop-off.
-  for (let k = 0; k < 8; k++)
+  // Seven white stall lines; the eighth line (z −3.45) is the accessible aisle's blue edge, not drawn twice. The
+  // aisle and stall lines run the full stall length, as the white ones do.
+  for (let k = 0; k < 7; k++)
     stall([-31.0, -23.05 + 2.8 * k], [-24.9, -23.05 + 2.8 * k]);
-  for (let x = -30.6; x < -26.6; x += 0.9)
+  for (let x = -30.9; x + 1.6 <= -24.95; x += 0.9)
     strip([x, -3.3], [x + 1.6, -1.2], 0.08, SITE.accessible);
   for (const z of [-3.45, -1.05, 1.45])
-    strip([-31.0, z], [-26.5, z], 0.1, SITE.accessible);
+    strip([-31.0, z], [-24.9, z], 0.1, SITE.accessible);
   accessSymbol(-27.9, 0.2, 1.1, Math.PI / 2);
   for (let k = 0; k < 6; k++)
     stall([-20.4, -19.5 + 2.7 * k], [-15.0, -21.5 + 2.7 * k]);
@@ -603,11 +605,8 @@ export function buildNeighborhood(model: Facility) {
     [4152, 671, 2.6, 4.8],
     [4152, 1064, 2.3, 4.4],
     [4152, 1693, 2.5, 4.6],
-    [464, 2334, 0.55, 1.6],
-    [551, 2334, 0.55, 1.6],
   ].forEach((p, i) => tree(p[0], p[1], p[2], p[3], i));
   for (const [x, z] of [
-    [-31.2, 29.6],
     [-4, 31],
     [30, 29],
     [63.6, -24],

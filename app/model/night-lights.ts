@@ -124,7 +124,9 @@ export function createNightLights(
     );
   }
   // Valley Blvd runs along the north; the trees stand at z 30.2, the lamps just past them with the arm over the road.
-  for (const x of [-27, -4, 20]) streetLamp(x, 31.2, [0, 1]);
+  // The one by the Ethel corner (Street View, May 2025) stands a little back from the curb, just east of the hydrant.
+  streetLamp(-26.6, 30.75, [0, 1]);
+  for (const x of [-4, 20]) streetLamp(x, 31.2, [0, 1]);
   // Ethel Avenue on the west, behind the parkway lawn.
   for (const z of [-15, 12]) streetLamp(-35.6, z, [-1, 0]);
   // The alley's utility pole carries a street light on a short arm.

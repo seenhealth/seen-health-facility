@@ -354,23 +354,24 @@ export function buildAlhambraExterior(model: Facility) {
       d,
       frame,
     );
+    // The sill runs down to the ground as the frame's base (Street View: no gap under the frame).
     box(
       corner,
       cx - d / 2,
-      0.36,
+      -0.05,
       (ethelEnd + cz + d) / 2,
       d,
-      0.16,
+      0.57,
       cz + d - ethelEnd,
       frame,
     );
     box(
       corner,
       (cx - d + valleyEnd) / 2,
-      0.36,
+      -0.05,
       cz + d / 2,
       valleyEnd - cx + d,
-      0.16,
+      0.57,
       d,
       frame,
     );
@@ -444,8 +445,8 @@ export function buildAlhambraExterior(model: Facility) {
   // carried 0.3 m past the foot and looped back.
   {
     const shape = new T.Shape();
-    shape.moveTo(RAMP.x0, -0.1);
-    shape.lineTo(RAMP.x1, -0.1);
+    shape.moveTo(RAMP.x0, -0.23);
+    shape.lineTo(RAMP.x1, -0.23);
     shape.lineTo(RAMP.x1, RAMP.y1);
     shape.lineTo(RAMP.x0, RAMP.y0);
     shape.closePath();
@@ -454,7 +455,9 @@ export function buildAlhambraExterior(model: Facility) {
       bevelEnabled: false,
     });
     geo.translate(0, 0, RAMP.z - RAMP.w / 2);
-    mesh(edge, geo, stone).receiveShadow = true;
+    const concrete = '#d6d2c9',
+      walk = '#e4e0d7';
+    mesh(edge, geo, concrete).receiveShadow = true;
     const curb = mesh(
       edge,
       new T.BoxGeometry(
@@ -462,7 +465,7 @@ export function buildAlhambraExterior(model: Facility) {
         0.12,
         0.15,
       ),
-      stone,
+      concrete,
     );
     curb.position.set(
       (RAMP.x0 + RAMP.x1) / 2,
@@ -470,15 +473,49 @@ export function buildAlhambraExterior(model: Facility) {
       RAMP.z + RAMP.w / 2 - 0.075,
     );
     curb.rotation.z = slope;
+    // Flush with the sidewalk (top −0.05): the apron at the ramp's foot, from the wall out to the ramp's street
+    // edge, and the strip between the storefront wall and the ramp along its length; a mulch bed fills the corner
+    // between the wall and the two sidewalks (no ground drawn there before), behind a concrete edge.
+    const wallZ = 27.289;
     box(
       edge,
-      RAMP.x0 - 0.75,
-      -0.1,
-      RAMP.z,
-      1.5,
-      0.05 + 0.1,
-      RAMP.w + 0.3,
-      stone,
+      (-31.309 + RAMP.x0) / 2,
+      -0.23,
+      (wallZ + RAMP.z + RAMP.w / 2) / 2,
+      RAMP.x0 + 31.309,
+      0.18,
+      RAMP.z + RAMP.w / 2 - wallZ,
+      walk,
+    );
+    box(
+      edge,
+      (RAMP.x0 + RAMP.x1) / 2,
+      -0.23,
+      (wallZ + RAMP.z - RAMP.w / 2) / 2,
+      RAMP.x1 - RAMP.x0,
+      0.18,
+      RAMP.z - RAMP.w / 2 - wallZ,
+      walk,
+    );
+    box(
+      edge,
+      (-32.51 - 31.309) / 2,
+      -0.23,
+      (26.8 + 28.29) / 2,
+      32.51 - 31.309,
+      0.15,
+      28.29 - 26.8,
+      '#5a4635',
+    );
+    box(
+      edge,
+      -32.44,
+      -0.23,
+      (26.8 + 28.29) / 2,
+      0.14,
+      0.2,
+      28.29 - 26.8,
+      concrete,
     );
   }
   function rail(
@@ -536,7 +573,7 @@ export function buildAlhambraExterior(model: Facility) {
   // and grasses (it was a row of round shrubs on a raised box).
   {
     const bz0 = RAMP.z + RAMP.w / 2,
-      bz1 = 30.1,
+      bz1 = 29.75,
       bx0 = RAMP.x0,
       bx1 = -14.9;
     box(
@@ -1061,7 +1098,8 @@ export function buildAlhambraExterior(model: Facility) {
         .position.set(x + dx, 0.4, z);
   }
   hydrant(-34.5, -23.2);
-  hydrant(-32.6, 28.8);
+  // On the Valley curb, just west of the street lamp by the corner (Street View, May 2025).
+  hydrant(-27.5, 30.85);
   function palm(x: number, z: number, h: number, crown: number) {
     const g = group(street, 'fan-palm');
     const trunk = mesh(g, new T.CylinderGeometry(0.11, 0.17, h, 10), '#8a7254');
