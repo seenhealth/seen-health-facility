@@ -23,8 +23,11 @@ import {
   updateArrivalVan,
 } from './arrival';
 import {
+  ANGLED,
+  angledApproach,
   FLEET_LOT,
   FLEET_VAN,
+  WEST_STALLS,
   fleetParking,
   fleetRoutes,
   type FleetLeg,
@@ -136,9 +139,15 @@ function photoOf(
   return null;
 }
 const L = FLEET_LOT;
-const BAYS = fleetParking.length; // five bays, then the three curb spots
-/** When every spot is taken: along the aisle, nose south, 7 m apart from the dock southward. */
-const overflowSpot = (n: number) => ({ x: L.aisle, z: -4 - 7 * n, heading: 0 });
+/**
+ * The lot's twelve spaces (no street parking: the fleet's curb spots on Ethel are its own): 0-4 the fleet's back-in
+ * bays, 5-6 the west row's two stalls north of them, 7-11 the angled stalls along the building, which take cars only.
+ * Vans fill the bays first, cars the angled stalls first. With none free a vehicle leaves rather than park off the lot.
+ */
+const BAYS = 5;
+const SPOTS = BAYS + WEST_STALLS.length + ANGLED.centres.length;
+const isWest = (i: number) => i >= BAYS && i < BAYS + WEST_STALLS.length;
+const angledIndex = (i: number) => i - BAYS - WEST_STALLS.length;
 const smooth = (a: number, b: number, x: number) => {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
   return t * t * (3 - 2 * t);
@@ -261,6 +270,8 @@ type Live = {
   /** Seconds since the last boarder vanished into the car with nobody else pending; closes up at 1.5. */
   closeTimer: number;
   leaveWhenClosed: boolean;
+  /** No space was free after unloading, so it is driving off. */
+  lotFull?: boolean;
   braking: boolean;
   reversing: boolean;
 };
@@ -277,7 +288,7 @@ function drive(legs: FleetLeg[]): Drive {
   return { pieces, length: at, legs: spans };
 }
 const reverseLeg = (leg: FleetLeg) =>
-  leg.id === 'dock-reverse' || leg.id === 'back-in';
+  leg.id === 'dock-reverse' || leg.id === 'back-in' || leg.id === 'back-out';
 const legAt = (d: Drive, s: number) =>
   d.legs.find((l) => s <= l.end) ?? d.legs.at(-1)!;
 
@@ -769,18 +780,56 @@ export function createLiveLot(ctx: {
       halfLength: car.halfLength,
     };
   }
-  function freeSpot(): number | null {
-    for (let i = 0; i < BAYS + 6; i++) if (!spots.has(i)) return i;
-    return null;
+  const order = (l: Live) => {
+    const all = Array.from({ length: SPOTS }, (_, i) => i);
+    return l.body.van
+      ? all.filter((i) => i < BAYS + WEST_STALLS.length)
+      : [
+          ...all.slice(BAYS + WEST_STALLS.length),
+          ...all.slice(BAYS, BAYS + WEST_STALLS.length),
+          ...all.slice(0, BAYS),
+        ];
+  };
+  function freeSpot(l: Live): number | null {
+    return order(l).find((i) => !spots.has(i)) ?? null;
   }
-  const spotPose = (i: number) =>
-    i < BAYS
-      ? {
-          x: fleetParking[i].x,
-          z: fleetParking[i].z,
-          heading: fleetParking[i].heading,
-        }
-      : overflowSpot(i - BAYS);
+  const spotPose = (i: number, l: Live) => {
+    if (i < BAYS)
+      return {
+        x: fleetParking[i].x,
+        z: fleetParking[i].z,
+        heading: fleetParking[i].heading,
+      };
+    if (isWest(i))
+      return {
+        x: fleetParking[0].x,
+        z: WEST_STALLS[i - BAYS],
+        heading: fleetParking[0].heading,
+      };
+    const a = angledApproach(angledIndex(i), l.body.halfLength);
+    return { x: a.cx, z: a.cz, heading: ANGLED.dir + Math.PI };
+  };
+  /** The way from the drop-off into spot `i`, and out of it off site; null when the planner cannot build one. */
+  function spotIn(i: number, l: Live): FleetLeg[] | null {
+    if (i < BAYS) return dockToBay(i);
+    try {
+      return isWest(i)
+        ? fleetRoutes.frontDockToStall(WEST_STALLS[i - BAYS])
+        : fleetRoutes.frontDockToAngled(angledIndex(i), l.body.halfLength);
+    } catch {
+      return null;
+    }
+  }
+  function spotOut(i: number, l: Live): FleetLeg[] | null {
+    if (i < BAYS) return bayRoute(i);
+    try {
+      return isWest(i)
+        ? fleetRoutes.stallToAway(WEST_STALLS[i - BAYS])
+        : fleetRoutes.angledToAway(angledIndex(i), l.body.halfLength);
+    } catch {
+      return null;
+    }
+  }
   function place(o: T.Object3D, x: number, z: number, heading: number) {
     o.position.set(x, L.streetY, z);
     o.rotation.y = heading;
@@ -803,16 +852,23 @@ export function createLiveLot(ctx: {
     l.vel = 0;
     l.targetS = l.drive?.length ?? 0;
     l.mode = mode;
+    if (mode === 'arriving') l.lotFull = false;
     if (l.drive) pose(l);
   }
   function parkAt(l: Live) {
-    const i = freeSpot();
+    const i = freeSpot(l);
     l.spot = i;
-    if (i !== null) spots.set(i, l.v.id);
-    const sp = i === null ? overflowSpot(9) : spotPose(i);
-    place(l.body.object, sp.x, sp.z, sp.heading);
     l.drive = null;
     l.vel = 0;
+    if (i === null) {
+      // The feed has it on the lot but every space is taken: not drawn rather than parked off the lot.
+      l.mode = 'gone';
+      l.opacity = 0;
+      return;
+    }
+    spots.set(i, l.v.id);
+    const sp = spotPose(i, l);
+    place(l.body.object, sp.x, sp.z, sp.heading);
     l.mode = 'parked';
     l.opacity = 1;
   }
@@ -881,6 +937,8 @@ export function createLiveLot(ctx: {
         riders: v.state === 'on-lot' ? all : [],
       };
     }
+    if (l.mode === 'leaving' && l.lotFull)
+      return { ...v, detail: 'lot full · leaving', riders: [] };
     if (l.mode === 'leaving') {
       const aboard = all.filter((p) => l.boarded.has(p.name));
       return {
@@ -1105,9 +1163,7 @@ export function createLiveLot(ctx: {
     }
     l.leaveWhenClosed = false;
     const bayLegs =
-      l.mode === 'parked' && l.spot !== null && l.spot < BAYS
-        ? bayRoute(l.spot)
-        : null;
+      l.mode === 'parked' && l.spot !== null ? spotOut(l.spot, l) : null;
     if (bayLegs) {
       releaseSpot(l);
       start(l, bayLegs, 'leaving');
@@ -1222,13 +1278,17 @@ export function createLiveLot(ctx: {
     if (l.ramp <= 0.01) l.doorTarget = 0;
     if (l.door <= 0.01 && l.ramp <= 0.01 && l.cab <= 0.01) {
       l.dock = null;
-      const i = freeSpot();
-      const legs = i !== null && i < BAYS ? dockToBay(i) : null;
+      const i = freeSpot(l);
+      const legs = i !== null ? spotIn(i, l) : null;
       if (legs && i !== null) {
         l.spot = i;
         spots.set(i, l.v.id);
         start(l, legs, 'toBay');
-      } else parkAt(l);
+      } else {
+        // Lot full: on out of the lot rather than park in the aisle or the street.
+        l.lotFull = true;
+        start(l, fleetRoutes.frontDockToAway(), 'leaving');
+      }
     }
   }
 

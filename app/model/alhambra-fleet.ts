@@ -373,6 +373,71 @@ export const fleetRoutes = {
       ),
     ];
   },
+  /** Live lot: drop-off → a stall of the west row north of the fleet bays (centre z), reversing in like the bays. */
+  frontDockToStall(z: number): FleetLeg[] {
+    const [x, z0] = FRONT_DOCK.at,
+      pen = new Pen(x, z0, SOUTH);
+    return [
+      leg(pen, 'front-dock-to-bay', 'Driving to a stall', LOT, (p) =>
+        p
+          .line(L.lead)
+          .jog(p.x - L.aisle, L.laneChangeRadius)
+          .lineToZ(z - R),
+      ),
+      leg(
+        new Pen(L.aisle, z - R, NORTH),
+        'back-in',
+        'Reversing into a stall',
+        REVERSE,
+        (p) => p.arc(R, -Math.PI / 2).lineToX(BAY.x),
+      ),
+    ];
+  },
+  /** Live lot: out of a west-row stall (centre z), right onto the aisle, over to the exit lane and off site. */
+  stallToAway(z: number): FleetLeg[] {
+    const pen = new Pen(BAY.x, z, EAST);
+    return [
+      leg(pen, 'bay-out', 'Pulling out of a stall', LOT, (p) =>
+        p.lineToX(L.aisle - R).arc(R, Math.PI / 2),
+      ),
+      leg(pen, 'lane-change', 'Driving to the street', LOT, (p) =>
+        p.jog(p.x - L.exitLane, LC),
+      ),
+      ...drivewayToAway(pen),
+    ];
+  },
+  /**
+   * Live lot: drop-off → angled stall `j` along the building (cars only; the stalls are too short for a van), nose
+   * in: straight on down the dock lane, a left turn into the stall's line and in until the nose is 0.3 m short of
+   * the stall's end. `half` is the car's half length.
+   */
+  frontDockToAngled(j: number, half: number): FleetLeg[] {
+    const a = angledApproach(j, half),
+      pen = new Pen(a.x0, FRONT_DOCK.at[1], SOUTH);
+    return [
+      leg(pen, 'front-dock-to-angled', 'Driving to a stall', LOT, (p) =>
+        p.lineToZ(a.z0).arc(ANGLED.turnRadius, a.turn).line(a.run),
+      ),
+    ];
+  },
+  /** Live lot: back out of angled stall `j` the way it went in, then on down the dock lane to the exit lane and off site. */
+  angledToAway(j: number, half: number): FleetLeg[] {
+    const a = angledApproach(j, half),
+      pen = new Pen(a.x0, a.z0, SOUTH);
+    return [
+      leg(
+        new Pen(a.cx, a.cz, ANGLED.dir + Math.PI),
+        'back-out',
+        'Backing out of a stall',
+        REVERSE,
+        (p) => p.line(a.run).arc(ANGLED.turnRadius, -a.turn),
+      ),
+      leg(pen, 'lane-change', 'Driving to the street', LOT, (p) =>
+        p.line(L.lead).jog(p.x - L.exitLane, LC),
+      ),
+      ...drivewayToAway(pen),
+    ];
+  },
   /** From south of the bay, reverse through a left-hand turn and straight back into it (the bays are back-in stalls, nose east). */
   backIn(index: number): FleetLeg[] {
     const b = fleetParking[index],
@@ -384,6 +449,35 @@ export const fleetRoutes = {
     ];
   },
 };
+/**
+ * The live lot's spaces besides the five fleet bays: the west row's two stalls north of them (centre z, reversed in
+ * like the bays, nose east) and the five slightly angled stalls along the building south of the drop-off, between the
+ * stall lines neighborhood.ts paints from (-20.4, -19.5 + 2.7k) to (-15.0, -21.5 + 2.7k); `dir` is the way a car faces
+ * nosed into one. Cars only: at 5.4 m the angled stalls are shorter than a fleet van.
+ */
+export const WEST_STALLS = [-7.65, -4.85];
+export const ANGLED = {
+  centres: [0, 1, 2, 3, 4].map((j) => -19.15 + 2.7 * j),
+  dir: Math.atan2(5.4, -2),
+  noseX: -15.3,
+  turnRadius: 4,
+};
+/** Where a car of half length `half` stands nosed into angled stall `j`, and the straight-then-turn way in from the dock lane. */
+export function angledApproach(j: number, half: number) {
+  const d = ANGLED.dir,
+    hx = Math.sin(d),
+    hz = Math.cos(d),
+    cx = ANGLED.noseX - half * hx,
+    cz = ANGLED.centres[j] + (cx + 17.7) * (-2 / 5.4),
+    x0 = FRONT_DOCK.at[0],
+    turn = d - SOUTH;
+  const probe = new Pen(x0, 0, SOUTH);
+  probe.arc(ANGLED.turnRadius, turn);
+  const px = probe.x,
+    run = (cx - px) / hx,
+    z0 = cz - run * hz - probe.z;
+  return { cx, cz, x0, z0, turn, run };
+}
 /** Southbound on the exit lane, out onto the street and off site to the south. */
 function drivewayToAway(pen: Pen): FleetLeg[] {
   return [
