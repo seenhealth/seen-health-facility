@@ -606,8 +606,8 @@ export function buildNeighborhood(model: Facility) {
     [4152, 1064, 2.3, 4.4],
     [4152, 1693, 2.5, 4.6],
   ].forEach((p, i) => tree(p[0], p[1], p[2], p[3], i));
+  // (The Valley street lamp at x -4 is night-lights.ts's; no second pole there.)
   for (const [x, z] of [
-    [-4, 31],
     [30, 29],
     [63.6, -24],
     [-34.4, -21.4],
