@@ -166,8 +166,11 @@ const DOCK_CLEAR = 0.6;
 const TURN_RATE = 0.55;
 /** The stretch of the street (z) a standing vehicle's centre keeps off, either side of the alley's mouth. */
 const ALLEY_MOUTH_Z: [number, number] = [L.westbound - 8.5, L.westbound + 6.7];
-/** A departure waits at the alley's end while an arrival is within `yield` m short of its mouth, and claims the crossing from `claim` m before its turn. */
-const CROSSING = { yield: 35, claim: 8 };
+/**
+ * A departure waits at the alley's end while an arrival will reach its mouth within `seconds` (plus `margin` m), and
+ * claims the crossing from `claim` m before its turn.
+ */
+const CROSSING = { seconds: 5, margin: 3, claim: 8 };
 const smooth = (a: number, b: number, x: number) => {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
   return t * t * (3 - 2 * t);
@@ -1542,43 +1545,40 @@ export function createLiveLot(ctx: {
       }
       // Still short of the corner: it waits there for an arrival on its way past, else it claims the crossing as it
       // comes up to it, so an arrival short of the mouth holds back.
+      // On its way past means it will be at the mouth within a few seconds at the speed it is doing (or it stands at
+      // the mouth about to set off): one creeping up the street as its ETA counts down is minutes away and no reason
+      // to wait.
       const crossing = arrivals.some(
         (a) =>
-          a.s > ALLEY_MOUTH[0] - CROSSING.yield &&
           a.s < ALLEY_MOUTH[1] &&
+          a.s + a.vel * CROSSING.seconds + CROSSING.margin > ALLEY_MOUTH[0] &&
           (a.vel > 0.1 || a.targetS > a.s + 0.5),
       );
       if (crossing) l.targetS = corner.start;
       else if (l.s > corner.start - CROSSING.claim) turningOut = true;
     }
     // Each arrival: as far as its ETA puts it, behind the one ahead, and short of the drop-off unless it is its own.
-    // One that is due is not held behind one still waiting up the street for its ETA (it is not really there yet).
+    // One that is due is not held up by one still waiting up the street for its ETA (that one is not really there
+    // yet): it drives past it, though it never stops on top of it. Otherwise everyone keeps their place in line.
     arrivals.forEach((l, i) => {
       let limit = l.wantS;
       if (dockHolder !== l.v.id) limit = Math.min(limit, HOLD_S);
-      let ahead: { s: number; half: number } | null = docked
-        ? { s: approach.length, half: docked.body.halfLength }
-        : null;
-      for (let k = i - 1; k >= 0; k--) {
-        const o = arrivals[k];
-        if (!due(l) || due(o) || o.s > WAIT_S + 1) {
-          ahead = { s: o.s, half: o.body.halfLength };
-          break;
-        }
-      }
-      if (ahead)
-        limit = Math.min(
-          limit,
-          ahead.s - ahead.half - l.body.halfLength - QUEUE_GAP,
-        );
-      // It drives past one that is waiting for its ETA, but it does not stop on top of it: short of it instead.
-      if (due(l))
-        for (const o of arrivals) {
-          if (o === l || due(o) || o.s > WAIT_S + 1 || o.s <= l.s) continue;
-          const room = o.body.halfLength + l.body.halfLength + QUEUE_GAP;
-          if (limit > o.s - room && limit < o.s + room)
-            limit = Math.min(limit, o.s - room);
-        }
+      const room = (o: Live) =>
+        o.body.halfLength + l.body.halfLength + QUEUE_GAP;
+      const inLine = (o: Live) => !due(l) || due(o) || o.s > WAIT_S + 1;
+      if (docked) limit = Math.min(limit, approach.length - room(docked));
+      const ahead = arrivals.slice(0, i);
+      const leader = [...ahead].reverse().find(inLine);
+      if (leader) limit = Math.min(limit, leader.s - room(leader));
+      // Driven past, but not stopped on top of: short of it instead.
+      for (const o of ahead)
+        if (
+          !inLine(o) &&
+          o.s > l.s &&
+          limit > o.s - room(o) &&
+          limit < o.s + room(o)
+        )
+          limit = o.s - room(o);
       // A departure is turning out of the alley: short of its mouth, if it can still stop there.
       if (
         turningOut &&
