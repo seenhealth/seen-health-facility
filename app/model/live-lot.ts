@@ -39,7 +39,7 @@ import { createWalkers, type WalkPoint } from './live-walkers';
 import { DROP_OFF } from './alhambra-exterior';
 import { FLEET_VAN_RAMP } from './photo-assets';
 import type { Facility } from './schema';
-import { Pen, pathAt, type Piece } from './vehicle-path';
+import { pathAt, type Piece } from './vehicle-path';
 import { routeAround, type Footprint } from './walk-route';
 
 export type LiveKind = 'van' | 'wav' | 'suv' | 'sedan';
@@ -130,8 +130,6 @@ function photoOf(
   return null;
 }
 const L = FLEET_LOT;
-const R = L.turnRadius;
-const EAST = Math.PI / 2;
 const BAYS = fleetParking.length; // five bays, then the three curb spots
 /** When every spot is taken: along the aisle, nose south, 7 m apart from the dock southward. */
 const overflowSpot = (n: number) => ({ x: L.aisle, z: -4 - 7 * n, heading: 0 });
@@ -277,36 +275,10 @@ const reverseLeg = (leg: FleetLeg) =>
 const legAt = (d: Drive, s: number) =>
   d.legs.find((l) => s <= l.end) ?? d.legs.at(-1)!;
 
-/** Drop-off → bay: back out, swing right onto the aisle, south past the bay, reverse in. Null when the bay sits too far north for the swing. */
+/** Drop-off → bay: on down the aisle, onto the bay's aisle line, south past the bay, reverse in. Null when the planner cannot build it. */
 function dockToBay(index: number): FleetLeg[] | null {
   try {
-    const bay = fleetParking[index];
-    const aisleX = bay.aisleX ?? L.aisle;
-    const stop = bay.z - R;
-    const pen = new Pen(L.dockBackTo, L.dock[1], EAST);
-    pen.line(L.lead).arc(R, Math.PI / 2);
-    const lateral = pen.x - aisleX;
-    for (const radius of [L.laneChangeRadius, 4, 3]) {
-      const probe = new Pen(pen.x, pen.z, pen.dir);
-      probe.jog(lateral, radius);
-      if (probe.z > stop + 0.5) {
-        pen.jog(lateral, radius).lineToZ(stop);
-        const legs: FleetLeg[] = [
-          ...fleetRoutes.dockReverse(),
-          {
-            id: 'dock-to-bay',
-            phase: 'Driving to a bay',
-            pieces: pen.take(),
-            length: 0,
-            speed: SPEED.lot,
-            lot: true,
-          },
-        ];
-        legs[1].length = legs[1].pieces.reduce((n, p) => n + p.length, 0);
-        return [...legs, ...fleetRoutes.backIn(index)];
-      }
-    }
-    return null;
+    return [...fleetRoutes.frontDockToBay(index), ...fleetRoutes.backIn(index)];
   } catch {
     return null;
   }
@@ -866,7 +838,7 @@ export function createLiveLot(ctx: {
     return onRamp && l.body.rampFoot ? l.body.rampFoot : l.body.foot;
   }
   /** Clear of the ramp: a stride straight on from the foot, so riders leave the ramp before they turn. */
-  const CLEAR = { ramp: 1.4, step: 0.6 };
+  const CLEAR = { ramp: 0.9, step: 0.6 };
   /** The vehicles standing on the lot (parked or at the drop-off), as walkers see them. */
   function footprints(): Footprint[] {
     const out: Footprint[] = [];
@@ -995,7 +967,7 @@ export function createLiveLot(ctx: {
         };
         live.set(v.id, l);
         if (v.state === 'inbound') {
-          start(l, fleetRoutes.awayToDock(), 'arriving');
+          start(l, fleetRoutes.awayToFrontDock(), 'arriving');
           l.s = l.targetS = approachTarget(v, l.drive!);
           pose(l);
         } else parkAt(l);
@@ -1013,7 +985,7 @@ export function createLiveLot(ctx: {
           ) {
             releaseSpot(l);
             l.boarded.clear();
-            start(l, fleetRoutes.awayToDock(), 'arriving');
+            start(l, fleetRoutes.awayToFrontDock(), 'arriving');
             l.targetS = approachTarget(v, l.drive!);
           }
         } else if (v.state === 'on-lot') {
@@ -1050,11 +1022,7 @@ export function createLiveLot(ctx: {
       l.mode === 'docked' ||
       (l.mode === 'arriving' && l.s > l.drive!.length - 1)
     ) {
-      start(
-        l,
-        [...fleetRoutes.dockReverse(), ...fleetRoutes.dockToAway()],
-        'leaving',
-      );
+      start(l, fleetRoutes.frontDockToAway(), 'leaving');
     } else if (!exitFrom(l)) {
       releaseSpot(l);
       l.drive = null;
@@ -1075,7 +1043,7 @@ export function createLiveLot(ctx: {
    * exit lane, out of the driveway and up the alley until it fades at the edge. False when it is nowhere near it.
    */
   function exitFrom(l: Live): boolean {
-    const legs = fleetRoutes.dockToAway();
+    const legs = fleetRoutes.frontDockToAway();
     const d = drive(legs);
     const { x, z } = l.body.object.position;
     let best = { s: 0, dist: Infinity };

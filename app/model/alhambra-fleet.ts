@@ -184,6 +184,13 @@ export const FLEET_LOT = {
   northbound: laneLine('west', 0),
   southbound: laneLine('west', 1),
 };
+/**
+ * The live lot's drop-off (live-lot.ts; the scripted fleet keeps `FLEET_LOT.dock`):
+ * a van stands on the aisle beside the lobby landing heading south (Pen
+ * direction π, scene heading 0), its sliding doors facing the entrance. Its
+ * ramp's foot lands 0.8 m short of the steps' foot and the landing's rail.
+ */
+export const FRONT_DOCK = { at: [-21.8, -0.35] as Vec2, dir: Math.PI };
 /** Nominal speeds (m per loop second) and the acceleration used to blend them. */
 const SPEED = { lot: 3, street: 9, corner: 5, reverse: 1.8 },
   ACCEL = 1.5;
@@ -320,6 +327,49 @@ export const fleetRoutes = {
       ),
       leg(pen, 'pull-past', 'Pulling past assigned bay', LOT, (p) =>
         p.lineToZ(stop),
+      ),
+    ];
+  },
+  /**
+   * The live lot's drop-off (live-lot.ts): in through the entrance, then a
+   * left turn (from the driver's seat) down the aisle, stopping beside the
+   * lobby landing heading south with the sliding doors toward the entrance.
+   */
+  awayToFrontDock(): FleetLeg[] {
+    const pen = new Pen(L.northbound, L.vanishSouth, NORTH),
+      [x, z] = FRONT_DOCK.at;
+    return [
+      ...awayToEntry(pen),
+      leg(pen, 'front-dock-in', 'Arriving at drop-off', LOT, (p) =>
+        p
+          .lineToX(x - R)
+          .arc(R, Math.PI / 2)
+          .lineToZ(z),
+      ),
+    ];
+  },
+  /** From the live lot's drop-off: on down the aisle, over to the exit lane and off site. */
+  frontDockToAway(): FleetLeg[] {
+    const [x, z] = FRONT_DOCK.at,
+      pen = new Pen(x, z, SOUTH);
+    return [
+      leg(pen, 'front-dock-out', 'Leaving the drop-off', LOT, (p) =>
+        p.line(L.lead).jog(p.x - L.exitLane, L.driftRadius),
+      ),
+      ...drivewayToAway(pen),
+    ];
+  },
+  /** From the live lot's drop-off: on down the aisle onto the bay's aisle line, south past the bay, ready to back in. */
+  frontDockToBay(index: number): FleetLeg[] {
+    const [x, z] = FRONT_DOCK.at,
+      pen = new Pen(x, z, SOUTH),
+      aisleX = aisleOf(index);
+    return [
+      leg(pen, 'front-dock-to-bay', 'Driving to a bay', LOT, (p) =>
+        p
+          .line(L.lead)
+          .jog(p.x - aisleX, L.laneChangeRadius)
+          .lineToZ(backInStop(index)),
       ),
     ];
   },
