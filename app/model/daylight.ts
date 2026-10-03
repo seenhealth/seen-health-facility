@@ -1,13 +1,13 @@
 import * as T from 'three';
+import { COMPASS } from './frame';
 
 /**
  * Real daylight for the live lot: the sun's actual direction and height over
  * the center, and the sky's brightness through dawn, day, dusk and night.
  * `apply` returns the moment's `night` factor (0 by day, 1 past civil dusk)
  * for the night lights (night-lights.ts) and the vehicles' lamps.
- * World axes: +x east, +z north (Valley Blvd is the north street, Ethel
- * Avenue the west street, the alley the south street; the fleet code's
- * NORTH heading is 0 = +z).
+ * Real directions come from `COMPASS` (frame.ts): +x east, +z south, since the
+ * center is on the north side of Valley Blvd (the code's `north` street).
  */
 export const CENTER = { lat: 34.0777588, lng: -118.1440427 };
 
@@ -80,6 +80,22 @@ export function solarPosition(
   return { azimuth: az, elevation: el };
 }
 
+/** Unit vector toward the sun in world axes, from its azimuth (degrees clockwise from north) and elevation (degrees). */
+export function sunDirection(
+  azimuth: number,
+  elevation: number,
+): [number, number, number] {
+  const az = azimuth * (Math.PI / 180),
+    el = elevation * (Math.PI / 180),
+    north = Math.cos(az) * Math.cos(el),
+    east = Math.sin(az) * Math.cos(el);
+  return [
+    east * COMPASS.east[0] + north * COMPASS.north[0],
+    Math.sin(el),
+    east * COMPASS.east[1] + north * COMPASS.north[1],
+  ];
+}
+
 const DAY = {
   sky: '#fbfaf6',
   ground: '#d8d4cc',
@@ -132,13 +148,8 @@ export function createDaylight(scene: T.Scene) {
       const phase =
         elevation > 0 ? 'day' : elevation > -6 ? 'twilight' : 'night';
       if (sun) {
-        const az = azimuth * (Math.PI / 180),
-          el = Math.max(elevation, 2) * (Math.PI / 180);
-        sun.position.set(
-          Math.sin(az) * Math.cos(el) * sunDistance,
-          Math.sin(el) * sunDistance,
-          Math.cos(az) * Math.cos(el) * sunDistance,
-        );
+        const [x, y, z] = sunDirection(azimuth, Math.max(elevation, 2));
+        sun.position.set(x * sunDistance, y * sunDistance, z * sunDistance);
         sun.intensity = DAY.sun * key;
         // Warmer and dimmer near the horizon, the usual low-sun look.
         sun.color

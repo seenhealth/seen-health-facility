@@ -1,0 +1,6884 @@
+{
+  "schemaVersion": "2.0",
+  "id": "seen-partner-adhc",
+  "name": "Partner adult day health care center · hall, stage, studio, classroom, group room and light rehab",
+  "address": "Illustrative partner center on the community pad south of the Alhambra center (not a real address)",
+  "units": "m",
+  "coordinateSystem": "Plan frame P: metres, origin at the centre of the hall’s width and the building’s depth, +X to the right seen from the drive, +Z toward the drive (the front), Y up; y = 0 is the finished floor (PAD level on the community pad). Stamped on the partner-adc pad with frame { position: [0, -6.6], heading: 0 } (pad-local): pad-local = P + (0, -6.6).",
+  "revision": "2026-10-02 · Partner ADHC plan v1 (ADHC-PLAN study, grid-aligned doors)",
+  "source": {
+    "title": "The partner adult day health care center: plan, furniture and day (ADHC-PLAN design study)",
+    "date": "2026-10-02",
+    "pages": 8,
+    "author": "Seen Health planning (illustrative design)"
+  },
+  "calibration": {
+    "method": "Designed in metres; no source drawing to calibrate",
+    "status": "Illustrative design dimensions",
+    "pixelsPerMeter": 50,
+    "sourcePixelOrigin": [
+      850,
+      1330
+    ],
+    "referencePage": 1,
+    "areaPage": 1,
+    "anchorAreaSqFt": 5208,
+    "anchorPolygonPixels": [
+      [
+        245,
+        1895
+      ],
+      [
+        1455,
+        1895
+      ],
+      [
+        1455,
+        995
+      ],
+      [
+        1185,
+        995
+      ],
+      [
+        1185,
+        815
+      ],
+      [
+        515,
+        815
+      ],
+      [
+        515,
+        995
+      ],
+      [
+        245,
+        995
+      ]
+    ],
+    "notes": "Pixel values refer to the study drawing adhc-plan.svg (50 px per metre). Room sizes follow the program brief at about a quarter of the main center's ground floor. Not a field survey."
+  },
+  "levels": [
+    {
+      "id": "ground",
+      "name": "Ground floor",
+      "elevation": 0,
+      "order": 0,
+      "referencePages": [
+        1
+      ],
+      "elevationStatus": "Slab on grade at pad level; step-free from the front walk",
+      "notes": "Single storey. Exterior walls 0.20 m, partitions 0.12 m; the stage is a 0.40 m platform in the hall."
+    }
+  ],
+  "zones": [
+    {
+      "id": "adhc-zone-hall",
+      "name": "Multipurpose hall and stage",
+      "short": "Hall",
+      "color": "#b5503f",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -6.6,
+          -11.3
+        ],
+        [
+          6.6,
+          -11.3
+        ],
+        [
+          6.6,
+          6.7
+        ],
+        [
+          -6.6,
+          6.7
+        ]
+      ],
+      "referencePages": [
+        1
+      ],
+      "floorMaterial": "adhc-hall-floor",
+      "notes": "The heart of the center: long banquet tables, an open dance floor and the stage across the back, the full depth of the building. The polygon follows the outer face of the back wall and the centre lines of the side partitions.",
+      "publishedAreaSqFt": null,
+      "tracedFootprintSqFt": 2557.5,
+      "programId": "adhc",
+      "wallHeight": 4.2,
+      "wallHeightStatus": "Nominal 4.2 m; illustrative",
+      "geometryStatus": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "spread": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "adhc-zone-west",
+      "name": "West wing: light rehab and classroom",
+      "short": "West wing",
+      "color": "#5f9b84",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -12.1,
+          -11.3
+        ],
+        [
+          -6.6,
+          -11.3
+        ],
+        [
+          -6.6,
+          6.7
+        ],
+        [
+          -12.1,
+          6.7
+        ]
+      ],
+      "referencePages": [
+        1
+      ],
+      "floorMaterial": "adhc-hall-floor",
+      "notes": "Light rehab at the back, the classroom at the front; both open off the hall.",
+      "publishedAreaSqFt": null,
+      "tracedFootprintSqFt": 1065.6,
+      "programId": "adhc",
+      "wallHeight": 3.2,
+      "wallHeightStatus": "Nominal 3.2 m; illustrative",
+      "geometryStatus": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "spread": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "adhc-zone-east",
+      "name": "East wing: studio and group room",
+      "short": "East wing",
+      "color": "#d2a24c",
+      "levelId": "ground",
+      "polygon": [
+        [
+          6.6,
+          -11.3
+        ],
+        [
+          12.1,
+          -11.3
+        ],
+        [
+          12.1,
+          6.7
+        ],
+        [
+          6.6,
+          6.7
+        ]
+      ],
+      "referencePages": [
+        1
+      ],
+      "floorMaterial": "adhc-hall-floor",
+      "notes": "The calligraphy and painting studio at the back, the group room at the front; both open off the hall.",
+      "publishedAreaSqFt": null,
+      "tracedFootprintSqFt": 1065.6,
+      "programId": "adhc",
+      "wallHeight": 3.2,
+      "wallHeightStatus": "Nominal 3.2 m; illustrative",
+      "geometryStatus": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "spread": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "adhc-zone-entry",
+      "name": "Entry pavilion: reception and restrooms",
+      "short": "Entry",
+      "color": "#c4795a",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -6.7,
+          6.7
+        ],
+        [
+          6.7,
+          6.7
+        ],
+        [
+          6.7,
+          10.3
+        ],
+        [
+          -6.7,
+          10.3
+        ]
+      ],
+      "referencePages": [
+        1
+      ],
+      "floorMaterial": "adhc-terrazzo",
+      "notes": "The front door opens into the reception, which opens into the hall; an accessible restroom on either side opens off the hall.",
+      "publishedAreaSqFt": null,
+      "tracedFootprintSqFt": 519.3,
+      "programId": "adhc",
+      "wallHeight": 3.2,
+      "wallHeightStatus": "Nominal 3.2 m; illustrative",
+      "geometryStatus": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "spread": [
+        0,
+        0
+      ]
+    }
+  ],
+  "rooms": [
+    {
+      "id": "adhc-hall",
+      "name": "Multipurpose hall",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -6.54,
+          -7.5
+        ],
+        [
+          6.54,
+          -7.5
+        ],
+        [
+          6.54,
+          6.54
+        ],
+        [
+          -6.54,
+          6.54
+        ]
+      ],
+      "kind": "multipurpose",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Two rows of long banquet tables (6 × 8 ft, 49 banquet chairs and 3 wheelchair places at the table ends) for meals, bingo and large groups; a 9.2 × 5.2 m patterned dance floor for line and fan dancing; the ramp and steps up to the stage; lantern posts at the dance floor corners; the bingo flashboard and the caller’s stand on the west side.",
+      "floorMaterial": "adhc-hall-floor"
+    },
+    {
+      "id": "adhc-stage",
+      "name": "Stage",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -6.54,
+          -11.1
+        ],
+        [
+          6.54,
+          -11.1
+        ],
+        [
+          6.54,
+          -7.5
+        ],
+        [
+          -6.54,
+          -7.5
+        ]
+      ],
+      "kind": "stage",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Raised 0.40 m honey-wood stage across the back of the hall: backdrop with a lantern valance, three-tier choir risers, lectern, microphone, upright piano and two speakers. Step-free by the 1:12 ramp and its top landing along the front (west), or by three steps with three handrails (east)."
+    },
+    {
+      "id": "adhc-rehab",
+      "name": "Light rehab",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -11.9,
+          -11.1
+        ],
+        [
+          -6.66,
+          -11.1
+        ],
+        [
+          -6.66,
+          -2.06
+        ],
+        [
+          -11.9,
+          -2.06
+        ]
+      ],
+      "kind": "rehab",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Parallel bars, two recumbent bikes, a mat table, a resistance-band wall, a practice stair, a weights and bands rack and chairs for seated strength; the visiting Seen physical therapist works here.",
+      "floorMaterial": "adhc-rehab-floor"
+    },
+    {
+      "id": "adhc-classroom",
+      "name": "Classroom",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -11.9,
+          -1.94
+        ],
+        [
+          -6.66,
+          -1.94
+        ],
+        [
+          -6.66,
+          6.5
+        ],
+        [
+          -11.9,
+          6.5
+        ]
+      ],
+      "kind": "classroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Six two-place tables in three rows facing a mobile whiteboard on the front wall; one place is left open for a wheelchair.",
+      "floorMaterial": "adhc-class-carpet"
+    },
+    {
+      "id": "adhc-studio",
+      "name": "Calligraphy and painting studio",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "polygon": [
+        [
+          6.66,
+          -11.1
+        ],
+        [
+          11.9,
+          -11.1
+        ],
+        [
+          11.9,
+          -0.06
+        ],
+        [
+          6.66,
+          -0.06
+        ]
+      ],
+      "kind": "studio",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Two calligraphy tables laid with felt, rice paper, ink stones and brush racks; a brush and ink stand; a hanging scroll display; four easels along the east wall and a drying rack by the door.",
+      "floorMaterial": "adhc-studio-floor"
+    },
+    {
+      "id": "adhc-group-room",
+      "name": "Group room",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "polygon": [
+        [
+          6.66,
+          0.06
+        ],
+        [
+          11.9,
+          0.06
+        ],
+        [
+          11.9,
+          6.5
+        ],
+        [
+          6.66,
+          6.5
+        ]
+      ],
+      "kind": "group-room",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "A circle of eight armchairs (one place open for a wheelchair) around a low table, for classes and group therapy sessions.",
+      "floorMaterial": "adhc-group-carpet"
+    },
+    {
+      "id": "adhc-reception",
+      "name": "Entry and reception",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -2.94,
+          6.66
+        ],
+        [
+          2.94,
+          6.66
+        ],
+        [
+          2.94,
+          10.1
+        ],
+        [
+          -2.94,
+          10.1
+        ]
+      ],
+      "kind": "reception",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Double front doors, the reception desk on the west side, three waiting chairs and a planter on the east side, and double doors into the hall.",
+      "floorMaterial": "adhc-terrazzo"
+    },
+    {
+      "id": "adhc-restroom-w",
+      "name": "Accessible restroom (west)",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "polygon": [
+        [
+          -6.5,
+          6.66
+        ],
+        [
+          -3.06,
+          6.66
+        ],
+        [
+          -3.06,
+          10.1
+        ],
+        [
+          -6.5,
+          10.1
+        ]
+      ],
+      "kind": "restroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Single-user accessible restroom off the hall: toilet with side and rear grab bars, roll-under basin, 1.5 m turning circle.",
+      "floorMaterial": "adhc-restroom-tile"
+    },
+    {
+      "id": "adhc-restroom-e",
+      "name": "Accessible restroom (east)",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "polygon": [
+        [
+          3.06,
+          6.66
+        ],
+        [
+          6.5,
+          6.66
+        ],
+        [
+          6.5,
+          10.1
+        ],
+        [
+          3.06,
+          10.1
+        ]
+      ],
+      "kind": "restroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Mirror of the west restroom.",
+      "floorMaterial": "adhc-restroom-tile"
+    }
+  ],
+  "walls": [
+    {
+      "id": "adhc-wall-back-west",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "a": [
+        -12.1,
+        -11.2
+      ],
+      "b": [
+        -6.6,
+        -11.2
+      ],
+      "height": 3.2,
+      "thickness": 0.2,
+      "material": "adhc-stucco",
+      "status": "Exterior wall, back (west wing) · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-back-hall",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "a": [
+        -6.6,
+        -11.2
+      ],
+      "b": [
+        6.6,
+        -11.2
+      ],
+      "height": 4.2,
+      "thickness": 0.2,
+      "material": "adhc-stucco",
+      "status": "Exterior wall, back of the stage · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-back-east",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "a": [
+        6.6,
+        -11.2
+      ],
+      "b": [
+        12.1,
+        -11.2
+      ],
+      "height": 3.2,
+      "thickness": 0.2,
+      "material": "adhc-stucco",
+      "status": "Exterior wall, back (east wing) · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-west",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "a": [
+        -12,
+        -11.3
+      ],
+      "b": [
+        -12,
+        6.7
+      ],
+      "height": 3.2,
+      "thickness": 0.2,
+      "material": "adhc-stucco",
+      "status": "Exterior wall, west side · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-east",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "a": [
+        12,
+        -11.3
+      ],
+      "b": [
+        12,
+        6.7
+      ],
+      "height": 3.2,
+      "thickness": 0.2,
+      "material": "adhc-stucco",
+      "status": "Exterior wall, east side · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-front-west",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "a": [
+        -12.1,
+        6.6
+      ],
+      "b": [
+        -6.6,
+        6.6
+      ],
+      "height": 3.2,
+      "thickness": 0.2,
+      "material": "adhc-stucco",
+      "status": "Exterior wall, front of the west wing (faces the drive) · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-front-east",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "a": [
+        6.6,
+        6.6
+      ],
+      "b": [
+        12.1,
+        6.6
+      ],
+      "height": 3.2,
+      "thickness": 0.2,
+      "material": "adhc-stucco",
+      "status": "Exterior wall, front of the east wing (faces the drive) · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-entry-west",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "a": [
+        -6.6,
+        6.6
+      ],
+      "b": [
+        -6.6,
+        10.3
+      ],
+      "height": 3.2,
+      "thickness": 0.2,
+      "material": "adhc-stucco",
+      "status": "Exterior wall, entry pavilion west side · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-entry-east",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "a": [
+        6.6,
+        6.6
+      ],
+      "b": [
+        6.6,
+        10.3
+      ],
+      "height": 3.2,
+      "thickness": 0.2,
+      "material": "adhc-stucco",
+      "status": "Exterior wall, entry pavilion east side · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-entry-front-a",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "a": [
+        -6.7,
+        10.2
+      ],
+      "b": [
+        -0.9,
+        10.2
+      ],
+      "height": 3.2,
+      "thickness": 0.2,
+      "material": "adhc-stucco",
+      "status": "Exterior wall, entry front with the double front doors (faces the drive) · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-entry-front-b",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "a": [
+        0.9,
+        10.2
+      ],
+      "b": [
+        6.7,
+        10.2
+      ],
+      "height": 3.2,
+      "thickness": 0.2,
+      "material": "adhc-stucco",
+      "status": "Exterior wall, entry front with the double front doors (faces the drive) · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-hall-west-a",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "a": [
+        -6.6,
+        -11.2
+      ],
+      "b": [
+        -6.6,
+        -4.5
+      ],
+      "height": 3.2,
+      "thickness": 0.12,
+      "material": "adhc-plaster",
+      "status": "Partition: hall / west wing · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-hall-west-b",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "a": [
+        -6.6,
+        -3.5
+      ],
+      "b": [
+        -6.6,
+        -0.5
+      ],
+      "height": 3.2,
+      "thickness": 0.12,
+      "material": "adhc-plaster",
+      "status": "Partition: hall / west wing · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-hall-west-c",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "a": [
+        -6.6,
+        0.5
+      ],
+      "b": [
+        -6.6,
+        6.6
+      ],
+      "height": 3.2,
+      "thickness": 0.12,
+      "material": "adhc-plaster",
+      "status": "Partition: hall / west wing · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-hall-east-a",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "a": [
+        6.6,
+        -11.2
+      ],
+      "b": [
+        6.6,
+        -3.5
+      ],
+      "height": 3.2,
+      "thickness": 0.12,
+      "material": "adhc-plaster",
+      "status": "Partition: hall / east wing · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-hall-east-b",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "a": [
+        6.6,
+        -2.5
+      ],
+      "b": [
+        6.6,
+        2.7
+      ],
+      "height": 3.2,
+      "thickness": 0.12,
+      "material": "adhc-plaster",
+      "status": "Partition: hall / east wing · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-hall-east-c",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "a": [
+        6.6,
+        3.7
+      ],
+      "b": [
+        6.6,
+        6.6
+      ],
+      "height": 3.2,
+      "thickness": 0.12,
+      "material": "adhc-plaster",
+      "status": "Partition: hall / east wing · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-hall-front-a",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "a": [
+        -6.6,
+        6.6
+      ],
+      "b": [
+        -5.3,
+        6.6
+      ],
+      "height": 3.2,
+      "thickness": 0.12,
+      "material": "adhc-plaster",
+      "status": "Partition: hall / entry pavilion · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-hall-front-b",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "a": [
+        -4.3,
+        6.6
+      ],
+      "b": [
+        -0.9,
+        6.6
+      ],
+      "height": 3.2,
+      "thickness": 0.12,
+      "material": "adhc-plaster",
+      "status": "Partition: hall / entry pavilion · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-hall-front-c",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "a": [
+        0.9,
+        6.6
+      ],
+      "b": [
+        4.3,
+        6.6
+      ],
+      "height": 3.2,
+      "thickness": 0.12,
+      "material": "adhc-plaster",
+      "status": "Partition: hall / entry pavilion · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-hall-front-d",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "a": [
+        5.3,
+        6.6
+      ],
+      "b": [
+        6.6,
+        6.6
+      ],
+      "height": 3.2,
+      "thickness": 0.12,
+      "material": "adhc-plaster",
+      "status": "Partition: hall / entry pavilion · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-west-mid",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "a": [
+        -11.9,
+        -2
+      ],
+      "b": [
+        -6.66,
+        -2
+      ],
+      "height": 3.2,
+      "thickness": 0.12,
+      "material": "adhc-plaster",
+      "status": "Partition: light rehab / classroom · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-east-mid",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "a": [
+        6.66,
+        0
+      ],
+      "b": [
+        11.9,
+        0
+      ],
+      "height": 3.2,
+      "thickness": 0.12,
+      "material": "adhc-plaster",
+      "status": "Partition: studio / group room · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-entry-p-west",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "a": [
+        -3,
+        6.66
+      ],
+      "b": [
+        -3,
+        10.1
+      ],
+      "height": 3.2,
+      "thickness": 0.12,
+      "material": "adhc-plaster",
+      "status": "Partition: west restroom / reception · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    },
+    {
+      "id": "adhc-wall-entry-p-east",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "a": [
+        3,
+        6.66
+      ],
+      "b": [
+        3,
+        10.1
+      ],
+      "height": 3.2,
+      "thickness": 0.12,
+      "material": "adhc-plaster",
+      "status": "Partition: reception / east restroom · Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "referencePages": [
+        1
+      ]
+    }
+  ],
+  "objects": [
+    {
+      "id": "adhc-stage-platform",
+      "assetId": "adhc-stage-platform",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        0,
+        0,
+        -9.3
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-stage",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Raised 0.40 m stage across the back of the hall. Its navigation footprints are the front edge only (performers walk on the deck): open where the ramp landing meets it (x -6.54…-5.0) and at the steps (x 1.9…3.3).",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          -1.55,
+          1.76,
+          6.9,
+          0.08
+        ],
+        [
+          4.92,
+          1.76,
+          3.24,
+          0.08
+        ]
+      ]
+    },
+    {
+      "id": "adhc-stage-ramp",
+      "assetId": "adhc-stage-ramp",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -3.37,
+        0,
+        -6.75
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1,
+        4
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Step-free route to the stage: a 1:12 slope (0.40 m over 4.8 m) along the stage front rising west to a 1.54 × 1.5 m landing level with the deck. Navigation footprint: the handrail on the open side; the stage edge is the other curb.",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          -0.69,
+          0,
+          0.06,
+          6.34
+        ]
+      ]
+    },
+    {
+      "id": "adhc-stage-steps",
+      "assetId": "adhc-stage-steps",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        2.6,
+        0,
+        -7.05
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1,
+        4
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Three 0.133 m risers with side and centre handrails: two 0.64 m lanes for walking performers. Walkers and wheelchairs take the ramp.",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          -0.675,
+          0,
+          0.04,
+          0.9
+        ],
+        [
+          0,
+          0,
+          0.04,
+          0.9
+        ],
+        [
+          0.675,
+          0,
+          0.04,
+          0.9
+        ]
+      ]
+    },
+    {
+      "id": "adhc-stage-backdrop",
+      "assetId": "adhc-stage-backdrop",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        0,
+        0.4,
+        -10.95
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-stage",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Curtain backdrop with banners and a valance of paper lanterns.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-choir-riser",
+      "assetId": "adhc-choir-riser",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        0,
+        0.4,
+        -9.85
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-stage",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Three tiers 0.20 m high and 0.60 m deep: the choir stands on them (standing surfaces), so it has no navigation footprint.",
+      "layer": "furniture",
+      "navigationFootprints": []
+    },
+    {
+      "id": "adhc-stage-lectern",
+      "assetId": "adhc-lectern",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -3.6,
+        0.4,
+        -8.3
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-stage",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-stage-mic",
+      "assetId": "adhc-mic-stand",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        0,
+        0.4,
+        -8.05
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-stage",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Soloist microphone in front of the risers; the boom points back toward the singer.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-stage-speaker-w",
+      "assetId": "adhc-speaker",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -5.6,
+        0.4,
+        -10.9
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-stage",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-stage-speaker-e",
+      "assetId": "adhc-speaker",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        5,
+        0.4,
+        -10.9
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-stage",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-stage-piano",
+      "assetId": "adhc-upright-piano",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        6.23,
+        0.4,
+        -9.6
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-stage",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Against the east wall, keyboard facing west: the pianist plays in profile to the hall.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-stage-piano-bench",
+      "assetId": "adhc-piano-bench",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        5.38,
+        0.4,
+        -9.6
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-stage",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-dance-floor",
+      "assetId": "adhc-dance-floor",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        0,
+        0,
+        -3
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1,
+        6
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Flush parquet inlay (checker of two honey tones, cinnabar border, jade-and-gold medallion): room for 15 line dancers at 1.4 × 1.2 m.",
+      "layer": "architecture"
+    },
+    {
+      "id": "adhc-lantern-post-sw",
+      "assetId": "adhc-lantern-post",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -5.25,
+        0,
+        -5.2
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Paper lantern on a lacquered post at a corner of the dance floor (in place of pendants, which would float over the cutaway).",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-lantern-post-nw",
+      "assetId": "adhc-lantern-post",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -5.25,
+        0,
+        -0.8
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Paper lantern on a lacquered post at a corner of the dance floor (in place of pendants, which would float over the cutaway).",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-lantern-post-se",
+      "assetId": "adhc-lantern-post",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        5.25,
+        0,
+        -5.2
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Paper lantern on a lacquered post at a corner of the dance floor (in place of pendants, which would float over the cutaway).",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-lantern-post-ne",
+      "assetId": "adhc-lantern-post",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        5.25,
+        0,
+        -0.8
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Paper lantern on a lacquered post at a corner of the dance floor (in place of pendants, which would float over the cutaway).",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-table-a1",
+      "assetId": "adhc-banquet-table",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -2.44,
+        0,
+        1.3
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1,
+        5
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-table-a2",
+      "assetId": "adhc-banquet-table",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        0,
+        0,
+        1.3
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1,
+        5
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Middle of a long table of three 8 ft tables under red cloths and a gold runner.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-table-a3",
+      "assetId": "adhc-banquet-table",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        2.44,
+        0,
+        1.3
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1,
+        5
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-chair-a1-01",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -3.355,
+        0,
+        0.62
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a2-01",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -3.355,
+        0,
+        1.98
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a1-02",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -2.745,
+        0,
+        0.62
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a2-02",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -2.745,
+        0,
+        1.98
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a1-03",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -2.135,
+        0,
+        0.62
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a2-03",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -2.135,
+        0,
+        1.98
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a1-04",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -1.525,
+        0,
+        0.62
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a2-04",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -1.525,
+        0,
+        1.98
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a1-05",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -0.915,
+        0,
+        0.62
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a2-05",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -0.915,
+        0,
+        1.98
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a1-06",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -0.305,
+        0,
+        0.62
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a2-06",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -0.305,
+        0,
+        1.98
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a1-07",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        0.305,
+        0,
+        0.62
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a2-07",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        0.305,
+        0,
+        1.98
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a1-08",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        0.915,
+        0,
+        0.62
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a2-08",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        0.915,
+        0,
+        1.98
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a1-09",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        1.525,
+        0,
+        0.62
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a2-09",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        1.525,
+        0,
+        1.98
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a1-10",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        2.135,
+        0,
+        0.62
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a2-10",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        2.135,
+        0,
+        1.98
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a1-11",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        2.745,
+        0,
+        0.62
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a2-11",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        2.745,
+        0,
+        1.98
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a1-12",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        3.355,
+        0,
+        0.62
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a2-12",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        3.355,
+        0,
+        1.98
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a-west",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -3.96,
+        0,
+        1.3
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Table-end place; the partner-adc registry entry leaves this chair out for a wheelchair.",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-a-east",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        3.96,
+        0,
+        1.3
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Table-end place; the partner-adc registry entry leaves this chair out for a wheelchair.",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-table-b1",
+      "assetId": "adhc-banquet-table",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -2.44,
+        0,
+        4.4
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1,
+        5
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-table-b2",
+      "assetId": "adhc-banquet-table",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        0,
+        0,
+        4.4
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1,
+        5
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Middle of a long table of three 8 ft tables under red cloths and a gold runner.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-table-b3",
+      "assetId": "adhc-banquet-table",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        2.44,
+        0,
+        4.4
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1,
+        5
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-chair-b1-01",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -3.355,
+        0,
+        3.72
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b2-01",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -3.355,
+        0,
+        5.08
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b1-02",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -2.745,
+        0,
+        3.72
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b2-02",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -2.745,
+        0,
+        5.08
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b1-03",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -2.135,
+        0,
+        3.72
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b2-03",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -2.135,
+        0,
+        5.08
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b1-04",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -1.525,
+        0,
+        3.72
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b2-04",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -1.525,
+        0,
+        5.08
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b1-05",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -0.915,
+        0,
+        3.72
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b2-05",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -0.915,
+        0,
+        5.08
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b1-06",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -0.305,
+        0,
+        3.72
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b2-06",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -0.305,
+        0,
+        5.08
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b1-07",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        0.305,
+        0,
+        3.72
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b2-07",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        0.305,
+        0,
+        5.08
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b1-08",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        0.915,
+        0,
+        3.72
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b2-08",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        0.915,
+        0,
+        5.08
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b1-09",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        1.525,
+        0,
+        3.72
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b2-09",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        1.525,
+        0,
+        5.08
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b1-10",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        2.135,
+        0,
+        3.72
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b2-10",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        2.135,
+        0,
+        5.08
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b1-11",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        2.745,
+        0,
+        3.72
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b2-11",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        2.745,
+        0,
+        5.08
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b1-12",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        3.355,
+        0,
+        3.72
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b2-12",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        3.355,
+        0,
+        5.08
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b-west",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -3.96,
+        0,
+        4.4
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Table-end place; the partner-adc registry entry leaves this chair out for a wheelchair.",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-chair-b-east",
+      "assetId": "adhc-banquet-chair",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        3.96,
+        0,
+        4.4
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0,
+          0.125,
+          0.45,
+          0.77
+        ]
+      ]
+    },
+    {
+      "id": "adhc-bingo-board",
+      "assetId": "adhc-bingo-board",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -6.24,
+        0,
+        2.8
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Bingo flashboard facing the long tables from the west aisle.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-bingo-caller",
+      "assetId": "adhc-bingo-caller",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -6.18,
+        0,
+        1.25
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-hall",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Against the west wall below the flashboard, clear of the aisle; the caller stands beside it facing the players.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-rehab-bars",
+      "assetId": "adhc-rehab-bars",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -9.3,
+        0,
+        -7.4
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-rehab",
+      "referencePages": [
+        1,
+        7
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Walkable between the rails (navigation footprints are the rails).",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          -0.5265,
+          0,
+          0.12,
+          3.65
+        ],
+        [
+          0.5265,
+          0,
+          0.12,
+          3.65
+        ]
+      ]
+    },
+    {
+      "id": "adhc-rehab-mat-table",
+      "assetId": "adhc-mat-table",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -11.25,
+        0,
+        -9.9
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-rehab",
+      "referencePages": [
+        1,
+        7
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-rehab-bike-1",
+      "assetId": "adhc-recumbent-bike",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -8.3,
+        0,
+        -10.2
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-rehab",
+      "referencePages": [
+        1,
+        7
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-rehab-bike-2",
+      "assetId": "adhc-recumbent-bike",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -7.4,
+        0,
+        -10.2
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-rehab",
+      "referencePages": [
+        1,
+        7
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-rehab-band-wall",
+      "assetId": "adhc-band-wall",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -11.75,
+        0,
+        -6.9
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-rehab",
+      "referencePages": [
+        1,
+        7
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-rehab-stair",
+      "assetId": "adhc-practice-stair",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -11.4,
+        0,
+        -4.25
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-rehab",
+      "referencePages": [
+        1,
+        7
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Practice stair: three steps up to a 0.45 m platform; climbed facing -z.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-rehab-rack",
+      "assetId": "adhc-rehab-rack",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -7.05,
+        0,
+        -2.5
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-rehab",
+      "referencePages": [
+        1,
+        7
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-rehab-chair-1",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -6.95,
+        0,
+        -6.2
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-rehab",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Chair for seated strength and rests.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-rehab-chair-2",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -6.95,
+        0,
+        -7
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-rehab",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Chair for seated strength and rests.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-rehab-chair-3",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -6.95,
+        0,
+        -7.8
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-rehab",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Chair for seated strength and rests.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-class-whiteboard",
+      "assetId": "adhc-whiteboard",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -9.3,
+        0,
+        6.2
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-classroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-class-table-1a",
+      "assetId": "adhc-class-table",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -10.55,
+        0,
+        4.4
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-classroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-class-table-1a-chair-1",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -10.91,
+        0,
+        3.8
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-classroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-class-table-1a-chair-2",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -10.19,
+        0,
+        3.8
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-classroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-class-table-1b",
+      "assetId": "adhc-class-table",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -8.35,
+        0,
+        4.4
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-classroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-class-table-1b-chair-1",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -8.71,
+        0,
+        3.8
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-classroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-class-table-1b-chair-2",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -7.99,
+        0,
+        3.8
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-classroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-class-table-2a",
+      "assetId": "adhc-class-table",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -10.55,
+        0,
+        2.9
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-classroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-class-table-2a-chair-1",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -10.91,
+        0,
+        2.3
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-classroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-class-table-2a-chair-2",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -10.19,
+        0,
+        2.3
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-classroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-class-table-2b",
+      "assetId": "adhc-class-table",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -8.35,
+        0,
+        2.9
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-classroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-class-table-2b-chair-1",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -8.71,
+        0,
+        2.3
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-classroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-class-table-2b-chair-2",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -7.99,
+        0,
+        2.3
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-classroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-class-table-3a",
+      "assetId": "adhc-class-table",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -10.55,
+        0,
+        1.4
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-classroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-class-table-3a-chair-1",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -10.91,
+        0,
+        0.8
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-classroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-class-table-3a-chair-2",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -10.19,
+        0,
+        0.8
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-classroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-class-table-3b",
+      "assetId": "adhc-class-table",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -8.35,
+        0,
+        1.4
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-classroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-class-table-3b-chair-1",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -8.71,
+        0,
+        0.8
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-classroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-class-table-3b-chair-2",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-west",
+      "levelId": "ground",
+      "position": [
+        -7.99,
+        0,
+        0.8
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-classroom",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "The partner-adc registry entry leaves this chair out for a wheelchair.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-table-1",
+      "assetId": "adhc-calligraphy-table",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        9.28,
+        0,
+        -9.1
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1,
+        8
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-table-1-chair-w1",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        8.53,
+        0,
+        -9.9
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-table-1-chair-e1",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        10.03,
+        0,
+        -9.9
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-table-1-chair-w2",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        8.53,
+        0,
+        -9.1
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-table-1-chair-e2",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        10.03,
+        0,
+        -9.1
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-table-1-chair-w3",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        8.53,
+        0,
+        -8.3
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-table-1-chair-e3",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        10.03,
+        0,
+        -8.3
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-table-2",
+      "assetId": "adhc-calligraphy-table",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        9.28,
+        0,
+        -6.3
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1,
+        8
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-table-2-chair-w1",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        8.53,
+        0,
+        -7.1
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-table-2-chair-e1",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        10.03,
+        0,
+        -7.1
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-table-2-chair-w2",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        8.53,
+        0,
+        -6.3
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-table-2-chair-e2",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        10.03,
+        0,
+        -6.3
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-table-2-chair-w3",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        8.53,
+        0,
+        -5.5
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-table-2-chair-e3",
+      "assetId": "adhc-chair",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        10.03,
+        0,
+        -5.5
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-scrolls",
+      "assetId": "adhc-scroll-display",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        9.28,
+        0,
+        -10.85
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1,
+        8
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-brush-stand",
+      "assetId": "adhc-brush-stand",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        6.905,
+        0,
+        -8
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1,
+        8
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-easel-1",
+      "assetId": "adhc-easel",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        11.4,
+        0,
+        -3.75
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1,
+        8
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Canvas faces west; the painter stands west of it.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-easel-2",
+      "assetId": "adhc-easel",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        11.4,
+        0,
+        -2.7
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1,
+        8
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Canvas faces west; the painter stands west of it.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-easel-3",
+      "assetId": "adhc-easel",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        11.4,
+        0,
+        -1.65
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1,
+        8
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Canvas faces west; the painter stands west of it.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-easel-4",
+      "assetId": "adhc-easel",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        11.4,
+        0,
+        -0.6
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1,
+        8
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Canvas faces west; the painter stands west of it.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-studio-drying-rack",
+      "assetId": "adhc-drying-rack",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        6.96,
+        0,
+        -1
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-studio",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-group-chair-1",
+      "assetId": "adhc-armchair",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        10.174,
+        0,
+        4.986
+      ],
+      "rotation": 0.392699,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-group-room",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-group-chair-2",
+      "assetId": "adhc-armchair",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        10.986,
+        0,
+        4.174
+      ],
+      "rotation": 1.178097,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-group-room",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-group-chair-3",
+      "assetId": "adhc-armchair",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        10.986,
+        0,
+        3.026
+      ],
+      "rotation": 1.963495,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-group-room",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-group-chair-4",
+      "assetId": "adhc-armchair",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        10.174,
+        0,
+        2.214
+      ],
+      "rotation": 2.748894,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-group-room",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-group-chair-5",
+      "assetId": "adhc-armchair",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        9.026,
+        0,
+        2.214
+      ],
+      "rotation": 3.534292,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-group-room",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "The partner-adc registry entry leaves this armchair out: a wheelchair place in the circle.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-group-chair-6",
+      "assetId": "adhc-armchair",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        8.214,
+        0,
+        3.026
+      ],
+      "rotation": 4.31969,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-group-room",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-group-chair-7",
+      "assetId": "adhc-armchair",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        8.214,
+        0,
+        4.174
+      ],
+      "rotation": 5.105088,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-group-room",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-group-chair-8",
+      "assetId": "adhc-armchair",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        9.026,
+        0,
+        4.986
+      ],
+      "rotation": 5.890486,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-group-room",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-group-table",
+      "assetId": "adhc-side-table",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        9.6,
+        0,
+        3.6
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-group-room",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-group-planter",
+      "assetId": "adhc-planter",
+      "zoneId": "adhc-zone-east",
+      "levelId": "ground",
+      "position": [
+        11.4,
+        0,
+        0.56
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-group-room",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-reception-desk",
+      "assetId": "adhc-reception-desk",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "position": [
+        -1.8,
+        0,
+        8.4
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-reception",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-reception-chair",
+      "assetId": "adhc-desk-chair",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "position": [
+        -2.55,
+        0,
+        8.4
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-reception",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-waiting-chair-1",
+      "assetId": "adhc-waiting-chair",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "position": [
+        2.64,
+        0,
+        7.6
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-reception",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-waiting-chair-2",
+      "assetId": "adhc-waiting-chair",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "position": [
+        2.64,
+        0,
+        8.3
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-reception",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-waiting-chair-3",
+      "assetId": "adhc-waiting-chair",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "position": [
+        2.64,
+        0,
+        9
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-reception",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-reception-planter",
+      "assetId": "adhc-planter",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "position": [
+        2.4,
+        0,
+        9.75
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-reception",
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-restroom-w-toilet",
+      "assetId": "toilet",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "position": [
+        -6.05,
+        0,
+        9.755
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-restroom-w",
+      "referencePages": [
+        1,
+        4
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Centreline 0.45 m from the side wall.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-restroom-w-basin",
+      "assetId": "basin",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "position": [
+        -3.31,
+        0,
+        8.6
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-restroom-w",
+      "referencePages": [
+        1,
+        4
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Roll-under basin on the partition.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-restroom-w-gb-side",
+      "assetId": "adhc-grab-bar-42",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "position": [
+        -6.46,
+        0.82,
+        9.26
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-restroom-w",
+      "referencePages": [
+        1,
+        4
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "42 in side bar on the side wall, 0.30 m from the rear wall.",
+      "layer": "architecture"
+    },
+    {
+      "id": "adhc-restroom-w-gb-rear",
+      "assetId": "adhc-grab-bar-36",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "position": [
+        -5.9,
+        0.82,
+        10.06
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-restroom-w",
+      "referencePages": [
+        1,
+        4
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "36 in rear bar.",
+      "layer": "architecture"
+    },
+    {
+      "id": "adhc-restroom-e-toilet",
+      "assetId": "toilet",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "position": [
+        6.05,
+        0,
+        9.755
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-restroom-e",
+      "referencePages": [
+        1,
+        4
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Centreline 0.45 m from the side wall.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-restroom-e-basin",
+      "assetId": "basin",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "position": [
+        3.31,
+        0,
+        8.6
+      ],
+      "rotation": 1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-restroom-e",
+      "referencePages": [
+        1,
+        4
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Roll-under basin on the partition.",
+      "layer": "furniture"
+    },
+    {
+      "id": "adhc-restroom-e-gb-side",
+      "assetId": "adhc-grab-bar-42",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "position": [
+        6.46,
+        0.82,
+        9.26
+      ],
+      "rotation": -1.570796,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-restroom-e",
+      "referencePages": [
+        1,
+        4
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "42 in side bar on the side wall, 0.30 m from the rear wall.",
+      "layer": "architecture"
+    },
+    {
+      "id": "adhc-restroom-e-gb-rear",
+      "assetId": "adhc-grab-bar-36",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "position": [
+        5.9,
+        0.82,
+        10.06
+      ],
+      "rotation": 3.141593,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "adhc-restroom-e",
+      "referencePages": [
+        1,
+        4
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "36 in rear bar.",
+      "layer": "architecture"
+    },
+    {
+      "id": "adhc-door-rehab-leaf",
+      "assetId": "adhc-door-rehab",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -6.6,
+        0,
+        -4.5
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": null,
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Hall to light rehab; swings into the rehab.",
+      "layer": "architecture"
+    },
+    {
+      "id": "adhc-door-classroom-leaf",
+      "assetId": "adhc-door-classroom",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -6.6,
+        0,
+        0.5
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": null,
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Hall to the classroom; swings into the classroom.",
+      "layer": "architecture"
+    },
+    {
+      "id": "adhc-door-studio-leaf",
+      "assetId": "adhc-door-studio",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        6.6,
+        0,
+        -3.5
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": null,
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Hall to the studio; swings into the studio.",
+      "layer": "architecture"
+    },
+    {
+      "id": "adhc-door-group-leaf",
+      "assetId": "adhc-door-group",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        6.6,
+        0,
+        3.7
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": null,
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Hall to the group room; swings into the group room.",
+      "layer": "architecture"
+    },
+    {
+      "id": "adhc-door-restroom-w-leaf",
+      "assetId": "adhc-door-restroom-w",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -5.3,
+        0,
+        6.6
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": null,
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Hall to the west restroom; swings in, latch openable from outside.",
+      "layer": "architecture"
+    },
+    {
+      "id": "adhc-door-restroom-e-leaf",
+      "assetId": "adhc-door-restroom-e",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        5.3,
+        0,
+        6.6
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": null,
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Hall to the east restroom; swings in, latch openable from outside.",
+      "layer": "architecture"
+    },
+    {
+      "id": "adhc-door-entrance-1-leaf",
+      "assetId": "adhc-door-entrance-1",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "position": [
+        -0.9,
+        0,
+        10.2
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": null,
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Double front doors, 1.8 m clear, swinging into the reception; flush threshold.",
+      "layer": "architecture"
+    },
+    {
+      "id": "adhc-door-entrance-2-leaf",
+      "assetId": "adhc-door-entrance-2",
+      "zoneId": "adhc-zone-entry",
+      "levelId": "ground",
+      "position": [
+        0.9,
+        0,
+        10.2
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": null,
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Double front doors, 1.8 m clear, swinging into the reception; flush threshold.",
+      "layer": "architecture"
+    },
+    {
+      "id": "adhc-door-hall-1-leaf",
+      "assetId": "adhc-door-hall-1",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        -0.9,
+        0,
+        6.6
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": null,
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Double doors between the reception and the hall, held open in the day; they swing into the reception.",
+      "layer": "architecture"
+    },
+    {
+      "id": "adhc-door-hall-2-leaf",
+      "assetId": "adhc-door-hall-2",
+      "zoneId": "adhc-zone-hall",
+      "levelId": "ground",
+      "position": [
+        0.9,
+        0,
+        6.6
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": null,
+      "referencePages": [
+        1
+      ],
+      "status": "Illustrative design (ADHC-PLAN study); not a surveyed building",
+      "notes": "Double doors between the reception and the hall, held open in the day; they swing into the reception.",
+      "layer": "architecture"
+    }
+  ],
+  "assets": {
+    "adhc-stage-platform": {
+      "name": "Stage platform",
+      "kind": "stage-platform",
+      "dimensions": [
+        13.08,
+        0.4,
+        3.5999999999999996
+      ],
+      "material": "adhc-honey",
+      "materials": {
+        "skirt": "adhc-cinnabar",
+        "trim": "adhc-gold",
+        "frame": "adhc-lacquer"
+      },
+      "parameters": {
+        "standing": "deck",
+        "deck": 0.4,
+        "front": "audience side (pleated skirt, gold nosing) at local +z; performers stand on the deck"
+      }
+    },
+    "adhc-stage-ramp": {
+      "name": "Stage ramp (1:12) with top landing",
+      "kind": "stage-ramp",
+      "dimensions": [
+        1.5,
+        1.32,
+        6.340000000000001
+      ],
+      "material": "adhc-honey",
+      "materials": {
+        "rail": "photo-silver"
+      },
+      "parameters": {
+        "standing": "ramp",
+        "rise": 0.4,
+        "landing": 1.54,
+        "front": "high end and landing at local -z, foot at +z; handrail and kick edge on the open side (-x), the stage face along +x"
+      }
+    },
+    "adhc-stage-steps": {
+      "name": "Stage steps",
+      "kind": "stage-steps",
+      "dimensions": [
+        1.4,
+        1.32,
+        0.9
+      ],
+      "material": "adhc-honey",
+      "parameters": {
+        "standing": "steps",
+        "rise": 0.4,
+        "risers": 3,
+        "centerRail": true,
+        "front": "top step at local -z (the deck), foot at +z; three handrails make two 0.64 m lanes"
+      }
+    },
+    "adhc-stage-backdrop": {
+      "name": "Stage backdrop with lantern valance",
+      "kind": "stage-backdrop",
+      "dimensions": [
+        9.2,
+        2.7,
+        0.3
+      ],
+      "material": "adhc-cinnabar",
+      "parameters": {
+        "front": "curtain, banners and lanterns face the audience at local +z"
+      }
+    },
+    "adhc-choir-riser": {
+      "name": "Choir risers (3 tiers)",
+      "kind": "choir-riser",
+      "dimensions": [
+        4.8,
+        0.6,
+        1.8
+      ],
+      "material": "adhc-riser-carpet",
+      "parameters": {
+        "standing": "tiers",
+        "tiers": 3,
+        "tierRise": 0.2,
+        "front": "lowest tier at local +z (the audience); singers face +z"
+      }
+    },
+    "adhc-lectern": {
+      "name": "Lectern",
+      "kind": "lectern",
+      "dimensions": [
+        0.6,
+        1.18,
+        0.5
+      ],
+      "material": "adhc-honey",
+      "parameters": {
+        "front": "audience face (medallion) at local +z; the speaker stands at -z"
+      }
+    },
+    "adhc-mic-stand": {
+      "name": "Microphone stand",
+      "kind": "mic-stand",
+      "dimensions": [
+        0.32,
+        1.55,
+        0.55
+      ],
+      "material": "photo-black",
+      "parameters": {
+        "front": "boom toward the singer at local +z"
+      }
+    },
+    "adhc-speaker": {
+      "name": "Tower speaker",
+      "kind": "tower-speaker",
+      "dimensions": [
+        0.32,
+        1.05,
+        0.3
+      ],
+      "material": "adhc-lacquer",
+      "parameters": {
+        "front": "drivers at local +z"
+      }
+    },
+    "adhc-upright-piano": {
+      "name": "Upright piano",
+      "kind": "upright-piano",
+      "dimensions": [
+        1.5,
+        1.25,
+        0.62
+      ],
+      "material": "adhc-lacquer",
+      "parameters": {
+        "front": "keyboard at local +z; the pianist sits at +z facing -z"
+      }
+    },
+    "adhc-piano-bench": {
+      "name": "Piano bench",
+      "kind": "piano-bench",
+      "dimensions": [
+        0.8,
+        0.5,
+        0.38
+      ],
+      "material": "adhc-cinnabar",
+      "parameters": {
+        "front": "seat faces local -z (the keyboard)"
+      }
+    },
+    "adhc-banquet-table": {
+      "name": "Banquet table (8 ft) with tablecloth",
+      "kind": "banquet-table",
+      "dimensions": [
+        2.44,
+        0.88,
+        0.76
+      ],
+      "material": "adhc-cloth-red",
+      "parameters": {
+        "top": 0.76,
+        "front": "used from both long sides and the ends; the declared height includes the centrepieces"
+      }
+    },
+    "adhc-banquet-chair": {
+      "name": "Banquet chair",
+      "kind": "banquet-chair",
+      "dimensions": [
+        0.45,
+        0.88,
+        0.52
+      ],
+      "material": "adhc-jade",
+      "parameters": {
+        "seatHeight": 0.46,
+        "front": "seat faces local -z; ladder back at +z"
+      }
+    },
+    "adhc-dance-floor": {
+      "name": "Dance floor inlay",
+      "kind": "dance-floor",
+      "dimensions": [
+        9.2,
+        0.012,
+        5.2
+      ],
+      "material": "adhc-dance-a",
+      "parameters": {
+        "border": 0.3,
+        "tile": 0.6,
+        "front": "flush parquet inlay, used from every side"
+      }
+    },
+    "adhc-lantern-post": {
+      "name": "Lantern post",
+      "kind": "lantern-post",
+      "dimensions": [
+        0.44,
+        2.4,
+        0.7
+      ],
+      "material": "adhc-lacquer",
+      "parameters": {
+        "front": "the arm and its paper lantern reach toward local +z"
+      }
+    },
+    "adhc-bingo-board": {
+      "name": "Bingo flashboard",
+      "kind": "bingo-board",
+      "dimensions": [
+        1.6,
+        1.9,
+        0.5
+      ],
+      "material": "adhc-lacquer",
+      "parameters": {
+        "front": "number grid faces the players at local +z"
+      }
+    },
+    "adhc-bingo-caller": {
+      "name": "Bingo caller's stand",
+      "kind": "bingo-caller",
+      "dimensions": [
+        0.9,
+        1.15,
+        0.6
+      ],
+      "material": "adhc-honey",
+      "parameters": {
+        "front": "players at local +z; the caller stands at -z or beside it"
+      }
+    },
+    "adhc-calligraphy-table": {
+      "name": "Calligraphy table",
+      "kind": "calligraphy-table",
+      "dimensions": [
+        2.4,
+        1.05,
+        0.9
+      ],
+      "material": "adhc-walnut",
+      "parameters": {
+        "top": 0.74,
+        "placesPerSide": 3,
+        "front": "places (felt, paper, ink stone) along both long sides, local ±z; brush rack down the middle"
+      }
+    },
+    "adhc-brush-stand": {
+      "name": "Brush and ink stand",
+      "kind": "brush-stand",
+      "dimensions": [
+        0.9,
+        1.1,
+        0.45
+      ],
+      "material": "adhc-walnut",
+      "parameters": {
+        "front": "cabinet doors and the brush rack face local +z"
+      }
+    },
+    "adhc-easel": {
+      "name": "Studio easel with canvas",
+      "kind": "easel",
+      "dimensions": [
+        0.7,
+        1.75,
+        0.7
+      ],
+      "material": "adhc-honey",
+      "parameters": {
+        "front": "canvas faces the painter at local +z"
+      }
+    },
+    "adhc-drying-rack": {
+      "name": "Painting drying rack",
+      "kind": "drying-rack",
+      "dimensions": [
+        0.9,
+        1.5,
+        0.55
+      ],
+      "material": "photo-silver",
+      "parameters": {
+        "shelves": 8,
+        "front": "shelves load from local +z"
+      }
+    },
+    "adhc-scroll-display": {
+      "name": "Hanging scroll display",
+      "kind": "scroll-display",
+      "dimensions": [
+        2,
+        1.8,
+        0.45
+      ],
+      "material": "adhc-honey",
+      "parameters": {
+        "scrolls": 3,
+        "front": "scrolls face local +z"
+      }
+    },
+    "adhc-whiteboard": {
+      "name": "Mobile whiteboard",
+      "kind": "whiteboard",
+      "dimensions": [
+        1.8,
+        1.85,
+        0.6
+      ],
+      "material": "adhc-board",
+      "parameters": {
+        "front": "writing surface faces the class at local +z"
+      }
+    },
+    "adhc-recumbent-bike": {
+      "name": "Recumbent exercise bike",
+      "kind": "recumbent-bike",
+      "dimensions": [
+        0.65,
+        1.15,
+        1.6
+      ],
+      "material": "adhc-jade",
+      "parameters": {
+        "front": "rider sits at local -z facing the pedals and console at +z"
+      }
+    },
+    "adhc-band-wall": {
+      "name": "Resistance-band wall",
+      "kind": "band-wall",
+      "dimensions": [
+        2.2,
+        1.9,
+        0.3
+      ],
+      "material": "adhc-jade",
+      "parameters": {
+        "front": "bands and shelf face the room at local +z"
+      }
+    },
+    "adhc-practice-stair": {
+      "name": "Practice stair",
+      "kind": "practice-stair",
+      "dimensions": [
+        0.85,
+        1.35,
+        1.5
+      ],
+      "material": "adhc-honey",
+      "parameters": {
+        "standing": "steps",
+        "rise": 0.45,
+        "risers": 3,
+        "platform": 0.6,
+        "front": "platform at local -z, foot at +z; handrails both sides"
+      }
+    },
+    "adhc-reception-desk": {
+      "name": "Reception desk",
+      "kind": "reception-desk",
+      "dimensions": [
+        1.6,
+        1.05,
+        0.7
+      ],
+      "material": "adhc-cinnabar",
+      "parameters": {
+        "front": "visitors at local +z (the ledge); the receptionist sits at -z"
+      }
+    },
+    "adhc-rehab-bars": {
+      "name": "Parallel bars",
+      "kind": "rehab-bars",
+      "dimensions": [
+        1.35,
+        0.92,
+        3.65
+      ],
+      "material": "photo-silver",
+      "parameters": {
+        "front": "walk between the rails along local z"
+      }
+    },
+    "adhc-mat-table": {
+      "name": "Mat table",
+      "kind": "rehab-plinth",
+      "dimensions": [
+        1.2,
+        0.55,
+        2
+      ],
+      "material": "adhc-mat"
+    },
+    "adhc-rehab-rack": {
+      "name": "Weights and bands rack",
+      "kind": "rehab-rack",
+      "dimensions": [
+        0.64,
+        1.82,
+        0.6
+      ],
+      "material": "adhc-jade"
+    },
+    "adhc-chair": {
+      "name": "Stacking chair",
+      "kind": "chair",
+      "dimensions": [
+        0.46,
+        0.84,
+        0.5
+      ],
+      "material": "adhc-jade",
+      "parameters": {
+        "front": "seat faces local -z"
+      }
+    },
+    "adhc-class-table": {
+      "name": "Classroom table (2 places)",
+      "kind": "table",
+      "dimensions": [
+        1.4,
+        0.74,
+        0.6
+      ],
+      "material": "adhc-birch"
+    },
+    "adhc-armchair": {
+      "name": "Group-room armchair",
+      "kind": "lounge-chair",
+      "dimensions": [
+        0.66,
+        1,
+        0.76
+      ],
+      "material": "adhc-terracotta",
+      "materials": {
+        "wood": "adhc-honey",
+        "metal": "adhc-honey"
+      },
+      "parameters": {
+        "front": "seat faces local -z"
+      }
+    },
+    "adhc-side-table": {
+      "name": "Low round table",
+      "kind": "round-table",
+      "dimensions": [
+        0.6,
+        0.45,
+        0.6
+      ],
+      "material": "adhc-honey"
+    },
+    "adhc-waiting-chair": {
+      "name": "Waiting chair",
+      "kind": "upholstered-chair",
+      "dimensions": [
+        0.55,
+        0.9,
+        0.57
+      ],
+      "material": "adhc-jade",
+      "materials": {
+        "wood": "adhc-honey",
+        "metal": "adhc-gold"
+      },
+      "parameters": {
+        "front": "seat faces local -z"
+      }
+    },
+    "adhc-desk-chair": {
+      "name": "Desk chair",
+      "kind": "task-chair",
+      "dimensions": [
+        0.6,
+        0.98,
+        0.6
+      ],
+      "material": "adhc-jade",
+      "parameters": {
+        "front": "seat faces local -z"
+      }
+    },
+    "adhc-planter": {
+      "name": "Planter",
+      "kind": "planter",
+      "dimensions": [
+        0.6,
+        1.4,
+        0.6
+      ],
+      "material": "adhc-terracotta"
+    },
+    "toilet": {
+      "name": "Toilet",
+      "kind": "toilet",
+      "dimensions": [
+        0.46,
+        0.74,
+        0.69
+      ],
+      "material": "porcelain"
+    },
+    "basin": {
+      "name": "Wall-hung basin (roll-under)",
+      "kind": "basin",
+      "dimensions": [
+        0.6,
+        0.85,
+        0.5
+      ],
+      "material": "porcelain"
+    },
+    "adhc-grab-bar-42": {
+      "name": "Grab bar (42 in)",
+      "kind": "grab-bar",
+      "dimensions": [
+        1.07,
+        0.08,
+        0.08
+      ],
+      "material": "photo-silver",
+      "parameters": {
+        "orientation": "horizontal",
+        "front": "wall plane at local -z"
+      }
+    },
+    "adhc-grab-bar-36": {
+      "name": "Grab bar (36 in)",
+      "kind": "grab-bar",
+      "dimensions": [
+        0.915,
+        0.08,
+        0.08
+      ],
+      "material": "photo-silver",
+      "parameters": {
+        "orientation": "horizontal",
+        "front": "wall plane at local -z"
+      }
+    },
+    "adhc-door-rehab": {
+      "name": "Door · light rehab",
+      "kind": "plan-door",
+      "dimensions": [
+        0.95,
+        2.13,
+        0.043
+      ],
+      "material": "adhc-door",
+      "parameters": {
+        "closedAngle": 1.570796,
+        "openAngle": 3.141593
+      }
+    },
+    "adhc-door-classroom": {
+      "name": "Door · classroom",
+      "kind": "plan-door",
+      "dimensions": [
+        0.95,
+        2.13,
+        0.043
+      ],
+      "material": "adhc-door",
+      "parameters": {
+        "closedAngle": -1.570796,
+        "openAngle": 3.141593
+      }
+    },
+    "adhc-door-studio": {
+      "name": "Door · studio",
+      "kind": "plan-door",
+      "dimensions": [
+        0.95,
+        2.13,
+        0.043
+      ],
+      "material": "adhc-door",
+      "parameters": {
+        "closedAngle": 1.570796,
+        "openAngle": 0
+      }
+    },
+    "adhc-door-group": {
+      "name": "Door · group room",
+      "kind": "plan-door",
+      "dimensions": [
+        0.95,
+        2.13,
+        0.043
+      ],
+      "material": "adhc-door",
+      "parameters": {
+        "closedAngle": -1.570796,
+        "openAngle": 0
+      }
+    },
+    "adhc-door-restroom-w": {
+      "name": "Door · west restroom",
+      "kind": "plan-door",
+      "dimensions": [
+        0.95,
+        2.13,
+        0.043
+      ],
+      "material": "adhc-door",
+      "parameters": {
+        "closedAngle": 0,
+        "openAngle": 1.570796
+      }
+    },
+    "adhc-door-restroom-e": {
+      "name": "Door · east restroom",
+      "kind": "plan-door",
+      "dimensions": [
+        0.95,
+        2.13,
+        0.043
+      ],
+      "material": "adhc-door",
+      "parameters": {
+        "closedAngle": 3.141593,
+        "openAngle": 1.570796
+      }
+    },
+    "adhc-door-entrance-1": {
+      "name": "Front door (left leaf)",
+      "kind": "plan-door",
+      "dimensions": [
+        0.875,
+        2.13,
+        0.043
+      ],
+      "material": "adhc-door",
+      "parameters": {
+        "closedAngle": 0,
+        "openAngle": -1.570796
+      }
+    },
+    "adhc-door-entrance-2": {
+      "name": "Front door (right leaf)",
+      "kind": "plan-door",
+      "dimensions": [
+        0.875,
+        2.13,
+        0.043
+      ],
+      "material": "adhc-door",
+      "parameters": {
+        "closedAngle": 3.141593,
+        "openAngle": -1.570796
+      }
+    },
+    "adhc-door-hall-1": {
+      "name": "Door · hall (left leaf)",
+      "kind": "plan-door",
+      "dimensions": [
+        0.875,
+        2.13,
+        0.043
+      ],
+      "material": "adhc-door",
+      "parameters": {
+        "closedAngle": 0,
+        "openAngle": 1.570796
+      }
+    },
+    "adhc-door-hall-2": {
+      "name": "Door · hall (right leaf)",
+      "kind": "plan-door",
+      "dimensions": [
+        0.875,
+        2.13,
+        0.043
+      ],
+      "material": "adhc-door",
+      "parameters": {
+        "closedAngle": 3.141593,
+        "openAngle": 1.570796
+      }
+    }
+  },
+  "materials": {
+    "adhc-stucco": {
+      "color": "#d7a283",
+      "roughness": 0.9
+    },
+    "adhc-plaster": {
+      "color": "#efdcc7",
+      "roughness": 0.9
+    },
+    "adhc-hall-floor": {
+      "color": "#cfa775",
+      "roughness": 0.6,
+      "pattern": "plank"
+    },
+    "adhc-terrazzo": {
+      "color": "#eadccb",
+      "roughness": 0.55,
+      "pattern": "mosaic"
+    },
+    "adhc-restroom-tile": {
+      "color": "#cbded3",
+      "roughness": 0.5,
+      "pattern": "tile"
+    },
+    "adhc-studio-floor": {
+      "color": "#e0c493",
+      "roughness": 0.62,
+      "pattern": "plank"
+    },
+    "adhc-class-carpet": {
+      "color": "#a6bbad",
+      "roughness": 1,
+      "pattern": "carpet"
+    },
+    "adhc-group-carpet": {
+      "color": "#c99f8b",
+      "roughness": 1,
+      "pattern": "carpet"
+    },
+    "adhc-rehab-floor": {
+      "color": "#8fb19e",
+      "roughness": 0.85
+    },
+    "adhc-honey": {
+      "color": "#c78f4f",
+      "roughness": 0.5
+    },
+    "adhc-honey-dark": {
+      "color": "#9b6a38",
+      "roughness": 0.6
+    },
+    "adhc-cinnabar": {
+      "color": "#ab443a",
+      "roughness": 0.8
+    },
+    "adhc-cinnabar-deep": {
+      "color": "#86322e",
+      "roughness": 0.85
+    },
+    "adhc-gold": {
+      "color": "#d2a24c",
+      "roughness": 0.38,
+      "metalness": 0.35
+    },
+    "adhc-jade": {
+      "color": "#5f9b84",
+      "roughness": 0.7
+    },
+    "adhc-jade-light": {
+      "color": "#a6c8b6",
+      "roughness": 0.7
+    },
+    "adhc-terracotta": {
+      "color": "#c4795a",
+      "roughness": 0.8
+    },
+    "adhc-sky": {
+      "color": "#8fb3c9",
+      "roughness": 0.7
+    },
+    "adhc-leaf": {
+      "color": "#7f9c5a",
+      "roughness": 0.8
+    },
+    "adhc-cloth-red": {
+      "color": "#b34a3d",
+      "roughness": 0.88
+    },
+    "adhc-runner-gold": {
+      "color": "#d9b45f",
+      "roughness": 0.6
+    },
+    "adhc-lacquer": {
+      "color": "#2b2422",
+      "roughness": 0.3
+    },
+    "adhc-lantern": {
+      "color": "#d6553f",
+      "roughness": 0.8,
+      "emissive": "#ff7a45",
+      "emissiveIntensity": 0.45
+    },
+    "adhc-paper": {
+      "color": "#f6efdf",
+      "roughness": 0.9
+    },
+    "adhc-canvas": {
+      "color": "#f3ede0",
+      "roughness": 0.9
+    },
+    "adhc-ink": {
+      "color": "#26221f",
+      "roughness": 0.6
+    },
+    "adhc-walnut": {
+      "color": "#6f4a30",
+      "roughness": 0.6
+    },
+    "adhc-felt": {
+      "color": "#3f4a45",
+      "roughness": 1
+    },
+    "adhc-board": {
+      "color": "#f6f6f1",
+      "roughness": 0.25
+    },
+    "adhc-riser-carpet": {
+      "color": "#4f5d58",
+      "roughness": 1
+    },
+    "adhc-dance-a": {
+      "color": "#d49b5b",
+      "roughness": 0.45
+    },
+    "adhc-dance-b": {
+      "color": "#b67b42",
+      "roughness": 0.45
+    },
+    "adhc-birch": {
+      "color": "#e8d4ae",
+      "roughness": 0.55
+    },
+    "adhc-door": {
+      "color": "#c78f4f",
+      "roughness": 0.5
+    },
+    "adhc-mat": {
+      "color": "#4f8a76",
+      "roughness": 0.8
+    },
+    "photo-white": {
+      "color": "#f5f3ea",
+      "roughness": 0.55
+    },
+    "photo-silver": {
+      "color": "#c5c9c9",
+      "roughness": 0.35,
+      "metalness": 0.68
+    },
+    "photo-black": {
+      "color": "#242b2c",
+      "roughness": 0.55
+    },
+    "photo-mosaic": {
+      "color": "#f1eadc",
+      "roughness": 0.75
+    },
+    "photo-blue-grey": {
+      "color": "#a1b8b6",
+      "roughness": 0.65
+    },
+    "photo-teal": {
+      "color": "#57adbc",
+      "roughness": 0.65
+    },
+    "photo-red-cart": {
+      "color": "#b4675c",
+      "roughness": 0.6
+    },
+    "photo-mustard": {
+      "color": "#c4a146",
+      "roughness": 0.65
+    },
+    "photo-blue-seat": {
+      "color": "#9ec6cb",
+      "roughness": 0.83
+    },
+    "porcelain": {
+      "color": "#eeeedd",
+      "roughness": 0.32
+    },
+    "metal": {
+      "color": "#b2bbb8",
+      "roughness": 0.4,
+      "metalness": 0.6
+    },
+    "oak": {
+      "color": "#ddbd85",
+      "roughness": 0.65
+    },
+    "screen": {
+      "color": "#14252b",
+      "roughness": 0.4
+    },
+    "concrete": {
+      "color": "#c5c8c2",
+      "roughness": 0.95
+    },
+    "leaf": {
+      "color": "#7f9a6a",
+      "roughness": 0.95
+    },
+    "blue": {
+      "color": "#39789e",
+      "roughness": 0.8
+    },
+    "glass": {
+      "color": "#7fabb7",
+      "roughness": 0.22,
+      "metalness": 0.15,
+      "opacity": 0.62
+    }
+  },
+  "programs": [],
+  "referencePages": [
+    {
+      "page": 1,
+      "title": "ADHC-PLAN · Partner adult day health care center design study (plan, furniture, the day, checks)",
+      "group": "Design study",
+      "findings": "Plan frame P, zones, rooms, walls with grid-centred door gaps, the stage and its step-free access, the furniture schedule, standing surfaces and the partner day. Generated by scripts/build-partner-adhc.mjs and checked by scripts/validate-partner-adhc.mjs.",
+      "reviewStatus": "Reviewed for the illustrative plan",
+      "evidenceType": "Design drawing (illustrative)",
+      "text": ""
+    },
+    {
+      "page": 2,
+      "title": "Program brief · the partner ADHC",
+      "group": "Program",
+      "findings": "Mostly long tables; lots of fancy dancing; line dance; bingo; singing or choir; large groups; a large area of activity; a stage; some smaller activity rooms; calligraphy; painting; classes and group therapy sessions; a light rehab space; nothing else; substantially smaller than the main center. Approved support spaces: an entry and reception, and restrooms.",
+      "reviewStatus": "Product owner brief",
+      "evidenceType": "Program brief",
+      "text": ""
+    },
+    {
+      "page": 3,
+      "title": "California adult day health care (CBAS) · physical plant",
+      "group": "Regulation",
+      "findings": "California Code of Regulations, Title 22, Division 5, Chapter 10 (adult day health centers) and the CDA Community-Based Adult Services (CBAS) program: activity space per participant, toilets and accessibility. Interpreted, not quoted; the model leaves out the clinic, food-service, quiet-room and office spaces a licensed center needs (accuracy issues).",
+      "reviewStatus": "Reviewed for the illustrative plan",
+      "evidenceType": "Regulation summary (interpreted, not quoted)",
+      "text": ""
+    },
+    {
+      "page": 4,
+      "title": "2010 ADA Standards for Accessible Design",
+      "group": "Accessibility",
+      "findings": "Turning space 304, doors 404, ramps 405 (1:12 maximum, level landings, handrails), stairs 504, toilet rooms 604 and grab bars 609, and performing areas 206.2.6 (an accessible route joins the seating and the stage). https://www.ada.gov/law-and-regs/design-standards/2010-stds/",
+      "reviewStatus": "Reviewed for the illustrative plan",
+      "evidenceType": "Standard (interpreted, not quoted)",
+      "text": ""
+    },
+    {
+      "page": 5,
+      "title": "Banquet seating and aisles",
+      "group": "Planning guides",
+      "findings": "8 ft × 30 in banquet tables seat four a side at about 24 in each, joined end to end as long tables; aisles of 36–48 in between chair backs; wheelchair places at table ends with the chair removed.",
+      "reviewStatus": "Reviewed for the illustrative plan",
+      "evidenceType": "Reference summary",
+      "text": ""
+    },
+    {
+      "page": 6,
+      "title": "Senior line dance, fan dance and community choir",
+      "group": "Program",
+      "findings": "Line dancing in rows about 1.2–1.5 m apart; fan and partner dances on the same floor; small community choirs of ten to fifteen on two- or three-tier risers (about 8 in rise and 24 in deep) beside a piano.",
+      "reviewStatus": "Reviewed for the illustrative plan",
+      "evidenceType": "Reference summary",
+      "text": ""
+    },
+    {
+      "page": 7,
+      "title": "Light rehab in adult day settings",
+      "group": "Care model",
+      "findings": "Parallel bars, recumbent exercisers, a mat table, resistance bands and a training stair for strength, balance and fall prevention (CDC STEADI); visiting therapists from the participant’s own program.",
+      "reviewStatus": "Reviewed for the illustrative plan",
+      "evidenceType": "Guidance summary",
+      "text": ""
+    },
+    {
+      "page": 8,
+      "title": "San Gabriel Valley adult day and senior programs",
+      "group": "Context",
+      "findings": "Chinese-American adult day and senior programs commonly offer line dancing, fan and ribbon dances, choir and opera singing, calligraphy and brush painting, bingo, classes and support groups. An illustrative composite; no specific center.",
+      "reviewStatus": "Reviewed for the illustrative plan",
+      "evidenceType": "Context summary",
+      "text": ""
+    }
+  ],
+  "accuracyIssues": [
+    {
+      "id": "illustrative-plan",
+      "title": "Illustrative plan, not a real center",
+      "detail": "An illustrative partner adult day health care center designed from the program brief, about a quarter of the main center’s ground floor. No real provider, address, survey or participant records are used.",
+      "status": "Illustrative",
+      "pages": [
+        1,
+        2,
+        8
+      ]
+    },
+    {
+      "id": "program-limited",
+      "title": "Only the brief’s spaces",
+      "detail": "The plan holds the brief’s spaces plus the approved entry, reception and two restrooms. A licensed ADHC (CBAS) center also needs a nurse’s station or clinic room, a quiet room, an office, food service and storage; they are left out by request. Lunch is shown catered and served at the long tables.",
+      "status": "Program scope",
+      "pages": [
+        2,
+        3
+      ]
+    },
+    {
+      "id": "accessibility-interpretation",
+      "title": "Accessibility values are interpretations",
+      "detail": "The 1:12 stage ramp with its 1.54 × 1.5 m landing, the steps with three handrails, the 1.0 m interior door gaps and 1.8 m double doors, the wheelchair places at table ends, in the classroom and in the circle, and the 1.5 m turning circles follow the 2010 ADA Standards as interpreted for this plan. Checked by scripts/validate-partner-adhc.mjs, not by an accessibility consultant.",
+      "status": "Design interpretation",
+      "pages": [
+        4,
+        5
+      ]
+    },
+    {
+      "id": "standing-surfaces",
+      "title": "Heights on the stage",
+      "detail": "People on the stage, the choir risers and the ramp landing stand at the heights the assets declare (`parameters.standing`, read by facility-instance.ts standingSurfaces); walks up the steps and the ramp rise linearly between the corners of their routes.",
+      "status": "Simulation simplification",
+      "pages": [
+        1
+      ]
+    },
+    {
+      "id": "grid-aligned-doors",
+      "title": "Door gaps on the navigation grid",
+      "detail": "Every door gap is centred on a multiple of 0.2 m so the 0.2 m navigation grid passes a wheelchair (0.37 m clearance) straight through a 1.0 m gap.",
+      "status": "Simulation adjustment",
+      "pages": [
+        1
+      ]
+    },
+    {
+      "id": "decor",
+      "title": "Finishes are a presentation choice",
+      "detail": "Terracotta stucco, warm plaster, honey wood, cinnabar, jade and gold give the partner its own identity next to Seen’s white, oak and stone; they are not a finish schedule. Paper lanterns stand on posts and hang from the stage backdrop rather than from the ceiling, so nothing floats over the cutaway.",
+      "status": "Presentation",
+      "pages": [
+        1,
+        8
+      ]
+    },
+    {
+      "id": "roof-windows",
+      "title": "Roof and windows not modelled",
+      "detail": "The roof (roofNote) and the windows (windowSchedule) are recorded only; the community instance is a cutaway at 1.2 m.",
+      "status": "Not modelled",
+      "pages": [
+        1
+      ]
+    }
+  ],
+  "site": {
+    "imageSize": [
+      1700,
+      2000
+    ],
+    "bounds": [
+      [
+        -17,
+        -13.4
+      ],
+      [
+        17,
+        26.6
+      ]
+    ],
+    "imagePixelBounds": [
+      0,
+      0,
+      1700,
+      2000
+    ],
+    "buildingOutline": [
+      [
+        -12.1,
+        -11.3
+      ],
+      [
+        12.1,
+        -11.3
+      ],
+      [
+        12.1,
+        6.7
+      ],
+      [
+        6.7,
+        6.7
+      ],
+      [
+        6.7,
+        10.3
+      ],
+      [
+        -6.7,
+        10.3
+      ],
+      [
+        -6.7,
+        6.7
+      ],
+      [
+        -12.1,
+        6.7
+      ]
+    ],
+    "referencePages": [
+      1
+    ],
+    "notes": "Bounds are the partner-adc pad (pad-local x -17..17, z -20..20) expressed in P. The drive, apron, front walk, trees, bench and planting belong to the community pad (community-pads.ts), not to this specification."
+  },
+  "roofSections": [],
+  "details": [],
+  "facade": {
+    "height": 4.2,
+    "status": "Terracotta stucco walls (illustrative); roof not modelled",
+    "wallMaterial": "adhc-stucco",
+    "glazingMaterial": "glass",
+    "referencePages": [
+      1
+    ]
+  },
+  "dimensions": [
+    {
+      "id": "gross-area",
+      "value": 483.84,
+      "unit": "m2",
+      "sourceValue": "483.8 m2 (5,208 sq ft)",
+      "pages": [
+        1,
+        2
+      ],
+      "status": "Computed from zone polygons",
+      "meaning": "Gross floor area over the outer wall faces (about a quarter of the main center’s 1,956 m2 ground floor)."
+    },
+    {
+      "id": "net-area",
+      "value": 457.816,
+      "unit": "m2",
+      "sourceValue": "457.8 m2",
+      "pages": [
+        1
+      ],
+      "status": "Computed from room polygons",
+      "meaning": "Net area of the nine rooms (hall, stage, light rehab, classroom, studio, group room, reception, two restrooms)."
+    },
+    {
+      "id": "hall-area",
+      "value": 183.643,
+      "unit": "m2",
+      "sourceValue": "183.6 m2 in front of the stage",
+      "pages": [
+        1,
+        5
+      ],
+      "status": "Computed from the room polygon",
+      "meaning": "The hall’s floor in front of the stage (tables, dance floor, ramp and steps)."
+    },
+    {
+      "id": "stage-height",
+      "value": 0.4,
+      "unit": "m",
+      "sourceValue": "0.40 m (15.75 in)",
+      "pages": [
+        1,
+        4
+      ],
+      "status": "Design dimension",
+      "meaning": "Height of the stage deck above the hall floor."
+    },
+    {
+      "id": "stage-ramp-run",
+      "value": 4.8,
+      "unit": "m",
+      "sourceValue": "0.40 m rise over 4.80 m = 1:12",
+      "pages": [
+        4
+      ],
+      "status": "Design dimension",
+      "meaning": "Run of the stage ramp at the 1:12 maximum slope, plus a 1.54 × 1.5 m landing at the top."
+    },
+    {
+      "id": "banquet-places",
+      "value": 52,
+      "unit": "places",
+      "sourceValue": "52 banquet chairs (3 left out on the pad for wheelchairs)",
+      "pages": [
+        1,
+        5
+      ],
+      "status": "Furniture schedule",
+      "meaning": "Places at the two long tables: 12 a side and one at each end of each table."
+    },
+    {
+      "id": "dance-floor",
+      "value": 9.2,
+      "unit": "m",
+      "sourceValue": "9.2 × 5.2 m (47.8 m2)",
+      "pages": [
+        1,
+        6
+      ],
+      "status": "Design dimension",
+      "meaning": "Dance floor inlay: room for 15 line dancers at 1.4 × 1.2 m."
+    },
+    {
+      "id": "door-clear-interior",
+      "value": 1,
+      "unit": "m",
+      "sourceValue": "39.4 in",
+      "pages": [
+        4
+      ],
+      "status": "Design dimension",
+      "meaning": "Clear gap of every interior door; the front and hall doors are 1.8 m pairs."
+    },
+    {
+      "id": "step-lane",
+      "value": 0.64,
+      "unit": "m",
+      "sourceValue": "two lanes of 25 in",
+      "pages": [
+        4
+      ],
+      "status": "Design dimension",
+      "meaning": "Clear width of each lane of the stage steps between the side and centre handrails."
+    }
+  ],
+  "doorSchedule": [
+    {
+      "id": "adhc-door-rehab",
+      "type": "swing",
+      "wall": "adhc-wall-hall-west",
+      "gap": [
+        -4.5,
+        -3.5
+      ],
+      "clear": 1,
+      "leaves": [
+        "adhc-door-rehab-leaf"
+      ],
+      "notes": "Hall to light rehab; swings into the rehab."
+    },
+    {
+      "id": "adhc-door-classroom",
+      "type": "swing",
+      "wall": "adhc-wall-hall-west",
+      "gap": [
+        -0.5,
+        0.5
+      ],
+      "clear": 1,
+      "leaves": [
+        "adhc-door-classroom-leaf"
+      ],
+      "notes": "Hall to the classroom; swings into the classroom."
+    },
+    {
+      "id": "adhc-door-studio",
+      "type": "swing",
+      "wall": "adhc-wall-hall-east",
+      "gap": [
+        -3.5,
+        -2.5
+      ],
+      "clear": 1,
+      "leaves": [
+        "adhc-door-studio-leaf"
+      ],
+      "notes": "Hall to the studio; swings into the studio."
+    },
+    {
+      "id": "adhc-door-group",
+      "type": "swing",
+      "wall": "adhc-wall-hall-east",
+      "gap": [
+        2.7,
+        3.7
+      ],
+      "clear": 1,
+      "leaves": [
+        "adhc-door-group-leaf"
+      ],
+      "notes": "Hall to the group room; swings into the group room."
+    },
+    {
+      "id": "adhc-door-restroom-w",
+      "type": "swing",
+      "wall": "adhc-wall-hall-front",
+      "gap": [
+        -5.3,
+        -4.3
+      ],
+      "clear": 1,
+      "leaves": [
+        "adhc-door-restroom-w-leaf"
+      ],
+      "notes": "Hall to the west restroom; swings in, latch openable from outside."
+    },
+    {
+      "id": "adhc-door-restroom-e",
+      "type": "swing",
+      "wall": "adhc-wall-hall-front",
+      "gap": [
+        4.3,
+        5.3
+      ],
+      "clear": 1,
+      "leaves": [
+        "adhc-door-restroom-e-leaf"
+      ],
+      "notes": "Hall to the east restroom; swings in, latch openable from outside."
+    },
+    {
+      "id": "adhc-door-entrance",
+      "type": "double-swing",
+      "wall": "adhc-wall-entry-front",
+      "gap": [
+        -0.9,
+        0.9
+      ],
+      "clear": 1.8,
+      "leaves": [
+        "adhc-door-entrance-1-leaf",
+        "adhc-door-entrance-2-leaf"
+      ],
+      "notes": "Double front doors, 1.8 m clear, swinging into the reception; flush threshold."
+    },
+    {
+      "id": "adhc-door-hall",
+      "type": "double-swing",
+      "wall": "adhc-wall-hall-front",
+      "gap": [
+        -0.9,
+        0.9
+      ],
+      "clear": 1.8,
+      "leaves": [
+        "adhc-door-hall-1-leaf",
+        "adhc-door-hall-2-leaf"
+      ],
+      "notes": "Double doors between the reception and the hall, held open in the day; they swing into the reception."
+    },
+    {
+      "id": "adhc-opening-stage-steps",
+      "type": "opening",
+      "wall": "adhc-stage (front edge)",
+      "gap": [
+        1.9,
+        3.3
+      ],
+      "clear": 1.4,
+      "leaves": [],
+      "notes": "Open front edge of the stage at the steps (two 0.64 m lanes between three handrails)."
+    }
+  ],
+  "windowSchedule": [
+    {
+      "id": "adhc-win-class-front-1",
+      "wall": "adhc-wall-front-west",
+      "offset": 1.4,
+      "width": 1.6,
+      "sill": 0.9,
+      "height": 1.3,
+      "roomId": "adhc-classroom"
+    },
+    {
+      "id": "adhc-win-class-front-2",
+      "wall": "adhc-wall-front-west",
+      "offset": 3.8,
+      "width": 1.6,
+      "sill": 0.9,
+      "height": 1.3,
+      "roomId": "adhc-classroom"
+    },
+    {
+      "id": "adhc-win-class-west",
+      "wall": "adhc-wall-west",
+      "offset": 14,
+      "width": 2.4,
+      "sill": 0.9,
+      "height": 1.3,
+      "roomId": "adhc-classroom"
+    },
+    {
+      "id": "adhc-win-rehab-west-1",
+      "wall": "adhc-wall-west",
+      "offset": 3,
+      "width": 1.8,
+      "sill": 0.9,
+      "height": 1.3,
+      "roomId": "adhc-rehab"
+    },
+    {
+      "id": "adhc-win-rehab-west-2",
+      "wall": "adhc-wall-west",
+      "offset": 6.4,
+      "width": 1.8,
+      "sill": 0.9,
+      "height": 1.3,
+      "roomId": "adhc-rehab"
+    },
+    {
+      "id": "adhc-win-studio-east-1",
+      "wall": "adhc-wall-east",
+      "offset": 2,
+      "width": 2.4,
+      "sill": 0.9,
+      "height": 1.3,
+      "roomId": "adhc-studio"
+    },
+    {
+      "id": "adhc-win-studio-east-2",
+      "wall": "adhc-wall-east",
+      "offset": 6.4,
+      "width": 2.4,
+      "sill": 0.9,
+      "height": 1.3,
+      "roomId": "adhc-studio"
+    },
+    {
+      "id": "adhc-win-group-east",
+      "wall": "adhc-wall-east",
+      "offset": 13.6,
+      "width": 2,
+      "sill": 0.9,
+      "height": 1.3,
+      "roomId": "adhc-group-room"
+    },
+    {
+      "id": "adhc-win-group-front",
+      "wall": "adhc-wall-front-east",
+      "offset": 2.2,
+      "width": 2,
+      "sill": 0.9,
+      "height": 1.3,
+      "roomId": "adhc-group-room"
+    },
+    {
+      "id": "adhc-win-entry-w",
+      "wall": "adhc-wall-entry-front-a",
+      "offset": 3.2,
+      "width": 1.6,
+      "sill": 0.1,
+      "height": 2.1,
+      "roomId": "adhc-reception"
+    },
+    {
+      "id": "adhc-win-entry-e",
+      "wall": "adhc-wall-entry-front-b",
+      "offset": 0.6,
+      "width": 1.6,
+      "sill": 0.1,
+      "height": 2.1,
+      "roomId": "adhc-reception"
+    }
+  ],
+  "turningCircles": [
+    {
+      "id": "turn-restroom-w",
+      "roomId": "adhc-restroom-w",
+      "centre": [
+        -4.6,
+        8.2
+      ],
+      "diameter": 1.5,
+      "required": true,
+      "notes": "Clear of the toilet, basin and door swing"
+    },
+    {
+      "id": "turn-restroom-e",
+      "roomId": "adhc-restroom-e",
+      "centre": [
+        4.6,
+        8.2
+      ],
+      "diameter": 1.5,
+      "required": true,
+      "notes": "Clear of the toilet, basin and door swing"
+    },
+    {
+      "id": "turn-reception",
+      "roomId": "adhc-reception",
+      "centre": [
+        0.4,
+        8.4
+      ],
+      "diameter": 1.5,
+      "required": true,
+      "notes": "Inside the front doors"
+    },
+    {
+      "id": "turn-ramp-foot",
+      "roomId": "adhc-hall",
+      "centre": [
+        0.8,
+        -6.6
+      ],
+      "diameter": 1.5,
+      "required": true,
+      "notes": "At the foot of the stage ramp"
+    },
+    {
+      "id": "turn-stage",
+      "roomId": "adhc-stage",
+      "centre": [
+        -5.7,
+        -8.4
+      ],
+      "diameter": 1.5,
+      "required": true,
+      "notes": "On the deck at the top of the ramp"
+    }
+  ],
+  "roofNote": "Gabled roof over the hall (ridge along z over x = 0, eave 4.2 m), flat roofs over the wings and the entry pavilion (3.2 m). Not modelled: the community instance shows the building as a cutaway.",
+  "publication": {
+    "sourceDocuments": "not-published"
+  }
+}

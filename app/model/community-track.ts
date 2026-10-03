@@ -79,11 +79,21 @@ export class Track {
   private heights() {
     return this.y === undefined ? undefined : [this.y, this.y];
   }
-  /** Stay put doing `action` until `until`. */
+  /**
+   * Stay put doing `action` until `until`. `seated` sits the person down
+   * whatever the action (a stool at a slit lamp, a chair at a console), as
+   * the generated instance casts do for seated stops.
+   */
   hold(
     until: number,
     action: Action,
-    opts: { title?: string; face?: Vec2; heading?: number; y?: number } = {},
+    opts: {
+      title?: string;
+      face?: Vec2;
+      heading?: number;
+      y?: number;
+      seated?: boolean;
+    } = {},
   ) {
     if (opts.heading !== undefined) this.heading = opts.heading;
     else if (opts.face) this.heading = facing(this.at, opts.face);
@@ -95,6 +105,7 @@ export class Track {
       heading: this.heading,
       heights: this.heights(),
       title: opts.title,
+      ...(opts.seated ? { seated: true } : {}),
     });
     return this;
   }

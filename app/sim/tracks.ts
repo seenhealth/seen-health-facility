@@ -47,8 +47,10 @@ export type CompiledStep = {
   interactionIds: string[];
   handoffs: { from: string; to: string; note: string }[];
   roles: string[];
-  /** Cutaways only: the care setting shown (the hero is not in them). */
+  /** Cutaways at a care setting: the setting shown (the compiled hero is not in them). */
   settingId?: string;
+  /** Cutaways that are the hero's own moment: the actor standing in for her. */
+  heroAlias?: string;
 };
 export type CompiledTracks = {
   version: 1;

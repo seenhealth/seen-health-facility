@@ -345,7 +345,7 @@ const corner = (from: Lane, to: Lane): Vec2[] => {
 };
 
 // --- Itineraries ------------------------------------------------------------
-const home = careSettingById('home-lin')!,
+const home = careSettingById('home-wong')!,
   pharmacy = careSettingById('pharmacy')!,
   hospital = careSettingById('hospital')!,
   specialist = careSettingById('specialist')!;
@@ -372,20 +372,24 @@ const legAt = (s: CareSetting, lane: 0 | 1, side: 'entry' | 'exit') =>
 const receiving = deliveryStops.find((d) => d.kind === 'package')!.door;
 /**
  * The Seen center's rear kerb: the meals car's home and the courier's stop by
- * receiving, in the 2.4 m strip between the south street slab (z ≤ -28.8)
- * and the raised sidewalk (z ≥ -26.4), so a 1.76 m car clears both.
+ * receiving, on the lot's edge just inside the south street slab (z ≤ -28.8),
+ * which a 1.76 m car at z -27.7 clears. The re-measured block has no raised
+ * sidewalk along the alley; the yard runs on to the building and its planters.
  */
 export const CENTER_LOT = {
   meals: { at: [-4, -27.7] as Vec2, dir: [1, 0] as Vec2 },
   courier: { at: [-16, -27.7] as Vec2, dir: [1, 0] as Vec2 },
   /**
    * On foot from the courier's door (street side) round the car's nose,
-   * across the sidewalk and the yard to rear receiving.
+   * across the yard south of the central block's corner (0, −22.44), and up
+   * the gap between its wall (x 0) and the rear court's palm island (x 1) to
+   * rear receiving.
    */
   receivingWalk: [
     [-13.2, -29.0],
     [-13.0, -25.6],
-    [-2, -24.0],
+    [0.5, -23.2],
+    [0.5, -18.0],
     [2.4, -16],
   ] as Vec2[],
   /** Where a courier stands to hand packs in, and the door it faces. */
@@ -414,12 +418,89 @@ const viaEastNorthWestbound = (fromX: number, toZ: number): Vec2[] => [
   ...corner(S.out, E.out),
   ...viaNorthWestbound(S.out.z! + R, toZ),
 ];
+/** Mrs. Lin's home, south of the pharmacy (its van is the last itinerary). */
+const homeLin = careSettingById('home-lin')!;
 const homeStall = { at: home.anchors.stall, dir: worldDir(home, [0, 1]) };
 const homeExitTurn = turnOutOf(
   legPoint(home, 1, 'exit', 'street'),
   outwardOf(home),
   W.in,
 );
+// --- Mrs. Lin's Seen van ------------------------------------------------------
+/**
+ * In from the south end of the west street on its inner lane and round Mrs.
+ * Lin's drive to the inner apex by the porch; out by the exit leg and south
+ * on the outer lane, off the map. The west street's southern reach carries
+ * only the fleet's off-site runs, so the van keeps to their gaps: in ahead of
+ * Van A's first arrival (on that reach from 15.8 s) and across the outer lane
+ * into her drive before Van B, out of the lot's exit, comes south past it
+ * (16.7 s). In the afternoon it comes back on only once Van A has left the
+ * map with the center's Mrs. Lin (faded out by 624 s), so she is never on
+ * screen in both vans: 7 s for the 69 m in (the morning's 11.5 s), at most
+ * 11.3 m/s (the fleet vans reach 9.6 m/s on this street), and at the apex
+ * by 631 s, before Van B comes back on (635.8 s).
+ */
+const linIn: Vec2[] = [
+    ...zRun(W.in, OFF_MAP.south, legAt(homeLin, 0, 'entry')[1] - R - 2),
+    ...arrive(homeLin, 0, W.in, 0),
+  ],
+  linOut: Vec2[] = [
+    ...depart(homeLin, 0, 0, W.out),
+    ...zRun(W.out, legAt(homeLin, 0, 'exit')[1] - R - 2, OFF_MAP.south),
+  ];
+const linVan: CommunityVehicle = {
+  id: 'van-lin',
+  kind: 'van',
+  name: 'Seen van · door to door',
+  accent: '#174a49',
+  variant: 'J',
+  rest: {
+    at: [W.in.x!, OFF_MAP.south],
+    dir: [0, 1],
+    visible: false,
+    phase: 'Off site',
+  },
+  // Mrs. Lin on the aisle seat of the first bench, the shortest step from
+  // the ramp with her cane.
+  seats: {
+    driver: FLEET_VAN_SEATS.driver,
+    participant: FLEET_VAN_SEATS.benches[1],
+  },
+  legs: [
+    drive(11, 22.5, linIn, 'Arriving for Mrs. Lin', {
+      easeIn: false,
+      fade: 'in',
+      post: beyond(homeLin, 0, 0, -10),
+    }),
+    // Her daughter walks her out; the driver sees her up the ramp (on board
+    // 43.7 s) and steps through to his seat before it folds.
+    dwell(22.5, 50, stop(homeLin, 0), 'Picking up Mrs. Lin', {
+      door: [[24.5, 47.7]],
+      ramp: [[26.5, 47.2]],
+    }),
+    drive(50, 62, linOut, 'Taking Mrs. Lin to the center', {
+      easeOut: false,
+      fade: 'out',
+      pre: beyond(homeLin, 0, 0, 10),
+    }),
+    drive(624, 631, linIn, 'Bringing Mrs. Lin home', {
+      easeIn: false,
+      fade: 'in',
+      post: beyond(homeLin, 0, 0, -10),
+    }),
+    // She is down the ramp by 639.5 s; the van waits, shut, while the driver
+    // walks her to the porch ramp and comes back.
+    dwell(631, 667.5, stop(homeLin, 0), 'Dropping Mrs. Lin off', {
+      door: [[632, 644]],
+      ramp: [[634, 643]],
+    }),
+    drive(667.5, 679.5, linOut, 'Off to the next ride', {
+      easeOut: false,
+      fade: 'out',
+      pre: beyond(homeLin, 0, 0, 10),
+    }),
+  ],
+};
 export const communityVehicles: CommunityVehicle[] = [
   {
     id: 'van-community',
@@ -709,7 +790,8 @@ export const communityVehicles: CommunityVehicle[] = [
       visible: false,
       phase: 'Off site',
     },
-    seats: {},
+    // The crew in the cab (the nose is at local −z).
+    seats: { driver: [-0.45, 0.55, -1.55], attendant: [0.45, 0.55, -1.55] },
     legs: [
       drive(
         58,
@@ -734,6 +816,7 @@ export const communityVehicles: CommunityVehicle[] = [
       ),
     ],
   },
+  linVan,
 ];
 export const communityVehicleById = (id: string) =>
   communityVehicles.find((v) => v.id === id);

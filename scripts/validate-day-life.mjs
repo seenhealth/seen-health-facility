@@ -1,11 +1,16 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
-import { roomPlacement } from '../work/validation/site-activity-data.mjs';
+import {
+  insideRoom,
+  roomPlacement,
+} from '../work/validation/site-activity-data.mjs';
 import { sampleActor, createActivity } from '../work/validation/activity.mjs';
 import { sampleVan } from '../work/validation/arrival.mjs';
 import { fleetParking } from '../work/validation/alhambra-fleet.mjs';
 import {
+  deliveryRuns,
   deliveryStops,
+  KITCHEN_LUNCH,
   sampleDelivery,
 } from '../work/validation/deliveries.mjs';
 import { showcaseFrame } from '../work/validation/showcase.mjs';
@@ -22,7 +27,8 @@ const n = {
     .filter((o) => !removed.has(o.id))
     .map((o) => ({ ...o, layer: o.layer || 'furniture' })),
 };
-const a = JSON.parse(fs.readFileSync('app/data/activity-loop.json')).actors;
+const loop = JSON.parse(fs.readFileSync('app/data/activity-loop.json')),
+  a = loop.actors;
 for (const zone of ['day', 'dining']) {
   const chairs = n.objects.filter(
     (o) => o.zoneId === zone && m.assets[o.assetId].kind.includes('chair'),
@@ -144,8 +150,8 @@ const activity = createActivity(m, new T.Scene());
 for (let i = 0; i < 2; i++) {
   const stop = deliveryStops[i],
     actor = a.find((a) => a.id === stop.id);
-  for (const start of stop.starts) {
-    const t = start + 34;
+  for (const run of deliveryRuns(stop)) {
+    const t = run.arrive + 10;
     activity.setOptions({ time: t, enabled: true, playing: false });
     assert.equal(sampleDelivery(i, t).phase, 'Unloading');
     const person = activity.actors.find((a) => a.spec.id === stop.id);
@@ -153,12 +159,12 @@ for (let i = 0; i < 2; i++) {
       person.root.getObjectByName('delivery-cargo').visible,
       'Inbound cargo visible',
     );
-    activity.setOptions({ time: start + 24 + stop.dwell - 12 });
+    activity.setOptions({ time: run.leave - 12 });
     assert(
       !person.root.getObjectByName('delivery-cargo').visible,
       'Return trolley empty',
     );
-    const path = actor.segments.find((s) => s.start === start + 26).path;
+    const path = actor.segments.find((s) => s.start === run.arrive + 2).path;
     assert(
       path.some(
         (p) =>
@@ -169,6 +175,87 @@ for (let i = 0; i < 2; i++) {
     );
   }
 }
+// The morning food run brings lunch into the kitchen before it is served: the
+// loaded trolley stands in kitchen-prep beside the kitchen staff member while
+// the truck waits at receiving, and leaves empty.
+const handover = loop.interactions.find(
+    (i) => i.id === 'kitchen-lunch-delivery',
+  ),
+  kitchen = m.rooms.find((r) => r.id === 'kitchen-prep');
+assert(handover?.zoneId === 'kitchen', 'Lunch hand-over in the kitchen');
+const [courier, cook] = handover.actorIds.map((id) =>
+    activity.actors.find((a) => a.spec.id === id),
+  ),
+  truck = deliveryStops.findIndex((s) => s.id === courier.spec.id);
+for (const [t, loaded] of [
+  [handover.start + 1, true],
+  [handover.end - 1, false],
+]) {
+  activity.setOptions({ time: t });
+  const p = courier.root.position,
+    q = cook.root.position;
+  assert(
+    insideRoom([p.x, p.z], kitchen.polygon) &&
+      insideRoom([q.x, q.z], kitchen.polygon),
+    `Lunch hand-over inside the kitchen at ${t}`,
+  );
+  assert(
+    Math.hypot(p.x - q.x, p.z - q.z) < 1.6,
+    'Delivery and kitchen staff meet at the trolley',
+  );
+  assert.equal(
+    courier.root.getObjectByName('delivery-cargo').visible,
+    loaded,
+    loaded ? 'Lunch arrives on the trolley' : 'Lunch is unloaded',
+  );
+  assert.equal(
+    sampleDelivery(truck, t).phase,
+    'Unloading',
+    'The truck waits at receiving',
+  );
+}
+// The carriers move from the trolley onto the island counter as unloading
+// starts and stay there until lunch service ends.
+const { at, from, to } = KITCHEN_LUNCH,
+  service = JSON.parse(fs.readFileSync('app/data/day-program.json')).lunch
+    .service;
+assert(
+  handover.start < from && from < handover.end && to === service[1],
+  'Lunch is unloaded during the hand-over and left out through service',
+);
+assert(
+  m.objects.some((o) => {
+    const [w, , d] = m.assets[o.assetId].dimensions.map(
+      (v, i) => v * o.scale[i],
+    );
+    return (
+      o.zoneId === 'kitchen' &&
+      m.assets[o.assetId].kind === 'counter' &&
+      Math.abs(at[0] - o.position[0]) < w / 2 &&
+      Math.abs(at[1] - o.position[2]) < d / 2
+    );
+  }),
+  'Lunch carriers rest on a kitchen counter',
+);
+for (const [t, onCounter] of [
+  [from - 0.25, false],
+  [from + 0.25, true],
+  [to - 0.25, true],
+  [to + 0.25, false],
+]) {
+  activity.setOptions({ time: t });
+  assert.equal(
+    activity.deliveries.lunch.visible,
+    onCounter,
+    `Lunch carriers on the island at ${t}`,
+  );
+  if (t < handover.end)
+    assert.equal(
+      courier.root.getObjectByName('delivery-cargo').visible,
+      !onCounter,
+      `Lunch on the trolley or the island at ${t}, not both`,
+    );
+}
 activity.dispose();
 for (const mode of ['tiltshift', 'day', 'logistics'])
   for (let t = 0; t <= 720; t += 10)
@@ -178,5 +265,5 @@ for (const mode of ['tiltshift', 'day', 'logistics'])
       'Camera stays fixed',
     );
 console.log(
-  `Day life: filled seats, clear routes through ${crossings} cabinet crossings, eight staggered vans, two delivery services and fixed cameras verified.`,
+  `Day life: filled seats, clear routes through ${crossings} cabinet crossings, eight staggered vans, two delivery services, lunch delivered into the kitchen and fixed cameras verified.`,
 );

@@ -102,12 +102,13 @@ trace showing which disciplines touched each participant at the partner site. Me
 road and on-site, participant activity minutes by setting, van utilisation. Missing pieces today: person
 identity across settings and a setting that can be either a pad or a full facility.
 
-Status: the layout and the day are built. The partner pad carries Seen's own Alhambra ground floor ("Seen
-Health floor plan", trace zone "Partner ADC · Seen layout") with twenty participants, the partner's
-activities lead, aide and nurse and a visiting Seen PT and RN, generated from
-`app/data/community/partner-adc.cast.json`: morning in the day room, tai chi on the patio, PT and medication
-reviews, tabletop games, lunch, music and afternoon conversation; the trace names its rooms. Still missing:
-the van drop-off and pickup, a meal delivery, the IDT huddle and person identity across settings.
+Status: the layout and the day are built. The partner pad carries the partner's own adult day health care
+center (`seen-partner-adhc`, trace zone "Partner ADC") with twenty-six participants, the partner's activities
+lead, activity aide, music and choir leader, social worker, rehab aide and receptionist and a visiting Seen PT,
+generated from `app/data/community/partner-adc.cast.json`: coffee at the long tables, calligraphy, a class and
+a support group, painting, the line dance and PT, lunch, the choir, bingo, an afternoon studio and the fan
+dance; the trace names its rooms. Still missing: the van drop-off and pickup, a meal delivery, the IDT huddle
+and person identity across settings.
 
 ### 4.2 Replicating another building quickly
 
@@ -188,8 +189,8 @@ feeds). Keep simulation and platform speaking one schema:
   in a van hidden once it is below half opacity. A van leaves the drop-off by backing straight out 3 m,
   because a forward exit would sweep the entrance ramp's landing. Alhambra's unload windows were shortened
   to fit the loop; Olympic and Alveare keep their original van timetable, now their own data.
-- **Deliveries.** The trucks keep their nose-in stop at the rear receiving doors and back straight out
-  before turning away; they still appear and vanish on the south street east of the yard.
+- **Deliveries.** The trucks nose in at the rear receiving doors beside the rear court's palm planters,
+  then back round onto the drive aisle south of them and pull away east; they still appear and vanish on the south street east of the yard.
 - **Community timings** were shifted to clear fleet, truck and street-car movements (the van leaves the
   home 9:15, specialist visit 10:05, discharge pickup 2:23 PM, home-health visit 3:07 PM, nurse line
   3:40 PM). The discharged participant goes home and rolls in at the front door at 3:28 PM; the home's

@@ -96,9 +96,11 @@ export type StopPlacement = PlacementPoint & {
 };
 export type StepPlacement = {
   /**
-   * `cutaway`: a moment across the care network (a partner site or a home),
-   * without the hero. It adds no tracks; the step summary points the camera at
-   * the community interactions it features (`ScenarioStep.interactionIds`).
+   * `cutaway`: a moment told through interactions that already exist in the
+   * care day, at a care setting (Mrs. Lin at home, through `heroAlias`) or in
+   * a room of the center (lunch arriving in the kitchen). It adds no tracks;
+   * the step summary points the camera at the interactions it features
+   * (`ScenarioStep.interactionIds`).
    */
   mode: 'meeting' | 'arrival' | 'checkin' | 'visit' | 'departure' | 'cutaway';
   category?: string;
@@ -119,10 +121,20 @@ export type ScenarioStep = {
   handoffs: { from: string; to: string; note: string }[];
   heroPresent: boolean;
   stops?: { roomId: string; window: Window; activity: string }[];
-  /** Cutaways: the care setting shown (`careSettings` id); its zone is `community:<id>`. */
+  /**
+   * Cutaways at a care setting: its `careSettings` id; the zone is then
+   * `community:<id>` and `roomId` null. A cutaway in the center leaves it out
+   * and names its zone and room instead.
+   */
   settingId?: string;
-  /** Cutaways: the community interactions featured; the first is the camera's follow target. */
+  /** Cutaways: the interactions featured; the first is the camera's follow target. */
   interactionIds?: string[];
+  /**
+   * Cutaways that are the hero's own moment somewhere the compiled hero does
+   * not go (Mrs. Lin at home): the actor who stands in for her there. The
+   * story tags and follows this actor as the hero.
+   */
+  heroAlias?: string;
   /** External roles named on the card and in the swimlane (not IDT disciplines). */
   partners?: string[];
   placement?: StepPlacement;
@@ -1175,17 +1187,16 @@ export function compileScenario(
 }
 
 /**
- * Step summary of a cutaway: no hero, no stops, no companions. The focus time
- * is the middle of the featured interactions' span inside the window, and the
- * camera follows the first featured interaction.
+ * Step summary of a cutaway: no compiled hero, no stops, no companions. The
+ * focus time is the middle of the featured interactions' span inside the
+ * window, and the camera follows the first featured interaction.
  */
 function cutawaySummary(
   step: ScenarioStep,
   context: CompileOptions['context'],
 ): CompiledStep {
   const ids = step.interactionIds || [];
-  if (!step.settingId || !ids.length)
-    throw new Error(`Cutaway ${step.id} needs a settingId and at least one interactionIds entry`);
+  if (!ids.length) throw new Error(`Cutaway ${step.id} needs at least one interactionIds entry`);
   const [w0, w1] = step.window;
   const spans = (context?.interactions || [])
     .filter((i) => ids.includes(i.id))
@@ -1199,7 +1210,7 @@ function cutawaySummary(
     window: step.window,
     heroPresent: false,
     zoneId: step.zoneId,
-    roomId: null,
+    roomId: step.roomId,
     focusTime,
     focusActorId: `interaction:${ids[0]}`,
     stops: [],
@@ -1208,6 +1219,7 @@ function cutawaySummary(
     handoffs: step.handoffs,
     roles: step.roles,
     settingId: step.settingId,
+    ...(step.heroAlias ? { heroAlias: step.heroAlias } : {}),
   };
 }
 

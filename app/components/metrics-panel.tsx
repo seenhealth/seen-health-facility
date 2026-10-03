@@ -9,7 +9,7 @@ import {
   type ActorSpec,
 } from '../model/activity';
 import { alhambraSource, alhambraVehicles } from '../model/alhambra-source';
-import { roleNames } from '../model/characters';
+import { isStaffRole, roleNames } from '../model/characters';
 import type { Facility } from '../model/schema';
 import type { createViewer } from '../model/renderer';
 import {
@@ -149,7 +149,8 @@ function TraceTab({
     const byLabel = (a: ActorSpec, b: ActorSpec) => a.label.localeCompare(b.label);
     return {
       participants: source.actors.filter((a) => a.role === 'participant').sort(byLabel),
-      staff: source.actors.filter((a) => a.role !== 'participant').sort(byLabel),
+      staff: source.actors.filter((a) => isStaffRole(a.role)).sort(byLabel),
+      family: source.actors.filter((a) => a.role === 'family').sort(byLabel),
     };
   }, [source]);
   const counts = useMemo(() => {
@@ -268,7 +269,8 @@ function TraceTab({
       <div className="mp-section-head">
         <h3>Who</h3>
         <span className="mp-scale">
-          {people.participants.length} participants, {people.staff.length} staff · n = events
+          {people.participants.length} participants, {people.staff.length} staff
+          {people.family.length ? `, ${people.family.length} family` : ''} · n = events
         </span>
       </div>
       <div className="mp-picker">
@@ -287,6 +289,9 @@ function TraceTab({
         >
           <optgroup label="Participants">{people.participants.filter(matches).map(option)}</optgroup>
           <optgroup label="Staff">{people.staff.filter(matches).map(option)}</optgroup>
+          {people.family.length > 0 && (
+            <optgroup label="Family">{people.family.filter(matches).map(option)}</optgroup>
+          )}
         </select>
       </div>
 

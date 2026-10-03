@@ -9,7 +9,7 @@ import { ARRIVAL } from './arrival';
  * light out of the lobby door and the Valley Blvd portals onto the paving.
  * `apply(night)` fades it all in as the daylight module's night factor rises
  * from 0 (day) to 1 (past civil dusk); by day every light is off and skipped
- * by the renderer. Axes: +x east, +z north, ground at y = −0.23.
+ * by the renderer. Axes: +x east, +z south (frame.ts COMPASS), ground at y = −0.23.
  */
 const GROUND = ARRIVAL.streetY;
 /** Warm LED white for the fixtures and the interior; amber for the sodium cobra heads on the public street. */

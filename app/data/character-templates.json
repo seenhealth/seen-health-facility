@@ -92,6 +92,12 @@
       "color": "#A63A2E",
       "skeleton": "seen-clay-16",
       "detail": "Guest cultural instructor in activity attire: tai chi silks, Tang jacket, qipao, opera costume or TCM coat"
+    },
+    "family": {
+      "wardrobe": "casual",
+      "color": "#8E4A57",
+      "detail": "Everyday clothes: cardigan, sweater or shirt",
+      "skeleton": "seen-clay-16"
     }
   },
   "people": [
@@ -540,14 +546,14 @@
       "variant": 11,
       "skin": "#7a523b",
       "hair": "#e6e2da",
-      "hairStyle": 0,
+      "hairStyle": 4,
       "glasses": false,
       "accent": "#BD9A6A",
       "height": 0.97,
       "role": "participant",
-      "figure": "m",
+      "figure": "f",
       "wardrobe": 5,
-      "cut": "shirt"
+      "cut": "cardigan"
     },
     {
       "id": "arrival-aide-a",
@@ -2276,7 +2282,20 @@
         "color": "#5d8b77",
         "trim": "#eee5d1"
       }
+    },
+    {
+      "id": "lin-daughter",
+      "role": "family",
+      "variant": 15,
+      "skin": "#7a523b",
+      "hair": "#3b2a21",
+      "hairStyle": 1,
+      "glasses": false,
+      "accent": "#8E4A57",
+      "height": 1.0,
+      "figure": "f",
+      "cut": "cardigan"
     }
   ],
-  "colorSource": "Role colours come from app/data/care-team.json (members[].color by characterRole). Front desk and food service sit outside the IDT and use the neutral colours below; participant tops use palette.participantWardrobe."
+  "colorSource": "Role colours come from app/data/care-team.json (members[].color by characterRole). Front desk and food service sit outside the IDT and use the neutral colours below; participant tops use palette.participantWardrobe; family wear everyday clothes in the family colour."
 }

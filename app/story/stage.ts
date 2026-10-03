@@ -60,8 +60,7 @@ export async function bootStage(
     maxPixelRatio: MAX_PIXEL_RATIO,
     labels: false,
     keepSiteWhenStacked: true,
-    // Facilities stamped on community pads, from the story's asset base (the
-    // partner day center is the story's own model and needs no fetch).
+    // Facilities stamped on community pads, from the story's asset base.
     loadFacility: async (url) => {
       const r = await fetch(assetUrl(base, url), { signal });
       if (!r.ok) throw new Error(`${url}: ${r.status}`);

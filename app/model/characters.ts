@@ -22,6 +22,7 @@ export type CharacterRole =
   | 'nutrition'
   | 'dietitian'
   | 'center-manager'
+  | 'family'
   | 'instructor';
 export type Action =
   | 'ping-pong'
@@ -53,6 +54,7 @@ export type Action =
   | 'craft'
   | 'music'
   | 'listen'
+  | 'phone'
   | 'qigong'
   | 'fan-dance'
   | 'opera'
@@ -123,15 +125,24 @@ export const roleNames: Record<CharacterRole, string> = {
   nutrition: 'Food service',
   dietitian: 'Dietitian',
   'center-manager': 'Center manager',
+  family: 'Family',
   instructor: 'Guest instructor',
 };
+/**
+ * Staff are the people who work the care day; participants and family (a
+ * daughter at home) are not. Measure, the trace and the "Staff only" filter
+ * count staff with this; family members are neither staff nor participants.
+ */
+export const isStaffRole = (role: CharacterRole) =>
+  role !== 'participant' && role !== 'family';
 export const characterLibrary = templates;
 const roles = templates.roles as Record<
   string,
   { wardrobe: string; color: string; detail?: string }
 >;
 // One palette for the figures and the story overlay: IDT colours come from the
-// care-team roster; front desk and food service (outside the IDT) from the templates.
+// care-team roster; front desk, food service and family (outside the IDT) from
+// the templates.
 const teamColors: Record<string, string> = Object.fromEntries(
   careTeam.members.map((m) => [m.characterRole, m.color]),
 );
@@ -714,6 +725,9 @@ export function createCharacter(spec: CharacterSpec) {
   const profile = characterProfile(spec),
     senior = spec.role === 'participant',
     wardrobe = roles[spec.role]?.wardrobe ?? 'uniform',
+    // Everyday clothes (participants and family): a sweater, cardigan or shirt
+    // over warm trousers; family keep an adult's hair, height and posture.
+    everyday = senior || wardrobe === 'casual',
     F = profile.figure === 'f',
     fig = profile.figure,
     h = hash(profile.id),
@@ -731,7 +745,7 @@ export function createCharacter(spec: CharacterSpec) {
     scrubs = wardrobe === 'scrubs',
     apron = spec.role === 'nutrition',
     cap = spec.role === 'driver',
-    cardigan = senior && profile.cut === 'cardigan',
+    cardigan = everyday && profile.cut === 'cardigan',
     lanyard = [
       'reception',
       'coordinator',
@@ -741,7 +755,7 @@ export function createCharacter(spec: CharacterSpec) {
     ].includes(spec.role),
     cut = costume
       ? 'costume'
-      : senior
+      : everyday
         ? profile.cut
         : scrubs || coat
           ? 'scrubs'
@@ -749,7 +763,7 @@ export function createCharacter(spec: CharacterSpec) {
   const warmTrousers = ['#5f5850', '#7a7063', '#4b4743', '#8d8373', '#6a625a'],
     trouser = costume
       ? (costumeWear[costume.style].trouser ?? costume.color)
-      : senior
+      : everyday
         ? warmTrousers[(h >>> 5) % warmTrousers.length]
         : scrubs
           ? shadeOf(roleColor, 0.9)
@@ -761,7 +775,7 @@ export function createCharacter(spec: CharacterSpec) {
     coatWhite = '#f1eee7',
     shoe = costume
       ? costumeWear[costume.style].shoe
-      : senior
+      : everyday
         ? ['#4b4038', '#2f2d2b', '#8a7662', '#5a5550'][(h >>> 7) % 4]
         : scrubs
           ? '#dcd9d2'
@@ -771,7 +785,7 @@ export function createCharacter(spec: CharacterSpec) {
       : coat ||
         cap ||
         spec.role === 'center-manager' ||
-        (senior && (profile.cut !== 'shirt' || (h >>> 9) % 2 === 0)),
+        (everyday && (profile.cut !== 'shirt' || (h >>> 9) % 2 === 0)),
     sleeveColor = costume ? costume.color : coat ? coatWhite : roleColor,
     innerTop = cardigan ? mixHex(roleColor, '#f3efe6', 0.72) : roleColor;
 
@@ -783,7 +797,7 @@ export function createCharacter(spec: CharacterSpec) {
     template: wardrobe,
     style: 'architectural clay figure',
     clothing:
-      'White coats / V-neck scrubs / polos with lanyard / apron / driver cap; participants in warm casual wear',
+      'White coats / V-neck scrubs / polos with lanyard / apron / driver cap; participants and family in warm casual wear',
     ...(costume ? { costume: costume.style } : {}),
   };
   // Skeleton: the same 16 joints and hierarchy as earlier Seen rigs.
@@ -938,7 +952,7 @@ export function createCharacter(spec: CharacterSpec) {
         : 0.5 + 0.5 * Math.cos((Math.PI * a) / width);
       return neckTop - depth * f;
     };
-  const hem = senior ? 0.845 : scrubs ? 0.83 : 0.855;
+  const hem = everyday ? 0.845 : scrubs ? 0.83 : 0.855;
   if (!costume)
     part(
       loft({
@@ -2173,6 +2187,20 @@ export function createCharacter(spec: CharacterSpec) {
     o.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), v.normalize());
     return o;
   };
+  // People who take calls ('phone' segments) get a handset in the right
+  // hand, shown only while the pose is 'phone'.
+  const caller = (
+    spec as CharacterSpec & { segments?: { action: string }[] }
+  ).segments?.some((s) => s.action === 'phone');
+  const handset = caller
+    ? put(new RoundedBoxGeometry(0.014, 0.165, 0.072, 2, 0.006), aids().dark)
+    : null;
+  if (handset) {
+    handset.name = `${spec.id}_handset`;
+    handset.position.set(-0.025, -0.092, 0.006);
+    handset.visible = false;
+    joints.handR.add(handset);
+  }
   const wheels: T.Object3D[] = [];
   const wheel = (
     x: number,
@@ -3267,6 +3295,20 @@ export function createCharacter(spec: CharacterSpec) {
       joints.elbowL.rotation.x = joints.elbowR.rotation.x = -0.85;
       joints.head.rotation.y = 0.06 * slow;
     }
+    if (action === 'phone') {
+      // A handset at the ear: the upper arm forward and turned in, the elbow
+      // folded; the head leans into it and turns slowly while talking.
+      joints.armR.rotation.set(-0.89, -0.46, 0.83);
+      joints.elbowR.rotation.set(-2.78, 0, 0);
+      joints.handR.rotation.set(0.47, 0.23, 0.63);
+      joints.head.rotation.z = -0.1;
+      joints.head.rotation.y = 0.1 * slow;
+      if (!sitting) {
+        joints.armL.rotation.x = -0.14 - 0.04 * breath;
+        joints.elbowL.rotation.x = -0.4;
+      }
+    }
+    if (handset) handset.visible = action === 'phone';
     if (spec.mobility === 'cane' && !sitting) {
       joints.armR.rotation.set(-0.02, 0, 0);
       joints.elbowR.rotation.set(-0.02, 0, 0);

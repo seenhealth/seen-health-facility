@@ -62,6 +62,12 @@ flowchart LR
   fleet crew (`withFleetCrew`) to a base loop, memoised per base. The renderer,
   the Measure panel, `composedStorySource(model)` and the report scripts all use
   it; the engine plays its source as given.
+- **Calls**: an `Interaction` with `channel: 'phone'` is a call between
+  members in different places, placed by its first member (the others are
+  the far end); its people hold the `phone` action for the window. The
+  community layer draws each call as an arc between the callers while it
+  lasts (`app/model/call-arcs.ts`, docs/COMMUNITY.md, Calls); metrics count a
+  call as direct care and the trace lists it like any interaction.
 - **Measurement** uses `sampleActor`, `sampleEscort` and `samplePairedActors`
   from the activity engine, seats riders in their vehicles through the same
   samplers the scene uses, and reads that same composed source, so it measures
@@ -78,7 +84,8 @@ Every vehicle route is a chain of straight runs and circular arcs of the
 vehicle's centre (`app/model/vehicle-path.ts`: the `Pen` turtle, `roundedPath`
 for corner-point data, `pathAt`), so turning radii are exact: 4 m in the fleet
 lot and at the Olympic and Alveare bays, 4.5 m for the delivery trucks (which
-back straight out of receiving before pulling away) and 6.4 m
+back out of receiving round onto the drive aisle, clear of the rear court's
+planters, before pulling away) and 6.4 m
 (`STREET_CORNER_RADIUS`) at the ring-street corners for street cars, fleet and
 community vehicles. Speeds blend with the shared `easeDistance`
 (`app/model/traffic-routes.ts`). `npm run validate:traffic` checks nose-first
@@ -118,12 +125,67 @@ the foot, then back in through the driver's door before departure. Vans A–D
 never park between runs (every drop-off arrival comes in from off site, its
 riders seated as it sets off out of sight); the drivers of vans E (bay) and F
 (curb) wait in the fleet office inside the center, walk out through the
-sliding entrance and across the lot to the parked van, get in through the
-driver's door and, after the run, get out and walk back. Vans C and D, which arrive
+sliding entrance, down the drop-off landing's steps past the palm planter and
+across the lot to the parked van, get in through the driver's door and, after
+the run, get out and walk back. Vans C and D, which arrive
 without actors, get two mid-day riders each who walk the base loop's walking
 arrival's ramp, entrance and lobby routes, check in behind the front-desk queue,
 wait in the lobby and ride home on Van A or Van B.
 `npm run validate:fleet` checks all of this as the viewer plays it.
+
+### Deliveries (`app/model/deliveries.ts`)
+
+The food and package trucks serve rear receiving on their `runs` ([start,
+dwell] in loop seconds; `deliveryRuns` gives each run's set-off, parking,
+backing-out and gone times). The food truck's morning run brings lunch: parked
+252–340 s (10:48–11:46 AM), its delivery person (`delivery-food`) wheels the
+loaded trolley up the receiving ramp, along the corridor east of the laundry
+and across the east hallway into the kitchen, where `food-service-02` checks
+the carriers against the diet plans and unloads them onto the island
+(`kitchen-lunch-delivery`, meals, 285–309 s). The carriers stay on the island
+until lunch service ends (`KITCHEN_LUNCH`, 297–405 s); the week's menus are
+`lunch` in `app/data/day-program.json`. The afternoon run stops just inside
+the receiving door.
+
+`scripts/apply-kitchen-delivery.mjs` writes the two tracks and the interaction
+into both copies of the base loop from the truck's run and `KITCHEN_LUNCH`,
+checks every trolley leg on the navigation grid at 0.45 m clearance (and the
+trolley's corners against walls and furniture), keeps the new tracks 0.5 m
+from the rest of the cast and leaves every other number in the file as
+written; `--check` fails when the loop is stale. Rerun it after changing the
+food truck's runs or the kitchen, then `npm run build:scenario`.
+
+### Drop-off (`DROP_OFF` in `app/model/alhambra-exterior.ts`)
+
+The landing along the lobby wall, its two steps and the switchback ramp
+(upper run along the wall, turn landing beside the block wall, lower run back
+down to the lot, bronze rails) are drawn from `DROP_OFF`, which also gives the
+walking surface's height anywhere on them (`surface`) and the accessible way
+up (`ascent`). A van docks nose-first 0.9 m short of the lower run
+(`FLEET_LOT.dock`), so its riders walk from the van's ramp round its nose and
+under the end of the lower run's west rail to the toe, up the lower run,
+across the turn landing and up the upper run, and turn in at the sliding
+entrance; departures walk the same way down.
+
+`scripts/apply-drop-off-route.mjs` writes these legs of the base loop's six
+van arrivals into both copies of the loop from `DROP_OFF`, the dock and the
+van's ramp. Each arrival keeps when it steps off the van's ramp and when it
+is inside, walking between at one pace; each departure keeps its boarding time
+and the 0.64 m/s escorted pace, and sets off earlier. Every other number in
+the file keeps its text; `--check` (part of `npm run validate:fleet`) fails
+when the loop no longer matches the geometry. The mid-day riders take the same
+legs from the walking arrival, and the story's hero re-derives her departure
+from Lin's, walking out at `boardingSpeed` (1.05 m/s) so that she leaves the
+farewell when she did. Rerun it after changing the drop-off, the dock or the
+van's ramp, then `npm run build:scenario`.
+
+`npm run validate:fleet` checks everyone on foot there as the viewer plays the
+day (base loop and story, with the community layer): clear of the rails and
+the planter by their route clearance (`MOBILITY_CLEARANCE`, else
+`WALL_CLEARANCE`), never stepping across a rail, at the surface's height on
+the landing, steps and runs, and half a metre apart between the docked van's
+nose and the lobby wall. `npm run validate:traffic` keeps every van 0.3 m off
+the landing, the runs, the turn landing, the rails and the planter.
 
 ## Navigation (`app/sim/nav.ts`)
 
@@ -167,7 +229,7 @@ shared contract.
     "arrivalThroughTitle": "Front desk greeting & check-in",
     "departureTitle": "Escorted departure · board van",
     "escortId": "arrival-aide-a", "escortLabel": "PCA · Alex",
-    "boardingSpeed": 0.64
+    "boardingSpeed": 1.05
   },
   "reservations": [ … ],            // extra areas new routes avoid
   "reserveBaseDwell": { "minSeconds": 40, "halfSize": 0.3 },
@@ -230,31 +292,41 @@ disappears (`visible: false` off duty); `exit` optionally differs.
 
 ### Cutaway steps
 
-A cutaway looks in on the care network around the center (a partner site or a
-home) for a few seconds of the story, without the hero:
+A cutaway tells a moment of the hero's day through interactions that already
+exist in the care day, instead of compiling hero tracks: Mrs. Lin at her own
+home (where the compiled hero never goes), or lunch arriving in the center's
+kitchen. At a care setting it names the setting, and the actor who stands in
+for the hero there:
 
 ```jsonc
 {
-  "id": "network-partner",
-  "window": [289, 300],                 // inside a gap between the hero's stops
-  "zoneId": "community:partner-adc",    // settingZone(settingId)
+  "id": "home-am",
+  "window": [16, 50],                   // inside a gap between the hero's stops
+  "zoneId": "community:home-lin",       // settingZone(settingId)
   "roomId": null,
-  "settingId": "partner-adc",           // a careSettings id
-  "interactionIds": ["partner-pt"],     // community interactions; the first is the camera's follow target
-  "title": "Therapy that travels", "kicker": "11:15 AM · Partner day center", "body": "…",
-  "roles": ["pt"],                      // IDT disciplines involved
-  "partners": ["Activities lead"],      // external roles (story only)
-  "handoffs": [{ "from": "pt", "to": "rn", "note": "Both steadier on turns; keep the walker" }],
+  "settingId": "home-lin",              // a careSettings id
+  "heroAlias": "lin-at-home",           // the hero's stand-in there (camera, name tag)
+  "interactionIds": ["lin-van-pickup", "lin-breakfast"], // the first is the camera's follow target
+  "title": "Out the door, together", "kicker": "8:15 AM · At home", "body": "…",
+  "roles": ["driver"],                  // IDT disciplines involved
+  "partners": ["Her daughter"],         // people outside the team (story only)
+  "handoffs": [],
   "heroPresent": false,
   "placement": { "mode": "cutaway" }
 }
 ```
 
+In the center it leaves `settingId` out and names its zone and room
+(`"zoneId": "kitchen", "roomId": "kitchen-prep"`).
+
 It adds no stops, companions, meetings or interactions, so the compiled actors
 and interactions do not change. The story trims the hero chapters next to a
 cutaway on screen only (`scrubWindows`, `app/sim/story-timeline.ts`); the hero
-steps' `window`s stay as authored. Metrics, the sim report and the trace
-validator count the hero's steps only (steps without `settingId`).
+steps' `window`s stay as authored. Every step is part of the hero's day, so
+Measure's handoffs count them all; the trace validator checks the disciplines
+of the steps with compiled hero tracks (not the cutaways). The story's closing
+highlights (`highlights` in the same file) are a separate track on their own
+clocks, validated by `build-scenario` but never compiled.
 
 ### What the compiler does
 
@@ -280,8 +352,9 @@ validator count the hero's steps only (steps without `settingId`).
    person they are, so the same RN is seen at the huddle and in the clinic.
 8. Emits interactions per stop, arrival, check-in, departure and meeting, and a
    `steps` summary with arrive/depart and a **focus time** for each step. A
-   cutaway's summary has `heroPresent: false`, `roomId: null`, its `settingId`
-   and featured `interactionIds`, `focusActorId: 'interaction:<first id>'` and a
+   cutaway's summary has `heroPresent: false`, its `roomId` (null at a care
+   setting), `settingId` and `heroAlias` when it has them, the featured
+   `interactionIds`, `focusActorId: 'interaction:<first id>'` and a
    focus time in the middle of the featured interactions' span inside the
    window. The interactions come from `CompileOptions.context` (the composed
    source; `build-scenario` passes `alhambraSource(model, activityData)`);
@@ -346,8 +419,8 @@ Measure and the reports read that one.
 
 Each `CompiledStep` has `window`, `focusTime`, `focusActorId`, `stops` (anchor,
 heading, action, arrive/depart, overlap, companions, partners, interaction id),
-`companionIds`, `interactionIds`, `handoffs` and `roles`; cutaways also carry
-`settingId`.
+`companionIds`, `interactionIds`, `handoffs` and `roles`; cutaways at a care
+setting also carry `settingId`, and the hero's own moments there `heroAlias`.
 
 ## What is measured (`app/sim/metrics.ts`)
 
@@ -360,7 +433,7 @@ where the scene draws them:
 | --- | --- |
 | Zone occupancy | visible participants and staff per zone at each sample (ground zones by point-in-polygon, like the engine; the home and partner sites by the composed source's `zones`; `site` for the street and vans); peaks, means and person-hours |
 | On site | participants and staff visible at the center (not at a home or partner site) |
-| Staff utilization | per role and per person: **direct care & programs** (treat, consult, tabletop, exercise, serve, greet, present, conversation, music …), **walking & escorting**, **documenting & standby** (document, idle, listen), **team meetings** (seated upstairs), **driving**; shares of on-duty time |
+| Staff utilization | per role and per person: **direct care & programs** (treat, consult, tabletop, exercise, serve, greet, present, conversation, music, phone calls …), **walking & escorting**, **documenting & standby** (document, idle, listen), **team meetings** (seated upstairs), **driving**; shares of on-duty time |
 | Walking distance | visible displacement per person, averaged per role |
 | Participant time | per participant: arrivals, clinical, therapy, activities, meals, coordination, care at home & in the community (from interaction categories), walking between, waiting & free time, home, in the van or away (away from the center only community touchpoints count) |
 | Hero touchpoints | per IDT discipline: minutes with someone of that discipline within 1.6 m or in a shared interaction, encounters, first time |
@@ -443,8 +516,8 @@ per participant.
 `npm run sim:report` (or `npm run trace:report` for the trace alone) traces the
 base loop and the story source, both composed as the viewer plays them, at 1 s
 and writes `public/models/touchpoint-trace.json`: `{ sources: { base, story } }`,
-each with a `summary` and one event per line, about 3.2 MB for ~10,200 events
-(237 people in the base loop, 252 in the story), under the 4 MB bound.
+each with a `summary` and one event per line, about 3.7 MB for ~11,800 events
+(258 people in the base loop, 273 in the story), under the 4 MB bound.
 Compactness comes from coalescing encounters, not from short keys. The console
 prints events by kind, participants covered per category and the hero's
 discipline coverage. `npm run validate:trace` recomputes the trace and asserts
@@ -494,7 +567,7 @@ exist in this repository.
 | `enter` / `leave` | room-level location where it exists: scheduled room use, clinic room assignment, badge or indoor positioning if deployed |
 | `interaction` · `clinical` | clinic visit records: encounter open/close times, vitals feed timestamps, medication administration |
 | `interaction` · `rehab` | therapy session notes with start and end times |
-| `interaction` · `meals` | meal service: tray tickets, dietary orders, dining attendance |
+| `interaction` · `meals` | meal service: tray tickets, dietary orders, dining attendance; kitchen receiving logs (delivery time, food temperatures) |
 | `interaction` · `activities` | program attendance and engagement notes |
 | `interaction` · `coordination` / `arrivals` | social-work notes, care-coordination tasks, family phone calls and texts, front-desk registration |
 | `encounter` | no direct record; approximated by staff assignment and task logs, or by proximity devices where consented |

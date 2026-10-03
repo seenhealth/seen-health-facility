@@ -13,6 +13,7 @@
  * van's docked pose, so the same choreography works wherever the dock is.
  */
 import { ARRIVAL, alhambraVanWindows, sampleVan } from './arrival';
+import { DROP_OFF } from './alhambra-exterior';
 import {
   FLEET_CAB_DOOR,
   FLEET_VAN,
@@ -93,35 +94,49 @@ type RoutePoint = { at: Vec2; y: number };
 /**
  * The fleet office is inside the center. The drivers of the vans that park on
  * the lot between runs (van E in its bay, van F at the west curb) walk out of
- * the sliding entrance, step down off the south edge of its landing and cross
- * the lot to the driver's door, and back the same way: they are never seen
- * appearing in, or vanishing from, a parked van.
+ * the sliding entrance, along the drop-off landing beside the lobby wall,
+ * down its steps and on between the wall and the palm planter (`DROP_OFF`),
+ * then across the lot to the driver's door, and back the same way: they are
+ * never seen appearing in, or vanishing from, a parked van.
  */
-const OFFICE = {
-  /** Just inside the sliding doors, where a driver leaves or reaches the office (out of sight). */
-  inside: [Math.round((ARRIVAL.door[0] + 0.45) * 1000) / 1000, ARRIVAL.door[1]] as Vec2,
-  /** Through the doors, across the landing and down its south step. */
-  exit: [
-    { at: ARRIVAL.door, y: LANDING_Y },
-    { at: [-15.35, -1.3], y: LANDING_Y },
-    { at: [-15.35, -2.05], y: GROUND },
-  ] as RoutePoint[],
-  /**
-   * On across the lot to each such van's driver door (`SPOT.cabOutside` is
-   * appended): diagonally over the lanes and round the bay noses to van E,
-   * and wide of a docked van's driver's door, through the gap in the curb
-   * islands and over the sidewalk to van F.
-   */
-  toVan: {
-    [fleetVanId(4)]: [{ at: [-23.6, -12.9], y: GROUND }],
-    [fleetVanId(5)]: [
-      { at: [-18, -3], y: GROUND },
-      { at: [-30.6, -3], y: GROUND },
-      { at: [-32.3, 1.2], y: GROUND },
-      { at: [-32.75, 1.75], y: SIDEWALK_Y },
-    ],
-  } as Record<string, RoutePoint[]>,
-};
+const OFFICE = (() => {
+  const { landing, steps, planter } = DROP_OFF,
+    mm = (v: number) => Math.round(v * 1000) / 1000;
+  /** Midway between the planter and the lobby wall (the plane of the sliding doors), and a step past the planter. */
+  const byWall = mm((planter.x + planter.w / 2 + ARRIVAL.door[0]) / 2),
+    pastPlanter = mm(planter.z - planter.d / 2 - 0.35);
+  return {
+    /** Just inside the sliding doors, where a driver leaves or reaches the office (out of sight). */
+    inside: [mm(ARRIVAL.door[0] + 0.45), ARRIVAL.door[1]] as Vec2,
+    /**
+     * Through the doors, along the landing by the wall and down its steps
+     * (heights along the nosings, reaching the lot a tread beyond the last
+     * step), then past the planter.
+     */
+    exit: [
+      { at: ARRIVAL.door, y: LANDING_Y },
+      { at: [byWall, mm(ARRIVAL.door[1] - 0.4)], y: LANDING_Y },
+      { at: [byWall, landing.z0], y: DROP_OFF.top },
+      { at: [byWall, mm(steps.z0 - steps.depth)], y: DROP_OFF.street },
+      { at: [byWall, pastPlanter], y: GROUND },
+    ] as RoutePoint[],
+    /**
+     * On across the lot to each such van's driver door (`SPOT.cabOutside` is
+     * appended): diagonally over the lanes and round the bay noses to van E,
+     * and round the planter's far end, wide of a docked van's driver's door,
+     * through the gap in the curb islands and over the sidewalk to van F.
+     */
+    toVan: {
+      [fleetVanId(4)]: [{ at: [-23.6, -12.9], y: GROUND }],
+      [fleetVanId(5)]: [
+        { at: [mm(planter.x - planter.w / 2 - 0.4), pastPlanter], y: GROUND },
+        { at: [-30.6, -3], y: GROUND },
+        { at: [-32.3, 1.2], y: GROUND },
+        { at: [-32.75, 1.75], y: SIDEWALK_Y },
+      ],
+    } as Record<string, RoutePoint[]>,
+  };
+})();
 const DRIVER_NAMES = ['Casey', 'Taylor', 'Robin', 'Dana', 'Jamie', 'Kai', 'Priya', 'Wen'];
 type Mobility = ActorSpec['mobility'];
 /**
@@ -605,6 +620,8 @@ type RampUse = {
   path: Vec2[];
   /** Gap between the rider and the last member of its party (0 without an escort). */
   partyGap: number;
+  /** A descent: the rider's pace on walking away from the ramp foot. */
+  awayPace?: number;
 };
 /** Ramp descents ('Unload on van ramp') and ascents (last leg of the departure walk) on one van. */
 function rampUses(index: number, actors: ActorSpec[], escorts: Map<string, ActorSpec>) {
@@ -615,11 +632,19 @@ function rampUses(index: number, actors: ActorSpec[], escorts: Map<string, Actor
   for (const a of actors) {
     if (a.escortFor || a.role === 'driver') continue;
     const partyGap = escorts.has(a.id) ? escortGap(a) : 0;
-    for (const s of a.segments) {
-      if (s.vehicleId !== vehicle || !['walk', 'roll'].includes(s.action)) continue;
-      if (s.path.length === 2 && near(s.path[0], sill) && near(s.path[1], foot))
-        down.push({ rider: a, start: s.start, end: s.end, path: s.path, partyGap });
-      else if (s.path.length > 2 && near(s.path.at(-1)!, sill) && near(s.path.at(-2)!, foot)) {
+    a.segments.forEach((s, i) => {
+      if (s.vehicleId !== vehicle || !['walk', 'roll'].includes(s.action)) return;
+      if (s.path.length === 2 && near(s.path[0], sill) && near(s.path[1], foot)) {
+        const away = a.segments[i + 1];
+        down.push({
+          rider: a,
+          start: s.start,
+          end: s.end,
+          path: s.path,
+          partyGap,
+          awayPace: away && length(away.path) > 0 ? length(away.path) / (away.end - away.start) : undefined,
+        });
+      } else if (s.path.length > 2 && near(s.path.at(-1)!, sill) && near(s.path.at(-2)!, foot)) {
         const total = length(s.path),
           before = length(s.path.slice(0, -1));
         up.push({
@@ -630,7 +655,7 @@ function rampUses(index: number, actors: ActorSpec[], escorts: Map<string, Actor
           partyGap,
         });
       }
-    }
+    });
   }
   down.sort((a, b) => a.start - b.start);
   up.sort((a, b) => a.start - b.start);
@@ -855,7 +880,17 @@ function dockedDuty(track: Track, index: number, spell: FleetSpell, ramp: RampUs
       track.walk([P.stepIn, P.inside], track.t + length([P.topside, P.stepIn, P.inside]) / climbSpeed, 'Step inside', FLOOR, 'walk', inside);
       track.stay(u.start + lag - 0.8, 'idle', 'Ready at the door', facing(P.inside, P.sill), inside);
       track.walk([P.sill], u.start + lag, 'Out behind the rider', FLOOR, 'walk', inside);
-      track.walk([P.foot], u.end + lag, 'Escorting down the ramp', GROUND, 'escort', inside);
+      // Down at the party's pace; once the rider steps off at the foot the
+      // party walks away at the rider's pace, and the driver keeps up.
+      const behind = u.partyGap + FOLLOW_GAP,
+        rampLength = length([P.sill, P.foot]),
+        offPace = u.awayPace ?? speedDown;
+      if (behind < rampLength && offPace !== speedDown) {
+        const f = (rampLength - behind) / rampLength,
+          last: Vec2 = [round(P.sill[0] + (P.foot[0] - P.sill[0]) * f), round(P.sill[1] + (P.foot[1] - P.sill[1]) * f)];
+        track.walk([last], u.end, 'Escorting down the ramp', rampHeight(last, P.sill, P.foot), 'escort', inside);
+        track.walk([P.foot], u.end + behind / offPace, 'Escorting down the ramp', GROUND, 'escort', inside);
+      } else track.walk([P.foot], u.end + lag, 'Escorting down the ramp', GROUND, 'escort', inside);
     }
     if (uses.length) track.stay(track.t + 1.5, 'greet', 'Handoff at the ramp foot', faceOut);
     track.walkAt([P.standby], STAFF_WALK, 'Back to the ramp hinge', GROUND);
@@ -904,10 +939,11 @@ function dockedDuty(track: Track, index: number, spell: FleetSpell, ramp: RampUs
 // ---------------------------------------------------------------------------
 type Leg = { path: Vec2[]; heights: number[] };
 /**
- * The base loop's walking arrival (`arrival-walker`): its approach along the
- * sidewalk, the wheelchair ramp, the sliding entrance, the walk to reception
- * and its afternoon walk back to the van are the routes the mid-day riders
- * share, so that a change to the entrance or lobby reaches them too.
+ * The base loop's walking arrival (`arrival-walker`): its approach round the
+ * docked van's nose, the switchback ramp, the sliding entrance, the walk to
+ * reception and its afternoon walk back to the van are the routes the mid-day
+ * riders share, so that a change to the drop-off, entrance or lobby reaches
+ * them too.
  */
 function entranceRoute(data: ActivityData) {
   const walker = data.actors.find((a) => a.id === 'arrival-walker');
@@ -929,7 +965,7 @@ function entranceRoute(data: ActivityData) {
   if (walkerVan < 0) throw new Error('withFleetCrew: arrival-walker does not board a fleet van');
   const footAt = departure.path.findIndex((p) => near(p, dockFrame(walkerVan).foot));
   return {
-    /** From the ramp foot along the sidewalk to the foot of the entrance ramp. */
+    /** From the van's ramp foot round its nose to the foot of the switchback ramp. */
     approach: tail(approach),
     ramp: tail(leg('Up the wheelchair ramp')),
     entrance: tail(leg('Turn right · sliding entrance')),
@@ -956,21 +992,30 @@ function middayRider(
 ): ActorSpec {
   const frame = dockFrame(vanIndex(spec.van)),
     homeFrame = dockFrame(vanIndex(spec.home));
-  // Ramp descents start five seconds after the ramp is down, twenty seconds apart
-  // (a descent, the driver's handoff and the climb back up for the next rider).
-  const r0 = frame.window.unload[0] + 5 + onVan * 20;
+  // Ramp descents start four seconds after the ramp is down, as the base
+  // loop's, and nineteen seconds apart (a descent, the driver's handoff and
+  // the climb back up for the next rider), so the last rider is past the van's
+  // nose before the driver walks round it to the cab.
+  const r0 = frame.window.unload[0] + 4 + onVan * 19;
   // Board the afternoon van between its own riders, three seconds apart, arriving at the sill.
   const boardingEnd = homeFrame.window.boarding[0] + 28 + onHome * 3;
-  const speed = spec.mobility ? 0.64 : 0.7;
+  // Out in single file with the van's own riders, at their escorted pace.
+  const speed = 0.64;
   const track = new Track(frame.sill, FLOOR, 0);
   const withHeights = (l: Leg) => ({ heights: [track.y, ...l.heights] });
   const onVanRoute = { vehicleId: spec.van };
   // Placeholder rides at the sill; seatRider assigns the seat, cabin walks and visibility.
   track.ride(r0, spec.van, FLEET_VAN_SEATS.benches[0], frame.sill, 'Riding to Seen Health', true);
   track.walk([frame.foot], r0 + 12, 'Unload on van ramp', GROUND, 'walk', onVanRoute);
-  track.walk(route.approach.path, r0 + 24, 'Meet escort · approach ramp', GROUND, 'walk', { ...onVanRoute, ...withHeights(route.approach) });
-  track.walk(route.ramp.path, r0 + 42, 'Up the wheelchair ramp', 0, 'walk', { ...onVanRoute, ...withHeights(route.ramp) });
-  track.walk(route.entrance.path, r0 + 47, 'Turn right · sliding entrance', 0, 'walk', { ...onVanRoute, zoneId: 'lobby', ...withHeights(route.entrance) });
+  // From the van's ramp foot to just inside the sliding entrance at one pace:
+  // round the van's nose to the switchback, up it and in.
+  const indoors = r0 + 47,
+    legs = [route.approach, route.ramp, route.entrance],
+    lengths = legs.map((l, i) => length([i ? legs[i - 1].path.at(-1)! : frame.foot, ...l.path])),
+    pace = lengths.reduce((a, b) => a + b) / (indoors - track.t);
+  track.walk(route.approach.path, track.t + lengths[0] / pace, 'Meet escort · approach ramp', GROUND, 'walk', { ...onVanRoute, ...withHeights(route.approach) });
+  track.walk(route.ramp.path, track.t + lengths[1] / pace, 'Up the wheelchair ramp', 0, 'walk', { ...onVanRoute, ...withHeights(route.ramp) });
+  track.walk(route.entrance.path, indoors, 'Turn right · sliding entrance', 0, 'walk', { ...onVanRoute, zoneId: 'lobby', ...withHeights(route.entrance) });
   track.walkAt(route.lobby.path, 0.77, 'Walk to reception', 0, 'walk', { zoneId: 'lobby', ...withHeights(route.lobby) });
   track.stay(track.t + 12, 'greet', 'Check in behind the front desk queue', facing(route.queue, route.desk), { zoneId: 'lobby' });
   track.walkAt([route.rejoin, spec.waitAt], 0.77, 'Find a place to wait', 0, 'walk', { zoneId: 'lobby' });

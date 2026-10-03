@@ -3,11 +3,11 @@ import type { Step } from './data';
 /**
  * Declarative camera direction for every beat of the story.
  *
- * World axes: +x east, +z north, y up (metres). Angles are radians. Azimuth
- * is measured around +y from +z: the camera sits at target + (sin a, ·, cos a),
- * so 0 puts it north of the subject looking south, π/2 east of it looking
- * west, and the renderer's default iso (~0.576) sees the north and east
- * faces. Elevation is the angle above the ground plane. Zoom is the
+ * World axes: +x east, +z south, y up (metres; frame.ts COMPASS). Angles are
+ * radians. Azimuth is measured around +y from +z: the camera sits at target +
+ * (sin a, ·, cos a), so 0 puts it south of the subject looking north, π/2 east
+ * of it looking west, and the renderer's default iso (~0.576) sees the south
+ * and east faces. Elevation is the angle above the ground plane. Zoom is the
  * orthographic zoom (1 shows 80 m of stage height; 0.9 frames the whole site,
  * ~2-3 a zone, ~5-9 a person).
  */
@@ -32,8 +32,15 @@ export type ShotSpec = {
    * (`frame(setting)`). Cutaways default to their own setting's pad.
    */
   place?: 'network' | { setting: string; room?: string; anchor?: string };
-  /** Zoom multiplier reached at the end of the beat (slow push-in). */
+  /** Zoom multiplier reached at the end of the beat (slow push-in; below 1 pulls back). */
   push?: number;
+  /**
+   * `call`: a reveal for a phone call. The beat opens on the caller (the
+   * anchor) and, after a short hold, eases the target to the middle of the
+   * featured call's two ends while `push` pulls back, so the arc and the
+   * place it reaches come into view together.
+   */
+  reveal?: 'call';
   /** Azimuth drift across the beat. */
   drift?: number;
 };
@@ -76,8 +83,8 @@ export const FINALE_SHOT: ShotSpec = {
 };
 /**
  * The whole care network around the center. Seen from the east, the network
- * is about 115 m across the screen (from the north-east it is about 210 m), so
- * every pad fits between the card and the team panel.
+ * is about 125 m across the screen (from the north-east it is about 250 m), so
+ * every pad fits to the right of the card (the team panel is hidden here).
  */
 export const NETWORK_SHOT: ShotSpec = {
   place: 'network',
@@ -124,68 +131,42 @@ export const CHAPTER_SHOTS: Record<string, ShotSpec> = {
     drift: -0.2,
   },
   'care-plan': { zoom: 3.3, azimuth: 1.05, elevation: 0.74, push: 1.12, drift: 0.16 },
-  // Cutaways: anchored where the featured people are (an instance room, or a
-  // registry anchor, so a pad that moves or turns keeps its framing) and
-  // leaning toward the first featured interaction. Fronts face east (home,
-  // pharmacy: seen from azimuth ≈ 1.1-1.3) or north (clinic, partner,
-  // hospital: ≈ 0-0.5). Elevations stay low enough to see under the clinic's
-  // upper storey, the pharmacy's roof and the hospital bay's roof; the
-  // stamped home and partner center are cut away at 1.2 m, so their shots
-  // look down into the rooms.
-  'network-pharmacy': {
-    place: { setting: 'pharmacy', anchor: 'counterBack' },
-    zoom: 2.9,
-    azimuth: 1.3,
-    elevation: 0.5,
-    follow: 0.3,
-    radius: 8,
-    push: 1.05,
+  // Cutaways: Mrs. Lin at home (she lives west of the west street, her
+  // front facing east, so the camera looks in from the east, azimuth ≈ 1)
+  // and lunch arriving in the kitchen. Home shots anchor through the
+  // community layer (`place`), so they survive the pad moving; the stamped
+  // house is cut away at 1.2 m and its shots look down into the rooms, wide
+  // enough to hold the porch and the van at the drive's apex.
+  'home-am': {
+    place: { setting: 'home-lin', anchor: 'porch' },
+    zoom: 3.3,
+    azimuth: 1.1,
+    elevation: 0.78,
+    follow: 0.55,
+    radius: 14,
+    push: 1.1,
+    drift: 0.12,
   },
-  'network-home-am': {
-    place: { setting: 'home-lin', room: 'home-kitchen', anchor: 'door' },
-    zoom: 4.6,
-    azimuth: 1.12,
-    elevation: 0.86,
+  // The hand-over at the kitchen's delivery door (trolley, then the island).
+  kitchen: {
+    anchor: [10.2, 0.8, 2.4],
+    zoom: 6.2,
+    azimuth: 0.55,
+    elevation: 0.85,
     follow: 0.4,
-    radius: 6,
-    push: 1.05,
+    radius: 4,
+    push: 1.1,
+    drift: 0.1,
   },
-  'network-specialist': {
-    place: { setting: 'specialist', anchor: 'examSeat' },
-    zoom: 3.0,
-    azimuth: 0.22,
-    elevation: 0.42,
-    follow: 0.3,
-    radius: 8,
-    push: 1.05,
-  },
-  'network-partner': {
-    place: { setting: 'partner-adc', room: 'rehab-open', anchor: 'ptStand' },
-    zoom: 2.8,
-    azimuth: 0.5,
-    elevation: 0.64,
-    follow: 0.4,
-    radius: 10,
-    push: 1.05,
-    drift: 0.08,
-  },
-  'network-hospital': {
-    place: { setting: 'hospital', anchor: 'huddleA' },
-    zoom: 2.6,
-    azimuth: 0.08,
-    elevation: 0.5,
-    follow: 0.3,
-    radius: 8,
-    push: 1.05,
-  },
-  'network-home-pm': {
-    place: { setting: 'home-lin', room: 'home-living', anchor: 'door' },
-    zoom: 5,
-    azimuth: 0.85,
-    elevation: 1,
-    follow: 0.4,
-    radius: 6,
-    push: 1.04,
+  'home-pm': {
+    place: { setting: 'home-lin', anchor: 'porch' },
+    zoom: 3.3,
+    azimuth: 0.95,
+    elevation: 0.8,
+    follow: 0.55,
+    radius: 14,
+    push: 1.12,
+    drift: -0.12,
   },
 };
 export const DEFAULT_CHAPTER_SHOT: ShotSpec = {
@@ -196,7 +177,7 @@ export const DEFAULT_CHAPTER_SHOT: ShotSpec = {
   radius: 8,
   push: 1.06,
 };
-/** Cutaways without an entry in CHAPTER_SHOTS: their own setting's pad. */
+/** Cutaways at a care setting without an entry in CHAPTER_SHOTS: the setting's pad. */
 export const DEFAULT_CUTAWAY_SHOT: ShotSpec = {
   zoom: 2.4,
   azimuth: 0.55,
@@ -205,6 +186,150 @@ export const DEFAULT_CUTAWAY_SHOT: ShotSpec = {
   radius: 14,
   push: 1.05,
 };
+
+/**
+ * The closing highlights, keyed by highlight id: one quick look per service,
+ * each anchored where its featured people are and pushing in hard, so every
+ * cut lands on a scene already in motion. Fronts face east (homes, pharmacy:
+ * azimuth ≈ 1.1-1.3) or north (clinic, partner, hospital: ≈ 0-0.5).
+ */
+export const HIGHLIGHT_SHOTS: Record<string, ShotSpec> = {
+  medication: {
+    place: { setting: 'pharmacy', anchor: 'counterBack' },
+    zoom: 3.4,
+    azimuth: 1.24,
+    elevation: 0.52,
+    follow: 0.3,
+    radius: 8,
+    push: 1.16,
+    drift: 0.16,
+  },
+  // The line dance on the patterned floor, the stage and its lanterns
+  // behind: looking in over the long tables from the front doors' side.
+  'day-center': {
+    place: { setting: 'partner-adc', anchor: 'hall' },
+    zoom: 4.4,
+    azimuth: 0.3,
+    elevation: 0.72,
+    follow: 0.3,
+    radius: 10,
+    push: 1.16,
+    drift: 0.12,
+  },
+  specialists: {
+    place: { setting: 'specialist', anchor: 'examSeat' },
+    zoom: 4.2,
+    azimuth: 0.2,
+    elevation: 0.44,
+    follow: 0.3,
+    radius: 8,
+    push: 1.16,
+    drift: -0.12,
+  },
+  // The clinic's open front sits under its upper storey: keep elevation at
+  // or below ≈0.55, and the azimuth low enough that the optometrist (≤0.45)
+  // and the X-ray shield wall (≤0.35) don't hide the patient.
+  optometry: {
+    place: { setting: 'specialist', anchor: 'optoSeat' },
+    zoom: 6.4,
+    azimuth: 0.3,
+    elevation: 0.5,
+    follow: 0.3,
+    radius: 6,
+    push: 1.16,
+    drift: 0.08,
+  },
+  imaging: {
+    place: { setting: 'specialist', anchor: 'imagingTable' },
+    zoom: 6.2,
+    azimuth: 0.26,
+    elevation: 0.5,
+    follow: 0.3,
+    radius: 6,
+    push: 1.16,
+    drift: -0.08,
+  },
+  // On the hospital's discharge nurse at her phone spot, then back and over
+  // to the middle of the call: the arc to Seen's nurse at the center. The
+  // pull-back ends with both ends and the arc's crown in frame (on a
+  // 1440 × 900 stage the hospital end ≈50 px inside the right edge, the crown
+  // in the top fifth); it scales with 1 / the call's span, now 110 m (0.27
+  // framed the 93 m call alike before the block was re-measured).
+  discharge: {
+    place: { setting: 'hospital', anchor: 'rnPhone' },
+    zoom: 3.6,
+    azimuth: 0.55,
+    elevation: 0.6,
+    follow: 0.3,
+    radius: 8,
+    push: 0.22,
+    drift: 0.08,
+    reveal: 'call',
+  },
+  'home-mods': {
+    place: { setting: 'home-wong', room: 'home-bath', anchor: 'door' },
+    zoom: 5.0,
+    azimuth: 1.0,
+    elevation: 0.98,
+    follow: 0.4,
+    radius: 6,
+    push: 1.12,
+    drift: 0.12,
+  },
+  // The ambulance crew's handoff at the ED, then the hospitalist's call to
+  // Seen's on-call nurse rising off the sidewalk.
+  'after-hours': {
+    place: { setting: 'hospital', anchor: 'edPhone' },
+    zoom: 4.2,
+    azimuth: 0.55,
+    elevation: 0.56,
+    follow: 0.35,
+    radius: 10,
+    push: 1.12,
+    drift: -0.12,
+  },
+  // Mrs. Wong at the foot of her bed on her pendant, then back and over to
+  // the middle of the call: the arc to the nurse line at the center.
+  pers: {
+    place: { setting: 'home-wong', room: 'home-primary', anchor: 'door' },
+    zoom: 5.4,
+    azimuth: 0.62,
+    elevation: 0.66,
+    follow: 0.4,
+    radius: 7,
+    push: 0.17,
+    drift: 0.08,
+    reveal: 'call',
+  },
+};
+/** Highlights without an entry in HIGHLIGHT_SHOTS: their setting's pad. */
+export const DEFAULT_HIGHLIGHT_SHOT: ShotSpec = {
+  zoom: 2.8,
+  azimuth: 0.55,
+  elevation: 0.62,
+  follow: 0.35,
+  radius: 12,
+  push: 1.14,
+  drift: 0.12,
+};
+/**
+ * Peace of mind: Mrs. Lin and her daughter at home at four, a slow, high
+ * push into the living room. The call to action holds its end state.
+ */
+export const PEACE_SHOT: ShotSpec = {
+  place: { setting: 'home-lin', room: 'home-living', anchor: 'porch' },
+  zoom: 3.2,
+  azimuth: 0.98,
+  elevation: 0.9,
+  push: 1.28,
+  drift: 0.22,
+};
+/**
+ * Where the camera lands after a cut, relative to the beat's shot: a touch
+ * wider and turned, so the critically damped spring carries it into the
+ * framing (each cut arrives in motion instead of on a dead frame).
+ */
+export const CUT_SETTLE = { zoom: 0.9, azimuth: -0.09, elevation: 0.04 };
 
 export type Shot = {
   target: [number, number, number];

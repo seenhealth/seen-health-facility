@@ -5,6 +5,7 @@ import { buildPhotoAsset } from './photo-assets';
 import { buildClinicalAsset } from './clinical-assets';
 import { buildCommunityAsset } from './community-assets';
 import { buildHomeAsset } from './home-assets';
+import { buildAdhcAsset } from './adhc-assets';
 import { buildRecreationAsset } from './recreation-assets';
 // Each asset is modeled around a local, floor-level origin. Dimensions and transforms live in JSON.
 export function buildAsset(
@@ -13,6 +14,8 @@ export function buildAsset(
 ) {
   const home = buildHomeAsset(spec, material);
   if (home) return home;
+  const adhc = buildAdhcAsset(spec, material);
+  if (adhc) return adhc;
   const community = buildCommunityAsset(spec);
   if (community) return community;
   const clinical = buildClinicalAsset(spec, material) || buildRecreationAsset(spec, material);

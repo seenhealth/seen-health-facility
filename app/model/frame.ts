@@ -5,9 +5,21 @@ import type { Vec2 } from './schema';
  * everywhere (community pads, facility instances, vehicles): `heading` turns
  * the frame like three.js `Object3D.rotation.y`, so local +z maps to the world
  * direction (sin h, cos h) and local +x to (cos h, −sin h). Metres, +x east,
- * +z north. Pure math, no three.js.
+ * +z south (`COMPASS`). Pure math, no three.js.
  */
 export type Frame = { position: Vec2; heading: number };
+/**
+ * The real compass on the world's ground plane. The center stands on the
+ * north side of Valley Blvd with Ethel Avenue to its west, so +x is east and
+ * +z is south. The code's street and heading names are the plan's, not the
+ * compass's: `north` is Valley Blvd (+z) and `south` the alley (−z), and the
+ * fleet's `NORTH` heading points +z. Anything that needs real directions (the
+ * sun) reads them from here.
+ */
+export const COMPASS = {
+  north: [0, -1] as Vec2,
+  east: [1, 0] as Vec2,
+};
 type Placed = Pick<Frame, 'position' | 'heading'>;
 
 /** A local point in the world. */

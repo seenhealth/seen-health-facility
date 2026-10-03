@@ -16,7 +16,7 @@ import {
   type ActorSpec,
   type VehicleLookup,
 } from '../model/activity';
-import type { CharacterRole } from '../model/characters';
+import { isStaffRole, type CharacterRole } from '../model/characters';
 import type { Facility, Vec2 } from '../model/schema';
 import { COMMUNITY_CATEGORIES } from '../model/community-settings';
 import careTeam from '../data/care-team.json';
@@ -108,6 +108,7 @@ const CARE_ACTIONS = new Set([
   'craft',
   'music',
   'escort',
+  'phone',
 ]);
 const CATEGORY_PRIORITY: ParticipantActivity[] = [
   'clinical',
@@ -215,9 +216,12 @@ export type SimMetrics = {
   hero: HeroMetrics | null;
   handoffs: HandoffMetrics | null;
   headline: {
+    /** Participants, staff (as people) and family members. */
     people: number;
     participants: number;
     staff: number;
+    /** Family members (a daughter at home): neither staff nor participants. */
+    family: number;
     peakParticipantsOnSite: number;
     peakStaffOnFloor: number;
     staffCareShare: number;
@@ -231,14 +235,13 @@ export type MetricsOptions = {
   /** Hero whose touchpoints are measured. */
   heroId?: string;
   /**
-   * Scenario steps whose handoffs are counted. Cutaways (steps with a
-   * `settingId`: moments across the care network, without the hero) are left
-   * out, so the handoffs are the hero's.
+   * Scenario steps whose handoffs are counted: every step is part of the
+   * hero's day (her moments at home and behind the scenes included); the
+   * story's closing highlights are kept apart in `scenario.highlights`.
    */
   steps?: {
     id: string;
     handoffs: { from: string; to: string; note: string }[];
-    settingId?: string;
   }[];
   /** Distance (m) that counts as being with the hero. */
   touchRadius?: number;
@@ -334,6 +337,8 @@ function staffActivity(a: ActorSpec, f: Frame, moved: boolean): StaffActivity {
   if (s.action === 'ride') return 'driving';
   if (s.action === 'walk' || s.action === 'roll' || (a.escortFor && moved))
     return 'walking';
+  // A call is care coordination, also from a desk upstairs (the nurse line).
+  if (s.action === 'phone') return 'care';
   if (a.levelId === 'upper' && s.seated) return 'meeting';
   if (a.levelId === 'upper' && ['present', 'listen'].includes(s.action))
     return 'meeting';
@@ -359,8 +364,11 @@ export function computeMetrics(
   ]);
   for (const z of [...model.zones, ...(source.zones || [])])
     zoneInfo.set(z.id, { name: z.name, levelId: z.levelId });
-  const staff = source.actors.filter((a) => a.role !== 'participant'),
-    participants = source.actors.filter((a) => a.role === 'participant');
+  // Family members (a daughter at home) are neither staff nor participants:
+  // they count among the people measured, not in occupancy or staff time.
+  const staff = source.actors.filter((a) => isStaffRole(a.role)),
+    participants = source.actors.filter((a) => a.role === 'participant'),
+    family = source.actors.filter((a) => a.role === 'family');
   const zoneSeries = new Map<string, { participants: number[]; staff: number[] }>();
   const series = (id: string) => {
     let s = zoneSeries.get(id);
@@ -411,7 +419,8 @@ export function computeMetrics(
     const active = interactionsAt(t);
     for (const a of source.actors) {
       const f = frame.get(a.id)!;
-      if (f.visible) {
+      // Occupancy counts participants and staff; family members are neither.
+      if (f.visible && a.role !== 'family') {
         const s = series(f.zoneId),
           staffMember = a.role !== 'participant';
         if (staffMember) s.staff[k]++;
@@ -607,7 +616,7 @@ export function computeMetrics(
 
   // Handoffs.
   let handoffs: HandoffMetrics | null = null;
-  const heroSteps = options.steps?.filter((s) => !s.settingId);
+  const heroSteps = options.steps;
   if (heroSteps) {
     const pairs = new Map<string, number>(),
       sent = new Map<string, number>(),
@@ -659,9 +668,10 @@ export function computeMetrics(
     hero: heroMetrics,
     handoffs,
     headline: {
-      people: participants.length + staffPeople.size,
+      people: participants.length + staffPeople.size + family.length,
       participants: participants.length,
       staff: staffPeople.size,
+      family: family.length,
       peakParticipantsOnSite: Math.max(...onSite.participants),
       peakStaffOnFloor: Math.max(...onSite.staff),
       staffCareShare: staffOnFloor ? careSeconds / staffOnFloor : 0,

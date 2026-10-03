@@ -11,6 +11,7 @@ import {
   sampleFleetVan,
 } from '../app/model/alhambra-fleet';
 import { alhambraVanWindows } from '../app/model/arrival';
+import { buildPhotoAsset } from '../app/model/photo-assets';
 import { vehicleGap } from '../app/model/vehicle-clearance';
 
 const close = (a: number, b: number, what: string) =>
@@ -122,4 +123,62 @@ void test('fleet vans maneuver past a parking spot or the drop-off only while it
     `moving vans were checked against parked ones (${checked})`,
   );
   assert.ok(closest >= margin, `closest pass ${closest.toFixed(2)} m`);
+});
+
+void test('the fleet van body is one volume: sides flush with roof, nose and rear', () => {
+  const [half, length] = [FLEET_VAN.halfWidth, FLEET_VAN.halfLength];
+  const van = buildPhotoAsset(
+    {
+      kind: 'fleet-van',
+      dimensions: [2 * half, 2.8, 2 * length],
+      material: 'body',
+      materials: { wrap: 'wrap' },
+      parameters: { operable: true },
+    },
+    () => new T.MeshStandardMaterial(),
+  )!;
+  van.updateMatrixWorld(true);
+  const ray = new T.Raycaster();
+  /** First surface met from `from` along `dir`, van-local. */
+  const hit = (from: number[], dir: number[]) => {
+    ray.set(new T.Vector3(...from), new T.Vector3(...dir));
+    const [first] = ray.intersectObject(van, true);
+    assert.ok(first, `a ray from (${from.join(', ')}) meets the van`);
+    return first.point;
+  };
+  // 1 cm inside the side planes, along the high roof.
+  const edge = half - 0.01;
+  for (let z = -1.5; z < length - 0.05; z += 0.1)
+    for (const side of [-1, 1]) {
+      const top = hit([side * edge, 9, z], [0, -1, 0]);
+      assert.ok(
+        top.y > 2.6,
+        `seen from above at x ${side * edge}, z ${z.toFixed(1)} the roof is met at y ${top.y.toFixed(2)}, not a ledge or a slit`,
+      );
+      for (const y of [2.3, 2.6]) {
+        const wall = hit([side * 9, y, z], [-side, 0, 0]);
+        assert.ok(
+          Math.abs(wall.x - side * half) < 1e-6,
+          `seen from the side at y ${y}, z ${z.toFixed(1)} the body is met at x ${wall.x.toFixed(3)}, off the side plane ${side * half}`,
+        );
+      }
+    }
+  for (let x = -edge; x <= edge + 1e-9; x += 0.05) {
+    const nose = hit([x, 0.9, -9], [0, 0, 1]).z,
+      rear = hit([x, 2.3, 9], [0, 0, -1]).z,
+      roofline = hit([x, 2.3, -9], [0, 0, 1]).z;
+    assert.ok(
+      nose < 0.03 - length,
+      `the nose face covers x ${x.toFixed(2)} (met at z ${nose.toFixed(2)})`,
+    );
+    assert.ok(
+      rear > length - 0.03,
+      `the rear doors cover x ${x.toFixed(2)} (met at z ${rear.toFixed(2)})`,
+    );
+    // At roof-rail height nothing stands ahead of the windshield's top.
+    assert.ok(
+      roofline > -2.0,
+      `at x ${x.toFixed(2)} the roofline starts at z ${roofline.toFixed(2)}, ahead of the windshield`,
+    );
+  }
 });
