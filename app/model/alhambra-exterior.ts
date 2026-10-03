@@ -268,49 +268,49 @@ export function buildAlhambraExterior(model: Facility) {
   shade('1841-entry-blue-sunshade', -16.7, 2.95, 27.34, 3.0, 0.72);
   // Concrete panel joints, restrained wall lights and metal coping on every visible flat wing.
   const surface = group(facade, 'concrete-panel-joints-and-coping');
-  // The wing's coping is a flush metal cap on its parapet (Street View, May 2025): set back over the wall, 1.5 cm
-  // proud of the face, rather than a ledge standing out over the street; its joints sit on the wall's face
-  // (shell-therapy-front / -west, 0.24 m thick on z 27.169 and x -31.189).
-  const WING = { front: 27.169 + 0.12, west: -31.189 - 0.12 };
-  box(
-    surface,
-    (-31.189 - 14.66) / 2,
-    6.2 - 0.06,
-    WING.front - 0.12,
-    -14.66 + 31.189,
-    0.07,
-    0.27,
-    steel,
-  );
-  box(
-    surface,
-    WING.west + 0.12,
-    6.2 - 0.06,
-    (8.9 + 27.169) / 2,
-    0.27,
-    0.07,
-    27.169 - 8.9 + 0.135,
-    steel,
-  );
-  for (const [x0, x1, z, h] of [
-    [-31.18, -14.66, WING.front + 0.005, 6.2],
-    [3.2, 15.26, 26.81, 6.65],
-    [15.57, 29.71, 26.97, 6.65],
+  // Every flat wing's coping is a flush metal cap on its parapet (Street View, May 2025): set back over the wall,
+  // 1.5 cm proud of the face, rather than a ledge standing out over the street; panel joints sit on the face.
+  // Faces are the envelope walls' outer faces (0.24 m thick walls): shell-therapy-*, shell-admin-front,
+  // shell-adjacent-front / -east, shell-rear-east.
+  const capDepth = 0.27,
+    capRise = 0.015;
+  for (const [x0, x1, face, h] of [
+    [-31.309, -14.66, 27.289, 6.2],
+    [3.2, 15.38, 26.78, 6.65],
+    [15.45, 29.83, 26.933, 6.65],
   ]) {
-    if (x0 > -31)
-      box(surface, (x0 + x1) / 2, h - 0.07, z, x1 - x0, 0.09, 0.32, steel);
+    box(
+      surface,
+      (x0 + x1) / 2,
+      h - 0.06,
+      face + capRise - capDepth / 2,
+      x1 - x0,
+      0.07,
+      capDepth,
+      steel,
+    );
+    const z = face + 0.005;
     for (let x = x0 + 0.7; x < x1; x += 3.4)
       box(surface, x, 0, z, 0.017, h, 0.016, joint);
     for (const y of [3.0, 5.55])
       box(surface, (x0 + x1) / 2, y, z, x1 - x0, 0.016, 0.016, joint);
   }
-  for (const [x, z0, z1, h] of [
-    [WING.west - 0.005, 8.9, 27.17, 6.2],
-    [29.86, 3.51, 26.81, 6.65],
-    [15.4, -12.46, 3.2, 6.65],
+  for (const [face, out, z0, z1, h] of [
+    [-31.309, -1, 8.9, 27.289, 6.2],
+    [29.833, 1, 3.51, 26.933, 6.65],
+    [15.384, 1, -12.46, 3.2, 6.65],
   ]) {
-    if (x > -31)
-      box(surface, x, h - 0.07, (z0 + z1) / 2, 0.32, 0.09, z1 - z0, steel);
+    box(
+      surface,
+      face + out * (capRise - capDepth / 2),
+      h - 0.06,
+      (z0 + z1) / 2,
+      capDepth,
+      0.07,
+      z1 - z0,
+      steel,
+    );
+    const x = face + out * 0.005;
     for (let z = z0 + 2; z < z1; z += 4.5) {
       box(surface, x, 0, z, 0.016, h, 0.018, joint);
       box(surface, x, 3.4, z, 0.23, 0.11, 0.43, stone);
@@ -439,46 +439,125 @@ export function buildAlhambraExterior(model: Facility) {
   const rampY = (x: number) =>
     RAMP.y0 + ((x - RAMP.x0) * (RAMP.y1 - RAMP.y0)) / (RAMP.x1 - RAMP.x0);
   const slope = Math.atan2(RAMP.y1 - RAMP.y0, RAMP.x1 - RAMP.x0);
-  const ramp = box(
-    edge,
-    (RAMP.x0 + RAMP.x1) / 2,
-    (RAMP.y0 + RAMP.y1) / 2 - 0.12,
-    RAMP.z,
-    RAMP.x1 - RAMP.x0,
-    0.12,
-    RAMP.w,
-    stone,
-  );
-  ramp.rotation.z = slope;
+  // Street View (May 2025): a solid concrete ramp with a raised curb along its street edge, a concrete apron at its
+  // foot joining the corner's sidewalk, and silver rails both sides: a handrail and a lower rail on posts, both
+  // carried 0.3 m past the foot and looped back.
+  {
+    const shape = new T.Shape();
+    shape.moveTo(RAMP.x0, -0.1);
+    shape.lineTo(RAMP.x1, -0.1);
+    shape.lineTo(RAMP.x1, RAMP.y1);
+    shape.lineTo(RAMP.x0, RAMP.y0);
+    shape.closePath();
+    const geo = new T.ExtrudeGeometry(shape, {
+      depth: RAMP.w,
+      bevelEnabled: false,
+    });
+    geo.translate(0, 0, RAMP.z - RAMP.w / 2);
+    mesh(edge, geo, stone).receiveShadow = true;
+    const curb = mesh(
+      edge,
+      new T.BoxGeometry(
+        Math.hypot(RAMP.x1 - RAMP.x0, RAMP.y1 - RAMP.y0),
+        0.12,
+        0.15,
+      ),
+      stone,
+    );
+    curb.position.set(
+      (RAMP.x0 + RAMP.x1) / 2,
+      (RAMP.y0 + RAMP.y1) / 2 + 0.06,
+      RAMP.z + RAMP.w / 2 - 0.075,
+    );
+    curb.rotation.z = slope;
+    box(
+      edge,
+      RAMP.x0 - 0.75,
+      -0.1,
+      RAMP.z,
+      1.5,
+      0.05 + 0.1,
+      RAMP.w + 0.3,
+      stone,
+    );
+  }
   function rail(
     x0: number,
     x1: number,
     z: number,
     base: (x: number) => number,
+    returns = false,
   ) {
-    for (let x = x0; x <= x1 + 0.01; x += 1.65)
-      box(
-        edge,
-        Math.min(x, x1),
-        base(Math.min(x, x1)),
-        z,
-        0.035,
-        0.95,
-        0.035,
-        steel,
-      );
-    for (const y of [0.62, 0.85, 1.12])
+    const n = Math.max(1, Math.ceil((x1 - x0) / 1.65));
+    for (let i = 0; i <= n; i++) {
+      const x = x0 + ((x1 - x0) * i) / n;
+      box(edge, x, base(x), z, 0.04, 0.92, 0.04, steel);
+    }
+    for (const y of [0.45, 0.92])
       beam(
         edge,
         [x0, base(x0) + y, z],
         [x1, base(x1) + y, z],
-        0.028,
+        0.035,
         0.035,
         steel,
       );
+    if (returns) {
+      const y0 = base(x0);
+      beam(
+        edge,
+        [x0, y0 + 0.92, z],
+        [x0 - 0.3, y0 + 0.92, z],
+        0.035,
+        0.035,
+        steel,
+      );
+      beam(
+        edge,
+        [x0 - 0.3, y0 + 0.92, z],
+        [x0 - 0.3, y0 + 0.45, z],
+        0.035,
+        0.035,
+        steel,
+      );
+      beam(
+        edge,
+        [x0 - 0.3, y0 + 0.45, z],
+        [x0, y0 + 0.45, z],
+        0.035,
+        0.035,
+        steel,
+      );
+    }
   }
-  for (const z of [RAMP.z - 0.68, RAMP.z + 0.68])
-    rail(RAMP.x0, RAMP.x1, z, rampY);
+  for (const z of [RAMP.z - 0.6, RAMP.z + 0.56])
+    rail(RAMP.x0, RAMP.x1, z, (x) => rampY(x) + (z > RAMP.z ? 0.12 : 0), true);
+  // The planting bed between the ramp and the Valley sidewalk: dark mulch behind a concrete edge, pygmy date palms
+  // and grasses (it was a row of round shrubs on a raised box).
+  {
+    const bz0 = RAMP.z + RAMP.w / 2,
+      bz1 = 30.1,
+      bx0 = RAMP.x0,
+      bx1 = -14.9;
+    box(
+      edge,
+      (bx0 + bx1) / 2,
+      -0.07,
+      (bz0 + bz1) / 2,
+      bx1 - bx0,
+      0.04,
+      bz1 - bz0,
+      '#5a4635',
+    );
+    box(edge, (bx0 + bx1) / 2, -0.1, bz1 + 0.07, bx1 - bx0, 0.14, 0.14, stone);
+    for (const x of [-27.6, -25.0, -21.6, -19.3, -16.9])
+      palm(x, (bz0 + bz1) / 2, 1.5, 1.0);
+    for (let x = bx0 + 0.5; x < bx1; x += 0.95) {
+      const tuft = mesh(edge, new T.IcosahedronGeometry(0.22, 1), '#7f9a5f');
+      tuft.position.set(x, 0.05, bz0 + 0.25 + (Math.round(x * 3) % 2) * 0.35);
+      tuft.scale.set(1, 0.65, 1);
+    }
+  }
   for (const [a, b] of [
     [-14.75, -11.7],
     [-7.1, 0.2],
@@ -486,8 +565,6 @@ export function buildAlhambraExterior(model: Facility) {
     rail(a, b, 28.45, () => RAMP.y1);
   // Sidewalk tree wells: a square of soil at the foot of every street tree on Valley Blvd.
   for (const [x, z] of [
-    [-29.6, 29.1],
-    [-27.4, 29.1],
     [-11, 30.2],
     [1, 30.2],
     [9, 30.2],
@@ -496,7 +573,6 @@ export function buildAlhambraExterior(model: Facility) {
   const planters = group(site, 'frontage-low-planters');
   for (const [x, z, w] of [
     [7.8, 27.35, 10.6],
-    [-22.3, 29.65, 13.4],
     [28.9, 24.5, 1.1],
   ]) {
     box(planters, x, -0.1, z, w, 0.4, 0.8, stone);
