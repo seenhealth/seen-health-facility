@@ -39,8 +39,9 @@ export const DROP_OFF = (() => {
     turn = { x0: -17.95, x1: -14.85, z0: 7.6, z1: 8.75 },
     lower = { x: -17.15, z0: 2.9, z1: 7.6 };
   /** Steps down from the landing's −z end to `z0`: `count` treads `depth` deep, equal risers to the lot. */
-  const count = 2,
-    depth = 0.4,
+  // Three treads 0.3 m deep (photo 2026-10-02).
+  const count = 3,
+    depth = 0.3,
     steps = { count, depth, z0: landing.z0 - count * depth };
   const riser = rise / (steps.count + 1);
   const upperY = (z: number) =>
@@ -50,7 +51,7 @@ export const DROP_OFF = (() => {
   const lotSide = landing.x - width / 2 - 0.05;
   /** Rail lines at constant x from z0 to z1, standing on the surface at height y(z). */
   const rails = {
-    landing: { x: lotSide, z0: steps.z0, z1: landing.z1, y: () => top },
+    landing: { x: lotSide, z0: landing.z0, z1: landing.z1, y: () => top },
     upper: { x: lotSide, z0: upper.z0, z1: upper.z1, y: upperY },
     lowerEast: {
       x: lower.x + width / 2 + 0.05,
@@ -582,6 +583,28 @@ export function buildAlhambraExterior(model: Facility) {
       steps.depth,
       paving,
     );
+  // A bronze handrail down each side of the steps (photo 2026-10-02), looping back at the foot.
+  for (const sx of [LAND.x - LAND.w / 2 - 0.05, LAND.x + LAND.w / 2 + 0.05]) {
+    box(landing, sx, LAND.top, LAND.z0 + 0.05, 0.035, 0.95, 0.035, bronze);
+    box(landing, sx, L_STREET, steps.z0, 0.035, 0.95, 0.035, bronze);
+    for (const dy of [0.95, 0.6])
+      beam(
+        landing,
+        [sx, LAND.top + dy, LAND.z0 + 0.05],
+        [sx, L_STREET + dy, steps.z0],
+        0.03,
+        0.03,
+        bronze,
+      );
+    beam(
+      landing,
+      [sx, L_STREET + 0.95, steps.z0],
+      [sx, L_STREET + 0.6, steps.z0 - 0.3],
+      0.03,
+      0.03,
+      bronze,
+    );
+  }
   const upperLen = upper.z1 - upper.z0,
     lowerLen = lower.z1 - lower.z0;
   const upperSlab = box(
@@ -941,7 +964,7 @@ export function buildAlhambraExterior(model: Facility) {
   // Square window with a silver frame, sill 1.3 m up, south of the door.
   const winZ = pz0 + 2.5 + 0.65;
   box(court2, FACE_X + 0.03, 1.25, winZ, 0.08, 1.4, 1.4, alu);
-  box(court2, FACE_X + 0.06, 1.3, winZ, 0.04, 1.3, 1.3, glassDark);
+  box(court2, FACE_X + 0.085, 1.3, winZ, 0.02, 1.3, 1.3, glassDark);
   // Raised concrete landing along the wall in front of the door and window, two steps up from the lot.
   const landW = 2.1,
     landZ0 = pz0 + 0.4,
@@ -1058,9 +1081,9 @@ export function buildAlhambraExterior(model: Facility) {
   const ldZ = -0.6,
     ldW = 2.2,
     ldH = 2.5;
-  for (const sz of [ldZ - ldW / 2 - 0.11, ldZ + ldW / 2 + 0.11])
-    box(lobby, LOBBY_X - 0.07, 0, sz, 0.14, ldH + 0.22, 0.22, aluBright);
-  box(lobby, LOBBY_X - 0.07, ldH, ldZ, 0.14, 0.22, ldW + 0.44, aluBright);
+  for (const sz of [ldZ - ldW / 2 - 0.16, ldZ + ldW / 2 + 0.16])
+    box(lobby, LOBBY_X - 0.15, 0, sz, 0.3, ldH + 0.32, 0.32, aluBright);
+  box(lobby, LOBBY_X - 0.15, ldH, ldZ, 0.3, 0.32, ldW + 0.64, aluBright);
   box(lobby, LOBBY_X - 0.02, 0.02, ldZ, 0.03, ldH - 0.04, ldW, '#2a3338');
   for (const sz of [ldZ, ldZ - ldW / 4, ldZ + ldW / 4])
     box(lobby, LOBBY_X - 0.035, 0.02, sz, 0.02, ldH - 0.04, 0.05, aluBright);
@@ -1068,7 +1091,7 @@ export function buildAlhambraExterior(model: Facility) {
   box(lobby, LOBBY_X - 0.045, 1.7, ldZ - 0.55, 0.01, 0.1, 0.62, '#f3efe4');
   for (const wz of [2.0, 3.5]) {
     box(lobby, LOBBY_X - 0.045, 0.95, wz, 0.09, 1.55, 1.05, aluBright);
-    box(lobby, LOBBY_X - 0.06, 1.0, wz, 0.03, 1.45, 0.95, '#2a3338');
+    box(lobby, LOBBY_X - 0.1, 1.0, wz, 0.02, 1.45, 0.95, '#2a3338');
   }
   const dome = mesh(
     lobby,
