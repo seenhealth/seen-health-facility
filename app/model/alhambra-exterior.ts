@@ -292,11 +292,70 @@ export function buildAlhambraExterior(model: Facility) {
     box(surface, x, 3.0, (z0 + z1) / 2, 0.015, 0.018, z1 - z0, joint);
   }
 
-  // Glass wraps the Ethel corner; silver mullions and shallow canopy make the showcase legible.
+  // Glass wraps the Valley / Ethel corner inside one deep light-grey frame (Street View, May 2025): a top band and
+  // a sill standing 0.3 m proud of the wall along both faces, round the corner, with a jamb at each far end; the
+  // Ethel glazing (ethel-corner-return-glazing, z 23.77 to 27.12) and the first Valley window
+  // (shell-therapy-front-opening-7, x -31.15 to -28.86) sit inside it, split by thin silver mullions and meeting
+  // at a mullion on the corner.
   const corner = group(facade, 'ethel-glazed-corner');
-  box(corner, -31.36, 2.88, 25.48, 0.65, 0.15, 3.65, steel);
-  for (const z of [23.72, 24.85, 26.05, 27.13])
-    box(corner, -31.34, 0.52, z, 0.12, 2.25, 0.06, steel);
+  {
+    const cx = -31.189,
+      cz = 27.169,
+      d = 0.3,
+      ethelEnd = 23.62,
+      valleyEnd = -28.72,
+      frame = '#e4e3dd',
+      top = 2.76,
+      band = 0.34;
+    // Ethel face (x = cx, the frame out toward -x), then the Valley face (z = cz, out toward +z), meeting at the corner.
+    box(
+      corner,
+      cx - d / 2,
+      top,
+      (ethelEnd + cz + d) / 2,
+      d,
+      band,
+      cz + d - ethelEnd,
+      frame,
+    );
+    box(
+      corner,
+      (cx - d + valleyEnd) / 2,
+      top,
+      cz + d / 2,
+      valleyEnd - cx + d,
+      band,
+      d,
+      frame,
+    );
+    box(
+      corner,
+      cx - d / 2,
+      0.36,
+      (ethelEnd + cz + d) / 2,
+      d,
+      0.16,
+      cz + d - ethelEnd,
+      frame,
+    );
+    box(
+      corner,
+      (cx - d + valleyEnd) / 2,
+      0.36,
+      cz + d / 2,
+      valleyEnd - cx + d,
+      0.16,
+      d,
+      frame,
+    );
+    box(corner, cx - d / 2, 0, ethelEnd + 0.08, d, top, 0.16, frame);
+    box(corner, valleyEnd - 0.08, 0, cz + d / 2, 0.16, top, d, frame);
+    for (const z of [24.62, 25.47, 26.31])
+      box(corner, cx - 0.05, 0.52, z, 0.05, 2.24, 0.04, steel);
+    for (const x of [-30.38, -29.62])
+      box(corner, x, 0.52, cz + 0.05, 0.04, 2.24, 0.05, steel);
+    box(corner, cx - 0.04, 0.52, cz + 0.04, 0.08, 2.24, 0.08, steel);
+  }
 
   const edge = group(site, 'valley-entry-terrace-and-rails');
   box(edge, -7.3, -0.15, 26.73, 14.9, 0.55, 2.75, stone);
