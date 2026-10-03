@@ -3,7 +3,13 @@
 import '../site/asset-base';
 import { validateFacility } from '../../app/model/schema';
 import { createViewer, defaultState } from '../../app/model/renderer';
-import { createLiveLot, type LiveMessage } from '../../app/model/live-lot';
+import {
+  createLiveLot,
+  type LiveMessage,
+  type LivePerson,
+  type LiveVehicle,
+} from '../../app/model/live-lot';
+import { Vector3 } from 'three';
 import { createDaylight } from '../../app/model/daylight';
 import { createNightLights } from '../../app/model/night-lights';
 import {
@@ -345,6 +351,82 @@ async function main() {
     new URLSearchParams(location.search).get('view') === 'perspective'
   )
     setProjection(true);
+  // The hovered car's details as an HTML bubble pinned above its roof: one size on screen in either projection, never
+  // cut by the scene's clipping or the post pass, kept inside the view. Hovering the bubble keeps it open; hovering a
+  // rider's avatar shows their card; a click on it follows the car, as a click on the car does.
+  const bubbleEl = document.getElementById('bubble')!;
+  const esc = (t: string) =>
+    t.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+  const RING: Record<string, string> = { high: '#c0392b', assisted: '#d08214' };
+  const avatar = (p: LivePerson, square: boolean) => {
+    const ring = !square && p.risk && RING[p.risk] ? RING[p.risk] : '';
+    const face = p.photo
+      ? `<img src="${esc(p.photo)}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:${esc(JSON.stringify(p.initials))}}))">`
+      : `<span>${esc(p.initials)}</span>`;
+    return `<span class="av${square ? ' drv' : ''}"${ring ? ` style="box-shadow:0 0 0 3px ${ring}"` : ''}>${face}${p.wheelchair ? '<b class="wc">WC</b>' : ''}</span>`;
+  };
+  const person = (p: LivePerson) => {
+    const card = p.lines?.length
+      ? `<span class="pcard"><span class="ph">${avatar(p, false)}<span><b>${esc(p.fullName ?? p.name)}</b>${p.subtitle ? `<i>${esc(p.subtitle)}</i>` : ''}</span></span>${p.lines.map((t) => `<span class="pl">${esc(t)}</span>`).join('')}</span>`
+      : '';
+    return `<span class="rider" tabindex="0">${avatar(p, false)}<span class="nm">${esc(p.name)}</span>${card}</span>`;
+  };
+  let bubbleKey = '',
+    bubbleId: string | null = null;
+  const paintBubble = (v: LiveVehicle) => {
+    const key = JSON.stringify([
+      v.label,
+      v.detail,
+      v.highlight,
+      v.driver,
+      v.riders,
+      v.lines,
+    ]);
+    if (key === bubbleKey) return;
+    bubbleKey = key;
+    bubbleEl.classList.toggle('hot', !!v.highlight);
+    bubbleEl.innerHTML = `<div class="tt">${esc(v.label)}${v.detail ? ` · ${esc(v.detail)}` : ''}</div><div class="crew">${v.driver ? `<span class="rider">${avatar(v.driver, true)}<span class="nm">${esc(v.driver.name)}</span></span>` : ''}${(v.riders ?? []).map(person).join('')}</div>${v.lines?.length ? `<div class="lines">${v.lines.map((t) => `<div>${esc(t)}</div>`).join('')}</div>` : ''}`;
+  };
+  const projected = new Vector3();
+  const placeBubble = () => {
+    requestAnimationFrame(placeBubble);
+    const b = lot?.bubble();
+    if (!b) {
+      if (bubbleId) {
+        bubbleEl.classList.remove('open');
+        bubbleId = null;
+      }
+      return;
+    }
+    bubbleId = b.v.id;
+    paintBubble(b.v);
+    projected.set(...b.at).project(viewer.getCamera());
+    const r = host.getBoundingClientRect();
+    if (projected.z > 1) return bubbleEl.classList.remove('open');
+    const x = ((projected.x + 1) / 2) * r.width,
+      y = ((1 - projected.y) / 2) * r.height;
+    const w = bubbleEl.offsetWidth,
+      h = bubbleEl.offsetHeight,
+      pad = 8;
+    // Above the car when there is room, else below it; always inside the frame.
+    let top = y - h - 10;
+    if (top < pad) top = Math.min(r.height - h - pad, y + 30);
+    const left = Math.min(Math.max(pad, x - w / 2), r.width - w - pad);
+    bubbleEl.style.transform = `translate(${Math.round(left)}px, ${Math.round(Math.max(pad, top))}px)`;
+    bubbleEl.classList.add('open');
+  };
+  requestAnimationFrame(placeBubble);
+  bubbleEl.addEventListener('pointerenter', () => lot?.pinBubble(true));
+  bubbleEl.addEventListener('pointerleave', () => lot?.pinBubble(false));
+  bubbleEl.addEventListener('click', () => {
+    if (!bubbleId) return;
+    if (window.parent && window.parent !== window)
+      window.parent.postMessage(
+        { type: 'seen-live-lot-pick', id: bubbleId },
+        '*',
+      );
+    else setFollow(bubbleId !== follow ? bubbleId : null);
+  });
   let pending: LiveMessage | null = null;
   // `?debug=true`: the vehicle simulator (sim.ts). Its vehicles ride along with every update from the dispatch board.
   const debugParam = new URLSearchParams(location.search).get('debug');

@@ -805,6 +805,8 @@ export function createLiveLot(ctx: {
    * from the car up to its bubble (across the gap between them) does not collapse it. */
   const EXPAND_GRACE = 0.4;
   let expandHold = 0;
+  /** True while the pointer is over the HTML bubble the page draws for the open vehicle: it stays open. */
+  let bubblePinned = false;
   /** The rider whose avatar the pointer is over in the opened bubble, and the card drawn for them. */
   let hoverPerson: { l: Live; rect: AvatarRect } | null = null;
   const personCard = makeLabel();
@@ -1768,6 +1770,8 @@ export function createLiveLot(ctx: {
     if (hoverId) {
       expandedId = hoverId;
       expandHold = EXPAND_GRACE;
+    } else if (bubblePinned && expandedId) {
+      expandHold = EXPAND_GRACE;
     } else if (expandedId) {
       expandHold -= dt;
       if (expandHold <= 0) expandedId = null;
@@ -1927,8 +1931,9 @@ export function createLiveLot(ctx: {
         (h0 + (l.plate[1] - h0) * k) * labelScale,
         1,
       );
-      // Plates show on hover only: the hovered car's bubble fades in, every other plate stays hidden (2026-10-03).
-      l.plateFade = tween(l.plateFade, expanded ? 1 : 0, 4, dt);
+      // No 3D plates: the hovered car's details are drawn by the page as an HTML bubble (`bubble()`), which keeps one size
+      // on screen in either projection and is never cut by the scene's clipping or the post pass (2026-10-03).
+      l.plateFade = tween(l.plateFade, 0, 4, dt);
       l.label.visible = l.opacity > 0.3 && l.plateFade > 0.01;
       // The opened bubble draws over every other plate.
       l.label.renderOrder = expanded ? 11 : 10;
@@ -2068,6 +2073,24 @@ export function createLiveLot(ctx: {
       return hoverId;
     },
     /** Open one vehicle's plate into its details bubble (null closes it). */
+    /**
+     * The open bubble, for the page to draw as HTML: the hovered vehicle (with the plate's text as the visit stands)
+     * and the world point just above its roof the bubble is pinned to; null when no car is hovered.
+     */
+    bubble(): { v: LiveVehicle; at: [number, number, number] } | null {
+      if (!expandedId) return null;
+      const l = live.get(expandedId);
+      if (!l || l.mode === 'gone' || l.opacity <= 0.05) return null;
+      const p = l.body.object.position;
+      return {
+        v: onPlate(l),
+        at: [p.x, p.y + 2.6 + (l.door > 0.01 ? 1.2 : 0), p.z],
+      };
+    },
+    /** Keep the bubble open while the pointer is over the page's HTML bubble. */
+    pinBubble(on: boolean) {
+      bubblePinned = on;
+    },
     setExpanded(id: string | null) {
       // The bubble follows the hover; this only opens one directly (e.g. from the console) until the next hover.
       expandedId = id;

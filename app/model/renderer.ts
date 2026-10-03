@@ -2581,6 +2581,10 @@ export function createViewer(
       controls.update();
     },
     /** Draw the scene flat (orthographic, the default) or as a camera would see it (perspective). */
+    /** The camera drawing the scene now (orthographic or perspective), for projecting world points to the screen. */
+    getCamera(): T.OrthographicCamera | T.PerspectiveCamera {
+      return activeCamera();
+    },
     setProjection(next: Projection) {
       projection = next;
       syncPerspective();
