@@ -74,6 +74,9 @@ async function main() {
       return lot;
     },
   });
+  // `?debug=1` also exposes the viewer (setShot, getShot) for scripted close-ups.
+  if (new URLSearchParams(location.search).has('debug'))
+    (window as unknown as { seenViewer?: unknown }).seenViewer = viewer;
   // Real sun and sky for the moment being shown; `?at=` pins another moment for review, and the time slider in the
   // controls panel overrides both until Now is pressed.
   const parseAt = (at: string | null): Date | null => {

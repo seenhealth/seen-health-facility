@@ -558,52 +558,41 @@ export function buildAlhambraExterior(model: Facility) {
     padRise = (DROP_OFF.top - L_STREET) / (DROP_OFF.steps.count + 1);
   box(rackPad, pad.x, L_STREET, pad.z, pad.w, padRise, pad.d, '#c5c8c2');
   {
-    const rackBlack = '#1f2224',
-      loops = 4,
-      rz = pad.z - 0.25,
-      x0 = pad.x + pad.w / 2 - 0.25,
-      top = L_STREET + padRise + 0.85;
-    // Hoops 0.25 m apart along x, each a pair of posts joined by a rounded top.
+    // One bent black tube: three tall loops in a row running out from the wall, a base plate at each end.
+    const foot = L_STREET + padRise,
+      xs = pad.x + pad.w / 2 - 0.22,
+      rz = pad.z - 0.2,
+      pitch = 0.27,
+      loops = 3,
+      pts: T.Vector3[] = [new T.Vector3(xs, foot, rz)];
     for (let i = 0; i < loops; i++) {
-      const x = x0 - i * 0.25;
-      for (const dz of [-0.11, 0.11])
-        box(
-          rackPad,
-          x,
-          L_STREET + padRise,
-          rz + dz,
-          0.03,
-          0.72,
-          0.03,
-          rackBlack,
+      const x = xs - i * pitch;
+      pts.push(
+        new T.Vector3(x, foot + 0.78, rz),
+        new T.Vector3(x - pitch / 2, foot + 0.9, rz),
+      );
+      if (i < loops - 1)
+        pts.push(
+          new T.Vector3(x - pitch, foot + 0.78, rz),
+          new T.Vector3(x - pitch * 1.5, foot + 0.3, rz),
         );
-      beam(
-        rackPad,
-        [x, top - 0.13, rz - 0.11],
-        [x, top, rz],
-        0.03,
-        0.03,
-        rackBlack,
-      );
-      beam(
-        rackPad,
-        [x, top, rz],
-        [x, top - 0.13, rz + 0.11],
-        0.03,
-        0.03,
-        rackBlack,
-      );
     }
-    box(
+    const xe = xs - (loops - 1) * pitch - pitch;
+    pts.push(new T.Vector3(xe, foot + 0.78, rz), new T.Vector3(xe, foot, rz));
+    const tube = mesh(
       rackPad,
-      x0 - ((loops - 1) * 0.25) / 2,
-      L_STREET + padRise + 0.1,
-      rz,
-      (loops - 1) * 0.25 + 0.03,
-      0.03,
-      0.03,
-      rackBlack,
+      new T.TubeGeometry(
+        new T.CatmullRomCurve3(pts, false, 'centripetal'),
+        120,
+        0.024,
+        8,
+        false,
+      ),
+      '#16181a',
     );
+    tube.castShadow = true;
+    for (const x of [xs, xe])
+      box(rackPad, x, foot, rz, 0.16, 0.012, 0.16, '#4a4c4e');
   }
   // Drop-off landing along the lobby wall, its steps and the switchback ramp
   // (`DROP_OFF`).
@@ -726,7 +715,83 @@ export function buildAlhambraExterior(model: Facility) {
         bronze,
       );
   };
-  railRun(rails.landing);
+  // The landing's guard (photo 2026-10-02): nine bars under a top rail, posts bolted to the landing's face on
+  // bronze brackets; the same guard runs along its −z edge above the bike rack, wall to the head of the steps.
+  const guardBars = [
+    0.12, 0.225, 0.33, 0.435, 0.54, 0.645, 0.75, 0.855, 0.96, 1.05,
+  ];
+  {
+    const r = rails.landing;
+    for (let z = r.z0; z <= r.z1 + 0.01; z += 1.4) {
+      const zz = Math.min(z, r.z1);
+      box(landing, r.x, LAND.top - 0.2, zz, 0.04, 1.27, 0.04, bronze);
+      box(landing, r.x + 0.03, LAND.top - 0.2, zz, 0.025, 0.13, 0.2, bronze);
+    }
+    for (const dy of guardBars)
+      beam(
+        landing,
+        [r.x, LAND.top + dy, r.z0],
+        [r.x, LAND.top + dy, r.z1],
+        0.03,
+        dy > 1 ? 0.045 : 0.03,
+        bronze,
+      );
+    const gz = LAND.z0 - 0.05,
+      gx0 = LAND.x + LAND.w / 2 - 0.05,
+      gx1 = LAND.x - LAND.w / 2;
+    for (const x of [gx0, (gx0 + gx1) / 2, gx1]) {
+      box(landing, x, LAND.top - 0.2, gz, 0.04, 1.27, 0.04, bronze);
+      box(landing, x, LAND.top - 0.2, gz + 0.03, 0.2, 0.13, 0.025, bronze);
+    }
+    for (const dy of guardBars)
+      beam(
+        landing,
+        [gx0, LAND.top + dy, gz],
+        [gx1, LAND.top + dy, gz],
+        dy > 1 ? 0.045 : 0.03,
+        0.03,
+        bronze,
+      );
+  }
+  // Yellow nosings on the steps and the landing's edge above them, and the yellow tactile paving at their foot
+  // that turns along the walk toward the ramp's toe.
+  const nosing = '#d9a92a';
+  for (let i = 0; i <= steps.count; i++) {
+    const h = rise - (rise / (steps.count + 1)) * i,
+      xf = steps.x1 - steps.depth * i;
+    box(
+      landing,
+      xf - 0.035,
+      L_STREET + h,
+      stepsZ,
+      0.05,
+      0.006,
+      stepsW - 0.04,
+      nosing,
+    );
+  }
+  // Laid on the lot's surface at the painted markings' height (neighborhood.ts paints at −0.206).
+  const tactileY = -0.205;
+  box(
+    landing,
+    steps.x0 - 0.45,
+    tactileY,
+    stepsZ + 0.3,
+    0.9,
+    0.012,
+    stepsW + 0.6,
+    '#d8b23a',
+  );
+  box(
+    landing,
+    steps.x0 - 0.1,
+    tactileY,
+    (steps.z1 + 0.6 + lower.z0) / 2,
+    0.6,
+    0.012,
+    lower.z0 - steps.z1 - 0.6,
+    '#d8b23a',
+  );
   railRun(rails.upper);
   railRun(rails.lowerEast);
   railRun(rails.lowerWest);
@@ -1113,23 +1178,60 @@ export function buildAlhambraExterior(model: Facility) {
   // to its south; a camera dome high on the wall north of the door and a small sconce beside it. The bronze canopy,
   // its channel letters and the switchback ramp are drawn elsewhere.
   const lobby = group(facade, 'lobby-entry-portal-and-windows');
+  // Lobby entrance from the lot (photos 2026-10-02): a satin-aluminium portal round the sliding doors' opening
+  // (the envelope's shell-lobby-west-opening-3, z −1.746 to 0.004, 2.3 m high) with the door operator's band
+  // across its top (maker's label at the left) under the portal header (motion sensor); the leaves themselves
+  // are arrival.ts's (ENTRY_DOORS). Beside it on the stucco: the fire-alarm strobe to the left, a card reader
+  // on the right-hand jamb, then two tall, narrow silver-framed windows (in the envelope's window opening,
+  // z 0.204 to 1.604, with a pier between them) and a small red notice past them.
   const LOBBY_X = -14.653 - 0.125;
-  const aluBright = '#c3c6c8';
-  const ldZ = -0.6,
-    ldW = 2.2,
-    ldH = 2.5;
-  for (const sz of [ldZ - ldW / 2 - 0.16, ldZ + ldW / 2 + 0.16])
-    box(lobby, LOBBY_X - 0.15, 0, sz, 0.3, ldH + 0.32, 0.32, aluBright);
-  box(lobby, LOBBY_X - 0.15, ldH, ldZ, 0.3, 0.32, ldW + 0.64, aluBright);
-  box(lobby, LOBBY_X - 0.02, 0.02, ldZ, 0.03, ldH - 0.04, ldW, '#2a3338');
-  for (const sz of [ldZ, ldZ - ldW / 4, ldZ + ldW / 4])
-    box(lobby, LOBBY_X - 0.035, 0.02, sz, 0.02, ldH - 0.04, 0.05, aluBright);
-  box(lobby, LOBBY_X - 0.045, 1.85, ldZ - 0.55, 0.01, 0.1, 0.62, '#f3efe4');
-  box(lobby, LOBBY_X - 0.045, 1.7, ldZ - 0.55, 0.01, 0.1, 0.62, '#f3efe4');
-  for (const wz of [2.0, 3.5]) {
-    box(lobby, LOBBY_X - 0.045, 0.95, wz, 0.09, 1.55, 1.05, aluBright);
-    box(lobby, LOBBY_X - 0.1, 1.0, wz, 0.02, 1.45, 0.95, '#2a3338');
+  const sash = '#d6d4cc',
+    stucco = '#d0c3a7';
+  const opZ0 = -1.746,
+    opZ1 = 0.004,
+    ldZ = (opZ0 + opZ1) / 2,
+    ldW = opZ1 - opZ0,
+    ldH = 2.3;
+  for (const sz of [opZ0 - 0.08, opZ1 + 0.08])
+    box(lobby, LOBBY_X - 0.15, 0, sz, 0.3, ldH + 0.3, 0.16, sash);
+  box(lobby, LOBBY_X - 0.15, ldH, ldZ, 0.3, 0.3, ldW + 0.32, sash);
+  box(lobby, LOBBY_X - 0.1, 2.15, ldZ, 0.2, ldH - 2.15, ldW, sash);
+  box(lobby, LOBBY_X - 0.203, 2.2, opZ0 + 0.22, 0.004, 0.025, 0.16, '#77797a');
+  box(lobby, LOBBY_X - 0.33, 2.36, opZ1 - 0.3, 0.06, 0.07, 0.24, '#1d1f21');
+  box(lobby, LOBBY_X - 0.035, 2.12, opZ0 - 0.7, 0.07, 0.2, 0.18, '#ecebe6');
+  box(lobby, LOBBY_X - 0.072, 2.24, opZ0 - 0.7, 0.006, 0.05, 0.09, '#c8322c');
+  box(lobby, LOBBY_X - 0.32, 1.06, opZ1 + 0.08, 0.04, 0.16, 0.08, '#3a3d3f');
+  const win0 = 0.204,
+    win1 = 1.604,
+    pier = [0.83, 0.98];
+  box(
+    lobby,
+    LOBBY_X - 0.02,
+    0.65,
+    (pier[0] + pier[1]) / 2,
+    0.04,
+    1.65,
+    pier[1] - pier[0],
+    stucco,
+  );
+  for (const [a, b] of [
+    [win0, pier[0]],
+    [pier[1], win1],
+  ]) {
+    box(lobby, LOBBY_X - 0.045, 0.65, (a + b) / 2, 0.09, 1.65, b - a, sash);
+    box(
+      lobby,
+      LOBBY_X - 0.095,
+      0.71,
+      (a + b) / 2,
+      0.02,
+      1.53,
+      b - a - 0.12,
+      '#2a3338',
+    );
   }
+  box(lobby, LOBBY_X - 0.008, 1.42, 1.88, 0.012, 0.28, 0.2, '#f1efe9');
+  box(lobby, LOBBY_X - 0.016, 1.47, 1.88, 0.004, 0.18, 0.16, '#c73a32');
   const dome = mesh(
     lobby,
     new T.SphereGeometry(0.11, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2),

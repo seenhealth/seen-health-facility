@@ -18,6 +18,7 @@ import * as T from 'three';
 import {
   ARRIVAL,
   buildArrivalVan,
+  entryLeafZ,
   fadeVehicle,
   updateArrivalVan,
 } from './arrival';
@@ -1424,9 +1425,7 @@ export function createLiveLot(ctx: {
       const near = walkers.nearest(ARRIVAL.door[0], ARRIVAL.door[1]);
       entryOpen = tween(entryOpen, 1 - smooth(0.7, 2.6, near), RATE.entry, dt);
       leaves.forEach(
-        (g, i) =>
-          (g.position.z =
-            ARRIVAL.door[1] + (i ? 1 : -1) * (0.315 + entryOpen * 0.65)),
+        (g, i) => (g.position.z = entryLeafZ(i ? 1 : -1, entryOpen)),
       );
     }
   }

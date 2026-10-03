@@ -91,7 +91,13 @@ export function buildEnvelopeWall(
         w.thickness + 0.035,
         'frame',
       );
-    if (o.kind === 'door' && !o.operable && o.width > 1.3)
+    // The lobby's sliding doors (arrival.ts ENTRY_DOORS) meet in the middle; no fixed mullion there.
+    if (
+      o.kind === 'door' &&
+      !o.operable &&
+      o.width > 1.3 &&
+      o.id !== 'shell-lobby-west-opening-3'
+    )
       block(
         o.offset + o.width / 2 - frame / 2,
         o.sill,
