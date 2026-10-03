@@ -173,7 +173,13 @@ const RAMP_IN: WalkPoint[] = [
 ];
 
 type Mode =
-  'waiting' | 'arriving' | 'docked' | 'toBay' | 'parked' | 'leaving' | 'gone';
+  | 'waiting'
+  | 'arriving'
+  | 'docked'
+  | 'toBay'
+  | 'parked'
+  | 'leaving'
+  | 'gone';
 type Drive = {
   pieces: Piece[];
   length: number;
@@ -191,7 +197,11 @@ type Body = {
   foot: [number, number];
   /** Height of the sill above the ground: a lift van's floor, a step, a car's sill. */
   sillRise: number;
+  /** Vans and lift vans carry the slide-out ramp; `rampFoot` is where it meets the ground. */
   hasRamp: boolean;
+  rampFoot: [number, number] | null;
+  /** A lift van puts the ramp out for every party; a van only when someone uses a wheelchair. */
+  rampForAll: boolean;
 };
 type Dock = {
   phase: 'open' | 'unload' | 'close';
@@ -230,6 +240,9 @@ type Live = {
   cabTarget: number;
   /** The riders seen on board while inbound: the party that alights at the drop-off. */
   arriving: LivePerson[];
+  /** Set once this inbound visit has reached the drop-off, so a feed that still says `inbound` afterwards (the
+   * dispatch board re-posts every few seconds; the AVL feed lags) does not send the parked vehicle round again. */
+  visited: boolean;
   dock: Dock | null;
   /** Riders who have already walked out to this parked car. */
   boarded: Set<string>;
@@ -743,12 +756,11 @@ export function createLiveLot(ctx: {
         wheels: van.wheels.length ? van.wheels : vanWheels(van.root),
         wheelRadius: van.wheelRadius,
         sill: FLEET_VAN_RAMP.sill,
-        foot:
-          kind === 'wav'
-            ? FLEET_VAN_RAMP.foot
-            : [FLEET_VAN_RAMP.sill[0] + 0.9, FLEET_VAN_RAMP.sill[1]],
+        foot: [FLEET_VAN_RAMP.sill[0] + 0.9, FLEET_VAN_RAMP.sill[1]],
         sillRise: FLEET_VAN_RAMP.rise,
-        hasRamp: kind === 'wav',
+        hasRamp: true,
+        rampFoot: FLEET_VAN_RAMP.foot,
+        rampForAll: kind === 'wav',
       };
     }
     const car = buildLiveCar(kind, KIND_ACCENT[kind]);
@@ -763,6 +775,8 @@ export function createLiveLot(ctx: {
       foot: car.foot,
       sillRise: 0.2,
       hasRamp: false,
+      rampFoot: null,
+      rampForAll: false,
     };
   }
   function freeSpot(): number | null {
@@ -835,20 +849,42 @@ export function createLiveLot(ctx: {
     return { x: p.x, z: p.z };
   }
   /** From the vehicle's door into the lobby: down the ramp or a step, across the lot, up the steps or the accessible ramp. */
+  /** Where a rider gets down: the ramp's foot while it is out, else a step out from the sill. */
+  function footOf(l: Live, onRamp: boolean): [number, number] {
+    return onRamp && l.body.rampFoot ? l.body.rampFoot : l.body.foot;
+  }
+  /** Clear of the ramp: a stride straight on from the foot, so riders leave the ramp before they turn. */
+  const CLEAR = { ramp: 1.4, step: 0.6 };
   function alightPath(l: Live, wheelchair: boolean): WalkPoint[] {
-    const sill = world(l, l.body.sill),
-      foot = world(l, l.body.foot);
-    const rampLeg: WalkPoint[] = [
+    const onRamp = l.rampTarget > 0 && !!l.body.rampFoot,
+      f = footOf(l, onRamp),
+      sill = world(l, l.body.sill),
+      foot = world(l, f),
+      clear = world(l, [f[0] + (onRamp ? CLEAR.ramp : CLEAR.step), f[1]]);
+    return [
       { x: sill.x, z: sill.z, y: GROUND + l.body.sillRise },
       { x: foot.x, z: foot.z, y: GROUND, speed: WALK.ramp },
+      { x: clear.x, z: clear.z, y: GROUND },
+      ...(wheelchair ? RAMP_IN : STEPS_IN),
     ];
-    return [...rampLeg, ...(wheelchair ? RAMP_IN : STEPS_IN)];
+  }
+  /** Nobody on the ramp or within reach of it, so it can slide back in (and the doors shut) without hitting anyone. */
+  function rampClear(l: Live) {
+    if (!l.body.rampFoot) return true;
+    const [sx, sz] = l.body.sill,
+      [fx] = l.body.rampFoot;
+    for (let t = 0; t <= 1.001; t += 0.25) {
+      const p = world(l, [sx + (fx + CLEAR.ramp - sx) * t, sz]);
+      if (walkers.nearest(p.x, p.z) < 1.0) return false;
+    }
+    return true;
   }
   /** Out of the lobby to the vehicle's door: the alighting route in reverse, ending a step out from the sill and then on it. */
   function boardPath(l: Live, wheelchair: boolean): WalkPoint[] {
-    const sill = world(l, l.body.sill),
-      foot = world(l, l.body.foot),
-      out = world(l, [l.body.foot[0] + 1.6, l.body.foot[1]]);
+    const f = footOf(l, wheelchair && l.body.hasRamp),
+      sill = world(l, l.body.sill),
+      foot = world(l, f),
+      out = world(l, [f[0] + 1.6, f[1]]);
     const back = (pts: WalkPoint[]) =>
       [...pts].reverse().map((p, i, arr) => ({
         ...p,
@@ -900,6 +936,7 @@ export function createLiveLot(ctx: {
           rampTarget: 0,
           cabTarget: 0,
           arriving: v.state === 'inbound' ? (v.riders ?? []) : [],
+          visited: false,
           dock: null,
           boarded: new Set(),
           boardTimer: 0,
@@ -916,7 +953,8 @@ export function createLiveLot(ctx: {
         } else parkAt(l);
       } else {
         l.v = v;
-        if (v.state === 'inbound') {
+        if (v.state !== 'inbound') l.visited = false;
+        if (v.state === 'inbound' && !l.visited) {
           l.arriving = v.riders ?? [];
           if (l.mode === 'arriving')
             l.targetS = Math.max(l.s, approachTarget(v, l.drive!));
@@ -1038,7 +1076,12 @@ export function createLiveLot(ctx: {
   /** The drop-off: open up, let the party off one at a time, close up, then find a bay. */
   function dockTick(l: Live, dt: number) {
     const d = l.dock!;
-    const wantsRamp = l.body.hasRamp && d.queue.length > 0;
+    // A wheelchair rider always gets the ramp; a lift van puts it out for any party.
+    const wantsRamp =
+      l.body.hasRamp &&
+      (l.body.rampForAll
+        ? d.queue.length > 0
+        : d.queue.some((p) => p.wheelchair));
     if (d.phase === 'open') {
       l.doorTarget = 1;
       if (wantsRamp) l.rampTarget = 1;
@@ -1064,7 +1107,7 @@ export function createLiveLot(ctx: {
       return;
     }
     d.timer -= dt;
-    if (d.timer > 0) return;
+    if (d.timer > 0 || !rampClear(l)) return;
     l.rampTarget = 0;
     l.cabTarget = 0;
     if (l.ramp <= 0.01) l.doorTarget = 0;
@@ -1101,7 +1144,7 @@ export function createLiveLot(ctx: {
       }
     } else if (walking === 0 && (l.door > 0.01 || l.ramp > 0.01) && !l.dock) {
       l.closeTimer += dt;
-      if (l.closeTimer > 1.5) {
+      if (l.closeTimer > 1.5 && rampClear(l)) {
         l.rampTarget = 0;
         l.cabTarget = 0;
         if (l.ramp <= 0.01) l.doorTarget = 0;
@@ -1191,6 +1234,7 @@ export function createLiveLot(ctx: {
         if (l.s >= l.drive.length - 1e-6 && l.vel < 0.05) {
           l.mode = 'docked';
           l.vel = 0;
+          l.visited = true;
           l.dock = { phase: 'open', timer: 0, queue: [...l.arriving], n: 0 };
         }
       } else if (l.mode === 'docked') {
