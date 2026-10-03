@@ -1294,10 +1294,50 @@ export function buildAlhambraExterior(model: Facility) {
     0.14,
     '#cfd2d3',
   );
-  // Square window with a silver frame, sill 1.3 m up, south of the door.
-  const winZ = pz0 + 2.5 + 0.65;
-  box(court2, FACE_X + 0.03, 1.25, winZ, 0.08, 1.4, 1.4, alu);
-  box(court2, FACE_X + 0.085, 1.3, winZ, 0.02, 1.3, 1.3, glassDark);
+  // Two windows in silver frames, both 1.3 m tall with their tops level with the door's (2.45 m, photo
+  // 2026-10-03): the square one under the canopy, south of the door, and the wider one past the canopy's south end
+  // (the envelope's shell-rear-east-opening-1, z -11.04 to -9.72, given the same frame).
+  const winZ = pz0 + 2.5 + 0.65,
+    winTop = 2.45,
+    winH = 1.3;
+  box(
+    court2,
+    FACE_X + 0.03,
+    winTop - winH - 0.05,
+    winZ,
+    0.08,
+    winH + 0.1,
+    1.4,
+    alu,
+  );
+  box(court2, FACE_X + 0.085, winTop - winH, winZ, 0.02, winH, 1.3, glassDark);
+  {
+    const z0 = -11.04,
+      z1 = -9.72,
+      rim = 0.1;
+    for (const z of [z0 - rim / 2, z1 + rim / 2])
+      box(
+        court2,
+        FACE_X + 0.03,
+        winTop - winH - rim,
+        z,
+        0.08,
+        winH + 2 * rim,
+        rim,
+        alu,
+      );
+    for (const y of [winTop - winH - rim, winTop])
+      box(
+        court2,
+        FACE_X + 0.03,
+        y,
+        (z0 + z1) / 2,
+        0.08,
+        rim,
+        z1 - z0 + 2 * rim,
+        alu,
+      );
+  }
   // Raised concrete landing along the wall in front of the door and window, two steps up from the lot.
   const landW = 2.1,
     landZ0 = pz0 + 0.4,
