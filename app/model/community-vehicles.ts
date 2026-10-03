@@ -380,13 +380,16 @@ export const CENTER_LOT = {
   meals: { at: [-4, -27.7] as Vec2, dir: [1, 0] as Vec2 },
   courier: { at: [-16, -27.7] as Vec2, dir: [1, 0] as Vec2 },
   /**
-   * On foot from the courier's door (street side) round the car's nose and
-   * across the yard to rear receiving.
+   * On foot from the courier's door (street side) round the car's nose,
+   * across the yard south of the central block's corner (0, −22.44), and up
+   * the gap between its wall (x 0) and the rear court's palm island (x 1) to
+   * rear receiving.
    */
   receivingWalk: [
     [-13.2, -29.0],
     [-13.0, -25.6],
-    [-2, -24.0],
+    [0.5, -23.2],
+    [0.5, -18.0],
     [2.4, -16],
   ] as Vec2[],
   /** Where a courier stands to hand packs in, and the door it faces. */

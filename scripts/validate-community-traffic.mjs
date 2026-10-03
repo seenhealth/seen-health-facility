@@ -12,6 +12,7 @@ import { Vector3 } from 'three';
 import { sampleVan } from '../work/validation/arrival.mjs';
 import { streetSlabs } from '../work/validation/neighborhood.mjs';
 import { STUB_SIDEWALK } from '../work/validation/community-pads.mjs';
+import { REAR_COURT_PLANTERS } from '../work/validation/alhambra-exterior.mjs';
 import {
   fleetParking,
   fleetVanId,
@@ -422,6 +423,25 @@ const groundOrSite = activityData.actors.filter(
 );
 const nearCenter = (p) =>
   p.x >= siteX0 - 2 && p.x <= siteX1 + 2 && p.z >= siteZ0 - 2 && p.z <= siteZ1 + 2;
+// On the center's site, people on foot stay out of the building (its plan
+// outline) and a body's width clear of the rear court's planters.
+const building = model.site.buildingOutline;
+const inBuilding = (p) => {
+  let odd = false;
+  for (let i = 0, j = building.length - 1; i < building.length; j = i++) {
+    const [ax, az] = building[i],
+      [bx, bz] = building[j];
+    if (az > p.z !== bz > p.z && p.x < ((bx - ax) * (p.z - az)) / (bz - az) + ax)
+      odd = !odd;
+  }
+  return odd;
+};
+const BODY = 0.25;
+const inPlanter = (p) =>
+  REAR_COURT_PLANTERS.some(
+    ([x0, z0, x1, z1]) =>
+      p.x > x0 - BODY && p.x < x1 + BODY && p.z > z0 - BODY && p.z < z1 + BODY,
+  );
 let samples = 0,
   nearest = Infinity;
 for (let t = 0; t < 720; t += 0.5) {
@@ -439,6 +459,16 @@ for (let t = 0; t < 720; t += 0.5) {
       check(
         d >= 0.55,
         `${a.id} and ${b.id} are ${d.toFixed(2)} m apart at ${t}s ("${p.title}" / "${q.title}")`,
+      );
+    }
+    if (a.levelId === 'site' && !p.inVehicle && nearCenter(p)) {
+      check(
+        !inBuilding(p),
+        `${a.id} walks through the center's building at (${p.x.toFixed(2)}, ${p.z.toFixed(2)}), ${t}s ("${p.title}")`,
+      );
+      check(
+        !inPlanter(p),
+        `${a.id} walks through a rear court planter at (${p.x.toFixed(2)}, ${p.z.toFixed(2)}), ${t}s ("${p.title}")`,
       );
     }
     if (a.levelId === 'site' && !p.inVehicle && nearCenter(p))
