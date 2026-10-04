@@ -14,9 +14,13 @@ gm = bpy.data.materials.new('g'); gm.use_nodes = True; gm.node_tree.nodes['Princ
 cam = bpy.data.cameras.new('c'); cam.lens = 40; co = bpy.data.objects.new('c', cam); sc.collection.objects.link(co); sc.camera = co
 # three (x,y,z) -> blender (x,-z,y); views: name, three camera pos
 views = {'kerb': (9, 1.4, 0.0), 'driver': (-9, 1.4, 0.0), 'front34': (5.5, 2.2, -6.5), 'rear34': (-5.0, 2.4, 6.5), 'front': (0, 1.4, -9), 'rear': (0, 1.5, 9), 'top': (4, 9, 3)}
-for name, (x, y, z) in views.items():
+# close-ups of the glazing, to hold against the photos: driver's cab square on, kerb front quarter
+close = {'cab': ((-6.5, 1.6, -1.7), (-1.0, 1.6, -1.7)), 'cabfront': ((5.2, 2.0, -5.6), (0.3, 1.5, -1.6))}
+for name, spec in list(views.items()) + list(close.items()):
+    (x, y, z), (tx, ty, tz) = spec if name in close else (spec, (0, 1.25, 0))
+    cam.lens = 52 if name in close else 40
     co.location = Vector((x, -z, y))
-    d = Vector((0, 0, 1.25)) - co.location
+    d = Vector((tx, -tz, ty)) - co.location
     co.rotation_euler = d.to_track_quat('-Z', 'Y').to_euler()
     sc.render.filepath = f'{out}_{name}.png'
     bpy.ops.render.render(write_still=True)

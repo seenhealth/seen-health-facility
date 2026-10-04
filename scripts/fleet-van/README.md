@@ -1,8 +1,8 @@
 # Fleet van model
 
 `public/models/fleet-van.glb`: low-poly RAM ProMaster 3500 159" EXT high roof in Seen's livery, textured from
-photos of the real van (`sources/fleet-van/photos`, taken 2026-10-02; like the rest of `sources/` they stay local and out of git: driver-side, kerb-side, rear, front and two quarter views, 2856 px wide). ~5,800 triangles, one 2048 × 2304 atlas,
-1.4 MB. `app/model/fleet-van-model.ts` loads it; `buildArrivalVan` uses it once loaded and keeps the procedural
+photos of the real van (`sources/fleet-van/photos`, taken 2026-10-02; like the rest of `sources/` they stay local and out of git: driver-side, kerb-side, rear, front and two quarter views, 2856 px wide). ~7,800 triangles (budget ~10k), one 2048 × 2304
+atlas, 1.3 MB. `app/model/fleet-van-model.ts` loads it; `buildArrivalVan` uses it once loaded and keeps the procedural
 `fleet-van` asset as the fallback.
 
 ```bash
@@ -15,11 +15,23 @@ Needs Blender 4.2+ (`BLENDER=`) and a python with numpy + pillow (`PYTHON=`). Pr
   hubs (159" wheelbase, front axle at z −2.2) and the roof line, the rear near-orthographically, and crops the front
   and a rim. Plates are painted blank. A new atlas changes the GLB image hash: add it to
   `sources/public-texture-review.json` after looking at it.
-- `build_van.py`: side profile extruded to 2.08 m and bevelled, then exact booleans for the cabin, wheel wells,
-  windows, the twin-door opening and the driver's door leaf. UVs are chosen per face: side photo, rear photo, the
-  front photo by height bands, or a flat swatch (trim, interior, tyres).
+- `build_van.py`: side profile extruded to 2.08 m and rounded by one weighted bevel (roof, nose, tail 0.15 m, the
+  A-pillar 0.09 m), then exact booleans for the cabin, wheel wells, windows, the twin-door opening and the driver's
+  door leaf. UVs are chosen per face: side photo, rear photo, the front photo by height bands, or a flat swatch
+  (trim, interior, tyres). Static parts that share the atlas are joined into `van-body` (one draw call).
+- Glazing is measured on the photos, not guessed: the cab windows on the rectified side photos (A-pillar edge, level
+  top, rear edge, belt falling toward the nose, the black mirror sail at its foot, the vent division bar), the
+  windshield on the front photo (rounded rectangle, top corners r 0.16, wrapping round the pillar to x 0.985, frit
+  band, moulding, sensor housing, wipers parked as photographed). To check a change, overlay the outlines on the
+  atlas's side strips (315 px/m) and compare `preview_cab` / `preview_cabfront` with the photos. The side and rear
+  windows under the perforated wrap stay in the texture.
+- The kerb photo's cab sits ~9 cm behind the driver photo's (window edge, handle, shut line; the twin doors line up),
+  so `side_uv` shifts the kerb samples ahead of the door opening. Side faces within 6-10 cm of the windshield line
+  and the roof's leading curve sample further in: the A-pillar sits on the photos' silhouette, where the wall and
+  sky begin.
 - Frame and node names follow the procedural van so the scene code is unchanged: nose −z, kerb side +x, floor
-  0.58, `passenger-door-0/1`, `driver-door` (pivot on its front edge), `wheel-*` (local y = axle), `lamp-*`.
+  0.58, `passenger-door-0/1`, `driver-door` (pivot on its front edge, z −2.17; the window, sail and mirror ride on
+  it), `wheel-*` (local y = axle), `lamp-*`.
 
 ## Live-lot cars
 
