@@ -100,7 +100,7 @@ def refRoom(id,refs,note):
 dr=[photo_refs[n] for n in [1,2,3]]
 asset('photo-dining-chair','upholstered-chair',.55,.9,.57,'photo-seat',{'wood':'photo-chair-wood','metal':'photo-bronze'})
 asset('photo-lounge-chair','lounge-chair',.69,1.17,.86,'photo-blue-seat',{'wood':'photo-white','metal':'photo-white'})
-asset('photo-tree-seat','tree-seat',3.1,4.5,3.1,'photo-blue-seat',{'wood':'photo-chair-wood','trim':'photo-bronze','leaf':'leaf'})
+asset('photo-tree-seat','tree-seat',3.1,4.0,3.1,'photo-blue-seat',{'wood':'photo-chair-wood','trim':'photo-bronze','leaf':'leaf'})
 assets['plan-dining-table']['material']='photo-marble';assets['plan-round-table']['material']='photo-marble';assets['plan-banquette-table']['material']='photo-marble';assets['plan-lounge-table']['material']='photo-marble'
 assets['plan-banquette']['material']='photo-blue-seat'
 for o in objs:
