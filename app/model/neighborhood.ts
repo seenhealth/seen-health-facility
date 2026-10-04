@@ -616,14 +616,14 @@ export function buildNeighborhood(model: Facility) {
     [8.2, -29.3, -18.75],
   ]);
   // East of the aisle, by the alley (Street View May 2025 from the alley, camera solved against the court): two
-  // stalls side by side, nosed SSE (151 degrees) along the tree island's west edge; past their fronts the court
-  // opens east toward the dialysis center's aisle and its row, an arrow on the aisle marking the turn.
+  // stalls side by side, nosed SSE (151 degrees) along the tree island's west edge; beyond them the left-turn path
+  // runs east to the dialysis center's aisle and its row (north of the palm's island), an arrow marking it.
   row(151, [
     [30.75, -6.28, -0.88],
     [33.35, -6.28, -0.88],
     [35.95, -6.28, -0.88],
   ]);
-  arrow(23.6, -14.0, Math.PI - (75 * Math.PI) / 180);
+  arrow(25.6, -10.4, Math.PI / 2);
   // Abstract model trees: a slender trunk under soft, smooth canopy volumes.
   const canopyGeometry = new T.SphereGeometry(1, 28, 18);
   function tree(x: number, z: number, r: number, h: number, i: number) {
@@ -719,12 +719,10 @@ export function buildNeighborhood(model: Facility) {
       z = NB.z0 + 5 + Math.floor(i / 3) * 15;
     box(x, NB.h - 0.2, z, 1.6, 0.9, 1.3, '#b0b2a8');
   }
-  // Planters in the neighbour's lot: the one against our east wall north of the palm's island, and the round one by
-  // the accessible stall's access aisle at the Valley end (the dialysis side's is the curb island past its last stall).
-  for (const [x0, z0, x1, z1] of [
-    [29.8, -10.2, 33.4, -8.2],
-    [32.6, 24.0, 35.2, 26.8],
-  ]) {
+  // Planter in the neighbour's lot: the round one by the accessible stall's access aisle at the Valley end (the
+  // dialysis side's is the curb island past its last stall). None north of the palm's island: that is the court's
+  // left-turn path into the dialysis aisle (the dispatcher, 2026-10-04).
+  for (const [x0, z0, x1, z1] of [[32.6, 24.0, 35.2, 26.8]]) {
     patch(
       [
         [x0, z0],
