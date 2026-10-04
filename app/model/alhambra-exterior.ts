@@ -5,10 +5,16 @@ import { exteriorPrimitives } from './exterior-primitives';
 /**
  * Rear court planters as [x0, z0, x1, z1]: the palm cluster east of the
  * garage ramp's gate (photos 2026-10-02; the fan-palm island the 2025 imagery
- * showed in front of the electrical room is gone, cars park there). The
- * delivery trucks keep clear of it (validate-traffic).
+ * showed in front of the electrical room is gone, cars park there), and the
+ * staff entrance's second planter, north of its walkway, its east end rounded
+ * (bounds; photo 2026-10-03 and the satellite). The delivery trucks keep
+ * clear of them (validate-traffic), people walk round them
+ * (validate-community-traffic).
  */
-export const REAR_COURT_PLANTERS = [[15.45, -24.0, 17.7, -20.9]] as const;
+export const REAR_COURT_PLANTERS = [
+  [15.45, -24.0, 17.7, -20.9],
+  [15.42, -9.6, 20.3, -6.8],
+] as const;
 
 /**
  * The underground garage's ramp (photos 2026-10-02): between the loading
@@ -1061,7 +1067,7 @@ export function buildAlhambraExterior(model: Facility) {
   );
   // Rear court planters (REAR_COURT_PLANTERS).
   const court = group(site, 'rear-court-planters');
-  for (const [x0, z0, x1, z1] of REAR_COURT_PLANTERS) {
+  for (const [x0, z0, x1, z1] of REAR_COURT_PLANTERS.slice(0, 1)) {
     box(
       court,
       (x0 + x1) / 2,
@@ -1432,28 +1438,29 @@ export function buildAlhambraExterior(model: Facility) {
   // Dirt planter in front of the landing with its blue-painted curb; agave by the door, pygmy date palm by the window.
   // Its east curb is where the satellite shows it (x 19.35), beside the accessible stall's hatched access aisle.
   const plX0 = FACE_X + landW,
-    plX1 = 19.35;
+    plX1 = 19.35,
+    plZ0 = -5.3; // its north end, at the walkway out to the lot (photo 2026-10-03)
   box(
     court2,
     (plX0 + plX1) / 2,
     -0.23,
-    (landZ0 + landZ1) / 2,
+    (plZ0 + landZ1) / 2,
     plX1 - plX0,
     0.14,
-    landZ1 - landZ0,
+    landZ1 - plZ0,
     '#9a8663',
   );
   box(
     court2,
     plX1 - 0.08,
     -0.23,
-    (landZ0 + landZ1) / 2,
+    (plZ0 + landZ1) / 2,
     0.16,
     0.2,
-    landZ1 - landZ0,
+    landZ1 - plZ0,
     '#2d5aa6',
   );
-  for (const sz of [landZ0 + 0.08, landZ1 - 0.08])
+  for (const sz of [plZ0 + 0.08, landZ1 - 0.08])
     box(
       court2,
       (plX0 + plX1) / 2,
@@ -1464,7 +1471,113 @@ export function buildAlhambraExterior(model: Facility) {
       0.16,
       '#2d5aa6',
     );
-  palm(plX0 + 1.0, winZ - 0.4, 1.7, 1.2);
+  palm(plX0 + 0.5, winZ + 0.5, 1.9, 1.2);
+  // The second planter, north of the walkway (photo 2026-10-03, REAR_COURT_PLANTERS[1]): off the wall to a rounded
+  // east end between the walkway and the first parking stall, a concrete curb painted blue on the walkway side,
+  // two pygmy date palms with twin leaning trunks, one at the rounded end and one by the wall.
+  {
+    const [x0, z0, x1, z1] = REAR_COURT_PLANTERS[1],
+      r = (z1 - z0) / 2,
+      cz = (z0 + z1) / 2,
+      cx = x1 - r;
+    const outline = (inset: number) => {
+      const pts: [number, number][] = [
+        [x0 + 0.1, z0 + inset],
+        [cx, z0 + inset],
+      ];
+      for (let i = 1; i < 12; i++) {
+        const a = -Math.PI / 2 + (Math.PI * i) / 12;
+        pts.push([
+          cx + (r - inset) * Math.cos(a),
+          cz + (r - inset) * Math.sin(a),
+        ]);
+      }
+      pts.push([cx, z1 - inset], [x0 + 0.1, z1 - inset]);
+      return pts;
+    };
+    const shape = (pts: [number, number][]) =>
+      new T.Shape(pts.map(([x, z]) => new T.Vector2(x, -z)));
+    const curbShape = shape(outline(0));
+    curbShape.holes.push(
+      new T.Path(outline(0.16).map(([x, z]) => new T.Vector2(x, -z))),
+    );
+    const extrude = (sh: T.Shape, h: number) => {
+      const geo = new T.ExtrudeGeometry(sh, { depth: h, bevelEnabled: false });
+      geo.rotateX(-Math.PI / 2);
+      return geo;
+    };
+    mesh(court2, extrude(curbShape, 0.2), '#d3cfc5').position.y = -0.23;
+    mesh(court2, extrude(shape(outline(0.16)), 0.13), '#9a8663').position.y =
+      -0.23;
+    // the blue paint along the walkway side and round the rounded end's walkway half
+    box(
+      court2,
+      (x0 + cx) / 2 + 0.05,
+      -0.03,
+      z1 - 0.08,
+      cx - x0 - 0.1,
+      0.012,
+      0.17,
+      '#2d5aa6',
+    );
+    for (let k = 0; k < 6; k++) {
+      const a0 = (Math.PI / 2) * (k / 6),
+        a1 = (Math.PI / 2) * ((k + 1) / 6),
+        rr = r - 0.08;
+      beam(
+        court2,
+        [cx + rr * Math.cos(a0), -0.025, cz + rr * Math.sin(a0)],
+        [cx + rr * Math.cos(a1), -0.025, cz + rr * Math.sin(a1)],
+        0.17,
+        0.012,
+        '#2d5aa6',
+      );
+    }
+    const pygmy = (bx: number, bz: number, lean: [number, number][]) => {
+      const g = group(court2, 'pygmy-date-palm');
+      lean.forEach(([dx, dz], k) => {
+        const h = 2.1 + 0.3 * k,
+          top = new T.Vector3(bx + dx, h - 0.23, bz + dz),
+          base = new T.Vector3(bx, -0.1, bz),
+          trunk = mesh(
+            g,
+            new T.CylinderGeometry(0.1, 0.13, base.distanceTo(top), 8),
+            '#6f5b44',
+          );
+        trunk.position.copy(base).lerp(top, 0.5);
+        trunk.quaternion.setFromUnitVectors(
+          new T.Vector3(0, 1, 0),
+          top.clone().sub(base).normalize(),
+        );
+        // arching fronds: a dome of thin leaves, the inner ones near level, the outer ones drooping
+        for (let i = 0; i < 18; i++) {
+          const a = (i / 18) * Math.PI * 2 + k * 0.7,
+            ring = i % 3,
+            reach = [0.3, 0.5, 0.62][ring],
+            tilt = [-0.1, -0.45, -0.8][ring];
+          const frond = mesh(
+            g,
+            new T.BoxGeometry([0.7, 0.95, 1.05][ring], 0.03, 0.2),
+            i % 2 ? '#6a9450' : '#7fa35c',
+          );
+          frond.position.set(
+            top.x + Math.cos(a) * reach,
+            top.y + [0.22, 0.08, -0.12][ring],
+            top.z + Math.sin(a) * reach,
+          );
+          frond.rotation.set(0, -a, tilt);
+        }
+      });
+    };
+    pygmy(cx + 0.1, cz + 0.1, [
+      [-0.45, 0.35],
+      [0.5, -0.3],
+    ]);
+    pygmy(x0 + 1.3, cz - 0.6, [
+      [-0.3, -0.35],
+      [0.35, 0.3],
+    ]);
+  }
   const agave = group(court2, 'agave');
   for (let i = 0; i < 14; i++) {
     const a = (i / 14) * Math.PI * 2,
@@ -1992,8 +2105,8 @@ export function buildAlhambraExterior(model: Facility) {
       '#e4c23a',
     ).position.set(poleX, y, poleZ);
   box(court2, poleX, 8.6, poleZ, 1.8, 0.1, 0.1, '#7d6a55');
-  // Blue-painted curbs on the court's planter.
-  for (const [x0, z0, x1, z1] of REAR_COURT_PLANTERS) {
+  // Blue-painted curbs on the ramp-side planter.
+  for (const [x0, z0, x1, z1] of REAR_COURT_PLANTERS.slice(0, 1)) {
     const cx = (x0 + x1) / 2,
       cz = (z0 + z1) / 2;
     box(court2, cx, -0.05, z0 + 0.08, x1 - x0, 0.015, 0.16, '#2d5aa6');

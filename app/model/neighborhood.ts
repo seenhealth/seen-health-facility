@@ -591,6 +591,9 @@ export function buildNeighborhood(model: Facility) {
   for (let z = -2.1; z < 2.9; z += 0.8)
     strip([19.45, z + 0.6], [21.1, z], 0.08, SITE.accessible);
   accessSymbol(22.55, -1.6, 1.0, Math.PI);
+  // the walkway from the staff entrance's landing out between its two planters, hatched like the access aisle
+  for (let x = 18.1; x < 20.2; x += 0.75)
+    strip([x, -5.45], [x + 0.55, -6.65], 0.08, SITE.accessible);
   // Five more outside the staff entrance (photo 2026-10-02 from the alley: its camera solved against the building's
   // corners and garage door, each car placed by its licence plate's width, the painted lines traced). A one-way aisle
   // runs south between two rows of shallow angled stalls (x 20.5 -> 24.2): three west of it nosed SSW toward the
@@ -611,9 +614,9 @@ export function buildNeighborhood(model: Facility) {
     const at = (s: number): Vec2 => [c * n[0] + s * d[0], c * n[1] + s * d[1]];
     stall(at(s0), at(s1 + length));
   };
-  // (the first line stops at the entrance planter's curb)
+  // (the first line stops at the staff entrance's second planter, alhambra-exterior.ts REAR_COURT_PLANTERS[1])
   for (const [c, length] of [
-    [13.42, 4.1],
+    [13.42, 1.95],
     [10.67, 6.0],
     [7.92, 6.0],
   ])
