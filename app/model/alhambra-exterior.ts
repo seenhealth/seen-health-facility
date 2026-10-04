@@ -1630,6 +1630,126 @@ export function buildAlhambraExterior(model: Facility) {
   // beside the portal, an alarm box and a camera dome to its left. The canopy's four tie rods run from plates on
   // the wall down to its front edge.
   const LOBBY_X = -14.653 - 0.125;
+  // Three VISITORS PARKING ONLY signs on the lot-side wall (photos 2026-10-03), 12 x 18 in, 1.5 m up, each at the
+  // head of an angled stall: the first one stall past the line nearest the drop-off's steps (as photographed), the
+  // others every second stall toward the alley. Drawn to a canvas in the browser; headless a plain plate.
+  // South of the lobby the wall is the clinic's (shell-clinic-west, centred on x −14.78): its face is 0.12 m further out.
+  const CLINIC_FACE = -14.780318 - 0.12;
+  for (const sz of [-9.35, -14.75, -20.15]) {
+    const sw = 0.305,
+      sh = 0.457,
+      sy = -0.23 + 1.53;
+    if (typeof document === 'undefined') {
+      box(lobby, CLINIC_FACE - 0.01, sy - sh / 2, sz, 0.01, sh, sw, '#f4f4f0');
+      continue;
+    }
+    const W = 512,
+      H = 768,
+      canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    const g = canvas.getContext('2d')!;
+    const green = '#1e6b3c',
+      sans = 'Helvetica, Arial, sans-serif';
+    g.fillStyle = '#ffffff';
+    g.fillRect(0, 0, W, H);
+    g.strokeStyle = green;
+    g.lineWidth = 9;
+    g.beginPath();
+    g.roundRect(14, 14, W - 28, H - 28, 18);
+    g.stroke();
+    // the mark: three petals fanned from a point, teal to mint
+    for (const [a, c] of [
+      [-0.95, '#9fd8c6'],
+      [0, '#55b49c'],
+      [0.95, '#2f8f7b'],
+    ] as const) {
+      g.save();
+      g.translate(W * 0.24, H * 0.155);
+      g.rotate(a + Math.PI);
+      g.fillStyle = c;
+      g.beginPath();
+      g.ellipse(0, 30, 20, 34, 0, 0, Math.PI * 2);
+      g.fill();
+      g.restore();
+    }
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    g.fillStyle = '#3d4446';
+    g.font = `56px "PingFang SC", "Noto Sans SC", ${sans}`;
+    g.fillText('见心颐养', W * 0.62, H * 0.1);
+    g.font = `bold 32px ${sans}`;
+    g.fillText('SEEN HEALTH', W * 0.62, H * 0.175);
+    g.fillStyle = green;
+    for (const [t, y] of [
+      ['VISITORS', 0.3],
+      ['PARKING', 0.405],
+      ['ONLY', 0.51],
+    ] as const) {
+      g.font = `bold 84px ${sans}`;
+      const fit = Math.min(1, (W * 0.84) / g.measureText(t).width);
+      g.font = `bold ${Math.floor(84 * fit)}px ${sans}`;
+      g.fillText(t, W / 2, H * y);
+    }
+    // the green band: the tow-away warning and its pictogram
+    g.fillRect(14, H * 0.575, W - 28, H - 28 - H * 0.575 + 14);
+    g.fillStyle = '#ffffff';
+    g.font = `bold 30px ${sans}`;
+    g.fillText('UNAUTHORIZED VEHICLES', W / 2, H * 0.625);
+    g.fillText('TOWED AT VEHICLE', W / 2, H * 0.67);
+    g.fillText("OWNER'S EXPENSE", W / 2, H * 0.715);
+    g.strokeStyle = '#ffffff';
+    g.lineWidth = 5;
+    g.beginPath();
+    g.roundRect(W * 0.1, H * 0.755, W * 0.8, H * 0.18, 8);
+    g.stroke();
+    // a car lifted at its rear by a tow truck, in white
+    const py = H * 0.885;
+    g.beginPath();
+    g.moveTo(W * 0.14, py - 10);
+    g.lineTo(W * 0.14, py - 48);
+    g.lineTo(W * 0.24, py - 62);
+    g.lineTo(W * 0.38, py - 40);
+    g.lineTo(W * 0.42, py - 10);
+    g.closePath();
+    g.fill();
+    g.beginPath();
+    g.moveTo(W * 0.44, py - 10);
+    g.lineTo(W * 0.44, py - 34);
+    g.lineTo(W * 0.62, py - 34);
+    g.lineTo(W * 0.66, py - 66);
+    g.lineTo(W * 0.78, py - 66);
+    g.lineTo(W * 0.86, py - 34);
+    g.lineTo(W * 0.86, py - 10);
+    g.closePath();
+    g.fill();
+    g.lineWidth = 6;
+    g.beginPath();
+    g.moveTo(W * 0.38, py - 36);
+    g.lineTo(W * 0.6, py - 56);
+    g.stroke();
+    g.fillStyle = green;
+    for (const wx of [0.26, 0.54, 0.78]) {
+      g.beginPath();
+      g.arc(W * wx, py - 8, 17, 0, Math.PI * 2);
+      g.fill();
+      g.fillStyle = '#ffffff';
+      g.beginPath();
+      g.arc(W * wx, py - 8, 11, 0, Math.PI * 2);
+      g.fill();
+      g.fillStyle = green;
+    }
+    const map = new T.CanvasTexture(canvas);
+    map.colorSpace = T.SRGBColorSpace;
+    map.anisotropy = 4;
+    const plate = new T.Mesh(
+      new T.PlaneGeometry(sw, sh),
+      new T.MeshStandardMaterial({ map, roughness: 0.55 }),
+    );
+    plate.position.set(CLINIC_FACE - 0.012, sy, sz);
+    plate.rotation.y = -Math.PI / 2; // faces the lot (−x)
+    lobby.add(plate);
+  }
   const sash = '#d6d4cc',
     surround = '#ecebe6',
     bronzeRod = '#6b5845';
