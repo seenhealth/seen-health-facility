@@ -17,6 +17,7 @@ import {
   preloadLiveCarModels,
 } from '../../app/model/fleet-van-model';
 import { createSimPanel } from './sim';
+import { LOT_SPACES } from '../../app/model/live-lot-traffic';
 
 /**
  * Static page that shows Seen's real vehicles on the Alhambra lot. A parent
@@ -451,7 +452,7 @@ async function main() {
     const base: LiveMessage = real ?? {
       type: 'seen-live-lot',
       vehicles: [],
-      capacity: 12,
+      capacity: LOT_SPACES,
     };
     const msg: LiveMessage = sim
       ? { ...base, vehicles: [...base.vehicles, ...sim.vehicles] }

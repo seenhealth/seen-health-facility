@@ -1,10 +1,10 @@
 /**
- * Live lot traffic: the Alhambra lot's twelve spaces, and the way a vehicle
+ * Live lot traffic: the Alhambra lot's thirteen spaces, and the way a vehicle
  * drives from the drop-off into one and out of it again without driving
  * through anything that is standing on the lot.
  *
  * The lot is tight: a 4.5 m one-way aisle between a west row of 6.1 m stalls
- * (reversed into, nose toward the aisle) and five 5.76 m angled stalls along
+ * (reversed into, nose toward the aisle) and six 5.76 m angled stalls along
  * the building (nosed into), and the vehicles are long (a fleet van 6.35 m, a
  * full-size SUV 5.75 m, whose tail hangs out of an angled stall). No single
  * route into a space clears every neighbour in every state of the lot, so a
@@ -53,14 +53,18 @@ const L = FLEET_LOT,
  * spaces are taken 0.15 m off centre, toward the side nobody parks on (the
  * kerb at the south end, the hatched aisle at the north): the room that
  * leaves beside the one neighbour is what turning in and out of them needs.
- * 7-11: the angled stalls along the building south to north, nose in, the
- * nose's corner `wallGap` short of the wall; cars only.
+ * 7-12: the angled stalls along the building south to north, nose in, the
+ * nose's corner `wallGap` short of the wall; cars only. Space 7 has no
+ * painted line on its south side: it is the room between the first line and
+ * the palm island at the alley corner, 2.3 m across at its mouth (the island's
+ * tip) against the others' 2.5 m, so a car there stands off the stall pitch,
+ * 0.16 m from the tip and just inside the line (the turn in clears the tip).
  */
 export const LOT_STALLS = {
   westZ: [-21.8, -18.85, -16.05, -13.25, -10.45, -7.65, -4.7],
   westTailX: -30.9,
   westNoseX: -25.0,
-  angledZ: [0, 1, 2, 3, 4].map((j) => -19.15 + 2.7 * j),
+  angledZ: [-21.67, ...[0, 1, 2, 3, 4].map((j) => -19.15 + 2.7 * j)],
   /** The way a car faces nosed into an angled stall (the stall lines run from (-20.4, z) to (-15.0, z - 2)). */
   angledDir: Math.atan2(5.4, -2),
   wallX: -14.65,
@@ -379,6 +383,16 @@ const ANGLED_TURNS: AngledTurn[] = (
     [-22, 0, 0, 4],
     [-22, 8, 20, 4],
     [-22.75, 6, 15, 4],
+    // The end stall by the palm island, whose tip narrows its mouth: from the far side of the aisle, a long straight
+    // and a wide last arc, so the car is square to the stall as it passes the tip.
+    [-23.5, 18, 15, 3.5],
+    [-23.5, 18, 10, 3.5],
+    [-23, 10, 30, 4],
+    [-22.75, 12, 15, 3.5],
+    [-23.25, 14, 15, 3.5],
+    // ...and, with the lot full round it, a tight first arc and a long wide one onto the stall's line.
+    [-22.75, 13, 15, 3],
+    [-22.75, 16, 15, 3],
   ] as const
 ).map(([x, r2, a2, r1]) => ({ x, r2, a2: a2 * DEG, r1 }));
 

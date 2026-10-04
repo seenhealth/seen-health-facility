@@ -6,7 +6,7 @@
  * due, stops at the drop-off, opens up (sliding door, then the ramp on a lift
  * van, the driver's door while the ramp is out), lets its riders off one by
  * one (each a figure who walks, or rolls up the accessible ramp, into the
- * lobby), closes up, parks in one of the lot's twelve spaces (a van reverses
+ * lobby), closes up, parks in one of the lot's thirteen spaces (a van reverses
  * into the west row, a car noses into an angled stall along the building),
  * waits, and pulls out by the alley driveway and fades when the dispatch app
  * says it is gone. Riders marked as boarding walk out of the lobby to a parked

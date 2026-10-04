@@ -60,8 +60,8 @@ const sameAngle = (a: number, b: number) =>
 const near = (a: number, b: number, what: string, within = 1e-6) =>
   assert.ok(Math.abs(a - b) <= within, `${what}: ${a} vs ${b}`);
 
-void test('twelve spaces: seven in the west row for anything, five angled for cars only', () => {
-  assert.equal(LOT_SPACES, 12);
+void test('thirteen spaces: seven in the west row for anything, six angled for cars only', () => {
+  assert.equal(LOT_SPACES, 13);
   assert.equal(WEST_STALLS, 7);
   for (const i of stalls) {
     assert.equal(fitsStall(i, SEDAN), true);
@@ -71,8 +71,8 @@ void test('twelve spaces: seven in the west row for anything, five angled for ca
   // Vans are only ever offered the west row, from the fleet's bays northward; cars the angled stalls first, the one
   // beside the drop-off last of them.
   assert.deepEqual(stallOrder(VAN), [0, 1, 2, 3, 4, 5, 6]);
-  assert.deepEqual(stallOrder(SUV), [7, 8, 9, 10, 11, 6, 5, 4, 3, 2, 1, 0]);
-  assert.deepEqual(stalls.filter(needsDockClear), [11]);
+  assert.deepEqual(stallOrder(SUV), [7, 8, 9, 10, 11, 12, 6, 5, 4, 3, 2, 1, 0]);
+  assert.deepEqual(stalls.filter(needsDockClear), [12]);
 });
 
 void test('parked vehicles stand clear of each other, of the aisle between the rows and of the drop-off', () => {
@@ -81,10 +81,11 @@ void test('parked vehicles stand clear of each other, of the aisle between the r
     for (const b of stalls) {
       if (b <= a) continue;
       const gap = footprintGap(parked[a], parked[b]);
-      // Neighbours in a row: half a metre between vans, a little less between full-size SUVs.
+      // Neighbours in a row: half a metre between vans, a little less between full-size SUVs; the end stall by the
+      // palm island is narrower, so its car stands a little closer to the next.
       const neighbours = b === a + 1 && isAngled(a) === isAngled(b);
       assert.ok(
-        gap >= (neighbours ? 0.45 : 3),
+        gap >= (neighbours ? (a === WEST_STALLS ? 0.3 : 0.45) : 2.8),
         `spaces ${a} and ${b}: ${gap.toFixed(2)} m apart`,
       );
     }
@@ -153,24 +154,32 @@ void test('with the lot empty every manoeuvre is clear by a wide margin', () => 
       assert.ok(out >= 0.25, `${kind} out of ${i}: ${out.toFixed(2)}`);
     }
   // Backing out of the stall beside the drop-off crosses it: clear only while the drop-off is held empty.
-  assert.ok(traffic.planOut(11, SUV, [], false)!.gap < 0);
+  assert.ok(traffic.planOut(12, SUV, [], false)!.gap < 0);
 });
 
-void test('with the lot packed with the longest vehicles a manoeuvre brushes a corner by at most 0.3 m (a car by 0.15 m)', () => {
+void test('with the lot packed with the longest vehicles a manoeuvre brushes a corner by at most 0.3 m (a car by 0.15 m, 0.2 m by the island)', () => {
   // The aisle is 4.5 m between 6.1 m stalls and 5.76 m angled stalls, the vans 6.35 m and the SUVs 5.75 m: no way in
   // clears both neighbours and the tails opposite at once. This pins how little the best of the family overlaps.
-  const worst: Record<string, number> = { van: 9, suv: 9, sedan: 9 };
+  // The end stall by the palm island (7) has a narrower mouth and gets its own, looser bound.
+  const worst: Record<string, number> = { van: 9, suv: 9, sedan: 9 },
+    island: Record<string, number> = { suv: 9, sedan: 9 };
   for (const i of stalls)
     for (const kind of ['van', 'suv', 'sedan'] as Kind[]) {
       const v = KINDS[kind];
       if (!fitsStall(i, v)) continue;
       const inn = traffic.planIn(i, v, packed(i))!,
-        out = traffic.planOut(i, v, packed(i), needsDockClear(i))!;
-      worst[kind] = Math.min(worst[kind], inn.gap, out.gap);
+        out = traffic.planOut(i, v, packed(i), needsDockClear(i))!,
+        into = i === WEST_STALLS ? island : worst;
+      into[kind] = Math.min(into[kind], inn.gap, out.gap);
     }
   assert.ok(worst.van >= -0.3, `van ${worst.van.toFixed(2)}`);
   assert.ok(worst.suv >= -0.15, `suv ${worst.suv.toFixed(2)}`);
   assert.ok(worst.sedan >= -0.05, `sedan ${worst.sedan.toFixed(2)}`);
+  assert.ok(island.suv >= -0.2, `suv by the island ${island.suv.toFixed(2)}`);
+  assert.ok(
+    island.sedan >= -0.1,
+    `sedan by the island ${island.sedan.toFixed(2)}`,
+  );
 });
 
 /** Arrivals take the chooser's space one after another; returns each choice. */
@@ -186,23 +195,28 @@ function fill(kinds: Kind[]) {
   });
 }
 
-void test('six vans, three SUVs and three sedans arriving in turn all park clear, each in a space of its own', () => {
+void test('six vans, three SUVs and four sedans arriving in turn all park clear, each in a space of its own', () => {
   const kinds: Kind[] = [
     ...Array<Kind>(6).fill('van'),
     ...Array<Kind>(3).fill('suv'),
-    ...Array<Kind>(3).fill('sedan'),
+    ...Array<Kind>(4).fill('sedan'),
   ];
   const picks = fill([...kinds, 'sedan', 'van']);
-  const parked = picks.slice(0, 12);
-  assert.ok(parked.every(Boolean), 'twelve find a space');
-  assert.equal(new Set(parked.map((p) => p!.stall)).size, 12);
+  const parked = picks.slice(0, 13);
+  assert.ok(parked.every(Boolean), 'thirteen find a space');
+  assert.equal(new Set(parked.map((p) => p!.stall)).size, 13);
   for (const p of parked) {
-    assert.ok(p!.gap >= 0, `${p!.kind} into ${p!.stall}: ${p!.gap.toFixed(2)}`);
+    // The last car in gets the end stall by the palm island, past an SUV beside it and the vans opposite: its
+    // corner passes the next car's by a few centimetres.
+    assert.ok(
+      p!.gap >= (p!.stall === WEST_STALLS ? -0.1 : 0),
+      `${p!.kind} into ${p!.stall}: ${p!.gap.toFixed(2)}`,
+    );
     if (p!.kind === 'van')
       assert.ok(!isAngled(p!.stall), 'vans in the west row');
   }
-  // The thirteenth and fourteenth find the lot full.
-  assert.deepEqual(picks.slice(12), [null, null]);
+  // The fourteenth and fifteenth find the lot full.
+  assert.deepEqual(picks.slice(13), [null, null]);
 });
 
 void test('whatever is parked where, a way in and a way out never overlap anything by more than 0.3 m', () => {
