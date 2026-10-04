@@ -4,7 +4,7 @@
 
 Each side photo is rectified onto the van's side plane with a homography fitted to the hubs and the roof
 line (model metres: z along the van, nose at -z; y up), the rear is near-orthographic, and the front is
-mapped band by band in build_van.py. Pixel coordinates below are on the 5712 x 4284 originals; the stored
+projected through its solved camera in build_van.py. Pixel coordinates below are on the 5712 x 4284 originals; the stored
 photos are half size and are scaled back up on load. Licence plates are painted blank.
 """
 import json, os, sys, numpy as np
@@ -50,15 +50,15 @@ d = ImageDraw.Draw(rear)
 atlas.paste(rear, (0, y0))
 meta['rear'] = {'rect': [0, y0, 589, 632], 'u': ['x', *RX], 'v': RY}
 
-# Front: crop the photo around the van; bands map model y -> photo row, with a per-band px/m (display px x4 = original).
+# Front: crop the photo around the van (5712 px coordinates).
 FX0, FY0, FX1, FY1 = 1240, 560, 4380, 3640
 front = photo(6).crop((FX0, FY0, FX1, FY1)).resize((630, 618), Image.LANCZOS)
 fx = 600
 atlas.paste(front, (fx, y0))
-# (y, row_display, px_per_m_display, centre_x_display)
-bands = [(0.33, 893, 339, 697), (0.98, 600, 341, 700), (1.08, 510, 335, 695), (1.26, 455, 305, 700),
-         (2.36, 250, 280, 702), (2.58, 165, 247, 688)]
-meta['front'] = {'rect': [fx, y0, 630, 618], 'crop': [FX0, FY0, FX1, FY1], 'bands': bands}
+meta['front'] = {'rect': [fx, y0, 630, 618], 'crop': [FX0, FY0, FX1, FY1]}
+# the front and front-quarter photos' solved cameras (solve_cameras.py): build_van.py textures the front through the
+# front camera and casts the headlamp outline traced on the driver's quarter photo onto the skin
+meta['cams'] = json.load(open(os.path.join(HERE, 'cameras.json')))
 
 # Rim: rear wheel of the driver-side photo, hub (4218, 2778), tyre radius ~255 px
 rim = photo(2).crop((4218 - 260, 2778 - 260, 4218 + 260, 2778 + 260)).resize((280, 280), Image.LANCZOS)

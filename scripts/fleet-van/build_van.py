@@ -27,12 +27,19 @@ WR, AR = 0.375, 0.48   # tyre radius, wheel-well radius
 WFZ, WRZ = -2.2, 1.84  # axle z (159" wheelbase)
 FLOOR = 0.58
 ROOF = 2.58
-BEV = 0.15         # roof, nose and tail rounding
+BEV = 0.15         # roof, hood edges and tail rounding
+NOSE_R = 0.45      # the nose's corners in plan, below the hood's top (the bumper's and the headlamps' sweep)
 PB = 0.09          # A-pillar rounding: the windshield wraps round it to ~97% of the width (front photo)
-# Side profile (z, y), nose first; windshield runs (-2.50, 1.26) -> (-1.48, 2.38)
-NOSE = [(-3.175, 0.34), (-3.20, 0.46), (-3.205, 0.66), (-3.185, 0.80), (-3.16, 0.95), (-3.11, 1.03), (-3.03, 1.09),
-        (-2.80, 1.17), (-2.50, 1.26)]
-PROFILE = NOSE + [(-1.48, 2.38), (-1.40, 2.47), (-1.26, 2.545), (-1.05, ROOF), (3.10, ROOF), (3.155, 2.555),
+# Side profile (z, y), nose first, measured with the solved cameras (cameras.json) and the hood lettering triangulated
+# between the front and front-quarter photos: the grille stands nearly upright (its lower chrome notch at z -3.10,
+# y 0.73); the hood rises almost vertically from its front edge over the grille (y 1.07) to y 1.25 ("SEEN HEALTH"
+# sits on that face), rounds over by y 1.34 and runs nearly level back to the cowl (y 1.37 on the centre line, 1.43 at
+# the sides); the windshield line runs (-2.43, 1.485) -> (-1.48, 2.38).
+NOSE = [(-3.175, 0.34), (-3.20, 0.46), (-3.205, 0.62), (-3.16, 0.70), (-3.115, 0.78), (-3.10, 0.95), (-3.085, 1.04),
+        (-3.08, 1.07), (-3.07, 1.15), (-3.062, 1.22), (-3.045, 1.27), (-3.01, 1.31), (-2.96, 1.34), (-2.88, 1.355),
+        (-2.75, 1.362), (-2.62, 1.367), (-2.53, 1.37)]
+WS0, WS1 = (-2.43, 1.485), (-1.48, 2.38)
+PROFILE = NOSE + [WS0, WS1, (-1.40, 2.47), (-1.26, 2.545), (-1.05, ROOF), (3.10, ROOF), (3.155, 2.555),
                   (3.175, 2.50), (3.175, 0.44), (3.10, SILL), (-3.05, SILL)]
 def nose_z(y):
     """z of the nose profile at height y (front face, before the corner bevel)."""
@@ -42,7 +49,6 @@ def nose_z(y):
     return NOSE[-1][0]
 
 # Windshield frame: s runs up the glass from the cowl line, off is outward (toward -z, +y), x across.
-WS0, WS1 = (-2.50, 1.26), (-1.48, 2.38)
 WL = math.hypot(WS1[0] - WS0[0], WS1[1] - WS0[1])
 WEZ, WEY = (WS1[0] - WS0[0]) / WL, (WS1[1] - WS0[1]) / WL
 WNZ, WNY = WEY, -WEZ                     # unit normal into the cab
@@ -57,8 +63,9 @@ def pillar_depth(x):
     a = abs(x) - (HW - PB)
     return 0.0 if a <= 0 else PB - math.sqrt(max(0.0, PB * PB - a * a))
 # The glass: a rounded rectangle wrapping into the pillars, 12 mm inside the skin (front photo: top corners
-# r ~0.16, bottom ~0.06, the glass reaching x 0.985 of the 1.04 half width).
-WG = dict(xw=0.985, s0=0.06 * WL, s1=0.94 * WL, rb=0.06, rt=0.16)
+# r ~0.16, bottom ~0.06, the glass reaching x 0.985 of the 1.04 half width), from just above the cowl up to y 2.21,
+# under the teal band of the high roof's cap.
+WG = dict(xw=0.985, s0=0.03 * WL, s1=0.81 * WL, rb=0.06, rt=0.16)
 def ws_glass_off(x):
     return -(pillar_depth(x) + 0.012)
 
@@ -173,7 +180,8 @@ def smooth(o, angle=35):
     me.set_sharp_from_angle(angle=math.radians(angle))
 
 # ---------------------------------------------------------------- body solid with rounded corners
-# One weighted bevel: roof, nose and tail at BEV, the A-pillar tighter (PB), easing between them.
+# One weighted bevel (weights are fractions of NOSE_R): the nose's upright corners at NOSE_R, easing to BEV where the
+# hood rounds over; roof and tail at BEV, the A-pillar tighter (PB).
 bm = prism(PROFILE, -HW, HW)
 bw = bm.edges.layers.float.new('bevel_weight_edge')
 def side_edges(pred):
@@ -184,31 +192,41 @@ def side_edges(pred):
             out.append(e)
     return out
 near = lambda p, q: abs(p.z - q[0]) < 1e-3 and abs(p.y - q[1]) < 1e-3
+k = BEV / NOSE_R
 for e in side_edges(lambda a, b: min(a.y, b.y) > 2.37 and max(a.z, b.z) < 3.12):       # roof
-    e[bw] = 0.8 if any(near(T(v.co), WS1) for v in e.verts) else 1.0
-for e in side_edges(lambda a, b: max(a.z, b.z) <= -2.49):                                  # nose
-    e[bw] = 0.8 if any(near(T(v.co), WS0) for v in e.verts) else 1.0
-for e in side_edges(lambda a, b: min(a.z, b.z) > -2.51 and max(a.z, b.z) < -1.47):        # A-pillar
-    e[bw] = PB / BEV
+    e[bw] = k * (0.8 if any(near(T(v.co), WS1) for v in e.verts) else 1.0)
+for e in side_edges(lambda a, b: max(a.z, b.z) <= NOSE[-1][0] + 0.01):                     # nose
+    ym = sum(T(v.co).y for v in e.verts) / 2
+    e[bw] = 0.8 * k if any(near(T(v.co), NOSE[-1]) for v in e.verts) else \
+        k + (1 - k) * min(1.0, max(0.0, (1.355 - ym) / (1.355 - 1.30)))
+for e in side_edges(lambda a, b: min(a.z, b.z) > NOSE[-1][0] - 0.01 and max(a.z, b.z) < -1.47):  # cowl, A-pillar
+    e[bw] = PB / NOSE_R
 for e in side_edges(lambda a, b: min(a.z, b.z) >= 3.09 and min(a.y, b.y) > 2.45):          # roof into the tail
-    e[bw] = 0.8 if min(T(v.co).z for v in e.verts) < 3.12 else 0.55
+    e[bw] = k * (0.8 if min(T(v.co).z for v in e.verts) < 3.12 else 0.55)
 for e in side_edges(lambda a, b: min(a.z, b.z) > 3.17 and abs(a.y - b.y) > 0.5):           # rear corners
-    e[bw] = 0.4
+    e[bw] = k * 0.4
 body = new_obj('van-body', bm)
 mod = body.modifiers.new('bevel', 'BEVEL')
-mod.limit_method = 'WEIGHT'; mod.width = BEV; mod.segments = 6; mod.profile = 0.5
+mod.limit_method = 'WEIGHT'; mod.width = NOSE_R; mod.segments = 7; mod.profile = 0.5
 mod.affect = 'EDGES'; mod.use_clamp_overlap = True
 apply_modifiers(body)
 # split the side faces at the nose zone and at the fascia line, so UVs can be chosen per region
 bm = bmesh.new(); bm.from_mesh(body.data)
+# the front fenders narrow toward the headlamps (their outer ends sit at x 0.96-0.97, triangulated): ahead of the cowl
+# and above the black fascia the body pulls in by up to 7%
+def taper(x, y, z):
+    t = min(1.0, max(0.0, (-2.45 - z) / 0.45)); g = min(1.0, max(0.0, (y - 0.95) / 0.12))
+    return x * (1 - 0.07 * t * g)
+for v in bm.verts:
+    p = T(v.co); v.co = B(taper(p.x, p.y, p.z), p.y, p.z)
 for co, no in [((0, 0, -2.72), (0, 0, 1)), ((0, 0.98, 0), (0, 1, 0))]:
     geom = bm.verts[:] + bm.edges[:] + bm.faces[:]
     bmesh.ops.bisect_plane(bm, geom=geom, plane_co=B(*co), plane_no=B(*no) - B(0, 0, 0))
 bm.to_mesh(body.data); bm.free()
 
 # ---------------------------------------------------------------- cabin, wheel wells, openings
-inner = [(-2.47, FLOOR), (3.12, FLOOR), (3.12, 2.52), (-1.05, 2.52), (-1.33, 2.47), (-1.46, 2.33),
-         (-2.47, 1.22)]
+inner = [(-2.39, FLOOR), (3.12, FLOOR), (3.12, 2.52), (-1.05, 2.52), (-1.33, 2.47), (-1.44, 2.336),
+         (-2.39, 1.441)]
 ic = cutter(prism(inner, -HW + 0.05, HW - 0.05), 'inner')
 for zc in (WFZ, WRZ):
     for s in (-1, 1):
@@ -354,7 +372,7 @@ blade(-0.74, 0.12, 0.28, 0.33)
 # rain-sensor and mirror housing at the top of the glass, behind it, on the frit
 hs = [(-0.18, WG['s1'] - 0.03), (0.18, WG['s1'] - 0.03), (0.15, WG['s1'] - 0.17), (-0.15, WG['s1'] - 0.17)]
 solid(trim, [ws(x, s, ws_glass_off(x) - 0.006) for x, s in hs], [ws(x, s, ws_glass_off(x) - 0.06) for x, s in hs])
-# front: wrap-around bumper (textured from the front photo), chrome grille surround
+# front: wrap-around bumper (textured from the front photo, like the grille and its chrome surround)
 bumper = bmesh.new()
 plan = [(-1.0, -2.95), (-1.04, -3.02), (-1.0, -3.12), (-0.86, -3.19), (-0.55, -3.225), (0.55, -3.225),
         (0.86, -3.19), (1.0, -3.12), (1.04, -3.02), (1.0, -2.95)]
@@ -362,13 +380,10 @@ def prism_y(points_xz, y0, y1, bmx):
     solid(bmx, [B(x, y0, z) for x, z in points_xz], [B(x, y1, z) for x, z in points_xz])
 prism_y(plan, 0.30, 0.62, bumper)
 prism_y([(x * 0.96, z + 0.03) for x, z in plan], 0.62, 0.66, bumper)
-gz = nose_z(0.80) - 0.035
-for x0, x1, y0g, y1g in ((-0.70, 0.70, 0.91, 0.94), (-0.67, 0.67, 0.665, 0.69), (-0.70, -0.67, 0.665, 0.94), (0.67, 0.70, 0.665, 0.94)):
-    box(x0, x1, y0g, y1g, gz - 0.04, gz + 0.03, chrome)
 # kerb-side cab door handle (the driver's rides on its door)
 box(HW - 0.01, HW + 0.03, 1.26, 1.32, -1.32, -1.18, trim)
-for x in (-0.6, -0.3, 0.0, 0.3, 0.6):
-    box(x - 0.05, x + 0.05, ROOF - 0.01, ROOF + 0.045, -1.16, -1.06, markers)
+for x in (-0.65, -0.225, 0.0, 0.225, 0.65):     # where the camera solve puts them, on the roof's front curve
+    box(x - 0.05, x + 0.05, 2.53, 2.595, -1.28, -1.18, markers)
 bmesh.ops.bevel(markers, geom=markers.edges[:], offset=0.012, segments=1, affect='EDGES', clamp_overlap=True)
 
 lamps = {k: bmesh.new() for k in ('head', 'tail', 'brake', 'reverse')}
@@ -376,15 +391,63 @@ def pad(bmx, x0, x1, y0, y1, z, facing):
     zz = z + facing * 0.004
     vs = [bmx.verts.new(B(x, y, zz)) for x, y in ((x0, y0), (x1, y0), (x1, y1), (x0, y1))]
     face(bmx, vs, (0, 0, facing))
-# headlamps: the swept lens from the grille's top corner out and up round the nose corner (front photo:
-# inner end x 0.57 at y 0.95-0.99, outer end x 0.98 at y 1.04-1.085), laid on the skin
-HEAD = [(0.57, 0.952, 0.992), (0.66, 0.968, 1.022), (0.76, 0.988, 1.050), (0.86, 1.010, 1.070), (0.93, 1.026, 1.080),
-        (0.98, 1.040, 1.085)]
+# headlamps: the lens outline traced on the driver's front-quarter photo and the front photo, triangulated through
+# their solved cameras (the top edge and the outer edge cross the epipolar lines well; the near-level bottom edge is
+# the front camera's rays on the lens surface fitted to the rest), then laid on the skin; the kerb lamp is the mirror.
+CAMS = A['cams']
+def camera_ray(name, u, v):
+    c = CAMS['cameras'][name]; R = Matrix(c['R']); t = Vector(c['t']); f = CAMS['focal']; w, h = CAMS['size']
+    d = R.transposed() @ Vector(((u - w / 2) / f, (v - h / 2) / f, 1.0))
+    return -(R.transposed() @ t), d.normalized()
+LAMP_TOP = [(-0.493, 1.096, -3.088), (-0.544, 1.156, -3.034), (-0.599, 1.218, -2.988), (-0.652, 1.247, -2.918),
+            (-0.727, 1.269, -2.846), (-0.812, 1.289, -2.783), (-0.886, 1.303, -2.711), (-0.939, 1.312, -2.617),
+            (-0.960, 1.307, -2.544)]
+LAMP_EDGE = [(-0.971, 1.277, -2.568), (-0.962, 1.223, -2.608), (-0.945, 1.166, -2.668)]
+LAMP_BOT_PX = [(1882, 1201), (1981, 1188), (2031, 1168), (2049, 1162)]      # front photo, driver lamp
+# lens surface z = a + b x + c y + d x^2, fitted to the triangulated points
+pts = LAMP_TOP + LAMP_EDGE
+rows = [(1, x, y, x * x) for x, y, _ in pts]
+M4 = Matrix([[sum(r[i] * r[j] for r in rows) for j in range(4)] for i in range(4)])
+rhs = Vector([sum(r[i] * p[2] for r, p in zip(rows, pts)) for i in range(4)])
+cf = M4.inverted() @ rhs
+lens_z = lambda x, y: cf[0] + cf[1] * x + cf[2] * y + cf[3] * x * x
+def on_lens(u, v):
+    o, d = camera_ray('front', u, v); t = 0.0
+    for _ in range(30):                       # march along the ray to the fitted surface
+        p = o + d * t; g = p.z - lens_z(p.x, p.y)
+        dz = d.z - (cf[1] + 2 * cf[3] * p.x) * d.x - cf[2] * d.y
+        t -= g / dz
+    p = o + d * t; return (p.x, p.y, p.z)
+LAMP_BOT = [LAMP_TOP[0]] + [on_lens(*q) for q in LAMP_BOT_PX] + LAMP_EDGE[::-1]
+def resample3(line, n):
+    seg = [(Vector(b) - Vector(a)).length for a, b in zip(line, line[1:])]; tot = sum(seg); out = []
+    for k in range(n):
+        t, i = tot * k / (n - 1), 0
+        while i < len(seg) - 1 and t > seg[i]: t -= seg[i]; i += 1
+        out.append(Vector(line[i]).lerp(Vector(line[i + 1]), min(1.0, t / seg[i])))
+    return out
+LN = 12
+top3 = resample3(LAMP_TOP, LN)
+bot3 = resample3(LAMP_BOT + [LAMP_TOP[-1]], LN)
+def skin_point(p, lift):
+    """The nearest point of the skin to p, lifted off it along its normal (outward: away from the van's middle)."""
+    hit, n, _, _ = SKIN.find_nearest(B(*p))
+    if (hit - B(0, 0, hit.z)).dot(n) < 0: n = -n
+    return hit + n * lift
+for sx in (1, -1):
+    ends = {i: lamps['head'].verts.new(skin_point((sx * top3[i].x, top3[i].y, top3[i].z), 0.006)) for i in (0, LN - 1)}
+    grid = []
+    for k in (0.0, 0.5, 1.0):
+        row = []
+        for i, (a, b) in enumerate(zip(top3, bot3)):
+            q = a.lerp(b, k)
+            row.append(ends[i] if i in ends else lamps['head'].verts.new(skin_point((sx * q.x, q.y, q.z), 0.006)))
+        grid.append(row)
+    for r0, r1 in zip(grid, grid[1:]):
+        for i in range(LN - 1):
+            quad = list(dict.fromkeys([r0[i], r0[i + 1], r1[i + 1], r1[i]]))
+            face(lamps['head'], quad, (0, 0.2, -1))
 for s in (-1, 1):
-    bot = [lamps['head'].verts.new(on_skin((s * x, y0, -4.0), (0, 0, 1), 0.004)) for x, y0, _ in HEAD]
-    top = [lamps['head'].verts.new(on_skin((s * x, y1, -4.0), (0, 0, 1), 0.004)) for x, _, y1 in HEAD]
-    for i in range(len(HEAD) - 1):
-        face(lamps['head'], [bot[i], bot[i + 1], top[i + 1], top[i]], (0, 0.3, -1))
     pad(lamps['tail'], *sorted((s * 0.91, s * 1.01)), 1.40, 1.59, 3.19, 1)
     pad(lamps['reverse'], *sorted((s * 0.91, s * 1.01)), 1.15, 1.39, 3.19, 1)
     pad(lamps['brake'], *sorted((s * 0.91, s * 1.01)), 0.94, 1.14, 3.19, 1)
@@ -404,10 +467,10 @@ for zc in (0.65, 1.55, 2.45):
 box(0.47, 0.97, 0.86, 1.0, 2.01, 2.49, seats)
 box(0.47, 0.97, 1.0, 1.55, 2.45, 2.56, seats)
 bmesh.ops.bevel(seats, geom=seats.edges[:], offset=0.03, segments=1, affect='EDGES', clamp_overlap=True)
-prism([(-2.47, 0.85), (-2.12, 0.85), (-2.08, 1.08), (-2.14, 1.20), (-2.30, 1.25), (-2.46, 1.21)], -0.98, 0.98, seats)
+prism([(-2.39, 0.85), (-2.25, 0.85), (-2.19, 1.05), (-2.13, 1.25), (-2.22, 1.40), (-2.38, 1.43)], -0.98, 0.98, seats)
 wheel_ring = bmesh.new()
 bmesh.ops.create_cone(wheel_ring, cap_ends=False, segments=16, radius1=0.19, radius2=0.19, depth=0.04,
-                      matrix=Matrix.Translation(B(-0.55, 1.22, -2.2)) @ Matrix.Rotation(math.radians(-55), 4, 'X'))
+                      matrix=Matrix.Translation(B(-0.55, 1.28, -2.06)) @ Matrix.Rotation(math.radians(-55), 4, 'X'))
 interior_obj = new_obj('van-interior', seats)
 
 # ---------------------------------------------------------------- UVs
@@ -443,17 +506,17 @@ def rear_uv(p):
     r = A['rear']; x, y, w, h = r['rect']; _, u0, u1 = r['u']; v0, v1 = r['v']
     return atlas_uv(x + (p.x - u0) / (u1 - u0) * w, y + (v1 - p.y) / (v1 - v0) * h)
 def front_uv(p):
-    r = A['front']; x, y, w, h = r['rect']; X0, Y0, X1, Y1 = r['crop']; bands = r['bands']
-    yy = min(max(p.y, bands[0][0]), bands[-1][0])
-    for (ya, ra, sa, ca), (yb, rb, sb, cb) in zip(bands, bands[1:]):
-        if yy <= yb:
-            t = (yy - ya) / (yb - ya); row = ra + (rb - ra) * t; ppm = sa + (sb - sa) * t; cx = ca + (cb - ca) * t
-            break
-    ox, oy = 4 * (cx - ppm * p.x), 4 * row
+    """Through the front photo's solved camera: the front of the van is textured where the photo shows it."""
+    r = A['front']; x, y, w, h = r['rect']; X0, Y0, X1, Y1 = r['crop']
+    c = CAMS['cameras']['front']; f = CAMS['focal']; cw, ch = CAMS['size']
+    q = Matrix(c['R']) @ Vector((p.x, p.y, p.z)) + Vector(c['t'])
+    u, v = cw / 2 + f * q.x / q.z, ch / 2 + f * q.y / q.z
+    ox = min(max(2 * u, X0), X1); oy = min(max(2 * v, Y0), Y1)      # the atlas crop is on the 5712 px original
     return atlas_uv(x + (ox - X0) / (X1 - X0) * w, y + (oy - Y0) / (Y1 - Y0) * h)
 def swatch(name):
     return atlas_uv(*SW[name])
 
+FRONT_EYE = Vector(CAMS['cameras']['front']['centre'])
 def classify(f, verts):
     n = T(f.normal); c = sum(verts, Vector()) / len(verts)
     for zc in (WFZ, WRZ):
@@ -469,6 +532,8 @@ def classify(f, verts):
         return 'black'
     if abs(n.x) > 0.55:
         if c.z < -2.72:
+            if n.dot((FRONT_EYE - c).normalized()) > 0.3:
+                return 'front'
             return 'black' if c.y < 0.98 else 'teal'
         return 'right' if n.x > 0 else 'left'
     if n.z > 0.55:
