@@ -760,15 +760,18 @@ export function buildAlhambraExterior(model: Facility) {
   const landTop = 0.5,
     wallZ = 7.0,
     wallX0 = doorX - 1.5,
-    wallX1 = -18.1;
+    wallX1 = -18.1,
+    // the walkway and the steps run from the block wall's back face (no gap between them) to the wing's face
+    walkZ0 = wallZ + 0.15,
+    walkZ1 = 8.9;
   box(
     lotDoor,
     (wallX0 + wallX1) / 2,
     -0.23,
-    8.1,
+    (walkZ0 + walkZ1) / 2,
     wallX1 - wallX0,
     landTop + 0.23,
-    1.6,
+    walkZ1 - walkZ0,
     '#c5c8c2',
   );
   const run = 0.35,
@@ -778,19 +781,28 @@ export function buildAlhambraExterior(model: Facility) {
       lotDoor,
       wallX0 - run / 2 - run * i,
       -0.23,
-      8.1,
+      (walkZ0 + walkZ1) / 2,
       run,
       landTop + 0.23 - riseStep * (i + 1),
-      1.6,
+      walkZ1 - walkZ0,
       '#c5c8c2',
     );
   const stairFoot = wallX0 - run * 4;
-  box(lotDoor, wallX0 - 0.05, landTop, 7.35, 0.035, 0.95, 0.035, steel);
-  box(lotDoor, stairFoot + 0.05, -0.23, 7.35, 0.035, 0.95, 0.035, steel);
+  box(lotDoor, wallX0 - 0.05, landTop, walkZ0 + 0.1, 0.035, 0.95, 0.035, steel);
+  box(
+    lotDoor,
+    stairFoot + 0.05,
+    -0.23,
+    walkZ0 + 0.1,
+    0.035,
+    0.95,
+    0.035,
+    steel,
+  );
   beam(
     lotDoor,
-    [wallX0 - 0.05, landTop + 0.95, 7.35],
-    [stairFoot + 0.05, -0.23 + 0.95, 7.35],
+    [wallX0 - 0.05, landTop + 0.95, walkZ0 + 0.1],
+    [stairFoot + 0.05, -0.23 + 0.95, walkZ0 + 0.1],
     0.035,
     0.035,
     steel,
