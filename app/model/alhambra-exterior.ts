@@ -1395,8 +1395,9 @@ export function buildAlhambraExterior(model: Facility) {
     bronze,
   );
   // Dirt planter in front of the landing with its blue-painted curb; agave by the door, pygmy date palm by the window.
+  // Its east curb is where the satellite shows it (x 19.35), beside the accessible stall's hatched access aisle.
   const plX0 = FACE_X + landW,
-    plX1 = plX0 + 3.0;
+    plX1 = 19.35;
   box(
     court2,
     (plX0 + plX1) / 2,
@@ -1428,11 +1429,11 @@ export function buildAlhambraExterior(model: Facility) {
       0.16,
       '#2d5aa6',
     );
-  palm(plX0 + 1.6, winZ - 0.4, 1.7, 1.2);
+  palm(plX0 + 1.0, winZ - 0.4, 1.7, 1.2);
   const agave = group(court2, 'agave');
   for (let i = 0; i < 14; i++) {
     const a = (i / 14) * Math.PI * 2,
-      r = 0.9 + (i % 3) * 0.25,
+      r = 0.55 + (i % 3) * 0.15,
       h = 0.7 + (i % 4) * 0.2;
     beam(
       agave,

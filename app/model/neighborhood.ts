@@ -96,17 +96,20 @@ const CURB_ISLANDS_PX = [
     [3070, 328],
     [2860, 455],
   ],
+  // The fan palm's island at the head of the angled row along our east wall, one stall wide between the row's
+  // lines (satellite, 2026-10-03): x 30.4 -> 35.95 between the 49-degree lines at z -7.0 and -4.26 (at x 30.4).
   [
-    [2780, 997],
-    [2960, 997],
-    [2990, 1340],
-    [2780, 1400],
+    [2823, 907],
+    [3041, 1158],
+    [3041, 1265],
+    [2823, 1015],
   ],
+  // The planter against our east wall at the row's foot, x 29.75 -> 31.4, z 21.9 -> 26.8.
   [
-    [2830, 2205],
-    [2870, 2040],
-    [2900, 2040],
-    [2900, 2200],
+    [2797, 2043],
+    [2862, 2043],
+    [2862, 2235],
+    [2797, 2235],
   ],
   [
     [3210, 2180],
@@ -506,7 +509,7 @@ export function buildNeighborhood(model: Facility) {
   arrow(-22.5, -6, Math.PI);
   arrow(-22.5, -16, Math.PI);
   arrow(37.7, -16.7, Math.PI);
-  arrow(37.7, 12.1, Math.PI);
+  arrow(37.7, 16.8, Math.PI);
   // Crosswalks, blue loading access and parking bays are geometry rather than a photograph.
   // Crosswalk across Valley on the east side of Ethel, between the two walks.
   for (let z = 31.9; z < 40.6; z += 0.85)
@@ -541,14 +544,34 @@ export function buildNeighborhood(model: Facility) {
     'strip-1300-building';
   for (let k = 0; k <= 10; k++)
     stall([-30.5 + 2.5 * k, -35.8], [-30.5 + 2.5 * k, -40.1]);
-  // The neighbour's lot: angled stalls along the dialysis center and along our
-  // east wall, one-way north up the aisle (arrows), the hatched accessible
-  // stall at the Valley end.
-  for (let z = -17; z <= 12; z += 3) stall([45.1, z], [39.7, z + 2.4]);
-  for (let z = -6; z <= 15; z += 3) stall([30.3, z], [35.5, z - 2.4]);
-  for (let x = 30.6; x < 35.2; x += 0.9)
-    strip([x, 15.4], [x + 1.4, 17.4], 0.08, SITE.accessible);
-  accessSymbol(34.6, 14.2, 1.0, Math.PI / 2);
+  // The lot between our east wall and the dialysis center (satellite, 2026-10-03, lines found by a Hough fit to within
+  // a few cm): one-way north up a 3.5 m aisle (x 35.95 -> 39.5, arrows), angled stalls either side entered heading
+  // north, so both rows lean the same way: along the dialysis center at 54 degrees to the aisle's cross line, lines
+  // every 4.68 m from the aisle (x 39.5) to its walk (x 44.45); along our east wall at 49 degrees, lines every ~3.7 m
+  // from the agave strip (x 30.4) to the aisle (x 35.95), after the fan palm's island: four stalls, the accessible
+  // stall (its symbol by the aisle) and its hatched access aisle, then the planters at the Valley end.
+  for (let k = -3; k <= 5; k++) {
+    const c = -2.24 + 4.68 * k;
+    stall([39.5, c], [44.45, c - 6.88]);
+  }
+  const eastRow = [-1.08, 2.46, 6.04, 10.02, 13.87, 17.62, 21.37],
+    eastSlope = 1.15,
+    eastLine = (c: number, x: number): Vec2 => [x, c + eastSlope * (x - 30.4)];
+  for (const c of eastRow) stall(eastLine(c, 30.4), eastLine(c, 35.95));
+  for (let x = 30.6; x < 35.6; x += 0.8)
+    strip(
+      eastLine(eastRow[5], x),
+      eastLine(eastRow[6], x + 0.55),
+      0.08,
+      SITE.accessible,
+    );
+  accessSymbol(34.9, 21.4, 1.0, Math.atan2(5.55, 5.55 * eastSlope));
+  // In the court by the staff entrance, nosed toward the east block's wall (z 3.51): the hatched access aisle beside
+  // the entrance's planter (x 19.35 -> 21.2), the accessible stall with its symbol at the court end, two more stalls.
+  for (const x of [21.2, 23.9, 26.33, 29.15]) stall([x, -2.4], [x, 3.3]);
+  for (let z = -2.1; z < 2.9; z += 0.8)
+    strip([19.45, z + 0.6], [21.1, z], 0.08, SITE.accessible);
+  accessSymbol(22.55, -1.6, 1.0, Math.PI);
   // Abstract model trees: a slender trunk under soft, smooth canopy volumes.
   const canopyGeometry = new T.SphereGeometry(1, 28, 18);
   function tree(x: number, z: number, r: number, h: number, i: number) {
@@ -596,11 +619,10 @@ export function buildNeighborhood(model: Facility) {
     [276, 1496, 2.6, 4.6],
     [276, 1988, 2.1, 4.0],
     [2945, 376, 3.4, 5.2],
-    [3153, 632, 2.8, 4.6],
-    [2858, 946, 1.0, 1.8],
-    [2858, 1064, 1.0, 1.8],
-    [2917, 2047, 1.1, 2.0],
-    [3334, 2007, 1.1, 2.0],
+    [3393, 435, 2.8, 4.6], // on the dialysis center's walk: its canopy shades the stalls, not a trunk in the aisle
+    [2941, 1072, 1.0, 1.8],
+    [2961, 2188, 1.1, 2.0],
+    [3341, 2099, 1.1, 2.0],
     [4152, 278, 2.4, 4.5],
     [4152, 671, 2.6, 4.8],
     [4152, 1064, 2.3, 4.4],
@@ -645,12 +667,11 @@ export function buildNeighborhood(model: Facility) {
       z = NB.z0 + 5 + Math.floor(i / 3) * 15;
     box(x, NB.h - 0.2, z, 1.6, 0.9, 1.3, '#b0b2a8');
   }
-  // Planters in the neighbour's lot: along our east wall, and either side of
-  // its Valley Blvd entrance.
+  // Planters in the neighbour's lot: the one against our east wall north of the palm's island, and the round one by
+  // the accessible stall's access aisle at the Valley end (the dialysis side's is the curb island past its last stall).
   for (const [x0, z0, x1, z1] of [
-    [30.0, -10.3, 32.6, -6.8],
-    [30.0, 19.0, 35.5, 24.6],
-    [41.6, 19.0, 45.1, 23.0],
+    [29.8, -10.2, 33.4, -8.2],
+    [32.6, 24.0, 35.2, 26.8],
   ]) {
     patch(
       [
