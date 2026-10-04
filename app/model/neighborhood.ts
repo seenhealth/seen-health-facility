@@ -594,35 +594,33 @@ export function buildNeighborhood(model: Facility) {
   // the walkway from the staff entrance's landing out between its two planters, hatched like the access aisle
   for (let x = 18.1; x < 20.2; x += 0.75)
     strip([x, -5.45], [x + 0.55, -6.65], 0.08, SITE.accessible);
-  // Five more outside the staff entrance (photo 2026-10-02 from the alley: its camera solved against the building's
-  // corners and garage door, each car placed by its licence plate's width, the painted lines traced). A one-way aisle
-  // runs south between two rows of shallow angled stalls (x 20.5 -> 24.2): three west of it nosed SSW toward the
-  // entrance's planter and the fence (lines on bearing 206 degrees, 2.75 m apart, the last stall bounded by the palm
-  // island's curb), two east of it nosed SSE (bearing 153 degrees).
-  const angled = (
-    bearing: number,
-    c: number,
-    rearX: number,
-    length: number,
-  ) => {
+  // Five more outside the staff entrance, either side of a one-way aisle running south, measured from two photos
+  // taken 23 s apart on 2026-10-02 (the alley view, each car placed by its licence plate's width, and the view of the
+  // entrance, which shows the first car's front tyre at the second planter's curb). As [c, s from, s to] along each
+  // row's bearing (s forward along the stall, c across it): three west of the aisle nosed SSW (206 degrees, 2.45 m
+  // stalls), their noses stepping from the second planter's curb to the ramp's rail, the last stall bounded by the
+  // cactus planter; two east of it nosed SSE (158 degrees, 2.6 m) toward the agave strip along the neighbour's lot.
+  const row = (bearing: number, lines: number[][]) => {
     const b = (bearing * Math.PI) / 180,
       d = [Math.sin(b), -Math.cos(b)],
-      n = [d[1], -d[0]],
-      s1 = (rearX - c * n[0]) / d[0],
-      // the rear end stays on the yard, clear of the alley's roadway (z -28.6)
-      s0 = Math.max(s1, (-28.6 - c * n[1]) / d[1]);
-    const at = (s: number): Vec2 => [c * n[0] + s * d[0], c * n[1] + s * d[1]];
-    stall(at(s0), at(s1 + length));
+      n = [d[1], -d[0]];
+    const at = (c: number, s: number): Vec2 => [
+      c * n[0] + s * d[0],
+      c * n[1] + s * d[1],
+    ];
+    for (const [c, s0, s1] of lines) stall(at(c, s0), at(c, s1));
   };
-  // (the first line stops at the staff entrance's second planter, alhambra-exterior.ts REAR_COURT_PLANTERS[1])
-  for (const [c, length] of [
-    [13.42, 1.95],
-    [10.67, 6.0],
-    [7.92, 6.0],
-  ])
-    angled(206, c, 20.5, length);
-  for (const c of [29.37, 32.12, 34.87]) angled(153, c, 24.2, 6.0);
-  // Abstract model trees  // Abstract model trees: a slender trunk under soft, smooth canopy volumes.
+  row(206, [
+    [13.15, -22.0, -17.32],
+    [10.65, -24.6, -16.9],
+    [8.2, -29.3, -18.75],
+  ]);
+  row(158, [
+    [27.85, -2.73, 2.77],
+    [30.45, -7.79, 2.77],
+    [33.05, -7.79, -2.29],
+  ]);
+  // Abstract model trees: a slender trunk under soft, smooth canopy volumes.
   const canopyGeometry = new T.SphereGeometry(1, 28, 18);
   function tree(x: number, z: number, r: number, h: number, i: number) {
     const [a, b] = px(x, z),

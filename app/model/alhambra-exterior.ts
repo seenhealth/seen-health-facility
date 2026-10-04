@@ -12,9 +12,19 @@ import { exteriorPrimitives } from './exterior-primitives';
  * (validate-community-traffic).
  */
 export const REAR_COURT_PLANTERS = [
-  [15.45, -24.0, 17.7, -20.9],
+  [15.45, -24.3, 17.3, -20.6],
   [15.42, -9.6, 20.3, -6.8],
 ] as const;
+/**
+ * The cactus planter's outline beside the ramp's gate: its east curb runs with the angled stalls (206 degrees),
+ * bounding the northernmost one (alley photo 2026-10-02); REAR_COURT_PLANTERS[0] is the part the validators test.
+ */
+export const RAMP_PLANTER: Vec2[] = [
+  [15.45, -20.6],
+  [16.48, -20.6],
+  [18.28, -24.3],
+  [15.45, -24.3],
+];
 
 /**
  * The underground garage's ramp (photos 2026-10-02): between the loading
@@ -192,7 +202,7 @@ export function buildAlhambraExterior(model: Facility) {
   facade.name = 'alhambra-brochure-facade';
   roof.name = 'alhambra-brochure-roof';
   site.name = 'alhambra-brochure-street-edge';
-  const { box, beam, group, mesh, batch } = exteriorPrimitives();
+  const { box, beam, group, mesh, patch, batch } = exteriorPrimitives();
   const L_STREET = -0.23;
   // Streetscape group and palette, declared up front because the wing's palm
   // island (built with the facade) shares the palm and colours.
@@ -1067,30 +1077,29 @@ export function buildAlhambraExterior(model: Facility) {
   );
   // Rear court planters (REAR_COURT_PLANTERS).
   const court = group(site, 'rear-court-planters');
-  for (const [x0, z0, x1, z1] of REAR_COURT_PLANTERS.slice(0, 1)) {
-    box(
+  // the cactus planter by the ramp's gate (RAMP_PLANTER): a plain concrete curb round gravel, its east side running
+  // with the angled stalls
+  {
+    const cxp =
+        RAMP_PLANTER.reduce((t, p) => t + p[0], 0) / RAMP_PLANTER.length,
+      czp = RAMP_PLANTER.reduce((t, p) => t + p[1], 0) / RAMP_PLANTER.length;
+    patch(court, RAMP_PLANTER, -0.23, 0.18, '#dcd7cd');
+    patch(
       court,
-      (x0 + x1) / 2,
-      -0.23,
-      (z0 + z1) / 2,
-      x1 - x0,
-      0.18,
-      z1 - z0,
-      '#dcd7cd',
-    );
-    box(
-      court,
-      (x0 + x1) / 2,
+      RAMP_PLANTER.map(([x, z]): Vec2 => [
+        x + (cxp - x) * 0.12,
+        z + (czp - z) * 0.12,
+      ]),
       -0.05,
-      (z0 + z1) / 2,
-      x1 - x0 - 0.3,
       0.02,
-      z1 - z0 - 0.3,
-      '#8c7a5c',
+      '#a0937c',
     );
   }
   palm(16.3, -23.2, 2.2, 1.3);
-  palm(16.9, -21.7, 1.6, 1.1);
+  palm(16.3, -21.5, 1.6, 1.1);
+  const cactus = mesh(court, new T.SphereGeometry(0.3, 12, 8), '#7d9a5e');
+  cactus.position.set(17.3, -0.02, -23.4);
+  cactus.scale.set(1, 0.8, 1);
   // The clinic's alley face (photo 2026-10-03; the 2025 Street View roll-up is gone): the grey service door (the
   // envelope's opening 1) with two white panel labels, a wall pack above it (night-lights.ts) and a yellow bollard either side; the
   // barred window east of it (opening 2); a galvanised gutter run along the wall, falling from both ends to a
@@ -1389,8 +1398,9 @@ export function buildAlhambraExterior(model: Facility) {
   box(court2, FACE_X + 0.02, winTop - winH, winZ, 0.02, winH, 1.3, glassDark);
   frameAround(-11.04, -9.72, winTop - winH, winTop, true);
   // Raised concrete landing along the wall in front of the door and window, two steps up from the lot.
+  // It ends at the walkway out between the two planters (z −6.8 → −5.3), which a short ramp drops into.
   const landW = 2.1,
-    landZ0 = pz0 + 0.4,
+    landZ0 = -6.8,
     landZ1 = pz1 + 0.3;
   box(
     court2,
@@ -1403,7 +1413,7 @@ export function buildAlhambraExterior(model: Facility) {
     '#c5c8c2',
   );
   // Bronze pipe rails: two bars along the landing's front edge in front of the door, a return to the wall at the
-  // north end, and a single handrail on posts continuing south past the window.
+  // north end, and a single handrail on posts continuing south past the window to the walkway, which stays open.
   const railX2 = FACE_X + landW - 0.08;
   const rail2 = [landZ1 - 0.05, doorZ - doorW / 2 - 0.9];
   for (const sz of [rail2[0], (rail2[0] + rail2[1]) / 2, rail2[1]])
@@ -1425,12 +1435,16 @@ export function buildAlhambraExterior(model: Facility) {
     0.035,
     bronze,
   );
-  for (const sz of [rail2[1] - 1.4, rail2[1] - 2.8, landZ0 + 0.1])
+  const walkRamp = mesh(court2, new T.BoxGeometry(1.25, 0.08, 1.5), '#c5c8c2');
+  walkRamp.position.set(FACE_X + landW + 0.6, -0.15, -6.05);
+  walkRamp.rotation.z = -Math.atan2(0.23, 1.25);
+  const railEnd = -5.2; // the walkway's south side
+  for (const sz of [(rail2[1] + railEnd) / 2, railEnd])
     box(court2, railX2, 0, sz, 0.04, 0.95, 0.04, bronze);
   beam(
     court2,
     [railX2, 0.95, rail2[1]],
-    [railX2, 0.95, landZ0 + 0.1],
+    [railX2, 0.95, railEnd],
     0.035,
     0.035,
     bronze,
@@ -2105,15 +2119,6 @@ export function buildAlhambraExterior(model: Facility) {
       '#e4c23a',
     ).position.set(poleX, y, poleZ);
   box(court2, poleX, 8.6, poleZ, 1.8, 0.1, 0.1, '#7d6a55');
-  // Blue-painted curbs on the ramp-side planter.
-  for (const [x0, z0, x1, z1] of REAR_COURT_PLANTERS.slice(0, 1)) {
-    const cx = (x0 + x1) / 2,
-      cz = (z0 + z1) / 2;
-    box(court2, cx, -0.05, z0 + 0.08, x1 - x0, 0.015, 0.16, '#2d5aa6');
-    box(court2, cx, -0.05, z1 - 0.08, x1 - x0, 0.015, 0.16, '#2d5aa6');
-    box(court2, x0 + 0.08, -0.05, cz, 0.16, 0.015, z1 - z0, '#2d5aa6');
-    box(court2, x1 - 0.08, -0.05, cz, 0.16, 0.015, z1 - z0, '#2d5aa6');
-  }
   for (const g of [facade, roof, site]) batch(g);
   return { facade, roof, site };
 }
