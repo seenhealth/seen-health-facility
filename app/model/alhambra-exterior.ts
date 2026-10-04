@@ -2050,14 +2050,105 @@ export function buildAlhambraExterior(model: Facility) {
   corrugated(fixedGates, 3.81, ex1);
   corrugated(fixedGates, 0.79, 2.24);
   corrugated(fixedGates, ex0, 0.79);
-  box(fixedGates, 1.95, 0.95, -0.04, 0.3, 0.45, 0.01, '#f4f2ec');
-  box(fixedGates, 1.95, 1.28, -0.045, 0.28, 0.07, 0.01, '#c0392b');
+  // The two signs (photo 2026-10-02, placed through its solved camera): a 12 x 18 in NO PARKING ANY TIME sign on the
+  // wide leaf by the padlock, and the red MAIN ELECTRICAL ROOM plate on the gate leaf (below). Drawn to a canvas in
+  // the browser; headless (the validators) each is a plain plate.
+  const sign = (
+    parent: T.Object3D,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    background: string,
+    draw: (g: CanvasRenderingContext2D, W: number, H: number) => void,
+  ) => {
+    if (typeof document === 'undefined') {
+      box(parent, x, y - h / 2, -0.04, w, h, 0.01, background);
+      return;
+    }
+    const W = 512,
+      H = Math.round((512 * h) / w),
+      canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    const g = canvas.getContext('2d')!;
+    g.fillStyle = background;
+    g.fillRect(0, 0, W, H);
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    draw(g, W, H);
+    const map = new T.CanvasTexture(canvas);
+    map.colorSpace = T.SRGBColorSpace;
+    map.anisotropy = 4;
+    const plate = new T.Mesh(
+      new T.PlaneGeometry(w, h),
+      new T.MeshStandardMaterial({ map, roughness: 0.6 }),
+    );
+    // the gates face the court (−z)
+    plate.position.set(x, y, -0.045);
+    plate.rotation.y = Math.PI;
+    parent.add(plate);
+  };
+  const doubleArrow = (
+    g: CanvasRenderingContext2D,
+    cx: number,
+    cy: number,
+    len: number,
+    t: number,
+  ) => {
+    g.lineWidth = t;
+    g.beginPath();
+    g.moveTo(cx - len / 2 + t * 2, cy);
+    g.lineTo(cx + len / 2 - t * 2, cy);
+    g.stroke();
+    for (const s of [-1, 1]) {
+      g.beginPath();
+      g.moveTo(cx + s * (len / 2), cy);
+      g.lineTo(cx + s * (len / 2 - t * 3.2), cy - t * 2);
+      g.lineTo(cx + s * (len / 2 - t * 3.2), cy + t * 2);
+      g.closePath();
+      g.fill();
+    }
+  };
+  sign(fixedGates, 1.95, 1.17, 0.32, 0.46, '#f6f4ef', (g, W, H) => {
+    const red = '#c0272d';
+    g.strokeStyle = g.fillStyle = red;
+    g.lineWidth = 10;
+    g.strokeRect(14, 14, W - 28, H - 28);
+    g.font = 'bold 190px Helvetica, Arial, sans-serif';
+    g.fillText('NO', W / 2, H * 0.2);
+    g.font = 'bold 92px Helvetica, Arial, sans-serif';
+    g.fillText('PARKING', W / 2, H * 0.42);
+    g.fillText('ANY', W / 2, H * 0.57);
+    g.fillText('TIME', W / 2, H * 0.71);
+    doubleArrow(g, W / 2, H * 0.86, W * 0.62, 14);
+  });
   // the leaf on a pivot at its east hinge; its padlock hasp at the west edge
   const pedGate = group(court2, 'electrical-room-gate-leaf');
   pedGate.position.set(3.81, 0, EZ);
   corrugated(pedGate, -1.57, 0);
-  box(pedGate, -0.75, 1.62, -0.04, 0.55, 0.12, 0.01, '#c0392b');
-  box(pedGate, -1.5, 0.95, -0.05, 0.1, 0.16, 0.05, '#8a8d8c');
+  sign(pedGate, -0.86, 1.45, 0.55, 0.16, '#c62a2a', (g, W, H) => {
+    g.fillStyle = '#ffffff';
+    // the up arrow at the left, then the two lines of white capitals
+    g.beginPath();
+    g.moveTo(W * 0.075, H * 0.14);
+    g.lineTo(W * 0.125, H * 0.5);
+    g.lineTo(W * 0.095, H * 0.5);
+    g.lineTo(W * 0.095, H * 0.86);
+    g.lineTo(W * 0.055, H * 0.86);
+    g.lineTo(W * 0.055, H * 0.5);
+    g.lineTo(W * 0.025, H * 0.5);
+    g.closePath();
+    g.fill();
+    // the lettering is fitted between the arrow and the plate's right edge
+    g.font = 'bold 50px Helvetica, Arial, sans-serif';
+    const room = W * 0.8,
+      fit = Math.min(1, room / g.measureText('MAIN ELECTRICAL').width);
+    g.font = `bold ${Math.floor(50 * fit)}px Helvetica, Arial, sans-serif`;
+    g.fillText('MAIN ELECTRICAL', W * 0.57, H * 0.3);
+    g.fillText('ROOM', W * 0.57, H * 0.72);
+  });
+  box(pedGate, -1.5, 0.72, -0.05, 0.1, 0.16, 0.05, '#8a8d8c');
   // the screen above: expanded metal in bays between posts
   box(
     court2,
