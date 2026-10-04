@@ -1677,7 +1677,8 @@ export function buildAlhambraExterior(model: Facility) {
       ],
     ] as const) {
       g.fillStyle = c;
-      g.fill(new Path2D(d));
+      // (validate-renderer's smoke test stubs the canvas but has no Path2D)
+      if (typeof Path2D !== 'undefined') g.fill(new Path2D(d));
     }
     g.restore();
     g.textAlign = 'center';
