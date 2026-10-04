@@ -599,7 +599,7 @@ export function buildNeighborhood(model: Facility) {
   // entrance, which shows the first car's front tyre at the second planter's curb). As [c, s from, s to] along each
   // row's bearing (s forward along the stall, c across it): three west of the aisle nosed SSW (206 degrees, 2.45 m
   // stalls), their noses stepping from the second planter's curb to the ramp's rail, the last stall bounded by the
-  // cactus planter; two east of it nosed SSE (158 degrees, 2.6 m) toward the agave strip along the neighbour's lot.
+  // cactus planter; two east of it, side by side by the alley (below).
   const row = (bearing: number, lines: number[][]) => {
     const b = (bearing * Math.PI) / 180,
       d = [Math.sin(b), -Math.cos(b)],
@@ -615,11 +615,15 @@ export function buildNeighborhood(model: Facility) {
     [10.65, -24.6, -16.9],
     [8.2, -29.3, -18.75],
   ]);
-  row(158, [
-    [27.85, -2.73, 2.77],
-    [30.45, -7.79, 2.77],
-    [33.05, -7.79, -2.29],
+  // East of the aisle, by the alley (Street View May 2025 from the alley, camera solved against the court): two
+  // stalls side by side, nosed SSE (151 degrees) along the tree island's west edge; past their fronts the court
+  // opens east toward the dialysis center's aisle and its row, an arrow on the aisle marking the turn.
+  row(151, [
+    [30.75, -6.28, -0.88],
+    [33.35, -6.28, -0.88],
+    [35.95, -6.28, -0.88],
   ]);
+  arrow(23.6, -14.0, Math.PI - (75 * Math.PI) / 180);
   // Abstract model trees: a slender trunk under soft, smooth canopy volumes.
   const canopyGeometry = new T.SphereGeometry(1, 28, 18);
   function tree(x: number, z: number, r: number, h: number, i: number) {
