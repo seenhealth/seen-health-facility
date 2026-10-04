@@ -327,13 +327,11 @@ for s in (-1, 1):
     q = [P['marker'].verts.new(B(s * (HW + 0.267), y, z)) for z, y in ((-2.275, 1.37), (-2.205, 1.37), (-2.205, 1.52), (-2.275, 1.52))]
     face(P['marker'], q, (s, 0, 0))
 
-# twin-door frame posts, header and threshold step (+x)
+# twin-door frame posts and header (+x); no step boards outside (the van has none: the lift's ramp and the door
+# sill serve, and the driver climbs straight in)
 box(HW - 0.01, HW + 0.04, y0d - 0.04, y1d + 0.06, z0d - 0.05, z0d, trim)
 box(HW - 0.01, HW + 0.04, y0d - 0.04, y1d + 0.06, z1d, z1d + 0.05, trim)
 box(HW - 0.01, HW + 0.04, y1d, y1d + 0.06, z0d, z1d, trim)
-box(HW - 0.12, HW + 0.16, 0.27, 0.34, z0d, z1d, trim)
-# driver-side running board
-box(-HW - 0.14, -HW + 0.05, 0.28, 0.34, -1.95, -1.15, trim)
 # rear: step bumper with a tread lip, corner caps, barn-door seam, hinges, tail-lamp housings, handle
 box(-1.0, 1.0, 0.30, 0.50, 3.06, 3.26, trim)
 box(-0.95, 0.95, 0.47, 0.50, 3.10, 3.30, trim)
