@@ -427,10 +427,16 @@ export function buildNeighborhood(model: Facility) {
   dashes(42, farZ, 6, 3, westLine, 0.12);
   // The alley (south street) is an unmarked driveway: no centre dashes.
   // STOP is painted across the exit lane where it meets the west street.
-  const roadText = (text: string, x0: number, z0: number, h: number) => {
+  const roadText = (
+    text: string,
+    x0: number,
+    z0: number,
+    h: number,
+    scale = 1,
+  ) => {
     const d: Vec2 = [Math.sin(h), Math.cos(h)],
       r: Vec2 = [-Math.cos(h), Math.sin(h)], // the reader's right in this map frame
-      stroke = 0.24;
+      stroke = 0.24 * scale;
     const glyphs: Record<string, number[][]> = {
       S: [
         [0.9, 1.9, 0.1, 1.9],
@@ -463,10 +469,10 @@ export function buildNeighborhood(model: Facility) {
     [...text].forEach((ch, k) => {
       const u0 = k * 1.15 - total / 2;
       for (const [a, b, c, e] of glyphs[ch] ?? []) {
-        const cu = u0 + (a + c) / 2,
-          cv = (b + e) / 2 - 1,
-          wx = (c - a) * r[0] + (e - b) * d[0],
-          wz = (c - a) * r[1] + (e - b) * d[1];
+        const cu = (u0 + (a + c) / 2) * scale,
+          cv = ((b + e) / 2 - 1) * scale,
+          wx = (c - a) * scale * r[0] + (e - b) * scale * d[0],
+          wz = (c - a) * scale * r[1] + (e - b) * scale * d[1];
         const m = box(
           x0 + cu * r[0] + cv * d[0],
           -0.206,
@@ -486,7 +492,8 @@ export function buildNeighborhood(model: Facility) {
   // one-way arrow behind it. The mouth runs from the bay row's curb island
   // (east edge x −27.0) to the palm island (west edge x −20.2), so both are
   // centred on x −23.6; the lanes themselves sit a little east of centre.
-  roadText('STOP', -23.6, -22.6, Math.PI);
+  // At three quarters size (3.3 m across) it stays clear of the west row's first stall line.
+  roadText('STOP', -23.6, -22.6, Math.PI, 0.75);
   box(-23.6, -0.206, -24.5, 6.2, 0.012, 0.45, SITE.marking);
   dashes(
     74,
@@ -537,13 +544,15 @@ export function buildNeighborhood(model: Facility) {
   // and stall at its south end, and a row of slightly angled stalls along the
   // building north of the drop-off.
   // Seven white stall lines; the eighth line (z −3.45) is the accessible aisle's blue edge, not drawn twice. The
-  // aisle and stall lines run the full stall length, as the white ones do.
+  // aisle and stall lines run 5.4 m from the kerb (to x −25.6, short of the aisle and of the STOP lettering at the
+  // row's south end), the blue ones as long as the white.
+  const westRowEnd = -25.6;
   for (let k = 0; k < 7; k++)
-    stall([-31.0, -23.05 + 2.8 * k], [-24.9, -23.05 + 2.8 * k]);
-  for (let x = -30.9; x + 1.6 <= -24.95; x += 0.9)
+    stall([-31.0, -23.05 + 2.8 * k], [westRowEnd, -23.05 + 2.8 * k]);
+  for (let x = -30.9; x + 1.6 <= westRowEnd - 0.05; x += 0.9)
     strip([x, -3.3], [x + 1.6, -1.2], 0.08, SITE.accessible);
   for (const z of [-3.45, -1.05, 1.45])
-    strip([-31.0, z], [-24.9, z], 0.1, SITE.accessible);
+    strip([-31.0, z], [westRowEnd, z], 0.1, SITE.accessible);
   accessSymbol(-27.9, 0.2, 1.1, Math.PI / 2);
   for (let k = 0; k < 6; k++)
     stall([-20.4, -19.5 + 2.7 * k], [-15.0, -21.5 + 2.7 * k]);
