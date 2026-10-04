@@ -192,8 +192,8 @@ export function createNightLights(
   wallPack(-14.8, 3.6, -18, [-1, 0]);
   wallPack(-21.5, 4.4, 8.95, [0, 1]);
   wallPack(-24.5, 4.6, 8.95, [0, 1]);
-  // Rear loading door on the alley and the east exit.
-  wallPack(-2.3, 3.0, -23.0, [0, -1]);
+  // The clinic's service door on the alley (its wall pack, photo 2026-10-03) and the east exit.
+  wallPack(-5.673, 2.72, -22.75, [0, -1]);
   wallPack(15.3, 2.7, -0.8, [1, 0]);
 
   // Entrance fixtures: a flush downlight under each canopy or header.
@@ -209,7 +209,6 @@ export function createNightLights(
   doorLight(-27.38, 2.25, 8.75); // the wing's lot-side awning door
   for (const x of [-12.9, -6.3]) doorLight(x, 3.1, 25.75); // Valley Blvd portals
   doorLight(1.6, 2.85, 28.4); // admin stair door
-  doorLight(-2.3, 2.95, -23.4, 10); // rear roll-up
 
   // Interior light spilling out of the glass doors onto the landing and the terrace.
   spot(

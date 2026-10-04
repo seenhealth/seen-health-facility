@@ -542,6 +542,12 @@ export function buildNeighborhood(model: Facility) {
   }
   box(-18.0, -0.432, -38.2, 26.0, 0.2, 4.8, SITE.asphalt).name =
     'strip-1300-building';
+  // Along the clinic's alley face (photo 2026-10-03): two parallel stalls, one either side of the clear zone in
+  // front of its service door and downspout (lines at x -4.82 and -8.53 from the wall out 2.6 m), with their outer
+  // line; the east stall runs open past the wall's corner.
+  for (const x of [-4.82, -8.53]) stall([x, -22.6], [x, -25.2]);
+  stall([0.6, -25.2], [-4.82, -25.2]);
+  stall([-8.53, -25.2], [-14.6, -25.2]);
   for (let k = 0; k <= 10; k++)
     stall([-30.5 + 2.5 * k, -35.8], [-30.5 + 2.5 * k, -40.1]);
   // The lot between our east wall and the dialysis center (satellite, 2026-10-03, lines found by a Hough fit to within

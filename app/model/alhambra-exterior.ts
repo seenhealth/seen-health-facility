@@ -1063,11 +1063,44 @@ export function buildAlhambraExterior(model: Facility) {
   palm(2.5, -19.8, 5.0, 1.9);
   palm(14.2, -22.9, 2.2, 1.3);
   palm(15.4, -21.4, 1.6, 1.1);
-  // Rear loading door on the alley: flat canopy over the roll-up and a gated enclosure beside it.
-  const rear = group(facade, 'clinic-rear-loading-canopy-and-gate');
-  box(rear, -5.6, 3.15, -23.1, 4.2, 0.16, 1.2, '#b7b9b2');
-  box(rear, -2.3, -0.23, -23.3, 2.6, 2.2, 0.08, '#b9aa89');
-  box(rear, -2.3, 2.0, -22.9, 2.8, 0.1, 0.9, '#b7b9b2');
+  // The clinic's alley face (photo 2026-10-03; the 2025 Street View roll-up is gone): the grey service door (the
+  // envelope's opening 1) with two white panel labels, a wall pack above it (night-lights.ts) and a yellow bollard either side; the
+  // barred window east of it (opening 2); a galvanised gutter run along the wall, falling from both ends to a
+  // downspout west of the door, with a thin pipe beside its foot; a small white box high on the east corner.
+  const rear = group(facade, 'clinic-alley-face-fittings');
+  const ALLEY_FACE = -22.463 - 0.12,
+    yard = -0.23,
+    galv = '#c9ccc9';
+  for (const lx of [-5.88, -5.47])
+    box(rear, lx, 1.52, ALLEY_FACE - 0.015, 0.3, 0.32, 0.01, '#f1efe8');
+  for (const bx of [-4.99, -6.5]) {
+    const post = mesh(
+      rear,
+      new T.CylinderGeometry(0.085, 0.085, 1.1, 14),
+      '#e2c227',
+    );
+    post.position.set(bx, yard + 0.55, ALLEY_FACE - 0.75);
+  }
+  // window bars: verticals every 0.13 m and two rails, just proud of the glass
+  for (let bx = -4.3; bx < -3.34; bx += 0.13)
+    box(rear, bx, 1.76, ALLEY_FACE - 0.03, 0.022, 1.22, 0.022, '#1f2224');
+  for (const by of [2.16, 2.56])
+    box(rear, -3.85, by, ALLEY_FACE - 0.03, 1.02, 0.025, 0.025, '#1f2224');
+  // gutter: high at both ends, down to the downspout at x -7.46
+  const gutterZ = ALLEY_FACE - 0.09,
+    drop = -7.46;
+  beam(rear, [0.12, 3.81, gutterZ], [drop, 3.29, gutterZ], 0.12, 0.12, galv);
+  beam(rear, [drop, 3.29, gutterZ], [-14.75, 3.89, gutterZ], 0.12, 0.12, galv);
+  beam(rear, [drop, 3.29, gutterZ], [drop, yard, gutterZ], 0.11, 0.11, galv);
+  beam(
+    rear,
+    [drop - 0.3, 1.0, ALLEY_FACE - 0.05],
+    [drop - 0.3, yard, ALLEY_FACE - 0.05],
+    0.05,
+    0.05,
+    galv,
+  );
+  box(rear, -0.37, 3.82, ALLEY_FACE - 0.08, 0.22, 0.24, 0.14, '#ecebe6');
   // Streetscape from the lot-side and Valley Blvd photographs (May 2025 Street
   // View and the 2026 photo): the Ethel Avenue parkway lawn with its yellow
   // hydrant, red-curbed planters with fan palms along the lot's west edge and

@@ -31504,6 +31504,12 @@
       "roughness": 1,
       "opacity": 0.6,
       "textureUrl": "/reference/photos/dropoff-sign-shadow.png"
+    },
+    "om-service-door": {
+      "name": "Grey metal service door - alley photo 2026-10-03",
+      "color": "#bfc1bd",
+      "roughness": 0.55,
+      "metalness": 0.3
     }
   },
   "programs": [
@@ -34585,15 +34591,24 @@
         "openings": [
           {
             "id": "shell-clinic-north-opening-1",
-            "offset": 7.6,
-            "width": 3.2,
+            "offset": 8.607318,
+            "width": 1,
             "sill": 0,
-            "height": 3,
+            "height": 2.13,
             "kind": "door",
-            "material": "om-rollup"
+            "material": "om-service-door"
+          },
+          {
+            "id": "shell-clinic-north-opening-2",
+            "offset": 10.420318,
+            "width": 1.02,
+            "sill": 1.76,
+            "height": 1.22,
+            "kind": "window",
+            "material": "om-glass"
           }
         ],
-        "status": "plan-traced perimeter / inferred elevation and opening heights",
+        "status": "plan-traced perimeter; door, barred window and fittings from the 2026-10-03 alley photo (the 2025 Street View roll-up is gone)",
         "referencePages": [
           92,
           19
