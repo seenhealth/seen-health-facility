@@ -3,15 +3,31 @@ import type { Facility, Vec2 } from './schema';
 import { exteriorPrimitives } from './exterior-primitives';
 
 /**
- * Rear court planters (Street View, Google Earth) as [x0, z0, x1, z1]: a
- * curbed island with a tall fan palm west of the stall row, and a palm
- * cluster at its east end. The delivery trucks keep clear of both
- * (validate-traffic).
+ * Rear court planters as [x0, z0, x1, z1]: the palm cluster east of the
+ * garage ramp's gate (photos 2026-10-02; the fan-palm island the 2025 imagery
+ * showed in front of the electrical room is gone, cars park there). The
+ * delivery trucks keep clear of it (validate-traffic).
  */
-export const REAR_COURT_PLANTERS = [
-  [1.0, -21.4, 4.0, -18.2],
-  [13.2, -24.0, 16.4, -20.4],
-] as const;
+export const REAR_COURT_PLANTERS = [[15.45, -24.0, 17.7, -20.9]] as const;
+
+/**
+ * The underground garage's ramp (photos 2026-10-02): between the loading
+ * block's east return (x 11.75) and the wing's end (x 15.26), down from a
+ * gate at z −20.6 to a roll-up door in the wing's north wall (z −12.47),
+ * 2.3 m below the court. The ground has a hole here (neighborhood.ts).
+ */
+/** The garage court's bare concrete (photos 2026-10-02); the envelope's `om-court-concrete` matches it. */
+export const COURT_CONCRETE = '#b3b1aa';
+
+export const GARAGE_RAMP = {
+  x0: 11.753,
+  x1: 15.264,
+  top: -22.8,
+  foot: -13.3,
+  door: -12.465,
+  grade: -0.23,
+  depth: 2.3,
+};
 
 /**
  * The drop-off at the lobby's sliding entrance (Street View, May 2025), in
@@ -694,13 +710,20 @@ export function buildAlhambraExterior(model: Facility) {
       const b = r.polygon![(i + 1) % r.polygon!.length];
       if (r.id === 'central' && a[1] > 24 && b[1] > 24) return; // the blue folded canopy sits here
       const cap =
-        r.id === 'east' || (a[1] < -20 && b[1] < -20) ? grey : '#d8ccb2';
+        r.id.startsWith('east') || (a[1] < -20 && b[1] < -20)
+          ? grey
+          : '#d8ccb2';
+      // the garage court's faces are bare grey concrete (photos 2026-10-02), the street faces tan stucco
+      const body =
+        r.id.startsWith('east') && a[1] < -12 && b[1] < -12
+          ? COURT_CONCRETE
+          : stone;
       const vertical = Math.abs(a[0] - b[0]) < 0.01;
       const x = vertical ? a[0] : (a[0] + b[0]) / 2,
         z = vertical ? (a[1] + b[1]) / 2 : a[1],
         w = vertical ? 0.24 : Math.abs(b[0] - a[0]) + 0.24,
         d = vertical ? Math.abs(b[1] - a[1]) + 0.24 : 0.24;
-      box(equipment, x, r.eaveHeight, z, w, h, d, stone);
+      box(equipment, x, r.eaveHeight, z, w, h, d, body);
       box(equipment, x, r.eaveHeight + h, z, w + 0.1, 0.06, d + 0.1, cap);
     });
   }
@@ -1060,9 +1083,8 @@ export function buildAlhambraExterior(model: Facility) {
       '#8c7a5c',
     );
   }
-  palm(2.5, -19.8, 5.0, 1.9);
-  palm(14.2, -22.9, 2.2, 1.3);
-  palm(15.4, -21.4, 1.6, 1.1);
+  palm(16.3, -23.2, 2.2, 1.3);
+  palm(16.9, -21.7, 1.6, 1.1);
   // The clinic's alley face (photo 2026-10-03; the 2025 Street View roll-up is gone): the grey service door (the
   // envelope's opening 1) with two white panel labels, a wall pack above it (night-lights.ts) and a yellow bollard either side; the
   // barred window east of it (opening 2); a galvanised gutter run along the wall, falling from both ends to a
@@ -1240,28 +1262,8 @@ export function buildAlhambraExterior(model: Facility) {
   const court2 = group(facade, 'rear-court-staff-entrance-and-loading');
   const SOUTH_Z = -22.463,
     BUMP_Z = -15.213;
-  // The wing's court face reads as one flat wall from the recess corner to its end: the far part is brought flush with
-  // the stair bump, with its parapet cap.
-  box(
-    court2,
-    13.51,
-    -0.23,
-    (BUMP_Z - 12.465) / 2,
-    3.52,
-    6.5 + 0.23,
-    -12.465 - BUMP_Z,
-    stone,
-  );
-  box(
-    court2,
-    13.51,
-    6.5,
-    (BUMP_Z - 12.465) / 2,
-    3.52 + 0.24,
-    0.6,
-    -12.465 - BUMP_Z + 0.24,
-    stone,
-  );
+  // The wing's north wall shows above the loading block's lower roof (eave 5.3 against the wing's 6.5).
+  box(court2, 8.47, 5.2, -12.465, 6.56, 1.45, 0.24, COURT_CONCRETE);
   // The entrance is on the wing's EAST face (x 15.26, z −12.5 → 3.5, the long wall the dispatcher shaded), elements
   // protruding +x. Proportions from the 2026-10-02 photo: a 8.8 m steel-blue canopy of boards on edge inside a flat
   // perimeter beam, hung on three cables from plates 1.4 m up the wall, its north end 1.3 m past the aluminium glass
@@ -1611,32 +1613,373 @@ export function buildAlhambraExterior(model: Facility) {
   dome.position.set(LOBBY_X - 0.06, 2.45, ldZ - 2.25);
   dome.rotation.z = Math.PI / 2;
 
-  // The garage wall (the wing's court face): rolling door under the grey hood, the electricity-room gate beside it,
-  // the louvred vent and the meter panel.
-  const gFace = BUMP_Z - 0.03;
-  box(court2, 9.3, 0, gFace, 2.6, 2.5, 0.06, '#e8e6df');
-  for (let y = 0.25; y < 2.5; y += 0.25)
-    box(court2, 9.3, y, gFace - 0.02, 2.6, 0.02, 0.02, '#cfcdc5');
-  const hood = mesh(court2, new T.BoxGeometry(3.4, 0.5, 1.5), '#9a9fa0');
-  hood.position.set(9.3, 3.3, BUMP_Z - 0.75);
-  hood.rotation.x = -0.22;
-  box(court2, 9.3, 2.85, BUMP_Z - 0.04, 3.4, 0.6, 0.08, '#8d9294');
-  for (const gx of [11.3, 12.4])
-    box(court2, gx, 0, gFace, 0.06, 2.2, 0.06, '#8f9496');
-  for (let gx = 11.4; gx < 12.4; gx += 0.12)
-    box(court2, gx, 0.05, gFace, 0.025, 2.05, 0.025, '#8f9496');
-  beam(court2, [11.3, 2.15, gFace], [12.4, 2.15, gFace], 0.04, 0.04, '#8f9496');
-  beam(court2, [11.3, 0.12, gFace], [12.4, 0.12, gFace], 0.04, 0.04, '#8f9496');
-  box(court2, 11.85, 2.4, gFace, 0.9, 0.5, 0.05, '#9a9fa0');
-  for (let y = 2.45; y < 2.85; y += 0.1)
-    box(court2, 11.85, y, gFace - 0.02, 0.8, 0.03, 0.02, '#6f7577');
-  box(court2, 13.6, 2.6, gFace, 0.9, 0.7, 0.05, '#9a9fa0');
-  for (let y = 2.65; y < 3.25; y += 0.1)
-    box(court2, 13.6, y, gFace - 0.02, 0.8, 0.03, 0.02, '#6f7577');
-  box(court2, 14.0, 1.0, gFace, 0.7, 1.1, 0.12, '#8f9496');
-  // Utility pole with its yellow guard in front of the junction of the two faces.
-  const poleX = 4.6,
-    poleZ = -17.6;
+  // The garage court (photos 2026-10-02). The loading block's face (z −15.21, x 5.19 → 11.75): one recessed frame
+  // with the roll-up curtain across it and above a service door at its east end (the envelope's openings 1-3), a
+  // louvre, a camera dome and two conduits west of it, all under a steel canopy. East of the block the ramp drops
+  // to the underground garage's roll-up in the wing's north wall; west of it the electrical room fills the notch to
+  // the clinic's wall, corrugated gates below and an expanded-metal screen above.
+  const concrete = '#b9b6ae',
+    jamb = '#8f8d87',
+    canopySteel = '#b9bdbe',
+    steelDark = '#8e9496',
+    pipeColor = '#ddd5c3',
+    gateTan = '#d7cfbd',
+    meshDark = '#5b5f5d';
+  const LF = BUMP_Z - 0.125; // the block's outer face
+  // recessed jamb round the frame (x 7.52 → 11.01, 3.54 tall)
+  for (const [x, w] of [
+    [7.46, 0.12],
+    [11.07, 0.12],
+  ])
+    box(court2, x, 0, LF - 0.01, w, 3.6, 0.03, jamb);
+  box(court2, 9.265, 3.42, LF - 0.01, 3.73, 0.18, 0.03, jamb);
+  // the curtain (opening 1 is open in the envelope; deliveries.ts raises this into the wall for the food truck)
+  const rollup = group(court2, 'rear-loading-rollup');
+  box(rollup, 8.89, -0.23, BUMP_Z - 0.04, 2.58, 3.61, 0.04, '#b4b1aa');
+  for (let y = 0.12; y < 3.38; y += 0.13)
+    box(rollup, 8.89, y, BUMP_Z - 0.065, 2.58, 0.018, 0.01, '#8f8c85');
+  for (let y = 2.3; y < 3.38; y += 0.13)
+    box(court2, 10.555, y, LF - 0.005, 0.75, 0.018, 0.01, '#8f8c85');
+  // the service door's notice and lever
+  box(court2, 10.62, 1.25, LF - 0.03, 0.28, 0.2, 0.01, '#f2efe4');
+  box(court2, 10.27, 0.98, LF - 0.06, 0.14, 0.03, 0.05, '#c7c9c8');
+  // louvre, camera dome, conduits, a no-smoking plate
+  box(court2, 6.56, 2.37, LF - 0.03, 0.56, 0.77, 0.06, '#a6a8a4');
+  for (let y = 2.45; y < 3.08; y += 0.08)
+    box(court2, 6.56, y, LF - 0.065, 0.46, 0.025, 0.03, '#6e7472');
+  const camDome = mesh(
+    court2,
+    new T.SphereGeometry(0.1, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2),
+    '#eceeed',
+  );
+  camDome.position.set(5.95, 3.62, LF - 0.06);
+  camDome.rotation.x = Math.PI / 2;
+  for (const [x, top] of [
+    [7.02, 3.1],
+    [5.45, 2.35],
+  ])
+    beam(
+      court2,
+      [x, 0, LF - 0.05],
+      [x, top, LF - 0.05],
+      0.045,
+      0.045,
+      '#a9aba7',
+    );
+  box(court2, 6.62, 1.75, LF - 0.02, 0.14, 0.2, 0.01, '#f2efe4');
+  // steel canopy over the face: a deep fascia in front, the soffit falling to it, ribs underneath
+  const can = { x0: 5.3, x1: 11.75, wallY: 4.65, frontY: 4.3, depth: 1.95 };
+  const soffit = mesh(
+    court2,
+    new T.BoxGeometry(
+      can.x1 - can.x0,
+      0.05,
+      Math.hypot(can.depth, can.wallY - can.frontY),
+    ),
+    steelDark,
+  );
+  soffit.position.set(
+    (can.x0 + can.x1) / 2,
+    (can.wallY + can.frontY) / 2,
+    LF - can.depth / 2,
+  );
+  soffit.rotation.x = Math.atan2(can.wallY - can.frontY, can.depth);
+  box(
+    court2,
+    (can.x0 + can.x1) / 2,
+    can.frontY - 0.05,
+    LF - can.depth,
+    can.x1 - can.x0,
+    0.55,
+    0.06,
+    canopySteel,
+  );
+  for (const sx of [can.x0, can.x1])
+    box(
+      court2,
+      sx,
+      can.frontY - 0.05,
+      LF - can.depth / 2,
+      0.05,
+      0.55,
+      can.depth,
+      canopySteel,
+    );
+  for (let x = can.x0 + 0.8; x < can.x1 - 0.4; x += 1.6)
+    beam(
+      court2,
+      [x, can.wallY - 0.08, LF],
+      [x, can.frontY, LF - can.depth],
+      0.06,
+      0.12,
+      steelDark,
+    );
+
+  // The garage ramp (GARAGE_RAMP): a sloped slab and a landing at the door, a block retaining wall on its west side
+  // (rail on its cap), a concrete curb wall on its east side (rail), a two-leaf gate across its head.
+  const R = GARAGE_RAMP,
+    floorY = R.grade - R.depth,
+    rx0 = R.x0 + 0.3,
+    rx1 = R.x1 - 0.3,
+    slopeL = Math.hypot(R.foot - R.top, R.depth);
+  const slab = mesh(
+    court2,
+    new T.BoxGeometry(rx1 - rx0, 0.2, slopeL),
+    concrete,
+  );
+  slab.position.set(
+    (rx0 + rx1) / 2,
+    (R.grade + floorY) / 2 - 0.1,
+    (R.top + R.foot) / 2,
+  );
+  slab.rotation.x = Math.atan2(R.depth, R.foot - R.top);
+  box(
+    court2,
+    (rx0 + rx1) / 2,
+    floorY - 0.2,
+    (R.foot + R.door) / 2,
+    rx1 - rx0,
+    0.2,
+    R.door - R.foot,
+    concrete,
+  );
+  box(
+    court2,
+    R.x0 + 0.15,
+    floorY - 0.2,
+    (R.top + R.door) / 2,
+    0.3,
+    R.depth + 0.28,
+    R.door - R.top,
+    '#aaa69d',
+  );
+  for (let y = floorY + 0.2; y < R.grade; y += 0.2)
+    box(
+      court2,
+      rx0 + 0.003,
+      y,
+      (R.top + R.door) / 2,
+      0.006,
+      0.012,
+      R.door - R.top,
+      '#97938b',
+    );
+  box(
+    court2,
+    R.x1 - 0.15,
+    floorY - 0.2,
+    (R.top + R.door) / 2,
+    0.3,
+    R.depth + 0.48,
+    R.door - R.top,
+    concrete,
+  );
+  // the wing's wall below the court and the garage's roll-up with its concrete header
+  box(
+    court2,
+    (R.x0 + R.x1) / 2,
+    floorY - 0.2,
+    R.door,
+    R.x1 - R.x0,
+    R.depth + 0.2,
+    0.24,
+    COURT_CONCRETE,
+  );
+  box(
+    court2,
+    (rx0 + rx1) / 2,
+    floorY,
+    R.door - 0.14,
+    rx1 - rx0 - 0.05,
+    2.0,
+    0.04,
+    '#a3abb2',
+  );
+  for (let y = floorY + 0.1; y < floorY + 2; y += 0.09)
+    box(
+      court2,
+      (rx0 + rx1) / 2,
+      y,
+      R.door - 0.165,
+      rx1 - rx0 - 0.05,
+      0.014,
+      0.01,
+      '#7f8890',
+    );
+  box(
+    court2,
+    (R.x0 + R.x1) / 2,
+    floorY + 2.0,
+    R.door - 0.17,
+    R.x1 - R.x0 - 0.3,
+    0.42,
+    0.1,
+    '#a7a49c',
+  );
+  // a dome light high on the wing's wall over the ramp
+  box(court2, 13.5, 4.4, R.door - 0.16, 0.34, 0.18, 0.1, '#55595a');
+  // pipe rails: posts every ~1.6 m and five rails, on both walls and across the gate
+  const pipeRail = (
+    x: number,
+    base: (z: number) => number,
+    z0: number,
+    z1: number,
+  ) => {
+    const n = Math.max(1, Math.round((z1 - z0) / 1.6));
+    for (let i = 0; i <= n; i++) {
+      const z = z0 + ((z1 - z0) * i) / n;
+      beam(
+        court2,
+        [x, base(z), z],
+        [x, base(z) + 1.07, z],
+        0.05,
+        0.05,
+        pipeColor,
+      );
+    }
+    for (let k = 1; k <= 5; k++)
+      beam(
+        court2,
+        [x, base(z0) + 0.21 * k, z0],
+        [x, base(z1) + 0.21 * k, z1],
+        0.042,
+        0.042,
+        pipeColor,
+      );
+  };
+  pipeRail(R.x0 + 0.15, () => R.grade + 0.08, R.top, R.door - 0.2);
+  pipeRail(R.x1 - 0.15, () => R.grade + 0.28, R.top, R.door - 0.2);
+  for (const [g0, g1] of [
+    [R.x0 + 0.3, (R.x0 + R.x1) / 2],
+    [(R.x0 + R.x1) / 2, R.x1 - 0.3],
+  ]) {
+    for (const x of [g0 + 0.03, g1 - 0.03])
+      beam(
+        court2,
+        [x, R.grade + 0.05, R.top],
+        [x, R.grade + 1.4, R.top],
+        0.05,
+        0.05,
+        pipeColor,
+      );
+    for (let k = 0; k < 6; k++) {
+      const y = R.grade + 0.12 + k * 0.25;
+      beam(court2, [g0, y, R.top], [g1, y, R.top], 0.04, 0.04, pipeColor);
+    }
+  }
+  for (const x of [R.x0 + 0.08, R.x1 - 0.08])
+    box(court2, x, R.grade, R.top, 0.09, 1.5, 0.09, pipeColor);
+
+  // The electrical room in the notch (x 0 → 5.19, front at the block's face), laid out from the photo taken along
+  // it (camera resected against the block's face and the pole): from the east a fixed panel, the gate leaf with the
+  // red MAIN ELECTRICAL ROOM plate (hinged at its east post; deliveries.ts swings it for the package courier),
+  // padlocked to a wide leaf with NO PARKING ANY TIME, a narrow leaf at the clinic's wall; corrugated, a mesh strip
+  // at the top; the expanded-metal screen above in bays; a thin metal roof edge; two bollards in front.
+  const EZ = LF + 0.03,
+    ex0 = 0.12,
+    ex1 = 5.07,
+    gateTop = 2.0,
+    roofY = 4.05;
+  for (const x of [ex1, 3.81, 2.24, 0.79, ex0])
+    box(court2, x, -0.23, EZ, 0.08, roofY + 0.23, 0.08, '#c9c2b2');
+  box(court2, (ex0 + ex1) / 2, gateTop, EZ, ex1 - ex0, 0.08, 0.08, '#c9c2b2');
+  const corrugated = (parent: T.Object3D, x0: number, x1: number, ox = 0) => {
+    box(
+      parent,
+      ox + (x0 + x1) / 2,
+      -0.18,
+      0,
+      x1 - x0 - 0.06,
+      1.75,
+      0.03,
+      gateTan,
+    );
+    for (let x = x0 + 0.12; x < x1 - 0.06; x += 0.12)
+      box(parent, ox + x, -0.18, -0.02, 0.035, 1.75, 0.012, '#c4bba7');
+    box(
+      parent,
+      ox + (x0 + x1) / 2,
+      1.6,
+      0,
+      x1 - x0 - 0.06,
+      0.35,
+      0.015,
+      meshDark,
+    );
+    for (const y of [-0.18, 1.55, 1.95])
+      box(
+        parent,
+        ox + (x0 + x1) / 2,
+        y,
+        -0.01,
+        x1 - x0 - 0.04,
+        0.05,
+        0.05,
+        '#c9c2b2',
+      );
+  };
+  const fixedGates = group(court2, 'electrical-room-gates');
+  fixedGates.position.z = EZ;
+  corrugated(fixedGates, 3.81, ex1);
+  corrugated(fixedGates, 0.79, 2.24);
+  corrugated(fixedGates, ex0, 0.79);
+  box(fixedGates, 1.95, 0.95, -0.04, 0.3, 0.45, 0.01, '#f4f2ec');
+  box(fixedGates, 1.95, 1.28, -0.045, 0.28, 0.07, 0.01, '#c0392b');
+  // the leaf on a pivot at its east hinge; its padlock hasp at the west edge
+  const pedGate = group(court2, 'electrical-room-gate-leaf');
+  pedGate.position.set(3.81, 0, EZ);
+  corrugated(pedGate, -1.57, 0);
+  box(pedGate, -0.75, 1.62, -0.04, 0.55, 0.12, 0.01, '#c0392b');
+  box(pedGate, -1.5, 0.95, -0.05, 0.1, 0.16, 0.05, '#8a8d8c');
+  // the screen above: expanded metal in bays between posts
+  box(
+    court2,
+    (ex0 + ex1) / 2,
+    gateTop + 0.08,
+    EZ + 0.02,
+    ex1 - ex0,
+    roofY - gateTop - 0.08,
+    0.02,
+    meshDark,
+  );
+  for (const x of [2.43, 1.13])
+    box(court2, x, gateTop, EZ - 0.02, 0.06, roofY - gateTop, 0.06, '#c9c2b2');
+  // its roof and the thin metal edge running on across the block's face to the canopy
+  box(
+    court2,
+    (ex0 + ex1) / 2,
+    roofY,
+    (EZ - 12.585) / 2,
+    ex1 - ex0,
+    0.08,
+    -12.585 - EZ,
+    '#a9aca8',
+  );
+  box(
+    court2,
+    (ex0 + 7.3) / 2,
+    roofY - 0.06,
+    EZ - 0.08,
+    7.3 - ex0,
+    0.16,
+    0.08,
+    canopySteel,
+  );
+  // the clinic's wall beside it: a louvre box and a small grey cabinet
+  box(court2, 0.17, 2.0, -16.3, 0.1, 1.0, 0.42, '#a6a8a4');
+  box(court2, 0.17, 1.45, -15.75, 0.1, 0.32, 0.4, '#9a9d9b');
+  for (const x of [3.6, 0.67]) {
+    const post = mesh(
+      court2,
+      new T.CylinderGeometry(0.1, 0.1, 1.0, 12),
+      '#cfc8b6',
+    );
+    post.position.set(x, -0.23 + 0.5, EZ - 0.62);
+  }
+
+  // Utility pole with its yellow guard, east of the ramp's head (photos 2026-10-02).
+  const poleX = 15.85,
+    poleZ = -15.8;
   mesh(
     court2,
     new T.CylinderGeometry(0.16, 0.19, 9.5, 10),
@@ -1649,11 +1992,8 @@ export function buildAlhambraExterior(model: Facility) {
       '#e4c23a',
     ).position.set(poleX, y, poleZ);
   box(court2, poleX, 8.6, poleZ, 1.8, 0.1, 0.1, '#7d6a55');
-  // Blue-painted curbs on the court's planter islands.
-  for (const [x0, z0, x1, z1] of [
-    [1.0, -21.4, 4.0, -18.2],
-    [13.2, -24.0, 16.4, -20.4],
-  ]) {
+  // Blue-painted curbs on the court's planter.
+  for (const [x0, z0, x1, z1] of REAR_COURT_PLANTERS) {
     const cx = (x0 + x1) / 2,
       cz = (z0 + z1) / 2;
     box(court2, cx, -0.05, z0 + 0.08, x1 - x0, 0.015, 0.16, '#2d5aa6');

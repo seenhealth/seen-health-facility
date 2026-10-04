@@ -12,6 +12,12 @@ const OWN_GLAZING = new Set([
   'shell-lobby-west-opening-1',
   'ethel-corner-return-glazing',
 ]);
+/** Openings whose surround the exterior draws itself (the loading block's recessed jamb, photos 2026-10-02). */
+const OWN_SURROUND = new Set([
+  'shell-rear-north-opening-1',
+  'shell-rear-north-opening-2',
+  'shell-rear-north-opening-3',
+]);
 export function buildEnvelopeWall(
   w: EnvelopeWall,
   material: (id: string) => T.Material,
@@ -81,6 +87,7 @@ export function buildEnvelopeWall(
     if (height <= 0) continue;
     if (!o.operable && !OWN_GLAZING.has(o.id))
       block(o.offset, o.sill, o.width, height, 0.055, o.material, o.id);
+    if (OWN_SURROUND.has(o.id)) continue;
     const frame = 0.045;
     block(o.offset, o.sill, frame, height, w.thickness + 0.035, 'frame');
     block(

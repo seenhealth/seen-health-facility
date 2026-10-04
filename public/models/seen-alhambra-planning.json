@@ -31488,10 +31488,10 @@
       "metalness": 0.16
     },
     "om-rollup": {
-      "name": "Tan roll-up loading door - Street View",
-      "color": "#b9aa89",
-      "roughness": 0.7,
-      "metalness": 0.2
+      "name": "Grey steel roll-up curtain - garage-court photos 2026-10-02",
+      "color": "#b4b1aa",
+      "roughness": 0.6,
+      "metalness": 0.35
     },
     "photo-sign-front-shadow": {
       "color": "#ffffff",
@@ -31510,6 +31510,11 @@
       "color": "#bfc1bd",
       "roughness": 0.55,
       "metalness": 0.3
+    },
+    "om-court-concrete": {
+      "name": "Bare grey concrete - garage-court photos 2026-10-02",
+      "color": "#b3b1aa",
+      "roughness": 0.9
     }
   },
   "programs": [
@@ -33004,7 +33009,7 @@
       "bounds": [
         [
           0,
-          -15.212789
+          -12.465328
         ],
         [
           15.263667,
@@ -33026,22 +33031,6 @@
           -12.465328
         ],
         [
-          5.189647,
-          -12.465328
-        ],
-        [
-          5.189647,
-          -15.212789
-        ],
-        [
-          11.753024,
-          -15.212789
-        ],
-        [
-          11.753024,
-          -12.465328
-        ],
-        [
           15.263667,
           -12.465328
         ],
@@ -33060,6 +33049,48 @@
         [
           0,
           28.085148
+        ]
+      ],
+      "parapet": false
+    },
+    {
+      "id": "east-loading",
+      "kind": "flat",
+      "bounds": [
+        [
+          5.189647,
+          -15.212789
+        ],
+        [
+          11.753024,
+          -12.465328
+        ]
+      ],
+      "eaveHeight": 5.3,
+      "rise": 0,
+      "referencePages": [
+        92,
+        19,
+        66,
+        67
+      ],
+      "status": "photographed 2026-10-02: the loading block in front of the wing, ~5.9 m to its parapet cap",
+      "polygon": [
+        [
+          5.189647,
+          -15.212789
+        ],
+        [
+          11.753024,
+          -15.212789
+        ],
+        [
+          11.753024,
+          -12.465328
+        ],
+        [
+          5.189647,
+          -12.465328
         ]
       ],
       "parapet": false
@@ -34627,7 +34658,7 @@
         "zoneId": "clinic",
         "height": 4.15,
         "thickness": 0.24,
-        "material": "om-stone",
+        "material": "om-court-concrete",
         "openings": [],
         "status": "plan-traced perimeter / inferred elevation and opening heights",
         "referencePages": [
@@ -34648,7 +34679,7 @@
         "zoneId": "ot",
         "height": 6.65,
         "thickness": 0.24,
-        "material": "om-stone",
+        "material": "om-court-concrete",
         "openings": [
           {
             "id": "shell-rear-court-opening-1",
@@ -34678,9 +34709,9 @@
           -15.212789
         ],
         "zoneId": "ot",
-        "height": 6.65,
+        "height": 5.45,
         "thickness": 0.24,
-        "material": "om-stone",
+        "material": "om-court-concrete",
         "openings": [
           {
             "id": "shell-rear-stair-west-opening-1",
@@ -34692,7 +34723,7 @@
             "material": "photo-white"
           }
         ],
-        "status": "plan-traced perimeter / inferred elevation and opening heights",
+        "status": "plan-traced; height and openings from the 2026-10-02 garage-court photos (the loading block stands ~0.8 m below the wing)",
         "referencePages": [
           92,
           19
@@ -34709,31 +34740,40 @@
           -15.212789
         ],
         "zoneId": "ot",
-        "height": 6.65,
+        "height": 5.45,
         "thickness": 0.24,
-        "material": "om-stone",
+        "material": "om-court-concrete",
         "openings": [
           {
             "id": "shell-rear-north-opening-1",
-            "offset": 2.28955,
-            "width": 2.645702,
+            "offset": 2.410353,
+            "width": 2.58,
             "sill": 0,
-            "height": 2.3,
+            "height": 3.38,
             "kind": "door",
-            "material": "om-glass",
+            "material": "om-rollup",
             "operable": true
           },
           {
             "id": "shell-rear-north-opening-2",
-            "offset": 4.935252,
-            "width": 1.068457,
+            "offset": 4.990353,
+            "width": 0.75,
+            "sill": 2.2,
+            "height": 1.18,
+            "kind": "window",
+            "material": "om-rollup"
+          },
+          {
+            "id": "shell-rear-north-opening-3",
+            "offset": 4.990353,
+            "width": 0.75,
             "sill": 0,
-            "height": 2.3,
+            "height": 2.13,
             "kind": "door",
-            "material": "om-glass"
+            "material": "om-service-door"
           }
         ],
-        "status": "plan-traced perimeter / inferred elevation and opening heights",
+        "status": "plan-traced; height and openings from the 2026-10-02 garage-court photos (the loading block stands ~0.8 m below the wing)",
         "referencePages": [
           92,
           19
@@ -34750,11 +34790,11 @@
           -12.465328
         ],
         "zoneId": "ot",
-        "height": 6.65,
+        "height": 5.45,
         "thickness": 0.24,
-        "material": "om-stone",
+        "material": "om-court-concrete",
         "openings": [],
-        "status": "plan-traced perimeter / inferred elevation and opening heights",
+        "status": "plan-traced; height and openings from the 2026-10-02 garage-court photos (the loading block stands ~0.8 m below the wing)",
         "referencePages": [
           92,
           19
@@ -34773,7 +34813,7 @@
         "zoneId": "ot",
         "height": 6.65,
         "thickness": 0.24,
-        "material": "om-stone",
+        "material": "om-court-concrete",
         "openings": [],
         "status": "plan-traced perimeter / inferred elevation and opening heights",
         "referencePages": [
