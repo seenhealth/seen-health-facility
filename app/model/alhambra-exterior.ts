@@ -14,6 +14,13 @@ import { exteriorPrimitives } from './exterior-primitives';
 export const REAR_COURT_PLANTERS = [
   [15.45, -24.3, 17.3, -20.6],
   [15.42, -9.6, 20.3, -6.8],
+  // The court east of the adjacent block (photos 2026-10-05): the blue fan palm's planter (A), the low grass bed (A2)
+  // and the railed raised planter (B) south of the cars at the tree island, and the agave strip's free-standing
+  // north end (D) between the court's last stall and the dialysis aisle's row.
+  [23.75, -15.9, 25.95, -10.9],
+  [26.0, -11.3, 28.2, -9.9],
+  [26.4, -12.6, 35.0, -11.3],
+  [29.15, -5.4, 30.4, 3.41],
 ] as const;
 /**
  * The cactus planter's outline beside the ramp's gate: its east curb runs with the angled stalls (206 degrees),
@@ -2407,6 +2414,488 @@ export function buildAlhambraExterior(model: Facility) {
       '#e4c23a',
     ).position.set(poleX, y, poleZ);
   box(court2, poleX, 8.6, poleZ, 1.8, 0.1, 0.1, '#7d6a55');
+
+  // The court between the adjacent block (1819 W Valley Blvd #B, whose north wall is at z 3.41 and east wall at
+  // x 29.81) and the dialysis center's lot, from five photos of 2026-10-05 placed against the satellite and the
+  // stall lines (the phone's compass was off by up to 100 degrees, so each camera was solved from what it shows):
+  // - A: a big Mexican blue fan palm in a long planter with a faded pinkish-grey curb, its north end rounded;
+  // - B: a raised planter with a bronze pipe rail on its south edge, grasses and a small fan palm, the cars parked
+  //   north of it facing it;
+  // - C/F: the fan palm's island (neighborhood.ts CURB_ISLANDS_PX[4]) with its curb painted red: a second blue fan
+  //   palm at its west end, hung with old flower stalks, Mediterranean fan palms and golden barrel cacti east of it;
+  // - D: the agave strip, a narrow two-tier planter from that palm south to the adjacent block's corner and on along
+  //   its east wall, a big agave by the corner and a dead agave flower stalk beyond;
+  // - E: the adjacent block's glass door with its blue awning and a wall light, behind the last stall of the row;
+  // - G: the eucalyptus on the tree island (CURB_ISLANDS_PX[3]).
+  const ce = group(site, 'court-east-planting');
+  const G0 = -0.23,
+    curbPink = '#d2c4bd',
+    curbConcrete = '#d6d1c7',
+    curbRed = '#a5432f',
+    soil = '#9a8770',
+    trunkBrown = '#8a7660',
+    bootBrown = '#76644f',
+    skirtTan = '#a8916d';
+  const blueFronds = ['#a7bcbf', '#9bb1b6', '#b7c7c6'];
+  const greenFronds = ['#5d8a4f', '#6f9a5c', '#557f49'];
+  const grassTans = ['#cbb077', '#bea36a', '#d5bd86'];
+  const centroid = (pts: Vec2[]): Vec2 => [
+    pts.reduce((t, p) => t + p[0], 0) / pts.length,
+    pts.reduce((t, p) => t + p[1], 0) / pts.length,
+  ];
+  // Inward offset of a convex polygon by t (each edge moved in, neighbours intersected).
+  const inset = (pts: Vec2[], t: number): Vec2[] => {
+    const [cx, cz] = centroid(pts);
+    const n = pts.length;
+    const lines = pts.map((a, i) => {
+      const b = pts[(i + 1) % n];
+      let nx = b[1] - a[1],
+        nz = a[0] - b[0];
+      const l = Math.hypot(nx, nz) || 1;
+      nx /= l;
+      nz /= l;
+      // point the normal inward
+      if (nx * (cx - a[0]) + nz * (cz - a[1]) < 0) {
+        nx = -nx;
+        nz = -nz;
+      }
+      return {
+        p: [a[0] + nx * t, a[1] + nz * t],
+        d: [b[0] - a[0], b[1] - a[1]],
+      };
+    });
+    return lines.map((L1, i) => {
+      const L0 = lines[(i + n - 1) % n];
+      const den = L0.d[0] * L1.d[1] - L0.d[1] * L1.d[0];
+      if (Math.abs(den) < 1e-9) return [L1.p[0], L1.p[1]] as Vec2;
+      const k =
+        ((L1.p[0] - L0.p[0]) * L1.d[1] - (L1.p[1] - L0.p[1]) * L1.d[0]) / den;
+      return [L0.p[0] + L0.d[0] * k, L0.p[1] + L0.d[1] * k] as Vec2;
+    });
+  };
+  // A rounded rectangle, corners of radius r (the north end of A is a full half-round).
+  const roundRect = (
+    x0: number,
+    z0: number,
+    x1: number,
+    z1: number,
+    r: [number, number, number, number],
+  ): Vec2[] => {
+    const out: Vec2[] = [];
+    const corners: [number, number, number, number][] = [
+      [x1 - r[1], z0 + r[1], -Math.PI / 2, r[1]],
+      [x1 - r[2], z1 - r[2], 0, r[2]],
+      [x0 + r[3], z1 - r[3], Math.PI / 2, r[3]],
+      [x0 + r[0], z0 + r[0], Math.PI, r[0]],
+    ];
+    for (const [cx, cz, a0, rr] of corners)
+      for (let k = 0; k <= 6; k++) {
+        const a = a0 + (k / 6) * (Math.PI / 2);
+        out.push([cx + Math.cos(a) * rr, cz + Math.sin(a) * rr]);
+      }
+    return out;
+  };
+  // Paint over a curb's outer face along one edge (the red-painted curbs).
+  const paintEdge = (a: Vec2, b: Vec2, out: Vec2, h: number, color: string) => {
+    const dx = b[0] - a[0],
+      dz = b[1] - a[1],
+      l = Math.hypot(dx, dz);
+    let nx = dz / l,
+      nz = -dx / l;
+    if (nx * (a[0] - out[0]) + nz * (a[1] - out[1]) < 0) {
+      nx = -nx;
+      nz = -nz;
+    }
+    const m = mesh(ce, new T.BoxGeometry(l, h, 0.025), color);
+    m.position.set(
+      (a[0] + b[0]) / 2 + nx * 0.012,
+      G0 + h / 2,
+      (a[1] + b[1]) / 2 + nz * 0.012,
+    );
+    m.rotation.y = -Math.atan2(dz, dx);
+  };
+  const planter = (pts: Vec2[], h: number, curb: string, rim = 0.15) => {
+    patch(ce, pts, G0, h, curb);
+    patch(ce, inset(pts, rim), G0 + h - 0.06, 0.05, soil);
+  };
+  // Dried fountain grass: a fountain of thin blades.
+  const tuft = (x: number, z: number, r: number, y = G0, i = 0) => {
+    for (let k = 0; k < 14; k++) {
+      const a = k * 2.39996 + i,
+        out = r * (0.35 + (k % 3) * 0.3),
+        up = r * (0.95 + (k % 2) * 0.4);
+      beam(
+        ce,
+        [x, y, z],
+        [x + Math.cos(a) * out, y + up, z + Math.sin(a) * out],
+        0.09,
+        0.03,
+        grassTans[(k + i) % grassTans.length],
+      );
+    }
+  };
+  const barrel = (x: number, z: number, r: number, y: number) => {
+    const b = mesh(ce, new T.SphereGeometry(r, 12, 8), '#a3a74c');
+    b.position.set(x, y + r * 0.8, z);
+    b.scale.set(1, 0.85, 1);
+    mesh(ce, new T.SphereGeometry(r * 0.45, 8, 6), '#d6b54a').position.set(
+      x,
+      y + r * 1.45,
+      z,
+    );
+  };
+  // Mexican blue fan palm: a thick booted trunk, a skirt of dead fronds under the crown, silver-blue fans.
+  const bluePalm = (
+    x: number,
+    z: number,
+    trunkH: number,
+    crown: number,
+    skirt: number,
+    stalks: number,
+    base = G0,
+  ) => {
+    const g = group(ce, 'blue-fan-palm');
+    mesh(
+      g,
+      new T.CylinderGeometry(0.27, 0.36, trunkH, 12),
+      trunkBrown,
+    ).position.set(x, base + trunkH / 2, z);
+    for (let y = 0.35; y < trunkH - skirt - 0.1; y += 0.3) {
+      const ring = mesh(
+        g,
+        new T.CylinderGeometry(0.36, 0.31, 0.15, 9),
+        bootBrown,
+      );
+      ring.position.set(x, base + y, z);
+      ring.rotation.y = y * 2.3;
+    }
+    if (skirt > 0) {
+      const sk = mesh(
+        g,
+        new T.CylinderGeometry(0.72, 0.4, skirt, 14, 1, true),
+        skirtTan,
+      );
+      sk.position.set(x, base + trunkH - skirt / 2, z);
+      (sk.material as T.MeshStandardMaterial).side = T.DoubleSide;
+    }
+    // The crown: a rounded silver-blue mass (a flattened core) bristling with short fan segments, the upper ones
+    // raised, the lower ones hanging.
+    const top = base + trunkH;
+    const core = mesh(g, new T.IcosahedronGeometry(crown * 0.42, 1), '#9eb2b4');
+    core.position.set(x, top + crown * 0.1, z);
+    core.scale.set(1, 0.7, 1);
+    for (let i = 0; i < 96; i++) {
+      const a = i * 2.39996 + x,
+        ring = i % 5,
+        reach = crown * [0.22, 0.4, 0.52, 0.58, 0.56][ring],
+        len = crown * [0.5, 0.62, 0.66, 0.62, 0.55][ring],
+        tilt = [0.7, 0.18, -0.35, -0.8, -1.2][ring];
+      const seg = mesh(
+        g,
+        new T.BoxGeometry(len, 0.03, 0.3),
+        blueFronds[i % blueFronds.length],
+      );
+      seg.position.set(
+        x + Math.cos(a) * reach,
+        top + crown * [0.42, 0.26, 0.08, -0.12, -0.34][ring],
+        z + Math.sin(a) * reach,
+      );
+      seg.rotation.set(0, -a, tilt);
+    }
+    // Old flower stalks hanging out of the crown in long arcs.
+    for (let i = 0; i < stalks; i++) {
+      const a = (i / stalks) * Math.PI * 2 + 0.6,
+        r1 = crown * 0.62,
+        r2 = crown * 0.78;
+      const p0 = [
+          x + Math.cos(a) * crown * 0.3,
+          top + crown * 0.25,
+          z + Math.sin(a) * crown * 0.3,
+        ],
+        p1 = [x + Math.cos(a) * r1, top + crown * 0.3, z + Math.sin(a) * r1],
+        p2 = [x + Math.cos(a) * r2, top - crown * 0.75, z + Math.sin(a) * r2];
+      beam(g, p0, p1, 0.04, 0.04, '#c9b48a');
+      beam(g, p1, p2, 0.09, 0.09, '#bca57a');
+    }
+  };
+  // Mediterranean fan palm: a clump of short leaning trunks, each with a small green crown.
+  const fanClump = (
+    x: number,
+    z: number,
+    n: number,
+    h: number,
+    base: number,
+  ) => {
+    const g = group(ce, 'mediterranean-fan-palm');
+    for (let k = 0; k < n; k++) {
+      const a = (k / n) * Math.PI * 2 + x,
+        lean = 0.35 + (k % 2) * 0.2,
+        hh = h * (0.6 + ((k * 37) % 5) * 0.1);
+      const tip = [x + Math.cos(a) * lean, base + hh, z + Math.sin(a) * lean];
+      beam(g, [x, base, z], tip, 0.14, 0.14, '#7d6a52');
+      for (let i = 0; i < 16; i++) {
+        const fa = (i / 16) * Math.PI * 2 + k * 0.7,
+          ring = i % 3;
+        const f = mesh(
+          g,
+          new T.BoxGeometry([0.5, 0.65, 0.72][ring], 0.03, 0.22),
+          greenFronds[(i + k) % greenFronds.length],
+        );
+        f.position.set(
+          tip[0] + Math.cos(fa) * [0.2, 0.34, 0.42][ring],
+          tip[1] + [0.2, 0.08, -0.08][ring],
+          tip[2] + Math.sin(fa) * [0.2, 0.34, 0.42][ring],
+        );
+        f.rotation.set(0, -fa, [0.35, -0.2, -0.65][ring]);
+      }
+    }
+  };
+  const agaveAt = (x: number, z: number, r: number, base: number) => {
+    const g = group(ce, 'agave');
+    for (let i = 0; i < 18; i++) {
+      const a = i * 2.39996,
+        rr = r * (0.6 + (i % 3) * 0.2),
+        h = r * (0.5 + (i % 4) * 0.18);
+      beam(
+        g,
+        [x, base, z],
+        [x + Math.cos(a) * rr, base + h, z + Math.sin(a) * rr],
+        0.2,
+        0.06,
+        i % 2 ? '#7f9a95' : '#8ca6a0',
+      );
+    }
+  };
+
+  // A: the first blue fan palm's planter, long north-south with a rounded north end.
+  const A = roundRect(...REAR_COURT_PLANTERS[2], [1.1, 1.1, 0.5, 0.5]);
+  planter(A, 0.18, curbPink);
+  bluePalm(24.85, -12.6, 2.6, 2.9, 1.0, 0);
+  for (const [tx, tz, r] of [
+    [24.2, -14.6, 0.45],
+    [25.4, -14.2, 0.4],
+    [24.3, -11.6, 0.45],
+    [25.5, -11.4, 0.4],
+    [24.6, -13.5, 0.35],
+  ])
+    tuft(tx, tz, r, G0 + 0.12, Math.round(tx * 10));
+
+  // B: the raised planter with its pipe rail along the south edge, cars nosing up to its north side; a low bed of
+  // grasses in front of its west end, rounded at the east.
+  const [bx0, bz0, bx1, bz1] = REAR_COURT_PLANTERS[4];
+  const B: Vec2[] = [
+    [bx0, bz0],
+    [bx1, bz0],
+    [bx1, bz1],
+    [bx0, bz1],
+  ];
+  planter(B, 0.45, curbConcrete, 0.18);
+  for (let tx = 26.9; tx < 34.8; tx += 0.7)
+    tuft(
+      tx,
+      -11.95 + Math.sin(tx * 3) * 0.2,
+      0.3,
+      G0 + 0.4,
+      Math.round(tx * 7),
+    );
+  fanClump(28.2, -12.0, 3, 1.3, G0 + 0.4);
+  const bronzeRail = '#7d6a4f';
+  for (let px = 26.55; px <= 34.9; px += 1.2)
+    beam(
+      ce,
+      [px, G0 + 0.45, -11.42],
+      [px, G0 + 1.4, -11.42],
+      0.05,
+      0.05,
+      bronzeRail,
+    );
+  for (const y of [G0 + 1.4, G0 + 0.95])
+    beam(ce, [26.55, y, -11.42], [34.9, y, -11.42], 0.045, 0.045, bronzeRail);
+  const A2 = roundRect(...REAR_COURT_PLANTERS[3], [0.2, 0.7, 0.7, 0.2]);
+  planter(A2, 0.16, curbPink);
+  for (const [tx, tz] of [
+    [26.5, -10.6],
+    [27.2, -10.4],
+    [27.8, -10.7],
+    [26.9, -11.0],
+  ])
+    tuft(tx, tz, 0.3, G0 + 0.12, Math.round(tx * 11));
+
+  // C/F: the fan palm's island gets its red curb faces and its planting.
+  const island: Vec2[] = [
+    [30.4, -7.0],
+    [35.95, -0.61],
+    [35.95, 2.11],
+    [30.4, -4.25],
+  ];
+  const ic = centroid(island);
+  island.forEach((a, i) =>
+    paintEdge(a, island[(i + 1) % island.length], ic, 0.19, curbRed),
+  );
+  fanClump(33.4, -2.9, 4, 2.1, G0 + 0.18);
+  fanClump(34.8, -1.0, 3, 1.6, G0 + 0.18);
+  for (const [bx, bz, r] of [
+    [32.3, -4.2, 0.28],
+    [34.3, -1.9, 0.32],
+    [35.3, 0.4, 0.3],
+    [35.4, 1.3, 0.26],
+    [32.0, -3.4, 0.24],
+  ])
+    barrel(bx, bz, r, G0 + 0.18);
+  for (const [tx, tz] of [
+    [31.4, -5.0],
+    [32.6, -3.0],
+    [34.0, -0.5],
+    [35.0, -0.1],
+    [33.6, -1.9],
+  ])
+    tuft(tx, tz, 0.36, G0 + 0.16, Math.round(tz * 9));
+
+  // D: the agave strip, from the second blue palm south to the adjacent block's corner (x 29.15 -> 30.4), then on
+  // along its east wall (x 29.81 -> 30.4) to the planter at the row's foot; a raised inner tier down its middle.
+  const [sx0, sz0, sx1, sz1] = REAR_COURT_PLANTERS[5];
+  const stripN: Vec2[] = [
+    [sx0, sz0],
+    [sx1, sz0],
+    [sx1, sz1],
+    [sx0, sz1],
+  ];
+  const stripS: Vec2[] = [
+    [29.81, 3.41],
+    [30.4, 3.41],
+    [30.4, 21.9],
+    [29.81, 21.9],
+  ];
+  planter(stripN, 0.18, curbConcrete, 0.12);
+  planter(stripS, 0.18, curbConcrete, 0.1);
+  paintEdge([29.15, -5.4], [30.4, -5.4], [29.8, 0], 0.17, curbRed);
+  paintEdge([29.15, -5.4], [29.15, -3.2], [29.8, 0], 0.17, curbRed);
+  box(ce, 29.78, G0, -0.4, 0.34, 0.48, 7.0, curbConcrete);
+  box(ce, 29.78, G0 + 0.48, -0.4, 0.24, 0.015, 6.9, soil);
+  bluePalm(29.85, -4.75, 3.4, 3.0, 1.6, 6, G0 + 0.12);
+  agaveAt(30.1, 2.55, 1.05, G0 + 0.14);
+  agaveAt(30.15, 12.5, 0.8, G0 + 0.14);
+  // the dead flower stalk of an agave that bloomed, standing well above the roof line
+  {
+    const sx = 30.1,
+      sz = 6.8,
+      top = 8.4;
+    beam(
+      ce,
+      [sx, G0 + 0.1, sz],
+      [sx - 0.25, top, sz + 0.15],
+      0.11,
+      0.11,
+      '#8d7c63',
+    );
+    for (let k = 0; k < 7; k++) {
+      const y = top * (0.55 + k * 0.06),
+        f = y / top,
+        bx = sx - 0.25 * f,
+        bz = sz + 0.15 * f,
+        a = k * 2.2;
+      const end = [bx + Math.cos(a) * 0.55, y + 0.25, bz + Math.sin(a) * 0.55];
+      beam(ce, [bx, y, bz], end, 0.05, 0.05, '#8d7c63');
+      mesh(ce, new T.IcosahedronGeometry(0.16, 0), '#9b8a6b').position.set(
+        end[0],
+        end[1] + 0.08,
+        end[2],
+      );
+    }
+  }
+
+  // E: the adjacent block's door behind the row's last stall: aluminium frame, dark glass, a blue awning over it and
+  // a wall light up to its west.
+  {
+    const FZ = 3.41,
+      dx0 = 27.9,
+      dx1 = 29.0,
+      dh = 2.3;
+    box(
+      ce,
+      (dx0 + dx1) / 2,
+      G0,
+      FZ - 0.02,
+      dx1 - dx0 + 0.16,
+      dh + 0.08,
+      0.05,
+      '#b9bcbe',
+    );
+    box(
+      ce,
+      (dx0 + dx1) / 2,
+      G0 + 0.04,
+      FZ - 0.05,
+      dx1 - dx0 - 0.04,
+      dh - 0.04,
+      0.02,
+      '#20282c',
+    );
+    box(ce, dx1 - 0.18, G0 + 0.95, FZ - 0.08, 0.03, 0.3, 0.03, '#c7cacb');
+    box(
+      ce,
+      (dx0 + dx1) / 2,
+      G0 + dh + 0.2,
+      FZ - 0.35,
+      dx1 - dx0 + 0.75,
+      0.16,
+      0.7,
+      '#2f5f9e',
+    );
+    box(ce, 27.0, G0 + 3.65, FZ - 0.08, 0.28, 0.2, 0.14, '#e6e6e2');
+    box(ce, 27.0, G0 + 3.6, FZ - 0.16, 0.2, 0.06, 0.02, '#3b4043');
+  }
+
+  for (const [tx, tz] of [
+    [29.5, -23.6],
+    [31.5, -23.9],
+    [33.8, -23.4],
+    [35.2, -22.6],
+    [33.9, -21.4],
+    [30.6, -22.0],
+  ])
+    tuft(tx, tz, 0.32, G0 + 0.15, Math.round(tx * 5));
+  // G: the eucalyptus on the tree island: a pale, peeling trunk forking into limbs, loose grey-green canopy.
+  {
+    const g = group(ce, 'eucalyptus');
+    const tx = 32.2,
+      tz = -19.8,
+      fork = [tx - 0.4, 6.2, tz + 0.3];
+    beam(g, [tx, G0 + 0.05, tz], fork, 0.62, 0.62, '#cfc5b2');
+    beam(
+      g,
+      [tx + 0.1, G0 + 0.4, tz + 0.05],
+      [tx - 0.15, 2.6, tz + 0.15],
+      0.66,
+      0.5,
+      '#aa9e8a',
+    );
+    const limbs = [
+      [-3.4, 13.2, -1.6],
+      [3.0, 12.4, 2.2],
+      [0.8, 14.4, -3.2],
+      [-2.4, 11.4, 3.2],
+      [3.4, 13.6, -2.0],
+    ];
+    const canopy = ['#8a9b7c', '#7c8f70', '#97a688', '#83957a'];
+    limbs.forEach(([lx, ly, lz], i) => {
+      const end = [fork[0] + lx, ly, fork[2] + lz];
+      beam(g, fork, end, 0.3, 0.3, '#c8bfac');
+      for (let k = 0; k < 3; k++) {
+        const lobe = mesh(
+          g,
+          new T.IcosahedronGeometry(2.5 - k * 0.35, 1),
+          canopy[(i + k) % 4],
+        );
+        lobe.position.set(
+          end[0] + Math.cos(i * 1.9 + k * 2.2) * 1.8,
+          end[1] - 0.6 + k * 0.5,
+          end[2] + Math.sin(i * 1.9 + k * 2.2) * 1.8,
+        );
+        lobe.scale.set(1.25, 0.75, 1.1);
+      }
+    });
+  }
   for (const g of [facade, roof, site]) batch(g);
   return { facade, roof, site };
 }

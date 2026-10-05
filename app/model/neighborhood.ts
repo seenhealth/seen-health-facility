@@ -632,7 +632,8 @@ export function buildNeighborhood(model: Facility) {
     [33.35, -6.28, -0.88],
     [35.95, -6.28, -0.88],
   ]);
-  arrow(25.6, -10.4, Math.PI / 2);
+  // moved east of the low grass bed in front of the railed planter (photos 2026-10-05)
+  arrow(28.7, -8.4, Math.PI / 2);
   // Abstract model trees: a slender trunk under soft, smooth canopy volumes.
   const canopyGeometry = new T.SphereGeometry(1, 28, 18);
   function tree(x: number, z: number, r: number, h: number, i: number) {
@@ -679,9 +680,7 @@ export function buildNeighborhood(model: Facility) {
     [276, 1025, 2.4, 4.4],
     [276, 1496, 2.6, 4.6],
     [276, 1988, 2.1, 4.0],
-    [2945, 376, 3.4, 5.2],
     [3393, 435, 2.8, 4.6], // on the dialysis center's walk: its canopy shades the stalls, not a trunk in the aisle
-    [2941, 1072, 1.0, 1.8],
     [2961, 2188, 1.1, 2.0],
     [3341, 2099, 1.1, 2.0],
     [4152, 278, 2.4, 4.5],
@@ -709,7 +708,7 @@ export function buildNeighborhood(model: Facility) {
     NB.x1 - NB.x0,
     NB.h,
     NB.z1 - NB.z0,
-    SITE.neighbor,
+    '#dccba7',
   ).name = 'neighbor-east-estimated-height';
   box(
     (NB.x0 + NB.x1) / 2,
@@ -720,9 +719,16 @@ export function buildNeighborhood(model: Facility) {
     NB.z1 - NB.z0 + 0.16,
     SITE.coping,
   );
-  for (const y of [1.1, 4.9])
-    for (let z = NB.z0 + 2; z < NB.z1 - 1; z += 3.2)
-      box(NB.x0 - 0.015, y, z, 0.025, 1.6, 1.7, SITE.neighborGlass);
+  // Its west face toward the court is blank (photos 2026-10-05): tan stucco over a dark brown base band.
+  box(
+    NB.x0 - 0.012,
+    -0.2,
+    (NB.z0 + NB.z1) / 2,
+    0.025,
+    1.45,
+    NB.z1 - NB.z0,
+    '#86705f',
+  );
   for (let i = 0; i < 9; i++) {
     const x = NB.x0 + 3 + (i % 3) * 6.5,
       z = NB.z0 + 5 + Math.floor(i / 3) * 15;
