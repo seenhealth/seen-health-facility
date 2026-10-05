@@ -2,6 +2,8 @@
 
     python3 scripts/lobby-door-decals.py      # needs pillow; macOS system fonts
 
+Also writes the wall signs beside the lobby and the staff entrance's door decals (rear_door).
+
 lobby-door-decal.png: the right-hand leaf's upper glass, all white vinyl: the street number, the Seen Health wordmark
 (SeenCentral's public/branding/seen-wordmark.svg, rendered white to lobby-door-assets/seen-wordmark-white.png) with 见心颐养, the center's name and address, phone numbers, opening hours and the no-smoking / no-firearms
 lines. The door shows the old name 见康颐养 and mark; this uses the current ones (见心颐养, the four-petal mark).
@@ -122,3 +124,37 @@ def wall_signs():
 
 wall_signs()
 print('wrote lobby-no-smoking.png, lobby-access-sign.png')
+
+def rear_door():
+    """The staff entrance's glass double door on the wing's east face (photo 2026-10-05): the right-hand leaf's texture,
+    covering the glass from 0.1 m to 2.26 m above the landing (0.68 x 2.16 m at 1 px per mm; row 0 is the top).
+
+    rear-door-right.png (the right-hand leaf as you face the door, model −z): the street number in large white letters at
+    the top, STAFF ENTRANCE ONLY / 员工入口 at chest height and a NO SOLICITING / THANK YOU sticker by the meeting stile.
+    The left-hand leaf (+z) carries the lobby door's lobby-door-decal.png (the center's information block).
+    """
+    w, h = 680, 2160
+    top = 2.26
+    row = lambda y_m: round((top - y_m) * 1000)  # height above the landing in metres -> texture row
+    im = Image.new('RGBA', (w, h), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+    def centred(y, text, f, fill=WHITE):
+        d.text(((w - d.textlength(text, font=f)) / 2, y), text, font=f, fill=fill)
+    f = bold(112)
+    centred(row(2.19), '1839 W', f)
+    centred(row(2.07), 'Valley Blvd', f)
+    y = row(1.45)
+    for line in ('STAFF', 'ENTRANCE', 'ONLY'):
+        centred(y, line, av_b(54)); y += 58
+    centred(y + 2, '员工入口', pf_b(52))
+    x0, y0 = 500, row(1.10)
+    x1, y1 = x0 + 165, y0 + 72
+    d.rounded_rectangle((x0, y0, x1, y1), 8, fill=(18, 18, 18, 230), outline=WHITE, width=3)
+    t = 'NO SOLICITING'; f = bold(19)
+    d.text(((x0 + x1 - d.textlength(t, font=f)) / 2, y0 + 10), t, font=f, fill=WHITE)
+    d.line((x0 + 14, y0 + 40, x1 - 14, y0 + 40), fill=WHITE, width=2)
+    t = 'THANK YOU'; f = bold(14)
+    d.text(((x0 + x1 - d.textlength(t, font=f)) / 2, y0 + 47), t, font=f, fill=WHITE)
+    im.save(os.path.join(OUT, 'rear-door-right.png'))
+
+rear_door()
+print('wrote rear-door-right.png')

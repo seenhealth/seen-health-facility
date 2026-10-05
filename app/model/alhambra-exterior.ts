@@ -1387,22 +1387,79 @@ export function buildAlhambraExterior(model: Facility) {
         rearSurround,
       );
   };
-  // Glass double door, 1.9 m wide, 1.3 m in from the canopy's north end; a camera above its north jamb.
+  // Glass double door, 1.9 m wide, 1.3 m in from the canopy's north end.
   frameAround(doorZ - doorW / 2, doorZ + doorW / 2, 0, 2.45, false);
   box(court2, FACE_X + 0.03, 0, doorZ, 0.04, 2.45, doorW, glassDark);
   box(court2, FACE_X + 0.06, 0, doorZ, 0.03, 2.45, 0.07, rearSurround);
-  for (const sz of [doorZ - 0.6, doorZ + 0.6])
-    box(court2, FACE_X + 0.07, 1.0, sz, 0.02, 0.9, 0.04, alu);
-  box(
+  // D-pull handles either side of the meeting stile at hip height (photo 2026-10-05).
+  for (const sz of [doorZ - 0.11, doorZ + 0.11]) {
+    box(court2, FACE_X + 0.11, 0.8, sz, 0.025, 0.28, 0.025, alu);
+    for (const y of [0.84, 1.04])
+      box(court2, FACE_X + 0.075, y, sz, 0.06, 0.02, 0.02, alu);
+  }
+  // Vinyl on the glass (photo 2026-10-05; scripts/lobby-door-decals.py): facing the door, the right-hand leaf (−z)
+  // has the street number at the top, STAFF ENTRANCE ONLY / 员工入口 and a NO SOLICITING sticker; the left-hand leaf
+  // carries the lobby door's information block. Cut out, like the lobby's, so night glazing leaves it alone.
+  if (typeof document !== 'undefined') {
+    const vinyl = (url: string, w: number, h: number, y: number, z: number) => {
+      const map = new T.TextureLoader().load(url);
+      map.colorSpace = T.SRGBColorSpace;
+      map.anisotropy = 4;
+      const m = new T.Mesh(
+        new T.PlaneGeometry(w, h),
+        new T.MeshStandardMaterial({ map, alphaTest: 0.5, roughness: 0.6 }),
+      );
+      m.rotation.y = Math.PI / 2;
+      m.position.set(FACE_X + 0.055, y, z);
+      court2.add(m);
+    };
+    vinyl(
+      '/reference/photos/rear-door-right.png',
+      0.68,
+      2.16,
+      0.1 + 2.16 / 2,
+      doorZ - doorW / 4,
+    );
+    vinyl(
+      '/reference/photos/lobby-door-decal.png',
+      0.68,
+      0.96,
+      1.25 + 0.96 / 2,
+      doorZ + doorW / 4,
+    );
+  }
+  // A dome camera on a wall bracket just outside the surround's top corner on the left-hand (+z) side, and the
+  // black access keypad on the wall just right of the surround at hand height.
+  const camZ = doorZ + doorW / 2 + rim + 0.22;
+  box(court2, FACE_X + 0.07, 2.7, camZ, 0.14, 0.05, 0.06, '#e9ebea');
+  const camBody = mesh(
     court2,
-    FACE_X + 0.12,
-    2.75,
-    doorZ + doorW / 2 + 0.45,
-    0.14,
-    0.14,
-    0.14,
-    '#cfd2d3',
+    new T.CylinderGeometry(0.08, 0.08, 0.06, 16),
+    '#eceeed',
   );
+  camBody.position.set(FACE_X + 0.15, 2.68, camZ);
+  const camLens = mesh(
+    court2,
+    new T.SphereGeometry(0.07, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2),
+    '#2c3236',
+  );
+  camLens.position.set(FACE_X + 0.15, 2.65, camZ);
+  camLens.rotation.x = Math.PI;
+  const padZ = doorZ - doorW / 2 - rim - 0.12;
+  box(court2, FACE_X + 0.015, 0.97, padZ, 0.03, 0.18, 0.1, '#1c1e20');
+  for (let r = 0; r < 4; r++)
+    for (let c = 0; c < 3; c++)
+      box(
+        court2,
+        FACE_X + 0.033,
+        0.99 + r * 0.03,
+        padZ - 0.025 + c * 0.025,
+        0.006,
+        0.016,
+        0.016,
+        '#d9dad6',
+      );
+  box(court2, FACE_X + 0.033, 1.12, padZ, 0.006, 0.02, 0.04, '#5b6064');
   const winZ = pz0 + 2.5 + 0.65,
     winTop = 2.45,
     winH = 1.3;
