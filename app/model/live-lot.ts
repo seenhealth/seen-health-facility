@@ -444,7 +444,7 @@ function drawAvatar(
   }
 }
 /**
- * Paint the plate: driver square, participants with first names, then the car's number and its countdown. Resizes the
+ * Paint the plate: the driver's photo when there is one (no initials square), participants with first names, then the car's number and its countdown. Resizes the
  * canvas and the sprite to fit. `expanded` paints the opened bubble instead: the full title on top, the crew under it
  * and the vehicle's detail lines below, so the plate itself carries what a details card would.
  */
@@ -457,7 +457,7 @@ function paintLabel(
   if (expanded) return paintExpanded(sprite, v, repaint);
   const canvas = sprite.userData.canvas as HTMLCanvasElement;
   const people: { p: LivePerson; square: boolean }[] = [
-    ...(v.driver ? [{ p: v.driver, square: true }] : []),
+    ...(v.driver?.photo ? [{ p: v.driver, square: true }] : []),
     ...(v.riders ?? []).slice(0, 4).map((p) => ({ p, square: false })),
   ];
   const more = Math.max(0, (v.riders?.length ?? 0) - 4);
@@ -528,7 +528,7 @@ function paintLabel(
 function paintExpanded(sprite: T.Sprite, v: LiveVehicle, repaint: () => void) {
   const canvas = sprite.userData.canvas as HTMLCanvasElement;
   const people: { p: LivePerson; square: boolean }[] = [
-    ...(v.driver ? [{ p: v.driver, square: true }] : []),
+    ...(v.driver?.photo ? [{ p: v.driver, square: true }] : []),
     ...(v.riders ?? []).slice(0, 8).map((p) => ({ p, square: false })),
   ];
   const more = Math.max(0, (v.riders?.length ?? 0) - 8);
@@ -567,7 +567,9 @@ function paintExpanded(sprite: T.Sprite, v: LiveVehicle, repaint: () => void) {
   );
   const yTitle = 84,
     yAv = 150,
-    yLines = yAv + AV + (people.some((c) => !c.square) ? 112 : 64);
+    yLines = people.length
+      ? yAv + AV + (people.some((c) => !c.square) ? 112 : 64)
+      : yAv;
   const height = Math.round(
     yLines + lines.length * LINE + (lines.length ? 40 : 12),
   );

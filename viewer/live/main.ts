@@ -386,7 +386,9 @@ async function main() {
     if (key === bubbleKey) return;
     bubbleKey = key;
     bubbleEl.classList.toggle('hot', !!v.highlight);
-    bubbleEl.innerHTML = `<div class="tt">${esc(v.label)}${v.detail ? ` · ${esc(v.detail)}` : ''}</div><div class="crew">${v.driver ? `<span class="rider">${avatar(v.driver, true)}<span class="nm">${esc(v.driver.name)}</span></span>` : ''}${(v.riders ?? []).map(person).join('')}</div>${v.lines?.length ? `<div class="lines">${v.lines.map((t) => `<div>${esc(t)}</div>`).join('')}</div>` : ''}`;
+    // The title already names the car and the driver, so a driver gets an avatar only with a photo: no initials square.
+    const crew = `${v.driver?.photo ? `<span class="rider">${avatar(v.driver, true)}<span class="nm">${esc(v.driver.name)}</span></span>` : ''}${(v.riders ?? []).map(person).join('')}`;
+    bubbleEl.innerHTML = `<div class="tt">${esc(v.label)}${v.detail ? ` · ${esc(v.detail)}` : ''}</div>${crew ? `<div class="crew">${crew}</div>` : ''}${v.lines?.length ? `<div class="lines">${v.lines.map((t) => `<div>${esc(t)}</div>`).join('')}</div>` : ''}`;
   };
   const projected = new Vector3();
   const placeBubble = () => {
