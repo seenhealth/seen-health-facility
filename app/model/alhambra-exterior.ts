@@ -14,12 +14,13 @@ import { exteriorPrimitives } from './exterior-primitives';
 export const REAR_COURT_PLANTERS = [
   [15.45, -24.3, 17.3, -20.6],
   [15.42, -9.6, 20.3, -6.8],
-  // The court east of the adjacent block (photos 2026-10-05): the blue fan palm's planter (A), the low grass bed (A2)
-  // and the railed raised planter (B) south of the cars at the tree island, and the agave strip's free-standing
-  // north end (D) between the court's last stall and the dialysis aisle's row.
-  [23.75, -15.9, 25.95, -10.9],
-  [26.0, -11.3, 28.2, -9.9],
-  [26.4, -12.6, 35.0, -11.3],
+  // The court east of the adjacent block (photos 2026-10-05): the blue fan palm's planter (A), the low grass bed (A2),
+  // the railed raised divider (B) running south from the tree island's south tip (bounds; its north end follows the
+  // island's edge), and the agave strip's free-standing north end (D) between the court's last stall and the
+  // dialysis aisle's row.
+  [29.1, -15.9, 31.3, -10.9],
+  [29.6, -10.9, 31.3, -9.7],
+  [31.3, -19.25, 32.6, -10.3],
   [29.15, -5.4, 30.4, 3.41],
 ] as const;
 /**
@@ -2418,9 +2419,10 @@ export function buildAlhambraExterior(model: Facility) {
   // The court between the adjacent block (1819 W Valley Blvd #B, whose north wall is at z 3.41 and east wall at
   // x 29.81) and the dialysis center's lot, from five photos of 2026-10-05 placed against the satellite and the
   // stall lines (the phone's compass was off by up to 100 degrees, so each camera was solved from what it shows):
-  // - A: a big Mexican blue fan palm in a long planter with a faded pinkish-grey curb, its north end rounded;
-  // - B: a raised planter with a bronze pipe rail on its south edge, grasses and a small fan palm, the cars parked
-  //   north of it facing it;
+  // - A: a big Mexican blue fan palm in a long planter with a faded pinkish-grey curb, its north end rounded, against
+  //   the divider's west side;
+  // - B: a raised divider with a bronze pipe rail on its west side, grasses and a small fan palm, running south from
+  //   the tree island's south tip;
   // - C/F: the fan palm's island (neighborhood.ts CURB_ISLANDS_PX[4]) with its curb painted red: a second blue fan
   //   palm at its west end, hung with old flower stalks, Mediterranean fan palms and golden barrel cacti east of it;
   // - D: the agave strip, a narrow two-tier planter from that palm south to the adjacent block's corner and on along
@@ -2667,57 +2669,68 @@ export function buildAlhambraExterior(model: Facility) {
     }
   };
 
-  // A: the first blue fan palm's planter, long north-south with a rounded north end.
-  const A = roundRect(...REAR_COURT_PLANTERS[2], [1.1, 1.1, 0.5, 0.5]);
+  // A: the first blue fan palm's planter, long north-south with a rounded north end, against the divider's west
+  // side (B, below), out of the court's drive.
+  const [ax0, az0, ax1, az1] = REAR_COURT_PLANTERS[2];
+  const A = roundRect(ax0, az0, ax1, az1, [1.1, 1.1, 0.5, 0.5]);
   planter(A, 0.18, curbPink);
-  bluePalm(24.85, -12.6, 2.6, 2.9, 1.0, 0);
-  for (const [tx, tz, r] of [
-    [24.2, -14.6, 0.45],
-    [25.4, -14.2, 0.4],
-    [24.3, -11.6, 0.45],
-    [25.5, -11.4, 0.4],
-    [24.6, -13.5, 0.35],
+  const acx = (ax0 + ax1) / 2;
+  bluePalm(acx, -12.6, 2.6, 2.9, 1.0, 0);
+  for (const [dx, tz, r] of [
+    [-0.65, -14.6, 0.45],
+    [0.55, -14.2, 0.4],
+    [-0.55, -11.6, 0.45],
+    [0.65, -11.4, 0.4],
+    [-0.25, -13.5, 0.35],
   ])
-    tuft(tx, tz, r, G0 + 0.12, Math.round(tx * 10));
+    tuft(acx + dx, tz, r, G0 + 0.12, Math.round(tz * -10));
 
-  // B: the raised planter with its pipe rail along the south edge, cars nosing up to its north side; a low bed of
-  // grasses in front of its west end, rounded at the east.
+  // B: the raised divider, north-south from the tree island's south tip (its north end runs along the island's
+  // south-east edge, so the two read as one planter) toward the court, the pipe rail on its west side facing the
+  // first palm; a low bed of grasses south of the palm's planter along it, rounded at the west.
   const [bx0, bz0, bx1, bz1] = REAR_COURT_PLANTERS[4];
+  const islandEdge = (x: number) =>
+    -18.49 + ((x - 31.34) * (-21.73 + 18.49)) / (36.68 - 31.34);
   const B: Vec2[] = [
-    [bx0, bz0],
-    [bx1, bz0],
+    [bx0, islandEdge(bx0)],
+    [bx1, islandEdge(bx1)],
     [bx1, bz1],
     [bx0, bz1],
   ];
   planter(B, 0.45, curbConcrete, 0.18);
-  for (let tx = 26.9; tx < 34.8; tx += 0.7)
+  for (let tz = bz1 - 0.5; tz > islandEdge(bx0) + 0.3; tz -= 0.7)
     tuft(
-      tx,
-      -11.95 + Math.sin(tx * 3) * 0.2,
+      (bx0 + bx1) / 2 + Math.sin(tz * 3) * 0.2,
+      tz,
       0.3,
       G0 + 0.4,
-      Math.round(tx * 7),
+      Math.round(-tz * 7),
     );
-  fanClump(28.2, -12.0, 3, 1.3, G0 + 0.4);
-  const bronzeRail = '#7d6a4f';
-  for (let px = 26.55; px <= 34.9; px += 1.2)
+  fanClump((bx0 + bx1) / 2, -16.4, 3, 1.3, G0 + 0.4);
+  const bronzeRail = '#7d6a4f',
+    railX = bx0 + 0.12,
+    railZ0 = islandEdge(bx0) + 0.15,
+    railZ1 = bz1 - 0.12;
+  const posts = Math.round((railZ1 - railZ0) / 1.2);
+  for (let i = 0; i <= posts; i++) {
+    const pz = railZ0 + ((railZ1 - railZ0) * i) / posts;
     beam(
       ce,
-      [px, G0 + 0.45, -11.42],
-      [px, G0 + 1.4, -11.42],
+      [railX, G0 + 0.45, pz],
+      [railX, G0 + 1.4, pz],
       0.05,
       0.05,
       bronzeRail,
     );
+  }
   for (const y of [G0 + 1.4, G0 + 0.95])
-    beam(ce, [26.55, y, -11.42], [34.9, y, -11.42], 0.045, 0.045, bronzeRail);
-  const A2 = roundRect(...REAR_COURT_PLANTERS[3], [0.2, 0.7, 0.7, 0.2]);
+    beam(ce, [railX, y, railZ0], [railX, y, railZ1], 0.045, 0.045, bronzeRail);
+  const A2 = roundRect(...REAR_COURT_PLANTERS[3], [0.55, 0.1, 0.1, 0.55]);
   planter(A2, 0.16, curbPink);
   for (const [tx, tz] of [
-    [26.5, -10.6],
-    [27.2, -10.4],
-    [27.8, -10.7],
-    [26.9, -11.0],
+    [30.1, -10.3],
+    [30.8, -10.5],
+    [30.6, -10.0],
   ])
     tuft(tx, tz, 0.3, G0 + 0.12, Math.round(tx * 11));
 
