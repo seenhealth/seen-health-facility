@@ -38,6 +38,9 @@ import {
   footprintGap,
   isAngled,
   needsDockClear,
+  REAR_BAYS,
+  rearBayFootprint,
+  rearBayPose,
   stallOrder,
   stallPose,
   type Footprint as LotFootprint,
@@ -158,6 +161,12 @@ const L = FLEET_LOT;
  * the one manoeuvring is parked or out on the street. Where each parks and the way in and out: live-lot-traffic.ts.
  */
 const QUEUE_GAP = 1.5;
+/**
+ * On the alley's westbound lane, east of the lot's driveway: where a vehicle coming from the rear court holds while a
+ * departure turns out of the driveway or one bound for the rear crosses it, so they take the shared stretch west of it
+ * (and the corner onto the west street) one at a time.
+ */
+const MERGE_X = -14;
 /** Where the first vehicle in the queue waits: its centre on the entrance lane, a van's nose 1.5 m short of the drop-off's side. */
 const HOLD_X = -27.6;
 /** A vehicle has left the drop-off once it is this far from where a van stands there. */
@@ -212,8 +221,19 @@ const RAMP_IN: WalkPoint[] = [
   INSIDE,
 ];
 
+/** `toRear` / `rear` / `fromRear`: overflow parking in the rear court while the lot is full (on the way, parked, and back
+ * round to the entrance for a space). */
 type Mode =
-  'waiting' | 'arriving' | 'docked' | 'toBay' | 'parked' | 'leaving' | 'gone';
+  | 'waiting'
+  | 'arriving'
+  | 'docked'
+  | 'toBay'
+  | 'parked'
+  | 'leaving'
+  | 'gone'
+  | 'toRear'
+  | 'rear'
+  | 'fromRear';
 type Drive = {
   pieces: Piece[];
   length: number;
@@ -304,8 +324,18 @@ type Live = {
   /** Seconds since the last boarder vanished into the car with nobody else pending; closes up at 1.5. */
   closeTimer: number;
   leaveWhenClosed: boolean;
-  /** No space was free for it, so it drives off (or was never drawn) and stays out of sight until one frees. */
+  /** No space was free for it, so it parks in the rear court, or (no rear bay either) drives off or was never drawn, and stays out of sight until one frees. */
   lotFull?: boolean;
+  /** The rear bay it holds while parking there, parked there or about to leave it. */
+  rear: number | null;
+  /** On its way out of a rear bay: it gives the rear court back once this far along its drive. */
+  rearClearS: number | null;
+  /** Parked in the rear and told to go: it leaves once the court is its own. */
+  rearLeave: boolean;
+  /** Its drive started in the rear court (out along the alley past the lot's driveway); `mergeS`: where on it the
+   * vehicle reaches the hold point east of the driveway's mouth. */
+  fromCourt: boolean;
+  mergeS: number;
   braking: boolean;
   reversing: boolean;
 };
@@ -752,6 +782,9 @@ export function createLiveLot(ctx: {
   const walkers = createWalkers(people);
   const live = new Map<string, Live>();
   const spots = new Map<number, string>();
+  /** Rear bays taken (bay -> vehicle id), and who is moving in the rear court (one at a time). */
+  const rearSpots = new Map<number, string>();
+  let rearHolder: string | null = null;
   const traffic = createLotTraffic(ctx.model);
   /** The approach every arrival drives, where the head of the queue holds on it, and where the lot begins. */
   const approach = drive(fleetRoutes.awayToFrontDock());
@@ -774,6 +807,21 @@ export function createLiveLot(ctx: {
   ];
   /** Where a vehicle that is still some minutes out waits at the nearest: on the street, just past the alley's mouth. */
   const WAIT_S = ALLEY_MOUTH[1] + 0.5;
+  /** Where a vehicle coming back round from the rear court joins the approach: the end of its corner onto the west street. */
+  const JOIN_S = (() => {
+    const zJoin = L.westbound + L.streetRadius;
+    let best = 0,
+      err = Infinity;
+    for (let s = 0; s < approach.length; s += 0.05) {
+      const p = pathAt(approach.pieces, s),
+        e = Math.hypot(p.x - L.northbound, p.z - zJoin);
+      if (e < err) {
+        err = e;
+        best = s;
+      }
+    }
+    return best;
+  })();
   /** As far along the approach as `s` without standing in a stretch that is kept clear. */
   const standAt = (s: number) => {
     for (const [from, to] of KEEP_CLEAR) if (s > from && s < to) return from;
@@ -885,6 +933,32 @@ export function createLiveLot(ctx: {
             (o.mode === 'arriving' && o.s >= ON_LOT_S - 12)),
       )
       .map(footprintOf);
+  /** The vehicles parked in the rear court besides `l`. */
+  const rearStanding = (l: Live) =>
+    [...rearSpots.entries()]
+      .filter(([, id]) => id !== l.v.id)
+      .map(([bay, id]) => rearBayFootprint(bay, sizeOf(live.get(id)!)));
+  function releaseRear(l: Live) {
+    if (l.rear !== null && rearSpots.get(l.rear) === l.v.id)
+      rearSpots.delete(l.rear);
+    l.rear = null;
+  }
+  /** Start a drive out of the rear bay; the court is given back once the vehicle is past its mouth on the alley. */
+  function startFromRear(l: Live, legs: LotLeg[], mode: Mode) {
+    releaseRear(l);
+    rearHolder = l.v.id;
+    l.rearLeave = false;
+    start(l, legs, mode);
+    const back = l.drive!.legs.find((g) => g.leg.id === 'back-out');
+    l.rearClearS = (back?.end ?? 0) + 12;
+    l.fromCourt = true;
+    l.mergeS = l.drive!.length;
+    for (let s = back?.end ?? 0; s < l.drive!.length; s += 0.1)
+      if (pathAt(l.drive!.pieces, s).x <= MERGE_X) {
+        l.mergeS = s;
+        break;
+      }
+  }
   /** The first free space, in the order this vehicle is offered them, that it fits. */
   function freeStall(l: Live): number | null {
     const size = sizeOf(l);
@@ -916,6 +990,7 @@ export function createLiveLot(ctx: {
     l.vel = 0;
     l.targetS = l.drive?.length ?? 0;
     l.mode = mode;
+    l.fromCourt = false;
     if (mode === 'arriving') l.lotFull = false;
     if (l.drive) pose(l);
   }
@@ -925,8 +1000,19 @@ export function createLiveLot(ctx: {
     l.drive = null;
     l.vel = 0;
     if (i === null) {
-      // The feed has it on the lot but every space is taken: not drawn rather than parked off the lot, and it
-      // drives in once a space is free (`controlTraffic`).
+      // The feed has it on the lot but every space is taken: in a free rear bay, else not drawn rather than parked
+      // off the lot; either way it drives in once a space is free (`controlTraffic`).
+      const bay = REAR_BAYS.findIndex((_, b) => !rearSpots.has(b));
+      if (bay >= 0) {
+        l.lotFull = true;
+        l.rear = bay;
+        rearSpots.set(bay, l.v.id);
+        const rp = rearBayPose(bay, sizeOf(l));
+        place(l.body.object, rp.x, rp.z, rp.dir + Math.PI);
+        l.mode = 'rear';
+        l.opacity = 1;
+        return;
+      }
       l.mode = 'gone';
       l.lotFull = true;
       l.opacity = 0;
@@ -961,6 +1047,8 @@ export function createLiveLot(ctx: {
   }
   function remove(l: Live) {
     releaseSpot(l);
+    releaseRear(l);
+    if (rearHolder === l.v.id) rearHolder = null;
     forget(l);
     for (const id of walkers.ids(`${l.v.id}|`)) walkers.remove(id);
     root.remove(l.body.object);
@@ -1032,6 +1120,12 @@ export function createLiveLot(ctx: {
         riders: v.state === 'on-lot' ? all : [],
       };
     }
+    if (l.mode === 'toRear')
+      return { ...v, detail: 'lot full · to the rear', riders: [] };
+    if (l.mode === 'rear')
+      return { ...v, detail: 'overflow · rear court', riders: [] };
+    if (l.mode === 'fromRear')
+      return { ...v, detail: 'back for a space', riders: [] };
     if (l.mode === 'leaving' && l.lotFull)
       return { ...v, detail: 'lot full · leaving', riders: [] };
     if (l.mode === 'leaving') {
@@ -1218,6 +1312,11 @@ export function createLiveLot(ctx: {
           pending: null,
           through: false,
           leaveOnceParked: false,
+          rear: null,
+          rearClearS: null,
+          rearLeave: false,
+          fromCourt: false,
+          mergeS: 0,
           returning: false,
           dropped: false,
           vel: 0,
@@ -1284,9 +1383,11 @@ export function createLiveLot(ctx: {
           } else if (
             l.mode === 'parked' ||
             l.mode === 'gone' ||
-            l.mode === 'waiting'
+            l.mode === 'waiting' ||
+            l.mode === 'rear'
           ) {
             releaseSpot(l);
+            releaseRear(l);
             forget(l);
             l.boarded.clear();
             start(l, fleetRoutes.awayToFrontDock(), 'arriving');
@@ -1323,6 +1424,20 @@ export function createLiveLot(ctx: {
   }
   function leave(l: Live) {
     if (l.mode === 'leaving' || l.mode === 'gone') return;
+    // Parked in the rear: out by the alley once the court is its own (`controlTraffic`). On its way there: it parks,
+    // then goes. On its way back round for a space: on through the drop-off without stopping.
+    if (l.mode === 'rear') {
+      l.rearLeave = true;
+      return;
+    }
+    if (l.mode === 'toRear') {
+      l.leaveOnceParked = true;
+      return;
+    }
+    if (l.mode === 'fromRear') {
+      l.through = true;
+      return;
+    }
     l.doorTarget = l.rampTarget = l.cabTarget = 0;
     l.dock = null;
     if (l.door > 0.01 || l.ramp > 0.01) {
@@ -1398,9 +1513,19 @@ export function createLiveLot(ctx: {
         spots.set(pick.stall, l.v.id);
         start(l, pick.plan.legs, 'toBay');
       } else {
-        // Lot full: on out of the lot rather than park in the aisle or the street.
+        // Lot full: overflow parking in the rear court, out of the driveway and east along the alley; with every rear
+        // bay taken too, on out of the lot rather than park in the aisle or the street.
         l.lotFull = true;
-        start(l, traffic.planDockOut(), 'leaving');
+        const rear = traffic.planToRear(
+          sizeOf(l),
+          (b) => rearSpots.has(b),
+          rearStanding(l),
+        );
+        if (rear) {
+          l.rear = rear.bay;
+          rearSpots.set(rear.bay, l.v.id);
+          start(l, rear.plan.legs, 'toRear');
+        } else start(l, traffic.planDockOut(), 'leaving');
       }
     } else if (l.mode === 'docked') start(l, traffic.planDockOut(), 'leaving');
     else if (l.mode === 'parked' && l.spot !== null) {
@@ -1417,7 +1542,8 @@ export function createLiveLot(ctx: {
         l.mode = 'gone';
       }
     }
-    if (l.mode !== 'toBay' && l.mode !== 'leaving') forget(l);
+    if (l.mode !== 'toBay' && l.mode !== 'leaving' && l.mode !== 'toRear')
+      forget(l);
   }
   const onLeg = (l: Live, id: string) =>
     !!l.drive && legAt(l.drive, l.s).leg.id === id;
@@ -1437,7 +1563,9 @@ export function createLiveLot(ctx: {
         dh.mode === 'gone' ||
         dh.mode === 'waiting' ||
         (dh.mode === 'parked' && dh.pending !== 'leave') ||
-        ((dh.mode === 'toBay' || dh.mode === 'leaving') &&
+        ((dh.mode === 'toBay' ||
+          dh.mode === 'leaving' ||
+          dh.mode === 'toRear') &&
           !onLeg(dh, 'back-out') &&
           footprintGap(footprintOf(dh), DOCK_FOOTPRINT) >= DOCK_CLEAR))
     )
@@ -1447,9 +1575,13 @@ export function createLiveLot(ctx: {
     if (
       aisleHolder &&
       (!ah ||
-        (ah.mode !== 'toBay' && ah.mode !== 'leaving') ||
+        (ah.mode !== 'toBay' &&
+          ah.mode !== 'leaving' &&
+          ah.mode !== 'toRear') ||
         (ah.mode === 'leaving' &&
-          ah.s >= (legSpan(ah, 'corner-south')?.end ?? 0)))
+          ah.s >= (legSpan(ah, 'corner-south')?.end ?? 0)) ||
+        (ah.mode === 'toRear' &&
+          ah.s >= (legSpan(ah, 'driveway-out')?.end ?? 0)))
     )
       aisleHolder = null;
 
@@ -1506,11 +1638,46 @@ export function createLiveLot(ctx: {
       }
     }
 
+    // The rear court, one vehicle at a time: one driving there waits on the alley until it is free.
+    if (rearHolder) {
+      const rh = live.get(rearHolder);
+      if (
+        !rh ||
+        (rh.mode === 'rear' && !rh.rearLeave) ||
+        (rh.rearClearS !== null && rh.s >= rh.rearClearS) ||
+        (rh.mode !== 'toRear' &&
+          rh.mode !== 'fromRear' &&
+          rh.mode !== 'leaving')
+      ) {
+        if (rh) rh.rearClearS = null;
+        rearHolder = null;
+      }
+    }
+    for (const l of live.values()) {
+      if (l.mode !== 'toRear' || !l.drive) continue;
+      const alley = legSpan(l, 'alley-east');
+      if (!alley || l.s >= alley.start + 1) continue;
+      if (!rearHolder && l.s >= alley.start - 6) rearHolder = l.v.id;
+      if (rearHolder !== l.v.id)
+        l.targetS = Math.min(l.drive.length, alley.start);
+      else l.targetS = l.drive.length;
+    }
+    for (const l of live.values())
+      if (l.mode === 'rear' && l.rearLeave && !rearHolder) {
+        const plan = traffic.planFromRear(
+          l.rear!,
+          sizeOf(l),
+          rearStanding(l),
+          'away',
+        );
+        if (plan) startFromRear(l, plan.legs, 'leaving');
+      }
     // A vehicle that drove off because the lot was full comes back in once there is a space no one else is after.
     let claims = [...live.values()].filter(
       (l) =>
         (l.mode === 'arriving' && due(l) && !l.through) ||
-        (l.mode === 'docked' && l.pending !== 'leave'),
+        (l.mode === 'docked' && l.pending !== 'leave') ||
+        (l.mode === 'fromRear' && !l.through),
     ).length;
     for (const l of live.values()) {
       if (
@@ -1537,16 +1704,51 @@ export function createLiveLot(ctx: {
       l.targetS = l.s;
       pose(l);
     }
+    // One parked in the rear drives back round to the entrance (out by the alley and up the west street) the same way.
+    for (const l of live.values()) {
+      if (
+        l.mode !== 'rear' ||
+        l.rearLeave ||
+        rearHolder ||
+        l.dropped ||
+        l.v.state === 'away'
+      )
+        continue;
+      const size = sizeOf(l);
+      const free = stallOrder(size).filter(
+        (i) => !spots.has(i) && fitsStall(i, size),
+      ).length;
+      if (free <= claims) continue;
+      const plan = traffic.planFromRear(l.rear!, size, rearStanding(l), 'back');
+      if (!plan) continue;
+      claims++;
+      startFromRear(l, plan.legs, 'fromRear');
+      l.returning = true;
+      l.arriving = [];
+    }
 
     // Departures turning out of the alley and arrivals passing its mouth take turns.
     const leaving = [...live.values()].filter(
-      (l) => l.mode === 'leaving' && l.drive,
+      (l) => (l.mode === 'leaving' || l.mode === 'fromRear') && l.drive,
     );
     let turningOut = false;
     for (const l of leaving) {
-      const corner = legSpan(l, 'corner-south');
+      const corner = legSpan(l, 'corner-south') ?? legSpan(l, 'corner-north');
       l.targetS = l.drive!.length;
       if (!corner || l.s >= corner.end) continue;
+      // Back round for a space: it turns onto the arrivals' lane only where there is room for it in their line.
+      if (
+        l.mode === 'fromRear' &&
+        l.s <= corner.start + 0.01 &&
+        arrivals.some(
+          (a) =>
+            Math.abs(a.s - JOIN_S) <
+            a.body.halfLength + l.body.halfLength + QUEUE_GAP + 2,
+        )
+      ) {
+        l.targetS = corner.start;
+        continue;
+      }
       if (l.s > corner.start + 0.01) {
         turningOut = true;
         continue;
@@ -1564,6 +1766,47 @@ export function createLiveLot(ctx: {
       );
       if (crossing) l.targetS = corner.start;
       else if (l.s > corner.start - CROSSING.claim) turningOut = true;
+    }
+    // The alley between the driveway's mouth and the west street is shared by departures out of the lot, vehicles
+    // bound for the rear court (they cross it) and vehicles coming from the court along it: one at a time.
+    const endOf = (o: Live, ...ids: string[]) =>
+      Math.max(...ids.map((id) => legSpan(o, id)?.end ?? -Infinity));
+    const lotOut = [...live.values()].filter(
+      (o) =>
+        !!o.drive &&
+        !o.fromCourt &&
+        (o.mode === 'leaving' || o.mode === 'toRear'),
+    );
+    const courtOut = [...live.values()].filter(
+      (o) =>
+        !!o.drive &&
+        o.fromCourt &&
+        (o.mode === 'leaving' || o.mode === 'fromRear'),
+    );
+    /** Past the STOP bar and not yet clear of the corner (out of the lot), or across the alley (bound for the rear). */
+    const lotInZone = (o: Live) => {
+      const stopEnd = endOf(o, 'to-stop', 'front-dock-out');
+      const clear =
+        o.mode === 'toRear'
+          ? endOf(o, 'driveway-out')
+          : endOf(o, 'corner-south') + 10;
+      return o.s > stopEnd + 0.05 && o.s < clear;
+    };
+    const courtInZone = (o: Live) =>
+      o.s >= o.mergeS - 0.05 &&
+      o.s < endOf(o, 'corner-south', 'corner-north') + 10;
+    for (const o of courtOut)
+      if (o.s < o.mergeS && lotOut.some(lotInZone))
+        o.targetS = Math.min(o.targetS, o.mergeS);
+    for (const o of lotOut) {
+      const stopEnd = endOf(o, 'to-stop', 'front-dock-out');
+      if (o.s > stopEnd + 0.05) continue;
+      const busy = courtOut.some(
+        (c) =>
+          courtInZone(c) ||
+          (c.s < c.mergeS && c.s > c.mergeS - 10 && c.targetS > c.s + 0.5),
+      );
+      if (busy) o.targetS = Math.min(o.targetS, stopEnd);
     }
     // Each arrival: as far as its ETA puts it, behind the one ahead, and short of the drop-off unless it is its own.
     // One that is due is not held up by one still waiting up the street for its ETA (that one is not really there
@@ -1839,6 +2082,36 @@ export function createLiveLot(ctx: {
             leave(l);
           }
         }
+      } else if (l.mode === 'toRear' && l.drive) {
+        advance(l, dt);
+        if (l.s >= l.drive.length - 1e-6 && l.vel < 0.05) {
+          l.mode = 'rear';
+          l.drive = null;
+          l.vel = 0;
+          if (rearHolder === l.v.id) rearHolder = null;
+          if (l.leaveOnceParked) {
+            l.leaveOnceParked = false;
+            l.rearLeave = true;
+          }
+        }
+      } else if (l.mode === 'fromRear' && l.drive) {
+        advance(l, dt);
+        if (l.s >= l.drive.length - 1e-6) {
+          // On the arrivals' lane up the west street: from here it is one of them, back for a space.
+          const vel = l.vel,
+            through = l.through;
+          start(l, fleetRoutes.awayToFrontDock(), 'arriving');
+          l.returning = true;
+          l.through = through;
+          l.arriving = [];
+          l.wantS = approach.length;
+          l.s = JOIN_S;
+          l.vel = vel;
+          l.targetS = l.s;
+          pose(l);
+        }
+      } else if (l.mode === 'rear') {
+        l.opacity = Math.min(1, l.opacity + dt);
       } else if (l.mode === 'leaving' && l.drive) {
         advance(l, dt);
         if (l.s >= l.drive.length - 1e-6) l.mode = 'gone';
@@ -2129,9 +2402,11 @@ export function createLiveLot(ctx: {
         opacity: +l.opacity.toFixed(2),
         pending: l.pending,
         lotFull: !!l.lotFull,
+        rear: l.rear,
         holds:
           (dockHolder === l.v.id ? 'dock ' : '') +
-          (aisleHolder === l.v.id ? 'aisle' : ''),
+          (aisleHolder === l.v.id ? 'aisle ' : '') +
+          (rearHolder === l.v.id ? 'rear' : ''),
       }));
     },
     /** People on foot right now, for the HUD. */

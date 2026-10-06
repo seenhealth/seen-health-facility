@@ -19,7 +19,11 @@
  * Directions are the fleet's (`atan2(dx, dz)`, alhambra-fleet.ts): its "south"
  * is −z, the way the one-way aisle runs from the drop-off to the alley.
  */
-import { DROP_OFF } from './alhambra-exterior';
+import {
+  DROP_OFF,
+  RAMP_PLANTER,
+  REAR_COURT_PLANTERS,
+} from './alhambra-exterior';
 import { FLEET_LOT, FRONT_DOCK, type FleetLeg } from './alhambra-fleet';
 import { siteCurbs } from './neighborhood';
 import type { Facility, Vec2 } from './schema';
@@ -109,6 +113,52 @@ export const DOCK_FOOTPRINT: Footprint = {
   halfWidth: 1.125,
   halfLength: 3.175,
 };
+
+// ---------------------------------------------------------------------------
+// Overflow parking in the rear court
+// ---------------------------------------------------------------------------
+/**
+ * The rear court's stalls a vehicle parks in when the lot is full (the dispatcher, 2026-10-05): the two angled stalls
+ * by the alley nosed SSE along the tree island's west edge and one beside the staff entrance nosed SSW, as
+ * neighborhood.ts paints them (`row(151)` / `row(206)`: c across a row, s along its bearing). Three of them: the
+ * third SSW stall has the utility pole in it, and the way into or out of the first one (the staff entrance's) runs
+ * through a vehicle standing in the SSE stall next to the alley. A vehicle noses in until it is 0.3 m short of the
+ * stall's far end. The order is the order they are filled: the deepest first, so the next one in passes no one's tail.
+ */
+const REAR_ROWS = { sse: 151, ssw: 206 } as const;
+export const REAR_BAYS: {
+  row: keyof typeof REAR_ROWS;
+  c: number;
+  nose: number;
+}[] = [
+  { row: 'sse', c: 34.65, nose: -0.88 },
+  { row: 'sse', c: 32.05, nose: -0.88 },
+  { row: 'ssw', c: 9.425, nose: -18.75 },
+];
+function rowFrame(row: keyof typeof REAR_ROWS) {
+  const b = (REAR_ROWS[row] * Math.PI) / 180,
+    d: Vec2 = [Math.sin(b), -Math.cos(b)],
+    n: Vec2 = [d[1], -d[0]];
+  return { d, n, dir: Math.atan2(d[0], d[1]) };
+}
+/** Where a vehicle of size `v` stands in rear bay `bay`, and the way its nose points (fleet direction). */
+export function rearBayPose(bay: number, v: Size) {
+  const b = REAR_BAYS[bay],
+    f = rowFrame(b.row),
+    s = b.nose - 0.3 - v.halfLength;
+  return {
+    x: b.c * f.n[0] + s * f.d[0],
+    z: b.c * f.n[1] + s * f.d[1],
+    dir: f.dir,
+  };
+}
+export const rearBayFootprint = (bay: number, v: Size): Footprint => ({
+  ...rearBayPose(bay, v),
+  halfWidth: v.halfWidth,
+  halfLength: v.halfLength,
+});
+/** The utility pole east of the garage ramp's head, standing in the court. */
+const REAR_POLE: Vec2 = [15.85, -15.8];
 
 // ---------------------------------------------------------------------------
 // Gaps between footprints and fixed things
@@ -763,11 +813,227 @@ export function createLotTraffic(
     return fallback;
   }
 
+  // -------------------------------------------------------------------------
+  // Overflow: out of the lot, east along the alley and into a rear bay; and back out of it
+  // -------------------------------------------------------------------------
+  /** Kerbs, planters, walls and the pole a vehicle in the alley or the rear court can come near, and the alley's far kerb. */
+  const rearFixed: Obstacle[] = [
+    ...curbs.islands,
+    ...curbs.sidewalks,
+    model.site.buildingOutline,
+    ...REAR_COURT_PLANTERS.map(([x0, z0, x1, z1]): Poly => [
+      [x0, z0],
+      [x1, z0],
+      [x1, z1],
+      [x0, z1],
+    ]),
+    RAMP_PLANTER,
+    [
+      [REAR_POLE[0] - 0.25, REAR_POLE[1] - 0.25],
+      [REAR_POLE[0] + 0.25, REAR_POLE[1] - 0.25],
+      [REAR_POLE[0] + 0.25, REAR_POLE[1] + 0.25],
+      [REAR_POLE[0] - 0.25, REAR_POLE[1] + 0.25],
+    ] as Poly,
+  ]
+    .flatMap(sides)
+    .filter(
+      (o) => o.box[1] > -12 && o.box[0] < 45 && o.box[3] > -40 && o.box[2] < 5,
+    )
+    .concat([
+      obstacle([
+        [-36, -36.2],
+        [45, -36.2],
+      ]),
+    ]);
+  const WEST = -Math.PI / 2;
+  /** Into rear bay `bay`: out of the drop-off and down the aisle to the STOP bar, left onto the alley's eastbound lane, then left into the court and nose first into the bay. */
+  function rearInRoute(bay: number, v: Size, rTurn: number, rIn: number) {
+    const [x, z] = FRONT_DOCK.at,
+      pen = new Pen(x, z, SOUTH).line(L.lead),
+      lateral = pen.x - L.exitLane;
+    pen.jog(lateral, L.driftRadius).lineToZ(L.exitStopZ);
+    const legs: LotLeg[] = [
+      leg('front-dock-out', 'Leaving the drop-off', pen.take(), {
+        ...LOT_LEG,
+        stop: EXIT_STOP,
+      }),
+    ];
+    pen.lineToZ(L.eastbound + rTurn);
+    legs.push(leg('aisle-south', 'Leaving the lot', pen.take(), LOT_LEG));
+    pen.arc(rTurn, -Math.PI / 2);
+    legs.push(
+      leg('driveway-out', 'Turning onto the alley', pen.take(), LOT_LEG),
+    );
+    const c = rearBayPose(bay, v),
+      phi = c.dir,
+      t = (c.z - L.eastbound - rIn + rIn * Math.sin(phi)) / Math.cos(phi),
+      x0 = c.x - t * Math.sin(phi) - rIn * Math.cos(phi);
+    if (t < 0 || x0 < pen.x) return null;
+    pen.lineToX(x0);
+    legs.push(
+      leg('alley-east', 'Eastbound on the alley', pen.take(), { speed: 6 }),
+    );
+    pen.arc(rIn, -(Math.PI / 2 - phi)).line(t);
+    legs.push(leg('rear-in', 'Parking in the rear court', pen.take(), LOT_LEG));
+    return legs;
+  }
+  /**
+   * Out of rear bay `bay`: backing out and round until the nose points west, then over to the alley's westbound
+   * lane and west along it; at the west street either the corner south and off the map (`away`) or the corner
+   * north onto the lane arrivals drive up, ending on their route (`back`, to come in for a space).
+   */
+  function rearOutRoute(
+    bay: number,
+    v: Size,
+    straight: number,
+    rRev: number,
+    to: 'away' | 'back',
+  ) {
+    const c = rearBayPose(bay, v),
+      travel = c.dir + Math.PI,
+      turn =
+        (((travel - Math.PI / 2) % (2 * Math.PI)) + 2 * Math.PI) %
+        (2 * Math.PI);
+    const back = new Pen(c.x, c.z, travel).line(straight).arc(rRev, -turn);
+    const legs: LotLeg[] = [
+      leg('back-out', 'Backing out of the rear bay', back.take(), {
+        ...REVERSE_LEG,
+        stop: CHANGE_DIRECTION,
+      }),
+    ];
+    if (back.z < -35.6 || back.z > -27.2) return null;
+    const pen = new Pen(back.x, back.z, WEST),
+      lateral = L.westbound - back.z;
+    if (Math.abs(lateral) > 0.02) {
+      if (jogLength(lateral, L.laneChangeRadius) > back.x - 8) return null;
+      pen.jog(lateral, L.laneChangeRadius);
+    }
+    const r = L.streetRadius;
+    if (to === 'away') {
+      pen.lineToX(L.southbound + r);
+      legs.push(
+        leg('street-west', 'Westbound on the alley', pen.take(), { speed: 6 }),
+      );
+      pen.arc(r, -Math.PI / 2);
+      legs.push(
+        leg('corner-south', 'Turning south onto the west street', pen.take(), {
+          speed: 5,
+          lot: true,
+        }),
+      );
+      pen.lineToZ(L.vanishSouth + L.fade);
+      legs.push(
+        leg('street-south', 'Southbound to the neighborhood', pen.take(), {
+          speed: 9,
+        }),
+      );
+      pen.line(L.fade);
+      legs.push(
+        leg('fade-out', 'Leaving the map', pen.take(), {
+          speed: 9,
+          fade: 'out',
+        }),
+      );
+    } else {
+      pen.lineToX(L.northbound + r);
+      legs.push(
+        leg('street-west', 'Westbound on the alley', pen.take(), { speed: 6 }),
+      );
+      pen.arc(r, Math.PI / 2);
+      legs.push(
+        leg('corner-north', 'Turning north onto the west street', pen.take(), {
+          speed: 5,
+          lot: true,
+        }),
+      );
+    }
+    return legs;
+  }
+  /** Outlines along the legs of a rear route that lie in the court or the alley (reverse legs nose against the travel). */
+  const rearSweep = (legs: LotLeg[], v: Size) =>
+    legs
+      .filter((g) =>
+        [
+          'driveway-out',
+          'alley-east',
+          'rear-in',
+          'back-out',
+          'street-west',
+        ].includes(g.id),
+      )
+      .flatMap((g) => sweep(g.pieces, v, g.id === 'back-out'));
+  type RearRoute = { legs: LotLeg[]; path: Outline[]; fixed: number };
+  const rearRoutes = new Map<string, RearRoute[]>();
+  /** The candidate routes for a bay, size and direction, best fixed gap first (worked out once). */
+  function rearCandidates(
+    bay: number,
+    v: Size,
+    kind: 'in' | 'away' | 'back',
+  ): RearRoute[] {
+    const key = `${kind}|${bay}|${v.halfWidth}|${v.halfLength}`;
+    let list = rearRoutes.get(key);
+    if (list) return list;
+    const routes: LotLeg[][] = [];
+    if (kind === 'in') {
+      for (const rTurn of [5, 4.5, 4])
+        for (const rIn of [5, 4.5, 5.5, 6, 4, 7, 8]) {
+          const r = rearInRoute(bay, v, rTurn, rIn);
+          if (r) routes.push(r);
+        }
+    } else
+      for (const straight of [2, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+        for (const rRev of [4.5, 4, 5, 6, 3.5, 7]) {
+          const r = rearOutRoute(bay, v, straight, rRev, kind);
+          if (r) routes.push(r);
+        }
+    list = routes
+      .map((legs) => {
+        const path = rearSweep(legs, v);
+        return { legs, path, fixed: gapAlong(path, rearFixed, FAR) };
+      })
+      .sort((a, b) => b.fixed - a.fixed);
+    rearRoutes.set(key, list);
+    return list;
+  }
+  /** The best route of a list past the vehicles standing in the court (`others`): the first that keeps `COMFORT` to everything, else the widest. */
+  function bestRear(list: RearRoute[], others: Footprint[]): LotPlan | null {
+    const vehicles = standing(others);
+    let top: LotPlan | null = null;
+    for (const r of list) {
+      const gap = Math.min(r.fixed, gapAlong(r.path, vehicles, FAR));
+      if (gap >= COMFORT) return { legs: r.legs, gap };
+      if (!top || gap > top.gap) top = { legs: r.legs, gap };
+    }
+    return top;
+  }
+  /** A rear bay for a vehicle the lot has no room for, and the way there clear of `others` (vehicles parked in the court); null when none can be driven into. */
+  function planToRear(
+    v: Size,
+    taken: (bay: number) => boolean,
+    others: Footprint[],
+  ): { bay: number; plan: LotPlan } | null {
+    for (let bay = 0; bay < REAR_BAYS.length; bay++) {
+      if (taken(bay)) continue;
+      const plan = bestRear(rearCandidates(bay, v, 'in'), others);
+      if (plan && plan.gap >= CLEAR) return { bay, plan };
+    }
+    return null;
+  }
+  /** The way out of a rear bay past `others`, off the map or back round to the lot's entrance. */
+  const planFromRear = (
+    bay: number,
+    v: Size,
+    others: Footprint[],
+    to: 'away' | 'back',
+  ) => bestRear(rearCandidates(bay, v, to), others);
+
   return {
     planIn,
     planOut,
     planDockOut,
     chooseStall,
+    planToRear,
+    planFromRear,
     /** Work out a space's manoeuvres for a size of vehicle ahead of time, so the first route there costs nothing. */
     prepare: (stall: number, v: Size) => {
       if (fitsStall(stall, v)) manoeuvres(stall, v);

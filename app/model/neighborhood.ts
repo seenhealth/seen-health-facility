@@ -556,12 +556,9 @@ export function buildNeighborhood(model: Facility) {
   accessSymbol(-27.9, 0.2, 1.1, Math.PI / 2);
   for (let k = 0; k < 6; k++)
     stall([-20.4, -19.5 + 2.7 * k], [-15.0, -21.5 + 2.7 * k]);
-  // The rear court behind the east block: two stalls in front of the electrical room's gates (cars park there,
-  // photos 2026-10-02), none in front of the loading door or over the garage ramp. Across the alley, perpendicular
-  // stalls entered from it along the north edge of the paved strip in front of the 1300 building, south of the
-  // alley's curb line (z −35.8), not on its lanes; the row stops short of the partner day center's drive stub
-  // (x −3.9 to 13.6), which crosses the strip.
-  for (const x of [2.6, 5.2]) stall([x, -15.5], [x, -20.5]);
+  // The rear court behind the east block: no stalls in front of the electrical room's gates (its sign says NO
+  // PARKING ANY TIME; the dispatcher, 2026-10-05), the loading door or over the garage ramp. Across the alley, the
+  // paved strip in front of the 1300 building, opposite the lot's STOP, is unmarked (the dispatcher, 2026-10-05).
   box(-18.0, -0.432, -38.2, 26.0, 0.2, 4.8, SITE.asphalt).name =
     'strip-1300-building';
   // Along the clinic's alley face (photo 2026-10-03): two parallel stalls, one either side of the clear zone in
@@ -570,8 +567,6 @@ export function buildNeighborhood(model: Facility) {
   for (const x of [-4.82, -8.53]) stall([x, -22.6], [x, -25.2]);
   stall([0.6, -25.2], [-4.82, -25.2]);
   stall([-8.53, -25.2], [-14.6, -25.2]);
-  for (let k = 0; k <= 10; k++)
-    stall([-30.5 + 2.5 * k, -35.8], [-30.5 + 2.5 * k, -40.1]);
   // The lot between our east wall and the dialysis center (satellite, 2026-10-03, lines found by a Hough fit to within
   // a few cm): one-way north up a 3.5 m aisle (x 35.95 -> 39.5, arrows), angled stalls either side entered heading
   // north, so both rows lean the same way: along the dialysis center at 54 degrees to the aisle's cross line, lines

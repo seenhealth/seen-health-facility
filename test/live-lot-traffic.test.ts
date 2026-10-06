@@ -10,6 +10,8 @@ import {
   isAngled,
   LOT_SPACES,
   needsDockClear,
+  REAR_BAYS,
+  rearBayFootprint,
   stallFootprint,
   stallOrder,
   stallPose,
@@ -251,4 +253,50 @@ void test('whatever is parked where, a way in and a way out never overlap anythi
   }
   // Most states of the lot are driven clear; the overlaps are the packed corners.
   assert.ok(clear / runs > 0.7, `${clear} of ${runs} clear`);
+});
+
+// Overflow parking in the rear court (the dispatcher, 2026-10-05): with the lot full, a vehicle drives out by the
+// alley into a rear bay, and later back out of it, off the map or round to the entrance.
+const bays = REAR_BAYS.map((_, i) => i);
+test('every rear bay can be driven into and out of, for every body, clear of the court', () => {
+  for (const [name, v] of Object.entries(KINDS))
+    for (const bay of bays) {
+      const into = traffic.planToRear(v, (b) => b !== bay, []);
+      assert.ok(into && into.bay === bay, `${name} into rear bay ${bay}`);
+      assert.ok(
+        into.plan.gap >= 0,
+        `${name} into rear bay ${bay}: ${into.plan.gap}`,
+      );
+      for (const to of ['away', 'back'] as const) {
+        const out = traffic.planFromRear(bay, v, [], to);
+        assert.ok(
+          out && out.gap >= 0,
+          `${name} out of rear bay ${bay} (${to}): ${out?.gap}`,
+        );
+      }
+    }
+});
+test('the rear bays fill in order without driving through a van already parked there, and each still gets out', () => {
+  for (const [name, v] of Object.entries(KINDS)) {
+    const parked: Footprint[] = [];
+    for (const bay of bays) {
+      const into = traffic.planToRear(v, (b) => b < bay, parked);
+      assert.ok(into && into.bay === bay, `${name}: next free rear bay ${bay}`);
+      assert.ok(
+        into.plan.gap >= 0,
+        `${name} into rear bay ${bay} past ${parked.length}: ${into.plan.gap}`,
+      );
+      parked.push(rearBayFootprint(bay, VAN));
+    }
+    for (const bay of bays) {
+      const others = bays
+        .filter((b) => b !== bay)
+        .map((b) => rearBayFootprint(b, VAN));
+      const out = traffic.planFromRear(bay, v, others, 'back');
+      assert.ok(
+        out && out.gap >= 0,
+        `${name} out of rear bay ${bay} with the others parked: ${out?.gap}`,
+      );
+    }
+  }
 });
