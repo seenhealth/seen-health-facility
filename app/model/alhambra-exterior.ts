@@ -1407,7 +1407,7 @@ export function buildAlhambraExterior(model: Facility) {
   }
   // Vinyl on the glass (photo 2026-10-05; scripts/lobby-door-decals.py): facing the door, the right-hand leaf (−z)
   // has the street number at the top, STAFF ENTRANCE ONLY / 员工入口 and a NO SOLICITING sticker; the left-hand leaf
-  // carries the lobby door's information block. Cut out, like the lobby's, so night glazing leaves it alone.
+  // carries the lobby door's information block without the street number. Cut out, like the lobby's, so night glazing leaves it alone.
   if (typeof document !== 'undefined') {
     const vinyl = (url: string, w: number, h: number, y: number, z: number) => {
       const map = new T.TextureLoader().load(url);
@@ -1428,11 +1428,12 @@ export function buildAlhambraExterior(model: Facility) {
       0.1 + 2.16 / 2,
       doorZ - doorW / 4,
     );
+    // the information block's top (row 262) at 1.70 m, as on the photo
     vinyl(
-      '/reference/photos/lobby-door-decal.png',
+      '/reference/photos/rear-door-left.png',
       0.68,
       0.96,
-      1.25 + 0.96 / 2,
+      1.962 - 0.96 / 2,
       doorZ + doorW / 4,
     );
   }

@@ -39,10 +39,10 @@ def mixed(draw, x, y, parts, fill=WHITE):
         x += draw.textlength(text, font=f)
     return x
 
-def decal():
+def decal(street=True, name='lobby-door-decal.png'):
     im = Image.new('RGBA', (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
-    # street number, two lines, centred
-    for i, line in enumerate(('1839 W', 'Valley Blvd')):
+    # street number, two lines, centred (left off the staff entrance's left-hand leaf)
+    for i, line in enumerate(('1839 W', 'Valley Blvd') if street else ()):
         f = bold(92)
         d.text(((W - d.textlength(line, font=f)) / 2, 22 + i * 102), line, font=f, fill=WHITE)
     # the wordmark (mark + SEEN / HEALTH), 见心颐养 beside it
@@ -67,7 +67,7 @@ def decal():
     y += 26
     for en, cn in (('NO SMOKING ', '禁止吸烟'), ('NO FIREARMS ', '禁止持枪')):
         mixed(d, 60, y, [(en, av_b(27)), (cn, pf_b(25))]); y += 36
-    im.save(os.path.join(OUT, 'lobby-door-decal.png'))
+    im.save(os.path.join(OUT, name))
 
 def stickers():
     im = Image.new('RGBA', (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
@@ -87,7 +87,9 @@ def stickers():
     im.save(os.path.join(OUT, 'lobby-door-stickers.png'))
 
 decal(); stickers()
-print('wrote lobby-door-decal.png, lobby-door-stickers.png')
+# the staff entrance's left-hand leaf: the same information block without the street number
+decal(street=False, name='rear-door-left.png')
+print('wrote lobby-door-decal.png, lobby-door-stickers.png, rear-door-left.png')
 
 
 def wall_signs():
@@ -131,7 +133,7 @@ def rear_door():
 
     rear-door-right.png (the right-hand leaf as you face the door, model −z): the street number in large white letters at
     the top, STAFF ENTRANCE ONLY / 员工入口 at chest height and a NO SOLICITING / THANK YOU sticker by the meeting stile.
-    The left-hand leaf (+z) carries the lobby door's lobby-door-decal.png (the center's information block).
+    The left-hand leaf (+z) carries rear-door-left.png: the lobby decal's information block without the street number.
     """
     w, h = 680, 2160
     top = 2.26
