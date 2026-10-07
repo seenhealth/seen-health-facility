@@ -22,7 +22,17 @@ const FACILITY = 'models/seen-alhambra-planning.json';
 const FACILITIES = [
   ...new Set([FACILITY, ...instanceFacilityUrls().map((u) => u.slice(1))]),
 ];
-const STATIC = ['brand/seen-health-horizontal.png', 'favicon.svg'];
+const STATIC = [
+  'brand/seen-health-horizontal.png',
+  'favicon.svg',
+  'models/fleet-van.glb',
+  'reference/photos/lobby-door-decal.png',
+  'reference/photos/lobby-door-stickers.png',
+  'reference/photos/lobby-no-smoking.png',
+  'reference/photos/lobby-access-sign.png',
+  'reference/photos/rear-door-right.png',
+  'reference/photos/rear-door-left.png',
+];
 
 type Facility = {
   materials?: Record<string, { textureUrl?: string }>;

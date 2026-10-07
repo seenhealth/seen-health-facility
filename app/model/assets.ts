@@ -7,6 +7,7 @@ import { buildCommunityAsset } from './community-assets';
 import { buildHomeAsset } from './home-assets';
 import { buildAdhcAsset } from './adhc-assets';
 import { buildRecreationAsset } from './recreation-assets';
+import { fleetVanModel } from './fleet-van-model';
 // Each asset is modeled around a local, floor-level origin. Dimensions and transforms live in JSON.
 export function buildAsset(
   spec: Asset,
@@ -63,7 +64,9 @@ export function buildAsset(
     for (const x of [-0.48, 0.48])
       box(x * w, h * 0.64, 0, 0.025, 0.04, d * 0.8, 'oak');
   };
-  const photoAsset = buildPhotoAsset(spec, material);
+  const photoAsset =
+    (spec.kind === 'fleet-van' ? fleetVanModel() : null) ||
+    buildPhotoAsset(spec, material);
   if (photoAsset) {
     g.add(photoAsset);
   } else if (spec.kind === 'task-chair') {

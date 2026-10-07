@@ -34,6 +34,13 @@ const STATIC = [
   'brand/seen-health-horizontal.png',
   'favicon.svg',
   'reference/fleet/final-vans.png',
+  'models/fleet-van.glb',
+  'reference/photos/lobby-door-decal.png',
+  'reference/photos/lobby-door-stickers.png',
+  'reference/photos/lobby-no-smoking.png',
+  'reference/photos/lobby-access-sign.png',
+  'reference/photos/rear-door-right.png',
+  'reference/photos/rear-door-left.png',
 ];
 /** Reviewed public textures only, as in scripts/validate-public-assets.mjs. */
 const PUBLIC_REFERENCE = /^reference\/(photos\/[^/]+|fleet\/final-vans\.png)$/;
