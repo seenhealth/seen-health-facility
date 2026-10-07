@@ -17,10 +17,6 @@ export function buildAsset(
   spec: Asset,
   material: (id: string) => T.MeshStandardMaterial,
 ) {
-  if (spec.kind === 'fleet-van') {
-    const van = fleetVanModel();
-    if (van) return new T.Group().add(van);
-  }
   const home = buildHomeAsset(spec, material);
   if (home) return home;
   const adhc = buildAdhcAsset(spec, material);
@@ -78,7 +74,9 @@ export function buildAsset(
     for (const x of [-0.48, 0.48])
       box(x * w, h * 0.64, 0, 0.025, 0.04, d * 0.8, 'oak');
   };
-  const photoAsset = buildPhotoAsset(spec, material);
+  const photoAsset =
+    (spec.kind === 'fleet-van' ? fleetVanModel() : null) ||
+    buildPhotoAsset(spec, material);
   if (photoAsset) {
     g.add(photoAsset);
   } else if (spec.kind === 'task-chair') {

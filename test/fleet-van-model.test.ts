@@ -107,6 +107,16 @@ void test('the committed photo van supplies parked assets and working arrival ri
     assert.equal(glass.material.transparent, true);
     assert.equal(glass.material.depthWrite, false);
     assert.equal(glass.castShadow, false);
+    parked.updateMatrixWorld(true);
+    const bounds = new T.Box3().setFromObject(parked);
+    const size = bounds.getSize(new T.Vector3());
+    const center = bounds.getCenter(new T.Vector3());
+    model.assets['fleet-van-a'].dimensions.forEach((dimension, axis) =>
+      close(size.getComponent(axis), dimension, 'parked van fits its specification'),
+    );
+    close(bounds.min.y, 0, 'parked tyres rest on the floor');
+    close(center.x, 0, 'parked van is centered across its width');
+    close(center.z, 0, 'parked van is centered along its length');
   });
 
   await t.test(
