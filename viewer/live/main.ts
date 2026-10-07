@@ -3,9 +3,21 @@
 import '../site/asset-base';
 import { validateFacility } from '../../app/model/schema';
 import { createViewer, defaultState } from '../../app/model/renderer';
-import { createLiveLot, type LiveMessage } from '../../app/model/live-lot';
+import {
+  createLiveLot,
+  type LiveMessage,
+  type LivePerson,
+  type LiveVehicle,
+} from '../../app/model/live-lot';
+import { Vector3 } from 'three';
 import { createDaylight } from '../../app/model/daylight';
 import { createNightLights } from '../../app/model/night-lights';
+import {
+  preloadFleetVanModel,
+  preloadLiveCarModels,
+} from '../../app/model/fleet-van-model';
+import { createSimPanel } from './sim';
+import { LOT_SPACES } from '../../app/model/live-lot-traffic';
 
 /**
  * Static page that shows Seen's real vehicles on the Alhambra lot. A parent
@@ -13,13 +25,15 @@ import { createNightLights } from '../../app/model/night-lights';
  * (app/model/live-lot.ts); this page answers `{ type: 'seen-live-lot-ready' }`
  * once the scene is up so the parent sends the current state. A message with
  * `follow: <vehicle id>` centres the camera on that car and keeps it centred as
- * it moves and opens its plate into a details bubble; `follow: null` returns
- * to the whole-lot shot and closes it. Camera moves glide (eased over ~0.8 s;
+ * it moves; `follow: null` returns to the whole-lot shot. Hovering a car or
+ * its plate opens the plate into a details bubble (closing shortly after the
+ * pointer leaves). Camera moves glide (eased over ~0.8 s;
  * following tracks the car smoothly). A click on a car or its plate posts
  * `{ type: 'seen-live-lot-pick', id }` to the parent, a click on nothing posts
  * `{ id: null }`, so the parent decides what to follow (standalone, the page
  * follows the car itself). Hovering a car or plate dims every other one to
- * half. A controls button in the corner unfolds zoom, pan, rotate and tilt
+ * half. A controls button in the corner unfolds zoom, pan, rotate, tilt and a
+ * Perspective toggle (flat drawing or a camera's view), plus
  * buttons and a time-of-day slider. The scene is lit by the real sun over the
  * center (app/model/daylight.ts), refreshed every minute; `?at=HH:MM` or
  * `?at=<ISO date>` lights it for another moment, and the slider overrides
@@ -30,10 +44,17 @@ import { createNightLights } from '../../app/model/night-lights';
 async function main() {
   const host = document.getElementById('root')!;
   const hud = document.getElementById('hud')!;
-  const model = validateFacility(
-    await (await fetch('/models/seen-alhambra-planning.json')).json(),
-  );
+  const [model] = await Promise.all([
+    fetch('/models/seen-alhambra-planning.json')
+      .then((r) => r.json())
+      .then(validateFacility),
+    // The photo-textured fleet van; vans fall back to the procedural body if it fails.
+    preloadFleetVanModel(),
+    preloadLiveCarModels(),
+  ]);
   let lot: ReturnType<typeof createLiveLot> | null = null;
+  /** How many times real time the lot runs (the simulator's speed control; `?speed=4` with `?debug` starts faster). */
+  let speed = 1;
   let daylight: ReturnType<typeof createDaylight> | null = null;
   let nightLights: ReturnType<typeof createNightLights> | null = null;
   const viewer = createViewer(host, model, () => {}, {
@@ -57,12 +78,26 @@ async function main() {
         (window as unknown as { seenScene?: unknown }).seenScene = ctx.scene;
       daylight = createDaylight(ctx.scene);
       nightLights = createNightLights(ctx.scene, ctx.material);
-      lot = createLiveLot(ctx);
+      const made = createLiveLot(ctx);
+      lot = made;
       if (new URLSearchParams(location.search).has('debug'))
         (window as unknown as { seenLot?: unknown }).seenLot = lot;
-      return lot;
+      // The simulator can run the lot faster than real time: each frame's step is taken `speed` times, so the motion
+      // stays as fine as at 1×.
+      return {
+        tick: (dt: number) => {
+          for (let i = 0; i < speed; i++) made.tick(dt);
+        },
+        dispose: () => made.dispose(),
+      };
     },
   });
+  // `?debug=1` also exposes the viewer (setShot, getShot) for scripted close-ups and lets the wheel zoom in much
+  // further (to the decals on the door).
+  if (new URLSearchParams(location.search).has('debug')) {
+    (window as unknown as { seenViewer?: unknown }).seenViewer = viewer;
+    viewer.setMaxZoom(150);
+  }
   // Real sun and sky for the moment being shown; `?at=` pins another moment for review, and the time slider in the
   // controls panel overrides both until Now is pressed.
   const parseAt = (at: string | null): Date | null => {
@@ -178,10 +213,11 @@ async function main() {
   const glideTo = (to: Shot) => {
     glide = { from: viewer.getShot(), to, start: performance.now() };
   };
+  let onFollowChange: ((id: string | null) => void) | null = null;
   const setFollow = (id: string | null) => {
     if (id === follow) return;
     follow = id;
-    lot?.setExpanded(id);
+    onFollowChange?.(id);
     touched = true; // a follow is the person's own framing; the start-up hold must not undo it
     if (!id) glideTo(SHOT);
     else {
@@ -246,7 +282,11 @@ async function main() {
   const PAN = 10; // metres at zoom 1
   const on = (id: string, fn: () => void) =>
     document.getElementById(id)!.addEventListener('click', fn);
-  on('ctl-zoom-in', () => nudge((s) => ({ zoom: Math.min(8, s.zoom * 1.3) })));
+  // `?debug` lets the button zoom on in to the building's details, as the wheel does.
+  const zoomCap = new URLSearchParams(location.search).has('debug') ? 150 : 8;
+  on('ctl-zoom-in', () =>
+    nudge((s) => ({ zoom: Math.min(zoomCap, s.zoom * 1.3) })),
+  );
   on('ctl-zoom-out', () =>
     nudge((s) => ({ zoom: Math.max(0.4, s.zoom / 1.3) })),
   );
@@ -282,15 +322,158 @@ async function main() {
     touched = true;
     glideTo(SHOT);
   });
+  // Perspective: the lot drawn as a camera sees it, with depth, instead of the flat orthographic shot. Zoom, pan and
+  // the follow carry over. Remembered per browser; `?view=perspective` starts in it.
+  const perspBtn = document.getElementById('ctl-persp')!;
+  const PROJECTION_KEY = 'seen-live-lot-projection';
+  const setProjection = (perspective: boolean) => {
+    viewer.setProjection(perspective ? 'perspective' : 'orthographic');
+    perspBtn.setAttribute('aria-pressed', String(perspective));
+    try {
+      localStorage.setItem(
+        PROJECTION_KEY,
+        perspective ? 'perspective' : 'orthographic',
+      );
+    } catch {
+      // Private window or storage blocked: the choice just does not persist.
+    }
+  };
+  perspBtn.addEventListener('click', () =>
+    setProjection(perspBtn.getAttribute('aria-pressed') !== 'true'),
+  );
+  let savedProjection: string | null = null;
+  try {
+    savedProjection = localStorage.getItem(PROJECTION_KEY);
+  } catch {
+    savedProjection = null;
+  }
+  if (
+    savedProjection === 'perspective' ||
+    new URLSearchParams(location.search).get('view') === 'perspective'
+  )
+    setProjection(true);
+  // The hovered car's details as an HTML bubble pinned above its roof: one size on screen in either projection, never
+  // cut by the scene's clipping or the post pass, kept inside the view. Hovering the bubble keeps it open; hovering a
+  // rider's avatar shows their card; a click on it follows the car, as a click on the car does.
+  const bubbleEl = document.getElementById('bubble')!;
+  const esc = (t: string) =>
+    t.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+  const RING: Record<string, string> = { high: '#c0392b', assisted: '#d08214' };
+  const avatar = (p: LivePerson, square: boolean) => {
+    const ring = !square && p.risk && RING[p.risk] ? RING[p.risk] : '';
+    const face = p.photo
+      ? `<img src="${esc(p.photo)}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:${esc(JSON.stringify(p.initials))}}))">`
+      : `<span>${esc(p.initials)}</span>`;
+    return `<span class="av${square ? ' drv' : ''}"${ring ? ` style="box-shadow:0 0 0 3px ${ring}"` : ''}>${face}${p.wheelchair ? '<b class="wc">WC</b>' : ''}</span>`;
+  };
+  const person = (p: LivePerson) => {
+    const card = p.lines?.length
+      ? `<span class="pcard"><span class="ph">${avatar(p, false)}<span><b>${esc(p.fullName ?? p.name)}</b>${p.subtitle ? `<i>${esc(p.subtitle)}</i>` : ''}</span></span>${p.lines.map((t) => `<span class="pl">${esc(t)}</span>`).join('')}</span>`
+      : '';
+    return `<span class="rider" tabindex="0">${avatar(p, false)}<span class="nm">${esc(p.name)}</span>${card}</span>`;
+  };
+  let bubbleKey = '',
+    bubbleId: string | null = null;
+  const paintBubble = (v: LiveVehicle) => {
+    const key = JSON.stringify([
+      v.label,
+      v.detail,
+      v.highlight,
+      v.driver,
+      v.riders,
+      v.lines,
+    ]);
+    if (key === bubbleKey) return;
+    bubbleKey = key;
+    bubbleEl.classList.toggle('hot', !!v.highlight);
+    // The title already names the car and the driver, so a driver gets an avatar only with a photo: no initials square.
+    const crew = `${v.driver?.photo ? `<span class="rider">${avatar(v.driver, true)}<span class="nm">${esc(v.driver.name)}</span></span>` : ''}${(v.riders ?? []).map(person).join('')}`;
+    bubbleEl.innerHTML = `<div class="tt">${esc(v.label)}${v.detail ? ` · ${esc(v.detail)}` : ''}</div>${crew ? `<div class="crew">${crew}</div>` : ''}${v.lines?.length ? `<div class="lines">${v.lines.map((t) => `<div>${esc(t)}</div>`).join('')}</div>` : ''}`;
+  };
+  const projected = new Vector3();
+  const placeBubble = () => {
+    requestAnimationFrame(placeBubble);
+    const b = lot?.bubble();
+    if (!b) {
+      if (bubbleId) {
+        bubbleEl.classList.remove('open');
+        bubbleId = null;
+      }
+      return;
+    }
+    bubbleId = b.v.id;
+    paintBubble(b.v);
+    projected.set(...b.at).project(viewer.getCamera());
+    const r = host.getBoundingClientRect();
+    if (projected.z > 1) return bubbleEl.classList.remove('open');
+    const x = ((projected.x + 1) / 2) * r.width,
+      y = ((1 - projected.y) / 2) * r.height;
+    const w = bubbleEl.offsetWidth,
+      h = bubbleEl.offsetHeight,
+      pad = 8;
+    // Above the car when there is room, else below it; always inside the frame.
+    let top = y - h - 10;
+    if (top < pad) top = Math.min(r.height - h - pad, y + 30);
+    const left = Math.min(Math.max(pad, x - w / 2), r.width - w - pad);
+    bubbleEl.style.transform = `translate(${Math.round(left)}px, ${Math.round(Math.max(pad, top))}px)`;
+    bubbleEl.classList.add('open');
+  };
+  requestAnimationFrame(placeBubble);
+  bubbleEl.addEventListener('pointerenter', () => lot?.pinBubble(true));
+  bubbleEl.addEventListener('pointerleave', () => lot?.pinBubble(false));
+  bubbleEl.addEventListener('click', () => {
+    if (!bubbleId) return;
+    if (window.parent && window.parent !== window)
+      window.parent.postMessage(
+        { type: 'seen-live-lot-pick', id: bubbleId },
+        '*',
+      );
+    else setFollow(bubbleId !== follow ? bubbleId : null);
+  });
   let pending: LiveMessage | null = null;
+  // `?debug=true`: the vehicle simulator (sim.ts). Its vehicles ride along with every update from the dispatch board.
+  const debugParam = new URLSearchParams(location.search).get('debug');
+  let lastReal: LiveMessage | null = null;
+  let lastParentFollow: string | null = null;
+  const sim =
+    debugParam !== null && !/^(0|false|no)$/i.test(debugParam)
+      ? createSimPanel({
+          onChange: () => show(lastReal),
+          follow: (id) => setFollow(id),
+          speed: (times) => {
+            speed = Math.min(16, Math.max(1, Math.round(times)));
+          },
+        })
+      : null;
+  if (sim) {
+    const start = Number(new URLSearchParams(location.search).get('speed'));
+    if (start > 1) sim.setSpeed(start);
+  }
+  if (sim) onFollowChange = (id) => sim.setFollowed(id);
+  const show = (real: LiveMessage | null) => {
+    const base: LiveMessage = real ?? {
+      type: 'seen-live-lot',
+      vehicles: [],
+      capacity: LOT_SPACES,
+    };
+    const msg: LiveMessage = sim
+      ? { ...base, vehicles: [...base.vehicles, ...sim.vehicles] }
+      : base;
+    if (lot) lot.apply(msg);
+    else pending = msg;
+    const n = lot?.onLot ?? 0;
+    hud.innerHTML = `<b>${n}</b> / ${msg.capacity ?? '?'} on the lot${msg.clock ? ` · ${msg.clock}` : ''} · ${msg.vehicles.filter((v) => v.state === 'inbound').length} inbound${sim?.vehicles.length ? ` · ${sim.vehicles.length} simulated` : ''}`;
+  };
   const onMessage = (e: MessageEvent) => {
     const msg = e.data as LiveMessage | undefined;
     if (!msg || msg.type !== 'seen-live-lot') return;
-    if (lot) lot.apply(msg);
-    else pending = msg;
-    setFollow(msg.follow ?? null);
-    const n = lot?.onLot ?? 0;
-    hud.innerHTML = `<b>${n}</b> / ${msg.capacity ?? '?'} on the lot${msg.clock ? ` · ${msg.clock}` : ''} · ${msg.vehicles.filter((v) => v.state === 'inbound').length} inbound`;
+    lastReal = msg;
+    show(msg);
+    // Only a change of the parent's follow moves the camera: the board re-posts its (unchanged) follow with every
+    // update, which would otherwise drop a follow started here (a click on a car, the simulator's Follow).
+    const parentFollow = msg.follow ?? null;
+    if (parentFollow !== lastParentFollow) setFollow(parentFollow);
+    lastParentFollow = parentFollow;
   };
   window.addEventListener('message', onMessage);
   const ready = () => {

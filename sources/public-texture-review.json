@@ -1,5 +1,5 @@
 {
-  "note": "Embedded GLB images visually reviewed: procedural finishes, bilingual signs, van wrap, address 1630, ENTRANCE and public street names. No source photographs or architectural drawings. Review newly exported images before approving their hashes.",
+  "note": "Embedded GLB images visually reviewed: procedural finishes, bilingual signs, van wrap, address 1630, ENTRANCE and public street names. No source photographs or architectural drawings. Review newly exported images before approving their hashes. fleet-van.glb (2026-10-02): atlas of rectified photos of Seen's own van exterior (published wrap artwork, phone number, QR code), licence plates painted blank; no people other than the wrap's printed imagery.",
   "sha256": [
     "84b775f83634b07e130fd591045be60f145147cd94f2f32595fa37974d9451d1",
     "1b66c1ccf7df15aab7bac5c0c6129955601808625264d6f9166e631a18ef23d2",
@@ -20,6 +20,7 @@
     "cbece5557fdb54adb6258f02006e838d9c18ea3cb9711439deee271e291089c5",
     "dbcb994a9de1d2bbf5a9a14c02bafe863108415d57e7b4887ecdabd101c041a7",
     "ea2c388fddd593f48ef19f5a5f26afedbf90305088f5579c76dc3f648e66e36a",
-    "f9177845321de9bc387742a9d9afa58091b60f0c618e02a4b018cab516f2f776"
+    "f9177845321de9bc387742a9d9afa58091b60f0c618e02a4b018cab516f2f776",
+    "9316b586577da1d70c397c8210dddc1c18cf1c895c18854b6dd1bdd28d7eddd4"
   ]
 }

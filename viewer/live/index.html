@@ -11,6 +11,28 @@
       #root { position: absolute; inset: 0; }
       #hud { position: absolute; left: 12px; top: 12px; z-index: 5; font: 13px/1.3 system-ui, sans-serif; color: #1f2a2a; background: rgba(255,255,255,.85); border: 1px solid rgba(31,42,42,.15); border-radius: 8px; padding: 6px 10px; pointer-events: none; }
       #hud b { font-size: 18px; font-variant-numeric: tabular-nums; }
+      #bubble { position: absolute; left: 0; top: 0; z-index: 7; display: none; max-width: 340px; padding: 10px 12px 11px; font: 12px/1.35 system-ui, sans-serif; color: #e9f6ef; background: rgba(14,35,33,.95); border: 2px solid #7fc9ad; border-radius: 14px; box-shadow: 0 10px 28px rgba(0,0,0,.35); cursor: pointer; will-change: transform; }
+      #bubble.open { display: block; }
+      #bubble.hot { background: rgba(90,40,24,.96); border-color: #fbae97; }
+      #bubble .tt { font-weight: 600; font-size: 13px; margin-bottom: 8px; }
+      #bubble.hot .tt { color: #fbae97; }
+      #bubble .crew { display: flex; flex-wrap: wrap; gap: 8px 10px; }
+      #bubble .rider { position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; outline: none; }
+      #bubble .nm { font-size: 11px; font-weight: 600; color: #f3efe4; max-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      #bubble .av { position: relative; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; overflow: hidden; background: #f3efe4; color: #1b3a36; font-weight: 700; font-size: 15px; flex: none; }
+      #bubble .av.drv { border-radius: 9px; background: #0f9d94; color: #062b28; }
+      #bubble .av img { width: 100%; height: 100%; object-fit: cover; }
+      #bubble .av .wc { position: absolute; right: -2px; bottom: -2px; font-size: 8px; line-height: 1; padding: 2px 3px; border-radius: 6px; background: #d08214; color: #fff; }
+      #bubble .lines { margin-top: 9px; padding-top: 7px; border-top: 1px solid rgba(255,255,255,.18); }
+      #bubble .lines div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      #bubble .lines div:last-child { color: #cbedd9; }
+      #bubble .pcard { position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%); display: none; width: 260px; padding: 9px 11px; background: #f3efe4; color: #1b3a36; border: 2px solid #2f6b62; border-radius: 12px; box-shadow: 0 8px 22px rgba(0,0,0,.3); cursor: default; z-index: 2; }
+      #bubble .rider:hover .pcard, #bubble .rider:focus .pcard { display: block; }
+      #bubble .ph { display: flex; align-items: center; gap: 9px; margin-bottom: 6px; }
+      #bubble .ph b { display: block; font-size: 13px; }
+      #bubble .ph i { display: block; font-style: normal; color: #5b6b66; }
+      #bubble .pl { display: block; font-size: 11.5px; line-height: 1.4; }
+      #bubble .pl:first-of-type { color: #5b6b66; }
       #ctl-toggle { position: absolute; right: 12px; bottom: 12px; z-index: 6; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(31,42,42,.2); border-radius: 50%; background: rgba(255,255,255,.9); color: #1f2a2a; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.15); padding: 0; }
       #ctl-toggle:hover { background: #fff; }
       #ctl { position: absolute; right: 12px; bottom: 56px; z-index: 6; display: none; flex-direction: column; gap: 8px; width: 196px; padding: 10px; font: 12px/1.3 system-ui, sans-serif; color: #1f2a2a; background: rgba(255,255,255,.92); border: 1px solid rgba(31,42,42,.15); border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.18); }
@@ -20,6 +42,7 @@
       #ctl .btns { display: flex; gap: 4px; }
       #ctl button { height: 26px; min-width: 26px; padding: 0 6px; border: 1px solid rgba(31,42,42,.2); border-radius: 6px; background: #fff; color: #1f2a2a; font: 13px system-ui, sans-serif; cursor: pointer; }
       #ctl button:hover { background: #eef3f1; }
+      #ctl button[aria-pressed=true] { background: #2f6b62; border-color: #2f6b62; color: #fff; }
       #ctl .pad { display: grid; grid-template-columns: repeat(3, 26px); grid-template-rows: repeat(2, 26px); gap: 3px; }
       #ctl .pad button:nth-child(1) { grid-column: 2; grid-row: 1; }
       #ctl .pad button:nth-child(2) { grid-column: 1; grid-row: 2; }
@@ -34,6 +57,7 @@
   </head>
   <body>
     <div id="root"></div>
+    <div id="bubble" role="tooltip"></div>
     <div id="hud">Waiting for the dispatch board…</div>
     <button id="ctl-toggle" type="button" aria-label="View controls" aria-expanded="false" aria-controls="ctl" title="View controls">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="9" cy="6" r="2" fill="#fff"/><circle cx="15" cy="12" r="2" fill="#fff"/><circle cx="7" cy="18" r="2" fill="#fff"/></svg>
@@ -43,6 +67,7 @@
       <div class="row"><span>Rotate</span><div class="btns"><button id="ctl-rot-l" type="button" title="Rotate left">↺</button><button id="ctl-rot-r" type="button" title="Rotate right">↻</button></div></div>
       <div class="row"><span>Tilt</span><div class="btns"><button id="ctl-tilt-up" type="button" title="Look from higher">⤒</button><button id="ctl-tilt-down" type="button" title="Look from lower">⤓</button></div></div>
       <div class="row"><span>Pan</span><div class="pad"><button id="ctl-pan-up" type="button" title="Pan up">↑</button><button id="ctl-pan-left" type="button" title="Pan left">←</button><button id="ctl-pan-down" type="button" title="Pan down">↓</button><button id="ctl-pan-right" type="button" title="Pan right">→</button></div></div>
+      <div class="row"><span>View</span><div class="btns"><button id="ctl-persp" type="button" aria-pressed="false" title="Perspective: the lot as a camera sees it, with depth. Off: the flat drawing.">Perspective</button></div></div>
       <button id="ctl-reset" type="button" class="wide" title="Back to the whole-lot shot">Whole lot</button>
       <div class="time">
         <div class="head"><span>Time of day</span><b id="ctl-time-label">--:--</b></div>

@@ -6,7 +6,8 @@ import { ARRIVAL } from './arrival';
  * Ethel Avenue, a light on the alley's utility pole, wall packs on the lot
  * faces of the building, a fixture over every entrance, and the building's
  * own windows and glass doors glowing with the interior lit, with a spill of
- * light out of the lobby door and the Valley Blvd portals onto the paving.
+ * light out of the lobby door and the Valley Blvd portals onto the paving, and
+ * the SEEN HEALTH channel letters over the drop-off and on Valley Blvd lit from inside.
  * `apply(night)` fades it all in as the daylight module's night factor rises
  * from 0 (day) to 1 (past civil dusk); by day every light is off and skipped
  * by the renderer. Axes: +x east, +z south (frame.ts COMPASS), ground at y = −0.23.
@@ -123,9 +124,13 @@ export function createNightLights(
     );
   }
   // Valley Blvd runs along the north; the trees stand at z 30.2, the lamps just past them with the arm over the road.
-  for (const x of [-27, -4, 20]) streetLamp(x, 31.2, [0, 1]);
+  // The one by the Ethel corner (Street View, May 2025) stands a little back from the curb, just east of the hydrant.
+  streetLamp(-26.6, 30.75, [0, 1]);
+  // On the sidewalk 0.45 m in from the curb (z 31.19), not on the curb line.
+  for (const x of [-4, 20]) streetLamp(x, 30.75, [0, 1]);
   // Ethel Avenue on the west, behind the parkway lawn.
-  for (const z of [-15, 12]) streetLamp(-35.6, z, [-1, 0]);
+  // On the walk 0.35 m in from the curb (x -35.21), between the parkway trees (z -15.5, -9.5 ... 8, 20.5).
+  for (const z of [-12.5, 14.3]) streetLamp(-34.85, z, [-1, 0]);
   // The alley's utility pole carries a street light on a short arm.
   {
     const g = new T.Group();
@@ -187,8 +192,8 @@ export function createNightLights(
   wallPack(-14.8, 3.6, -18, [-1, 0]);
   wallPack(-21.5, 4.4, 8.95, [0, 1]);
   wallPack(-24.5, 4.6, 8.95, [0, 1]);
-  // Rear loading door on the alley and the east exit.
-  wallPack(-2.3, 3.0, -23.0, [0, -1]);
+  // The clinic's service door on the alley (its wall pack, photo 2026-10-03) and the east exit.
+  wallPack(-5.673, 2.72, -22.75, [0, -1]);
   wallPack(15.3, 2.7, -0.8, [1, 0]);
 
   // Entrance fixtures: a flush downlight under each canopy or header.
@@ -204,7 +209,6 @@ export function createNightLights(
   doorLight(-27.38, 2.25, 8.75); // the wing's lot-side awning door
   for (const x of [-12.9, -6.3]) doorLight(x, 3.1, 25.75); // Valley Blvd portals
   doorLight(1.6, 2.85, 28.4); // admin stair door
-  doorLight(-2.3, 2.95, -23.4, 10); // rear roll-up
 
   // Interior light spilling out of the glass doors onto the landing and the terrace.
   spot(
@@ -234,6 +238,43 @@ export function createNightLights(
     emissive: COLOR.interior,
     emissiveIntensity: 0,
   });
+  // The two SEEN HEALTH 见心颐养 signs (channel letters over the drop-off canopy and on the Valley Blvd face) are lit
+  // from inside at night: their lettering layers (the cut-out planes with alphaTest, not the printed shadow) get a
+  // glowing copy of their material whose emission is the lettering texture itself, so only the letters and the mark glow.
+  // The photo assets arrive after the first night frame, so this keeps looking for a minute until both signs are lit.
+  const SIGNS = ['dropoff-bilingual-sign', 'valley-bilingual-sign'];
+  const signGlows = new Map<T.Material, T.MeshStandardMaterial>();
+  const litSigns = new Set<string>();
+  let signTries = 0;
+  function lightSigns() {
+    for (const name of SIGNS) {
+      if (litSigns.has(name)) continue;
+      const sign = scene.getObjectByName(name);
+      if (!sign) continue;
+      litSigns.add(name);
+      sign.traverse((o) => {
+        if (!(o instanceof T.Mesh)) return;
+        const m = o.material as T.MeshStandardMaterial;
+        if (
+          !(m instanceof T.MeshStandardMaterial) ||
+          !m.map ||
+          m.alphaTest < 0.5
+        )
+          return;
+        let lit = signGlows.get(m);
+        if (!lit) {
+          lit = m.clone();
+          lit.emissive = new T.Color('#fff4dc');
+          lit.emissiveMap = m.map;
+          lit.emissiveIntensity = 0;
+          signGlows.set(m, lit);
+        }
+        o.material = lit;
+      });
+    }
+    if (litSigns.size < SIGNS.length && signTries++ < 120)
+      setTimeout(lightSigns, 500);
+  }
   let reglazed = false;
   function reglaze() {
     reglazed = true;
@@ -241,11 +282,14 @@ export function createNightLights(
       if (!(o instanceof T.Mesh)) return;
       if (o.material === glass) o.material = glow;
       else if (
-        (o.parent?.name ?? '').startsWith('sliding-entry-leaf-') &&
+        ((o.parent?.name ?? '').startsWith('sliding-entry-leaf-') ||
+          o.parent?.name === 'lobby-window-glass' ||
+          o.parent?.name === 'corner-window-glass') &&
         (o.material as T.Material).transparent
       )
         o.material = leafGlow;
     });
+    lightSigns();
   }
 
   let last = -1;
@@ -263,6 +307,7 @@ export function createNightLights(
       lens.emissiveIntensity = 2.2 * k;
       glow.emissiveIntensity = 1.7 * k;
       leafGlow.emissiveIntensity = 1.3 * k;
+      for (const lit of signGlows.values()) lit.emissiveIntensity = 2.6 * k;
       // Lit glass reads brighter and warmer than the daytime sky reflection.
       glow.opacity = T.MathUtils.lerp(glass.opacity, 0.88, k);
     },

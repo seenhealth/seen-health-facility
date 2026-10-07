@@ -1,6 +1,7 @@
 import * as T from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import type { Facility, Vec2 } from './schema';
+import { GARAGE_RAMP } from './alhambra-exterior';
 import { sampleStreetCar, type StreetSide } from './traffic-routes';
 
 // Presentation-model site palette: warm light asphalt, soft white markings,
@@ -12,7 +13,8 @@ const SITE = {
   curb: '#dcd7cd',
   planting: '#b4bea2',
   marking: '#f8f6f1',
-  accessible: '#a3b6bf',
+  /** Accessible-parking blue (hatching and the symbol's ground), as painted on the lot (photo 2026-10-03). */
+  accessible: '#2f62b3',
   trunk: '#8f8472',
   canopy: ['#a9b598', '#9fad8d', '#b3bda3'],
   pole: '#a3a5a0',
@@ -95,17 +97,20 @@ const CURB_ISLANDS_PX = [
     [3070, 328],
     [2860, 455],
   ],
+  // The fan palm's island at the head of the angled row along our east wall, one stall wide between the row's
+  // lines (satellite, 2026-10-03): x 30.4 -> 35.95 between the 49-degree lines at z -7.0 and -4.26 (at x 30.4).
   [
-    [2780, 997],
-    [2960, 997],
-    [2990, 1340],
-    [2780, 1400],
+    [2823, 907],
+    [3041, 1158],
+    [3041, 1265],
+    [2823, 1015],
   ],
+  // The planter against our east wall at the row's foot, x 29.75 -> 31.4, z 21.9 -> 26.8.
   [
-    [2830, 2205],
-    [2870, 2040],
-    [2900, 2040],
-    [2900, 2200],
+    [2797, 2043],
+    [2862, 2043],
+    [2862, 2235],
+    [2797, 2235],
   ],
   [
     [3210, 2180],
@@ -179,6 +184,23 @@ export function streetSlabs() {
   ];
 }
 
+/**
+ * The building's outline with the garage ramp's well added (alhambra-exterior.ts GARAGE_RAMP): the ground is cut
+ * round both, the ramp running north from the wing's north wall between the loading block's return and the wing's end.
+ */
+function withGarageRamp(outline: Vec2[]): Vec2[] {
+  const R = GARAGE_RAMP,
+    near = (p: Vec2, x: number, z: number) =>
+      Math.abs(p[0] - x) < 0.01 && Math.abs(p[1] - z) < 0.01;
+  const i = outline.findIndex((p) => near(p, R.x0, R.door));
+  if (i < 0 || !near(outline[i + 1], R.x1, R.door)) return outline;
+  return [
+    ...outline.slice(0, i),
+    [R.x0, R.top],
+    [R.x1, R.top],
+    ...outline.slice(i + 1),
+  ];
+}
 /** Owned plan-derived ground geometry; surrounding building heights are illustrative. */
 export function buildNeighborhood(model: Facility) {
   const root = new T.Group();
@@ -225,6 +247,61 @@ export function buildNeighborhood(model: Facility) {
     c: string,
     p: T.Object3D = root,
   ) => add(new T.BoxGeometry(w, h, d), c, x, y + h / 2, z, p);
+  /**
+   * The International Symbol of Access painted in a stall: the white wheelchair figure on a blue square, `size` m
+   * across, its head toward `up` (the scene heading the figure's top points to, as a rotation about y). Drawn to a
+   * canvas in the browser; headless (the validators) it is the blue square alone.
+   */
+  function accessSymbol(x: number, z: number, size: number, up: number) {
+    if (typeof document === 'undefined') {
+      box(x, -0.208, z, size, 0.012, size, SITE.accessible);
+      return;
+    }
+    const n = 256,
+      canvas = document.createElement('canvas');
+    canvas.width = canvas.height = n;
+    const g = canvas.getContext('2d')!;
+    g.fillStyle = SITE.accessible;
+    g.fillRect(0, 0, n, n);
+    g.strokeStyle = g.fillStyle = '#f8f6f1';
+    g.lineCap = g.lineJoin = 'round';
+    g.lineWidth = 6;
+    g.strokeRect(10, 10, n - 20, n - 20);
+    // Head, back and seat, the arm, the leg to the footrest, and the open wheel round the seat.
+    g.beginPath();
+    g.arc(104, 48, 20, 0, Math.PI * 2);
+    g.fill();
+    g.lineWidth = 22;
+    g.beginPath();
+    g.moveTo(100, 82);
+    g.lineTo(100, 150);
+    g.lineTo(160, 150);
+    g.lineTo(184, 204);
+    g.lineTo(212, 204);
+    g.stroke();
+    g.lineWidth = 16;
+    g.beginPath();
+    g.moveTo(100, 108);
+    g.lineTo(148, 108);
+    g.stroke();
+    // The wheel, open at the top behind the back.
+    g.beginPath();
+    g.arc(112, 176, 58, (-48 * Math.PI) / 180, (228 * Math.PI) / 180);
+    g.stroke();
+    const map = new T.CanvasTexture(canvas);
+    map.colorSpace = T.SRGBColorSpace;
+    map.anisotropy = 4;
+    const geo = new T.PlaneGeometry(size, size);
+    geo.rotateX(-Math.PI / 2);
+    const m = new T.Mesh(
+      geo,
+      new T.MeshStandardMaterial({ map, roughness: 0.85 }),
+    );
+    m.position.set(x, -0.195, z);
+    m.rotation.y = up;
+    m.receiveShadow = true;
+    root.add(m);
+  }
   const px = (x: number, z: number): Vec2 => [
     (x - model.calibration.sourcePixelOrigin[0]) /
       model.calibration.pixelsPerMeter,
@@ -268,7 +345,7 @@ export function buildNeighborhood(model: Facility) {
     0.2,
     SITE.asphalt,
     'parking-and-street-bed',
-    model.site.buildingOutline,
+    withGarageRamp(model.site.buildingOutline),
   );
   // Streets continue beyond the crop; their length is presentation context, not a site survey.
   // Extensions out to STREET_EXTENT sit 2 mm lower so they never fight with
@@ -350,10 +427,16 @@ export function buildNeighborhood(model: Facility) {
   dashes(42, farZ, 6, 3, westLine, 0.12);
   // The alley (south street) is an unmarked driveway: no centre dashes.
   // STOP is painted across the exit lane where it meets the west street.
-  const roadText = (text: string, x0: number, z0: number, h: number) => {
+  const roadText = (
+    text: string,
+    x0: number,
+    z0: number,
+    h: number,
+    scale = 1,
+  ) => {
     const d: Vec2 = [Math.sin(h), Math.cos(h)],
       r: Vec2 = [-Math.cos(h), Math.sin(h)], // the reader's right in this map frame
-      stroke = 0.24;
+      stroke = 0.24 * scale;
     const glyphs: Record<string, number[][]> = {
       S: [
         [0.9, 1.9, 0.1, 1.9],
@@ -386,10 +469,10 @@ export function buildNeighborhood(model: Facility) {
     [...text].forEach((ch, k) => {
       const u0 = k * 1.15 - total / 2;
       for (const [a, b, c, e] of glyphs[ch] ?? []) {
-        const cu = u0 + (a + c) / 2,
-          cv = (b + e) / 2 - 1,
-          wx = (c - a) * r[0] + (e - b) * d[0],
-          wz = (c - a) * r[1] + (e - b) * d[1];
+        const cu = (u0 + (a + c) / 2) * scale,
+          cv = ((b + e) / 2 - 1) * scale,
+          wx = (c - a) * scale * r[0] + (e - b) * scale * d[0],
+          wz = (c - a) * scale * r[1] + (e - b) * scale * d[1];
         const m = box(
           x0 + cu * r[0] + cv * d[0],
           -0.206,
@@ -409,7 +492,8 @@ export function buildNeighborhood(model: Facility) {
   // one-way arrow behind it. The mouth runs from the bay row's curb island
   // (east edge x −27.0) to the palm island (west edge x −20.2), so both are
   // centred on x −23.6; the lanes themselves sit a little east of centre.
-  roadText('STOP', -23.6, -22.6, Math.PI);
+  // At three quarters size (3.3 m across) it stays clear of the west row's first stall line.
+  roadText('STOP', -23.6, -22.6, Math.PI, 0.75);
   box(-23.6, -0.206, -24.5, 6.2, 0.012, 0.45, SITE.marking);
   dashes(
     74,
@@ -450,7 +534,7 @@ export function buildNeighborhood(model: Facility) {
   arrow(-22.5, -6, Math.PI);
   arrow(-22.5, -16, Math.PI);
   arrow(37.7, -16.7, Math.PI);
-  arrow(37.7, 12.1, Math.PI);
+  arrow(37.7, 16.8, Math.PI);
   // Crosswalks, blue loading access and parking bays are geometry rather than a photograph.
   // Crosswalk across Valley on the east side of Ethel, between the two walks.
   for (let z = 31.9; z < 40.6; z += 0.85)
@@ -459,46 +543,92 @@ export function buildNeighborhood(model: Facility) {
   // planter (the fleet's bays, at their pitch), the hatched accessible aisle
   // and stall at its south end, and a row of slightly angled stalls along the
   // building north of the drop-off.
-  for (let k = 0; k < 8; k++)
-    stall([-31.0, -23.05 + 2.8 * k], [-24.9, -23.05 + 2.8 * k]);
-  for (let x = -30.6; x < -26.6; x += 0.9)
+  // Seven white stall lines; the eighth line (z −3.45) is the accessible aisle's blue edge, not drawn twice. The
+  // aisle and stall lines run 5.4 m from the kerb (to x −25.6, short of the aisle and of the STOP lettering at the
+  // row's south end), the blue ones as long as the white.
+  const westRowEnd = -25.6;
+  for (let k = 0; k < 7; k++)
+    stall([-31.0, -23.05 + 2.8 * k], [westRowEnd, -23.05 + 2.8 * k]);
+  for (let x = -30.9; x + 1.6 <= westRowEnd - 0.05; x += 0.9)
     strip([x, -3.3], [x + 1.6, -1.2], 0.08, SITE.accessible);
   for (const z of [-3.45, -1.05, 1.45])
-    strip([-31.0, z], [-26.5, z], 0.1, SITE.accessible);
-  box(-27.9, -0.208, 0.2, 1.1, 0.012, 1.1, SITE.accessible);
-  const isaRing = add(
-    new T.TorusGeometry(0.28, 0.035, 6, 32),
-    SITE.marking,
-    -27.9,
-    -0.191,
-    0.2,
-  );
-  isaRing.rotation.x = -Math.PI / 2;
+    strip([-31.0, z], [westRowEnd, z], 0.1, SITE.accessible);
+  accessSymbol(-27.9, 0.2, 1.1, Math.PI / 2);
   for (let k = 0; k < 6; k++)
     stall([-20.4, -19.5 + 2.7 * k], [-15.0, -21.5 + 2.7 * k]);
-  // The rear court behind the east block (Street View and Google Earth): a
-  // row of stalls nosed into the building's rear (south) faces. Across the
-  // alley, perpendicular stalls entered from it along the north edge of the
-  // paved strip in front of the 1300 building, south of the alley's curb line
-  // (z −35.8), not on its lanes; the row stops short of the partner day
-  // center's drive stub (x −3.9 to 13.6), which crosses the strip.
-  for (let k = 0; k <= 6; k++) {
-    const x = 0.4 + 2.45 * k,
-      face = x > 5.2 && x < 11.8 ? -15.2 : -12.5;
-    stall([x, face], [x, face - 5.0]);
-  }
+  // The rear court behind the east block: no stalls in front of the electrical room's gates (its sign says NO
+  // PARKING ANY TIME; the dispatcher, 2026-10-05), the loading door or over the garage ramp. Across the alley, the
+  // paved strip in front of the 1300 building, opposite the lot's STOP, is unmarked (the dispatcher, 2026-10-05).
   box(-18.0, -0.432, -38.2, 26.0, 0.2, 4.8, SITE.asphalt).name =
     'strip-1300-building';
-  for (let k = 0; k <= 10; k++)
-    stall([-30.5 + 2.5 * k, -35.8], [-30.5 + 2.5 * k, -40.1]);
-  // The neighbour's lot: angled stalls along the dialysis center and along our
-  // east wall, one-way north up the aisle (arrows), the hatched accessible
-  // stall at the Valley end.
-  for (let z = -17; z <= 12; z += 3) stall([45.1, z], [39.7, z + 2.4]);
-  for (let z = -6; z <= 15; z += 3) stall([30.3, z], [35.5, z - 2.4]);
-  for (let x = 30.6; x < 35.2; x += 0.9)
-    strip([x, 15.4], [x + 1.4, 17.4], 0.08, SITE.accessible);
-  box(34.6, -0.208, 14.2, 1.0, 0.012, 1.0, SITE.accessible);
+  // Along the clinic's alley face (photo 2026-10-03): two parallel stalls, one either side of the clear zone in
+  // front of its service door and downspout (lines at x -4.82 and -8.53 from the wall out 2.6 m), with their outer
+  // line; the east stall runs open past the wall's corner.
+  for (const x of [-4.82, -8.53]) stall([x, -22.6], [x, -25.2]);
+  stall([0.6, -25.2], [-4.82, -25.2]);
+  stall([-8.53, -25.2], [-14.6, -25.2]);
+  // The lot between our east wall and the dialysis center (satellite, 2026-10-03, lines found by a Hough fit to within
+  // a few cm): one-way north up a 3.5 m aisle (x 35.95 -> 39.5, arrows), angled stalls either side entered heading
+  // north, so both rows lean the same way: along the dialysis center at 54 degrees to the aisle's cross line, lines
+  // every 4.68 m from the aisle (x 39.5) to its walk (x 44.45); along our east wall at 49 degrees, lines every ~3.7 m
+  // from the agave strip (x 30.4) to the aisle (x 35.95), after the fan palm's island: four stalls, the accessible
+  // stall (its symbol by the aisle) and its hatched access aisle, then the planters at the Valley end.
+  for (let k = -3; k <= 5; k++) {
+    const c = -2.24 + 4.68 * k;
+    stall([39.5, c], [44.45, c - 6.88]);
+  }
+  const eastRow = [-1.08, 2.46, 6.04, 10.02, 13.87, 17.62, 21.37],
+    eastSlope = 1.15,
+    eastLine = (c: number, x: number): Vec2 => [x, c + eastSlope * (x - 30.4)];
+  for (const c of eastRow) stall(eastLine(c, 30.4), eastLine(c, 35.95));
+  for (let x = 30.6; x < 35.6; x += 0.8)
+    strip(
+      eastLine(eastRow[5], x),
+      eastLine(eastRow[6], x + 0.55),
+      0.08,
+      SITE.accessible,
+    );
+  accessSymbol(34.9, 21.4, 1.0, Math.atan2(5.55, 5.55 * eastSlope));
+  // In the court by the staff entrance, nosed toward the east block's wall (z 3.51): the hatched access aisle beside
+  // the entrance's planter (x 19.35 -> 21.2), the accessible stall with its symbol at the court end, two more stalls.
+  for (const x of [21.2, 23.9, 26.33, 29.15]) stall([x, -2.4], [x, 3.3]);
+  for (let z = -2.1; z < 2.9; z += 0.8)
+    strip([19.45, z + 0.6], [21.1, z], 0.08, SITE.accessible);
+  accessSymbol(22.55, -1.6, 1.0, Math.PI);
+  // the walkway from the staff entrance's landing out between its two planters, hatched like the access aisle
+  for (let x = 18.1; x < 20.2; x += 0.75)
+    strip([x, -5.45], [x + 0.55, -6.65], 0.08, SITE.accessible);
+  // Five more outside the staff entrance, either side of a one-way aisle running south, measured from two photos
+  // taken 23 s apart on 2026-10-02 (the alley view, each car placed by its licence plate's width, and the view of the
+  // entrance, which shows the first car's front tyre at the second planter's curb). As [c, s from, s to] along each
+  // row's bearing (s forward along the stall, c across it): three west of the aisle nosed SSW (206 degrees, 2.45 m
+  // stalls), their noses stepping from the second planter's curb to the ramp's rail, the last stall bounded by the
+  // cactus planter; two east of it, side by side by the alley (below).
+  const row = (bearing: number, lines: number[][]) => {
+    const b = (bearing * Math.PI) / 180,
+      d = [Math.sin(b), -Math.cos(b)],
+      n = [d[1], -d[0]];
+    const at = (c: number, s: number): Vec2 => [
+      c * n[0] + s * d[0],
+      c * n[1] + s * d[1],
+    ];
+    for (const [c, s0, s1] of lines) stall(at(c, s0), at(c, s1));
+  };
+  row(206, [
+    [13.15, -22.0, -17.32],
+    [10.65, -24.6, -16.9],
+    [8.2, -29.3, -18.75],
+  ]);
+  // East of the aisle, by the alley (Street View May 2025 from the alley, camera solved against the court): two
+  // stalls side by side, nosed SSE (151 degrees) along the tree island's west edge; beyond them the left-turn path
+  // runs east to the dialysis center's aisle and its row (north of the palm's island), an arrow marking it.
+  row(151, [
+    [30.75, -6.28, -0.88],
+    [33.35, -6.28, -0.88],
+    [35.95, -6.28, -0.88],
+  ]);
+  // moved east of the low grass bed in front of the railed planter (photos 2026-10-05)
+  arrow(28.7, -8.4, Math.PI / 2);
   // Abstract model trees: a slender trunk under soft, smooth canopy volumes.
   const canopyGeometry = new T.SphereGeometry(1, 28, 18);
   function tree(x: number, z: number, r: number, h: number, i: number) {
@@ -545,22 +675,16 @@ export function buildNeighborhood(model: Facility) {
     [276, 1025, 2.4, 4.4],
     [276, 1496, 2.6, 4.6],
     [276, 1988, 2.1, 4.0],
-    [2945, 376, 3.4, 5.2],
-    [3153, 632, 2.8, 4.6],
-    [2858, 946, 1.0, 1.8],
-    [2858, 1064, 1.0, 1.8],
-    [2917, 2047, 1.1, 2.0],
-    [3334, 2007, 1.1, 2.0],
+    [3393, 435, 2.8, 4.6], // on the dialysis center's walk: its canopy shades the stalls, not a trunk in the aisle
+    [2961, 2188, 1.1, 2.0],
+    [3341, 2099, 1.1, 2.0],
     [4152, 278, 2.4, 4.5],
     [4152, 671, 2.6, 4.8],
     [4152, 1064, 2.3, 4.4],
     [4152, 1693, 2.5, 4.6],
-    [464, 2334, 0.55, 1.6],
-    [551, 2334, 0.55, 1.6],
   ].forEach((p, i) => tree(p[0], p[1], p[2], p[3], i));
+  // (The Valley street lamp at x -4 is night-lights.ts's; no second pole there.)
   for (const [x, z] of [
-    [-31.2, 29.6],
-    [-4, 31],
     [30, 29],
     [63.6, -24],
     [-34.4, -21.4],
@@ -579,7 +703,7 @@ export function buildNeighborhood(model: Facility) {
     NB.x1 - NB.x0,
     NB.h,
     NB.z1 - NB.z0,
-    SITE.neighbor,
+    '#dccba7',
   ).name = 'neighbor-east-estimated-height';
   box(
     (NB.x0 + NB.x1) / 2,
@@ -590,21 +714,25 @@ export function buildNeighborhood(model: Facility) {
     NB.z1 - NB.z0 + 0.16,
     SITE.coping,
   );
-  for (const y of [1.1, 4.9])
-    for (let z = NB.z0 + 2; z < NB.z1 - 1; z += 3.2)
-      box(NB.x0 - 0.015, y, z, 0.025, 1.6, 1.7, SITE.neighborGlass);
+  // Its west face toward the court is blank (photos 2026-10-05): tan stucco over a dark brown base band.
+  box(
+    NB.x0 - 0.012,
+    -0.2,
+    (NB.z0 + NB.z1) / 2,
+    0.025,
+    1.45,
+    NB.z1 - NB.z0,
+    '#86705f',
+  );
   for (let i = 0; i < 9; i++) {
     const x = NB.x0 + 3 + (i % 3) * 6.5,
       z = NB.z0 + 5 + Math.floor(i / 3) * 15;
     box(x, NB.h - 0.2, z, 1.6, 0.9, 1.3, '#b0b2a8');
   }
-  // Planters in the neighbour's lot: along our east wall, and either side of
-  // its Valley Blvd entrance.
-  for (const [x0, z0, x1, z1] of [
-    [30.0, -10.3, 32.6, -6.8],
-    [30.0, 19.0, 35.5, 24.6],
-    [41.6, 19.0, 45.1, 23.0],
-  ]) {
+  // Planter in the neighbour's lot: the round one by the accessible stall's access aisle at the Valley end (the
+  // dialysis side's is the curb island past its last stall). None north of the palm's island: that is the court's
+  // left-turn path into the dialysis aisle (the dispatcher, 2026-10-04).
+  for (const [x0, z0, x1, z1] of [[32.6, 24.0, 35.2, 26.8]]) {
     patch(
       [
         [x0, z0],

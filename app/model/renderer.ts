@@ -145,7 +145,7 @@ const FULLSCREEN_VERTEX = /* glsl */ `
 function createPostPipeline(
   renderer: T.WebGLRenderer,
   scene: T.Scene,
-  camera: T.OrthographicCamera,
+  camera: () => T.OrthographicCamera | T.PerspectiveCamera,
   paper: T.Color,
 ) {
   const depthTexture = new T.DepthTexture(1, 1);
@@ -272,27 +272,28 @@ function createPostPipeline(
       renderer.getClearColor(previousClear);
       const clearAlpha = renderer.getClearAlpha();
       renderer.setRenderTarget(sceneTarget);
-      renderer.render(scene, camera);
+      renderer.render(scene, camera());
       normalMaterial.uniforms.cameraProjectionMatrixInverse.value.copy(
-        camera.projectionMatrixInverse,
+        camera().projectionMatrixInverse,
       );
       pass(normalMaterial, normalTarget);
-      gu.cameraNear.value = camera.near;
-      gu.cameraFar.value = camera.far;
-      gu.cameraProjectionMatrix.value.copy(camera.projectionMatrix);
+      gu.cameraNear.value = camera().near;
+      gu.cameraFar.value = camera().far;
+      gu.cameraProjectionMatrix.value.copy(camera().projectionMatrix);
       gu.cameraProjectionMatrixInverse.value.copy(
-        camera.projectionMatrixInverse,
+        camera().projectionMatrixInverse,
       );
-      gu.cameraWorldMatrix.value.copy(camera.matrixWorld);
+      gu.cameraWorldMatrix.value.copy(camera().matrixWorld);
       du.cameraProjectionMatrixInverse.value.copy(
-        camera.projectionMatrixInverse,
+        camera().projectionMatrixInverse,
       );
       renderer.setClearColor(white, 1);
       for (const t of [aoTarget, denoiseTarget]) {
         renderer.setRenderTarget(t);
         renderer.clear(true, false, false);
       }
-      compositeMaterial.uniforms.depthRange.value = camera.far - camera.near;
+      compositeMaterial.uniforms.depthRange.value =
+        camera().far - camera().near;
       pass(gtaoMaterial, aoTarget);
       // Two rotated denoise iterations, ending back in aoTarget.
       du.tDiffuse.value = aoTarget.texture;
@@ -372,6 +373,9 @@ export const defaultState: ViewerState = {
  * The camera orbits `target`; azimuth is measured around +y from +z and
  * elevation is the angle above the ground plane (both radians).
  */
+/** How the scene is projected: the flat orthographic drawing, or a camera's view with depth. */
+export type Projection = 'orthographic' | 'perspective';
+
 export type CameraShot = {
   target: [number, number, number];
   zoom: number;
@@ -482,6 +486,27 @@ export function createViewer(
   controls.dampingFactor = 0.1;
   controls.enabled = options.interactive !== false;
   controls.update();
+  // Perspective view (the live lot's Perspective toggle): the orthographic camera stays the orbit model (OrbitControls,
+  // shots, zoom, pan); a perspective camera mirrors it each frame from the same direction, at the distance where its
+  // view height at the target equals the orthographic frustum's, so framing, zoom and pan carry over between the two.
+  const persp = new T.PerspectiveCamera(32, 1, 1, 2000);
+  let projection: Projection = 'orthographic';
+  const activeCamera = (): T.OrthographicCamera | T.PerspectiveCamera =>
+    projection === 'perspective' ? persp : camera;
+  const syncPerspective = () => {
+    if (projection !== 'perspective') return;
+    const dir = camera.position.clone().sub(controls.target).normalize();
+    const halfHeight = (camera.top - camera.bottom) / 2 / camera.zoom;
+    const d = halfHeight / Math.tan(T.MathUtils.degToRad(persp.fov) / 2);
+    persp.position.copy(controls.target).addScaledVector(dir, d);
+    persp.up.copy(camera.up);
+    persp.lookAt(controls.target);
+    persp.aspect = (camera.right - camera.left) / (camera.top - camera.bottom);
+    persp.near = Math.max(0.5, d / 100);
+    persp.far = d + 800;
+    persp.updateProjectionMatrix();
+    persp.updateMatrixWorld();
+  };
   // Soft, even architectural light: a pale sky/ground fill, a gentle room
   // environment for material response and a warm, low-contrast key.
   scene.add(new T.HemisphereLight('#fbfaf6', '#d8d4cc', 1.1));
@@ -1010,8 +1035,7 @@ export function createViewer(
       object: o,
       group: g,
       inspectable,
-      clipped:
-        parent !== context || layer === 'exterior' || layer === 'roof',
+      clipped: parent !== context || layer === 'exterior' || layer === 'roof',
     });
     if (inspectable) inspectableGroups.add(g);
     if (spec.modelUrl) {
@@ -1363,7 +1387,9 @@ export function createViewer(
   });
   const inspectContext = { model, activity, community };
   const picker = createPicker({
-    camera,
+    get camera() {
+      return activeCamera();
+    },
     section: () => (activePlanes ? sectionPlane : null),
     people: activity.actors,
     peopleRoot: activity.root,
@@ -1806,7 +1832,7 @@ export function createViewer(
     renderer.setPixelRatio(pixelRatio());
     applyShadowQuality();
     if (quality === 'high' && !post)
-      post = createPostPipeline(renderer, scene, camera, paper);
+      post = createPostPipeline(renderer, scene, activeCamera, paper);
     else if (quality !== 'high' && post) {
       post.dispose();
       post = null;
@@ -1935,7 +1961,7 @@ export function createViewer(
         ((e.clientX - r.left) / r.width) * 2 - 1,
         (-(e.clientY - r.top) / r.height) * 2 + 1,
       ),
-      camera,
+      activeCamera(),
     );
     if (options.pick?.(ray)) return;
     // A person, a piece of furniture or a vehicle opens its card; a person
@@ -1996,7 +2022,7 @@ export function createViewer(
         ((hoverAt[0] - r.left) / r.width) * 2 - 1,
         (-(hoverAt[1] - r.top) / r.height) * 2 + 1,
       ),
-      camera,
+      activeCamera(),
     );
     options.hover(ray);
   };
@@ -2079,9 +2105,10 @@ export function createViewer(
     if (enabled && showcase) prepareTilt();
   };
   const renderScene = () => {
+    syncPerspective();
     if (showcase && tiltShiftEnabled && tiltComposer) tiltComposer.render();
     else if (post) post.render();
-    else renderer.render(scene, camera);
+    else renderer.render(scene, activeCamera());
   };
   async function recordShowcase(
     onProgress: (progress: number) => void,
@@ -2287,7 +2314,7 @@ export function createViewer(
         label.size = [0, 0];
       }
       if (!visible) continue;
-      highlightPoint.copy(h.position).project(camera);
+      highlightPoint.copy(h.position).project(activeCamera());
       if (highlightPoint.z > 1) {
         label.el.style.visibility = 'hidden';
         continue;
@@ -2340,6 +2367,7 @@ export function createViewer(
     frame = requestAnimationFrame(loop);
     const dt = Math.max(0, (now - lastTime) / 1000);
     lastTime = now;
+    syncPerspective();
     if (
       autoQuality &&
       !recordingSize &&
@@ -2406,7 +2434,7 @@ export function createViewer(
       if (!label) continue;
       const anchor = new T.Vector3(c[0], 2, c[1])
         .add(g.position)
-        .project(camera);
+        .project(activeCamera());
       label.style.left = `${(anchor.x * 0.5 + 0.5) * host.clientWidth}px`;
       label.style.top = `${(-anchor.y * 0.5 + 0.5) * host.clientHeight}px`;
       label.style.visibility = anchor.z > 1 ? 'hidden' : 'visible';
@@ -2525,12 +2553,16 @@ export function createViewer(
       const p = box
           .getCenter(new T.Vector3())
           .applyMatrix4(frame)
-          .project(camera),
+          .project(activeCamera()),
         r = renderer.domElement.getBoundingClientRect();
       return {
         x: r.left + ((p.x + 1) / 2) * r.width,
         y: r.top + ((1 - p.y) / 2) * r.height,
       };
+    },
+    /** How far the person may zoom in (the live lot's `?debug` raises it for close-ups of the building). */
+    setMaxZoom(zoom: number) {
+      controls.maxZoom = zoom;
     },
     /** Place the camera exactly; cancels any in-flight focus animation. */
     setShot(shot: CameraShot) {
@@ -2548,6 +2580,16 @@ export function createViewer(
       camera.updateProjectionMatrix();
       controls.update();
     },
+    /** Draw the scene flat (orthographic, the default) or as a camera would see it (perspective). */
+    /** The camera drawing the scene now (orthographic or perspective), for projecting world points to the screen. */
+    getCamera(): T.OrthographicCamera | T.PerspectiveCamera {
+      return activeCamera();
+    },
+    setProjection(next: Projection) {
+      projection = next;
+      syncPerspective();
+    },
+    getProjection: (): Projection => projection,
     getShot(): CameraShot {
       const offset = camera.position.clone().sub(controls.target);
       return {

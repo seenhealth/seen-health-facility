@@ -718,7 +718,7 @@
       "levelId": "basement",
       "polygon": [
         [
-          -1e-06,
+          -0.000001,
           -15.27138
         ],
         [
@@ -738,7 +738,7 @@
           26.492967
         ],
         [
-          -1e-06,
+          -0.000001,
           26.492967
         ]
       ],
@@ -873,7 +873,7 @@
       "levelId": "basement",
       "polygon": [
         [
-          -1e-06,
+          -0.000001,
           -15.27138
         ],
         [
@@ -893,7 +893,7 @@
           26.492967
         ],
         [
-          -1e-06,
+          -0.000001,
           26.492967
         ]
       ],
@@ -4718,7 +4718,7 @@
       "zoneId": "basement",
       "levelId": "basement",
       "a": [
-        -1e-06,
+        -0.000001,
         -15.27138
       ],
       "b": [
@@ -4806,7 +4806,7 @@
         26.492967
       ],
       "b": [
-        -1e-06,
+        -0.000001,
         26.492967
       ],
       "height": 2.7,
@@ -4823,11 +4823,11 @@
       "zoneId": "basement",
       "levelId": "basement",
       "a": [
-        -1e-06,
+        -0.000001,
         26.492967
       ],
       "b": [
-        -1e-06,
+        -0.000001,
         -15.27138
       ],
       "height": 2.7,
@@ -4844,7 +4844,7 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "a": [
-        -1e-06,
+        -0.000001,
         8.810744
       ],
       "b": [
@@ -4890,7 +4890,7 @@
         26.492967
       ],
       "b": [
-        -1e-06,
+        -0.000001,
         26.492967
       ],
       "height": 2.9,
@@ -4907,11 +4907,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "a": [
-        -1e-06,
+        -0.000001,
         26.492967
       ],
       "b": [
-        -1e-06,
+        -0.000001,
         8.810744
       ],
       "height": 2.9,
@@ -13167,7 +13167,7 @@
       "kind": "tree-seat",
       "dimensions": [
         3.1,
-        4.5,
+        4,
         3.1
       ],
       "material": "photo-blue-seat",
@@ -15880,6 +15880,37 @@
   },
   "objects": [
     {
+      "id": "rehab-basin-6",
+      "assetId": "basin",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -16.739155,
+        0,
+        9.28
+      ],
+      "rotation": 0,
+      "scale": [
+        0.8479815275512008,
+        1,
+        0.9158200497552967
+      ],
+      "roomId": "rehab-entry",
+      "referencePages": [
+        92
+      ],
+      "status": "image-traced-position-and-footprint / height-inferred",
+      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred. Moved 0.58 m north (2026-10-03): traced just outside the rehab wing's south wall, it stood on the drop-off ramp's turn landing; now against the wall inside the entry room.",
+      "sourcePixelPosition": [
+        485,
+        773.39392
+      ],
+      "sourcePixelFootprint": [
+        10.000000000000002,
+        9
+      ]
+    },
+    {
       "id": "clinic-west-office-chair-0",
       "assetId": "plan-clinical-chair",
       "zoneId": "clinic",
@@ -17767,37 +17798,6 @@
       "sourcePixelPosition": [
         414,
         927
-      ],
-      "sourcePixelFootprint": [
-        10.000000000000002,
-        9
-      ]
-    },
-    {
-      "id": "rehab-basin-6",
-      "assetId": "basin",
-      "zoneId": "rehab",
-      "levelId": "ground",
-      "position": [
-        -16.739155,
-        0,
-        8.70029
-      ],
-      "rotation": 0,
-      "scale": [
-        0.8479815275512008,
-        1,
-        0.9158200497552967
-      ],
-      "roomId": null,
-      "referencePages": [
-        92
-      ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        485,
-        762
       ],
       "sourcePixelFootprint": [
         10.000000000000002,
@@ -20687,13 +20687,13 @@
       "levelId": "ground",
       "position": [
         -16.33,
-        3.21,
-        0.8
+        2.96,
+        0.45
       ],
       "rotation": -1.5707963267948966,
       "scale": [
-        1,
-        1,
+        1.1,
+        1.1,
         1
       ],
       "roomId": null,
@@ -20701,7 +20701,7 @@
         109
       ],
       "status": "photo-informed / dimensions-estimated",
-      "notes": "Current sign over the drop-off door (photo 2026-10-02): white SEEN HEALTH 见心颐养 channel letters, no mark, standing on top of the bronze canopy over the sliding door, along its front edge (placement corrected by the dispatcher, 2026-10-02); the backing is drawn in the canopy bronze so it reads as a low sign band on the canopy. Placement is registered to the plan; dimensions estimated without a measured drawing.",
+      "notes": "Current sign over the drop-off door (photos 2026-10-02/03): white SEEN HEALTH 见心颐养 channel letters, no mark, standing directly on top of the bronze canopy along its front edge, from above the door portal's left jamb to past the first window; the backing is drawn in the canopy bronze so it reads as a low sign band on the canopy. Dimensions estimated from the photo.",
       "layer": "exterior"
     },
     {
@@ -31405,13 +31405,13 @@
       "color": "#ffffff",
       "roughness": 0.6,
       "textureUrl": "/reference/photos/front-sign.png",
-      "opacity": 1.0
+      "opacity": 1
     },
     "photo-sign-dropoff": {
       "color": "#ffffff",
       "roughness": 0.6,
       "textureUrl": "/reference/photos/dropoff-sign.png",
-      "opacity": 1.0
+      "opacity": 1
     },
     "photo-sign-clinic": {
       "color": "#ffffff",
@@ -31488,10 +31488,10 @@
       "metalness": 0.16
     },
     "om-rollup": {
-      "name": "Tan roll-up loading door - Street View",
-      "color": "#b9aa89",
-      "roughness": 0.7,
-      "metalness": 0.2
+      "name": "Grey steel roll-up curtain - garage-court photos 2026-10-02",
+      "color": "#b4b1aa",
+      "roughness": 0.6,
+      "metalness": 0.35
     },
     "photo-sign-front-shadow": {
       "color": "#ffffff",
@@ -31504,6 +31504,17 @@
       "roughness": 1,
       "opacity": 0.6,
       "textureUrl": "/reference/photos/dropoff-sign-shadow.png"
+    },
+    "om-service-door": {
+      "name": "Grey metal service door - alley photo 2026-10-03",
+      "color": "#bfc1bd",
+      "roughness": 0.55,
+      "metalness": 0.3
+    },
+    "om-court-concrete": {
+      "name": "Bare grey concrete - garage-court photos 2026-10-02",
+      "color": "#b3b1aa",
+      "roughness": 0.9
     }
   },
   "programs": [
@@ -32805,7 +32816,7 @@
         -29.153605
       ],
       [
-        65.0,
+        65,
         37.701259
       ]
     ],
@@ -32998,7 +33009,7 @@
       "bounds": [
         [
           0,
-          -15.212789
+          -12.465328
         ],
         [
           15.263667,
@@ -33020,22 +33031,6 @@
           -12.465328
         ],
         [
-          5.189647,
-          -12.465328
-        ],
-        [
-          5.189647,
-          -15.212789
-        ],
-        [
-          11.753024,
-          -15.212789
-        ],
-        [
-          11.753024,
-          -12.465328
-        ],
-        [
           15.263667,
           -12.465328
         ],
@@ -33054,6 +33049,48 @@
         [
           0,
           28.085148
+        ]
+      ],
+      "parapet": false
+    },
+    {
+      "id": "east-loading",
+      "kind": "flat",
+      "bounds": [
+        [
+          5.189647,
+          -15.212789
+        ],
+        [
+          11.753024,
+          -12.465328
+        ]
+      ],
+      "eaveHeight": 5.3,
+      "rise": 0,
+      "referencePages": [
+        92,
+        19,
+        66,
+        67
+      ],
+      "status": "photographed 2026-10-02: the loading block in front of the wing, ~5.9 m to its parapet cap",
+      "polygon": [
+        [
+          5.189647,
+          -15.212789
+        ],
+        [
+          11.753024,
+          -15.212789
+        ],
+        [
+          11.753024,
+          -12.465328
+        ],
+        [
+          5.189647,
+          -12.465328
         ]
       ],
       "parapet": false
@@ -33155,13 +33192,13 @@
       "id": "west-entry-canopy",
       "position": [
         -15.568941,
-        2.8,
-        0.8
+        2.84,
+        0.35
       ],
       "dimensions": [
         1.5772456412452331,
-        0.16,
-        5.6
+        0.12,
+        8.7
       ],
       "material": "photo-bronze",
       "surface": "exterior",
@@ -33171,7 +33208,7 @@
         0
       ],
       "zoneId": null,
-      "status": "image-inferred",
+      "status": "photo-informed",
       "referencePages": [
         109,
         92
@@ -33181,13 +33218,13 @@
       "id": "west-entry-canopy-fascia",
       "position": [
         -16.3,
-        2.24,
-        0.8
+        2.68,
+        0.35
       ],
       "dimensions": [
         0.14,
-        0.72,
-        5.6
+        0.28,
+        8.7
       ],
       "material": "photo-bronze",
       "surface": "exterior",
@@ -34493,19 +34530,19 @@
         "openings": [
           {
             "id": "shell-lobby-west-opening-1",
-            "offset": 5.65,
-            "width": 1.1,
-            "sill": 0,
-            "height": 2.2,
-            "kind": "door",
-            "material": "photo-white"
+            "offset": 6.1288,
+            "width": 0.85,
+            "sill": 0.88,
+            "height": 1.4,
+            "kind": "window",
+            "material": "om-glass"
           },
           {
             "id": "shell-lobby-west-opening-2",
-            "offset": 7.3,
-            "width": 1.4,
-            "sill": 0.65,
-            "height": 1.65,
+            "offset": 7.3238,
+            "width": 0.96,
+            "sill": 0.88,
+            "height": 1.4,
             "kind": "window",
             "material": "om-glass"
           },
@@ -34585,15 +34622,24 @@
         "openings": [
           {
             "id": "shell-clinic-north-opening-1",
-            "offset": 7.6,
-            "width": 3.2,
+            "offset": 8.607318,
+            "width": 1,
             "sill": 0,
-            "height": 3.0,
+            "height": 2.13,
             "kind": "door",
-            "material": "om-rollup"
+            "material": "om-service-door"
+          },
+          {
+            "id": "shell-clinic-north-opening-2",
+            "offset": 10.420318,
+            "width": 1.02,
+            "sill": 1.76,
+            "height": 1.22,
+            "kind": "window",
+            "material": "om-glass"
           }
         ],
-        "status": "plan-traced perimeter / inferred elevation and opening heights",
+        "status": "plan-traced perimeter; door, barred window and fittings from the 2026-10-03 alley photo (the 2025 Street View roll-up is gone)",
         "referencePages": [
           92,
           19
@@ -34612,7 +34658,7 @@
         "zoneId": "clinic",
         "height": 4.15,
         "thickness": 0.24,
-        "material": "om-stone",
+        "material": "om-court-concrete",
         "openings": [],
         "status": "plan-traced perimeter / inferred elevation and opening heights",
         "referencePages": [
@@ -34633,7 +34679,7 @@
         "zoneId": "ot",
         "height": 6.65,
         "thickness": 0.24,
-        "material": "om-stone",
+        "material": "om-court-concrete",
         "openings": [
           {
             "id": "shell-rear-court-opening-1",
@@ -34663,9 +34709,9 @@
           -15.212789
         ],
         "zoneId": "ot",
-        "height": 6.65,
+        "height": 5.45,
         "thickness": 0.24,
-        "material": "om-stone",
+        "material": "om-court-concrete",
         "openings": [
           {
             "id": "shell-rear-stair-west-opening-1",
@@ -34677,7 +34723,7 @@
             "material": "photo-white"
           }
         ],
-        "status": "plan-traced perimeter / inferred elevation and opening heights",
+        "status": "plan-traced; height and openings from the 2026-10-02 garage-court photos (the loading block stands ~0.8 m below the wing)",
         "referencePages": [
           92,
           19
@@ -34694,31 +34740,40 @@
           -15.212789
         ],
         "zoneId": "ot",
-        "height": 6.65,
+        "height": 5.45,
         "thickness": 0.24,
-        "material": "om-stone",
+        "material": "om-court-concrete",
         "openings": [
           {
             "id": "shell-rear-north-opening-1",
-            "offset": 2.28955,
-            "width": 2.645702,
+            "offset": 2.410353,
+            "width": 2.58,
             "sill": 0,
-            "height": 2.3,
+            "height": 3.38,
             "kind": "door",
-            "material": "om-glass",
+            "material": "om-rollup",
             "operable": true
           },
           {
             "id": "shell-rear-north-opening-2",
-            "offset": 4.935252,
-            "width": 1.068457,
+            "offset": 4.990353,
+            "width": 0.75,
+            "sill": 2.2,
+            "height": 1.18,
+            "kind": "window",
+            "material": "om-rollup"
+          },
+          {
+            "id": "shell-rear-north-opening-3",
+            "offset": 4.990353,
+            "width": 0.75,
             "sill": 0,
-            "height": 2.3,
+            "height": 2.13,
             "kind": "door",
-            "material": "om-glass"
+            "material": "om-service-door"
           }
         ],
-        "status": "plan-traced perimeter / inferred elevation and opening heights",
+        "status": "plan-traced; height and openings from the 2026-10-02 garage-court photos (the loading block stands ~0.8 m below the wing)",
         "referencePages": [
           92,
           19
@@ -34735,11 +34790,11 @@
           -12.465328
         ],
         "zoneId": "ot",
-        "height": 6.65,
+        "height": 5.45,
         "thickness": 0.24,
-        "material": "om-stone",
+        "material": "om-court-concrete",
         "openings": [],
-        "status": "plan-traced perimeter / inferred elevation and opening heights",
+        "status": "plan-traced; height and openings from the 2026-10-02 garage-court photos (the loading block stands ~0.8 m below the wing)",
         "referencePages": [
           92,
           19
@@ -34758,7 +34813,7 @@
         "zoneId": "ot",
         "height": 6.65,
         "thickness": 0.24,
-        "material": "om-stone",
+        "material": "om-court-concrete",
         "openings": [],
         "status": "plan-traced perimeter / inferred elevation and opening heights",
         "referencePages": [
@@ -34785,8 +34840,8 @@
             "id": "shell-rear-east-opening-1",
             "offset": 1.424609,
             "width": 1.322851,
-            "sill": 0.75,
-            "height": 1.4,
+            "sill": 1.15,
+            "height": 1.3,
             "kind": "window",
             "material": "om-glass"
           }
@@ -34815,7 +34870,7 @@
           {
             "id": "shell-east-exit-opening-1",
             "offset": 0.050879,
-            "width": 1.780761,
+            "width": 1.431605,
             "sill": 0,
             "height": 2.15,
             "kind": "door",
@@ -35347,20 +35402,38 @@
         "material": "om-stone",
         "openings": [
           {
-            "id": "shell-therapy-west-opening-1",
-            "offset": 4.019432,
-            "width": 1.170215,
-            "sill": 0,
-            "height": 2.15,
-            "kind": "door",
-            "material": "photo-white"
-          },
-          {
             "id": "ethel-corner-return-glazing",
             "offset": 0.05,
-            "width": 3.35,
+            "width": 2.52,
             "sill": 0.52,
             "height": 2.24,
+            "kind": "window",
+            "material": "om-glass"
+          },
+          {
+            "id": "shell-therapy-west-opening-2",
+            "offset": 2.0493,
+            "width": 0.44,
+            "sill": 3.28,
+            "height": 1.74,
+            "kind": "window",
+            "material": "om-glass"
+          },
+          {
+            "id": "shell-therapy-west-opening-3",
+            "offset": 16.2793,
+            "width": 0.44,
+            "sill": 3.28,
+            "height": 1.74,
+            "kind": "window",
+            "material": "om-glass"
+          },
+          {
+            "id": "shell-therapy-west-opening-4",
+            "offset": 16.2793,
+            "width": 0.44,
+            "sill": 1.57,
+            "height": 1.63,
             "kind": "window",
             "material": "om-glass"
           }
@@ -35877,7 +35950,8 @@
       "rehab-basin-2",
       "rehab-basin-3",
       "rehab-basin-4",
-      "rehab-basin-5"
+      "rehab-basin-5",
+      "rehab-basin-6"
     ],
     "newObjectIds": [
       "day-landscape-wall",

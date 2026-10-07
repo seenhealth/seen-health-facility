@@ -28,11 +28,10 @@ export const deliveryStops = [
   {
     id: 'delivery-package',
     kind: 'package',
-    // The employee entrance is behind the rear court's palm island
-    // (REAR_COURT_PLANTERS) and the utility pole in front of the garage wall,
-    // so the truck noses in east of the pole, short of the food truck's
-    // receiving ramp, and its driver walks north past the pole's east side and
-    // round to the door.
+    // Rear receiving is the door at the back of the electrical room's notch
+    // (west of the loading block, photos 2026-10-02): the truck noses in west
+    // of the food truck, and its driver walks through the enclosure's
+    // pedestrian gate (alhambra-exterior.ts, swung open here) to the door.
     x: 6.75,
     z: -19.6,
     door: [3.56, -12.465328],
@@ -314,8 +313,16 @@ export function buildDeliveries() {
     box(lunch, 0, 0.09, i * 0.56, 0.46, 0.18, 0.52, '#a4baa5');
     box(lunch, -0.236, 0.09, i * 0.56, 0.012, 0.18, 0.055, '#e1d0aa');
   }
+  // The exterior's loading roll-up and the electrical room's pedestrian gate (alhambra-exterior.ts) open with their
+  // stops' doors: found in the scene on first use, left as they are when the deliveries are off.
+  let exterior: { rollup?: T.Object3D; gate?: T.Object3D } | null = null;
   function tick(time: number, enabled: boolean) {
     root.visible = enabled;
+    if (enabled && !exterior && root.parent)
+      exterior = {
+        rollup: root.parent.getObjectByName('rear-loading-rollup'),
+        gate: root.parent.getObjectByName('electrical-room-gate-leaf'),
+      };
     vehicles.forEach((v, i) => {
       const p = sampleDelivery(i, time);
       v.root.visible = p.visible;
@@ -323,6 +330,12 @@ export function buildDeliveries() {
       v.root.rotation.y = p.heading;
       v.tail.position.y = 1.4 + p.door * 0.65;
       doors[i].rotation.y = -Math.PI * 0.47 * p.door;
+      const stop = deliveryStops[i];
+      if (!enabled || !exterior) return;
+      if (stop.kind === 'food' && exterior.rollup)
+        exterior.rollup.position.y = 3.3 * p.door;
+      if (stop.kind === 'package' && exterior.gate)
+        exterior.gate.rotation.y = 1.45 * p.door;
     });
     const t = ((time % 720) + 720) % 720;
     lunch.visible = t >= KITCHEN_LUNCH.from && t < KITCHEN_LUNCH.to;

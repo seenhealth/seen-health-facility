@@ -8,6 +8,7 @@ import {
   sampleFleetVan,
 } from './alhambra-fleet';
 import { FLEET_VAN_CAB_DOOR, FLEET_VAN_RAMP } from './photo-assets';
+import { FLEET_VAN_MODEL, fleetVanModel } from './fleet-van-model';
 import type { Facility, Vec2 } from './schema';
 /** Van-local (x, z) → world for the van docked at the drop-off, to the millimetre. */
 const atDock = ([x, z]: Vec2): Vec2 => {
@@ -31,6 +32,30 @@ export const ARRIVAL = {
   streetY: -0.23,
   vanFloorY: 0.35,
 };
+/**
+ * The lobby's sliding doors (photos 2026-10-02): two satin-aluminium leaves in
+ * the wall's opening (the envelope's `shell-lobby-west-opening-3`, z −1.746
+ * to 0.004), each with a mid-rail splitting the
+ * glass. Opening, they slide into the wall either side. The right-hand leaf
+ * (seen from the lot) carries the street-number and information decal, the
+ * left the STAND CLEAR and NO SOLICITING stickers
+ * (scripts/lobby-door-decals.py).
+ */
+export const ENTRY_DOORS = {
+  x: -14.653,
+  z0: -1.746,
+  z1: 0.004,
+  height: 2.15,
+  /** Each leaf slides this far into the wall when fully open (behind the window beside it on the +z side). */
+  travel: 0.85,
+};
+/** Centre z of sliding leaf `sign` (−1 the −z leaf, +1 the +z leaf) when the doors are `open` (0–1). */
+export function entryLeafZ(sign: number, open: number) {
+  const { z0, z1, travel } = ENTRY_DOORS,
+    mid = (z0 + z1) / 2,
+    half = (z1 - z0) / 4;
+  return mid + sign * (half + open * travel);
+}
 // Unload windows close once the last rider is off the ramp and the driver has
 // stowed it, so the driver is back in the cab before the outbound trip starts
 // (fleet-crew.ts times the ramp duty against these door/ramp curves).
@@ -79,10 +104,7 @@ export function buildArrival(
       opacity,
       depthWrite: opacity === 1,
     });
-  // Satin door frames and a deep-green entrance header.
-  const silver = mat('#c4c7c4'),
-    teal = mat('#1f4d3a'),
-    glass = mat('#d4e0df', 0.36);
+
   const box = (
     parent: T.Object3D,
     x: number,
@@ -99,18 +121,65 @@ export function buildArrival(
     parent.add(o);
     return o;
   };
-  box(entry, -14.653, 2.2, -0.992, 0.16, 0.14, 1.49, teal);
   const leaves: T.Group[] = [];
-  for (const sign of [-1, 1]) {
-    const g = new T.Group();
-    g.name = `sliding-entry-leaf-${sign}`;
-    g.position.set(-14.653, 0, -0.992 + sign * 0.315);
-    entry.add(g);
-    box(g, 0, 0.04, 0, 0.035, 2.12, 0.615, glass);
-    for (const z of [-0.307, 0.307])
-      box(g, 0, 0.025, z, 0.06, 2.16, 0.025, silver);
-    box(g, 0, 1.04, 0, 0.045, 0.06, 0.61, teal);
-    leaves.push(g);
+  {
+    const D = ENTRY_DOORS,
+      leafW = (D.z1 - D.z0) / 2,
+      stile = 0.06,
+      sash = mat('#d6d4cc'),
+      // Dark glass with a sheen, as the photo shows it from the bright lot; still transparent, so the lobby and
+      // the night glazing (night-lights.ts) read through it.
+      tint = new T.MeshStandardMaterial({
+        color: '#0e1417',
+        roughness: 0.12,
+        metalness: 0.35,
+        transparent: true,
+        opacity: 0.9,
+        depthWrite: false,
+      }),
+      loader = new T.TextureLoader();
+    const decal = (url: string) => {
+      // Node (the validators build this scene headless) has no image loader; the vinyl is skipped there.
+      if (typeof document === 'undefined') return null;
+      const map = loader.load(url);
+      map.colorSpace = T.SRGBColorSpace;
+      map.anisotropy = 4;
+      // Cut out rather than blended, so the night glazing pass (night-lights.ts), which re-lights the leaves'
+      // transparent glass, leaves the vinyl alone.
+      return new T.MeshStandardMaterial({
+        map,
+        alphaTest: 0.5,
+        roughness: 0.6,
+      });
+    };
+
+    const decals: Record<number, T.MeshStandardMaterial | null> = {
+      1: decal('/reference/photos/lobby-door-decal.png'),
+      [-1]: decal('/reference/photos/lobby-door-stickers.png'),
+    };
+    for (const sign of [-1, 1]) {
+      const g = new T.Group();
+      g.name = `sliding-entry-leaf-${sign}`;
+      g.position.set(D.x, 0, entryLeafZ(sign, 0));
+      entry.add(g);
+      // Frame: stiles, a deep top rail, the mid-rail at hand height and the bottom rail; tinted glass between.
+      for (const z of [-leafW / 2 + stile / 2, leafW / 2 - stile / 2])
+        box(g, 0, 0, z, 0.05, D.height, stile, sash);
+      box(g, 0, D.height - 0.13, 0, 0.05, 0.13, leafW, sash);
+      box(g, 0, 0.93, 0, 0.05, 0.12, leafW, sash);
+      box(g, 0, 0, 0, 0.05, 0.1, leafW, sash);
+      box(g, 0, 1.05, 0, 0.02, D.height - 0.13 - 1.05, leafW - 2 * stile, tint);
+      box(g, 0, 0.1, 0, 0.02, 0.83, leafW - 2 * stile, tint);
+      // The vinyl on the lot side of the upper glass (0.68 x 0.96 m textures at 1 px per mm).
+      const vinylMat = decals[sign];
+      if (vinylMat) {
+        const vinyl = new T.Mesh(new T.PlaneGeometry(0.68, 0.96), vinylMat);
+        vinyl.rotation.y = -Math.PI / 2;
+        vinyl.position.set(-0.016, 1.05 + 0.96 / 2 + 0.005, 0);
+        g.add(vinyl);
+      }
+      leaves.push(g);
+    }
   }
   const materialFor =
     material ||
@@ -151,10 +220,7 @@ export function buildArrival(
         .map((p) => Math.hypot(p.x - ARRIVAL.door[0], p.z - ARRIVAL.door[1])),
     );
     doorOpen = enabled ? 1 - smooth(0.7, 2.25, nearest) : 0;
-    leaves.forEach(
-      (g, i) =>
-        (g.position.z = -0.992 + (i ? 1 : -1) * (0.315 + doorOpen * 0.65)),
-    );
+    leaves.forEach((g, i) => (g.position.z = entryLeafZ(i ? 1 : -1, doorOpen)));
   }
   return {
     root,
@@ -171,7 +237,9 @@ export function buildArrival(
  * Shared fleet body, sliding passenger doors and folding ramp for every site,
  * in the livery of `variant` (a letter: 'A' for the first fleet van; see
  * `fleetVanLetter`). Van A uses the model's `fleet-van-a` spec, every other
- * letter `fleet-van-b` when the model has one.
+ * letter `fleet-van-b` when the model has one. Once the photo-textured van
+ * (fleet-van-model.ts) has loaded, every letter uses it instead: the fleet is
+ * one livery on the real van.
  */
 export function buildArrivalVan(
   model: Facility,
@@ -182,13 +250,16 @@ export function buildArrivalVan(
   const spec =
     model.assets[`fleet-van-${letter === 'A' ? 'a' : 'b'}`] ||
     model.assets['fleet-van-a'];
-  const root = buildAsset(
-    {
-      ...spec,
-      parameters: { ...spec.parameters, variant: letter, operable: true },
-    },
-    material,
-  );
+  const photoVan = fleetVanModel();
+  const root = photoVan
+    ? new T.Group().add(photoVan)
+    : buildAsset(
+        {
+          ...spec,
+          parameters: { ...spec.parameters, variant: letter, operable: true },
+        },
+        material,
+      );
   root.name = `animated-van-${letter.toLowerCase()}`;
   // Own copies of the body materials, so one van can fade out at the map edge
   // without touching the others (the renderer's section clones key on these).
@@ -242,6 +313,13 @@ export function buildArrivalVan(
       root.getObjectByName('passenger-door-1')!,
     ],
     cabDoor: root.getObjectByName('driver-door') ?? null,
+    /** Wheels of the photo model (local y is the axle); empty for the procedural body. */
+    wheels: photoVan
+      ? ['fl', 'fr', 'rl', 'rr'].map((k) => root.getObjectByName(`wheel-${k}`)!)
+      : [],
+    wheelRadius: photoVan ? FLEET_VAN_MODEL.wheelRadius : 0.36,
+    /** Slide of each passenger-door leaf when fully open. */
+    doorSlide: photoVan ? FLEET_VAN_MODEL.doorSlide : 0.6,
   };
 }
 /** What a van body needs from a vehicle sampler; fleet vans also fade and open the driver's door. */
@@ -295,10 +373,23 @@ export function updateArrivalVan(
   van.root.rotation.y = sample.heading;
   van.root.visible = enabled && sample.visible;
   fadeVehicle(van.root, sample.opacity ?? 1);
+  // Slide-out ramp: stowed telescoped to a third of its length under the floor,
+  // it runs out level from under the door sill over the first 65% of `ramp`,
+  // extending as it goes, then its outer end tips down to the ground about the sill.
+  const ramp = FLEET_VAN_RAMP,
+    run = smooth(0, 0.65, sample.ramp),
+    tip = smooth(0.65, 1, sample.ramp),
+    stretch = T.MathUtils.lerp(0.32, 1, run);
   van.pivot.visible = sample.ramp > 0.001;
-  van.pivot.rotation.z = T.MathUtils.lerp(Math.PI / 2, rampAngle, sample.ramp);
+  van.pivot.scale.x = stretch;
+  van.pivot.position.set(
+    ramp.hinge[0] - ramp.length * stretch * (1 - run),
+    ramp.hinge[1] - 0.07 * (1 - tip),
+    ramp.hinge[2],
+  );
+  van.pivot.rotation.z = rampAngle * tip;
   van.doors.forEach(
-    (door, i) => (door.position.z = (i ? 1 : -1) * 0.6 * sample.door),
+    (door, i) => (door.position.z = (i ? 1 : -1) * van.doorSlide * sample.door),
   );
   if (van.cabDoor)
     van.cabDoor.rotation.y =
