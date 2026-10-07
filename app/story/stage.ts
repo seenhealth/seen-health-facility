@@ -1,5 +1,6 @@
 import type { Facility } from '../model/schema';
 import type { Viewer } from './director';
+import { FLEET_VAN_MODEL_URL, preloadFleetVanModel } from '../model/fleet-van-model';
 
 /** Facility specification, relative to the asset base. */
 export const FACILITY_PATH = 'models/seen-alhambra-planning.json';
@@ -48,6 +49,7 @@ export async function bootStage(
     import('../model/schema'),
     import('../model/renderer'),
     import('./hero-source'),
+    preloadFleetVanModel(assetUrl(base, FLEET_VAN_MODEL_URL)),
   ]);
   if (!response.ok) throw new Error('The facility model could not be loaded.');
   const model = schema.validateFacility(await response.json());

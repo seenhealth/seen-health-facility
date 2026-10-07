@@ -11,11 +11,16 @@ import { buildCareAsset } from './care-assets';
 import { buildRehabAsset } from './rehab-assets';
 import { buildKitchenAsset } from './kitchen-assets';
 import { buildDayAdminAsset } from './day-admin-assets';
+import { fleetVanModel } from './fleet-van-model';
 // Each asset is modeled around a local, floor-level origin. Dimensions and transforms live in JSON.
 export function buildAsset(
   spec: Asset,
   material: (id: string) => T.MeshStandardMaterial,
 ) {
+  if (spec.kind === 'fleet-van') {
+    const van = fleetVanModel();
+    if (van) return new T.Group().add(van);
+  }
   const home = buildHomeAsset(spec, material);
   if (home) return home;
   const adhc = buildAdhcAsset(spec, material);

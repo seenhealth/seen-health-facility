@@ -37,6 +37,7 @@ import {
 } from './model/schema';
 import { defaultState, type ViewerState } from './model/renderer';
 import type { createViewer } from './model/renderer';
+import { preloadFleetVanModel } from './model/fleet-van-model';
 import {
   COMMUNITY_VIEW,
   SETTING_ZONE_PREFIX,
@@ -280,7 +281,10 @@ export default function Home() {
     if (!model || !host.current) return;
     let ended = false;
     setReady(false);
-    import('./model/renderer').then(({ createViewer }) => {
+    Promise.all([
+      import('./model/renderer'),
+      preloadFleetVanModel(),
+    ]).then(([{ createViewer }]) => {
       if (ended || !host.current) return;
       try {
         viewer.current = createViewer(host.current, model, (zone, room) => {
