@@ -982,19 +982,19 @@
         ],
         [
           0.2,
-          20.7
-        ],
-        [
-          2.9,
-          20.7
+          17.6
         ],
         [
           2.9,
           17.6
+        ],
+        [
+          2.9,
+          14.5
         ],
         [
           0.2,
-          17.6
+          14.5
         ]
       ],
       "kind": "office",
@@ -3260,7 +3260,7 @@
         92
       ],
       "status": "image-traced",
-      "notes": "Boundary traced from Overall Planning.jpg. Stable trace ID; room name is descriptive unless shown in the architectural set.",
+      "notes": "Boundary traced from Overall Planning.jpg. Equipment follows the owner’s photo of the built kitchen (October 2026 walkthrough): stainless west wall with the sink run, island work tables, reach-ins on the east wall, quarry-tile floor.",
       "sourcePolygonPixels": [
         [
           979,
@@ -3295,7 +3295,7 @@
           740
         ]
       ],
-      "floorMaterial": "concrete"
+      "floorMaterial": "kitchen-quarry"
     },
     {
       "id": "east-service",
@@ -4581,7 +4581,7 @@
         92
       ],
       "status": "user-located / photograph fit-out",
-      "notes": "User-confirmed Staff Lounge 1520 beside the upstairs stair and locker corridor. Furnishings follow the plan; photo-only stools, kitchenette, breakfast counter and locker bank are not added to this configuration."
+      "notes": "User-confirmed Staff Lounge 1520 beside the upstairs stair and locker corridor. Fitted out from the plan crop and the staff-lounge photograph (October 2026 walkthrough): L-shaped kitchenette, breakfast bar with stools, lounge seating."
     },
     {
       "id": "upperfit-conference",
@@ -4655,19 +4655,19 @@
       "polygon": [
         [
           0.2,
-          17.6
+          14.5
         ],
         [
-          2.9000000000000004,
-          17.6
+          2.9,
+          14.5
         ],
         [
-          2.9000000000000004,
-          20.700000000000003
+          2.9,
+          17.6
         ],
         [
           0.2,
-          20.700000000000003
+          17.6
         ]
       ],
       "kind": "restroom",
@@ -12578,11 +12578,11 @@
       "levelId": "upper",
       "a": [
         0.2,
-        17.6
+        14.5
       ],
       "b": [
         2.9,
-        17.6
+        14.5
       ],
       "height": 2.7,
       "thickness": 0.13,
@@ -12599,11 +12599,11 @@
       "levelId": "upper",
       "a": [
         0.2,
-        20.7
+        17.6
       ],
       "b": [
         2.9,
-        20.7
+        17.6
       ],
       "height": 2.7,
       "thickness": 0.13,
@@ -12620,11 +12620,11 @@
       "levelId": "upper",
       "a": [
         2.9,
-        17.6
+        14.5
       ],
       "b": [
         2.9,
-        18.8
+        15.7
       ],
       "height": 2.7,
       "thickness": 0.13,
@@ -12641,11 +12641,11 @@
       "levelId": "upper",
       "a": [
         2.9,
-        19.8
+        16.7
       ],
       "b": [
         2.9,
-        20.7
+        17.6
       ],
       "height": 2.7,
       "thickness": 0.13,
@@ -15204,15 +15204,6 @@
       ],
       "material": "oak"
     },
-    "interior-dining-service-sill": {
-      "kind": "box",
-      "dimensions": [
-        0.62,
-        0.06,
-        1.98
-      ],
-      "material": "photo-quartz"
-    },
     "interior-dining-service-jamb-1.38": {
       "kind": "box",
       "dimensions": [
@@ -15540,7 +15531,8 @@
       ],
       "material": "oak",
       "parameters": {
-        "activity": "meal"
+        "activity": "meal",
+        "seed": 1
       }
     },
     "daily-top-dining-table-02": {
@@ -15552,7 +15544,8 @@
       ],
       "material": "oak",
       "parameters": {
-        "activity": "meal"
+        "activity": "meal",
+        "seed": 2
       }
     },
     "daily-top-dining-table-03": {
@@ -15564,7 +15557,8 @@
       ],
       "material": "oak",
       "parameters": {
-        "activity": "meal"
+        "activity": "meal",
+        "seed": 3
       }
     },
     "daily-top-dining-table-04": {
@@ -15576,7 +15570,8 @@
       ],
       "material": "oak",
       "parameters": {
-        "activity": "meal"
+        "activity": "meal",
+        "seed": 4
       }
     },
     "daily-top-dining-table-05": {
@@ -15588,7 +15583,8 @@
       ],
       "material": "oak",
       "parameters": {
-        "activity": "meal"
+        "activity": "meal",
+        "seed": 5
       }
     },
     "daily-top-day-banquette-table-01": {
@@ -15855,18 +15851,6 @@
         "activity": "buffet"
       }
     },
-    "daily-food-trays": {
-      "kind": "activity-tabletop",
-      "dimensions": [
-        1.4,
-        0.15,
-        0.48
-      ],
-      "material": "oak",
-      "parameters": {
-        "activity": "buffet"
-      }
-    },
     "photo-rehab-wc-east-stall-door-3": {
       "kind": "box",
       "dimensions": [
@@ -16053,6 +16037,229 @@
         "metal": "photo-silver",
         "screen": "screen",
         "frame": "photo-black"
+      }
+    },
+    "kitchen-wall-panel-1": {
+      "kind": "box",
+      "dimensions": [
+        0.02,
+        2.2,
+        1
+      ],
+      "material": "kitchen-stainless"
+    },
+    "kitchen-wall-panel-3": {
+      "kind": "box",
+      "dimensions": [
+        0.02,
+        2.2,
+        3
+      ],
+      "material": "kitchen-stainless"
+    },
+    "kitchen-hand-sink": {
+      "kind": "hand-sink",
+      "dimensions": [
+        0.45,
+        1.2,
+        0.42
+      ],
+      "material": "photo-silver",
+      "materials": {
+        "dark": "photo-black",
+        "bin": "kitchen-bin-grey",
+        "glass": "glass"
+      }
+    },
+    "kitchen-three-compartment-sink": {
+      "kind": "three-compartment-sink",
+      "dimensions": [
+        2.2,
+        1.65,
+        0.7
+      ],
+      "material": "photo-silver",
+      "materials": {
+        "dark": "photo-black",
+        "bin": "kitchen-bin-grey",
+        "glass": "glass"
+      }
+    },
+    "kitchen-dish-machine": {
+      "kind": "dish-machine",
+      "dimensions": [
+        1.1,
+        1.2,
+        0.66
+      ],
+      "material": "photo-silver",
+      "materials": {
+        "dark": "photo-black",
+        "bin": "kitchen-bin-grey",
+        "glass": "glass"
+      }
+    },
+    "kitchen-warming-cabinet": {
+      "kind": "warming-cabinet",
+      "dimensions": [
+        0.64,
+        1.9,
+        0.78
+      ],
+      "material": "photo-silver",
+      "materials": {
+        "dark": "photo-black",
+        "bin": "kitchen-bin-grey",
+        "glass": "glass"
+      }
+    },
+    "kitchen-island": {
+      "kind": "stainless-work-table",
+      "dimensions": [
+        0.76,
+        0.9,
+        1.8
+      ],
+      "material": "photo-silver",
+      "materials": {
+        "dark": "photo-black",
+        "bin": "kitchen-bin-grey",
+        "glass": "glass"
+      },
+      "parameters": {
+        "bins": 3
+      }
+    },
+    "kitchen-dish-table": {
+      "kind": "stainless-work-table",
+      "dimensions": [
+        1.8,
+        0.9,
+        0.76
+      ],
+      "material": "photo-silver",
+      "materials": {
+        "dark": "photo-black",
+        "bin": "kitchen-bin-grey",
+        "glass": "glass"
+      },
+      "parameters": {
+        "bins": 2
+      }
+    },
+    "kitchen-wire-shelving": {
+      "kind": "wire-rack",
+      "dimensions": [
+        1.2,
+        1.85,
+        0.61
+      ],
+      "material": "photo-mesh-white",
+      "materials": {
+        "metal": "photo-silver"
+      }
+    },
+    "kitchen-reach-in-refrigerator": {
+      "kind": "reach-in-refrigerator",
+      "dimensions": [
+        1.4,
+        2,
+        0.8
+      ],
+      "material": "photo-silver",
+      "materials": {
+        "dark": "photo-black",
+        "bin": "kitchen-bin-grey",
+        "glass": "glass"
+      },
+      "parameters": {
+        "doors": 2
+      }
+    },
+    "dining-steam-table": {
+      "kind": "steam-table",
+      "dimensions": [
+        1.9,
+        1.45,
+        1.06
+      ],
+      "material": "photo-silver",
+      "materials": {
+        "dark": "photo-black",
+        "bin": "kitchen-bin-grey",
+        "glass": "glass"
+      }
+    },
+    "dining-wall-tv": {
+      "kind": "wall-tv",
+      "dimensions": [
+        1.4,
+        0.95,
+        0.08
+      ],
+      "material": "photo-black",
+      "materials": {
+        "dark": "photo-black",
+        "screen": "tv-glow"
+      }
+    },
+    "lounge-refrigerator": {
+      "kind": "reach-in-refrigerator",
+      "dimensions": [
+        0.85,
+        1.9,
+        0.78
+      ],
+      "material": "photo-silver",
+      "materials": {
+        "dark": "photo-black",
+        "bin": "kitchen-bin-grey",
+        "glass": "glass"
+      },
+      "parameters": {
+        "doors": 1,
+        "domestic": true
+      }
+    },
+    "lounge-pantry-cabinet": {
+      "kind": "pantry-cabinet",
+      "dimensions": [
+        0.6,
+        2.28,
+        0.59
+      ],
+      "material": "photo-white",
+      "materials": {
+        "wood": "photo-white",
+        "white": "photo-silver",
+        "dark": "photo-black"
+      }
+    },
+    "lounge-microwave": {
+      "kind": "microwave",
+      "dimensions": [
+        0.5,
+        0.3,
+        0.38
+      ],
+      "material": "photo-white",
+      "materials": {
+        "white": "photo-white",
+        "dark": "photo-black"
+      }
+    },
+    "lounge-bar-partition": {
+      "kind": "bar-partition",
+      "dimensions": [
+        1.9,
+        1.1,
+        0.5
+      ],
+      "material": "photo-silver",
+      "materials": {
+        "panel": "lounge-tan",
+        "wood": "photo-chair-wood",
+        "white": "photo-white"
       }
     }
   },
@@ -17979,378 +18186,6 @@
       "sourcePixelFootprint": [
         10.000000000000002,
         9
-      ]
-    },
-    {
-      "id": "kitchen-equipment-0",
-      "assetId": "counter",
-      "zoneId": "kitchen",
-      "levelId": "ground",
-      "position": [
-        8.802048,
-        0,
-        4.528221
-      ],
-      "rotation": 0,
-      "scale": [
-        0.4133909946812103,
-        0.989010989010989,
-        5.171297184410601
-      ],
-      "roomId": "kitchen-prep",
-      "referencePages": [
-        92
-      ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        987,
-        680
-      ],
-      "sourcePixelFootprint": [
-        13,
-        62
-      ]
-    },
-    {
-      "id": "kitchen-equipment-1",
-      "assetId": "counter",
-      "zoneId": "kitchen",
-      "levelId": "ground",
-      "position": [
-        10.786325,
-        0,
-        4.528221
-      ],
-      "rotation": 0,
-      "scale": [
-        0.5405882238138904,
-        0.989010989010989,
-        6.172193413651362
-      ],
-      "roomId": "kitchen-prep",
-      "referencePages": [
-        92
-      ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        1026,
-        680
-      ],
-      "sourcePixelFootprint": [
-        17,
-        74
-      ]
-    },
-    {
-      "id": "kitchen-equipment-2",
-      "assetId": "counter",
-      "zoneId": "kitchen",
-      "levelId": "ground",
-      "position": [
-        12.719723,
-        0,
-        4.222948
-      ],
-      "rotation": 0,
-      "scale": [
-        0.5405882238138904,
-        0.989010989010989,
-        7.339905681098918
-      ],
-      "roomId": "kitchen-prep",
-      "referencePages": [
-        92
-      ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        1064,
-        674
-      ],
-      "sourcePixelFootprint": [
-        17,
-        88
-      ]
-    },
-    {
-      "id": "kitchen-equipment-3",
-      "assetId": "counter",
-      "zoneId": "kitchen",
-      "levelId": "ground",
-      "position": [
-        9.056443,
-        0,
-        9.1582
-      ],
-      "rotation": 0,
-      "scale": [
-        0.7949826820792506,
-        0.989010989010989,
-        1.0843042483441583
-      ],
-      "roomId": "kitchen-prep",
-      "referencePages": [
-        92
-      ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        992,
-        771
-      ],
-      "sourcePixelFootprint": [
-        25,
-        13
-      ]
-    },
-    {
-      "id": "kitchen-equipment-4",
-      "assetId": "counter",
-      "zoneId": "kitchen",
-      "levelId": "ground",
-      "position": [
-        10.481052,
-        0,
-        9.1582
-      ],
-      "rotation": 0,
-      "scale": [
-        0.7949826820792506,
-        0.989010989010989,
-        1.0843042483441583
-      ],
-      "roomId": "kitchen-prep",
-      "referencePages": [
-        92
-      ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        1020,
-        771
-      ],
-      "sourcePixelFootprint": [
-        25,
-        13
-      ]
-    },
-    {
-      "id": "kitchen-equipment-5",
-      "assetId": "counter",
-      "zoneId": "kitchen",
-      "levelId": "ground",
-      "position": [
-        12.617965,
-        0,
-        7.78447
-      ],
-      "rotation": 0,
-      "scale": [
-        0.4451903019643803,
-        0.989010989010989,
-        4.42062501248003
-      ],
-      "roomId": "kitchen-prep",
-      "referencePages": [
-        92
-      ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        1062,
-        744
-      ],
-      "sourcePixelFootprint": [
-        14,
-        52.99999999999999
-      ]
-    },
-    {
-      "id": "kitchen-equipment-6",
-      "assetId": "counter",
-      "zoneId": "dining",
-      "levelId": "ground",
-      "position": [
-        5.800194,
-        0,
-        7.224803
-      ],
-      "rotation": 0,
-      "scale": [
-        1.0811764476277808,
-        0.989010989010989,
-        1.2511202865509519
-      ],
-      "roomId": "dining-1421",
-      "referencePages": [
-        92
-      ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        928,
-        733
-      ],
-      "sourcePixelFootprint": [
-        34,
-        15.000000000000002
-      ]
-    },
-    {
-      "id": "kitchen-equipment-7",
-      "assetId": "counter",
-      "zoneId": "kitchen",
-      "levelId": "ground",
-      "position": [
-        8.70029,
-        0,
-        0.966699
-      ],
-      "rotation": 0,
-      "scale": [
-        0.5087889165307203,
-        0.989010989010989,
-        1.7515684011713326
-      ],
-      "roomId": "kitchen-prep",
-      "referencePages": [
-        92
-      ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        985,
-        610
-      ],
-      "sourcePixelFootprint": [
-        15.999999999999998,
-        21
-      ]
-    },
-    {
-      "id": "kitchen-cart-0",
-      "assetId": "plan-cabinet",
-      "zoneId": "kitchen",
-      "levelId": "ground",
-      "position": [
-        11.193356,
-        0,
-        6.766893
-      ],
-      "rotation": 0,
-      "scale": [
-        1.0000044220185023,
-        1,
-        0.8000035376148019
-      ],
-      "roomId": "kitchen-prep",
-      "referencePages": [
-        92
-      ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        1034,
-        724
-      ],
-      "sourcePixelFootprint": [
-        15,
-        12
-      ]
-    },
-    {
-      "id": "kitchen-cart-1",
-      "assetId": "plan-cabinet",
-      "zoneId": "kitchen",
-      "levelId": "ground",
-      "position": [
-        11.193356,
-        0,
-        7.631834
-      ],
-      "rotation": 0,
-      "scale": [
-        1.0000044220185023,
-        1,
-        0.8000035376148019
-      ],
-      "roomId": "kitchen-prep",
-      "referencePages": [
-        92
-      ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        1034,
-        741
-      ],
-      "sourcePixelFootprint": [
-        15,
-        12
-      ]
-    },
-    {
-      "id": "kitchen-cart-2",
-      "assetId": "plan-cabinet",
-      "zoneId": "kitchen",
-      "levelId": "ground",
-      "position": [
-        12.617965,
-        0,
-        1.933398
-      ],
-      "rotation": 0,
-      "scale": [
-        1.1333383449543026,
-        1,
-        0.6000026532111015
-      ],
-      "roomId": "kitchen-prep",
-      "referencePages": [
-        92
-      ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        1062,
-        629
-      ],
-      "sourcePixelFootprint": [
-        17,
-        9.000000000000002
-      ]
-    },
-    {
-      "id": "kitchen-cart-3",
-      "assetId": "plan-cabinet",
-      "zoneId": "kitchen",
-      "levelId": "ground",
-      "position": [
-        12.617965,
-        0,
-        2.900097
-      ],
-      "rotation": 0,
-      "scale": [
-        1.1333383449543026,
-        1,
-        0.6000026532111015
-      ],
-      "roomId": "kitchen-prep",
-      "referencePages": [
-        92
-      ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        1062,
-        648
-      ],
-      "sourcePixelFootprint": [
-        17,
-        9.000000000000002
       ]
     },
     {
@@ -20868,11 +20703,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        5.799999999999999,
+        7.38,
         0,
-        21.45
+        20.27
       ],
-      "rotation": 1.5707963267948966,
+      "rotation": 3.141593,
       "scale": [
         1,
         1,
@@ -20892,11 +20727,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        5.989999999999998,
+        7.38,
         0.75,
-        21.45
+        20.08
       ],
-      "rotation": 1.5707963267948966,
+      "rotation": 3.141593,
       "scale": [
         1,
         1,
@@ -20916,11 +20751,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        4.969999999999999,
+        7.38,
         0,
-        21.45
+        21.1
       ],
-      "rotation": 4.71238898038469,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -20940,11 +20775,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        6.599999999999998,
+        7.38,
         0,
-        21.45
+        19.47
       ],
-      "rotation": 4.71238898038469,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -20964,11 +20799,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        6.409999999999997,
+        7.38,
         0.75,
-        21.45
+        19.66
       ],
-      "rotation": 4.71238898038469,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -20988,11 +20823,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        7.429999999999996,
+        7.38,
         0,
-        21.45
+        18.64
       ],
-      "rotation": 7.853981633974483,
+      "rotation": 3.141593,
       "scale": [
         1,
         1,
@@ -21012,11 +20847,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        5.799999999999999,
+        5.8,
         0,
-        19.87
+        20.27
       ],
-      "rotation": 1.5707963267948966,
+      "rotation": 3.141593,
       "scale": [
         1,
         1,
@@ -21036,11 +20871,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        5.989999999999998,
+        5.8,
         0.75,
-        19.87
+        20.08
       ],
-      "rotation": 1.5707963267948966,
+      "rotation": 3.141593,
       "scale": [
         1,
         1,
@@ -21060,11 +20895,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        4.969999999999999,
+        5.8,
         0,
-        19.87
+        21.1
       ],
-      "rotation": 4.71238898038469,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -21084,11 +20919,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        6.599999999999998,
+        5.8,
         0,
-        19.87
+        19.47
       ],
-      "rotation": 4.71238898038469,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -21108,11 +20943,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        6.409999999999997,
+        5.8,
         0.75,
-        19.87
+        19.66
       ],
-      "rotation": 4.71238898038469,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -21132,11 +20967,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        7.429999999999996,
+        5.8,
         0,
-        19.87
+        18.64
       ],
-      "rotation": 7.853981633974483,
+      "rotation": 3.141593,
       "scale": [
         1,
         1,
@@ -21156,11 +20991,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        5.799999999999999,
+        4.22,
         0,
-        18.290000000000003
+        20.27
       ],
-      "rotation": 1.5707963267948966,
+      "rotation": 3.141593,
       "scale": [
         1,
         1,
@@ -21180,11 +21015,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        5.989999999999998,
+        4.22,
         0.75,
-        18.290000000000003
+        20.08
       ],
-      "rotation": 1.5707963267948966,
+      "rotation": 3.141593,
       "scale": [
         1,
         1,
@@ -21204,11 +21039,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        4.969999999999999,
+        4.22,
         0,
-        18.290000000000003
+        21.1
       ],
-      "rotation": 4.71238898038469,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -21228,11 +21063,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        6.599999999999998,
+        4.22,
         0,
-        18.290000000000003
+        19.47
       ],
-      "rotation": 4.71238898038469,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -21252,11 +21087,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        6.409999999999997,
+        4.22,
         0.75,
-        18.290000000000003
+        19.66
       ],
-      "rotation": 4.71238898038469,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -21276,11 +21111,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        7.429999999999996,
+        4.22,
         0,
-        18.290000000000003
+        18.64
       ],
-      "rotation": 7.853981633974483,
+      "rotation": 3.141593,
       "scale": [
         1,
         1,
@@ -21300,11 +21135,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        10.700000000000003,
+        13.08,
         0,
-        21.45
+        20.27
       ],
-      "rotation": 1.5707963267948966,
+      "rotation": 3.141593,
       "scale": [
         1,
         1,
@@ -21324,11 +21159,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        10.890000000000004,
+        13.08,
         0.75,
-        21.45
+        20.08
       ],
-      "rotation": 1.5707963267948966,
+      "rotation": 3.141593,
       "scale": [
         1,
         1,
@@ -21348,11 +21183,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        9.870000000000005,
+        13.08,
         0,
-        21.45
+        21.1
       ],
-      "rotation": 4.71238898038469,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -21372,11 +21207,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        11.5,
+        13.08,
         0,
-        21.45
+        19.47
       ],
-      "rotation": 4.71238898038469,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -21396,11 +21231,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        11.309999999999999,
+        13.08,
         0.75,
-        21.45
+        19.66
       ],
-      "rotation": 4.71238898038469,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -21420,11 +21255,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        12.329999999999998,
+        13.08,
         0,
-        21.45
+        18.64
       ],
-      "rotation": 7.853981633974483,
+      "rotation": 3.141593,
       "scale": [
         1,
         1,
@@ -21444,11 +21279,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        10.700000000000003,
+        11.5,
         0,
-        19.87
+        20.27
       ],
-      "rotation": 1.5707963267948966,
+      "rotation": 3.141593,
       "scale": [
         1,
         1,
@@ -21468,11 +21303,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        10.890000000000004,
+        11.5,
         0.75,
-        19.87
+        20.08
       ],
-      "rotation": 1.5707963267948966,
+      "rotation": 3.141593,
       "scale": [
         1,
         1,
@@ -21492,11 +21327,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        9.870000000000005,
+        11.5,
         0,
-        19.87
+        21.1
       ],
-      "rotation": 4.71238898038469,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -21518,9 +21353,9 @@
       "position": [
         11.5,
         0,
-        19.87
+        19.47
       ],
-      "rotation": 4.71238898038469,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -21540,11 +21375,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        11.309999999999999,
+        11.5,
         0.75,
-        19.87
+        19.66
       ],
-      "rotation": 4.71238898038469,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -21564,11 +21399,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        12.329999999999998,
+        11.5,
         0,
-        19.87
+        18.64
       ],
-      "rotation": 7.853981633974483,
+      "rotation": 3.141593,
       "scale": [
         1,
         1,
@@ -21588,11 +21423,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        10.700000000000003,
+        9.92,
         0,
-        18.290000000000003
+        20.27
       ],
-      "rotation": 1.5707963267948966,
+      "rotation": 3.141593,
       "scale": [
         1,
         1,
@@ -21612,11 +21447,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        10.890000000000004,
+        9.92,
         0.75,
-        18.290000000000003
+        20.08
       ],
-      "rotation": 1.5707963267948966,
+      "rotation": 3.141593,
       "scale": [
         1,
         1,
@@ -21636,11 +21471,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        9.870000000000005,
+        9.92,
         0,
-        18.290000000000003
+        21.1
       ],
-      "rotation": 4.71238898038469,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -21660,11 +21495,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        11.5,
+        9.92,
         0,
-        18.290000000000003
+        19.47
       ],
-      "rotation": 4.71238898038469,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -21684,11 +21519,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        11.309999999999999,
+        9.92,
         0.75,
-        18.290000000000003
+        19.66
       ],
-      "rotation": 4.71238898038469,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -21708,11 +21543,11 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        12.329999999999998,
+        9.92,
         0,
-        18.290000000000003
+        18.64
       ],
-      "rotation": 7.853981633974483,
+      "rotation": 3.141593,
       "scale": [
         1,
         1,
@@ -22022,7 +21857,7 @@
       "position": [
         0.7,
         0,
-        14.85
+        18.45
       ],
       "rotation": -1.5707963267948966,
       "scale": [
@@ -22046,7 +21881,7 @@
       "position": [
         0.51,
         0.75,
-        14.85
+        18.45
       ],
       "rotation": -1.5707963267948966,
       "scale": [
@@ -22068,9 +21903,9 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        1.5299999999999998,
+        1.53,
         0,
-        14.85
+        18.45
       ],
       "rotation": 1.5707963267948966,
       "scale": [
@@ -22094,7 +21929,7 @@
       "position": [
         0.7,
         0,
-        16.35
+        19.95
       ],
       "rotation": -1.5707963267948966,
       "scale": [
@@ -22118,7 +21953,7 @@
       "position": [
         0.51,
         0.75,
-        16.35
+        19.95
       ],
       "rotation": -1.5707963267948966,
       "scale": [
@@ -22140,9 +21975,9 @@
       "zoneId": "upper-office",
       "levelId": "upper",
       "position": [
-        1.5299999999999998,
+        1.53,
         0,
-        16.35
+        19.95
       ],
       "rotation": 1.5707963267948966,
       "scale": [
@@ -23342,7 +23177,7 @@
       "position": [
         0.65,
         0,
-        18.35
+        15.25
       ],
       "rotation": 1.5707963267948966,
       "scale": [
@@ -23366,7 +23201,7 @@
       "position": [
         2.55,
         0,
-        18.2
+        15.1
       ],
       "rotation": -1.5707963267948966,
       "scale": [
@@ -23390,7 +23225,7 @@
       "position": [
         0.27,
         1.25,
-        19.1
+        16
       ],
       "rotation": 1.5707963267948966,
       "scale": [
@@ -29259,30 +29094,6 @@
       "layer": "architecture"
     },
     {
-      "id": "dining-service-sill",
-      "assetId": "interior-dining-service-sill",
-      "zoneId": "dining",
-      "levelId": "ground",
-      "position": [
-        8.39,
-        0.9,
-        2.36
-      ],
-      "rotation": 0,
-      "scale": [
-        1,
-        1,
-        1
-      ],
-      "roomId": "dining-1421",
-      "referencePages": [
-        115
-      ],
-      "status": "photo appearance / plan registered / dimensions estimated",
-      "notes": "Visible component follows the photograph. Dimensions and placement require field verification.",
-      "layer": "architecture"
-    },
-    {
       "id": "dining-service-jamb-1.38",
       "assetId": "interior-dining-service-jamb-1.38",
       "zoneId": "dining",
@@ -31073,9 +30884,9 @@
       "zoneId": "dining",
       "levelId": "ground",
       "position": [
-        7.1,
+        7.93,
         0,
-        4.9
+        5.95
       ],
       "rotation": 0,
       "scale": [
@@ -31089,17 +30900,377 @@
         92
       ],
       "status": "user-directed food service",
-      "notes": "Prepared meal trays, fruit and drinks."
+      "notes": "Plated-meal cart beside the serving line’s south end: plated lunches and drinks on their way to the tables."
     },
     {
-      "id": "daily-food-trays",
-      "assetId": "daily-food-trays",
+      "id": "kitchen-wall-panel-north",
+      "assetId": "kitchen-wall-panel-1",
+      "zoneId": "kitchen",
+      "levelId": "ground",
+      "position": [
+        8.532,
+        0,
+        0.84
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "kitchen-prep",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Stainless wall panel on the west wall beside the door (owner photo).",
+      "layer": "wall-finish"
+    },
+    {
+      "id": "kitchen-wall-panel-middle",
+      "assetId": "kitchen-wall-panel-3",
+      "zoneId": "kitchen",
+      "levelId": "ground",
+      "position": [
+        8.532,
+        0,
+        4.885
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "kitchen-prep",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Stainless wall panel behind the sink run (owner photo).",
+      "layer": "wall-finish"
+    },
+    {
+      "id": "kitchen-wall-panel-south",
+      "assetId": "kitchen-wall-panel-1",
+      "zoneId": "kitchen",
+      "levelId": "ground",
+      "position": [
+        8.532,
+        0,
+        7.07
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "kitchen-prep",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Stainless wall panel behind the warming cabinet (owner photo).",
+      "layer": "wall-finish"
+    },
+    {
+      "id": "kitchen-hand-sink",
+      "assetId": "kitchen-hand-sink",
+      "zoneId": "kitchen",
+      "levelId": "ground",
+      "position": [
+        8.732,
+        0,
+        0.95
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "kitchen-prep",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Hand sink inside the kitchen door, north of the serving window.",
+      "layer": "furniture"
+    },
+    {
+      "id": "kitchen-sink",
+      "assetId": "kitchen-three-compartment-sink",
+      "zoneId": "kitchen",
+      "levelId": "ground",
+      "position": [
+        8.872,
+        0,
+        4.5
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "kitchen-prep",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Three-compartment sink with pre-rinse spray and drainboards on the west wall (owner photo).",
+      "layer": "furniture"
+    },
+    {
+      "id": "kitchen-dish-machine",
+      "assetId": "kitchen-dish-machine",
+      "zoneId": "kitchen",
+      "levelId": "ground",
+      "position": [
+        8.852,
+        0,
+        6.2
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "kitchen-prep",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Under-counter dish machine beside a second small sink, south of the pot sink (owner photo).",
+      "layer": "furniture"
+    },
+    {
+      "id": "kitchen-warming-cabinet",
+      "assetId": "kitchen-warming-cabinet",
+      "zoneId": "kitchen",
+      "levelId": "ground",
+      "position": [
+        8.912,
+        0,
+        7.17
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "kitchen-prep",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Alto-Shaam-style warming cabinet at the south end of the sink run (owner photo).",
+      "layer": "furniture"
+    },
+    {
+      "id": "kitchen-island-1",
+      "assetId": "kitchen-island",
+      "zoneId": "kitchen",
+      "levelId": "ground",
+      "position": [
+        10.79,
+        0,
+        3.4
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "kitchen-prep",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "North half of the island: two 1.8 m stainless work tables end to end with grey bins beneath (owner photo). The delivered lunch carriers are set out here (deliveries.ts KITCHEN_LUNCH).",
+      "layer": "furniture"
+    },
+    {
+      "id": "kitchen-island-2",
+      "assetId": "kitchen-island",
+      "zoneId": "kitchen",
+      "levelId": "ground",
+      "position": [
+        10.79,
+        0,
+        5.2
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "kitchen-prep",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "South half of the island work table (owner photo).",
+      "layer": "furniture"
+    },
+    {
+      "id": "kitchen-dish-table",
+      "assetId": "kitchen-dish-table",
+      "zoneId": "kitchen",
+      "levelId": "ground",
+      "position": [
+        10.3,
+        0,
+        9.109
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "kitchen-prep",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Dish landing table on the south wall; the plan showed counters here, the photo does not show this wall.",
+      "layer": "furniture"
+    },
+    {
+      "id": "kitchen-wire-shelving",
+      "assetId": "kitchen-wire-shelving",
+      "zoneId": "kitchen",
+      "levelId": "ground",
+      "position": [
+        12.847,
+        0,
+        1.6
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "kitchen-prep",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Four-shelf wire rack north of the reach-ins on the east wall (owner photo).",
+      "layer": "furniture"
+    },
+    {
+      "id": "kitchen-reach-in-1",
+      "assetId": "kitchen-reach-in-refrigerator",
+      "zoneId": "kitchen",
+      "levelId": "ground",
+      "position": [
+        12.752,
+        0,
+        3.1
+      ],
+      "rotation": -1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "kitchen-prep",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Two-door stainless reach-in refrigerator on the east wall (owner photo).",
+      "layer": "furniture"
+    },
+    {
+      "id": "kitchen-reach-in-2",
+      "assetId": "kitchen-reach-in-refrigerator",
+      "zoneId": "kitchen",
+      "levelId": "ground",
+      "position": [
+        12.752,
+        0,
+        4.6
+      ],
+      "rotation": -1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "kitchen-prep",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Second two-door reach-in refrigerator on the east wall (owner photo).",
+      "layer": "furniture"
+    },
+    {
+      "id": "kitchen-dry-rack",
+      "assetId": "kitchen-wire-shelving",
+      "zoneId": "kitchen",
+      "levelId": "ground",
+      "position": [
+        12.847,
+        0,
+        6.2
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "kitchen-prep",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Dry-goods wire rack south of the reach-ins; not in the photo, keeps the plan’s east-wall storage.",
+      "layer": "furniture"
+    },
+    {
+      "id": "dining-steam-table",
+      "assetId": "dining-steam-table",
       "zoneId": "dining",
       "levelId": "ground",
       "position": [
-        5.8,
-        0.95,
-        7.2
+        8.245,
+        0,
+        2.366
+      ],
+      "rotation": -1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "dining-1421",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Heated serving line in the pass-through to the dining room: hot-holding pans, sneeze guard and tray slide on the dining side (owner: “the window connecting to the dining room should be a heating and serving tray”). Fills the opening, so people go round by the hall.",
+      "layer": "furniture"
+    },
+    {
+      "id": "dining-wall-tv",
+      "assetId": "dining-wall-tv",
+      "zoneId": "dining",
+      "levelId": "ground",
+      "position": [
+        4.2,
+        1.4,
+        0.498
       ],
       "rotation": 0,
       "scale": [
@@ -31108,12 +31279,372 @@
         1
       ],
       "roomId": "dining-1421",
-      "layer": "furniture",
       "referencePages": [
         92
       ],
-      "status": "user-directed food service",
-      "notes": "Prepared meal trays, fruit and drinks."
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Wall-mounted TV on the dining room’s north wall (owner; source p.79 “Dining perspective: TV wall”). Height and size estimated.",
+      "layer": "architecture"
+    },
+    {
+      "id": "lounge-fridge",
+      "assetId": "lounge-refrigerator",
+      "zoneId": "veranda",
+      "levelId": "ground",
+      "position": [
+        8.645,
+        0,
+        10.16
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "admin-staff-lounge",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Stainless fridge-freezer at the west end of the kitchenette (staff-lounge photo).",
+      "layer": "furniture"
+    },
+    {
+      "id": "lounge-pantry",
+      "assetId": "lounge-pantry-cabinet",
+      "zoneId": "veranda",
+      "levelId": "ground",
+      "position": [
+        9.37,
+        0,
+        10.065
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "admin-staff-lounge",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Tall cabinet with the microwave niche beside the fridge (staff-lounge photo puts it at the far end of the run; here the run ends at the breakfast bar). The plan’s west return is left out so the waiting room, lounge and corridor stay connected.",
+      "layer": "furniture"
+    },
+    {
+      "id": "lounge-microwave",
+      "assetId": "lounge-microwave",
+      "zoneId": "veranda",
+      "levelId": "ground",
+      "position": [
+        9.37,
+        1.05,
+        10
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "admin-staff-lounge",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Microwave in the tall cabinet’s niche (staff-lounge photo).",
+      "layer": "furniture"
+    },
+    {
+      "id": "lounge-casework-north",
+      "assetId": "photo-staff-casework",
+      "zoneId": "veranda",
+      "levelId": "ground",
+      "position": [
+        10.97,
+        0,
+        10.065
+      ],
+      "rotation": 0,
+      "scale": [
+        0.8666666666666667,
+        1,
+        1
+      ],
+      "roomId": "admin-staff-lounge",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Kitchenette run on the north wall, 2.6 m: base and wall cabinets, quartz top, single sink with gooseneck faucet, tile splash (plan crop and staff-lounge photo).",
+      "layer": "furniture"
+    },
+    {
+      "id": "lounge-table",
+      "assetId": "plan-lounge-table",
+      "zoneId": "veranda",
+      "levelId": "ground",
+      "position": [
+        10.29,
+        0,
+        11.45
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "admin-staff-lounge",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Low round table between two pairs of lounge chairs.",
+      "layer": "furniture"
+    },
+    {
+      "id": "lounge-chair-1",
+      "assetId": "plan-lounge-chair",
+      "zoneId": "veranda",
+      "levelId": "ground",
+      "position": [
+        9.45,
+        0,
+        11.12
+      ],
+      "rotation": -1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "admin-staff-lounge",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Lounge chair, west pair, facing the table.",
+      "layer": "furniture"
+    },
+    {
+      "id": "lounge-chair-2",
+      "assetId": "plan-lounge-chair",
+      "zoneId": "veranda",
+      "levelId": "ground",
+      "position": [
+        9.45,
+        0,
+        11.78
+      ],
+      "rotation": -1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "admin-staff-lounge",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Lounge chair, west pair, facing the table.",
+      "layer": "furniture"
+    },
+    {
+      "id": "lounge-chair-3",
+      "assetId": "plan-lounge-chair",
+      "zoneId": "veranda",
+      "levelId": "ground",
+      "position": [
+        11.13,
+        0,
+        11.12
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "admin-staff-lounge",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Lounge chair, east pair, facing the table.",
+      "layer": "furniture"
+    },
+    {
+      "id": "lounge-chair-4",
+      "assetId": "plan-lounge-chair",
+      "zoneId": "veranda",
+      "levelId": "ground",
+      "position": [
+        11.13,
+        0,
+        11.78
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "admin-staff-lounge",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Lounge chair, east pair, facing the table.",
+      "layer": "furniture"
+    },
+    {
+      "id": "lounge-bar-partition",
+      "assetId": "lounge-bar-partition",
+      "zoneId": "veranda",
+      "levelId": "ground",
+      "position": [
+        13.01,
+        0,
+        10.72
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "admin-staff-lounge",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Half-height partition and support of the breakfast bar along the east side from the north wall (staff-lounge photo shows a full wall with the room sign and extinguisher; kept low so the lounge stays open to the locker corridor).",
+      "layer": "furniture"
+    },
+    {
+      "id": "lounge-breakfast-bar",
+      "assetId": "photo-staff-breakfast-counter",
+      "zoneId": "veranda",
+      "levelId": "ground",
+      "position": [
+        12.98,
+        0.9,
+        10.72
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        0.6440677966101694,
+        1,
+        1
+      ],
+      "roomId": "admin-staff-lounge",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "White quartz breakfast bar on the partition (staff-lounge photo), shortened to 1.9 m.",
+      "layer": "furniture"
+    },
+    {
+      "id": "lounge-stool-1",
+      "assetId": "photo-staff-stool",
+      "zoneId": "veranda",
+      "levelId": "ground",
+      "position": [
+        12.52,
+        0,
+        10
+      ],
+      "rotation": -1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "admin-staff-lounge",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Bent-plywood stool on white legs at the breakfast bar (staff-lounge photo).",
+      "layer": "furniture"
+    },
+    {
+      "id": "lounge-stool-2",
+      "assetId": "photo-staff-stool",
+      "zoneId": "veranda",
+      "levelId": "ground",
+      "position": [
+        12.52,
+        0,
+        10.46
+      ],
+      "rotation": -1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "admin-staff-lounge",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Bent-plywood stool on white legs at the breakfast bar (staff-lounge photo).",
+      "layer": "furniture"
+    },
+    {
+      "id": "lounge-stool-3",
+      "assetId": "photo-staff-stool",
+      "zoneId": "veranda",
+      "levelId": "ground",
+      "position": [
+        12.52,
+        0,
+        10.92
+      ],
+      "rotation": -1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "admin-staff-lounge",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Bent-plywood stool on white legs at the breakfast bar (staff-lounge photo).",
+      "layer": "furniture"
+    },
+    {
+      "id": "lounge-stool-4",
+      "assetId": "photo-staff-stool",
+      "zoneId": "veranda",
+      "levelId": "ground",
+      "position": [
+        12.52,
+        0,
+        11.38
+      ],
+      "rotation": -1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "admin-staff-lounge",
+      "referencePages": [
+        92
+      ],
+      "status": "owner walkthrough 2026-10 / photo-described / dimensions estimated",
+      "notes": "Bent-plywood stool on white legs at the breakfast bar (staff-lounge photo).",
+      "layer": "furniture"
     },
     {
       "id": "rehab-wc-east-stall-door-3",
@@ -31644,6 +32175,297 @@
       "status": "owner walkthrough 2026-10 / dimensions estimated",
       "notes": "Standing desk with monitor in the PT & OT workspace; the therapists stand at it between sessions.",
       "layer": "furniture"
+    },
+    {
+      "id": "upperfit-desk-east-0",
+      "assetId": "upperfit-desk-white",
+      "position": [
+        14.35,
+        0,
+        14.1
+      ],
+      "rotation": 1.5707963267948966,
+      "zoneId": "upper-office",
+      "levelId": "upper",
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "upper-office-shell",
+      "referencePages": [
+        112
+      ],
+      "status": "owner-directed arrangement (walkthrough 2026-10) / dimensions estimated",
+      "notes": "Owner walkthrough 2026-10: a few more desks along the east wall. Position within the existing fit-out is a proposal; dimensions estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "upperfit-monitor-east-0",
+      "assetId": "upperfit-monitor",
+      "position": [
+        14.54,
+        0.75,
+        14.1
+      ],
+      "rotation": 1.5707963267948966,
+      "zoneId": "upper-office",
+      "levelId": "upper",
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "upper-office-shell",
+      "referencePages": [
+        112
+      ],
+      "status": "owner-directed arrangement (walkthrough 2026-10) / dimensions estimated",
+      "notes": "Owner walkthrough 2026-10: a few more desks along the east wall. Position within the existing fit-out is a proposal; dimensions estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "upperfit-chair-east-0",
+      "assetId": "upperfit-chair",
+      "position": [
+        13.52,
+        0,
+        14.1
+      ],
+      "rotation": 4.71238898038469,
+      "zoneId": "upper-office",
+      "levelId": "upper",
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "upper-office-shell",
+      "referencePages": [
+        112
+      ],
+      "status": "owner-directed arrangement (walkthrough 2026-10) / dimensions estimated",
+      "notes": "Owner walkthrough 2026-10: a few more desks along the east wall. Position within the existing fit-out is a proposal; dimensions estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "upperfit-desk-east-1",
+      "assetId": "upperfit-desk-white",
+      "position": [
+        14.35,
+        0,
+        15.7
+      ],
+      "rotation": 1.5707963267948966,
+      "zoneId": "upper-office",
+      "levelId": "upper",
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "upper-office-shell",
+      "referencePages": [
+        112
+      ],
+      "status": "owner-directed arrangement (walkthrough 2026-10) / dimensions estimated",
+      "notes": "Owner walkthrough 2026-10: a few more desks along the east wall. Position within the existing fit-out is a proposal; dimensions estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "upperfit-monitor-east-1",
+      "assetId": "upperfit-monitor",
+      "position": [
+        14.54,
+        0.75,
+        15.7
+      ],
+      "rotation": 1.5707963267948966,
+      "zoneId": "upper-office",
+      "levelId": "upper",
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "upper-office-shell",
+      "referencePages": [
+        112
+      ],
+      "status": "owner-directed arrangement (walkthrough 2026-10) / dimensions estimated",
+      "notes": "Owner walkthrough 2026-10: a few more desks along the east wall. Position within the existing fit-out is a proposal; dimensions estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "upperfit-chair-east-1",
+      "assetId": "upperfit-chair",
+      "position": [
+        13.52,
+        0,
+        15.7
+      ],
+      "rotation": 4.71238898038469,
+      "zoneId": "upper-office",
+      "levelId": "upper",
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "upper-office-shell",
+      "referencePages": [
+        112
+      ],
+      "status": "owner-directed arrangement (walkthrough 2026-10) / dimensions estimated",
+      "notes": "Owner walkthrough 2026-10: a few more desks along the east wall. Position within the existing fit-out is a proposal; dimensions estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "upperfit-desk-east-2",
+      "assetId": "upperfit-desk-white",
+      "position": [
+        14.35,
+        0,
+        17.3
+      ],
+      "rotation": 1.5707963267948966,
+      "zoneId": "upper-office",
+      "levelId": "upper",
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "upper-office-shell",
+      "referencePages": [
+        112
+      ],
+      "status": "owner-directed arrangement (walkthrough 2026-10) / dimensions estimated",
+      "notes": "Owner walkthrough 2026-10: a few more desks along the east wall. Position within the existing fit-out is a proposal; dimensions estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "upperfit-monitor-east-2",
+      "assetId": "upperfit-monitor",
+      "position": [
+        14.54,
+        0.75,
+        17.3
+      ],
+      "rotation": 1.5707963267948966,
+      "zoneId": "upper-office",
+      "levelId": "upper",
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "upper-office-shell",
+      "referencePages": [
+        112
+      ],
+      "status": "owner-directed arrangement (walkthrough 2026-10) / dimensions estimated",
+      "notes": "Owner walkthrough 2026-10: a few more desks along the east wall. Position within the existing fit-out is a proposal; dimensions estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "upperfit-chair-east-2",
+      "assetId": "upperfit-chair",
+      "position": [
+        13.52,
+        0,
+        17.3
+      ],
+      "rotation": 4.71238898038469,
+      "zoneId": "upper-office",
+      "levelId": "upper",
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "upper-office-shell",
+      "referencePages": [
+        112
+      ],
+      "status": "owner-directed arrangement (walkthrough 2026-10) / dimensions estimated",
+      "notes": "Owner walkthrough 2026-10: a few more desks along the east wall. Position within the existing fit-out is a proposal; dimensions estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "owner-ext-pt-stair-landing",
+      "assetId": "access-rehab-stair-landing",
+      "position": [
+        -30.323819,
+        3.186,
+        23.368744
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "roomId": null,
+      "layer": "architecture",
+      "referencePages": [
+        15,
+        112
+      ],
+      "status": "cutaway stand-in for the upper level’s piece (owner walkthrough 2026-10)",
+      "notes": "A copy of access-rehab-stair-landing drawn with the ground floor, 3.35 m up, so that the PT stair leads to its landing and guard rails when only the ground floor is shown (the cutaway); the mezzanine itself stays with the upper level."
+    },
+    {
+      "id": "owner-ext-pt-stair-guard--1",
+      "assetId": "access-rehab-stair-guard",
+      "position": [
+        -30.994364,
+        3.346,
+        19.995404
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "roomId": null,
+      "layer": "architecture",
+      "referencePages": [
+        15,
+        112
+      ],
+      "status": "cutaway stand-in for the upper level’s piece (owner walkthrough 2026-10)",
+      "notes": "A copy of access-rehab-stair-guard--1 drawn with the ground floor, 3.35 m up, so that the PT stair leads to its landing and guard rails when only the ground floor is shown (the cutaway); the mezzanine itself stays with the upper level."
+    },
+    {
+      "id": "owner-ext-pt-stair-guard-1",
+      "assetId": "access-rehab-stair-guard",
+      "position": [
+        -29.653274,
+        3.346,
+        19.995404
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "roomId": null,
+      "layer": "architecture",
+      "referencePages": [
+        15,
+        112
+      ],
+      "status": "cutaway stand-in for the upper level’s piece (owner walkthrough 2026-10)",
+      "notes": "A copy of access-rehab-stair-guard-1 drawn with the ground floor, 3.35 m up, so that the PT stair leads to its landing and guard rails when only the ground floor is shown (the cutaway); the mezzanine itself stays with the upper level."
     }
   ],
   "materials": {
@@ -32007,6 +32829,30 @@
       "name": "Bare grey concrete - garage-court photos 2026-10-02",
       "color": "#b3b1aa",
       "roughness": 0.9
+    },
+    "kitchen-stainless": {
+      "color": "#cfd3d2",
+      "roughness": 0.28,
+      "metalness": 0.78
+    },
+    "kitchen-bin-grey": {
+      "color": "#8d9294",
+      "roughness": 0.72
+    },
+    "kitchen-quarry": {
+      "color": "#9a5f3f",
+      "roughness": 0.85,
+      "pattern": "tile"
+    },
+    "tv-glow": {
+      "color": "#4e86b4",
+      "roughness": 0.3,
+      "emissive": "#2f6a9c",
+      "emissiveIntensity": 0.7
+    },
+    "lounge-tan": {
+      "color": "#cbb58f",
+      "roughness": 0.85
     }
   },
   "programs": [
@@ -34981,8 +35827,8 @@
         "openings": [
           {
             "id": "shell-therapy-north-opening-1",
-            "offset": 3.25,
-            "width": 1.1,
+            "offset": 5.045761,
+            "width": 1,
             "sill": 0,
             "height": 2.2,
             "kind": "door",
@@ -34990,15 +35836,16 @@
           },
           {
             "id": "shell-therapy-north-opening-2",
-            "offset": 8.1,
-            "width": 3.6,
+            "offset": 9.388761,
+            "width": 3,
             "sill": 0,
-            "height": 2.3,
+            "height": 2.5,
             "kind": "door",
-            "material": "om-glass"
+            "material": "om-rollup",
+            "operable": true
           }
         ],
-        "status": "plan-traced perimeter / inferred elevation and opening heights",
+        "status": "plan-traced perimeter / openings cut to the traced plan walls’ gaps (owner walkthrough 2026-10: the awning door and the roll-up onto the veranda)",
         "referencePages": [
           92,
           109,
@@ -35321,7 +36168,7 @@
         ],
         "b": [
           15.263667,
-          -1.882519
+          -2.340429
         ],
         "zoneId": "ot",
         "height": 6.65,
@@ -35348,7 +36195,7 @@
         "id": "shell-east-exit",
         "a": [
           15.263667,
-          -1.882519
+          -2.340429
         ],
         "b": [
           15.263667,
@@ -35361,15 +36208,15 @@
         "openings": [
           {
             "id": "shell-east-exit-opening-1",
-            "offset": 0.050879,
-            "width": 1.431605,
+            "offset": 0,
+            "width": 1.984277,
             "sill": 0,
             "height": 2.15,
             "kind": "door",
             "material": "om-glass"
           }
         ],
-        "status": "plan-traced perimeter / inferred elevation and opening heights",
+        "status": "plan-traced perimeter / opening cut to the traced plan walls’ gap (owner walkthrough 2026-10)",
         "referencePages": [
           92,
           19
@@ -36122,7 +36969,7 @@
     "photoCount": 14,
     "reference": 112,
     "placementStatus": "user-directed 90-degree counterclockwise orientation; footprint-registered fit-out",
-    "workstationCount": 18,
+    "workstationCount": 21,
     "observed": [
       "Open workstation banks",
       "White mesh task chairs",
@@ -41991,6 +42838,81 @@
         ],
         "change": "The NW corner room on S Ethel Ave is the PT & OT workspace: four standing desks with monitors (two under the street windows, two on the south wall); a new PT and OT chart there between sessions, in and out through the north support room. The four participant chairs at the glazed SW corner are removed, as the owner said the workspace replaces them.",
         "unresolved": "\"At the corner right by the street\" is read as the NW corner room (the only side room on the Ethel Ave street wall, where the window is). The alternative reading, the open SW glazed corner where the participant chairs stood (Ethel Ave / Valley Blvd), would put the desks on the open therapy floor instead; the chairs are removed under either reading."
+      },
+      {
+        "id": "kitchen-relayout",
+        "rooms": [
+          "kitchen-prep"
+        ],
+        "change": "Kitchen re-laid to the owner’s photo: stainless panels on the west wall; hand sink by the door; three-compartment sink with pre-rinse, under-counter dish machine with a second sink and a warming cabinet along the west wall; an island of two stainless work tables with grey bins beneath; two 2-door reach-ins and a wire rack on the east wall; a dish landing table on the south wall; quarry-tile floor. The plan’s oak counters and carts are removed. The lunch delivery (trolley lane, hand-over at the island) is unchanged.",
+        "unresolved": "Equipment sizes are standard products, not measured; the south-wall table and the second wire rack are not in the photo; ceiling lights and the FRP wall finish are not modelled."
+      },
+      {
+        "id": "dining-serving-line",
+        "rooms": [
+          "dining-1421",
+          "kitchen-prep"
+        ],
+        "change": "The pass-through window is now a heated serving line: a four-pan steam table with a sneeze guard and a tray slide on the dining side, at counter height in the opening, so nobody walks through the window any more (routes go round by the hall). The quartz sill and the buffet trays on the old dining-side counter are removed; the plated-meal cart moves beside the serving line’s south end.",
+        "unresolved": "Whether the real unit is a drop-in or a mobile steam table, and which side it is served from."
+      },
+      {
+        "id": "dining-tv",
+        "rooms": [
+          "dining-1421"
+        ],
+        "change": "A 1.4 m wall-mounted TV with a soundbar on the dining room’s north wall, centred at x 4.2, bottom 1.4 m.",
+        "unresolved": "Exact position and size on the wall."
+      },
+      {
+        "id": "dining-asian-lunch",
+        "rooms": [
+          "dining-1421"
+        ],
+        "change": "Lunch place settings are Chinese and East Asian home cooking: rice bowls with chopsticks, noodle soup, bamboo-steamer dumplings, stir-fry plates, congee, steamed buns, each with tea and a soy dish, one per chair on every square table with a teapot and oranges to share; each table is dealt a different order (asset parameter `seed`).",
+        "unresolved": "The dishes are illustrative; they do not follow the weekday menu in day-program.json."
+      },
+      {
+        "id": "staff-lounge-fitout",
+        "rooms": [
+          "admin-staff-lounge"
+        ],
+        "change": "Staff Lounge 1520 fitted out from the plan crop and the photo: a kitchenette along the north wall (fridge, sink run with wall cabinets and tile splash, tall cabinet with a microwave niche), a quartz breakfast bar with four stools against a half partition down the east side, and a low table with two pairs of lounge chairs; the coordinator on break sits at the bar, and a lane stays open along the south wall between the west and east openings.",
+        "unresolved": "The plan’s second cabinet run down the west side is left out: the model has no wall there, and the run would close the way from the waiting room through the lounge to the corridor. The photo’s full-height partition and room sign are modelled as a half wall."
+      },
+      {
+        "id": "exterior-veranda-garden",
+        "rooms": [
+          "rehab-entry",
+          "rehab-support-north"
+        ],
+        "change": "Veranda and garden off the therapy entry corridor: the envelope’s lot-side doors now sit in the plan’s wall gaps (awning door x -26.143..-25.143 into the north support room; a 3 m roll-up x -21.8..-18.8 from the corridor onto the walkway, its curtain raised by day), the walkway behind the block wall is level with the sills (two steps down to the lot at its west end), and the garden is on it: timber planter boxes with herbs, flowers, shrubs and a small citrus, two benches, a watering can, a potted agave, and a mulched bed of agaves and grasses along the wall’s lot side (app/model/alhambra-exterior.ts VERANDA).",
+        "unresolved": "The owner described the garden, not its layout: box, bench and plant positions are a proposal. The roll-up is drawn raised all day (no operating animation). The plan’s awning door was a single leaf; the as-built door hardware is not verified."
+      },
+      {
+        "id": "exterior-staff-entrance-door",
+        "rooms": [
+          "hall"
+        ],
+        "change": "The staff entrance’s glass door now fills the plan’s gap in the wing’s east wall (z -2.340429..-0.356152; it stopped 0.46 m short at its south end), and the court’s landing, ramp, rails, pergola and planters stay in view in the cutaway (they are the site’s now, not the facade’s). The fire department connection stands on the wing’s outer west face.",
+        "unresolved": "The envelope wall split (shell-rear-east / shell-east-exit) moved to the gap’s south end so the door is one opening; the hall zone still owns the whole opening."
+      },
+      {
+        "id": "exterior-upstairs",
+        "rooms": [
+          "upper-office-shell",
+          "upperfit-restroom"
+        ],
+        "change": "Upstairs: the restroom flipped with the desk beside it (restroom now x 0.2..2.9, z 14.5..17.6 with its door on the east wall at z 15.7..16.7; the two rear desks together south of it at z 18.45 and 19.95); both desk pods turned 90° about their own centres so the desks face ±z, set side by side (centres x 5.8 and 11.5) with an aisle between; three white desks added along the east wall (x 14.35, z 14.1 / 15.7 / 17.3, chairs on the west side); workstationCount 21. The three seated upstairs actors moved with their chairs.",
+        "unresolved": "The owner did not say which way the pods should turn or how far apart to set them: turned +90° and spread to leave a 1 m aisle between them and 0.9 m to the east wall. The restroom’s new place leaves a 1.3 m strip between it and the storage room. Desk pitch and the east-wall desks’ positions are estimated."
+      },
+      {
+        "id": "exterior-cutaway-mezzanine",
+        "rooms": [
+          "mezzanine-shell"
+        ],
+        "change": "In the cutaway (ground level only) the PT stair now leads to its upper landing and guard rails: ground-level copies of the mezzanine’s landing and two guards are drawn 3.35 m up with the therapy wing (owner-ext-pt-stair-*). The staff entrance’s ramp, pergola and planters and the therapy veranda are in view there too (site, not facade).",
+        "unresolved": "The equipment mezzanine’s floor plate stays hidden in the cutaway (it would cover the therapy floor); only the stair’s landing and guards show. \"Balcony\" was taken to mean this mezzanine gallery over the therapy wing."
       }
     ],
     "changedWallIds": [
@@ -42021,7 +42943,19 @@
       "rehab-visible-chair-0",
       "rehab-visible-chair-1",
       "rehab-visible-chair-2",
-      "rehab-visible-chair-3"
+      "rehab-visible-chair-3",
+      "kitchen-equipment-0",
+      "kitchen-equipment-1",
+      "kitchen-equipment-2",
+      "kitchen-equipment-3",
+      "kitchen-equipment-4",
+      "kitchen-equipment-5",
+      "kitchen-equipment-6",
+      "kitchen-equipment-7",
+      "kitchen-cart-0",
+      "kitchen-cart-1",
+      "kitchen-cart-2",
+      "kitchen-cart-3"
     ],
     "newObjectIds": [
       "rehab-wc-east-stall-door-3",
@@ -42045,7 +42979,50 @@
       "rehab-workspace-desk-1",
       "rehab-workspace-desk-2",
       "rehab-workspace-desk-3",
-      "rehab-workspace-desk-4"
+      "rehab-workspace-desk-4",
+      "kitchen-wall-panel-north",
+      "kitchen-wall-panel-middle",
+      "kitchen-wall-panel-south",
+      "kitchen-hand-sink",
+      "kitchen-sink",
+      "kitchen-dish-machine",
+      "kitchen-warming-cabinet",
+      "kitchen-island-1",
+      "kitchen-island-2",
+      "kitchen-dish-table",
+      "kitchen-wire-shelving",
+      "kitchen-reach-in-1",
+      "kitchen-reach-in-2",
+      "kitchen-dry-rack",
+      "dining-steam-table",
+      "dining-wall-tv",
+      "lounge-fridge",
+      "lounge-pantry",
+      "lounge-microwave",
+      "lounge-casework-north",
+      "lounge-table",
+      "lounge-chair-1",
+      "lounge-chair-2",
+      "lounge-chair-3",
+      "lounge-chair-4",
+      "lounge-bar-partition",
+      "lounge-breakfast-bar",
+      "lounge-stool-1",
+      "lounge-stool-2",
+      "lounge-stool-3",
+      "lounge-stool-4",
+      "upperfit-desk-east-0",
+      "upperfit-monitor-east-0",
+      "upperfit-chair-east-0",
+      "upperfit-desk-east-1",
+      "upperfit-monitor-east-1",
+      "upperfit-chair-east-1",
+      "upperfit-desk-east-2",
+      "upperfit-monitor-east-2",
+      "upperfit-chair-east-2",
+      "owner-ext-pt-stair-landing",
+      "owner-ext-pt-stair-guard--1",
+      "owner-ext-pt-stair-guard-1"
     ]
   },
   "publication": {
