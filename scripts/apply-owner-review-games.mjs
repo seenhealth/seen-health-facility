@@ -38,7 +38,7 @@ const actor = (id) => loop.actors.find((a) => a.id === id);
 /** Half the karaoke period (game-rhythm KARAOKE_PERIOD = 48). */
 const SECOND_SINGER_OFFSET = 24;
 const LEAD = 'community-44',
-  SECOND = 'community-71';
+  SECOND = 'community-99';
 const lead = actor(LEAD);
 if (!lead) throw new Error(`${LEAD} (the karaoke singer) is missing`);
 lead.offset = 0;
