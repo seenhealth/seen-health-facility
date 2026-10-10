@@ -228,9 +228,12 @@ assert(
     const [w, , d] = m.assets[o.assetId].dimensions.map(
       (v, i) => v * o.scale[i],
     );
+    // The island is a stainless work table since the October 2026 owner
+    // review (scripts/apply-owner-review-kitchen.mjs); the plan's oak counter
+    // is still accepted for the baseline model.
     return (
       o.zoneId === 'kitchen' &&
-      m.assets[o.assetId].kind === 'counter' &&
+      ['counter', 'stainless-work-table'].includes(m.assets[o.assetId].kind) &&
       Math.abs(at[0] - o.position[0]) < w / 2 &&
       Math.abs(at[1] - o.position[2]) < d / 2
     );

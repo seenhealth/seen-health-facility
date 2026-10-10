@@ -481,7 +481,7 @@
             "id": "lunch",
             "walkTitle": "Walk to lunch",
             "window": [
-              290,
+              304,
               350
             ],
             "roomId": "dining-1421",

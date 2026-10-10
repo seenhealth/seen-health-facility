@@ -9,6 +9,7 @@ import { buildAdhcAsset } from './adhc-assets';
 import { buildRecreationAsset } from './recreation-assets';
 import { buildCareAsset } from './care-assets';
 import { buildRehabAsset } from './rehab-assets';
+import { buildKitchenAsset } from './kitchen-assets';
 // Each asset is modeled around a local, floor-level origin. Dimensions and transforms live in JSON.
 export function buildAsset(
   spec: Asset,
@@ -26,6 +27,7 @@ export function buildAsset(
     buildRehabAsset(spec, material);
   if (clinical) return clinical;
   const care = buildCareAsset(spec, material); if (care) return care; // Owner review 2026-10 · care-rooms
+  const kitchen = buildKitchenAsset(spec, material); if (kitchen) return kitchen; // owner review 2026-10 · kitchen
   const g = new T.Group(),
     [w, h, d] = spec.dimensions;
   const box = (

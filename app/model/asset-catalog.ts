@@ -751,6 +751,61 @@ export const assetCatalog: Record<string, CatalogEntry> = {
     purpose:
       'Height-adjustable desk raised to standing height, with a monitor, in the therapists’ workspace where the physical and occupational therapists chart between sessions.',
   },
+  // Owner review 2026-10 · kitchen
+  'three-compartment-sink': {
+    name: 'Three-compartment sink',
+    purpose:
+      'Wash, rinse and sanitize sinks with a pre-rinse spray and drainboards; where the kitchen washes pans and the lunch carriers.',
+  },
+  'dish-machine': {
+    name: 'Dish machine',
+    purpose:
+      'Under-counter dish machine with its own small sink and landing; lunch plates, bowls and cups go through it after service.',
+  },
+  'hand-sink': {
+    name: 'Hand sink',
+    purpose:
+      'Hand-washing sink by the kitchen door, used before handling food.',
+  },
+  'stainless-work-table': {
+    name: 'Stainless work table',
+    purpose:
+      'Island work table where the delivered lunch is checked against the diet plans and plated; lidded bins for ingredients and waste sit beneath.',
+  },
+  'reach-in-refrigerator': {
+    name: 'Reach-in refrigerator',
+    purpose:
+      'Refrigerator for the day’s cold food, drinks and the next day’s deliveries.',
+  },
+  'warming-cabinet': {
+    name: 'Warming cabinet',
+    purpose:
+      'Heated holding cabinet that keeps plated meals and late trays hot for participants who eat after the main service.',
+  },
+  'steam-table': {
+    name: 'Heated serving line',
+    purpose:
+      'Hot-holding pans in the pass-through to the dining room with a sneeze guard and a tray slide; the kitchen serves each plate through it to the participant’s diet order.',
+  },
+  'wall-tv': {
+    name: 'Television',
+    purpose:
+      'Wall-mounted screen in the dining room for the day’s announcements, music videos and news in Chinese and Vietnamese during meals.',
+  },
+  microwave: {
+    name: 'Microwave',
+    purpose: 'Microwave in the staff kitchenette for reheating lunches.',
+  },
+  'pantry-cabinet': {
+    name: 'Tall cabinet',
+    purpose:
+      'Tall kitchenette cabinet with a niche for the microwave and shelves for staff supplies.',
+  },
+  'bar-partition': {
+    name: 'Breakfast bar',
+    purpose:
+      'Counter-height bar along the lounge partition where staff eat and take breaks on stools.',
+  },
 };
 
 /** Asset ids that say more than their kind (generic `box`, `table`, … assets). */
@@ -1011,6 +1066,12 @@ export const assetEntries: Record<string, CatalogEntry> = {
     purpose:
       'Padded bed in the acupressure massage room; participants sit on its edge or lie down while the therapist works on stiff shoulders, backs and legs.',
   },
+  // Owner review 2026-10 · kitchen
+  'photo-staff-breakfast-counter': {
+    name: 'Breakfast bar top',
+    purpose:
+      'White quartz slab of the staff lounge breakfast bar, where staff eat and take breaks on the stools.',
+  },
 };
 
 /** `activity-tabletop` and `meal-cart` sets by their `parameters.activity`. */
@@ -1018,7 +1079,7 @@ export const tabletopEntries: Record<string, CatalogEntry> = {
   meal: {
     name: 'Lunch place settings',
     purpose:
-      'Plates, cups and cutlery for lunch; aides help with cutting and opening and note how much each participant eats.',
+      'Rice, noodle and congee bowls, bamboo steamers and plates with chopsticks, tea and soy dishes for lunch; aides help with opening and cutting and note how much each participant eats.',
   },
   tea: {
     name: 'Tea service',
