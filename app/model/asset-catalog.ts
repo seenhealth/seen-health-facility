@@ -698,7 +698,7 @@ export const assetCatalog: Record<string, CatalogEntry> = {
   'wash-pad': {
     name: 'Wheelchair wash pad',
     purpose:
-      'Kerbed, tiled pad with a floor drain where wheelchairs and walkers are hosed down and disinfected before they go back into the day center.',
+      'Kerbed, tiled pad with a floor drain in the wash bay across the corridor from the linen room, where wheelchairs and walkers are hosed down and disinfected before they go back into the day center.',
   },
   'hose-reel': {
     name: 'Wash-down spray gun',
@@ -718,17 +718,22 @@ export const assetCatalog: Record<string, CatalogEntry> = {
   'tumble-dryer': {
     name: 'Tumble dryer',
     purpose:
-      'Dryer beside the washers in receiving, for towels, linens and participants’ clothes after a shower or an accident.',
+      'Dryer beside the washer in the laundry room next to the clean linen, for towels, linens and participants’ clothes after a shower or an accident.',
   },
   'janitor-sink': {
     name: 'Mop sink',
     purpose:
-      'Floor-level sink in the soiled-utility room where housekeeping fills and empties mop buckets away from the clean linen.',
+      'Floor-level sink in the laundry room’s far corner where housekeeping fills and empties mop buckets away from the clean linen.',
   },
   'housekeeping-cart': {
     name: 'Housekeeping cart',
     purpose:
-      'Cart with cleaning supplies and a bag for soiled linen, kept in the soiled-utility room between rounds.',
+      'Cart with cleaning supplies and a bag for soiled linen, kept in the laundry room between rounds.',
+  },
+  'electrical-panel': {
+    name: 'Electrical panel',
+    purpose:
+      'Switchboard and sub-panel on the wall of the electrical room behind the loading roll-up: the building’s electrical service, kept locked and clear of stored goods; the electrician reaches it by the room’s door from receiving.',
   },
   // Owner review 2026-10 · rehab
   'rehab-fridge': {
@@ -1080,6 +1085,12 @@ export const assetEntries: Record<string, CatalogEntry> = {
     purpose: 'Locked files for records that are still kept on paper.',
   },
 
+  // Owner review 2026-10 · care-rooms
+  'owner-care-storage-rack': {
+    name: 'Storage rack',
+    purpose:
+      'Open shelving in the storage room off receiving (the plan’s east nook) for supplies, spare equipment and bulk deliveries that do not go to the kitchen.',
+  },
   // Owner review 2026-10 · rehab
   'rehab-kitchen-casework': {
     name: 'Practice kitchen',

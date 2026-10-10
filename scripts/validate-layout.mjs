@@ -148,9 +148,9 @@ for (const id of [
   'access-shower-east',
   'access-barber-chair',
   'access-hair-wash',
+  // Owner review 2026-10 (care-rooms): one washer and a dryer, in the laundry
+  // room by the clean linen (the second washer is gone).
   'access-washing-machine-1',
-  'access-washing-machine-2',
-  // Owner review 2026-10 (care-rooms): the washers moved to receiving with a dryer.
   'access-dryer',
 ]) {
   const o = objects.get(id),

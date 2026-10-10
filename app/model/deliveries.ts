@@ -7,13 +7,26 @@ import {
   roundedPath,
   type Piece,
 } from './vehicle-path';
+/**
+ * The small service door east of the loading roll-up in the loading block's
+ * north face (the envelope's `shell-rear-north-opening-3`, widened to 0.9 m,
+ * x 10.11–11.01): owner review 2026-10, the roll-up now fronts the electrical
+ * room, so both deliveries come in through this door and down the strip east
+ * of the electrical room (scripts/apply-owner-review-care-rooms.mjs sets the
+ * opening and the plan walls to match; `at` is the door's centre on the wall
+ * line, `width` its clear width).
+ */
+export const SERVICE_DOOR = {
+  at: [10.56, -15.212789] as const,
+  width: 0.9,
+};
 export const deliveryStops = [
   {
     id: 'delivery-food',
     kind: 'food',
     x: 9.7,
     z: -21.8,
-    door: [8.8, -15.212789],
+    door: SERVICE_DOOR.at,
     /**
      * Runs as [start, dwell] in loop seconds. The morning run brings lunch: it
      * waits while its trolley goes through receiving into the kitchen and
@@ -30,14 +43,14 @@ export const deliveryStops = [
     kind: 'package',
     // The truck noses in west of the food truck's bay, east of the utility
     // pole. Owner review 2026-10: the door at the back of the electrical
-    // room's notch (photos 2026-10-02) opens into the trash enclosure, so
-    // packages come in through the loading roll-up like the food (the same
-    // door point, whose leaf and ramp the food stop draws) and the driver
-    // walks round the truck's nose to the ramp
-    // (scripts/apply-owner-review-care-rooms.mjs).
+    // room's notch (photos 2026-10-02) opens into the trash enclosure, and
+    // the loading roll-up fronts the electrical room, so packages come in
+    // through the service door like the food (the same door point, whose
+    // leaf and ramp the food stop draws) and the driver walks round the
+    // truck's nose to the ramp (scripts/apply-owner-review-care-rooms.mjs).
     x: 6.75,
     z: -19.6,
-    door: [8.8, -15.212789],
+    door: SERVICE_DOOR.at,
     runs: [
       [280, 52],
       [590, 52],
@@ -69,9 +82,12 @@ const TRUCK = {
   tailgate: 2,
 };
 type Stop = (typeof deliveryStops)[number];
-/** The shallow receiving ramp from the pavement up to a stop's door (x/z extent). */
+/**
+ * The shallow receiving ramp from the pavement up to a stop's door (x/z
+ * extent): half a metre wider than the service door both stops share.
+ */
 export function receivingRamp(s: Stop) {
-  const w = s.kind === 'food' ? 2.5 : 1.15;
+  const w = SERVICE_DOOR.width + 0.5;
   return {
     x0: s.door[0] - w / 2,
     x1: s.door[0] + w / 2,
@@ -280,7 +296,7 @@ export function buildDeliveries() {
     return { root: g, tail };
   });
   // One leaf and one ramp per door: stops that share a door (the package
-  // and food trucks both use the loading roll-up) share the first stop's
+  // and food trucks both use the service door) share the first stop's
   // leaf, which opens while either truck unloads.
   const leafOf = deliveryStops.map((s) =>
     deliveryStops.findIndex(
@@ -296,7 +312,7 @@ export function buildDeliveries() {
   };
   const doors = deliveryStops.map((s, i) => {
     if (leafOf[i] !== i) return null;
-    const pivot = leaf(s.door, s.kind === 'food' ? 2.5 : 1);
+    const pivot = leaf(s.door, SERVICE_DOOR.width);
     // A shallow receiving ramp connects the pavement to the interior datum.
     const r = receivingRamp(s);
     const ramp = box(
@@ -323,16 +339,13 @@ export function buildDeliveries() {
     box(lunch, 0, 0.09, i * 0.56, 0.46, 0.18, 0.52, '#a4baa5');
     box(lunch, -0.236, 0.09, i * 0.56, 0.012, 0.18, 0.055, '#e1d0aa');
   }
-  // The exterior's loading roll-up (alhambra-exterior.ts) rises for whichever
-  // truck unloads at it: found in the scene on first use, left as it is when
-  // the deliveries are off. The electrical room's pedestrian gate stays shut
-  // (owner review 2026-10: nobody delivers through the notch).
-  let exterior: { rollup?: T.Object3D } | null = null;
-  const rollupLeaf = leafOf[deliveryStops.findIndex((s) => s.kind === 'food')];
+  // The exterior's loading roll-up (alhambra-exterior.ts `rear-loading-rollup`)
+  // stays down: it fronts the electrical room now and the trucks unload
+  // through the service door beside it (owner review 2026-10). The
+  // electrical room's court-side pedestrian gate stays shut too (nobody
+  // delivers through the notch).
   function tick(time: number, enabled: boolean) {
     root.visible = enabled;
-    if (enabled && !exterior && root.parent)
-      exterior = { rollup: root.parent.getObjectByName('rear-loading-rollup') };
     const opening = deliveryStops.map(() => 0);
     vehicles.forEach((v, i) => {
       const p = sampleDelivery(i, time);
@@ -345,8 +358,6 @@ export function buildDeliveries() {
     doors.forEach((pivot, i) => {
       if (pivot) pivot.rotation.y = -Math.PI * 0.47 * opening[i];
     });
-    if (enabled && exterior?.rollup)
-      exterior.rollup.position.y = 3.3 * opening[rollupLeaf];
     const t = ((time % 720) + 720) % 720;
     lunch.visible = t >= KITCHEN_LUNCH.from && t < KITCHEN_LUNCH.to;
   }

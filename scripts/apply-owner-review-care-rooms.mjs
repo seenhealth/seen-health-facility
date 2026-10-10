@@ -1,5 +1,5 @@
 // Owner walkthrough, October 2026 · care rooms: the therapy bathrooms (7) and
-// the back of house (8).
+// the back of house (8), as corrected by the owner on the live build.
 //
 //   node scripts/apply-owner-review-care-rooms.mjs
 //
@@ -11,22 +11,35 @@
 // wheelchair arrival that rolled through the northwest bathroom as a corridor
 // is re-routed on the navigation grid.
 //
-// (8) Back of house, as the owner described it from the roll-up inward: the
-// nook to the right is the wheelchair wash (a drained pad, a wall hose reel
-// with its spray gun, a chair parked on the pad), the washer and dryer stand
-// against receiving's west wall, the old laundry room becomes soiled utility,
-// the linen room keeps three racks, the rear employee door opens into the
-// trash enclosure (bins instead of the plan's counter), and packages come in
-// through the loading roll-up with the food. The two personal-care rooms are
-// re-planned: east room hair-wash basin and chair in the northwest corner,
-// shower northeast, toilet and basin down the east wall; west room mirrored.
+// (8) Back of house. The owner's first description put the washers in
+// receiving and the wheelchair wash in the east nook; on the live build the
+// owner corrected it: the north-west part of receiving, behind the loading
+// roll-up, is an electrical room, so the delivery people come in through the
+// small service door beside the roll-up and all the way through receiving;
+// there is one washer and one dryer, in the room right by the linen racks (the
+// plan's laundry room), not in the back; the wheelchair wash stands opposite
+// the entrance to the linen room and the laundry; and the east nook is just
+// storage. So: new plan walls enclose the electrical room (a switchboard and a
+// sub-panel inside, a door from receiving), the service door is widened to a
+// standard 0.9 m leaf and both deliveries' routes go through it and down the
+// strip east of the electrical room; the washer and dryer stand against the
+// laundry room's west wall with the laundry aide in front of them and the mop
+// sink and housekeeping cart in its far corner; the wash pad, hose reel and
+// parked chair are in the bay of the west corridor across from the linen
+// room's door (the bay backs onto the laundry room's wall); three storage
+// racks fill the east nook. Unchanged from the first pass: the linen room keeps
+// three racks, the rear employee door opens into the trash enclosure (bins
+// instead of the plan's counter), and the two personal-care rooms are
+// re-planned (east room hair-wash basin and chair in the northwest corner,
+// shower northeast, toilet and basin down the east wall; west room mirrored).
 //
 // Idempotent: everything this script owns (ids below) is removed and rebuilt,
 // the owner registry (`ownerReview`) is updated as a set union, and the loop
 // actors it touches are rebuilt from the constants here. Afterwards run
 // `node scripts/apply-drop-off-route.mjs` (loop formatting), then
-// `node scripts/apply-kitchen-delivery.mjs` (the food trolley's route and the
-// people it must keep clear of) and `npm run build:scenario`.
+// `node scripts/apply-kitchen-delivery.mjs` (the food trolley's route through
+// the service door and the people it must keep clear of) and
+// `npm run build:scenario`.
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { loadSim } from './build-scenario.mjs';
@@ -49,6 +62,7 @@ const PI = Math.PI,
 const OWN = 'owner-care-',
   OWN_WALL = 'owner-care-wall-',
   OWN_ITEM = 'care-rooms-',
+  OWN_ROOMS = ['rear-electrical', 'rear-wash-bay'],
   OWN_OBJECTS = new Set([
     'access-dryer',
     'rehab-wc-east-stall-door-3',
@@ -57,16 +71,19 @@ const OWN = 'owner-care-',
   OWN_ASSETS = new Set([
     'photo-rehab-wc-east-stall-door-3',
     'photo-rehab-wc-east-stall-handle-3',
-  ]);
+  ]),
+  /** Layout-correction furnishings (not baseline) this script drops: the fourth linen rack and the second washer. */
+  DROPPED_OBJECTS = ['access-linen-rack-4', 'access-washing-machine-2'];
 /** Baseline walls this script removes, moves and baseline objects it moves or removes. */
 const REMOVED_WALLS = ['plan-wall-199', 'plan-wall-081', 'plan-wall-102'],
-  CHANGED_WALLS = ['plan-wall-177', 'plan-wall-179', 'plan-wall-068'],
+  CHANGED_WALLS = ['plan-wall-177', 'plan-wall-179', 'plan-wall-068', 'plan-wall-083'],
   CHANGED_OBJECTS = ['ot-toilet-0', 'ot-basin-0', 'ot-toilet-2', 'ot-basin-1'],
   REMOVED_OBJECTS = ['reception-counter-2'];
 const STATUS = 'owner-walkthrough 2026-10 / described, not surveyed';
 const PAGES = [92];
 
 const r3 = (v) => Math.round(v * 1000) / 1000;
+const r6 = (v) => Math.round(v * 1e6) / 1e6;
 const union = (list, ids) => [...new Set([...(list ?? []), ...ids])];
 
 // --- The model --------------------------------------------------------------
@@ -95,8 +112,9 @@ m.objects = m.objects.filter(
     !o.id.startsWith(OWN) &&
     !OWN_OBJECTS.has(o.id) &&
     !REMOVED_OBJECTS.includes(o.id) &&
-    o.id !== 'access-linen-rack-4',
+    !DROPPED_OBJECTS.includes(o.id),
 );
+m.rooms = m.rooms.filter((r) => !OWN_ROOMS.includes(r.id));
 for (const id of Object.keys(m.assets))
   if (id.startsWith(OWN) || OWN_ASSETS.has(id)) delete m.assets[id];
 review.items = review.items.filter((i) => !i.id.startsWith(OWN_ITEM));
@@ -131,6 +149,23 @@ const addWall = (id, like, a, b) => {
     status: STATUS,
     referencePages: [...w.referencePages],
   });
+};
+/** A new room record, filed after `after` in the room list. */
+const addRoom = (id, after, name, polygon, kind, notes) => {
+  const r = {
+    id,
+    name,
+    zoneId: room(after).zoneId,
+    levelId: 'ground',
+    polygon,
+    kind,
+    referencePages: PAGES,
+    status: STATUS,
+    notes,
+    floorMaterial: 'concrete',
+  };
+  m.rooms.splice(m.rooms.findIndex((x) => x.id === after) + 1, 0, r);
+  return r;
 };
 /** Move a furnishing (a baseline one loses its plan-trace registration). */
 const move = (id, position, rotation, roomId, notes) => {
@@ -169,6 +204,7 @@ const rename = (id, name, notes) => {
 };
 /** Inner face of a plan wall: its line plus half its thickness. */
 const face = (id) => wall(id).thickness / 2;
+const inRoom = (p, id) => nav.insidePolygon(p, room(id).polygon);
 
 // --- (7) Bathrooms by the PT area -------------------------------------------
 const Z_NORTH = 11.142477, // the bathrooms' north edge (rooms rehab-wc-nw / rehab-wc-east)
@@ -224,7 +260,182 @@ room('rehab-wc-east').notes =
   room('rehab-wc-east').notes.replace(/^Owner review 2026-10:.*?cross-hall\. /, '');
 
 // --- (8) Back of house ------------------------------------------------------
-// Wheelchair wash: a 0.92 m door from receiving into the east nook.
+// The loading block: receiving's west wall (plan-wall-067), its east wall
+// (plan-wall-068) and the block's north face (the roll-up's wall line).
+const X_W = wall('plan-wall-067').a[0],
+  Z_N = wall('plan-wall-067').a[1],
+  X_E = wall('plan-wall-068').a[0],
+  Z_S = room('rear-wc-east').polygon[0][1], // receiving's south edge (−6.970)
+  T = wall('plan-wall-067').thickness;
+
+// The service door east of the roll-up (the envelope's shell-rear-north
+// opening 3, with its transom, opening 2): widened from the photographed
+// 0.75 m to a standard 0.9 m leaf so the food trolley passes it, keeping its
+// west jamb (x 10.11) and staying inside the recessed frame the exterior
+// draws (its east jamb is at x 11.01, alhambra-exterior.ts); the roll-up
+// opening (opening 1) narrows 7 cm to meet the door. deliveries.ts carries
+// the same door (`SERVICE_DOOR`) and swings its leaf, so the opening is
+// `operable` (the envelope draws no fixed panel in it).
+const DOOR_X0 = 10.11,
+  DOOR_W = 0.9,
+  DOOR_X1 = r3(DOOR_X0 + DOOR_W);
+{
+  const shell = m.envelope.walls.find((w) => w.id === 'shell-rear-north');
+  assert.ok(shell, 'the loading block’s north face is in the envelope');
+  const opening = (id) => {
+    const o = shell.openings.find((o) => o.id === id);
+    assert.ok(o, `envelope opening ${id}`);
+    return o;
+  };
+  const rollup = opening('shell-rear-north-opening-1'),
+    transom = opening('shell-rear-north-opening-2'),
+    door = opening('shell-rear-north-opening-3');
+  rollup.width = r6(DOOR_X0 - (shell.a[0] + rollup.offset));
+  assert.ok(Math.abs(rollup.width - 2.51) < 1e-6, 'the roll-up keeps its west jamb and ends at the service door');
+  door.offset = r6(DOOR_X0 - shell.a[0]);
+  door.width = DOOR_W;
+  door.operable = true;
+  transom.offset = door.offset;
+  transom.width = DOOR_W;
+  const sd = deliveries.SERVICE_DOOR;
+  assert.ok(
+    Math.abs(sd.at[0] - (DOOR_X0 + DOOR_W / 2)) < 1e-6 && Math.abs(sd.at[1] - Z_N) < 1e-6 && sd.width === DOOR_W,
+    'deliveries.ts SERVICE_DOOR matches the envelope’s service door',
+  );
+  // The plan wall east of the openings starts at the door's east jamb.
+  wall('plan-wall-083').a = [DOOR_X1, Z_N];
+  assert.ok(wall('plan-wall-082').b[0] < shell.a[0] + rollup.offset, 'the plan wall west of the roll-up stays short of it');
+}
+
+// The electrical room: receiving's north-west part behind the roll-up,
+// enclosed by a wall just west of the service door's jamb and a wall across
+// at z −10.3, with a 0.9 m door from receiving at its south-east corner (the
+// east wall stops short of the corner). The roll-up opens into it and stays
+// down; its switchboard and sub-panel hang on the west wall.
+const ELEC_X = 10.0,
+  ELEC_Z = -10.3,
+  ELEC_DOOR_Z = r3(ELEC_Z - 0.9);
+assert.ok(ELEC_X + T / 2 <= DOOR_X0 + 1e-9, 'the electrical room’s east wall clears the service door’s jamb');
+addWall('owner-care-wall-electrical-east', 'plan-wall-067', [ELEC_X, Z_N], [ELEC_X, ELEC_DOOR_Z]);
+addWall('owner-care-wall-electrical-south', 'plan-wall-067', [X_W, ELEC_Z], [ELEC_X, ELEC_Z]);
+addRoom(
+  'rear-electrical',
+  'rear-north',
+  'Electrical room',
+  [[X_W, Z_N], [ELEC_X, Z_N], [ELEC_X, ELEC_Z], [X_W, ELEC_Z]],
+  'room',
+  'Owner review 2026-10 (live build): “where the current washing machine and washer and dryer are, there’s another electrical room enclosing that”. Enclosed in receiving’s north-west part behind the loading roll-up; a door from receiving at its south-east corner for the electrician. Size and door position assumed.',
+);
+{
+  const north = room('rear-north');
+  north.polygon = [
+    [ELEC_X, Z_N],
+    [X_E, Z_N],
+    [X_E, Z_S],
+    [wall('plan-wall-080').a[0], Z_S],
+    [wall('plan-wall-080').a[0], wall('plan-wall-090').a[1]],
+    [X_W, wall('plan-wall-090').a[1]],
+    [X_W, ELEC_Z],
+    [ELEC_X, ELEC_Z],
+  ];
+  delete north.sourcePolygonPixels;
+  north.status = STATUS;
+  rename(
+    'rear-north',
+    'Receiving',
+    'Owner review 2026-10 (live build): deliveries come in through the small service door beside the roll-up (the roll-up fronts the electrical room) and down the strip east of the electrical room to the south gap; the laundry moved to the room by the linen racks. The room now excludes the electrical room and the laundry.',
+  );
+}
+m.assets['owner-care-switchboard'] = {
+  kind: 'electrical-panel',
+  dimensions: [1.2, 1.8, 0.3],
+  material: 'photo-blue-grey',
+  materials: { door: 'photo-white' },
+  parameters: { sections: 3 },
+};
+m.assets['owner-care-sub-panel'] = {
+  kind: 'electrical-panel',
+  dimensions: [0.5, 1.0, 0.16],
+  material: 'photo-blue-grey',
+  materials: { door: 'photo-white' },
+  parameters: { sections: 1 },
+};
+const WEST_FACE = r3(X_W + T / 2);
+place('owner-care-switchboard', 'owner-care-switchboard', 'rear-electrical', [r3(WEST_FACE + 0.15 + 0.005), 0.3, -12.8], HALF,
+  'Main switchboard on the electrical room’s west wall (three sections). Illustrative: the service size and position are not surveyed.', { layer: 'architecture' });
+place('owner-care-sub-panel', 'owner-care-sub-panel', 'rear-electrical', [r3(WEST_FACE + 0.08 + 0.005), 1.0, -11.3], HALF,
+  'Sub-panel beside the switchboard. Illustrative.', { layer: 'architecture' });
+
+// The laundry: the plan's laundry room next to the clean linen (entered from
+// the corridor east of it), with one washer and one dryer against its west
+// wall, fronts east, the laundry aide in front of them, and the mop sink and
+// housekeeping cart in its south end.
+const L_WEST = WEST_FACE,
+  L_NORTH = r3(wall('plan-wall-090').a[1] + face('plan-wall-090')),
+  L_SOUTH = r3(wall('plan-wall-093').a[1] - face('plan-wall-093')),
+  L_X = r3(L_WEST + 0.36 + 0.02),
+  WASHER_Z = r3(L_NORTH + 0.34 + 0.03),
+  DRYER_Z = r3(WASHER_Z + 0.68 + 0.06);
+move('access-washing-machine-1', [L_X, 0, WASHER_Z], HALF, 'rear-support-center',
+  'Owner (live build): “the washer and dryer there should be only two. It should be in the room right by the linen rack versus in the back.” The one washer, against the laundry room’s west wall.');
+m.assets['owner-care-tumble-dryer'] = {
+  kind: 'tumble-dryer',
+  dimensions: [0.68, 0.92, 0.72],
+  material: 'photo-white',
+  parameters: {},
+};
+place('access-dryer', 'owner-care-tumble-dryer', 'rear-support-center', [L_X, 0, DRYER_Z], HALF,
+  'Owner: one dryer beside the washer, against the laundry room’s west wall. Product and dimensions estimated.');
+m.assets['owner-care-janitor-sink'] = { kind: 'janitor-sink', dimensions: [0.65, 1.3, 0.65], material: 'photo-white', parameters: {} };
+m.assets['owner-care-housekeeping-cart'] = { kind: 'housekeeping-cart', dimensions: [0.55, 1.05, 1.1], material: 'photo-mustard', parameters: {} };
+place('owner-care-janitor-sink', 'owner-care-janitor-sink', 'rear-support-center',
+  [r3(L_WEST + 0.325 + 0.01), 0, r3(L_SOUTH - 0.325 - 0.02)], HALF,
+  'Mop sink in the laundry room’s far (south-west) corner. Illustrative; not described by the owner.');
+place('owner-care-housekeeping-cart', 'owner-care-housekeeping-cart', 'rear-support-center',
+  [8.35, 0, r3(L_SOUTH - 0.275 - 0.02)], HALF,
+  'Housekeeping cart parked along the laundry room’s south wall. Illustrative.');
+rename(
+  'rear-support-center',
+  'Laundry',
+  'Owner review 2026-10 (live build): the laundry is “in the room right by the linen rack versus in the back”: one washer and one dryer against the west wall; the mop sink and housekeeping cart share the south end. Entered from the corridor east of it (the plan’s door).',
+);
+
+// The wheelchair wash: the bay of the west corridor across from the linen
+// room's east door, backing onto the laundry room's wall (the plan's
+// widening between the stair's chase and the personal-care room): a kerbed
+// pad with a drain, a chair parked on it facing the corridor's south end and
+// the hose reel on the bay's north wall. The pad is flat architecture (no
+// obstacle); the chair and reel are furniture.
+const WB_W = wall('plan-wall-077').a[0],
+  WB_E = X_W,
+  WB_N = wall('plan-wall-089').a[1],
+  WB_S = wall('plan-wall-093').a[1];
+const bay = [[WB_W, WB_N], [WB_E, WB_N], [WB_E, WB_S], [WB_W, WB_S]];
+for (const o of m.objects)
+  if ((o.layer ?? 'furniture') === 'furniture' && o.levelId === 'ground' && nav.insidePolygon([o.position[0], o.position[2]], bay))
+    assert.fail(`${o.id} already stands in the wash bay`);
+addRoom(
+  'rear-wash-bay',
+  'rear-support-west',
+  'Wheelchair wash',
+  bay,
+  'room',
+  'Owner review 2026-10 (live build): “the wheelchair wash should be opposite the entrance to the linen room and the washing machine room”: the corridor bay across from the linen room’s east door, against the laundry room’s wall. Open to the west corridor; a pad in the east corridor would have blocked the trolley lane.',
+);
+const WB_X = r3((WB_W + WB_E - T / 2) / 2),
+  WB_Z = r3((WB_N + T / 2 + WB_S - T / 2) / 2);
+m.assets['owner-care-wash-pad'] = { kind: 'wash-pad', dimensions: [0.9, 0.05, 1.4], material: 'photo-mosaic', materials: { kerb: 'concrete' }, parameters: {} };
+m.assets['owner-care-hose-reel'] = { kind: 'hose-reel', dimensions: [0.4, 0.5, 0.3], material: 'photo-teal', parameters: {} };
+m.assets['owner-care-wheelchair'] = { kind: 'wheelchair', dimensions: [0.66, 0.92, 1.05], material: 'photo-black', parameters: {} };
+place('owner-care-wash-pad', 'owner-care-wash-pad', 'rear-wash-bay', [WB_X, 0, WB_Z], 0,
+  'Owner: a wheelchair wash “like a spray gun”, opposite the linen room’s entrance. Drained, kerbed pad filling the bay; size estimated.', { layer: 'architecture' });
+place('owner-care-wheelchair', 'owner-care-wheelchair', 'rear-wash-bay', [WB_X, 0, WB_Z], 0,
+  'A center wheelchair parked on the wash pad, facing the corridor’s south end. Illustrative.');
+place('owner-care-hose-reel', 'owner-care-hose-reel', 'rear-wash-bay', [WB_X, 1.0, r3(WB_N + T / 2 + 0.15 + 0.005)], 0,
+  'Wall-mounted hose reel and spray gun on the bay’s north wall. Mounting height estimated.');
+
+// Storage: the plan's east nook (the first pass's wheelchair wash) with three
+// racks and its door from receiving kept.
 {
   const w = wall('plan-wall-068'),
     x = w.a[0],
@@ -233,45 +444,16 @@ room('rehab-wc-east').notes =
   w.b = [x, r3(doorZ - half)];
   addWall('owner-care-wall-068-south', 'plan-wall-068', [x, r3(doorZ + half)], [x, -6.614256]);
 }
-const EAST = room('rear-support-east');
-m.assets['owner-care-wash-pad'] = { kind: 'wash-pad', dimensions: [1.6, 0.05, 1.6], material: 'photo-mosaic', materials: { kerb: 'concrete' }, parameters: {} };
-m.assets['owner-care-hose-reel'] = { kind: 'hose-reel', dimensions: [0.4, 0.5, 0.3], material: 'photo-teal', parameters: {} };
-m.assets['owner-care-wheelchair'] = { kind: 'wheelchair', dimensions: [0.66, 0.92, 1.05], material: 'photo-black', parameters: {} };
-place('owner-care-wash-pad', 'owner-care-wash-pad', EAST.id, [13.5, 0, -10.84], 0,
-  'Owner: “in that nook to the right, there is a wheelchair wash … like a spray gun”. Drained, kerbed pad; size estimated.');
-place('owner-care-wheelchair', 'owner-care-wheelchair', EAST.id, [13.5, 0, -10.84], -HALF,
-  'A center wheelchair parked on the wash pad, facing the door. Illustrative.');
-place('owner-care-hose-reel', 'owner-care-hose-reel', EAST.id, [13.5, 1.0, r3(-12.363571 + face('plan-wall-086') + 0.15 + 0.005)], 0,
-  'Wall-mounted hose reel and spray gun on the nook’s north wall, clear of the east window. Mounting height estimated.');
-rename('rear-support-east', 'Wheelchair wash', 'Owner review 2026-10: the nook off receiving is the wheelchair wash (spray gun over a drained pad), entered by a new door from receiving.');
-
-// Receiving: washer, washer and dryer against the west wall, fronts east, out
-// of the trolley lane from the roll-up to the south gap.
-const WEST_X = r3(6.614256 + face('plan-wall-067') + 0.36 + 0.02);
-move('access-washing-machine-1', [WEST_X, 0, -12.3], HALF, 'rear-north',
-  'Owner: “immediately to the left is where the washer and dryer are, against the left wall” (receiving’s west wall).');
-move('access-washing-machine-2', [WEST_X, 0, -11.5], HALF, 'rear-north',
-  'Owner: washer and dryer against receiving’s west wall.');
-m.assets['owner-care-tumble-dryer'] = {
-  kind: 'tumble-dryer',
-  dimensions: [0.68, 0.92, 0.72],
-  material: 'photo-white',
-  parameters: {},
-};
-place('access-dryer', 'owner-care-tumble-dryer', 'rear-north', [WEST_X, 0, -10.7], HALF,
-  'Owner: a dryer beside the washers against receiving’s west wall. Product and dimensions estimated.');
-rename('rear-north', 'Receiving & laundry', 'Owner review 2026-10: deliveries come in through the roll-up; the washer and dryer stand against the west wall. The trolley lane from the roll-up to the south gap stays clear.');
-
-// The old laundry room: soiled utility and housekeeping.
-m.assets['owner-care-janitor-sink'] = { kind: 'janitor-sink', dimensions: [0.65, 1.3, 0.65], material: 'photo-white', parameters: {} };
-m.assets['owner-care-housekeeping-cart'] = { kind: 'housekeeping-cart', dimensions: [0.55, 1.05, 1.1], material: 'photo-mustard', parameters: {} };
-place('owner-care-janitor-sink', 'owner-care-janitor-sink', 'rear-support-center',
-  [r3(6.614256 + face('plan-wall-067') + 0.325 + 0.01), 0, r3(-9.616111 + face('plan-wall-090') + 0.325 + 0.02)], HALF,
-  'Mop sink in the former laundry room, now soiled utility (the laundry moved to receiving). Illustrative.');
-place('owner-care-housekeeping-cart', 'owner-care-housekeeping-cart', 'rear-support-center',
-  [r3(6.614256 + face('plan-wall-067') + 0.55 + 0.02), 0, -7.75], HALF,
-  'Housekeeping cart parked in soiled utility. Illustrative.');
-rename('rear-support-center', 'Soiled utility & housekeeping', 'Owner review 2026-10: the washers moved to receiving; this room keeps housekeeping’s mop sink and cart. Assumed use, not described by the owner.');
+const S_NORTH = r3(wall('plan-wall-086').a[1] + face('plan-wall-086')),
+  S_SOUTH = r3(wall('plan-wall-091').a[1] - face('plan-wall-091'));
+m.assets['owner-care-storage-rack'] = { kind: 'linen-rack', dimensions: [1.55, 1.9, 0.48], material: 'photo-white', parameters: {} };
+place('owner-care-storage-rack-1', 'owner-care-storage-rack', 'rear-support-east', [12.7, 0, r3(S_NORTH + 0.24 + 0.02)], 0,
+  'Owner (live build): “where the current wheelchair wash is, there is just additional storage”. Rack along the north wall.');
+place('owner-care-storage-rack-2', 'owner-care-storage-rack', 'rear-support-east', [14.33, 0, r3(S_NORTH + 0.24 + 0.02)], 0,
+  'Storage rack along the north wall. Count assumed.');
+place('owner-care-storage-rack-3', 'owner-care-storage-rack', 'rear-support-east', [14.0, 0, r3(S_SOUTH - 0.24 - 0.02)], PI,
+  'Storage rack along the south wall, clear of the east window. Count assumed.');
+rename('rear-support-east', 'Storage', 'Owner review 2026-10 (live build): “just additional storage” in the nook off receiving; three racks, the door from receiving kept.');
 
 // Clean linen room: three racks, none through a wall.
 const LINEN_Z = r3(-10.328415 + face('plan-wall-087') + 0.24 + 0.02),
@@ -279,7 +461,7 @@ const LINEN_Z = r3(-10.328415 + face('plan-wall-087') + 0.24 + 0.02),
 move('access-linen-rack-1', [0.86, 0, LINEN_Z], 0, 'rear-support-west', 'Owner: “there are three racks instead”. Along the north wall of the west bay.');
 move('access-linen-rack-2', [LINEN_WEST_X, 0, -8.3], HALF, 'rear-support-west', 'Owner: three racks. Along the west wall (two do not fit along the north wall).');
 move('access-linen-rack-3', [3.99, 0, LINEN_Z], 0, 'rear-support-west', 'Owner: three racks. Along the north wall of the northeast bay, clear of its walls.');
-rename('rear-support-west', 'Clean linen room', 'Owner review 2026-10: the linen room with three racks; its existing doors (from the northeast bay and from the west corridor) are kept, the owner’s “another door leading to the linen room” read as the door between its two bays.');
+rename('rear-support-west', 'Clean linen room', 'Owner review 2026-10: the linen room with three racks; its existing doors (from the northeast bay and from the west corridor) are kept, the owner’s “another door leading to the linen room” read as the door between its two bays. The wheelchair wash is across the corridor from its east door and the laundry is the room beyond that bay.');
 
 // Trash enclosure: wheeled bins instead of the plan's counter.
 m.assets['owner-care-waste-bin'] = { kind: 'waste-bin', dimensions: [0.7, 1.2, 0.8], material: 'photo-black', materials: { lid: 'photo-blue-grey' }, parameters: { bin: 'trash' } };
@@ -332,22 +514,30 @@ rename('rear-utility-nw', 'Trash enclosure', 'Owner review 2026-10: the rear emp
     'Owner review 2026-10: shower in the northwest corner, toilet and basin down the west wall; east door kept.');
 }
 
-// Deliveries: packages come through the roll-up with the food (deliveries.ts).
+// Deliveries: both come through the service door (deliveries.ts), down the
+// strip east of the electrical room.
 {
   const stop = deliveries.deliveryStops.find((s) => s.id === 'delivery-package'),
     food = deliveries.deliveryStops.find((s) => s.id === 'delivery-food');
-  assert.deepEqual([...stop.door], [...food.door], 'the package stop shares the loading roll-up (deliveries.ts)');
+  assert.deepEqual([...stop.door], [...food.door], 'the package stop shares the service door (deliveries.ts)');
   m.designDecisions.rearServiceActivity =
-    'Package and meal deliveries both come in through the wide rear receiving roll-up; the rear employee door opens into the trash enclosure (owner walkthrough, October 2026). Routes, vehicle sizes and timing are illustrative.';
+    'Package and meal deliveries both come in through the small service door east of the loading roll-up and down the strip of receiving beside the electrical room, which the roll-up fronts; the rear employee door opens into the trash enclosure (owner walkthrough, October 2026, corrected on the live build). Routes, vehicle sizes and timing are illustrative.';
 }
 
-// Every new furnishing sits inside its room; every moved fixture too. (Room
-// polygons overlap at the back: receiving's covers the soiled-utility room's,
-// so this tests the object's own room rather than the first room at the point.)
-const inRoom = (p, id) => nav.insidePolygon(p, room(id).polygon);
+// Every new furnishing sits inside its room; every moved fixture too.
 for (const o of m.objects)
   if (o.id.startsWith(OWN) || OWN_OBJECTS.has(o.id) || CHANGED_OBJECTS.includes(o.id) || /^access-(shower|hair|barber|washing|linen)/.test(o.id))
     assert.ok(inRoom([o.position[0], o.position[2]], o.roomId), `${o.id} inside ${o.roomId}`);
+// The back rooms no longer overlap: one room at each test point.
+for (const [p, id] of [
+  [[8, -13], 'rear-electrical'],
+  [[11, -13], 'rear-north'],
+  [[8, -10], 'rear-north'],
+  [[8, -8.5], 'rear-support-center'],
+  [[6.0, -7.9], 'rear-wash-bay'],
+  [[13.5, -10.8], 'rear-support-east'],
+])
+  assert.deepEqual(m.rooms.filter((r) => r.levelId === 'ground' && nav.insidePolygon(p, r.polygon)).map((r) => r.id), [id], `one room at ${p}`);
 
 // The registry.
 review.changedWallIds = union(review.changedWallIds, CHANGED_WALLS);
@@ -370,11 +560,19 @@ review.items.push(
   },
   {
     id: 'care-rooms-8-back-of-house',
-    rooms: ['rear-north', 'rear-support-east', 'rear-support-center', 'rear-support-west', 'rear-utility-nw', 'rear-wc-east', 'rear-wc-west'],
+    rooms: ['rear-north', 'rear-support-west', 'rear-utility-nw', 'rear-wc-east', 'rear-wc-west'],
     change:
-      'Wheelchair wash in the east nook (new door from receiving, drained pad, hose reel and spray gun, parked chair); washer, washer and dryer against receiving’s west wall; the old laundry room is soiled utility (mop sink, cart); the linen room keeps three racks; the rear employee door opens into the trash enclosure (bins replace the plan’s counter) and packages come in through the roll-up with the food. Personal care east: hair-wash basin and chair northwest, shower northeast, toilet and basin down the east wall; personal care west mirrored.',
+      'The linen room keeps three racks; the rear employee door opens into the trash enclosure (bins replace the plan’s counter) and nobody delivers through it. Personal care east: hair-wash basin and chair northwest, shower northeast, toilet and basin down the east wall; personal care west mirrored.',
     unresolved:
-      '“Another door leading to the linen room” is read as the existing door between the linen room’s two bays (the stair sits between the linen room and receiving). The bins are inside the rear utility room; if the enclosure is the court notch outside the employee door they belong there. Fixture sizes, the dryer and the soiled-utility fit-out are assumed.',
+      '“Another door leading to the linen room” is read as the existing door between the linen room’s two bays (the stair sits between the linen room and receiving). The bins are inside the rear utility room; if the enclosure is the court notch outside the employee door they belong there. Fixture sizes are assumed.',
+  },
+  {
+    id: 'care-rooms-8b-back-of-house-live-build',
+    rooms: ['rear-electrical', 'rear-north', 'rear-support-center', 'rear-wash-bay', 'rear-support-east'],
+    change:
+      'Owner’s corrections on the live build. An electrical room is enclosed in receiving’s north-west part behind the loading roll-up (new walls at x 10.0 and z −10.3, a switchboard and sub-panel, a 0.9 m door from receiving at its south-east corner); the roll-up stays down. Both deliveries come in through the small service door beside the roll-up, widened from 0.75 m to 0.9 m (x 10.11–11.01, the roll-up opening narrowed 7 cm to meet it), and down the strip east of the electrical room: the food trolley on to the kitchen, the package driver to a hand-over point just inside. One washer and one dryer stand against the west wall of the plan’s laundry room next to the clean linen, with the laundry aide in front of them and the mop sink and housekeeping cart in its south end (the second washer is gone). The wheelchair wash (pad, hose reel, parked chair) is in the bay of the west corridor across from the linen room’s door, backing onto the laundry room’s wall. The plan’s east nook is storage with three racks.',
+    unresolved:
+      '“The room right by the linen rack” is read as the plan’s laundry room, whose door is on the corridor east of it rather than on the linen room’s corridor (if the as-built laundry opens toward the linen room, a door through the wall between them is needed, not modeled). “Opposite the entrance to the linen room and the washing machine room” is read as the corridor bay across from the linen room’s door; a pad in the east corridor would have blocked the food trolley’s lane. The service door’s true width is not measured: 0.9 m is the standard single leaf and the most the photographed frame allows; the exterior’s roll-up curtain is still drawn 2.58 m wide and laps the door’s west jamb by 7 cm when down. The electrical room’s size, door and panel positions are assumed.',
   },
 );
 writeFileSync(MODEL, JSON.stringify(m, null, 2) + '\n');
@@ -416,6 +614,11 @@ const routeFor = (a, b, what) => {
   throw new Error(`no route for ${what} from ${a.join(',')} to ${b.join(',')}`);
 };
 
+// The food trolley's lane down the strip east of the electrical room (the
+// legs apply-kitchen-delivery.mjs authors) passes at its 0.45 m clearance.
+for (const p of samples([[10.6, -13.9], [10.6, -10.0], [10.45, -9.0]]))
+  assert.ok(nav.isClear(grid, p, 0.45), `the trolley lane beside the electrical room is clear at 0.45 m at ${p.map((v) => v.toFixed(2)).join(',')}`);
+
 // (7) The wheelchair arrival and its escort: the legs that cut through the
 // northwest bathroom as a corridor, recomputed with the same start and end
 // times and the same endpoints.
@@ -438,16 +641,19 @@ for (const title of ['Escort to occupational therapy', 'Escort to supported acti
 }
 assert.equal(actor('arrival-wheelchair').segments.length, actor('arrival-aide-b').segments.length);
 
-// (8) The laundry aide works at the washer and dryer in receiving.
+// (8) The laundry aide works in front of the washer and dryer in the laundry
+// room, facing them.
 {
   const a = actor('community-52'),
-    at = [7.85, -11.9];
-  assert.ok(inRoom(at, 'rear-north'));
+    at = [7.95, -8.75];
+  assert.ok(inRoom(at, 'rear-support-center'));
+  const q = nav.measurePoint(grid, at);
+  assert.ok(q.wallMargin >= 0.28 && q.obstacleExcess + nav.FURNITURE_CLEARANCE >= 0.28, 'the laundry aide stands 0.28 m clear of the walls and the machines');
   for (const s of a.segments) {
     s.path = [at, at];
     s.heading = -HALF;
   }
-  a.roomId = 'rear-north';
+  a.roomId = 'rear-support-center';
 }
 // The hair-care participant sits in the barber chair (the chair's own seat
 // heading) except while the story's hero has it (12:25 PM, day-in-the-life
@@ -517,18 +723,25 @@ assert.equal(actor('arrival-wheelchair').segments.length, actor('arrival-aide-b'
   }
 }
 
-// The package delivery: round the truck's nose to the loading ramp, through
-// the roll-up and to a receiving point beside it, out of the food trolley's
-// lane (apply-kitchen-delivery.mjs).
+// The package delivery: round the truck's nose to the foot of the receiving
+// ramp, up it and through the service door to a hand-over point just inside,
+// on the east side of the strip, out of the food trolley's lane
+// (apply-kitchen-delivery.mjs).
 {
   const stop = deliveries.deliveryStops.find((s) => s.id === 'delivery-package'),
-    a = actor('delivery-package');
+    a = actor('delivery-package'),
+    ramp = deliveries.receivingRamp(stop),
+    /** Height of the court (−0.23) or, on the ramp, of its surface at a point. */
+    rampY = ([x, z]) =>
+      x < ramp.x0 || x > ramp.x1 || z <= ramp.z0 ? -0.23 : z >= ramp.z1 ? 0 : r3(-0.23 * ((ramp.z1 - z) / (ramp.z1 - ramp.z0)));
   const TRUCK_SIDE = [5.25, -18],
-    RECEIVE_AT = [7.8, -13.8],
-    route = [TRUCK_SIDE, [5.25, -16.6], [8.8, -16.1], [...stop.door], RECEIVE_AT],
-    heights = [-0.23, -0.23, -0.115, 0, 0];
+    DOOR = [...stop.door],
+    RECEIVE_AT = [11.25, -14.3],
+    // Along the court to the ramp's west edge, onto the ramp, up it and in.
+    route = [TRUCK_SIDE, [5.25, -16.75], [r3(ramp.x0 - 0.05), -16.75], [DOOR[0], -16.75], [DOOR[0], -16.1], DOOR, RECEIVE_AT],
+    heights = route.map(rampY);
   assert.ok(inRoom(RECEIVE_AT, 'rear-north'));
-  for (const p of samples(route.slice(3)))
+  for (const p of samples(route.slice(route.indexOf(DOOR))))
     assert.ok(nav.isClear(grid, p), `package route inside is clear at ${p.join(',')}`);
   const reversed = (list) => [...list].reverse();
   const segments = [];
@@ -548,7 +761,7 @@ assert.equal(actor('arrival-wheelchair').segments.length, actor('arrival-aide-b'
   }
   push(num(loop.duration), 'ride', parked, 'Delivery route', false, street);
   a.segments = segments;
-  a.label = 'Package delivery · loading roll-up';
+  a.label = 'Package delivery · service door';
 }
 
 // The two delivery people, the laundry aide and the hair-care pair keep their
@@ -580,5 +793,5 @@ const ascii = (s) => s.replace(/[^\n\x20-\x7f]/g, (c) => '\\u' + c.charCodeAt(0)
 const out = ascii(JSON.stringify(loop, null, 2)) + '\n';
 for (const file of [LOOP, PUBLISHED]) writeFileSync(file, out);
 console.log(
-  `Owner review · care rooms: ${review.newWallIds.length} new, ${review.changedWallIds.length} changed and ${review.removedWallIds.length} removed walls; ${review.newObjectIds.length} new objects, ${review.changedPlanObjectIds.length} moved and ${review.removedPlanObjectIds.length} removed plan objects. ${legs.join('; ')}. Wrote ${MODEL}, ${LOOP} and ${PUBLISHED}.`,
+  `Owner review · care rooms: ${review.newWallIds.length} new, ${review.changedWallIds.length} changed and ${review.removedWallIds.length} removed walls; ${review.newObjectIds.length} new objects, ${review.changedPlanObjectIds.length} moved and ${review.removedPlanObjectIds.length} removed plan objects; service door ${DOOR_X0}–${DOOR_X1} (${DOOR_W} m). ${legs.join('; ')}. Wrote ${MODEL}, ${LOOP} and ${PUBLISHED}.`,
 );

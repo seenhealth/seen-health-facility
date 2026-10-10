@@ -5,13 +5,16 @@ import type { Asset } from './schema';
 /**
  * Back-of-house and personal-care fittings from the October 2026 owner
  * walkthrough (scripts/apply-owner-review-care-rooms.mjs): the wheelchair
- * wash in the rear nook (a kerbed wash pad with a floor drain, a wall-mounted
- * hose reel with its spray gun and an empty wheelchair parked on the pad),
- * the trash enclosure's wheeled bins, the tumble dryer beside the washers in
- * receiving, and the soiled-utility room's mop sink and housekeeping cart.
- * Each component is modeled at its declared dimensions around a floor-centred
- * origin with its usable face toward local +Z, like the other asset families;
- * proportions follow standard products, not a verified manufacturer schedule.
+ * wash in the bay opposite the linen room (a kerbed wash pad with a floor
+ * drain, a wall-mounted hose reel with its spray gun and an empty wheelchair
+ * parked on the pad), the trash enclosure's wheeled bins, the tumble dryer
+ * beside the washer in the laundry room, the laundry's mop sink and
+ * housekeeping cart, and the electrical room's wall-mounted switchboard and
+ * sub-panel (the owner's second pass, which enclosed the electrical room
+ * behind the loading roll-up). Each component is modeled at its declared
+ * dimensions around a floor-centred origin with its usable face toward local
+ * +Z, like the other asset families; proportions follow standard products,
+ * not a verified manufacturer schedule.
  */
 export const CARE_ASSET_KINDS = [
   'wash-pad',
@@ -21,6 +24,7 @@ export const CARE_ASSET_KINDS = [
   'tumble-dryer',
   'janitor-sink',
   'housekeeping-cart',
+  'electrical-panel',
 ] as const;
 
 export function buildCareAsset(
@@ -206,6 +210,26 @@ export function buildCareAsset(
     box(0, 1.02, -0.5, 0.5, 0.03, 0.03, dark);
     box(0.12, 0.43, 0.26, 0.09, 0.22, 0.09, 'photo-yellow', 0.01);
     box(-0.12, 0.43, 0.2, 0.14, 0.1, 0.1, white, 0.01);
+  } else if (spec.kind === 'electrical-panel') {
+    // Wall-mounted switchboard: a steel cabinet the size of the component
+    // with its back (local -Z) on the wall, one hinged door per section
+    // (`parameters.sections`, default 1) with a cam lock and a warning label,
+    // and a cable gland strip along the bottom edge.
+    const body = slot('body', 'photo-blue-grey'),
+      door = slot('door', white),
+      sections = Math.max(1, Math.round(Number(spec.parameters?.sections ?? 1))),
+      gap = 0.03,
+      sw = (w - gap * (sections + 1)) / sections;
+    box(0, 0, 0, w, h, d, body, 0.01);
+    for (let i = 0; i < sections; i++) {
+      const x = -w / 2 + gap + sw / 2 + i * (sw + gap);
+      box(x, gap, d / 2 - 0.004, sw, h - 2 * gap, 0.012, door, 0.004);
+      box(x + sw / 2 - 0.04, h * 0.5, d / 2 + 0.008, 0.022, 0.06, 0.012, metal);
+      box(x, h * 0.86, d / 2 + 0.009, sw * 0.55, 0.05, 0.004, 'photo-yellow');
+      box(x, h * 0.86, d / 2 + 0.012, sw * 0.45, 0.012, 0.002, dark);
+    }
+    for (let x = -w / 2 + 0.08; x < w / 2 - 0.05; x += 0.1)
+      box(x, -0.02, 0, 0.03, 0.02, d * 0.4, dark);
   }
   // Fitted to the declared dimensions with the base at the floor, like the
   // other asset families (clinical-assets.ts).

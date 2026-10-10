@@ -175,6 +175,23 @@ for (let i = 0; i < 2; i++) {
     );
   }
 }
+// Owner review 2026-10 (care-rooms): both deliveries come in through the small
+// service door east of the loading roll-up (the envelope's
+// shell-rear-north-opening-3); the roll-up now fronts the electrical room.
+{
+  const wall = m.envelope.walls.find((w) => w.id === 'shell-rear-north'),
+    door = wall.openings.find((o) => o.id === 'shell-rear-north-opening-3'),
+    x0 = wall.a[0] + door.offset,
+    x1 = x0 + door.width;
+  for (const stop of deliveryStops)
+    assert(
+      Math.abs(stop.door[1] - wall.a[1]) < 1e-6 &&
+        stop.door[0] > x0 &&
+        stop.door[0] < x1,
+      `${stop.id} comes in through the rear service door`,
+    );
+  assert(door.width >= 0.9, 'The service door takes the food trolley');
+}
 // The morning food run brings lunch into the kitchen before it is served: the
 // loaded trolley stands in kitchen-prep beside the kitchen staff member while
 // the truck waits at receiving, and leaves empty.
