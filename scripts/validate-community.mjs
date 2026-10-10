@@ -25,11 +25,11 @@ const normalized = {
 };
 const data = JSON.parse(fs.readFileSync('app/data/activity-loop.json'));
 const cast = data.actors.filter((a) => a.id.startsWith('community-'));
-assert.equal(data.actors.length, 184);
+assert.equal(data.actors.length, 185);
 const profiles = JSON.parse(
   fs.readFileSync('app/data/character-templates.json'),
 ).people;
-assert.equal(new Set(data.actors.map((a) => a.profileId)).size, 184);
+assert.equal(new Set(data.actors.map((a) => a.profileId)).size, 185);
 assert(data.actors.every((a) => profiles.some((p) => p.id === a.profileId)));
 let samples = 0;
 for (const actor of cast) {
@@ -72,17 +72,27 @@ for (const room of [
     'Old desks and conference furniture removed',
   );
 }
+// Game props move on their table's clock while people play (a cue ball
+// waits at its tee until the shot, so sample a whole period) and come to
+// rest once the players leave.
 for (const id of ['ping-pong', 'pool', 'wii', 'karaoke']) {
   const g = buildCommunityAsset(model.assets['community-' + id]);
   let count = 0;
   g.traverse((o) => {
     if (o.userData.gameMotion) {
-      const old = o.position.toArray().join() + '/' + o.scale.toArray().join();
-      animateCommunityProp(o, 1.234);
-      assert.notEqual(
-        o.position.toArray().join() + '/' + o.scale.toArray().join(),
-        old,
-      );
+      const state = () =>
+        o.position.toArray().join() + '/' + o.scale.toArray().join();
+      const seen = new Set();
+      for (let t = 0; t < 48; t += 0.25) {
+        animateCommunityProp(o, t, 2);
+        seen.add(state());
+      }
+      assert(seen.size > 4, `Game prop moves with players: ${id}`);
+      // Nobody playing: it eases to rest and stays there.
+      for (let i = 0; i < 200; i++) animateCommunityProp(o, 100 + i * 0.3, 0);
+      const rest = state();
+      for (let i = 0; i < 40; i++) animateCommunityProp(o, 160 + i * 0.3, 0);
+      assert.equal(state(), rest, `Game prop rests without players: ${id}`);
       count++;
     }
   });

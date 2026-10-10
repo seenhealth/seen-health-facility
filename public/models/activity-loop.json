@@ -5614,7 +5614,7 @@
         {
           "start": 0,
           "end": 720,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               10.8,
@@ -5643,7 +5643,7 @@
         {
           "start": 0,
           "end": 720,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               8,
@@ -18190,11 +18190,11 @@
           "path": [
             [
               13.8,
-              20.25
+              20.69
             ],
             [
               13.8,
-              20.25
+              20.69
             ]
           ],
           "zoneId": "admin",
@@ -18209,11 +18209,11 @@
           "path": [
             [
               13.8,
-              20.25
+              20.69
             ],
             [
               13.8,
-              20.25
+              20.69
             ]
           ],
           "zoneId": "admin",
@@ -18228,11 +18228,11 @@
           "path": [
             [
               13.8,
-              20.25
+              20.69
             ],
             [
               13.8,
-              20.25
+              20.69
             ]
           ],
           "zoneId": "admin",
@@ -18247,11 +18247,11 @@
           "path": [
             [
               13.8,
-              20.25
+              20.69
             ],
             [
               13.8,
-              20.25
+              20.69
             ]
           ],
           "zoneId": "admin",
@@ -18266,11 +18266,11 @@
           "path": [
             [
               13.8,
-              20.25
+              20.69
             ],
             [
               13.8,
-              20.25
+              20.69
             ]
           ],
           "zoneId": "admin",
@@ -18285,11 +18285,11 @@
           "path": [
             [
               13.8,
-              20.25
+              20.69
             ],
             [
               13.8,
-              20.25
+              20.69
             ]
           ],
           "zoneId": "admin",
@@ -18304,11 +18304,11 @@
           "path": [
             [
               13.8,
-              20.25
+              20.69
             ],
             [
               13.8,
-              20.25
+              20.69
             ]
           ],
           "zoneId": "admin",
@@ -18323,11 +18323,11 @@
           "path": [
             [
               13.8,
-              20.25
+              20.69
             ],
             [
               13.8,
-              20.25
+              20.69
             ]
           ],
           "zoneId": "admin",
@@ -18340,11 +18340,11 @@
     },
     {
       "id": "community-44",
-      "label": "Karaoke \u00b7 singer",
+      "label": "Karaoke \u00b7 lead singer",
       "role": "participant",
       "variant": 84,
       "profileId": "community-44",
-      "offset": 31,
+      "offset": 0,
       "levelId": "ground",
       "segments": [
         {
@@ -18514,7 +18514,7 @@
         {
           "start": 0,
           "end": 90,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               8,
@@ -18533,7 +18533,7 @@
         {
           "start": 90,
           "end": 180,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               8,
@@ -18552,7 +18552,7 @@
         {
           "start": 180,
           "end": 270,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               8,
@@ -18571,7 +18571,7 @@
         {
           "start": 270,
           "end": 360,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               8,
@@ -18590,7 +18590,7 @@
         {
           "start": 360,
           "end": 450,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               8,
@@ -18609,7 +18609,7 @@
         {
           "start": 450,
           "end": 540,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               8,
@@ -18628,7 +18628,7 @@
         {
           "start": 540,
           "end": 630,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               8,
@@ -18647,7 +18647,7 @@
         {
           "start": 630,
           "end": 720,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               8,
@@ -18680,7 +18680,7 @@
         {
           "start": 0,
           "end": 90,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               9.3,
@@ -18699,7 +18699,7 @@
         {
           "start": 90,
           "end": 180,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               9.3,
@@ -18718,7 +18718,7 @@
         {
           "start": 180,
           "end": 270,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               9.3,
@@ -18737,7 +18737,7 @@
         {
           "start": 270,
           "end": 360,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               9.3,
@@ -18756,7 +18756,7 @@
         {
           "start": 360,
           "end": 450,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               9.3,
@@ -18775,7 +18775,7 @@
         {
           "start": 450,
           "end": 540,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               9.3,
@@ -18794,7 +18794,7 @@
         {
           "start": 540,
           "end": 630,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               9.3,
@@ -18813,7 +18813,7 @@
         {
           "start": 630,
           "end": 720,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               9.3,
@@ -18846,7 +18846,7 @@
         {
           "start": 0,
           "end": 90,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               9.3,
@@ -18865,7 +18865,7 @@
         {
           "start": 90,
           "end": 180,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               9.3,
@@ -18884,7 +18884,7 @@
         {
           "start": 180,
           "end": 270,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               9.3,
@@ -18903,7 +18903,7 @@
         {
           "start": 270,
           "end": 360,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               9.3,
@@ -18922,7 +18922,7 @@
         {
           "start": 360,
           "end": 450,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               9.3,
@@ -18941,7 +18941,7 @@
         {
           "start": 450,
           "end": 540,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               9.3,
@@ -18960,7 +18960,7 @@
         {
           "start": 540,
           "end": 630,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               9.3,
@@ -18979,7 +18979,7 @@
         {
           "start": 630,
           "end": 720,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               9.3,
@@ -19012,7 +19012,7 @@
         {
           "start": 0,
           "end": 90,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               10.7,
@@ -19031,7 +19031,7 @@
         {
           "start": 90,
           "end": 180,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               10.7,
@@ -19050,7 +19050,7 @@
         {
           "start": 180,
           "end": 270,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               10.7,
@@ -19069,7 +19069,7 @@
         {
           "start": 270,
           "end": 360,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               10.7,
@@ -19088,7 +19088,7 @@
         {
           "start": 360,
           "end": 450,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               10.7,
@@ -19107,7 +19107,7 @@
         {
           "start": 450,
           "end": 540,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               10.7,
@@ -19126,7 +19126,7 @@
         {
           "start": 540,
           "end": 630,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               10.7,
@@ -19145,7 +19145,7 @@
         {
           "start": 630,
           "end": 720,
-          "action": "clap",
+          "action": "audience",
           "path": [
             [
               10.7,
@@ -32369,6 +32369,170 @@
         }
       ],
       "profileId": "instructor-tea"
+    },
+    {
+      "id": "community-71",
+      "role": "participant",
+      "variant": 99,
+      "label": "Karaoke \u00b7 duet partner",
+      "offset": 24,
+      "levelId": "ground",
+      "profileId": "community-71",
+      "roomId": "admin-conference",
+      "segments": [
+        {
+          "start": 0,
+          "end": 90,
+          "action": "karaoke",
+          "path": [
+            [
+              12.9,
+              25.5
+            ],
+            [
+              12.9,
+              25.5
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 1.5707963267948966,
+          "seated": false,
+          "title": "Karaoke \u00b7 singer (duet)"
+        },
+        {
+          "start": 90,
+          "end": 180,
+          "action": "karaoke",
+          "path": [
+            [
+              12.9,
+              25.5
+            ],
+            [
+              12.9,
+              25.5
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 1.5707963267948966,
+          "seated": false,
+          "title": "Karaoke \u00b7 singer (duet)"
+        },
+        {
+          "start": 180,
+          "end": 270,
+          "action": "karaoke",
+          "path": [
+            [
+              12.9,
+              25.5
+            ],
+            [
+              12.9,
+              25.5
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 1.5707963267948966,
+          "seated": false,
+          "title": "Karaoke \u00b7 singer (duet)"
+        },
+        {
+          "start": 270,
+          "end": 360,
+          "action": "karaoke",
+          "path": [
+            [
+              12.9,
+              25.5
+            ],
+            [
+              12.9,
+              25.5
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 1.5707963267948966,
+          "seated": false,
+          "title": "Karaoke \u00b7 singer (duet)"
+        },
+        {
+          "start": 360,
+          "end": 450,
+          "action": "karaoke",
+          "path": [
+            [
+              12.9,
+              25.5
+            ],
+            [
+              12.9,
+              25.5
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 1.5707963267948966,
+          "seated": false,
+          "title": "Karaoke \u00b7 singer (duet)"
+        },
+        {
+          "start": 450,
+          "end": 540,
+          "action": "karaoke",
+          "path": [
+            [
+              12.9,
+              25.5
+            ],
+            [
+              12.9,
+              25.5
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 1.5707963267948966,
+          "seated": false,
+          "title": "Karaoke \u00b7 singer (duet)"
+        },
+        {
+          "start": 540,
+          "end": 630,
+          "action": "karaoke",
+          "path": [
+            [
+              12.9,
+              25.5
+            ],
+            [
+              12.9,
+              25.5
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 1.5707963267948966,
+          "seated": false,
+          "title": "Karaoke \u00b7 singer (duet)"
+        },
+        {
+          "start": 630,
+          "end": 720,
+          "action": "karaoke",
+          "path": [
+            [
+              12.9,
+              25.5
+            ],
+            [
+              12.9,
+              25.5
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 1.5707963267948966,
+          "seated": false,
+          "title": "Karaoke \u00b7 singer (duet)"
+        }
+      ]
     }
   ],
   "interactions": [
@@ -32796,7 +32960,8 @@
         "community-45",
         "community-46",
         "community-47",
-        "community-48"
+        "community-48",
+        "community-71"
       ],
       "start": 0,
       "end": 720,

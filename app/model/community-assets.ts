@@ -1,4 +1,12 @@
 import * as T from 'three';
+import {
+  PING_PONG,
+  PING_PONG_PERIOD,
+  POOL,
+  POOL_PERIOD,
+  pingPongBall,
+  poolCueBall,
+} from './game-rhythm';
 import type { Asset } from './schema';
 /** Reusable furniture for the participant activity wing. All dimensions are meters. */
 export function buildCommunityAsset(spec: Asset) {
@@ -246,7 +254,7 @@ export function buildCommunityAsset(spec: Asset) {
           '#d68847',
         ][i],
       );
-    const b = ball(-0.65, h + 0.065, 0.08, 0.031, '#fbefd4');
+    const b = ball(-POOL.tee, h + 0.065, POOL.laneZ, 0.031, '#fbefd4');
     b.userData.gameMotion = 'pool';
     box(0, 0.2, 0, w * 0.7, 0.25, d * 0.6, '#8a6846');
   }
@@ -292,24 +300,56 @@ export function buildCommunityAsset(spec: Asset) {
   }
   return root;
 }
-export function animateCommunityProp(object: T.Object3D, time: number) {
-  const phase = object.userData.phase || 0;
-  switch (object.userData.gameMotion) {
-    case 'ping-pong':
-      object.position.set(
-        Math.sin(time * 2.8) * 1.05,
-        object.userData.baseY + 0.07 + Math.abs(Math.cos(time * 2.8)) * 0.28,
-        Math.sin(time * 1.4) * 0.18,
-      );
+/** The game action whose players keep a prop in motion. */
+export const GAME_MOTION_ACTION: Record<string, string> = {
+  'ping-pong': 'ping-pong',
+  pool: 'billiards',
+  equalizer: 'karaoke',
+  bowling: 'wii',
+};
+/** How many players a prop needs before it moves. */
+export const GAME_MOTION_PLAYERS: Record<string, number> = {
+  'ping-pong': 2,
+  pool: 2,
+  equalizer: 1,
+  bowling: 1,
+};
+/**
+ * Move a game prop for care-day `time` (loop seconds). The ball flies on
+ * the table's shared clock (`game-rhythm`), so it is at the paddle or the
+ * cue when a player strikes. With fewer than `players` people at the game
+ * the prop eases to rest: a ball lies still on an empty table.
+ */
+export function animateCommunityProp(
+  object: T.Object3D,
+  time: number,
+  players = 2,
+) {
+  const phase = object.userData.phase || 0,
+    kind = object.userData.gameMotion as string;
+  const target = players >= (GAME_MOTION_PLAYERS[kind] ?? 1) ? 1 : 0,
+    was = object.userData.live ?? 1,
+    live = was + (target - was) * 0.08;
+  object.userData.live = Math.abs(live - target) < 0.002 ? target : live;
+  const mix = (rest: number, moving: number) =>
+    rest + (moving - rest) * object.userData.live;
+  switch (kind) {
+    case 'ping-pong': {
+      const top = object.userData.baseY as number,
+        [x, y, z] = pingPongBall(time / PING_PONG_PERIOD),
+        [rx, ry, rz] = PING_PONG.rest;
+      object.position.set(mix(rx, x), top + mix(ry, y), mix(rz, z));
       break;
+    }
     case 'pool':
-      object.position.x = -0.75 + ((time * 0.12) % 1.25);
+      object.position.x = mix(-POOL.tee, poolCueBall(time / POOL_PERIOD));
+      object.position.z = POOL.laneZ;
       break;
     case 'equalizer':
-      object.scale.y = 0.6 + Math.abs(Math.sin(time * 2 + phase)) * 0.8;
+      object.scale.y = mix(0.6, 0.6 + Math.abs(Math.sin(time * 2 + phase)) * 0.8);
       break;
     case 'bowling':
-      object.position.y = 1 + ((time * 0.15) % 0.26);
+      object.position.y = mix(1, 1 + ((time * 0.15) % 0.26));
       break;
   }
 }

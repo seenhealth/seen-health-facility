@@ -87,11 +87,21 @@ const rel = (s: Pick<CareSetting, 'heading'>, local = 0) => s.heading + local;
 const carDoor = (vehicleId: string, time: number) =>
   carDoorWorld(sampleCommunityVehicle(vehicleId, time));
 /**
- * Seen's nurses on the phone work from the perimeter desks of the upstairs
- * open office, taken in order along it (largest z, then x): the 24/7 nurse
- * line at the corner desk, the care-transitions nurse at the next one.
+ * Seen's nurses on the phone work at the center's two phones on the ground
+ * floor, so a call from a home or the hospital lands where staff pick up:
+ * the 24/7 nurse line at the clinic nurse station (its telephone stands
+ * beside the second task chair) and the care-transitions nurse at the front
+ * desk, inside the reception counter's L beside the receptionists.
  */
-const SEEN_DESKS = { zoneId: 'upper-office', assetId: 'upperfit-chair' };
+const SEEN_PHONES = {
+  nurseLine: { zoneId: 'clinic', seatId: 'clinic-nurse-task-chair-1' },
+  transitions: {
+    zoneId: 'lobby',
+    at: [-8.5, 2.6] as Vec2,
+    /** Facing the counter run along x −9.46 (west). */
+    heading: -Math.PI / 2,
+  },
+};
 /** The hospital discharge nurse's call to Seen's care-transitions nurse. */
 const DISCHARGE_CALL = [495, 525] as const;
 /** The hospitalist's call to Seen's on-call nurse after the ambulance handoff. */
@@ -1815,91 +1825,88 @@ export function communitySource(model: Facility): SourceExtension {
       )
       .ride(CLOCK_END, VAN, 'driver', 'At the wheel');
     add(driver);
-    const desks = model.objects
-      .filter(
-        (o) =>
-          o.zoneId === SEEN_DESKS.zoneId && o.assetId === SEEN_DESKS.assetId,
-      )
-      .sort(
-        (a, b) =>
-          b.position[2] - a.position[2] || b.position[0] - a.position[0],
-      );
-    if (desks.length < 2)
+    const stationChair = model.objects.find(
+      (o) => o.id === SEEN_PHONES.nurseLine.seatId,
+    );
+    if (!stationChair)
       throw new Error(
-        `Need two ${SEEN_DESKS.assetId} in ${SEEN_DESKS.zoneId} for the nurse line and care transitions`,
+        `Need ${SEEN_PHONES.nurseLine.seatId} at the nurse station for the nurse line`,
       );
-    /** A Seen nurse seated at an upstairs desk all day, facing it. */
-    const atDesk = (
-      desk: (typeof desks)[number],
-      id: string,
-      label: string,
-      variant: number,
-    ) =>
+    /** The 24/7 nurse line RN, seated at the station chair all day (facing as the chair does). */
+    const nurseLineHeading = stationChair.rotation + Math.PI;
+    const atStation = (id: string, label: string, variant: number) =>
       new Track(
         id,
         'nurse',
         {
-          zoneId: 'upper-office',
-          levelId: 'upper',
+          zoneId: SEEN_PHONES.nurseLine.zoneId,
+          levelId: 'ground',
           ground: false,
           label,
           variant,
           seated: true,
-          seatId: desk.id,
+          seatId: stationChair.id,
         },
-        [desk.position[0], desk.position[2]],
+        [stationChair.position[0], stationChair.position[2]],
       );
     // The nurse line takes the Wongs' calls when their generated cast places
     // them (the PERS call in the morning, the evening plan) and the ED's call
     // after the ambulance handoff.
     const pers = castCall(home.id, 'home-pers-call'),
       evening = castCall(home.id, 'after-hours-call');
-    const nurseLine = atDesk(
-      desks[0],
-      'nurse-line-rn',
-      '24/7 nurse line RN',
-      12,
-    )
+    const nurseLine = atStation('nurse-line-rn', '24/7 nurse line RN', 12)
       .hold(pers.start, 'document', {
         title: 'Nurse line & on-call coordination',
-        heading: 0,
+        heading: nurseLineHeading,
       })
       .hold(pers.end, 'phone', {
         title: 'PERS call: Mrs. Wong, light-headed at home',
-        heading: 0,
+        heading: nurseLineHeading,
       })
       .hold(ED_CALL[0], 'document', {
         title: 'Nurse line & on-call coordination',
-        heading: 0,
+        heading: nurseLineHeading,
       })
       .hold(ED_CALL[1], 'phone', {
         title: 'On-call: the ED reports an ambulance arrival',
-        heading: 0,
+        heading: nurseLineHeading,
       })
       .hold(evening.start, 'document', {
         title: 'Nurse line & on-call coordination',
-        heading: 0,
+        heading: nurseLineHeading,
       })
-      .hold(evening.end, 'phone', { title: 'Call with the Wongs', heading: 0 })
-      .hold(CLOCK_END, 'document', { title: 'Logging the call', heading: 0 });
+      .hold(evening.end, 'phone', {
+        title: 'Call with the Wongs',
+        heading: nurseLineHeading,
+      })
+      .hold(CLOCK_END, 'document', {
+        title: 'Logging the call',
+        heading: nurseLineHeading,
+      });
     add(nurseLine);
-    const transitions = atDesk(
-      desks[1],
+    const transitions = new Track(
       'seen-transitions-rn',
-      'Seen RN · care transitions',
-      14,
+      'nurse',
+      {
+        zoneId: SEEN_PHONES.transitions.zoneId,
+        levelId: 'ground',
+        ground: false,
+        label: 'Seen RN · care transitions',
+        variant: 14,
+      },
+      SEEN_PHONES.transitions.at,
     )
       .hold(DISCHARGE_CALL[0], 'document', {
-        title: 'Care transitions: admissions, discharges, follow-up calls',
-        heading: 0,
+        title: 'Care transitions at the front desk: admissions, discharges, follow-up calls',
+        heading: SEEN_PHONES.transitions.heading,
       })
       .hold(DISCHARGE_CALL[1], 'phone', {
         title: 'Discharge call with the hospital’s nurse',
-        heading: 0,
+        heading: SEEN_PHONES.transitions.heading,
       })
       .hold(CLOCK_END, 'document', {
         title: 'Home health referral, meals and the care-plan update',
-        heading: 0,
+        heading: SEEN_PHONES.transitions.heading,
       });
     add(transitions);
   }

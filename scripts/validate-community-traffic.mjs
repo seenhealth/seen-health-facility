@@ -337,9 +337,11 @@ const onDrawnGround = (p) =>
 let walks = 0,
   maxGait = 0;
 for (const a of source.actors) {
+  // Seen's nurses on the phone work at the center's ground-floor phones:
+  // the clinic nurse station and the front desk.
   assert(
     settingZones.has(a.segments[0].zoneId) ||
-      a.segments[0].zoneId === 'upper-office',
+      ['upper-office', 'clinic', 'lobby'].includes(a.segments[0].zoneId),
     `${a.id}: zone`,
   );
   assert.equal(a.segments[0].start, 0);
@@ -407,7 +409,8 @@ for (const i of source.interactions) {
   assert(categories.has(i.category), `${i.id}: category ${i.category}`);
   assert(i.start >= 0 && i.end <= 720 && i.end > i.start, `${i.id}: window`);
   assert(
-    settingZones.has(i.zoneId) || ['site', 'upper-office'].includes(i.zoneId),
+    settingZones.has(i.zoneId) ||
+      ['site', 'upper-office', 'clinic', 'lobby'].includes(i.zoneId),
     `${i.id}: zone ${i.zoneId}`,
   );
   for (const id of i.actorIds)

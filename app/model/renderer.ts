@@ -1,5 +1,8 @@
 import { floorShapes } from './floor-geometry';
-import { animateCommunityProp } from './community-assets';
+import {
+  animateCommunityProp,
+  GAME_MOTION_ACTION,
+} from './community-assets';
 import { showcaseFrame, type ShowcaseView } from './showcase';
 import dayProgram from '../data/day-program.json';
 import * as T from 'three';
@@ -2051,6 +2054,26 @@ export function createViewer(
   scene.traverse((o) => {
     if (o.userData.gameMotion) gameProps.push(o);
   });
+  // A ball or screen moves only while enough people are playing at it:
+  // visible people in the game's action within reach of the prop.
+  const gameAt = new T.Vector3();
+  function animateGameProps() {
+    const time = activity.getState().time;
+    for (const prop of gameProps) {
+      const action = GAME_MOTION_ACTION[prop.userData.gameMotion as string];
+      prop.getWorldPosition(gameAt);
+      let players = 0;
+      if (action)
+        for (const a of activity.actors)
+          if (
+            a.root.visible &&
+            a.sample.action === action &&
+            Math.hypot(a.root.position.x - gameAt.x, a.root.position.z - gameAt.z) < 3.2
+          )
+            players++;
+      animateCommunityProp(prop, time, players);
+    }
+  }
   let showcase = false,
     showcasePlaying = true,
     showcaseTime = 0;
@@ -2403,7 +2426,7 @@ export function createViewer(
     }
     activity.tick(typeof document !== 'undefined' && document.hidden ? 0 : dt);
     neighborhood.tick(activity.getState().time);
-    community?.tick(activity.getState().time);
+    community?.tick(activity.getState().time, camera.zoom);
     layer?.tick(dt);
     // Entry leaves open for approaching transport parties, even with the design door toggle shut.
     if (model.contextStyle) {
@@ -2470,8 +2493,7 @@ export function createViewer(
       camera.updateProjectionMatrix();
       if (Math.abs(camera.zoom - zoomTarget) < 0.001) zoomTarget = null;
     }
-    for (const prop of gameProps)
-      animateCommunityProp(prop, activity.getState().time);
+    animateGameProps();
     // At most one hover pick per frame, only after the pointer moved.
     if (hoverPending) {
       hoverPending = false;

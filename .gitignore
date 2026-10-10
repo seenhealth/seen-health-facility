@@ -50,3 +50,6 @@ next-env.d.ts
 # Private architectural authoring inputs are not published to GitHub.
 /sources/*
 !/sources/public-texture-review.json
+
+# Agent worktrees
+.claude/worktrees/

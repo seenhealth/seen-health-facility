@@ -806,6 +806,7 @@ export function createActivity(
           : options.time + a.spec.offset,
         a.spec.programMode === 'wheelchair' ? 0.65 : 1,
         s.seated,
+        s.heading,
       );
     }
     dayRoom.root.visible =

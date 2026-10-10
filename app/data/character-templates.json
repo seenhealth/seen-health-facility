@@ -124,7 +124,7 @@
       "hairStyle": 5,
       "glasses": false,
       "accent": "#B8747E",
-      "height": 1.0,
+      "height": 1,
       "figure": "f"
     },
     {
@@ -276,7 +276,7 @@
       "hairStyle": 5,
       "glasses": false,
       "accent": "#D4846A",
-      "height": 1.0,
+      "height": 1,
       "figure": "f"
     },
     {
@@ -2292,9 +2292,20 @@
       "hairStyle": 1,
       "glasses": false,
       "accent": "#8E4A57",
-      "height": 1.0,
+      "height": 1,
       "figure": "f",
       "cut": "cardigan"
+    },
+    {
+      "id": "community-71",
+      "role": "participant",
+      "appearance": 5,
+      "skin": "#d9a67f",
+      "hair": "#5a4a44",
+      "hairStyle": 2,
+      "glasses": true,
+      "accent": "#8a5a3a",
+      "height": 0.95
     }
   ],
   "colorSource": "Role colours come from app/data/care-team.json (members[].color by characterRole). Front desk and food service sit outside the IDT and use the neutral colours below; participant tops use palette.participantWardrobe; family wear everyday clothes in the family colour."

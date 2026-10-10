@@ -1,5 +1,14 @@
 import * as T from 'three';
 import {
+  KARAOKE,
+  KARAOKE_PERIOD,
+  PING_PONG_PERIOD,
+  POOL_PERIOD,
+  CYCLE_PERIOD,
+  window01,
+  wrap01,
+} from './game-rhythm';
+import {
   mergeGeometries,
   mergeVertices,
 } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -64,7 +73,10 @@ export type Action =
   | 'watch'
   | 'knit'
   | 'cards'
-  | 'read';
+  | 'read'
+  | 'cycle'
+  | 'audience'
+  | 'massage';
 /** Guest-instructor attire: one silhouette and colour signature per style. */
 export type CostumeStyle = 'taichi' | 'tang' | 'qipao' | 'opera' | 'tcm-coat';
 export type Costume = {
@@ -109,6 +121,12 @@ export type CharacterSpec = {
   seated?: boolean;
   assisted?: boolean;
   cargo?: 'package' | 'food';
+  /**
+   * The person's time offset on the care-day loop (ActorSpec.offset): pose
+   * times arrive with it added, and the shared table and song clocks take
+   * it off again. Default 0.
+   */
+  offset?: number;
 };
 export const roleNames: Record<CharacterRole, string> = {
   participant: 'Participant',
@@ -848,6 +866,11 @@ export function createCharacter(spec: CharacterSpec) {
     bone(`foot${side}`, `knee${side}`, 0, -SHIN);
   }
   joints.hip.updateMatrixWorld(true);
+  // Game props (built below once the aids are); declared here as pose()
+  // runs while the figure is still being assembled.
+  let paddle: T.Group | null = null,
+    cue: T.Mesh | null = null,
+    mic: T.Group | null = null;
   const bw = (name: string) =>
     new T.Vector3().setFromMatrixPosition(joints[name].matrixWorld);
   const bi = (name: string) => bones.indexOf(joints[name]);
@@ -2350,34 +2373,56 @@ export function createCharacter(spec: CharacterSpec) {
   };
   wheels.forEach(consolidate);
   consolidate(accessory);
-  const gameAction = (
-    spec as CharacterSpec & { segments?: { action: string }[] }
-  ).segments?.[0]?.action;
-  if (['ping-pong', 'wii', 'billiards', 'karaoke'].includes(gameAction || '')) {
-    const color =
-      gameAction === 'ping-pong'
-        ? '#b85842'
-        : gameAction === 'billiards'
-          ? '#caa674'
-          : '#e7e8df';
-    const geo =
-      gameAction === 'ping-pong'
-        ? new T.CylinderGeometry(0.09, 0.09, 0.018, 16)
-        : gameAction === 'billiards'
-          ? new T.CylinderGeometry(0.012, 0.008, 1.2, 8)
-          : new T.BoxGeometry(0.035, 0.15, 0.04);
-    const prop = new T.Mesh(geo, new T.MeshStandardMaterial({ color }));
-    prop.position.set(0, -0.07, 0.03);
-    if (gameAction === 'ping-pong') prop.rotation.x = Math.PI / 2;
-    joints.handR.add(prop);
-    if (gameAction === 'karaoke') {
-      const head = new T.Mesh(
-        new T.SphereGeometry(0.035, 10, 8),
-        new T.MeshStandardMaterial({ color: '#263f48' }),
-      );
-      head.position.y = -0.16;
-      joints.handR.add(head);
-    }
+  // Game props in the playing hand (the left for someone whose right hand
+  // holds a cane): a paddle, a cue or a microphone, each shown only while
+  // its game is played. pose() re-seats the cue between shots and passes
+  // the microphone between the two singers.
+  const gameActions = new Set(
+    (
+      spec as CharacterSpec & { segments?: { action: string }[] }
+    ).segments?.map((s) => s.action) ?? [],
+  );
+  const gameHand = spec.mobility === 'cane' ? joints.handL : joints.handR;
+  const gameProp = (color: string) => {
+    const g = new T.Group();
+    g.visible = false;
+    gameHand.add(g);
+    return { group: g, mat: new T.MeshStandardMaterial({ color }) };
+  };
+  if (gameActions.has('ping-pong')) {
+    // Blade in line with the forearm, its face across the palm; a short
+    // handle in the fist.
+    const { group, mat } = gameProp('#b85842');
+    const blade = new T.Mesh(new T.CylinderGeometry(0.085, 0.085, 0.012, 18), mat);
+    blade.rotation.z = Math.PI / 2;
+    blade.position.set(0, -0.2, 0.02);
+    const handle = new T.Mesh(
+      new T.BoxGeometry(0.014, 0.11, 0.026),
+      new T.MeshStandardMaterial({ color: '#d9c7a2' }),
+    );
+    handle.position.set(0, -0.085, 0.02);
+    group.add(blade, handle);
+    paddle = group;
+  }
+  if (gameActions.has('billiards')) {
+    cue = new T.Mesh(
+      new T.CylinderGeometry(0.007, 0.013, 1.3, 8),
+      new T.MeshStandardMaterial({ color: '#caa674' }),
+    );
+    cue.visible = false;
+    gameHand.add(cue);
+  }
+  if (gameActions.has('karaoke')) {
+    const { group, mat } = gameProp('#e7e8df');
+    const body = new T.Mesh(new T.CylinderGeometry(0.016, 0.02, 0.15, 10), mat);
+    body.position.set(0, -0.075, 0.02);
+    const head = new T.Mesh(
+      new T.SphereGeometry(0.034, 10, 8),
+      new T.MeshStandardMaterial({ color: '#263f48' }),
+    );
+    head.position.set(0, -0.17, 0.02);
+    group.add(body, head);
+    mic = group;
   }
   if (spec.cargo) {
     const trolley = new T.Group();
@@ -3131,17 +3176,27 @@ export function createCharacter(spec: CharacterSpec) {
     sleeveAim.L.set(0, -1, 0);
     sleeveAim.R.set(0, -1, 0);
   }
+  /**
+   * Set every joint for `action` at the person's own time (loop time plus
+   * their offset). `heading` is the facing of the current segment; the
+   * table games use it to tell which end of the table the person plays
+   * from, so their strokes meet the ball that `animateCommunityProp` flies.
+   */
   function pose(
     action: Action,
     time: number,
     motion = 1,
     seatedOverride = false,
+    heading = 0,
   ) {
     for (const b of bones) b.rotation.set(0, 0, 0);
     joints.hip.position.set(0, baseY, 0);
     wheels.forEach((w) => (w.rotation.x = 0));
     const stride = Math.sin(time * Math.PI * 2 * 0.9) * motion,
       breath = Math.sin(time * Math.PI * 2 * 0.25) * motion,
+      // The shared care-day clock, for anything timed with a table's ball
+      // or a room's song rather than with this person's own cycle.
+      loop = time - (spec.offset ?? 0),
       walking =
         ['walk', 'escort'].includes(action) && spec.mobility !== 'wheelchair';
     // Relaxed arms carry a slight natural bend.
@@ -3168,6 +3223,7 @@ export function createCharacter(spec: CharacterSpec) {
         action === 'seated' ||
         action === 'ride' ||
         action === 'erhu' ||
+        action === 'cycle' ||
         TABLE_ACTIONS.has(action) ||
         !!spec.seated ||
         seatedOverride ||
@@ -3201,17 +3257,104 @@ export function createCharacter(spec: CharacterSpec) {
       joints.head.rotation.x = 0.07;
       joints.head.rotation.y = 0.06 * breath;
     }
-    if (['ping-pong', 'wii'].includes(action)) {
+    if (action === 'wii') {
       joints.armR.rotation.x = -0.7 + 0.65 * stride;
       joints.elbowR.rotation.x = -0.45;
       joints.torso.rotation.y = 0.17 * stride;
       joints.armL.rotation.x = -0.35;
     }
+    // Table games: side A faces the table's +x and plays from its −x end.
+    // The ball (community-assets) is struck at A at loop phase 0 and at B
+    // at 0.5, so each player's stroke is timed to meet it.
+    const sideA = Math.sin(heading) >= 0,
+      p = spec.mobility === 'cane' ? 'L' : 'R',
+      q = p === 'L' ? 'R' : 'L',
+      ps = p === 'L' ? -1 : 1, // sign of the playing side's z/x mirror
+      // A little personal tempo and reach so no two players swing alike.
+      amp = 0.86 + 0.28 * ((h % 101) / 100),
+      backhand = h % 3 === 0;
+    if (action === 'ping-pong') {
+      // Phase with this player's hit at 0.5 (A hits at loop phase 0).
+      // (+0.03: the paddle crosses the strike point a moment into the swing.)
+      const g = wrap01(loop / PING_PONG_PERIOD + (sideA ? 0.5 : 0) + 0.03);
+      // Backswing, then the paddle crosses the strike point mid-swing at
+      // 0.5 and follows through.
+      const back = window01(g, 0.3, 0.42, 0.44, 0.52),
+        through = window01(g, 0.44, 0.58, 0.64, 0.82),
+        // Swings go across the body: forehand from the playing side,
+        // backhand from the other.
+        side = (backhand ? -1 : 1) * ps;
+      // Ready stance: knees soft, weight forward, paddle up in front.
+      joints.torso.rotation.x = 0.16;
+      joints.hip.position.y -= 0.05;
+      for (const sd of ['L', 'R']) {
+        joints[`leg${sd}`].rotation.x = -0.2;
+        joints[`knee${sd}`].rotation.x = 0.42;
+        joints[`foot${sd}`].rotation.x = -0.22;
+        joints[`leg${sd}`].rotation.z = (sd === 'L' ? -1 : 1) * 0.08;
+      }
+      joints.hip.position.y += 0.012 * Math.sin(loop * Math.PI * 2 * 0.45);
+      joints.torso.rotation.y = side * (0.5 * back - 0.45 * through) * amp;
+      joints[`arm${p}`].rotation.x = -0.55 + 0.4 * back - 0.6 * through * amp;
+      joints[`arm${p}`].rotation.z =
+        ps * (0.3 + side * ps * (0.55 * back - 0.5 * through) * amp);
+      joints[`elbow${p}`].rotation.x = -1.1 - 0.15 * back + 0.65 * through;
+      joints[`hand${p}`].rotation.x = -0.2 + 0.3 * through;
+      joints[`arm${q}`].rotation.x = -0.45 + 0.35 * through;
+      joints[`elbow${q}`].rotation.x = -1.0 + 0.3 * back;
+      joints.hip.position.x += side * (0.03 * back - 0.04 * through);
+      joints.head.rotation.x = 0.14;
+      joints.head.rotation.y = side * (0.12 * back - 0.16 * through);
+    }
     if (action === 'billiards') {
-      joints.torso.rotation.x = 0.18;
-      joints.armL.rotation.x = -0.8;
-      joints.armR.rotation.x = -0.65 + 0.1 * stride;
-      joints.elbowR.rotation.x = -0.7;
+      // A shoots in the first half of the period, B in the second.
+      const g = wrap01(loop / POOL_PERIOD + (sideA ? 0 : 0.5)),
+        turn = g < 0.5 ? g * 2 : 0, // 0–1 through this player's shot
+        down = g < 0.5 ? window01(turn, 0, 0.16, 0.84, 1) : 0, // bent over the cue
+        strokes = Math.sin(turn * Math.PI * 2 * 2.5) * window01(turn, 0.2, 0.3, 0.55, 0.62),
+        draw = window01(turn, 0.62, 0.67, 0.67, 0.68), // final backstroke
+        strike = window01(turn, 0.67, 0.69, 0.78, 0.84);
+      // Stance: feet apart, bent at the hip with a level back, the bridge
+      // hand on the cloth, the cue hand back with the forearm along the cue.
+      joints.torso.rotation.x = 0.62 * down;
+      joints.hip.position.y -= 0.05 * down;
+      for (const sd of ['L', 'R']) {
+        joints[`leg${sd}`].rotation.z = (sd === 'L' ? -1 : 1) * 0.14 * down;
+        joints[`knee${sd}`].rotation.x = 0.12 * down;
+        joints[`leg${sd}`].rotation.x = -0.1 * down;
+      }
+      // The torso frame's "down" tilts back as the back bends, so arm
+      // angles below are in that frame (a hanging arm is −0.62 at full bend).
+      // Bridge arm (the non-playing hand) reaches forward onto the cloth.
+      joints[`arm${q}`].rotation.x = -0.4 - 0.85 * down;
+      joints[`arm${q}`].rotation.z = -ps * 0.18 * down;
+      joints[`elbow${q}`].rotation.x = -0.5 + 0.1 * down;
+      // Cue arm: the upper arm hangs a little behind, the forearm level
+      // along the cue and swinging like a pendulum.
+      joints[`arm${p}`].rotation.x = -0.2 - 0.12 * down;
+      joints[`arm${p}`].rotation.z = ps * (0.18 + 0.04 * down);
+      // The forearm is a pendulum from the elbow: drawing back unfolds it,
+      // the strike folds it through.
+      joints[`elbow${p}`].rotation.x =
+        -0.6 -
+        1.26 * down +
+        (0.06 * strokes + 0.1 * draw - 0.12 * strike) * amp * down;
+      joints[`hand${p}`].rotation.x = 0.1 * down;
+      joints.head.rotation.x = -0.55 * down;
+      if (!down) {
+        // Waiting: standing by the table with the cue upright, watching.
+        joints.head.rotation.y = -ps * 0.35 + 0.08 * Math.sin(loop * 0.7);
+        joints.torso.rotation.y = -ps * 0.12;
+        joints[`arm${p}`].rotation.x = 0.1;
+        joints[`elbow${p}`].rotation.x = -0.42;
+        joints[`arm${q}`].rotation.x = -0.25;
+        joints[`elbow${q}`].rotation.x = -0.9;
+      }
+      if (cue) {
+        // Along the forearm for the shot; stood upright by the hip between.
+        cue.rotation.x = down > 0.5 ? 0 : Math.PI + 0.22;
+        cue.position.set(0, down > 0.5 ? -0.42 : 0.12, 0.03);
+      }
     }
     if (action === 'mahjong') {
       joints.armL.rotation.x = -0.5;
@@ -3238,14 +3381,119 @@ export function createCharacter(spec: CharacterSpec) {
       joints.elbowR.rotation.z = 1.7 + 0.2 * stride;
     }
     const slow = Math.sin((time * Math.PI) / 4) * motion;
-    if (['present', 'conversation', 'perform', 'karaoke'].includes(action)) {
+    if (['present', 'conversation', 'perform'].includes(action)) {
       joints.armL.rotation.x = -0.4;
       joints.elbowL.rotation.x = -0.9;
       joints.armR.rotation.set(-0.45, 0, 0.3 + 0.12 * breath);
-      joints.elbowR.rotation.x = ['perform', 'karaoke'].includes(action)
-        ? -1.55
-        : -0.8;
+      joints.elbowR.rotation.x = action === 'perform' ? -1.55 : -0.8;
       joints.head.rotation.y = 0.12 * slow;
+    }
+    // Karaoke: two singers share the microphone. The lead (offset in the
+    // first half of the period) sings first with the partner on their
+    // right; at the end of the song they turn to each other and the mic
+    // changes hands. Hands stay still while singing: the body sways.
+    let micHeld = false;
+    const MIC_TWIST = 0.75;
+    if (action === 'karaoke') {
+      const lead = wrap01((spec.offset ?? 0) / KARAOKE_PERIOD) < 0.5,
+        g = wrap01(loop / KARAOKE_PERIOD + (lead ? 0 : 0.5)),
+        toward = lead ? 1 : -1, // the partner's side, +x = right
+        sing = window01(g, KARAOKE.sing[0] - 0.03, KARAOKE.sing[0], KARAOKE.sing[1], KARAOKE.handOff[0] + 0.02),
+        give = window01(g, KARAOKE.handOff[0] - 0.02, KARAOKE.handOff[0] + 0.02, KARAOKE.handOff[1] - 0.02, KARAOKE.handOff[1] + 0.03),
+        take =
+          window01(g, KARAOKE.receive[0] - 0.02, KARAOKE.receive[0] + 0.02, 0.999, 1) +
+          window01(g, 0, 0.001, KARAOKE.receive[1] - 1 - 0.02, KARAOKE.receive[1] - 1 + 0.03),
+        sway = Math.sin(loop * Math.PI * 2 / 5 + (h % 7)),
+        nod = Math.sin(loop * Math.PI * 2 / 2.5);
+      micHeld = g < 0.5;
+      // Body: a gentle sway, head nodding to the beat; feet planted.
+      joints.torso.rotation.z = 0.05 * sway * (sing + 0.4);
+      joints.head.rotation.z = -0.03 * sway;
+      joints.head.rotation.x = -0.06 + 0.035 * nod * sing;
+      joints.hip.position.y += 0.006 * nod * sing;
+      // Microphone hand at the mouth: elbow by the ribs, forearm folded up
+      // and in so the fist sits under the chin.
+      joints[`arm${p}`].rotation.set(-0.35, -ps * MIC_TWIST, ps * 0.1);
+      joints[`elbow${p}`].rotation.x = -2.5;
+      joints[`hand${p}`].rotation.x = 0.3;
+      // Other hand resting at the waist.
+      joints[`arm${q}`].rotation.x = -0.25;
+      joints[`elbow${q}`].rotation.x = -1.05;
+      if (!micHeld) {
+        // Listening to the partner: hands clasped low, head turned to them.
+        joints[`arm${p}`].rotation.set(-0.28, 0, ps * 0.05);
+        joints[`elbow${p}`].rotation.x = -1.0;
+        joints[`hand${p}`].rotation.x = 0;
+        joints.head.rotation.y = toward * 0.4;
+        joints.torso.rotation.y = toward * 0.12;
+      }
+      // Hand-off: both turn to each other; the giver holds the mic out, the
+      // taker reaches for it.
+      const reach = Math.max(give, take);
+      if (reach > 0) {
+        joints.torso.rotation.y = toward * 0.55 * reach;
+        joints.head.rotation.y = toward * 0.45 * reach;
+        joints[`arm${p}`].rotation.x = T.MathUtils.lerp(joints[`arm${p}`].rotation.x, -0.95, reach);
+        joints[`arm${p}`].rotation.z = T.MathUtils.lerp(joints[`arm${p}`].rotation.z, toward * 0.35, reach);
+        joints[`elbow${p}`].rotation.x = T.MathUtils.lerp(joints[`elbow${p}`].rotation.x, -0.35, reach);
+        joints[`hand${p}`].rotation.x = T.MathUtils.lerp(joints[`hand${p}`].rotation.x, 0.5, reach);
+      }
+    }
+    if (action === 'audience') {
+      // Listening to a song: still hands, a nod to the beat, a look toward
+      // the singers and applause for a moment as each song ends.
+      const g = wrap01(loop / KARAOKE_PERIOD),
+        applause =
+          window01(g, 0.44, 0.47, 0.53, 0.57) + window01(g, 0.94, 0.97, 0.999, 1) + window01(g, 0, 0.001, 0.03, 0.07),
+        beat = Math.sin(loop * Math.PI * 2 / 2.5 + (h % 5));
+      joints.armL.rotation.x = joints.armR.rotation.x = -0.3;
+      joints.elbowL.rotation.x = joints.elbowR.rotation.x = -1.0;
+      joints.head.rotation.x = 0.03 * beat;
+      joints.head.rotation.y = 0.08 * Math.sin(loop * 0.5 + h);
+      joints.torso.rotation.z = 0.02 * Math.sin(loop * Math.PI * 2 / 6 + h);
+      if (applause > 0) {
+        const clapAt = Math.sin(loop * Math.PI * 2 * 1.4);
+        for (const sd of ['L', 'R']) {
+          joints[`arm${sd}`].rotation.x = T.MathUtils.lerp(-0.3, -0.75, applause);
+          joints[`elbow${sd}`].rotation.x = T.MathUtils.lerp(-1.0, -1.1, applause);
+          joints[`arm${sd}`].rotation.z =
+            (sd === 'L' ? 1 : -1) * (0.08 + 0.1 * (clapAt + 1)) * applause;
+        }
+      }
+    }
+    if (action === 'cycle') {
+      // Pedalling a recumbent bike or stepper: hands on the grips, thighs
+      // pumping a half turn apart, shins following the pedals.
+      const w = (loop * Math.PI * 2) / CYCLE_PERIOD;
+      for (const sd of ['L', 'R']) {
+        const ph = w + (sd === 'L' ? Math.PI : 0),
+          lift = Math.sin(ph);
+        joints[`leg${sd}`].rotation.x = -(Math.PI / 2 - seatDrop) - 0.32 * lift - 0.12;
+        joints[`knee${sd}`].rotation.x = Math.PI / 2 - seatDrop + 0.5 * lift - 0.1;
+        joints[`foot${sd}`].rotation.x = -0.15 * Math.cos(ph);
+        joints[`arm${sd}`].rotation.x = -0.95;
+        joints[`arm${sd}`].rotation.z = (sd === 'L' ? -1 : 1) * 0.12;
+        joints[`elbow${sd}`].rotation.x = -0.45;
+      }
+      joints.torso.rotation.x = -0.08;
+      joints.head.rotation.y = 0.07 * Math.sin(loop * 0.4 + h);
+    }
+    if (action === 'massage') {
+      // Acupressure: bent over the bed, both hands pressing in turn with
+      // the weight behind them.
+      const press = Math.sin(loop * Math.PI * 2 / 3);
+      joints.torso.rotation.x = 0.5 + 0.06 * press;
+      joints.hip.position.y -= 0.04;
+      for (const sd of ['L', 'R']) {
+        const own = sd === 'L' ? press : -press;
+        joints[`arm${sd}`].rotation.x = -0.95 - 0.12 * own;
+        joints[`arm${sd}`].rotation.z = (sd === 'L' ? -1 : 1) * 0.2;
+        joints[`elbow${sd}`].rotation.x = -0.25 - 0.1 * Math.max(0, own);
+        joints[`hand${sd}`].rotation.x = 0.4;
+        joints[`knee${sd}`].rotation.x = 0.1;
+        joints[`leg${sd}`].rotation.x = -0.08;
+      }
+      joints.head.rotation.x = -0.25;
     }
     if (action === 'clap') {
       for (const side of ['L', 'R']) {
@@ -3309,6 +3557,9 @@ export function createCharacter(spec: CharacterSpec) {
       }
     }
     if (handset) handset.visible = action === 'phone';
+    if (paddle) paddle.visible = action === 'ping-pong';
+    if (cue) cue.visible = action === 'billiards';
+    if (mic) mic.visible = action === 'karaoke' && micHeld;
     if (spec.mobility === 'cane' && !sitting) {
       joints.armR.rotation.set(-0.02, 0, 0);
       joints.elbowR.rotation.set(-0.02, 0, 0);

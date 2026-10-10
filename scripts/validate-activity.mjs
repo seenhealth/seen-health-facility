@@ -36,8 +36,10 @@ const scene = new T.Scene(),
   ),
   neighborhood = buildNeighborhood(m);
 scene.add(neighborhood.root);
-assert.equal(activity.actors.length, 258);
-assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 184);
+// The base loop's people (owner walkthrough 2026-10: +1 karaoke duet partner)
+// and the composed scene (base + fleet crew + community layer).
+assert.equal(activity.actors.length, 259);
+assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 185);
 for (const role of [
   'doctor',
   'nurse',
