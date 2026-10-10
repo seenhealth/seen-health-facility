@@ -255,8 +255,30 @@ rename(
 rename(
   'rehab-wc-sw',
   'Therapy bathroom west',
-  'Owner review 2026-10: enclosed; entered only from the therapy cross-hall by its south door.',
+  'Owner review 2026-10: enclosed; entered only from the therapy cross-hall by its south door. A roll-in shower stands to the right of the toilet (the owner, on the live build: “in the large bathroom in the rehab area, let’s add a shower to the right of the toilet”).',
 );
+// The large therapy bathroom's shower (the owner, on the live build): a
+// roll-in shower in the room's north-east corner, to the right of the toilet
+// as one sits on it (the toilet's back is on the east wall, it faces west);
+// the only free run of wall (1.4 m between the north wall and the toilet).
+// Back to the east wall, seat side to the north wall, open side west.
+{
+  const toilet = object('rehab-toilet-1'),
+    EAST_FACE = r3(wall('plan-wall-177').a[0] - face('plan-wall-177')),
+    NORTH_FACE = r3(wall('plan-wall-195').a[1] + face('plan-wall-195')),
+    SHOWER = { w: 1.3, h: 2.18, d: 1.2 },
+    toiletNorth = toilet.position[2] - m.assets[toilet.assetId].dimensions[0] / 2;
+  m.assets['owner-care-rehab-shower'] = {
+    kind: 'care-shower',
+    dimensions: [SHOWER.w, SHOWER.h, SHOWER.d],
+    material: 'photo-teal-tile',
+    parameters: {},
+  };
+  const at = [r3(EAST_FACE - SHOWER.d / 2 - 0.005), 0, r3(NORTH_FACE + SHOWER.w / 2 + 0.005)];
+  assert.ok(at[2] + SHOWER.w / 2 <= toiletNorth - 0.05, 'the shower clears the toilet');
+  place('owner-care-rehab-shower', 'owner-care-rehab-shower', 'rehab-wc-sw', at, -HALF,
+    'Owner (live build): “in the large bathroom in the rehab area, let’s add a shower to the right of the toilet.” Roll-in shower with a seat and grab bars in the north-east corner, beside the toilet; size from the personal-care showers, reduced to fit.');
+}
 room('rehab-wc-east').notes =
   'Owner review 2026-10: fully enclosed; all four stalls inside one restroom entered from the therapy cross-hall. ' +
   room('rehab-wc-east').notes.replace(/^Owner review 2026-10:.*?cross-hall\. /, '');
@@ -579,6 +601,14 @@ review.items.push(
       '“Opposite the entrance to the linen room and the washing machine room” is read as the corridor bay across from the linen room’s door; a pad in the east corridor would have blocked the food trolley’s lane. The service door’s true width is not measured: 0.9 m is the standard single leaf and the most the photographed frame allows; the exterior’s roll-up curtain is still drawn 2.58 m wide and laps the door’s west jamb by 7 cm when down. The electrical room’s size, door and panel positions are assumed.',
   },
 );
+review.items.push({
+  id: 'care-rooms-7b-rehab-shower',
+  rooms: ['rehab-wc-sw'],
+  change:
+    'Owner on the live build: “in the large bathroom in the rehab area, let’s add a shower to the right of the toilet.” A 1.3 × 1.2 m roll-in shower (seat, grab bars, hand shower, curtain) stands in the north-east corner of the west therapy bathroom, against the east wall beside the toilet, open to the room.',
+  unresolved:
+    '“The large bathroom” is read as the larger of the two single therapy bathrooms (the west one, 3.9 m long), not the shared multistall restroom. “To the right of the toilet” is read as seen by someone seated on it (north); the other side has only 0.8 m before the basin. Shower size and fixtures are typical, not measured.',
+});
 review.items.push({
   id: 'care-rooms-8c-laundry-in-linen-room',
   rooms: ['rear-support-west', 'rear-support-center'],
