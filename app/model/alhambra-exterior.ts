@@ -2209,16 +2209,18 @@ export function buildAlhambraExterior(model: Facility) {
   ])
     box(wingFace, x, 0, LF - 0.01, w, 3.6, 0.03, jamb);
   box(wingFace, 9.265, 3.42, LF - 0.01, 3.73, 0.18, 0.03, jamb);
-  // the curtain (opening 1 is open in the envelope; deliveries.ts raises this into the wall for the food truck)
+  // the curtain over envelope opening 1 (x 7.60 → 10.11; it stays down, the
+  // electrical room is behind it) and the 0.9 m service door east of it
+  // (x 10.11 → 11.01, deliveries.ts SERVICE_DOOR) under its transom bars
   const rollup = group(wingFace, 'rear-loading-rollup');
-  box(rollup, 8.89, -0.23, BUMP_Z - 0.04, 2.58, 3.61, 0.04, '#b4b1aa');
+  box(rollup, 8.855, -0.23, BUMP_Z - 0.04, 2.51, 3.61, 0.04, '#b4b1aa');
   for (let y = 0.12; y < 3.38; y += 0.13)
-    box(rollup, 8.89, y, BUMP_Z - 0.065, 2.58, 0.018, 0.01, '#8f8c85');
+    box(rollup, 8.855, y, BUMP_Z - 0.065, 2.51, 0.018, 0.01, '#8f8c85');
   for (let y = 2.3; y < 3.38; y += 0.13)
-    box(wingFace, 10.555, y, LF - 0.005, 0.75, 0.018, 0.01, '#8f8c85');
+    box(wingFace, 10.56, y, LF - 0.005, 0.9, 0.018, 0.01, '#8f8c85');
   // the service door's notice and lever
-  box(wingFace, 10.62, 1.25, LF - 0.03, 0.28, 0.2, 0.01, '#f2efe4');
-  box(wingFace, 10.27, 0.98, LF - 0.06, 0.14, 0.03, 0.05, '#c7c9c8');
+  box(wingFace, 10.56, 1.25, LF - 0.03, 0.28, 0.2, 0.01, '#f2efe4');
+  box(wingFace, 10.22, 0.98, LF - 0.06, 0.14, 0.03, 0.05, '#c7c9c8');
   // louvre, camera dome, conduits, a no-smoking plate
   box(wingFace, 6.56, 2.37, LF - 0.03, 0.56, 0.77, 0.06, '#a6a8a4');
   for (let y = 2.45; y < 3.08; y += 0.08)
