@@ -2164,7 +2164,7 @@
     },
     {
       "id": "rear-support-west",
-      "name": "Clean linen room",
+      "name": "Linen room & laundry",
       "zoneId": "ot",
       "levelId": "ground",
       "polygon": [
@@ -2190,7 +2190,7 @@
         92
       ],
       "status": "image-traced",
-      "notes": "Owner review 2026-10: the linen room with three racks; its existing doors (from the northeast bay and from the west corridor) are kept, the owner’s “another door leading to the linen room” read as the door between its two bays. The wheelchair wash is across the corridor from its east door and the laundry is the room beyond that bay.",
+      "notes": "Owner review 2026-10: the linen room with three racks, and the washer and dryer against the south wall of its west bay by the door from the west corridor (the owner’s comment on the live build, “this should be moved to the linen room”); its existing doors (from the northeast bay and from the west corridor) are kept, the owner’s “another door leading to the linen room” read as the door between its two bays. The wheelchair wash is across the corridor from its east door.",
       "sourcePolygonPixels": [
         [
           814,
@@ -2244,7 +2244,7 @@
     },
     {
       "id": "rear-support-center",
-      "name": "Laundry",
+      "name": "Housekeeping",
       "zoneId": "ot",
       "levelId": "ground",
       "polygon": [
@@ -2270,7 +2270,7 @@
         92
       ],
       "status": "image-traced",
-      "notes": "Owner review 2026-10 (live build): the laundry is “in the room right by the linen rack versus in the back”: one washer and one dryer against the west wall; the mop sink and housekeeping cart share the south end. Entered from the corridor east of it (the plan’s door).",
+      "notes": "Owner review 2026-10: the plan’s laundry room. The washer and dryer moved to the linen room (the owner’s comment on the live build, “this should be moved to the linen room”); the mop sink and housekeeping cart stay in its south end. Entered from the corridor east of it (the plan’s door).",
       "sourcePolygonPixels": [
         [
           944,
@@ -29832,11 +29832,11 @@
       "id": "access-washing-machine-1",
       "assetId": "access-laundry",
       "position": [
-        7.096,
+        1.3,
         0,
-        -9.144
+        -7.462
       ],
-      "rotation": 1.5707963267948966,
+      "rotation": 3.141592653589793,
       "scale": [
         1,
         1,
@@ -29844,7 +29844,7 @@
       ],
       "zoneId": "ot",
       "levelId": "ground",
-      "roomId": "rear-support-center",
+      "roomId": "rear-support-west",
       "layer": "furniture",
       "referencePages": [
         114,
@@ -29852,7 +29852,7 @@
         116
       ],
       "status": "owner-walkthrough 2026-10 / described, not surveyed",
-      "notes": "Owner (live build): “the washer and dryer there should be only two. It should be in the room right by the linen rack versus in the back.” The one washer, against the laundry room’s west wall."
+      "notes": "Owner (live build): “the washer and dryer there should be only two”, and on the next build “this should be moved to the linen room”. The one washer, against the south wall of the linen room’s west bay, front to the north."
     },
     {
       "id": "access-linen-rack-1",
@@ -32279,23 +32279,23 @@
       "zoneId": "ot",
       "levelId": "ground",
       "position": [
-        7.096,
+        2.04,
         0,
-        -8.404
+        -7.462
       ],
-      "rotation": 1.5707963267948966,
+      "rotation": 3.141592653589793,
       "scale": [
         1,
         1,
         1
       ],
-      "roomId": "rear-support-center",
+      "roomId": "rear-support-west",
       "layer": "furniture",
       "referencePages": [
         92
       ],
       "status": "owner-walkthrough 2026-10 / described, not surveyed",
-      "notes": "Owner: one dryer beside the washer, against the laundry room’s west wall. Product and dimensions estimated."
+      "notes": "Owner: one dryer beside the washer, in the linen room against the south wall of its west bay. Product and dimensions estimated."
     },
     {
       "id": "owner-care-janitor-sink",
@@ -43435,8 +43435,17 @@
           "rear-wash-bay",
           "rear-support-east"
         ],
-        "change": "Owner’s corrections on the live build. An electrical room is enclosed in receiving’s north-west part behind the loading roll-up (new walls at x 10.0 and z −10.3, a switchboard and sub-panel, a 0.9 m door from receiving at its south-east corner); the roll-up stays down. Both deliveries come in through the small service door beside the roll-up, widened from 0.75 m to 0.9 m (x 10.11–11.01, the roll-up opening narrowed 7 cm to meet it), and down the strip east of the electrical room: the food trolley on to the kitchen, the package driver to a hand-over point just inside. One washer and one dryer stand against the west wall of the plan’s laundry room next to the clean linen, with the laundry aide in front of them and the mop sink and housekeeping cart in its south end (the second washer is gone). The wheelchair wash (pad, hose reel, parked chair) is in the bay of the west corridor across from the linen room’s door, backing onto the laundry room’s wall. The plan’s east nook is storage with three racks.",
-        "unresolved": "“The room right by the linen rack” is read as the plan’s laundry room, whose door is on the corridor east of it rather than on the linen room’s corridor (if the as-built laundry opens toward the linen room, a door through the wall between them is needed, not modeled). “Opposite the entrance to the linen room and the washing machine room” is read as the corridor bay across from the linen room’s door; a pad in the east corridor would have blocked the food trolley’s lane. The service door’s true width is not measured: 0.9 m is the standard single leaf and the most the photographed frame allows; the exterior’s roll-up curtain is still drawn 2.58 m wide and laps the door’s west jamb by 7 cm when down. The electrical room’s size, door and panel positions are assumed."
+        "change": "Owner’s corrections on the live build. An electrical room is enclosed in receiving’s north-west part behind the loading roll-up (new walls at x 10.0 and z −10.3, a switchboard and sub-panel, a 0.9 m door from receiving at its south-east corner); the roll-up stays down. Both deliveries come in through the small service door beside the roll-up, widened from 0.75 m to 0.9 m (x 10.11–11.01, the roll-up opening narrowed 7 cm to meet it), and down the strip east of the electrical room: the food trolley on to the kitchen, the package driver to a hand-over point just inside. One washer and one dryer (the second washer is gone; see care-rooms-8c for where they stand). The wheelchair wash (pad, hose reel, parked chair) is in the bay of the west corridor across from the linen room’s door, backing onto the plan’s laundry room. The plan’s east nook is storage with three racks.",
+        "unresolved": "“Opposite the entrance to the linen room and the washing machine room” is read as the corridor bay across from the linen room’s door; a pad in the east corridor would have blocked the food trolley’s lane. The service door’s true width is not measured: 0.9 m is the standard single leaf and the most the photographed frame allows; the exterior’s roll-up curtain is still drawn 2.58 m wide and laps the door’s west jamb by 7 cm when down. The electrical room’s size, door and panel positions are assumed."
+      },
+      {
+        "id": "care-rooms-8c-laundry-in-linen-room",
+        "rooms": [
+          "rear-support-west",
+          "rear-support-center"
+        ],
+        "change": "Owner’s comment on the live build, “this should be moved to the linen room”: the washer and dryer stand side by side against the south wall of the linen room’s west bay, fronts north, just inside its door from the west corridor, with the laundry aide in front of them. The plan’s laundry room next door keeps the mop sink and housekeeping cart and is named Housekeeping.",
+        "unresolved": "The comment was pinned to the 3D view, not to an object; it is read as the washer and dryer, which the previous build had put in the plan’s laundry room as an assumption. Their wall within the linen room is assumed (the south wall of the west bay is the only free run long enough for both). Whether the mop sink belongs with them is not known."
       },
       {
         "id": "rehab-bikes",

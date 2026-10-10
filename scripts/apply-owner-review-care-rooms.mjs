@@ -22,12 +22,14 @@
 // storage. So: new plan walls enclose the electrical room (a switchboard and a
 // sub-panel inside, a door from receiving), the service door is widened to a
 // standard 0.9 m leaf and both deliveries' routes go through it and down the
-// strip east of the electrical room; the washer and dryer stand against the
-// laundry room's west wall with the laundry aide in front of them and the mop
-// sink and housekeeping cart in its far corner; the wash pad, hose reel and
-// parked chair are in the bay of the west corridor across from the linen
-// room's door (the bay backs onto the laundry room's wall); three storage
-// racks fill the east nook. Unchanged from the first pass: the linen room keeps
+// strip east of the electrical room; the wash pad, hose reel and parked
+// chair are in the bay of the west corridor across from the linen room's door
+// (the bay backs onto the plan's laundry room); three storage racks fill the
+// east nook. A later comment on the live build ("this should be moved to the
+// linen room") put the washer and dryer in the clean linen room itself:
+// against the south wall of its west bay, by its door from the west corridor,
+// with the laundry aide in front of them; the plan's laundry room keeps the
+// mop sink and housekeeping cart as housekeeping. Unchanged from the first pass: the linen room keeps
 // three racks, the rear employee door opens into the trash enclosure (bins
 // instead of the plan's counter), and the two personal-care rooms are
 // re-planned (east room hair-wash basin and chair in the northwest corner,
@@ -366,26 +368,27 @@ place('owner-care-switchboard', 'owner-care-switchboard', 'rear-electrical', [r3
 place('owner-care-sub-panel', 'owner-care-sub-panel', 'rear-electrical', [r3(WEST_FACE + 0.08 + 0.005), 1.0, -11.3], HALF,
   'Sub-panel beside the switchboard. Illustrative.', { layer: 'architecture' });
 
-// The laundry: the plan's laundry room next to the clean linen (entered from
-// the corridor east of it), with one washer and one dryer against its west
-// wall, fronts east, the laundry aide in front of them, and the mop sink and
-// housekeeping cart in its south end.
+// The laundry: one washer and one dryer in the clean linen room (the owner's
+// comment on the live build, "this should be moved to the linen room"),
+// against the south wall of its west bay, fronts north, just inside its door
+// from the west corridor; the laundry aide stands in front of them. The plan's
+// laundry room next door keeps the mop sink and housekeeping cart.
 const L_WEST = WEST_FACE,
-  L_NORTH = r3(wall('plan-wall-090').a[1] + face('plan-wall-090')),
   L_SOUTH = r3(wall('plan-wall-093').a[1] - face('plan-wall-093')),
-  L_X = r3(L_WEST + 0.36 + 0.02),
-  WASHER_Z = r3(L_NORTH + 0.34 + 0.03),
-  DRYER_Z = r3(WASHER_Z + 0.68 + 0.06);
-move('access-washing-machine-1', [L_X, 0, WASHER_Z], HALF, 'rear-support-center',
-  'Owner (live build): “the washer and dryer there should be only two. It should be in the room right by the linen rack versus in the back.” The one washer, against the laundry room’s west wall.');
+  LINEN_SOUTH = r3(wall('plan-wall-092').a[1] - face('plan-wall-092')),
+  MACHINE_Z = r3(LINEN_SOUTH - 0.36 - 0.03),
+  WASHER_X = 1.3,
+  DRYER_X = r3(WASHER_X + 0.68 + 0.06);
+move('access-washing-machine-1', [WASHER_X, 0, MACHINE_Z], PI, 'rear-support-west',
+  'Owner (live build): “the washer and dryer there should be only two”, and on the next build “this should be moved to the linen room”. The one washer, against the south wall of the linen room’s west bay, front to the north.');
 m.assets['owner-care-tumble-dryer'] = {
   kind: 'tumble-dryer',
   dimensions: [0.68, 0.92, 0.72],
   material: 'photo-white',
   parameters: {},
 };
-place('access-dryer', 'owner-care-tumble-dryer', 'rear-support-center', [L_X, 0, DRYER_Z], HALF,
-  'Owner: one dryer beside the washer, against the laundry room’s west wall. Product and dimensions estimated.');
+place('access-dryer', 'owner-care-tumble-dryer', 'rear-support-west', [DRYER_X, 0, MACHINE_Z], PI,
+  'Owner: one dryer beside the washer, in the linen room against the south wall of its west bay. Product and dimensions estimated.');
 m.assets['owner-care-janitor-sink'] = { kind: 'janitor-sink', dimensions: [0.65, 1.3, 0.65], material: 'photo-white', parameters: {} };
 m.assets['owner-care-housekeeping-cart'] = { kind: 'housekeeping-cart', dimensions: [0.55, 1.05, 1.1], material: 'photo-mustard', parameters: {} };
 place('owner-care-janitor-sink', 'owner-care-janitor-sink', 'rear-support-center',
@@ -396,8 +399,8 @@ place('owner-care-housekeeping-cart', 'owner-care-housekeeping-cart', 'rear-supp
   'Housekeeping cart parked along the laundry room’s south wall. Illustrative.');
 rename(
   'rear-support-center',
-  'Laundry',
-  'Owner review 2026-10 (live build): the laundry is “in the room right by the linen rack versus in the back”: one washer and one dryer against the west wall; the mop sink and housekeeping cart share the south end. Entered from the corridor east of it (the plan’s door).',
+  'Housekeeping',
+  'Owner review 2026-10: the plan’s laundry room. The washer and dryer moved to the linen room (the owner’s comment on the live build, “this should be moved to the linen room”); the mop sink and housekeeping cart stay in its south end. Entered from the corridor east of it (the plan’s door).',
 );
 
 // The wheelchair wash: the bay of the west corridor across from the linen
@@ -461,7 +464,7 @@ const LINEN_Z = r3(-10.328415 + face('plan-wall-087') + 0.24 + 0.02),
 move('access-linen-rack-1', [0.86, 0, LINEN_Z], 0, 'rear-support-west', 'Owner: “there are three racks instead”. Along the north wall of the west bay.');
 move('access-linen-rack-2', [LINEN_WEST_X, 0, -8.3], HALF, 'rear-support-west', 'Owner: three racks. Along the west wall (two do not fit along the north wall).');
 move('access-linen-rack-3', [3.99, 0, LINEN_Z], 0, 'rear-support-west', 'Owner: three racks. Along the north wall of the northeast bay, clear of its walls.');
-rename('rear-support-west', 'Clean linen room', 'Owner review 2026-10: the linen room with three racks; its existing doors (from the northeast bay and from the west corridor) are kept, the owner’s “another door leading to the linen room” read as the door between its two bays. The wheelchair wash is across the corridor from its east door and the laundry is the room beyond that bay.');
+rename('rear-support-west', 'Linen room & laundry', 'Owner review 2026-10: the linen room with three racks, and the washer and dryer against the south wall of its west bay by the door from the west corridor (the owner’s comment on the live build, “this should be moved to the linen room”); its existing doors (from the northeast bay and from the west corridor) are kept, the owner’s “another door leading to the linen room” read as the door between its two bays. The wheelchair wash is across the corridor from its east door.');
 
 // Trash enclosure: wheeled bins instead of the plan's counter.
 m.assets['owner-care-waste-bin'] = { kind: 'waste-bin', dimensions: [0.7, 1.2, 0.8], material: 'photo-black', materials: { lid: 'photo-blue-grey' }, parameters: { bin: 'trash' } };
@@ -534,6 +537,7 @@ for (const [p, id] of [
   [[11, -13], 'rear-north'],
   [[8, -10], 'rear-north'],
   [[8, -8.5], 'rear-support-center'],
+  [[1.3, -8.2], 'rear-support-west'],
   [[6.0, -7.9], 'rear-wash-bay'],
   [[13.5, -10.8], 'rear-support-east'],
 ])
@@ -570,11 +574,19 @@ review.items.push(
     id: 'care-rooms-8b-back-of-house-live-build',
     rooms: ['rear-electrical', 'rear-north', 'rear-support-center', 'rear-wash-bay', 'rear-support-east'],
     change:
-      'Owner’s corrections on the live build. An electrical room is enclosed in receiving’s north-west part behind the loading roll-up (new walls at x 10.0 and z −10.3, a switchboard and sub-panel, a 0.9 m door from receiving at its south-east corner); the roll-up stays down. Both deliveries come in through the small service door beside the roll-up, widened from 0.75 m to 0.9 m (x 10.11–11.01, the roll-up opening narrowed 7 cm to meet it), and down the strip east of the electrical room: the food trolley on to the kitchen, the package driver to a hand-over point just inside. One washer and one dryer stand against the west wall of the plan’s laundry room next to the clean linen, with the laundry aide in front of them and the mop sink and housekeeping cart in its south end (the second washer is gone). The wheelchair wash (pad, hose reel, parked chair) is in the bay of the west corridor across from the linen room’s door, backing onto the laundry room’s wall. The plan’s east nook is storage with three racks.',
+      'Owner’s corrections on the live build. An electrical room is enclosed in receiving’s north-west part behind the loading roll-up (new walls at x 10.0 and z −10.3, a switchboard and sub-panel, a 0.9 m door from receiving at its south-east corner); the roll-up stays down. Both deliveries come in through the small service door beside the roll-up, widened from 0.75 m to 0.9 m (x 10.11–11.01, the roll-up opening narrowed 7 cm to meet it), and down the strip east of the electrical room: the food trolley on to the kitchen, the package driver to a hand-over point just inside. One washer and one dryer (the second washer is gone; see care-rooms-8c for where they stand). The wheelchair wash (pad, hose reel, parked chair) is in the bay of the west corridor across from the linen room’s door, backing onto the plan’s laundry room. The plan’s east nook is storage with three racks.',
     unresolved:
-      '“The room right by the linen rack” is read as the plan’s laundry room, whose door is on the corridor east of it rather than on the linen room’s corridor (if the as-built laundry opens toward the linen room, a door through the wall between them is needed, not modeled). “Opposite the entrance to the linen room and the washing machine room” is read as the corridor bay across from the linen room’s door; a pad in the east corridor would have blocked the food trolley’s lane. The service door’s true width is not measured: 0.9 m is the standard single leaf and the most the photographed frame allows; the exterior’s roll-up curtain is still drawn 2.58 m wide and laps the door’s west jamb by 7 cm when down. The electrical room’s size, door and panel positions are assumed.',
+      '“Opposite the entrance to the linen room and the washing machine room” is read as the corridor bay across from the linen room’s door; a pad in the east corridor would have blocked the food trolley’s lane. The service door’s true width is not measured: 0.9 m is the standard single leaf and the most the photographed frame allows; the exterior’s roll-up curtain is still drawn 2.58 m wide and laps the door’s west jamb by 7 cm when down. The electrical room’s size, door and panel positions are assumed.',
   },
 );
+review.items.push({
+  id: 'care-rooms-8c-laundry-in-linen-room',
+  rooms: ['rear-support-west', 'rear-support-center'],
+  change:
+    'Owner’s comment on the live build, “this should be moved to the linen room”: the washer and dryer stand side by side against the south wall of the linen room’s west bay, fronts north, just inside its door from the west corridor, with the laundry aide in front of them. The plan’s laundry room next door keeps the mop sink and housekeeping cart and is named Housekeeping.',
+  unresolved:
+    'The comment was pinned to the 3D view, not to an object; it is read as the washer and dryer, which the previous build had put in the plan’s laundry room as an assumption. Their wall within the linen room is assumed (the south wall of the west bay is the only free run long enough for both). Whether the mop sink belongs with them is not known.',
+});
 writeFileSync(MODEL, JSON.stringify(m, null, 2) + '\n');
 
 // --- The loop ---------------------------------------------------------------
@@ -641,19 +653,19 @@ for (const title of ['Escort to occupational therapy', 'Escort to supported acti
 }
 assert.equal(actor('arrival-wheelchair').segments.length, actor('arrival-aide-b').segments.length);
 
-// (8) The laundry aide works in front of the washer and dryer in the laundry
-// room, facing them.
+// (8) The laundry aide works in front of the washer and dryer in the linen
+// room, facing them (south).
 {
   const a = actor('community-52'),
-    at = [7.95, -8.75];
-  assert.ok(inRoom(at, 'rear-support-center'));
+    at = [1.3, -8.2];
+  assert.ok(inRoom(at, 'rear-support-west'));
   const q = nav.measurePoint(grid, at);
   assert.ok(q.wallMargin >= 0.28 && q.obstacleExcess + nav.FURNITURE_CLEARANCE >= 0.28, 'the laundry aide stands 0.28 m clear of the walls and the machines');
   for (const s of a.segments) {
     s.path = [at, at];
-    s.heading = -HALF;
+    s.heading = 0;
   }
-  a.roomId = 'rear-support-center';
+  a.roomId = 'rear-support-west';
 }
 // The hair-care participant sits in the barber chair (the chair's own seat
 // heading) except while the story's hero has it (12:25 PM, day-in-the-life

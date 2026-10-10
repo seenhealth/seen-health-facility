@@ -18152,7 +18152,7 @@
       "offDuty": 0.18632478632478633
      },
      "onFloorSeconds": 7616,
-     "meanWalkMeters": 83.8755556444683
+     "meanWalkMeters": 83.87095306731638
     },
     {
      "role": "nurse",
@@ -20809,7 +20809,7 @@
       "waiting": 78,
       "offSite": 115
      },
-     "walkMeters": 434.32720808415456
+     "walkMeters": 434.2696775400363
     },
     {
      "id": "optometry-participant",
@@ -21437,7 +21437,7 @@
       "waiting": 78,
       "offSite": 115
      },
-     "walkMeters": 434.32720808415456
+     "walkMeters": 434.2696775400363
     },
     "touchpoints": [
      {
@@ -21584,7 +21584,7 @@
      }
     ],
     "disciplinesSeen": 11,
-    "walkMeters": 434.32720808415456
+    "walkMeters": 434.2696775400363
    },
    "handoffs": {
     "total": 15,

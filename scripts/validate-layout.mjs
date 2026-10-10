@@ -148,8 +148,8 @@ for (const id of [
   'access-shower-east',
   'access-barber-chair',
   'access-hair-wash',
-  // Owner review 2026-10 (care-rooms): one washer and a dryer, in the laundry
-  // room by the clean linen (the second washer is gone).
+  // Owner review 2026-10 (care-rooms): one washer and a dryer, in the linen
+  // room (the second washer is gone).
   'access-washing-machine-1',
   'access-dryer',
 ]) {
