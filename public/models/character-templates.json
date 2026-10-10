@@ -1248,28 +1248,6 @@
       "height": 1.06
     },
     {
-      "id": "community-57",
-      "role": "participant",
-      "appearance": 0,
-      "skin": "#9b684c",
-      "hair": "#f2eee5",
-      "hairStyle": 0,
-      "glasses": false,
-      "accent": "#487b89",
-      "height": 0.91
-    },
-    {
-      "id": "community-58",
-      "role": "participant",
-      "appearance": 1,
-      "skin": "#f2c9a4",
-      "hair": "#3d3531",
-      "hairStyle": 1,
-      "glasses": true,
-      "accent": "#d8988c",
-      "height": 0.935
-    },
-    {
       "id": "community-59",
       "role": "aide",
       "appearance": 2,
@@ -2297,7 +2275,7 @@
       "cut": "cardigan"
     },
     {
-      "id": "community-71",
+      "id": "community-99",
       "role": "participant",
       "appearance": 5,
       "skin": "#d9a67f",
@@ -2306,6 +2284,208 @@
       "glasses": true,
       "accent": "#8a5a3a",
       "height": 0.95
+    },
+    {
+      "id": "community-57",
+      "role": "activities",
+      "appearance": 0,
+      "skin": "#dcae8b",
+      "hair": "#3d3531",
+      "hairStyle": 2,
+      "glasses": false,
+      "accent": "#D4846A",
+      "height": 1,
+      "figure": "f"
+    },
+    {
+      "id": "community-58",
+      "role": "activities",
+      "appearance": 1,
+      "skin": "#f2c9a4",
+      "hair": "#231f1c",
+      "hairStyle": 1,
+      "glasses": true,
+      "accent": "#D4846A",
+      "height": 1.02,
+      "figure": "m"
+    },
+    {
+      "id": "community-60",
+      "role": "activities",
+      "appearance": 3,
+      "skin": "#c08a61",
+      "hair": "#231f1c",
+      "hairStyle": 5,
+      "glasses": false,
+      "accent": "#D4846A",
+      "height": 0.99,
+      "figure": "f"
+    },
+    {
+      "id": "community-61",
+      "role": "activities",
+      "appearance": 5,
+      "skin": "#9b684c",
+      "hair": "#3d3531",
+      "hairStyle": 3,
+      "glasses": false,
+      "accent": "#D4846A",
+      "height": 1.03,
+      "figure": "m"
+    },
+    {
+      "id": "community-62",
+      "role": "participant",
+      "appearance": 2,
+      "skin": "#74503d",
+      "hair": "#f2eee5",
+      "hairStyle": 0,
+      "glasses": false,
+      "accent": "#627ea6",
+      "height": 0.96
+    },
+    {
+      "id": "community-63",
+      "role": "participant",
+      "appearance": 4,
+      "skin": "#c08a61",
+      "hair": "#b5b2aa",
+      "hairStyle": 1,
+      "glasses": true,
+      "accent": "#a5667c",
+      "height": 0.93
+    },
+    {
+      "id": "community-64",
+      "role": "participant",
+      "appearance": 6,
+      "skin": "#9b684c",
+      "hair": "#8a8178",
+      "hairStyle": 2,
+      "glasses": false,
+      "accent": "#a6ad77",
+      "height": 0.91
+    },
+    {
+      "id": "community-65",
+      "role": "participant",
+      "appearance": 7,
+      "skin": "#dcae8b",
+      "hair": "#d0cbbb",
+      "hairStyle": 3,
+      "glasses": false,
+      "accent": "#7997a6",
+      "height": 1.01
+    },
+    {
+      "id": "community-66",
+      "role": "participant",
+      "appearance": 1,
+      "skin": "#e9b18a",
+      "hair": "#3d3531",
+      "hairStyle": 4,
+      "glasses": false,
+      "accent": "#aa7287",
+      "height": 0.985
+    },
+    {
+      "id": "community-67",
+      "role": "participant",
+      "appearance": 3,
+      "skin": "#74503d",
+      "hair": "#f2eee5",
+      "hairStyle": 2,
+      "glasses": true,
+      "accent": "#8c7b9e",
+      "height": 0.95
+    },
+    {
+      "id": "community-68",
+      "role": "participant",
+      "appearance": 5,
+      "skin": "#c08a61",
+      "hair": "#8a8178",
+      "hairStyle": 0,
+      "glasses": false,
+      "accent": "#a6ac7e",
+      "height": 1.035
+    },
+    {
+      "id": "community-69",
+      "role": "participant",
+      "appearance": 0,
+      "skin": "#f2c9a4",
+      "hair": "#b5b2aa",
+      "hairStyle": 1,
+      "glasses": false,
+      "accent": "#487b89",
+      "height": 0.92
+    },
+    {
+      "id": "community-70",
+      "role": "participant",
+      "appearance": 8,
+      "skin": "#9b684c",
+      "hair": "#f2eee5",
+      "hairStyle": 2,
+      "glasses": false,
+      "accent": "#d0ae66",
+      "height": 0.94
+    },
+    {
+      "id": "community-71",
+      "role": "participant",
+      "appearance": 2,
+      "skin": "#dcae8b",
+      "hair": "#8a8178",
+      "hairStyle": 3,
+      "glasses": true,
+      "accent": "#627ea6",
+      "height": 0.985
+    },
+    {
+      "id": "community-72",
+      "role": "participant",
+      "appearance": 4,
+      "skin": "#74503d",
+      "hair": "#b5b2aa",
+      "hairStyle": 0,
+      "glasses": false,
+      "accent": "#a5667c",
+      "height": 0.91
+    },
+    {
+      "id": "community-73",
+      "role": "participant",
+      "appearance": 6,
+      "skin": "#c08a61",
+      "hair": "#3d3531",
+      "hairStyle": 1,
+      "glasses": false,
+      "accent": "#7997a6",
+      "height": 1.01
+    },
+    {
+      "id": "community-74",
+      "role": "participant",
+      "appearance": 1,
+      "skin": "#e9b18a",
+      "hair": "#d0cbbb",
+      "hairStyle": 2,
+      "glasses": false,
+      "accent": "#aa7287",
+      "height": 0.96
+    },
+    {
+      "id": "community-75",
+      "role": "participant",
+      "appearance": 3,
+      "skin": "#9b684c",
+      "hair": "#f2eee5",
+      "hairStyle": 4,
+      "glasses": true,
+      "accent": "#a6ad77",
+      "height": 0.935
     },
     {
       "id": "rehab-rider-02",

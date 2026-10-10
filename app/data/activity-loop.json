@@ -3,7 +3,7 @@
   "duration": 720,
   "dayStartMinutes": 480,
   "dayDurationMinutes": 480,
-  "description": "184 individual people, with most day-center and dining seats occupied, concurrent cultural activities with guest instructors, table games and crafts, care, meals and transport.",
+  "description": "207 individual people, with most day-center and dining seats occupied, concurrent cultural activities with guest instructors, table games and crafts, care, meals and transport.",
   "timing": "Twelve-minute repeating overview of a representative 8 AM\u20134 PM care day. Playback time is compressed and all visit times are illustrative.",
   "navigation": {
     "cellSize": 0.2,
@@ -20435,334 +20435,6 @@
       "roomId": "admin-side-office"
     },
     {
-      "id": "community-57",
-      "label": "Welcome & conversation",
-      "role": "participant",
-      "variant": 97,
-      "profileId": "community-57",
-      "offset": 32,
-      "levelId": "ground",
-      "segments": [
-        {
-          "start": 0,
-          "end": 90,
-          "action": "greet",
-          "path": [
-            [
-              -5.5,
-              4.7
-            ],
-            [
-              -5.5,
-              4.7
-            ]
-          ],
-          "zoneId": "lobby",
-          "heading": 1.5707963267948966,
-          "seated": false,
-          "title": "Welcome & conversation"
-        },
-        {
-          "start": 90,
-          "end": 180,
-          "action": "greet",
-          "path": [
-            [
-              -5.5,
-              4.7
-            ],
-            [
-              -5.5,
-              4.7
-            ]
-          ],
-          "zoneId": "lobby",
-          "heading": 1.5707963267948966,
-          "seated": false,
-          "title": "Welcome & conversation"
-        },
-        {
-          "start": 180,
-          "end": 270,
-          "action": "greet",
-          "path": [
-            [
-              -5.5,
-              4.7
-            ],
-            [
-              -5.5,
-              4.7
-            ]
-          ],
-          "zoneId": "lobby",
-          "heading": 1.5707963267948966,
-          "seated": false,
-          "title": "Welcome & conversation"
-        },
-        {
-          "start": 270,
-          "end": 360,
-          "action": "greet",
-          "path": [
-            [
-              -5.5,
-              4.7
-            ],
-            [
-              -5.5,
-              4.7
-            ]
-          ],
-          "zoneId": "lobby",
-          "heading": 1.5707963267948966,
-          "seated": false,
-          "title": "Welcome & conversation"
-        },
-        {
-          "start": 360,
-          "end": 450,
-          "action": "greet",
-          "path": [
-            [
-              -5.5,
-              4.7
-            ],
-            [
-              -5.5,
-              4.7
-            ]
-          ],
-          "zoneId": "lobby",
-          "heading": 1.5707963267948966,
-          "seated": false,
-          "title": "Welcome & conversation"
-        },
-        {
-          "start": 450,
-          "end": 540,
-          "action": "greet",
-          "path": [
-            [
-              -5.5,
-              4.7
-            ],
-            [
-              -5.5,
-              4.7
-            ]
-          ],
-          "zoneId": "lobby",
-          "heading": 1.5707963267948966,
-          "seated": false,
-          "title": "Welcome & conversation"
-        },
-        {
-          "start": 540,
-          "end": 630,
-          "action": "greet",
-          "path": [
-            [
-              -5.5,
-              4.7
-            ],
-            [
-              -5.5,
-              4.7
-            ]
-          ],
-          "zoneId": "lobby",
-          "heading": 1.5707963267948966,
-          "seated": false,
-          "title": "Welcome & conversation"
-        },
-        {
-          "start": 630,
-          "end": 720,
-          "action": "greet",
-          "path": [
-            [
-              -5.5,
-              4.7
-            ],
-            [
-              -5.5,
-              4.7
-            ]
-          ],
-          "zoneId": "lobby",
-          "heading": 1.5707963267948966,
-          "seated": false,
-          "title": "Welcome & conversation"
-        }
-      ],
-      "roomId": "lobby-office-c3"
-    },
-    {
-      "id": "community-58",
-      "label": "Welcome & conversation",
-      "role": "participant",
-      "variant": 98,
-      "profileId": "community-58",
-      "offset": 39,
-      "levelId": "ground",
-      "segments": [
-        {
-          "start": 0,
-          "end": 90,
-          "action": "greet",
-          "path": [
-            [
-              -6.439529,
-              4.725369999999999
-            ],
-            [
-              -6.439529,
-              4.725369999999999
-            ]
-          ],
-          "zoneId": "lobby",
-          "heading": -1.5707963267948966,
-          "seated": false,
-          "title": "Welcome & conversation"
-        },
-        {
-          "start": 90,
-          "end": 180,
-          "action": "greet",
-          "path": [
-            [
-              -6.439529,
-              4.725369999999999
-            ],
-            [
-              -6.439529,
-              4.725369999999999
-            ]
-          ],
-          "zoneId": "lobby",
-          "heading": -1.5707963267948966,
-          "seated": false,
-          "title": "Welcome & conversation"
-        },
-        {
-          "start": 180,
-          "end": 270,
-          "action": "greet",
-          "path": [
-            [
-              -6.439529,
-              4.725369999999999
-            ],
-            [
-              -6.439529,
-              4.725369999999999
-            ]
-          ],
-          "zoneId": "lobby",
-          "heading": -1.5707963267948966,
-          "seated": false,
-          "title": "Welcome & conversation"
-        },
-        {
-          "start": 270,
-          "end": 360,
-          "action": "greet",
-          "path": [
-            [
-              -6.439529,
-              4.725369999999999
-            ],
-            [
-              -6.439529,
-              4.725369999999999
-            ]
-          ],
-          "zoneId": "lobby",
-          "heading": -1.5707963267948966,
-          "seated": false,
-          "title": "Welcome & conversation"
-        },
-        {
-          "start": 360,
-          "end": 450,
-          "action": "greet",
-          "path": [
-            [
-              -6.439529,
-              4.725369999999999
-            ],
-            [
-              -6.439529,
-              4.725369999999999
-            ]
-          ],
-          "zoneId": "lobby",
-          "heading": -1.5707963267948966,
-          "seated": false,
-          "title": "Welcome & conversation"
-        },
-        {
-          "start": 450,
-          "end": 540,
-          "action": "greet",
-          "path": [
-            [
-              -6.439529,
-              4.725369999999999
-            ],
-            [
-              -6.439529,
-              4.725369999999999
-            ]
-          ],
-          "zoneId": "lobby",
-          "heading": -1.5707963267948966,
-          "seated": false,
-          "title": "Welcome & conversation"
-        },
-        {
-          "start": 540,
-          "end": 630,
-          "action": "greet",
-          "path": [
-            [
-              -6.439529,
-              4.725369999999999
-            ],
-            [
-              -6.439529,
-              4.725369999999999
-            ]
-          ],
-          "zoneId": "lobby",
-          "heading": -1.5707963267948966,
-          "seated": false,
-          "title": "Welcome & conversation"
-        },
-        {
-          "start": 630,
-          "end": 720,
-          "action": "greet",
-          "path": [
-            [
-              -6.439529,
-              4.725369999999999
-            ],
-            [
-              -6.439529,
-              4.725369999999999
-            ]
-          ],
-          "zoneId": "lobby",
-          "heading": -1.5707963267948966,
-          "seated": false,
-          "title": "Welcome & conversation"
-        }
-      ],
-      "roomId": "lobby-office-c3"
-    },
-    {
       "id": "community-59",
       "label": "Welcome & conversation",
       "role": "aide",
@@ -32115,13 +31787,13 @@
       "profileId": "instructor-tea"
     },
     {
-      "id": "community-71",
+      "id": "community-99",
       "role": "participant",
       "variant": 99,
       "label": "Karaoke \u00b7 duet partner",
       "offset": 24,
       "levelId": "ground",
-      "profileId": "community-71",
+      "profileId": "community-99",
       "roomId": "admin-conference",
       "segments": [
         {
@@ -32277,6 +31949,4713 @@
           "title": "Karaoke \u00b7 singer (duet)"
         }
       ]
+    },
+    {
+      "id": "community-57",
+      "role": "activities",
+      "variant": 320,
+      "label": "Recreation therapist",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "community-57",
+      "segments": [
+        {
+          "start": 0,
+          "end": 20,
+          "action": "document",
+          "path": [
+            [
+              -5.842,
+              5.5
+            ],
+            [
+              -5.842,
+              5.5
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": -1.571,
+          "title": "Planning the week\u2019s activities"
+        },
+        {
+          "start": 20,
+          "end": 34.9403,
+          "action": "walk",
+          "path": [
+            [
+              -5.842,
+              5.5
+            ],
+            [
+              -5.8,
+              5.4
+            ],
+            [
+              -5.6,
+              5.6
+            ],
+            [
+              -5.4,
+              5.6
+            ],
+            [
+              -4.2,
+              6.8
+            ],
+            [
+              -3.6,
+              6.8
+            ],
+            [
+              -3.4,
+              7
+            ],
+            [
+              -3.4,
+              7.8
+            ],
+            [
+              -2.8,
+              8.4
+            ],
+            [
+              -1.2,
+              8.4
+            ],
+            [
+              -0.6,
+              9
+            ],
+            [
+              -0.6,
+              9.8
+            ],
+            [
+              -0.4,
+              10
+            ],
+            [
+              0.6,
+              10
+            ],
+            [
+              0.8,
+              10.2
+            ],
+            [
+              1.2,
+              10.2
+            ],
+            [
+              1.4,
+              10.4
+            ],
+            [
+              1.3,
+              10.3
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": 0,
+          "title": "Out to the day room"
+        },
+        {
+          "start": 34.9403,
+          "end": 84.9403,
+          "action": "consult",
+          "path": [
+            [
+              1.3,
+              10.3
+            ],
+            [
+              1.3,
+              10.3
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 1.41,
+          "title": "Checking in on the chess players"
+        },
+        {
+          "start": 84.9403,
+          "end": 99.8806,
+          "action": "walk",
+          "path": [
+            [
+              1.3,
+              10.3
+            ],
+            [
+              1.4,
+              10.4
+            ],
+            [
+              1.2,
+              10.2
+            ],
+            [
+              0.8,
+              10.2
+            ],
+            [
+              0.6,
+              10
+            ],
+            [
+              -0.4,
+              10
+            ],
+            [
+              -0.6,
+              9.8
+            ],
+            [
+              -0.6,
+              9
+            ],
+            [
+              -1.2,
+              8.4
+            ],
+            [
+              -2.8,
+              8.4
+            ],
+            [
+              -3.4,
+              7.8
+            ],
+            [
+              -3.4,
+              7
+            ],
+            [
+              -3.6,
+              6.8
+            ],
+            [
+              -4.2,
+              6.8
+            ],
+            [
+              -5.4,
+              5.6
+            ],
+            [
+              -5.6,
+              5.6
+            ],
+            [
+              -5.8,
+              5.4
+            ],
+            [
+              -5.842,
+              5.5
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 0,
+          "title": "Back to the office"
+        },
+        {
+          "start": 99.8806,
+          "end": 310,
+          "action": "document",
+          "path": [
+            [
+              -5.842,
+              5.5
+            ],
+            [
+              -5.842,
+              5.5
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": -1.571,
+          "title": "Planning the week\u2019s activities"
+        },
+        {
+          "start": 310,
+          "end": 324.9403,
+          "action": "walk",
+          "path": [
+            [
+              -5.842,
+              5.5
+            ],
+            [
+              -5.8,
+              5.4
+            ],
+            [
+              -5.6,
+              5.6
+            ],
+            [
+              -5.4,
+              5.6
+            ],
+            [
+              -4.2,
+              6.8
+            ],
+            [
+              -3.6,
+              6.8
+            ],
+            [
+              -3.4,
+              7
+            ],
+            [
+              -3.4,
+              7.8
+            ],
+            [
+              -2.8,
+              8.4
+            ],
+            [
+              -1.2,
+              8.4
+            ],
+            [
+              -0.6,
+              9
+            ],
+            [
+              -0.6,
+              9.8
+            ],
+            [
+              -0.4,
+              10
+            ],
+            [
+              0.6,
+              10
+            ],
+            [
+              0.8,
+              10.2
+            ],
+            [
+              1.2,
+              10.2
+            ],
+            [
+              1.4,
+              10.4
+            ],
+            [
+              1.3,
+              10.3
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": 0,
+          "title": "Out to the day room"
+        },
+        {
+          "start": 324.9403,
+          "end": 374.9403,
+          "action": "consult",
+          "path": [
+            [
+              1.3,
+              10.3
+            ],
+            [
+              1.3,
+              10.3
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 1.41,
+          "title": "Checking in on the chess players"
+        },
+        {
+          "start": 374.9403,
+          "end": 389.8806,
+          "action": "walk",
+          "path": [
+            [
+              1.3,
+              10.3
+            ],
+            [
+              1.4,
+              10.4
+            ],
+            [
+              1.2,
+              10.2
+            ],
+            [
+              0.8,
+              10.2
+            ],
+            [
+              0.6,
+              10
+            ],
+            [
+              -0.4,
+              10
+            ],
+            [
+              -0.6,
+              9.8
+            ],
+            [
+              -0.6,
+              9
+            ],
+            [
+              -1.2,
+              8.4
+            ],
+            [
+              -2.8,
+              8.4
+            ],
+            [
+              -3.4,
+              7.8
+            ],
+            [
+              -3.4,
+              7
+            ],
+            [
+              -3.6,
+              6.8
+            ],
+            [
+              -4.2,
+              6.8
+            ],
+            [
+              -5.4,
+              5.6
+            ],
+            [
+              -5.6,
+              5.6
+            ],
+            [
+              -5.8,
+              5.4
+            ],
+            [
+              -5.842,
+              5.5
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 0,
+          "title": "Back to the office"
+        },
+        {
+          "start": 389.8806,
+          "end": 600,
+          "action": "document",
+          "path": [
+            [
+              -5.842,
+              5.5
+            ],
+            [
+              -5.842,
+              5.5
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": -1.571,
+          "title": "Planning the week\u2019s activities"
+        },
+        {
+          "start": 600,
+          "end": 614.9403,
+          "action": "walk",
+          "path": [
+            [
+              -5.842,
+              5.5
+            ],
+            [
+              -5.8,
+              5.4
+            ],
+            [
+              -5.6,
+              5.6
+            ],
+            [
+              -5.4,
+              5.6
+            ],
+            [
+              -4.2,
+              6.8
+            ],
+            [
+              -3.6,
+              6.8
+            ],
+            [
+              -3.4,
+              7
+            ],
+            [
+              -3.4,
+              7.8
+            ],
+            [
+              -2.8,
+              8.4
+            ],
+            [
+              -1.2,
+              8.4
+            ],
+            [
+              -0.6,
+              9
+            ],
+            [
+              -0.6,
+              9.8
+            ],
+            [
+              -0.4,
+              10
+            ],
+            [
+              0.6,
+              10
+            ],
+            [
+              0.8,
+              10.2
+            ],
+            [
+              1.2,
+              10.2
+            ],
+            [
+              1.4,
+              10.4
+            ],
+            [
+              1.3,
+              10.3
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": 0,
+          "title": "Out to the day room"
+        },
+        {
+          "start": 614.9403,
+          "end": 660.9403,
+          "action": "consult",
+          "path": [
+            [
+              1.3,
+              10.3
+            ],
+            [
+              1.3,
+              10.3
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 1.41,
+          "title": "Checking in on the chess players"
+        },
+        {
+          "start": 660.9403,
+          "end": 675.8806,
+          "action": "walk",
+          "path": [
+            [
+              1.3,
+              10.3
+            ],
+            [
+              1.4,
+              10.4
+            ],
+            [
+              1.2,
+              10.2
+            ],
+            [
+              0.8,
+              10.2
+            ],
+            [
+              0.6,
+              10
+            ],
+            [
+              -0.4,
+              10
+            ],
+            [
+              -0.6,
+              9.8
+            ],
+            [
+              -0.6,
+              9
+            ],
+            [
+              -1.2,
+              8.4
+            ],
+            [
+              -2.8,
+              8.4
+            ],
+            [
+              -3.4,
+              7.8
+            ],
+            [
+              -3.4,
+              7
+            ],
+            [
+              -3.6,
+              6.8
+            ],
+            [
+              -4.2,
+              6.8
+            ],
+            [
+              -5.4,
+              5.6
+            ],
+            [
+              -5.6,
+              5.6
+            ],
+            [
+              -5.8,
+              5.4
+            ],
+            [
+              -5.842,
+              5.5
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 0,
+          "title": "Back to the office"
+        },
+        {
+          "start": 675.8806,
+          "end": 720,
+          "action": "document",
+          "path": [
+            [
+              -5.842,
+              5.5
+            ],
+            [
+              -5.842,
+              5.5
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": -1.571,
+          "title": "Planning the week\u2019s activities"
+        }
+      ],
+      "roomId": "lobby-office-c3"
+    },
+    {
+      "id": "community-58",
+      "role": "activities",
+      "variant": 321,
+      "label": "Recreation therapist",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "community-58",
+      "segments": [
+        {
+          "start": 0,
+          "end": 60,
+          "action": "phone",
+          "path": [
+            [
+              -3.774,
+              3.9
+            ],
+            [
+              -3.774,
+              3.9
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": 1.571,
+          "title": "Calling families about next week\u2019s outings"
+        },
+        {
+          "start": 60,
+          "end": 75.7689,
+          "action": "walk",
+          "path": [
+            [
+              -3.774,
+              3.9
+            ],
+            [
+              -3.8,
+              3.8
+            ],
+            [
+              -4.4,
+              4.4
+            ],
+            [
+              -4.4,
+              6
+            ],
+            [
+              -3.6,
+              6.8
+            ],
+            [
+              -3.6,
+              8.4
+            ],
+            [
+              -3.2,
+              8.8
+            ],
+            [
+              -3.2,
+              12.2
+            ],
+            [
+              -3.4,
+              12.4
+            ],
+            [
+              -3.4,
+              12.8
+            ],
+            [
+              -3.6,
+              13
+            ],
+            [
+              -3.6,
+              13.4
+            ],
+            [
+              -3.8,
+              13.4
+            ],
+            [
+              -3.9,
+              13.2
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": 0,
+          "title": "Out to the day room"
+        },
+        {
+          "start": 75.7689,
+          "end": 125.7689,
+          "action": "consult",
+          "path": [
+            [
+              -3.9,
+              13.2
+            ],
+            [
+              -3.9,
+              13.2
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -0.94,
+          "title": "A word with the small-group table"
+        },
+        {
+          "start": 125.7689,
+          "end": 141.5377,
+          "action": "walk",
+          "path": [
+            [
+              -3.9,
+              13.2
+            ],
+            [
+              -3.8,
+              13.4
+            ],
+            [
+              -3.6,
+              13.4
+            ],
+            [
+              -3.6,
+              13
+            ],
+            [
+              -3.4,
+              12.8
+            ],
+            [
+              -3.4,
+              12.4
+            ],
+            [
+              -3.2,
+              12.2
+            ],
+            [
+              -3.2,
+              8.8
+            ],
+            [
+              -3.6,
+              8.4
+            ],
+            [
+              -3.6,
+              6.8
+            ],
+            [
+              -4.4,
+              6
+            ],
+            [
+              -4.4,
+              4.4
+            ],
+            [
+              -3.8,
+              3.8
+            ],
+            [
+              -3.774,
+              3.9
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Back to the office"
+        },
+        {
+          "start": 141.5377,
+          "end": 329,
+          "action": "phone",
+          "path": [
+            [
+              -3.774,
+              3.9
+            ],
+            [
+              -3.774,
+              3.9
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": 1.571,
+          "title": "Calling families about next week\u2019s outings"
+        },
+        {
+          "start": 329,
+          "end": 344.7689,
+          "action": "walk",
+          "path": [
+            [
+              -3.774,
+              3.9
+            ],
+            [
+              -3.8,
+              3.8
+            ],
+            [
+              -4.4,
+              4.4
+            ],
+            [
+              -4.4,
+              6
+            ],
+            [
+              -3.6,
+              6.8
+            ],
+            [
+              -3.6,
+              8.4
+            ],
+            [
+              -3.2,
+              8.8
+            ],
+            [
+              -3.2,
+              12.2
+            ],
+            [
+              -3.4,
+              12.4
+            ],
+            [
+              -3.4,
+              12.8
+            ],
+            [
+              -3.6,
+              13
+            ],
+            [
+              -3.6,
+              13.4
+            ],
+            [
+              -3.8,
+              13.4
+            ],
+            [
+              -3.9,
+              13.2
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": 0,
+          "title": "Out to the day room"
+        },
+        {
+          "start": 344.7689,
+          "end": 394.7689,
+          "action": "consult",
+          "path": [
+            [
+              -3.9,
+              13.2
+            ],
+            [
+              -3.9,
+              13.2
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -0.94,
+          "title": "A word with the small-group table"
+        },
+        {
+          "start": 394.7689,
+          "end": 410.5377,
+          "action": "walk",
+          "path": [
+            [
+              -3.9,
+              13.2
+            ],
+            [
+              -3.8,
+              13.4
+            ],
+            [
+              -3.6,
+              13.4
+            ],
+            [
+              -3.6,
+              13
+            ],
+            [
+              -3.4,
+              12.8
+            ],
+            [
+              -3.4,
+              12.4
+            ],
+            [
+              -3.2,
+              12.2
+            ],
+            [
+              -3.2,
+              8.8
+            ],
+            [
+              -3.6,
+              8.4
+            ],
+            [
+              -3.6,
+              6.8
+            ],
+            [
+              -4.4,
+              6
+            ],
+            [
+              -4.4,
+              4.4
+            ],
+            [
+              -3.8,
+              3.8
+            ],
+            [
+              -3.774,
+              3.9
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Back to the office"
+        },
+        {
+          "start": 410.5377,
+          "end": 597,
+          "action": "phone",
+          "path": [
+            [
+              -3.774,
+              3.9
+            ],
+            [
+              -3.774,
+              3.9
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": 1.571,
+          "title": "Calling families about next week\u2019s outings"
+        },
+        {
+          "start": 597,
+          "end": 612.7689,
+          "action": "walk",
+          "path": [
+            [
+              -3.774,
+              3.9
+            ],
+            [
+              -3.8,
+              3.8
+            ],
+            [
+              -4.4,
+              4.4
+            ],
+            [
+              -4.4,
+              6
+            ],
+            [
+              -3.6,
+              6.8
+            ],
+            [
+              -3.6,
+              8.4
+            ],
+            [
+              -3.2,
+              8.8
+            ],
+            [
+              -3.2,
+              12.2
+            ],
+            [
+              -3.4,
+              12.4
+            ],
+            [
+              -3.4,
+              12.8
+            ],
+            [
+              -3.6,
+              13
+            ],
+            [
+              -3.6,
+              13.4
+            ],
+            [
+              -3.8,
+              13.4
+            ],
+            [
+              -3.9,
+              13.2
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": 0,
+          "title": "Out to the day room"
+        },
+        {
+          "start": 612.7689,
+          "end": 652.7689,
+          "action": "consult",
+          "path": [
+            [
+              -3.9,
+              13.2
+            ],
+            [
+              -3.9,
+              13.2
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -0.94,
+          "title": "A word with the small-group table"
+        },
+        {
+          "start": 652.7689,
+          "end": 668.5377,
+          "action": "walk",
+          "path": [
+            [
+              -3.9,
+              13.2
+            ],
+            [
+              -3.8,
+              13.4
+            ],
+            [
+              -3.6,
+              13.4
+            ],
+            [
+              -3.6,
+              13
+            ],
+            [
+              -3.4,
+              12.8
+            ],
+            [
+              -3.4,
+              12.4
+            ],
+            [
+              -3.2,
+              12.2
+            ],
+            [
+              -3.2,
+              8.8
+            ],
+            [
+              -3.6,
+              8.4
+            ],
+            [
+              -3.6,
+              6.8
+            ],
+            [
+              -4.4,
+              6
+            ],
+            [
+              -4.4,
+              4.4
+            ],
+            [
+              -3.8,
+              3.8
+            ],
+            [
+              -3.774,
+              3.9
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Back to the office"
+        },
+        {
+          "start": 668.5377,
+          "end": 720,
+          "action": "phone",
+          "path": [
+            [
+              -3.774,
+              3.9
+            ],
+            [
+              -3.774,
+              3.9
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": 1.571,
+          "title": "Calling families about next week\u2019s outings"
+        }
+      ],
+      "roomId": "lobby-office-c3"
+    },
+    {
+      "id": "community-60",
+      "role": "activities",
+      "variant": 322,
+      "label": "Recreation therapist",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "community-60",
+      "segments": [
+        {
+          "start": 0,
+          "end": 100,
+          "action": "document",
+          "path": [
+            [
+              -5.842,
+              6.6
+            ],
+            [
+              -5.842,
+              6.6
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": -1.571,
+          "title": "Planning the week\u2019s activities"
+        },
+        {
+          "start": 100,
+          "end": 114.1353,
+          "action": "walk",
+          "path": [
+            [
+              -5.842,
+              6.6
+            ],
+            [
+              -5.8,
+              6.6
+            ],
+            [
+              -5.6,
+              6.8
+            ],
+            [
+              -3.6,
+              6.8
+            ],
+            [
+              -3.4,
+              7
+            ],
+            [
+              -3.4,
+              7.8
+            ],
+            [
+              -2.6,
+              8.6
+            ],
+            [
+              -1.2,
+              8.6
+            ],
+            [
+              -0.8,
+              9
+            ],
+            [
+              -0.6,
+              9
+            ],
+            [
+              -0.6,
+              9.8
+            ],
+            [
+              -0.4,
+              10
+            ],
+            [
+              0.6,
+              10
+            ],
+            [
+              0.8,
+              10.2
+            ],
+            [
+              1.2,
+              10.2
+            ],
+            [
+              1.4,
+              10.4
+            ],
+            [
+              1.3,
+              10.3
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": 0,
+          "title": "Out to the day room"
+        },
+        {
+          "start": 114.1353,
+          "end": 164.1353,
+          "action": "consult",
+          "path": [
+            [
+              1.3,
+              10.3
+            ],
+            [
+              1.3,
+              10.3
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 1.41,
+          "title": "Checking in on the chess players"
+        },
+        {
+          "start": 164.1353,
+          "end": 178.2705,
+          "action": "walk",
+          "path": [
+            [
+              1.3,
+              10.3
+            ],
+            [
+              1.4,
+              10.4
+            ],
+            [
+              1.2,
+              10.2
+            ],
+            [
+              0.8,
+              10.2
+            ],
+            [
+              0.6,
+              10
+            ],
+            [
+              -0.4,
+              10
+            ],
+            [
+              -0.6,
+              9.8
+            ],
+            [
+              -0.6,
+              9
+            ],
+            [
+              -0.8,
+              9
+            ],
+            [
+              -1.2,
+              8.6
+            ],
+            [
+              -2.6,
+              8.6
+            ],
+            [
+              -3.4,
+              7.8
+            ],
+            [
+              -3.4,
+              7
+            ],
+            [
+              -3.6,
+              6.8
+            ],
+            [
+              -5.6,
+              6.8
+            ],
+            [
+              -5.8,
+              6.6
+            ],
+            [
+              -5.842,
+              6.6
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 0,
+          "title": "Back to the office"
+        },
+        {
+          "start": 178.2705,
+          "end": 387,
+          "action": "document",
+          "path": [
+            [
+              -5.842,
+              6.6
+            ],
+            [
+              -5.842,
+              6.6
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": -1.571,
+          "title": "Planning the week\u2019s activities"
+        },
+        {
+          "start": 387,
+          "end": 401.1353,
+          "action": "walk",
+          "path": [
+            [
+              -5.842,
+              6.6
+            ],
+            [
+              -5.8,
+              6.6
+            ],
+            [
+              -5.6,
+              6.8
+            ],
+            [
+              -3.6,
+              6.8
+            ],
+            [
+              -3.4,
+              7
+            ],
+            [
+              -3.4,
+              7.8
+            ],
+            [
+              -2.6,
+              8.6
+            ],
+            [
+              -1.2,
+              8.6
+            ],
+            [
+              -0.8,
+              9
+            ],
+            [
+              -0.6,
+              9
+            ],
+            [
+              -0.6,
+              9.8
+            ],
+            [
+              -0.4,
+              10
+            ],
+            [
+              0.6,
+              10
+            ],
+            [
+              0.8,
+              10.2
+            ],
+            [
+              1.2,
+              10.2
+            ],
+            [
+              1.4,
+              10.4
+            ],
+            [
+              1.3,
+              10.3
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": 0,
+          "title": "Out to the day room"
+        },
+        {
+          "start": 401.1353,
+          "end": 451.1353,
+          "action": "consult",
+          "path": [
+            [
+              1.3,
+              10.3
+            ],
+            [
+              1.3,
+              10.3
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 1.41,
+          "title": "Checking in on the chess players"
+        },
+        {
+          "start": 451.1353,
+          "end": 465.2705,
+          "action": "walk",
+          "path": [
+            [
+              1.3,
+              10.3
+            ],
+            [
+              1.4,
+              10.4
+            ],
+            [
+              1.2,
+              10.2
+            ],
+            [
+              0.8,
+              10.2
+            ],
+            [
+              0.6,
+              10
+            ],
+            [
+              -0.4,
+              10
+            ],
+            [
+              -0.6,
+              9.8
+            ],
+            [
+              -0.6,
+              9
+            ],
+            [
+              -0.8,
+              9
+            ],
+            [
+              -1.2,
+              8.6
+            ],
+            [
+              -2.6,
+              8.6
+            ],
+            [
+              -3.4,
+              7.8
+            ],
+            [
+              -3.4,
+              7
+            ],
+            [
+              -3.6,
+              6.8
+            ],
+            [
+              -5.6,
+              6.8
+            ],
+            [
+              -5.8,
+              6.6
+            ],
+            [
+              -5.842,
+              6.6
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 0,
+          "title": "Back to the office"
+        },
+        {
+          "start": 465.2705,
+          "end": 541,
+          "action": "document",
+          "path": [
+            [
+              -5.842,
+              6.6
+            ],
+            [
+              -5.842,
+              6.6
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": -1.571,
+          "title": "Planning the week\u2019s activities"
+        },
+        {
+          "start": 541,
+          "end": 555.1353,
+          "action": "walk",
+          "path": [
+            [
+              -5.842,
+              6.6
+            ],
+            [
+              -5.8,
+              6.6
+            ],
+            [
+              -5.6,
+              6.8
+            ],
+            [
+              -3.6,
+              6.8
+            ],
+            [
+              -3.4,
+              7
+            ],
+            [
+              -3.4,
+              7.8
+            ],
+            [
+              -2.6,
+              8.6
+            ],
+            [
+              -1.2,
+              8.6
+            ],
+            [
+              -0.8,
+              9
+            ],
+            [
+              -0.6,
+              9
+            ],
+            [
+              -0.6,
+              9.8
+            ],
+            [
+              -0.4,
+              10
+            ],
+            [
+              0.6,
+              10
+            ],
+            [
+              0.8,
+              10.2
+            ],
+            [
+              1.2,
+              10.2
+            ],
+            [
+              1.4,
+              10.4
+            ],
+            [
+              1.3,
+              10.3
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": 0,
+          "title": "Out to the day room"
+        },
+        {
+          "start": 555.1353,
+          "end": 589.1353,
+          "action": "consult",
+          "path": [
+            [
+              1.3,
+              10.3
+            ],
+            [
+              1.3,
+              10.3
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 1.41,
+          "title": "Checking in on the chess players"
+        },
+        {
+          "start": 589.1353,
+          "end": 603.2705,
+          "action": "walk",
+          "path": [
+            [
+              1.3,
+              10.3
+            ],
+            [
+              1.4,
+              10.4
+            ],
+            [
+              1.2,
+              10.2
+            ],
+            [
+              0.8,
+              10.2
+            ],
+            [
+              0.6,
+              10
+            ],
+            [
+              -0.4,
+              10
+            ],
+            [
+              -0.6,
+              9.8
+            ],
+            [
+              -0.6,
+              9
+            ],
+            [
+              -0.8,
+              9
+            ],
+            [
+              -1.2,
+              8.6
+            ],
+            [
+              -2.6,
+              8.6
+            ],
+            [
+              -3.4,
+              7.8
+            ],
+            [
+              -3.4,
+              7
+            ],
+            [
+              -3.6,
+              6.8
+            ],
+            [
+              -5.6,
+              6.8
+            ],
+            [
+              -5.8,
+              6.6
+            ],
+            [
+              -5.842,
+              6.6
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 0,
+          "title": "Back to the office"
+        },
+        {
+          "start": 603.2705,
+          "end": 720,
+          "action": "document",
+          "path": [
+            [
+              -5.842,
+              6.6
+            ],
+            [
+              -5.842,
+              6.6
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": -1.571,
+          "title": "Planning the week\u2019s activities"
+        }
+      ],
+      "roomId": "lobby-office-c3"
+    },
+    {
+      "id": "community-61",
+      "role": "activities",
+      "variant": 323,
+      "label": "Recreation therapist",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "community-61",
+      "segments": [
+        {
+          "start": 0,
+          "end": 140,
+          "action": "phone",
+          "path": [
+            [
+              -3.774,
+              5.1
+            ],
+            [
+              -3.774,
+              5.1
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": 1.571,
+          "title": "Calling families about next week\u2019s outings"
+        },
+        {
+          "start": 140,
+          "end": 153.3445,
+          "action": "walk",
+          "path": [
+            [
+              -3.774,
+              5.1
+            ],
+            [
+              -3.8,
+              5
+            ],
+            [
+              -3.8,
+              6.2
+            ],
+            [
+              -3.4,
+              6.6
+            ],
+            [
+              -3.4,
+              8
+            ],
+            [
+              -3.2,
+              8.2
+            ],
+            [
+              -3.2,
+              12.2
+            ],
+            [
+              -3.4,
+              12.4
+            ],
+            [
+              -3.4,
+              12.8
+            ],
+            [
+              -3.6,
+              13
+            ],
+            [
+              -3.6,
+              13.4
+            ],
+            [
+              -3.8,
+              13.4
+            ],
+            [
+              -3.9,
+              13.2
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": 0,
+          "title": "Out to the day room"
+        },
+        {
+          "start": 153.3445,
+          "end": 203.3445,
+          "action": "consult",
+          "path": [
+            [
+              -3.9,
+              13.2
+            ],
+            [
+              -3.9,
+              13.2
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -0.94,
+          "title": "A word with the small-group table"
+        },
+        {
+          "start": 203.3445,
+          "end": 216.689,
+          "action": "walk",
+          "path": [
+            [
+              -3.9,
+              13.2
+            ],
+            [
+              -3.8,
+              13.4
+            ],
+            [
+              -3.6,
+              13.4
+            ],
+            [
+              -3.6,
+              13
+            ],
+            [
+              -3.4,
+              12.8
+            ],
+            [
+              -3.4,
+              12.4
+            ],
+            [
+              -3.2,
+              12.2
+            ],
+            [
+              -3.2,
+              8.2
+            ],
+            [
+              -3.4,
+              8
+            ],
+            [
+              -3.4,
+              6.6
+            ],
+            [
+              -3.8,
+              6.2
+            ],
+            [
+              -3.8,
+              5
+            ],
+            [
+              -3.774,
+              5.1
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Back to the office"
+        },
+        {
+          "start": 216.689,
+          "end": 406,
+          "action": "phone",
+          "path": [
+            [
+              -3.774,
+              5.1
+            ],
+            [
+              -3.774,
+              5.1
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": 1.571,
+          "title": "Calling families about next week\u2019s outings"
+        },
+        {
+          "start": 406,
+          "end": 419.3445,
+          "action": "walk",
+          "path": [
+            [
+              -3.774,
+              5.1
+            ],
+            [
+              -3.8,
+              5
+            ],
+            [
+              -3.8,
+              6.2
+            ],
+            [
+              -3.4,
+              6.6
+            ],
+            [
+              -3.4,
+              8
+            ],
+            [
+              -3.2,
+              8.2
+            ],
+            [
+              -3.2,
+              12.2
+            ],
+            [
+              -3.4,
+              12.4
+            ],
+            [
+              -3.4,
+              12.8
+            ],
+            [
+              -3.6,
+              13
+            ],
+            [
+              -3.6,
+              13.4
+            ],
+            [
+              -3.8,
+              13.4
+            ],
+            [
+              -3.9,
+              13.2
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": 0,
+          "title": "Out to the day room"
+        },
+        {
+          "start": 419.3445,
+          "end": 469.3445,
+          "action": "consult",
+          "path": [
+            [
+              -3.9,
+              13.2
+            ],
+            [
+              -3.9,
+              13.2
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -0.94,
+          "title": "A word with the small-group table"
+        },
+        {
+          "start": 469.3445,
+          "end": 482.689,
+          "action": "walk",
+          "path": [
+            [
+              -3.9,
+              13.2
+            ],
+            [
+              -3.8,
+              13.4
+            ],
+            [
+              -3.6,
+              13.4
+            ],
+            [
+              -3.6,
+              13
+            ],
+            [
+              -3.4,
+              12.8
+            ],
+            [
+              -3.4,
+              12.4
+            ],
+            [
+              -3.2,
+              12.2
+            ],
+            [
+              -3.2,
+              8.2
+            ],
+            [
+              -3.4,
+              8
+            ],
+            [
+              -3.4,
+              6.6
+            ],
+            [
+              -3.8,
+              6.2
+            ],
+            [
+              -3.8,
+              5
+            ],
+            [
+              -3.774,
+              5.1
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Back to the office"
+        },
+        {
+          "start": 482.689,
+          "end": 545,
+          "action": "phone",
+          "path": [
+            [
+              -3.774,
+              5.1
+            ],
+            [
+              -3.774,
+              5.1
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": 1.571,
+          "title": "Calling families about next week\u2019s outings"
+        },
+        {
+          "start": 545,
+          "end": 558.3445,
+          "action": "walk",
+          "path": [
+            [
+              -3.774,
+              5.1
+            ],
+            [
+              -3.8,
+              5
+            ],
+            [
+              -3.8,
+              6.2
+            ],
+            [
+              -3.4,
+              6.6
+            ],
+            [
+              -3.4,
+              8
+            ],
+            [
+              -3.2,
+              8.2
+            ],
+            [
+              -3.2,
+              12.2
+            ],
+            [
+              -3.4,
+              12.4
+            ],
+            [
+              -3.4,
+              12.8
+            ],
+            [
+              -3.6,
+              13
+            ],
+            [
+              -3.6,
+              13.4
+            ],
+            [
+              -3.8,
+              13.4
+            ],
+            [
+              -3.9,
+              13.2
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": 0,
+          "title": "Out to the day room"
+        },
+        {
+          "start": 558.3445,
+          "end": 588.3445,
+          "action": "consult",
+          "path": [
+            [
+              -3.9,
+              13.2
+            ],
+            [
+              -3.9,
+              13.2
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -0.94,
+          "title": "A word with the small-group table"
+        },
+        {
+          "start": 588.3445,
+          "end": 601.689,
+          "action": "walk",
+          "path": [
+            [
+              -3.9,
+              13.2
+            ],
+            [
+              -3.8,
+              13.4
+            ],
+            [
+              -3.6,
+              13.4
+            ],
+            [
+              -3.6,
+              13
+            ],
+            [
+              -3.4,
+              12.8
+            ],
+            [
+              -3.4,
+              12.4
+            ],
+            [
+              -3.2,
+              12.2
+            ],
+            [
+              -3.2,
+              8.2
+            ],
+            [
+              -3.4,
+              8
+            ],
+            [
+              -3.4,
+              6.6
+            ],
+            [
+              -3.8,
+              6.2
+            ],
+            [
+              -3.8,
+              5
+            ],
+            [
+              -3.774,
+              5.1
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Back to the office"
+        },
+        {
+          "start": 601.689,
+          "end": 720,
+          "action": "phone",
+          "path": [
+            [
+              -3.774,
+              5.1
+            ],
+            [
+              -3.774,
+              5.1
+            ]
+          ],
+          "zoneId": "lobby",
+          "heading": 1.571,
+          "title": "Calling families about next week\u2019s outings"
+        }
+      ],
+      "roomId": "lobby-office-c3"
+    },
+    {
+      "id": "community-62",
+      "role": "participant",
+      "variant": 324,
+      "label": "Quiet room \u00b7 player",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "community-62",
+      "segments": [
+        {
+          "start": 0,
+          "end": 720,
+          "action": "board-game",
+          "path": [
+            [
+              3.6,
+              9.82
+            ],
+            [
+              3.6,
+              9.82
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 6.283,
+          "seated": true,
+          "title": "Chinese chess \u8c61\u68cb \u00b7 quiet room"
+        }
+      ],
+      "roomId": "admin-waiting-west",
+      "seatId": "quiet-table-1-chair-1",
+      "seated": true
+    },
+    {
+      "id": "community-63",
+      "role": "participant",
+      "variant": 325,
+      "label": "Quiet room \u00b7 player",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "community-63",
+      "segments": [
+        {
+          "start": 0,
+          "end": 720,
+          "action": "board-game",
+          "path": [
+            [
+              3.6,
+              11.54
+            ],
+            [
+              3.6,
+              11.54
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 3.142,
+          "seated": true,
+          "title": "Chinese chess \u8c61\u68cb \u00b7 quiet room"
+        }
+      ],
+      "roomId": "admin-waiting-west",
+      "seatId": "quiet-table-1-chair-3",
+      "seated": true
+    },
+    {
+      "id": "community-64",
+      "role": "participant",
+      "variant": 326,
+      "label": "Quiet room \u00b7 onlooker",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "community-64",
+      "segments": [
+        {
+          "start": 0,
+          "end": 720,
+          "action": "watch",
+          "path": [
+            [
+              4.46,
+              10.68
+            ],
+            [
+              4.46,
+              10.68
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 4.712,
+          "seated": true,
+          "title": "Chinese chess \u8c61\u68cb \u00b7 quiet room"
+        }
+      ],
+      "roomId": "admin-waiting-west",
+      "seatId": "quiet-table-1-chair-2",
+      "seated": true
+    },
+    {
+      "id": "community-65",
+      "role": "participant",
+      "variant": 327,
+      "label": "Quiet room \u00b7 onlooker",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "community-65",
+      "segments": [
+        {
+          "start": 0,
+          "end": 720,
+          "action": "watch",
+          "path": [
+            [
+              2.74,
+              10.68
+            ],
+            [
+              2.74,
+              10.68
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 1.571,
+          "seated": true,
+          "title": "Chinese chess \u8c61\u68cb \u00b7 quiet room"
+        }
+      ],
+      "roomId": "admin-waiting-west",
+      "seatId": "quiet-table-1-chair-4",
+      "seated": true
+    },
+    {
+      "id": "community-66",
+      "role": "participant",
+      "variant": 328,
+      "label": "Quiet room \u00b7 player",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "community-66",
+      "segments": [
+        {
+          "start": 0,
+          "end": 720,
+          "action": "board-game",
+          "path": [
+            [
+              2.46,
+              12.78
+            ],
+            [
+              2.46,
+              12.78
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 4.712,
+          "seated": true,
+          "title": "Go \u570d\u68cb \u00b7 quiet room"
+        }
+      ],
+      "roomId": "admin-waiting-west",
+      "seatId": "quiet-table-2-chair-2",
+      "seated": true
+    },
+    {
+      "id": "community-67",
+      "role": "participant",
+      "variant": 329,
+      "label": "Quiet room \u00b7 player",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "community-67",
+      "segments": [
+        {
+          "start": 0,
+          "end": 720,
+          "action": "board-game",
+          "path": [
+            [
+              0.74,
+              12.78
+            ],
+            [
+              0.74,
+              12.78
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 1.571,
+          "seated": true,
+          "title": "Go \u570d\u68cb \u00b7 quiet room"
+        }
+      ],
+      "roomId": "admin-waiting-west",
+      "seatId": "quiet-table-2-chair-4",
+      "seated": true
+    },
+    {
+      "id": "community-68",
+      "role": "participant",
+      "variant": 330,
+      "label": "Quiet room \u00b7 onlooker",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "community-68",
+      "segments": [
+        {
+          "start": 0,
+          "end": 720,
+          "action": "watch",
+          "path": [
+            [
+              1.6,
+              13.64
+            ],
+            [
+              1.6,
+              13.64
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 3.142,
+          "seated": true,
+          "title": "Go \u570d\u68cb \u00b7 quiet room"
+        }
+      ],
+      "roomId": "admin-waiting-west",
+      "seatId": "quiet-table-2-chair-3",
+      "seated": true
+    },
+    {
+      "id": "community-69",
+      "role": "participant",
+      "variant": 331,
+      "label": "Quiet room \u00b7 onlooker",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "community-69",
+      "segments": [
+        {
+          "start": 0,
+          "end": 150,
+          "action": "watch",
+          "path": [
+            [
+              1.6,
+              11.92
+            ],
+            [
+              1.6,
+              11.92
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 6.283,
+          "seated": true,
+          "title": "Go \u570d\u68cb \u00b7 quiet room"
+        },
+        {
+          "start": 150,
+          "end": 165.4856,
+          "action": "walk",
+          "path": [
+            [
+              1.6,
+              11.92
+            ],
+            [
+              1.6,
+              11.2
+            ],
+            [
+              1.4,
+              11
+            ],
+            [
+              0.6,
+              11
+            ],
+            [
+              0.6,
+              10.2
+            ],
+            [
+              0.4,
+              10
+            ],
+            [
+              -0.4,
+              10
+            ],
+            [
+              -0.6,
+              9.8
+            ],
+            [
+              -0.6,
+              9
+            ],
+            [
+              -2.2,
+              9
+            ],
+            [
+              -2.2,
+              9.4
+            ],
+            [
+              -2,
+              9.4
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 0,
+          "title": "Stepping out to the day room"
+        },
+        {
+          "start": 165.4856,
+          "end": 235.4856,
+          "action": "conversation",
+          "path": [
+            [
+              -2,
+              9.4
+            ],
+            [
+              -2,
+              9.4
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "title": "A breath of air in the day room"
+        },
+        {
+          "start": 235.4856,
+          "end": 250.9712,
+          "action": "walk",
+          "path": [
+            [
+              -2,
+              9.4
+            ],
+            [
+              -2.2,
+              9.4
+            ],
+            [
+              -2.2,
+              9
+            ],
+            [
+              -0.6,
+              9
+            ],
+            [
+              -0.6,
+              9.8
+            ],
+            [
+              -0.4,
+              10
+            ],
+            [
+              0.4,
+              10
+            ],
+            [
+              0.6,
+              10.2
+            ],
+            [
+              0.6,
+              11
+            ],
+            [
+              1.4,
+              11
+            ],
+            [
+              1.6,
+              11.2
+            ],
+            [
+              1.6,
+              11.92
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Back to watch the game"
+        },
+        {
+          "start": 250.9712,
+          "end": 579,
+          "action": "watch",
+          "path": [
+            [
+              1.6,
+              11.92
+            ],
+            [
+              1.6,
+              11.92
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 6.283,
+          "seated": true,
+          "title": "Go \u570d\u68cb \u00b7 quiet room"
+        },
+        {
+          "start": 579,
+          "end": 594.4856,
+          "action": "walk",
+          "path": [
+            [
+              1.6,
+              11.92
+            ],
+            [
+              1.6,
+              11.2
+            ],
+            [
+              1.4,
+              11
+            ],
+            [
+              0.6,
+              11
+            ],
+            [
+              0.6,
+              10.2
+            ],
+            [
+              0.4,
+              10
+            ],
+            [
+              -0.4,
+              10
+            ],
+            [
+              -0.6,
+              9.8
+            ],
+            [
+              -0.6,
+              9
+            ],
+            [
+              -2.2,
+              9
+            ],
+            [
+              -2.2,
+              9.4
+            ],
+            [
+              -2,
+              9.4
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 0,
+          "title": "Stepping out to the day room"
+        },
+        {
+          "start": 594.4856,
+          "end": 664.4856,
+          "action": "conversation",
+          "path": [
+            [
+              -2,
+              9.4
+            ],
+            [
+              -2,
+              9.4
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "title": "A breath of air in the day room"
+        },
+        {
+          "start": 664.4856,
+          "end": 679.9712,
+          "action": "walk",
+          "path": [
+            [
+              -2,
+              9.4
+            ],
+            [
+              -2.2,
+              9.4
+            ],
+            [
+              -2.2,
+              9
+            ],
+            [
+              -0.6,
+              9
+            ],
+            [
+              -0.6,
+              9.8
+            ],
+            [
+              -0.4,
+              10
+            ],
+            [
+              0.4,
+              10
+            ],
+            [
+              0.6,
+              10.2
+            ],
+            [
+              0.6,
+              11
+            ],
+            [
+              1.4,
+              11
+            ],
+            [
+              1.6,
+              11.2
+            ],
+            [
+              1.6,
+              11.92
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Back to watch the game"
+        },
+        {
+          "start": 679.9712,
+          "end": 720,
+          "action": "watch",
+          "path": [
+            [
+              1.6,
+              11.92
+            ],
+            [
+              1.6,
+              11.92
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 6.283,
+          "seated": true,
+          "title": "Go \u570d\u68cb \u00b7 quiet room"
+        }
+      ],
+      "roomId": "admin-waiting-west",
+      "seatId": "quiet-table-2-chair-1"
+    },
+    {
+      "id": "community-70",
+      "role": "participant",
+      "variant": 332,
+      "label": "Banquette regular",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "community-70",
+      "segments": [
+        {
+          "start": 0,
+          "end": 40,
+          "action": "conversation",
+          "path": [
+            [
+              -0.5,
+              11.0153
+            ],
+            [
+              -0.5,
+              11.0153
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "seated": true,
+          "title": "Chatting on the banquette"
+        },
+        {
+          "start": 40,
+          "end": 56.4923,
+          "action": "walk",
+          "path": [
+            [
+              -0.5,
+              11.0153
+            ],
+            [
+              -0.5,
+              12.0583
+            ],
+            [
+              -3,
+              12.0583
+            ],
+            [
+              -3,
+              12
+            ],
+            [
+              -3.2,
+              12
+            ],
+            [
+              -3.2,
+              14
+            ],
+            [
+              -3.4,
+              14.2
+            ],
+            [
+              -3.8,
+              14.2
+            ],
+            [
+              -4,
+              14.4
+            ],
+            [
+              -4.4863,
+              14.8381
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Stretching legs"
+        },
+        {
+          "start": 56.4923,
+          "end": 140.4923,
+          "action": "conversation",
+          "path": [
+            [
+              -4.4863,
+              14.8381
+            ],
+            [
+              -4.4863,
+              14.8381
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 3.927,
+          "seated": true,
+          "title": "Visiting friends at the tree seat"
+        },
+        {
+          "start": 140.4923,
+          "end": 156.9845,
+          "action": "walk",
+          "path": [
+            [
+              -4.4863,
+              14.8381
+            ],
+            [
+              -4,
+              14.4
+            ],
+            [
+              -3.8,
+              14.2
+            ],
+            [
+              -3.4,
+              14.2
+            ],
+            [
+              -3.2,
+              14
+            ],
+            [
+              -3.2,
+              12
+            ],
+            [
+              -3,
+              12
+            ],
+            [
+              -3,
+              12.0583
+            ],
+            [
+              -0.5,
+              12.0583
+            ],
+            [
+              -0.5,
+              11.0153
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Back to the banquette"
+        },
+        {
+          "start": 156.9845,
+          "end": 567,
+          "action": "conversation",
+          "path": [
+            [
+              -0.5,
+              11.0153
+            ],
+            [
+              -0.5,
+              11.0153
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "seated": true,
+          "title": "Chatting on the banquette"
+        },
+        {
+          "start": 567,
+          "end": 583.4923,
+          "action": "walk",
+          "path": [
+            [
+              -0.5,
+              11.0153
+            ],
+            [
+              -0.5,
+              12.0583
+            ],
+            [
+              -3,
+              12.0583
+            ],
+            [
+              -3,
+              12
+            ],
+            [
+              -3.2,
+              12
+            ],
+            [
+              -3.2,
+              14
+            ],
+            [
+              -3.4,
+              14.2
+            ],
+            [
+              -3.8,
+              14.2
+            ],
+            [
+              -4,
+              14.4
+            ],
+            [
+              -4.4863,
+              14.8381
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Stretching legs"
+        },
+        {
+          "start": 583.4923,
+          "end": 673.4923,
+          "action": "conversation",
+          "path": [
+            [
+              -4.4863,
+              14.8381
+            ],
+            [
+              -4.4863,
+              14.8381
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 3.927,
+          "seated": true,
+          "title": "Visiting friends at the tree seat"
+        },
+        {
+          "start": 673.4923,
+          "end": 689.9845,
+          "action": "walk",
+          "path": [
+            [
+              -4.4863,
+              14.8381
+            ],
+            [
+              -4,
+              14.4
+            ],
+            [
+              -3.8,
+              14.2
+            ],
+            [
+              -3.4,
+              14.2
+            ],
+            [
+              -3.2,
+              14
+            ],
+            [
+              -3.2,
+              12
+            ],
+            [
+              -3,
+              12
+            ],
+            [
+              -3,
+              12.0583
+            ],
+            [
+              -0.5,
+              12.0583
+            ],
+            [
+              -0.5,
+              11.0153
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Back to the banquette"
+        },
+        {
+          "start": 689.9845,
+          "end": 720,
+          "action": "conversation",
+          "path": [
+            [
+              -0.5,
+              11.0153
+            ],
+            [
+              -0.5,
+              11.0153
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "seated": true,
+          "title": "Chatting on the banquette"
+        }
+      ],
+      "roomId": "day-open",
+      "seatId": "day-east-banquette"
+    },
+    {
+      "id": "community-71",
+      "role": "participant",
+      "variant": 333,
+      "label": "Banquette regular",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "community-71",
+      "segments": [
+        {
+          "start": 0,
+          "end": 75,
+          "action": "read",
+          "path": [
+            [
+              -0.5,
+              15.1873
+            ],
+            [
+              -0.5,
+              15.1873
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "seated": true,
+          "title": "Reading on the banquette"
+        },
+        {
+          "start": 75,
+          "end": 110.5461,
+          "action": "walk",
+          "path": [
+            [
+              -0.5,
+              15.1873
+            ],
+            [
+              -0.5,
+              14.1443
+            ],
+            [
+              -3,
+              14.1443
+            ],
+            [
+              -3,
+              14.2
+            ],
+            [
+              -3.2,
+              14.2
+            ],
+            [
+              -3.2,
+              10
+            ],
+            [
+              -2.8,
+              9.6
+            ],
+            [
+              -2.8,
+              8.6
+            ],
+            [
+              -1.2,
+              8.6
+            ],
+            [
+              -0.8,
+              9
+            ],
+            [
+              -0.6,
+              9
+            ],
+            [
+              -0.6,
+              9.8
+            ],
+            [
+              -0.4,
+              10
+            ],
+            [
+              0.4,
+              10
+            ],
+            [
+              0.6,
+              10.2
+            ],
+            [
+              0.6,
+              12
+            ],
+            [
+              0.7,
+              12
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Stretching legs"
+        },
+        {
+          "start": 110.5461,
+          "end": 200.5461,
+          "action": "watch",
+          "path": [
+            [
+              0.7,
+              12
+            ],
+            [
+              0.7,
+              12
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 1.571,
+          "title": "Watching the Go game"
+        },
+        {
+          "start": 200.5461,
+          "end": 236.0923,
+          "action": "walk",
+          "path": [
+            [
+              0.7,
+              12
+            ],
+            [
+              0.6,
+              12
+            ],
+            [
+              0.6,
+              10.2
+            ],
+            [
+              0.4,
+              10
+            ],
+            [
+              -0.4,
+              10
+            ],
+            [
+              -0.6,
+              9.8
+            ],
+            [
+              -0.6,
+              9
+            ],
+            [
+              -0.8,
+              9
+            ],
+            [
+              -1.2,
+              8.6
+            ],
+            [
+              -2.8,
+              8.6
+            ],
+            [
+              -2.8,
+              9.6
+            ],
+            [
+              -3.2,
+              10
+            ],
+            [
+              -3.2,
+              14.2
+            ],
+            [
+              -3,
+              14.2
+            ],
+            [
+              -3,
+              14.1443
+            ],
+            [
+              -0.5,
+              14.1443
+            ],
+            [
+              -0.5,
+              15.1873
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 0,
+          "title": "Back to the banquette"
+        },
+        {
+          "start": 236.0923,
+          "end": 528,
+          "action": "read",
+          "path": [
+            [
+              -0.5,
+              15.1873
+            ],
+            [
+              -0.5,
+              15.1873
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "seated": true,
+          "title": "Reading on the banquette"
+        },
+        {
+          "start": 528,
+          "end": 563.5461,
+          "action": "walk",
+          "path": [
+            [
+              -0.5,
+              15.1873
+            ],
+            [
+              -0.5,
+              14.1443
+            ],
+            [
+              -3,
+              14.1443
+            ],
+            [
+              -3,
+              14.2
+            ],
+            [
+              -3.2,
+              14.2
+            ],
+            [
+              -3.2,
+              10
+            ],
+            [
+              -2.8,
+              9.6
+            ],
+            [
+              -2.8,
+              8.6
+            ],
+            [
+              -1.2,
+              8.6
+            ],
+            [
+              -0.8,
+              9
+            ],
+            [
+              -0.6,
+              9
+            ],
+            [
+              -0.6,
+              9.8
+            ],
+            [
+              -0.4,
+              10
+            ],
+            [
+              0.4,
+              10
+            ],
+            [
+              0.6,
+              10.2
+            ],
+            [
+              0.6,
+              12
+            ],
+            [
+              0.7,
+              12
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Stretching legs"
+        },
+        {
+          "start": 563.5461,
+          "end": 647.5461,
+          "action": "watch",
+          "path": [
+            [
+              0.7,
+              12
+            ],
+            [
+              0.7,
+              12
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 1.571,
+          "title": "Watching the Go game"
+        },
+        {
+          "start": 647.5461,
+          "end": 683.0923,
+          "action": "walk",
+          "path": [
+            [
+              0.7,
+              12
+            ],
+            [
+              0.6,
+              12
+            ],
+            [
+              0.6,
+              10.2
+            ],
+            [
+              0.4,
+              10
+            ],
+            [
+              -0.4,
+              10
+            ],
+            [
+              -0.6,
+              9.8
+            ],
+            [
+              -0.6,
+              9
+            ],
+            [
+              -0.8,
+              9
+            ],
+            [
+              -1.2,
+              8.6
+            ],
+            [
+              -2.8,
+              8.6
+            ],
+            [
+              -2.8,
+              9.6
+            ],
+            [
+              -3.2,
+              10
+            ],
+            [
+              -3.2,
+              14.2
+            ],
+            [
+              -3,
+              14.2
+            ],
+            [
+              -3,
+              14.1443
+            ],
+            [
+              -0.5,
+              14.1443
+            ],
+            [
+              -0.5,
+              15.1873
+            ]
+          ],
+          "zoneId": "admin",
+          "heading": 0,
+          "title": "Back to the banquette"
+        },
+        {
+          "start": 683.0923,
+          "end": 720,
+          "action": "read",
+          "path": [
+            [
+              -0.5,
+              15.1873
+            ],
+            [
+              -0.5,
+              15.1873
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "seated": true,
+          "title": "Reading on the banquette"
+        }
+      ],
+      "roomId": "day-open",
+      "seatId": "day-east-banquette"
+    },
+    {
+      "id": "community-72",
+      "role": "participant",
+      "variant": 334,
+      "label": "Banquette regular",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "community-72",
+      "segments": [
+        {
+          "start": 0,
+          "end": 110,
+          "action": "tea",
+          "path": [
+            [
+              -0.5,
+              17.3039
+            ],
+            [
+              -0.5,
+              17.3039
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "seated": true,
+          "title": "Tea on the banquette"
+        },
+        {
+          "start": 110,
+          "end": 121.7093,
+          "action": "walk",
+          "path": [
+            [
+              -0.5,
+              17.3039
+            ],
+            [
+              -0.5,
+              16.2456
+            ],
+            [
+              -3,
+              16.2456
+            ],
+            [
+              -3,
+              16.2
+            ],
+            [
+              -3.8,
+              16.2
+            ],
+            [
+              -4,
+              16.4
+            ],
+            [
+              -4.4913,
+              16.7128
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Stretching legs"
+        },
+        {
+          "start": 121.7093,
+          "end": 211.7093,
+          "action": "conversation",
+          "path": [
+            [
+              -4.4913,
+              16.7128
+            ],
+            [
+              -4.4913,
+              16.7128
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 5.498,
+          "seated": true,
+          "title": "Visiting friends at the tree seat"
+        },
+        {
+          "start": 211.7093,
+          "end": 223.4185,
+          "action": "walk",
+          "path": [
+            [
+              -4.4913,
+              16.7128
+            ],
+            [
+              -4,
+              16.4
+            ],
+            [
+              -3.8,
+              16.2
+            ],
+            [
+              -3,
+              16.2
+            ],
+            [
+              -3,
+              16.2456
+            ],
+            [
+              -0.5,
+              16.2456
+            ],
+            [
+              -0.5,
+              17.3039
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Back to the banquette"
+        },
+        {
+          "start": 223.4185,
+          "end": 576,
+          "action": "tea",
+          "path": [
+            [
+              -0.5,
+              17.3039
+            ],
+            [
+              -0.5,
+              17.3039
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "seated": true,
+          "title": "Tea on the banquette"
+        },
+        {
+          "start": 576,
+          "end": 587.7093,
+          "action": "walk",
+          "path": [
+            [
+              -0.5,
+              17.3039
+            ],
+            [
+              -0.5,
+              16.2456
+            ],
+            [
+              -3,
+              16.2456
+            ],
+            [
+              -3,
+              16.2
+            ],
+            [
+              -3.8,
+              16.2
+            ],
+            [
+              -4,
+              16.4
+            ],
+            [
+              -4.4913,
+              16.7128
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Stretching legs"
+        },
+        {
+          "start": 587.7093,
+          "end": 677.7093,
+          "action": "conversation",
+          "path": [
+            [
+              -4.4913,
+              16.7128
+            ],
+            [
+              -4.4913,
+              16.7128
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 5.498,
+          "seated": true,
+          "title": "Visiting friends at the tree seat"
+        },
+        {
+          "start": 677.7093,
+          "end": 689.4185,
+          "action": "walk",
+          "path": [
+            [
+              -4.4913,
+              16.7128
+            ],
+            [
+              -4,
+              16.4
+            ],
+            [
+              -3.8,
+              16.2
+            ],
+            [
+              -3,
+              16.2
+            ],
+            [
+              -3,
+              16.2456
+            ],
+            [
+              -0.5,
+              16.2456
+            ],
+            [
+              -0.5,
+              17.3039
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Back to the banquette"
+        },
+        {
+          "start": 689.4185,
+          "end": 720,
+          "action": "tea",
+          "path": [
+            [
+              -0.5,
+              17.3039
+            ],
+            [
+              -0.5,
+              17.3039
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "seated": true,
+          "title": "Tea on the banquette"
+        }
+      ],
+      "roomId": "day-open",
+      "seatId": "day-east-banquette"
+    },
+    {
+      "id": "community-73",
+      "role": "participant",
+      "variant": 335,
+      "label": "Banquette regular",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "community-73",
+      "segments": [
+        {
+          "start": 0,
+          "end": 145,
+          "action": "conversation",
+          "path": [
+            [
+              -0.5,
+              19.4459
+            ],
+            [
+              -0.5,
+              19.4459
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "seated": true,
+          "title": "Chatting on the banquette"
+        },
+        {
+          "start": 145,
+          "end": 156.5727,
+          "action": "walk",
+          "path": [
+            [
+              -0.5,
+              19.4459
+            ],
+            [
+              -0.5,
+              18.3749
+            ],
+            [
+              -3,
+              18.3749
+            ],
+            [
+              -3,
+              18.4
+            ],
+            [
+              -4,
+              18.4
+            ],
+            [
+              -4.4913,
+              18.0357
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Stretching legs"
+        },
+        {
+          "start": 156.5727,
+          "end": 246.5727,
+          "action": "conversation",
+          "path": [
+            [
+              -4.4913,
+              18.0357
+            ],
+            [
+              -4.4913,
+              18.0357
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 3.927,
+          "seated": true,
+          "title": "Visiting friends at the tree seat"
+        },
+        {
+          "start": 246.5727,
+          "end": 258.1455,
+          "action": "walk",
+          "path": [
+            [
+              -4.4913,
+              18.0357
+            ],
+            [
+              -4,
+              18.4
+            ],
+            [
+              -3,
+              18.4
+            ],
+            [
+              -3,
+              18.3749
+            ],
+            [
+              -0.5,
+              18.3749
+            ],
+            [
+              -0.5,
+              19.4459
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Back to the banquette"
+        },
+        {
+          "start": 258.1455,
+          "end": 576,
+          "action": "conversation",
+          "path": [
+            [
+              -0.5,
+              19.4459
+            ],
+            [
+              -0.5,
+              19.4459
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "seated": true,
+          "title": "Chatting on the banquette"
+        },
+        {
+          "start": 576,
+          "end": 587.5727,
+          "action": "walk",
+          "path": [
+            [
+              -0.5,
+              19.4459
+            ],
+            [
+              -0.5,
+              18.3749
+            ],
+            [
+              -3,
+              18.3749
+            ],
+            [
+              -3,
+              18.4
+            ],
+            [
+              -4,
+              18.4
+            ],
+            [
+              -4.4913,
+              18.0357
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Stretching legs"
+        },
+        {
+          "start": 587.5727,
+          "end": 677.5727,
+          "action": "conversation",
+          "path": [
+            [
+              -4.4913,
+              18.0357
+            ],
+            [
+              -4.4913,
+              18.0357
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 3.927,
+          "seated": true,
+          "title": "Visiting friends at the tree seat"
+        },
+        {
+          "start": 677.5727,
+          "end": 689.1455,
+          "action": "walk",
+          "path": [
+            [
+              -4.4913,
+              18.0357
+            ],
+            [
+              -4,
+              18.4
+            ],
+            [
+              -3,
+              18.4
+            ],
+            [
+              -3,
+              18.3749
+            ],
+            [
+              -0.5,
+              18.3749
+            ],
+            [
+              -0.5,
+              19.4459
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Back to the banquette"
+        },
+        {
+          "start": 689.1455,
+          "end": 720,
+          "action": "conversation",
+          "path": [
+            [
+              -0.5,
+              19.4459
+            ],
+            [
+              -0.5,
+              19.4459
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "seated": true,
+          "title": "Chatting on the banquette"
+        }
+      ],
+      "roomId": "day-open",
+      "seatId": "day-east-banquette"
+    },
+    {
+      "id": "community-74",
+      "role": "participant",
+      "variant": 336,
+      "label": "Banquette regular",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "community-74",
+      "segments": [
+        {
+          "start": 0,
+          "end": 180,
+          "action": "read",
+          "path": [
+            [
+              -0.5,
+              21.5269
+            ],
+            [
+              -0.5,
+              21.5269
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "seated": true,
+          "title": "Reading on the banquette"
+        },
+        {
+          "start": 180,
+          "end": 198.5305,
+          "action": "walk",
+          "path": [
+            [
+              -0.5,
+              21.5269
+            ],
+            [
+              -0.5,
+              20.4864
+            ],
+            [
+              -3,
+              20.4864
+            ],
+            [
+              -3,
+              20.4
+            ],
+            [
+              -3.2,
+              20.4
+            ],
+            [
+              -3.2,
+              24.6
+            ],
+            [
+              -3,
+              24.6
+            ],
+            [
+              -2.9,
+              24.55
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Stretching legs"
+        },
+        {
+          "start": 198.5305,
+          "end": 288.5305,
+          "action": "idle",
+          "path": [
+            [
+              -2.9,
+              24.55
+            ],
+            [
+              -2.9,
+              24.55
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Looking out at the courtyard"
+        },
+        {
+          "start": 288.5305,
+          "end": 307.0609,
+          "action": "walk",
+          "path": [
+            [
+              -2.9,
+              24.55
+            ],
+            [
+              -3,
+              24.6
+            ],
+            [
+              -3.2,
+              24.6
+            ],
+            [
+              -3.2,
+              20.4
+            ],
+            [
+              -3,
+              20.4
+            ],
+            [
+              -3,
+              20.4864
+            ],
+            [
+              -0.5,
+              20.4864
+            ],
+            [
+              -0.5,
+              21.5269
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Back to the banquette"
+        },
+        {
+          "start": 307.0609,
+          "end": 562,
+          "action": "read",
+          "path": [
+            [
+              -0.5,
+              21.5269
+            ],
+            [
+              -0.5,
+              21.5269
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "seated": true,
+          "title": "Reading on the banquette"
+        },
+        {
+          "start": 562,
+          "end": 580.5305,
+          "action": "walk",
+          "path": [
+            [
+              -0.5,
+              21.5269
+            ],
+            [
+              -0.5,
+              20.4864
+            ],
+            [
+              -3,
+              20.4864
+            ],
+            [
+              -3,
+              20.4
+            ],
+            [
+              -3.2,
+              20.4
+            ],
+            [
+              -3.2,
+              24.6
+            ],
+            [
+              -3,
+              24.6
+            ],
+            [
+              -2.9,
+              24.55
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Stretching legs"
+        },
+        {
+          "start": 580.5305,
+          "end": 670.5305,
+          "action": "idle",
+          "path": [
+            [
+              -2.9,
+              24.55
+            ],
+            [
+              -2.9,
+              24.55
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Looking out at the courtyard"
+        },
+        {
+          "start": 670.5305,
+          "end": 689.0609,
+          "action": "walk",
+          "path": [
+            [
+              -2.9,
+              24.55
+            ],
+            [
+              -3,
+              24.6
+            ],
+            [
+              -3.2,
+              24.6
+            ],
+            [
+              -3.2,
+              20.4
+            ],
+            [
+              -3,
+              20.4
+            ],
+            [
+              -3,
+              20.4864
+            ],
+            [
+              -0.5,
+              20.4864
+            ],
+            [
+              -0.5,
+              21.5269
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Back to the banquette"
+        },
+        {
+          "start": 689.0609,
+          "end": 720,
+          "action": "read",
+          "path": [
+            [
+              -0.5,
+              21.5269
+            ],
+            [
+              -0.5,
+              21.5269
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "seated": true,
+          "title": "Reading on the banquette"
+        }
+      ],
+      "roomId": "day-open",
+      "seatId": "day-east-banquette"
+    },
+    {
+      "id": "community-75",
+      "role": "participant",
+      "variant": 337,
+      "label": "Banquette regular",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "community-75",
+      "segments": [
+        {
+          "start": 0,
+          "end": 252,
+          "action": "conversation",
+          "path": [
+            [
+              -0.5,
+              23.6434
+            ],
+            [
+              -0.5,
+              23.6434
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "seated": true,
+          "title": "Tea on the banquette"
+        },
+        {
+          "start": 252,
+          "end": 286.4895,
+          "action": "walk",
+          "path": [
+            [
+              -0.5,
+              23.6434
+            ],
+            [
+              -0.5,
+              22.5851
+            ],
+            [
+              -3,
+              22.5851
+            ],
+            [
+              -3,
+              22.6
+            ],
+            [
+              -3.2,
+              22.6
+            ],
+            [
+              -3.2,
+              23.2
+            ],
+            [
+              -4,
+              24
+            ],
+            [
+              -4,
+              24.2
+            ],
+            [
+              -12.8,
+              24.2
+            ],
+            [
+              -13,
+              24
+            ],
+            [
+              -13.4,
+              24
+            ],
+            [
+              -13.6,
+              23.8
+            ],
+            [
+              -13.65,
+              23.8
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Stretching legs"
+        },
+        {
+          "start": 286.4895,
+          "end": 376.4895,
+          "action": "read",
+          "path": [
+            [
+              -13.65,
+              23.8
+            ],
+            [
+              -13.65,
+              23.8
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "title": "Browsing the lattice bookcases"
+        },
+        {
+          "start": 376.4895,
+          "end": 410.9789,
+          "action": "walk",
+          "path": [
+            [
+              -13.65,
+              23.8
+            ],
+            [
+              -13.6,
+              23.8
+            ],
+            [
+              -13.4,
+              24
+            ],
+            [
+              -13,
+              24
+            ],
+            [
+              -12.8,
+              24.2
+            ],
+            [
+              -4,
+              24.2
+            ],
+            [
+              -4,
+              24
+            ],
+            [
+              -3.2,
+              23.2
+            ],
+            [
+              -3.2,
+              22.6
+            ],
+            [
+              -3,
+              22.6
+            ],
+            [
+              -3,
+              22.5851
+            ],
+            [
+              -0.5,
+              22.5851
+            ],
+            [
+              -0.5,
+              23.6434
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Back to the banquette"
+        },
+        {
+          "start": 410.9789,
+          "end": 531,
+          "action": "conversation",
+          "path": [
+            [
+              -0.5,
+              23.6434
+            ],
+            [
+              -0.5,
+              23.6434
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "seated": true,
+          "title": "Tea on the banquette"
+        },
+        {
+          "start": 531,
+          "end": 565.4895,
+          "action": "walk",
+          "path": [
+            [
+              -0.5,
+              23.6434
+            ],
+            [
+              -0.5,
+              22.5851
+            ],
+            [
+              -3,
+              22.5851
+            ],
+            [
+              -3,
+              22.6
+            ],
+            [
+              -3.2,
+              22.6
+            ],
+            [
+              -3.2,
+              23.2
+            ],
+            [
+              -4,
+              24
+            ],
+            [
+              -4,
+              24.2
+            ],
+            [
+              -12.8,
+              24.2
+            ],
+            [
+              -13,
+              24
+            ],
+            [
+              -13.4,
+              24
+            ],
+            [
+              -13.6,
+              23.8
+            ],
+            [
+              -13.65,
+              23.8
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Stretching legs"
+        },
+        {
+          "start": 565.4895,
+          "end": 637.4895,
+          "action": "read",
+          "path": [
+            [
+              -13.65,
+              23.8
+            ],
+            [
+              -13.65,
+              23.8
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "title": "Browsing the lattice bookcases"
+        },
+        {
+          "start": 637.4895,
+          "end": 671.9789,
+          "action": "walk",
+          "path": [
+            [
+              -13.65,
+              23.8
+            ],
+            [
+              -13.6,
+              23.8
+            ],
+            [
+              -13.4,
+              24
+            ],
+            [
+              -13,
+              24
+            ],
+            [
+              -12.8,
+              24.2
+            ],
+            [
+              -4,
+              24.2
+            ],
+            [
+              -4,
+              24
+            ],
+            [
+              -3.2,
+              23.2
+            ],
+            [
+              -3.2,
+              22.6
+            ],
+            [
+              -3,
+              22.6
+            ],
+            [
+              -3,
+              22.5851
+            ],
+            [
+              -0.5,
+              22.5851
+            ],
+            [
+              -0.5,
+              23.6434
+            ]
+          ],
+          "zoneId": "day",
+          "heading": 0,
+          "title": "Back to the banquette"
+        },
+        {
+          "start": 671.9789,
+          "end": 720,
+          "action": "conversation",
+          "path": [
+            [
+              -0.5,
+              23.6434
+            ],
+            [
+              -0.5,
+              23.6434
+            ]
+          ],
+          "zoneId": "day",
+          "heading": -1.571,
+          "seated": true,
+          "title": "Tea on the banquette"
+        }
+      ],
+      "roomId": "day-open",
+      "seatId": "day-east-banquette"
     },
     {
       "id": "rehab-rider-02",
@@ -36312,7 +40691,8 @@
         "community-46",
         "community-47",
         "community-48",
-        "community-71"
+        "community-71",
+        "community-99"
       ],
       "start": 0,
       "end": 720,
@@ -37201,6 +41581,68 @@
       "end": 720,
       "zoneId": "day",
       "description": "Photo albums at the photo lounge table."
+    },
+    {
+      "id": "owner-review-day-admin-rt-office",
+      "label": "Recreation therapists \u00b7 office and rounds",
+      "category": "activities",
+      "actorIds": [
+        "community-57",
+        "community-58",
+        "community-60",
+        "community-61"
+      ],
+      "start": 0,
+      "end": 720,
+      "zoneId": "lobby",
+      "description": "The recreation therapists plan programs and call families at standing desks in their office north of the day room, and go out in turn to check in at the tree-seat tables."
+    },
+    {
+      "id": "table-quiet-table-1-1",
+      "label": "Chinese chess \u00b7 \u8c61\u68cb",
+      "category": "activities",
+      "actorIds": [
+        "community-62",
+        "community-63",
+        "community-64",
+        "community-65"
+      ],
+      "start": 0,
+      "end": 720,
+      "zoneId": "admin",
+      "description": "Chinese chess at a square table in the quiet room (\u68cb\u724c\u5ba4) beside the day room: two players and two onlookers."
+    },
+    {
+      "id": "table-quiet-table-2-1",
+      "label": "Go \u00b7 \u570d\u68cb",
+      "category": "activities",
+      "actorIds": [
+        "community-66",
+        "community-67",
+        "community-68",
+        "community-69"
+      ],
+      "start": 0,
+      "end": 720,
+      "zoneId": "admin",
+      "description": "Go at a square table in the quiet room (\u68cb\u724c\u5ba4) beside the day room: two players and two onlookers."
+    },
+    {
+      "id": "owner-review-day-admin-banquette",
+      "label": "Banquette regulars \u00b7 coming and going",
+      "category": "activities",
+      "actorIds": [
+        "community-70",
+        "community-71",
+        "community-72",
+        "community-73",
+        "community-74",
+        "community-75"
+      ],
+      "start": 0,
+      "end": 720,
+      "zoneId": "day",
+      "description": "Participants on the day room\u2019s east banquette, one at each banquette table, who get up now and then to visit the tree seat, the lattice bookcases or the south windows and come back."
     }
   ],
   "roles": [

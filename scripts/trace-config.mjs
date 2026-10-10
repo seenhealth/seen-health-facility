@@ -12,8 +12,9 @@ export const TRACE_OPTIONS = {
 /**
  * Size bound for the published trace JSON (bytes), with headroom. Group
  * interactions list every other member on each member's start and end events,
- * so the file grows with the square of group size.
+ * so the file grows with the square of group size. Raised from 4.0 MB with
+ * the October 2026 owner walkthrough, whose cast of 207 writes about 4.3 MB.
  */
-export const TRACE_SIZE_LIMIT = 4_000_000;
+export const TRACE_SIZE_LIMIT = 4_800_000;
 /** The published trace, relative to the repository root. */
 export const TRACE_FILE = 'public/models/touchpoint-trace.json';

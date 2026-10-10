@@ -2772,7 +2772,7 @@
     },
     {
       "id": "lobby-office-c3",
-      "name": "Central support room C3",
+      "name": "Recreation therapy office",
       "zoneId": "lobby",
       "levelId": "ground",
       "polygon": [
@@ -2798,7 +2798,7 @@
         92
       ],
       "status": "image-traced",
-      "notes": "Boundary traced from Overall Planning.jpg. Stable trace ID; room name is descriptive unless shown in the architectural set.",
+      "notes": "Boundary traced from Overall Planning.jpg. Owner walkthrough 2026-10: the recreation therapists’ office, with about five standing desks; they come and go to the day room through the south door.",
       "sourcePolygonPixels": [
         [
           678,
@@ -4044,7 +4044,7 @@
     },
     {
       "id": "admin-waiting-west",
-      "name": "Administration waiting west",
+      "name": "Quiet room · 棋牌室",
       "zoneId": "admin",
       "levelId": "ground",
       "polygon": [
@@ -4078,7 +4078,7 @@
         92
       ],
       "status": "image-traced",
-      "notes": "Boundary traced from Overall Planning.jpg. Stable trace ID; room name is descriptive unless shown in the architectural set.",
+      "notes": "Boundary traced from Overall Planning.jpg. Owner walkthrough 2026-10: a quiet room that is also the 棋牌室, with two square tables and four chairs each for Go and Chinese chess, entered by a door from the day room at its north-west corner (as the architectural plan shows).",
       "sourcePolygonPixels": [
         [
           814,
@@ -9184,7 +9184,7 @@
       ]
     },
     {
-      "id": "plan-wall-154",
+      "id": "owner-wall-154-north",
       "zoneId": "day",
       "levelId": "ground",
       "a": [
@@ -9193,24 +9193,34 @@
       ],
       "b": [
         0,
+        9.45
+      ],
+      "height": 3.6576,
+      "thickness": 0.30527334991843225,
+      "material": "wall",
+      "status": "owner-review 2026-10 / traced wall split for the quiet-room door",
+      "referencePages": [
+        92
+      ]
+    },
+    {
+      "id": "owner-wall-154-south",
+      "zoneId": "day",
+      "levelId": "ground",
+      "a": [
+        0,
+        10.47
+      ],
+      "b": [
+        0,
         25.134172
       ],
       "height": 3.6576,
       "thickness": 0.30527334991843225,
       "material": "wall",
-      "status": "source-stroke-traced / height-inferred",
+      "status": "owner-review 2026-10 / traced wall split for the quiet-room door",
       "referencePages": [
         92
-      ],
-      "sourcePixels": [
-        [
-          814,
-          774
-        ],
-        [
-          814,
-          1085
-        ]
       ]
     },
     {
@@ -16261,6 +16271,23 @@
         "wood": "photo-chair-wood",
         "white": "photo-white"
       }
+    },
+    "rt-standing-desk": {
+      "kind": "standing-desk",
+      "dimensions": [
+        1,
+        1.5,
+        0.65
+      ],
+      "material": "photo-white",
+      "materials": {
+        "metal": "photo-silver",
+        "screen": "screen",
+        "frame": "photo-black"
+      },
+      "parameters": {
+        "worktop": 1.05
+      }
     }
   },
   "objects": [
@@ -16832,7 +16859,7 @@
         0,
         20.249799
       ],
-      "rotation": 1.5707963267948966,
+      "rotation": 3.141592653589793,
       "scale": [
         1,
         1,
@@ -16842,16 +16869,8 @@
       "referencePages": [
         92
       ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        849,
-        989
-      ],
-      "sourcePixelFootprint": [
-        13.00008664713244,
-        13.00008664713244
-      ]
+      "status": "image-traced-position / owner-review 2026-10 orientation / height-inferred",
+      "notes": "Plan location follows Overall Planning.jpg; owner walkthrough 2026-10: the two seats face each other rather than the wall. Product and height remain inferred."
     },
     {
       "id": "admin-side-chair-1",
@@ -16863,7 +16882,7 @@
         0,
         21.521771
       ],
-      "rotation": 1.5707963267948966,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -16873,28 +16892,140 @@
       "referencePages": [
         92
       ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        849,
-        1014
-      ],
-      "sourcePixelFootprint": [
-        13.00008664713244,
-        13.00008664713244
-      ]
+      "status": "image-traced-position / owner-review 2026-10 orientation / height-inferred",
+      "notes": "Plan location follows Overall Planning.jpg; owner walkthrough 2026-10: the two seats face each other rather than the wall. Product and height remain inferred."
     },
     {
-      "id": "admin-waiting-chair-0",
-      "assetId": "plan-grey-chair",
+      "id": "rt-desk-1",
+      "assetId": "rt-standing-desk",
+      "zoneId": "lobby",
+      "levelId": "ground",
+      "position": [
+        -6.4673,
+        0,
+        4.4
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "lobby-office-c3",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-review 2026-10 / use described by owner / dimensions estimated",
+      "notes": "Standing desk against the office wall, user side toward the room; count and standing height from the owner’s description, product estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rt-desk-2",
+      "assetId": "rt-standing-desk",
+      "zoneId": "lobby",
+      "levelId": "ground",
+      "position": [
+        -6.4673,
+        0,
+        5.5
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "lobby-office-c3",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-review 2026-10 / use described by owner / dimensions estimated",
+      "notes": "Standing desk against the office wall, user side toward the room; count and standing height from the owner’s description, product estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rt-desk-3",
+      "assetId": "rt-standing-desk",
+      "zoneId": "lobby",
+      "levelId": "ground",
+      "position": [
+        -6.4673,
+        0,
+        6.6
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "lobby-office-c3",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-review 2026-10 / use described by owner / dimensions estimated",
+      "notes": "Standing desk against the office wall, user side toward the room; count and standing height from the owner’s description, product estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rt-desk-4",
+      "assetId": "rt-standing-desk",
+      "zoneId": "lobby",
+      "levelId": "ground",
+      "position": [
+        -3.1488,
+        0,
+        3.9
+      ],
+      "rotation": -1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "lobby-office-c3",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-review 2026-10 / use described by owner / dimensions estimated",
+      "notes": "Standing desk against the office wall, user side toward the room; count and standing height from the owner’s description, product estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rt-desk-5",
+      "assetId": "rt-standing-desk",
+      "zoneId": "lobby",
+      "levelId": "ground",
+      "position": [
+        -3.1488,
+        0,
+        5.1
+      ],
+      "rotation": -1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "lobby-office-c3",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-review 2026-10 / use described by owner / dimensions estimated",
+      "notes": "Standing desk against the office wall, user side toward the room; count and standing height from the owner’s description, product estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "quiet-table-1",
+      "assetId": "interior-plan-dining-table",
       "zoneId": "admin",
       "levelId": "ground",
       "position": [
-        4.172069,
+        3.6,
         0,
-        11.091598
+        10.68
       ],
-      "rotation": 2.263130761467927,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -16904,28 +17035,21 @@
       "referencePages": [
         92
       ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        896,
-        809
-      ],
-      "sourcePixelFootprint": [
-        13.00008664713244,
-        13.00008664713244
-      ]
+      "status": "owner-review 2026-10 / use described by owner / dimensions estimated",
+      "notes": "Square game table of the quiet room (Chinese chess); the day room’s marble-top table, placement estimated.",
+      "layer": "furniture"
     },
     {
-      "id": "admin-waiting-chair-1",
-      "assetId": "plan-grey-chair",
+      "id": "quiet-table-1-chair-1",
+      "assetId": "photo-dining-chair",
       "zoneId": "admin",
       "levelId": "ground",
       "position": [
-        0.712304,
+        3.6,
         0,
-        13.381149
+        9.82
       ],
-      "rotation": -1.1839206090638685,
+      "rotation": 3.141592653589793,
       "scale": [
         1,
         1,
@@ -16935,28 +17059,21 @@
       "referencePages": [
         92
       ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        828,
-        854
-      ],
-      "sourcePixelFootprint": [
-        13.00008664713244,
-        13.00008664713244
-      ]
+      "status": "owner-review 2026-10 / use described by owner / dimensions estimated",
+      "notes": "One of four chairs around a quiet-room game table; the day room’s dining chair, placement estimated.",
+      "layer": "furniture"
     },
     {
-      "id": "admin-waiting-chair-2",
-      "assetId": "plan-grey-chair",
+      "id": "quiet-table-1-chair-2",
+      "assetId": "photo-dining-chair",
       "zoneId": "admin",
       "levelId": "ground",
       "position": [
-        2.442187,
+        4.46,
         0,
-        13.381149
+        10.68
       ],
-      "rotation": 0.5667292175235064,
+      "rotation": 1.5707963267948966,
       "scale": [
         1,
         1,
@@ -16966,16 +17083,177 @@
       "referencePages": [
         92
       ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        862,
-        854
+      "status": "owner-review 2026-10 / use described by owner / dimensions estimated",
+      "notes": "One of four chairs around a quiet-room game table; the day room’s dining chair, placement estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "quiet-table-1-chair-3",
+      "assetId": "photo-dining-chair",
+      "zoneId": "admin",
+      "levelId": "ground",
+      "position": [
+        3.6,
+        0,
+        11.54
       ],
-      "sourcePixelFootprint": [
-        13.00008664713244,
-        13.00008664713244
-      ]
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "admin-waiting-west",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-review 2026-10 / use described by owner / dimensions estimated",
+      "notes": "One of four chairs around a quiet-room game table; the day room’s dining chair, placement estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "quiet-table-1-chair-4",
+      "assetId": "photo-dining-chair",
+      "zoneId": "admin",
+      "levelId": "ground",
+      "position": [
+        2.74,
+        0,
+        10.68
+      ],
+      "rotation": -1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "admin-waiting-west",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-review 2026-10 / use described by owner / dimensions estimated",
+      "notes": "One of four chairs around a quiet-room game table; the day room’s dining chair, placement estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "quiet-table-2",
+      "assetId": "interior-plan-dining-table",
+      "zoneId": "admin",
+      "levelId": "ground",
+      "position": [
+        1.6,
+        0,
+        12.78
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "admin-waiting-west",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-review 2026-10 / use described by owner / dimensions estimated",
+      "notes": "Square game table of the quiet room (Go); the day room’s marble-top table, placement estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "quiet-table-2-chair-1",
+      "assetId": "photo-dining-chair",
+      "zoneId": "admin",
+      "levelId": "ground",
+      "position": [
+        1.6,
+        0,
+        11.92
+      ],
+      "rotation": 3.141592653589793,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "admin-waiting-west",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-review 2026-10 / use described by owner / dimensions estimated",
+      "notes": "One of four chairs around a quiet-room game table; the day room’s dining chair, placement estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "quiet-table-2-chair-2",
+      "assetId": "photo-dining-chair",
+      "zoneId": "admin",
+      "levelId": "ground",
+      "position": [
+        2.46,
+        0,
+        12.78
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "admin-waiting-west",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-review 2026-10 / use described by owner / dimensions estimated",
+      "notes": "One of four chairs around a quiet-room game table; the day room’s dining chair, placement estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "quiet-table-2-chair-3",
+      "assetId": "photo-dining-chair",
+      "zoneId": "admin",
+      "levelId": "ground",
+      "position": [
+        1.6,
+        0,
+        13.64
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "admin-waiting-west",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-review 2026-10 / use described by owner / dimensions estimated",
+      "notes": "One of four chairs around a quiet-room game table; the day room’s dining chair, placement estimated.",
+      "layer": "furniture"
+    },
+    {
+      "id": "quiet-table-2-chair-4",
+      "assetId": "photo-dining-chair",
+      "zoneId": "admin",
+      "levelId": "ground",
+      "position": [
+        0.74,
+        0,
+        12.78
+      ],
+      "rotation": -1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "admin-waiting-west",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-review 2026-10 / use described by owner / dimensions estimated",
+      "notes": "One of four chairs around a quiet-room game table; the day room’s dining chair, placement estimated.",
+      "layer": "furniture"
     },
     {
       "id": "admin-waiting-chair-3",
@@ -23977,7 +24255,7 @@
       "scale": [
         1,
         1,
-        1
+        0.8906
       ],
       "roomId": "day-open",
       "referencePages": [
@@ -23986,7 +24264,7 @@
         115
       ],
       "status": "photo appearance / plan registered / dimensions estimated",
-      "notes": "Visible component follows the photograph. Dimensions and placement require field verification.",
+      "notes": "Visible component follows the photograph. Owner walkthrough 2026-10: shortened along the bench so that banquette sitters can get out between the tables, as the plan’s short tables allow; dimensions estimated.",
       "layer": "furniture"
     },
     {
@@ -24055,7 +24333,7 @@
       "scale": [
         1,
         1,
-        1
+        0.8906
       ],
       "roomId": "day-open",
       "referencePages": [
@@ -24064,7 +24342,7 @@
         115
       ],
       "status": "photo appearance / plan registered / dimensions estimated",
-      "notes": "Visible component follows the photograph. Dimensions and placement require field verification.",
+      "notes": "Visible component follows the photograph. Owner walkthrough 2026-10: shortened along the bench so that banquette sitters can get out between the tables, as the plan’s short tables allow; dimensions estimated.",
       "layer": "furniture"
     },
     {
@@ -24133,7 +24411,7 @@
       "scale": [
         1,
         1,
-        1
+        0.8906
       ],
       "roomId": "day-open",
       "referencePages": [
@@ -24142,7 +24420,7 @@
         115
       ],
       "status": "photo appearance / plan registered / dimensions estimated",
-      "notes": "Visible component follows the photograph. Dimensions and placement require field verification.",
+      "notes": "Visible component follows the photograph. Owner walkthrough 2026-10: shortened along the bench so that banquette sitters can get out between the tables, as the plan’s short tables allow; dimensions estimated.",
       "layer": "furniture"
     },
     {
@@ -24211,7 +24489,7 @@
       "scale": [
         1,
         1,
-        1
+        0.8906
       ],
       "roomId": "day-open",
       "referencePages": [
@@ -24220,7 +24498,7 @@
         115
       ],
       "status": "photo appearance / plan registered / dimensions estimated",
-      "notes": "Visible component follows the photograph. Dimensions and placement require field verification.",
+      "notes": "Visible component follows the photograph. Owner walkthrough 2026-10: shortened along the bench so that banquette sitters can get out between the tables, as the plan’s short tables allow; dimensions estimated.",
       "layer": "furniture"
     },
     {
@@ -24289,7 +24567,7 @@
       "scale": [
         1,
         1,
-        1
+        0.8906
       ],
       "roomId": "day-open",
       "referencePages": [
@@ -24298,7 +24576,7 @@
         115
       ],
       "status": "photo appearance / plan registered / dimensions estimated",
-      "notes": "Visible component follows the photograph. Dimensions and placement require field verification.",
+      "notes": "Visible component follows the photograph. Owner walkthrough 2026-10: shortened along the bench so that banquette sitters can get out between the tables, as the plan’s short tables allow; dimensions estimated.",
       "layer": "furniture"
     },
     {
@@ -24367,7 +24645,7 @@
       "scale": [
         1,
         1,
-        1
+        0.8906
       ],
       "roomId": "day-open",
       "referencePages": [
@@ -24376,7 +24654,7 @@
         115
       ],
       "status": "photo appearance / plan registered / dimensions estimated",
-      "notes": "Visible component follows the photograph. Dimensions and placement require field verification.",
+      "notes": "Visible component follows the photograph. Owner walkthrough 2026-10: shortened along the bench so that banquette sitters can get out between the tables, as the plan’s short tables allow; dimensions estimated.",
       "layer": "furniture"
     },
     {
@@ -24445,7 +24723,7 @@
       "scale": [
         1,
         1,
-        1
+        0.8906
       ],
       "roomId": "day-open",
       "referencePages": [
@@ -24454,7 +24732,7 @@
         115
       ],
       "status": "photo appearance / plan registered / dimensions estimated",
-      "notes": "Visible component follows the photograph. Dimensions and placement require field verification.",
+      "notes": "Visible component follows the photograph. Owner walkthrough 2026-10: shortened along the bench so that banquette sitters can get out between the tables, as the plan’s short tables allow; dimensions estimated.",
       "layer": "furniture"
     },
     {
@@ -25089,11 +25367,11 @@
       "position": [
         -0.508789,
         0,
-        17.45146
+        17.6895
       ],
       "rotation": 1.5707963267948966,
       "scale": [
-        1,
+        0.9677,
         1,
         1
       ],
@@ -25104,7 +25382,7 @@
         116
       ],
       "status": "photo appearance / plan registered / dimensions estimated",
-      "notes": "Visible component follows the photograph. Dimensions and placement require field verification.",
+      "notes": "Visible component follows the photograph. Owner walkthrough 2026-10: the bench starts south of the quiet-room door; length estimated.",
       "layer": "furniture"
     },
     {
@@ -42913,6 +43191,39 @@
         ],
         "change": "In the cutaway (ground level only) the PT stair now leads to its upper landing and guard rails: ground-level copies of the mezzanine’s landing and two guards are drawn 3.35 m up with the therapy wing (owner-ext-pt-stair-*). The staff entrance’s ramp, pergola and planters and the therapy veranda are in view there too (site, not facade).",
         "unresolved": "The equipment mezzanine’s floor plate stays hidden in the cutaway (it would cover the therapy floor); only the stair’s landing and guards show. \"Balcony\" was taken to mean this mezzanine gallery over the therapy wing."
+      },
+      {
+        "id": "day-admin-recreation-therapy-office",
+        "rooms": [
+          "lobby-office-c3"
+        ],
+        "change": "Central support room C3 renamed the recreation therapy office: five standing desks (worktop 1.05 m, monitor each) along the solid west and east walls, the south door lane and the north openings kept clear; the two waving participants became recreation therapists and two more were added, two at a desk at any time while the others go out to the day room and back about every minute.",
+        "unresolved": "Desk product, exact count (about five) and positions are assumed; the therapists’ day-room check-in spots are illustrative."
+      },
+      {
+        "id": "day-admin-quiet-room",
+        "rooms": [
+          "admin-waiting-west",
+          "day-open"
+        ],
+        "change": "Administration waiting west renamed the quiet room · 棋牌室: a 1.02 m door cut into the day room’s east wall at the room’s north-west corner (plan-wall-154 split), the three waiting chairs removed, two square tables with four chairs each, Chinese chess on one and Go on the other with two players and two onlookers at each; the east banquette now starts south of the door.",
+        "unresolved": "Door width and position follow the architectural plan, not a survey; table and chair products are the day room’s; one onlooker’s breaks in the day room are illustrative."
+      },
+      {
+        "id": "day-admin-banquettes",
+        "rooms": [
+          "day-open"
+        ],
+        "change": "Six more participants sit on the east banquette, one per banquette table, and come and go: each slides out past the end of the table, visits a free tree-seat chair, the lattice bookcases or the south windows and returns. The banquette tables are shortened to 1.45 m so there is a way out between them, as the plan’s short tables allow.",
+        "unresolved": "Table length is an estimate from the plan (the photo-estimated 1.63 m tables left no gap to pass); who sits where and when is illustrative."
+      },
+      {
+        "id": "day-admin-social-work-chairs",
+        "rooms": [
+          "admin-side-office"
+        ],
+        "change": "The two chairs of the social-work office turn to face each other (north chair faces south, south chair faces north) instead of the wall desk.",
+        "unresolved": "Nothing else in the room was changed."
       }
     ],
     "changedWallIds": [
@@ -42924,18 +43235,23 @@
       "owner-care-wall-rehab-wc-nw-north",
       "owner-care-wall-rehab-wc-east-north",
       "owner-care-wall-rehab-wc-east-stall-3",
-      "owner-care-wall-068-south"
+      "owner-care-wall-068-south",
+      "owner-wall-154-north",
+      "owner-wall-154-south"
     ],
     "removedWallIds": [
       "plan-wall-199",
       "plan-wall-081",
-      "plan-wall-102"
+      "plan-wall-102",
+      "plan-wall-154"
     ],
     "changedPlanObjectIds": [
       "ot-toilet-0",
       "ot-basin-0",
       "ot-toilet-2",
-      "ot-basin-1"
+      "ot-basin-1",
+      "admin-side-chair-0",
+      "admin-side-chair-1"
     ],
     "removedPlanObjectIds": [
       "reception-counter-2",
@@ -42955,7 +43271,10 @@
       "kitchen-cart-0",
       "kitchen-cart-1",
       "kitchen-cart-2",
-      "kitchen-cart-3"
+      "kitchen-cart-3",
+      "admin-waiting-chair-0",
+      "admin-waiting-chair-1",
+      "admin-waiting-chair-2"
     ],
     "newObjectIds": [
       "rehab-wc-east-stall-door-3",
@@ -42969,6 +43288,18 @@
       "owner-care-waste-bin-1",
       "owner-care-waste-bin-2",
       "owner-care-recycling-bin",
+      "upperfit-desk-east-0",
+      "upperfit-monitor-east-0",
+      "upperfit-chair-east-0",
+      "upperfit-desk-east-1",
+      "upperfit-monitor-east-1",
+      "upperfit-chair-east-1",
+      "upperfit-desk-east-2",
+      "upperfit-monitor-east-2",
+      "upperfit-chair-east-2",
+      "owner-ext-pt-stair-landing",
+      "owner-ext-pt-stair-guard--1",
+      "owner-ext-pt-stair-guard-1",
       "rehab-kitchen-casework",
       "rehab-kitchen-fridge",
       "rehab-kitchen-microwave",
@@ -43011,18 +43342,21 @@
       "lounge-stool-2",
       "lounge-stool-3",
       "lounge-stool-4",
-      "upperfit-desk-east-0",
-      "upperfit-monitor-east-0",
-      "upperfit-chair-east-0",
-      "upperfit-desk-east-1",
-      "upperfit-monitor-east-1",
-      "upperfit-chair-east-1",
-      "upperfit-desk-east-2",
-      "upperfit-monitor-east-2",
-      "upperfit-chair-east-2",
-      "owner-ext-pt-stair-landing",
-      "owner-ext-pt-stair-guard--1",
-      "owner-ext-pt-stair-guard-1"
+      "rt-desk-1",
+      "rt-desk-2",
+      "rt-desk-3",
+      "rt-desk-4",
+      "rt-desk-5",
+      "quiet-table-1",
+      "quiet-table-1-chair-1",
+      "quiet-table-1-chair-2",
+      "quiet-table-1-chair-3",
+      "quiet-table-1-chair-4",
+      "quiet-table-2",
+      "quiet-table-2-chair-1",
+      "quiet-table-2-chair-2",
+      "quiet-table-2-chair-3",
+      "quiet-table-2-chair-4"
     ]
   },
   "publication": {
