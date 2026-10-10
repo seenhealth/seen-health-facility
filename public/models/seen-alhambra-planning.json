@@ -2037,7 +2037,7 @@
     },
     {
       "id": "rear-north",
-      "name": "Rear support north",
+      "name": "Receiving & laundry",
       "zoneId": "ot",
       "levelId": "ground",
       "polygon": [
@@ -2063,7 +2063,7 @@
         92
       ],
       "status": "image-traced",
-      "notes": "Boundary traced from Overall Planning.jpg. Stable trace ID; room name is descriptive unless shown in the architectural set.",
+      "notes": "Owner review 2026-10: deliveries come in through the roll-up; the washer and dryer stand against the west wall. The trolley lane from the roll-up to the south gap stays clear.",
       "sourcePolygonPixels": [
         [
           944,
@@ -2086,7 +2086,7 @@
     },
     {
       "id": "rear-utility-nw",
-      "name": "Rear utility northwest",
+      "name": "Trash enclosure",
       "zoneId": "ot",
       "levelId": "ground",
       "polygon": [
@@ -2112,7 +2112,7 @@
         92
       ],
       "status": "image-traced",
-      "notes": "Boundary traced from Overall Planning.jpg. Stable trace ID; room name is descriptive unless shown in the architectural set.",
+      "notes": "Owner review 2026-10: the rear employee door opens into the trash enclosure; bins along its south wall, the door lane kept clear. Nobody delivers through this door.",
       "sourcePolygonPixels": [
         [
           814,
@@ -2135,7 +2135,7 @@
     },
     {
       "id": "rear-support-west",
-      "name": "Back storage & clean linen",
+      "name": "Clean linen room",
       "zoneId": "ot",
       "levelId": "ground",
       "polygon": [
@@ -2161,7 +2161,7 @@
         92
       ],
       "status": "image-traced",
-      "notes": "User-directed storage racks behind the personal-care shower rooms.",
+      "notes": "Owner review 2026-10: the linen room with three racks; its existing doors (from the northeast bay and from the west corridor) are kept, the owner’s “another door leading to the linen room” read as the door between its two bays.",
       "sourcePolygonPixels": [
         [
           814,
@@ -2184,7 +2184,7 @@
     },
     {
       "id": "rear-support-center",
-      "name": "Back laundry",
+      "name": "Soiled utility & housekeeping",
       "zoneId": "ot",
       "levelId": "ground",
       "polygon": [
@@ -2210,7 +2210,7 @@
         92
       ],
       "status": "image-traced",
-      "notes": "Two front-loading washing machines directly behind the east shower and hair-care suite; dimensions estimated.",
+      "notes": "Owner review 2026-10: the washers moved to receiving; this room keeps housekeeping’s mop sink and cart. Assumed use, not described by the owner.",
       "sourcePolygonPixels": [
         [
           944,
@@ -2233,7 +2233,7 @@
     },
     {
       "id": "rear-support-east",
-      "name": "Rear support east",
+      "name": "Wheelchair wash",
       "zoneId": "ot",
       "levelId": "ground",
       "polygon": [
@@ -2259,7 +2259,7 @@
         92
       ],
       "status": "image-traced",
-      "notes": "Boundary traced from Overall Planning.jpg. Stable trace ID; room name is descriptive unless shown in the architectural set.",
+      "notes": "Owner review 2026-10: the nook off receiving is the wheelchair wash (spray gun over a drained pad), entered by a new door from receiving.",
       "sourcePolygonPixels": [
         [
           1045,
@@ -2380,7 +2380,7 @@
     },
     {
       "id": "rear-wc-west",
-      "name": "Personal care · shower",
+      "name": "Personal care west · shower",
       "zoneId": "ot",
       "levelId": "ground",
       "polygon": [
@@ -2406,7 +2406,7 @@
         92
       ],
       "status": "image-traced",
-      "notes": "User-confirmed shower room opposite dining. Roll-in shower, folding seat and grab rails.",
+      "notes": "Owner review 2026-10: shower in the northwest corner, toilet and basin down the west wall; east door kept.",
       "sourcePolygonPixels": [
         [
           814,
@@ -2429,7 +2429,7 @@
     },
     {
       "id": "rear-wc-east",
-      "name": "Personal care · shower & hair care",
+      "name": "Personal care east · hair care & shower",
       "zoneId": "ot",
       "levelId": "ground",
       "polygon": [
@@ -2455,7 +2455,7 @@
         92
       ],
       "status": "image-traced",
-      "notes": "User-confirmed shower room opposite dining. Right-hand room includes a black barber chair and hair-washing sink.",
+      "notes": "Owner review 2026-10: hair-wash basin and chair in the northwest corner, shower northeast, toilet and basin down the east wall; west door kept.",
       "sourcePolygonPixels": [
         [
           923,
@@ -3654,7 +3654,7 @@
         92
       ],
       "status": "image-traced",
-      "notes": "Boundary traced from Overall Planning.jpg. Stable trace ID; room name is descriptive unless shown in the architectural set.",
+      "notes": "Owner review 2026-10: enclosed; entered only from the therapy area by its west door, with no opening to the entry corridor (the veranda corridor).",
       "sourcePolygonPixels": [
         [
           370,
@@ -3703,7 +3703,7 @@
         92
       ],
       "status": "image-traced",
-      "notes": "Boundary traced from Overall Planning.jpg. Stable trace ID; room name is descriptive unless shown in the architectural set.",
+      "notes": "Owner review 2026-10: enclosed; entered only from the therapy cross-hall by its south door.",
       "sourcePolygonPixels": [
         [
           370,
@@ -3756,7 +3756,7 @@
         92
       ],
       "status": "plan boundary / photographed equipment family / estimated placement",
-      "notes": "Sheets 25/26 bathroom views: shared double washbasin with open knee space, mirror, soap/paper dispensers, pale-wood storage and tall cubicle fronts, white mosaic floor and teal border/tile band. Toilet positions and stall subdivisions retained from the plan; closed stall interiors, gender assignment and measured clearances remain unverified. User correction: direct cross-passage between library cabinets; no passage behind the shelving.",
+      "notes": "Owner review 2026-10: fully enclosed; all four stalls inside one restroom entered from the therapy cross-hall. Sheets 25/26 bathroom views: shared double washbasin with open knee space, mirror, soap/paper dispensers, pale-wood storage and tall cubicle fronts, white mosaic floor and teal border/tile band. Toilet positions and stall subdivisions retained from the plan; closed stall interiors, gender assignment and measured clearances remain unverified. User correction: direct cross-passage between library cabinets; no passage behind the shelving.",
       "sourcePolygonPixels": [
         [
           424,
@@ -6673,7 +6673,7 @@
       ],
       "b": [
         11.753024,
-        -6.614256
+        -10.96
       ],
       "height": 2.9,
       "thickness": 0.20351556661228815,
@@ -7050,36 +7050,6 @@
         [
           994,
           555
-        ]
-      ]
-    },
-    {
-      "id": "plan-wall-081",
-      "zoneId": "ot",
-      "levelId": "ground",
-      "a": [
-        8.140623,
-        -6.970408
-      ],
-      "b": [
-        8.140623,
-        -5.851073
-      ],
-      "height": 2.9,
-      "thickness": 0.20351556661228815,
-      "material": "wall",
-      "status": "source-stroke-traced / height-inferred",
-      "referencePages": [
-        92
-      ],
-      "sourcePixels": [
-        [
-          974,
-          454
-        ],
-        [
-          974,
-          476
         ]
       ]
     },
@@ -7680,36 +7650,6 @@
         [
           994,
           554
-        ]
-      ]
-    },
-    {
-      "id": "plan-wall-102",
-      "zoneId": "ot",
-      "levelId": "ground",
-      "a": [
-        8.140623,
-        -5.851073
-      ],
-      "b": [
-        9.1582,
-        -5.851073
-      ],
-      "height": 2.9,
-      "thickness": 0.20351556661228815,
-      "material": "wall",
-      "status": "source-stroke-traced / height-inferred",
-      "referencePages": [
-        92
-      ],
-      "sourcePixels": [
-        [
-          974,
-          476
-        ],
-        [
-          994,
-          476
         ]
       ]
     },
@@ -9909,7 +9849,7 @@
       "levelId": "ground",
       "a": [
         -19.842768,
-        11.396872
+        11.142477
       ],
       "b": [
         -19.842768,
@@ -9969,7 +9909,7 @@
       "levelId": "ground",
       "a": [
         -14.653121,
-        11.396872
+        11.142477
       ],
       "b": [
         -14.653121,
@@ -10560,38 +10500,6 @@
         [
           505,
           944
-        ]
-      ]
-    },
-    {
-      "id": "plan-wall-199",
-      "zoneId": "rehab",
-      "levelId": "ground",
-      "a": [
-        -19.842768,
-        13.279391
-      ],
-      "b": [
-        -14.653121,
-        13.279391
-      ],
-      "height": 2.38,
-      "thickness": 0.20351556661228815,
-      "material": "oak",
-      "status": "source-stroke-traced / height-inferred",
-      "referencePages": [
-        105,
-        101,
-        92
-      ],
-      "sourcePixels": [
-        [
-          424,
-          852
-        ],
-        [
-          505,
-          852
         ]
       ]
     },
@@ -12747,6 +12655,88 @@
         15
       ],
       "status": "user-directed orientation / estimated partition dimensions"
+    },
+    {
+      "id": "owner-care-wall-rehab-wc-nw-north",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "a": [
+        -22.590228,
+        11.142477
+      ],
+      "b": [
+        -19.842768,
+        11.142477
+      ],
+      "height": 4.8,
+      "thickness": 0.2543944582653602,
+      "material": "wall",
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "referencePages": [
+        92
+      ]
+    },
+    {
+      "id": "owner-care-wall-rehab-wc-east-north",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "a": [
+        -19.842768,
+        11.142477
+      ],
+      "b": [
+        -14.653121,
+        11.142477
+      ],
+      "height": 4.8,
+      "thickness": 0.2543944582653602,
+      "material": "wall",
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "referencePages": [
+        92
+      ]
+    },
+    {
+      "id": "owner-care-wall-rehab-wc-east-stall-3",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "a": [
+        -19.842768,
+        13.279391
+      ],
+      "b": [
+        -19.486616,
+        13.279391
+      ],
+      "height": 2.38,
+      "thickness": 0.20351556661228815,
+      "material": "oak",
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "referencePages": [
+        105,
+        101,
+        92
+      ]
+    },
+    {
+      "id": "owner-care-wall-068-south",
+      "zoneId": "ot",
+      "levelId": "ground",
+      "a": [
+        11.753024,
+        -10.04
+      ],
+      "b": [
+        11.753024,
+        -6.614256
+      ],
+      "height": 2.9,
+      "thickness": 0.20351556661228815,
+      "material": "wall",
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "referencePages": [
+        92
+      ]
     }
   ],
   "assets": {
@@ -15876,6 +15866,117 @@
       "parameters": {
         "activity": "buffet"
       }
+    },
+    "photo-rehab-wc-east-stall-door-3": {
+      "kind": "box",
+      "dimensions": [
+        0.048,
+        2.25,
+        0.8
+      ],
+      "material": "oak"
+    },
+    "photo-rehab-wc-east-stall-handle-3": {
+      "kind": "box",
+      "dimensions": [
+        0.04,
+        0.027,
+        0.12
+      ],
+      "material": "photo-bronze"
+    },
+    "owner-care-wash-pad": {
+      "kind": "wash-pad",
+      "dimensions": [
+        1.6,
+        0.05,
+        1.6
+      ],
+      "material": "photo-mosaic",
+      "materials": {
+        "kerb": "concrete"
+      },
+      "parameters": {}
+    },
+    "owner-care-hose-reel": {
+      "kind": "hose-reel",
+      "dimensions": [
+        0.4,
+        0.5,
+        0.3
+      ],
+      "material": "photo-teal",
+      "parameters": {}
+    },
+    "owner-care-wheelchair": {
+      "kind": "wheelchair",
+      "dimensions": [
+        0.66,
+        0.92,
+        1.05
+      ],
+      "material": "photo-black",
+      "parameters": {}
+    },
+    "owner-care-tumble-dryer": {
+      "kind": "tumble-dryer",
+      "dimensions": [
+        0.68,
+        0.92,
+        0.72
+      ],
+      "material": "photo-white",
+      "parameters": {}
+    },
+    "owner-care-janitor-sink": {
+      "kind": "janitor-sink",
+      "dimensions": [
+        0.65,
+        1.3,
+        0.65
+      ],
+      "material": "photo-white",
+      "parameters": {}
+    },
+    "owner-care-housekeeping-cart": {
+      "kind": "housekeeping-cart",
+      "dimensions": [
+        0.55,
+        1.05,
+        1.1
+      ],
+      "material": "photo-mustard",
+      "parameters": {}
+    },
+    "owner-care-waste-bin": {
+      "kind": "waste-bin",
+      "dimensions": [
+        0.7,
+        1.2,
+        0.8
+      ],
+      "material": "photo-black",
+      "materials": {
+        "lid": "photo-blue-grey"
+      },
+      "parameters": {
+        "bin": "trash"
+      }
+    },
+    "owner-care-recycling-bin": {
+      "kind": "waste-bin",
+      "dimensions": [
+        0.7,
+        1.2,
+        0.8
+      ],
+      "material": "blue",
+      "materials": {
+        "lid": "photo-black"
+      },
+      "parameters": {
+        "bin": "recycling"
+      }
     }
   },
   "objects": [
@@ -16407,37 +16508,6 @@
       ]
     },
     {
-      "id": "reception-counter-2",
-      "assetId": "plan-reception-counter",
-      "zoneId": "ot",
-      "levelId": "ground",
-      "position": [
-        0.254394,
-        0,
-        -12.210934
-      ],
-      "rotation": 0,
-      "scale": [
-        0.31578912787672725,
-        1,
-        2.5000157347431156
-      ],
-      "roomId": "rear-utility-nw",
-      "referencePages": [
-        92
-      ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        819,
-        351
-      ],
-      "sourcePixelFootprint": [
-        6,
-        35
-      ]
-    },
-    {
       "id": "admin-side-worktop",
       "assetId": "table",
       "zoneId": "admin",
@@ -16911,9 +16981,9 @@
       "zoneId": "ot",
       "levelId": "ground",
       "position": [
-        0.305273,
+        0.415,
         0,
-        -5.138768
+        -4.85
       ],
       "rotation": 1.5707963267948966,
       "scale": [
@@ -16925,16 +16995,8 @@
       "referencePages": [
         92
       ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        820,
-        490
-      ],
-      "sourcePixelFootprint": [
-        7.999999999999999,
-        12
-      ]
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner: “the toilet is immediately south of that” (the shower, on the west wall)."
     },
     {
       "id": "ot-toilet-2",
@@ -16942,9 +17004,9 @@
       "zoneId": "ot",
       "levelId": "ground",
       "position": [
-        8.70029,
+        8.741,
         0,
-        -3.714159
+        -4.85
       ],
       "rotation": -1.5707963267948966,
       "scale": [
@@ -16956,16 +17018,8 @@
       "referencePages": [
         92
       ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        985,
-        518
-      ],
-      "sourcePixelFootprint": [
-        7.999999999999999,
-        12
-      ]
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner: “the toilet should be immediately below the shower in the top middle right wall”."
     },
     {
       "id": "rehab-toilet-0",
@@ -17562,11 +17616,11 @@
       "zoneId": "ot",
       "levelId": "ground",
       "position": [
-        0.305273,
+        0.339,
         0,
-        -2.950976
+        -4.05
       ],
-      "rotation": 0,
+      "rotation": 1.5707963267948966,
       "scale": [
         0.8479815275512008,
         1,
@@ -17576,16 +17630,8 @@
       "referencePages": [
         92
       ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        820,
-        533
-      ],
-      "sourcePixelFootprint": [
-        10.000000000000002,
-        9
-      ]
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner: “the sink is immediately south of that” (the toilet, on the west wall)."
     },
     {
       "id": "ot-basin-1",
@@ -17593,11 +17639,11 @@
       "zoneId": "ot",
       "levelId": "ground",
       "position": [
-        8.70029,
+        8.817,
         0,
-        -2.950976
+        -4.05
       ],
-      "rotation": 0,
+      "rotation": -1.5707963267948966,
       "scale": [
         0.8479815275512008,
         1,
@@ -17607,16 +17653,8 @@
       "referencePages": [
         92
       ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        985,
-        533
-      ],
-      "sourcePixelFootprint": [
-        10.000000000000002,
-        9
-      ]
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner: “the sink should be immediately beneath that” (south of the toilet, on the east wall)."
     },
     {
       "id": "ot-basin-4",
@@ -29494,9 +29532,9 @@
       "id": "access-shower-west",
       "assetId": "access-shower",
       "position": [
-        2.65,
+        0.86,
         0,
-        -6.05
+        -6.099
       ],
       "rotation": 0,
       "scale": [
@@ -29513,18 +29551,18 @@
         115,
         116
       ],
-      "status": "user-directed arrangement / dimensions estimated",
-      "notes": "September 21 user-directed layout correction. Component dimensions estimated."
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner: “the same layout but flipped: top left-hand corner is the shower”."
     },
     {
       "id": "access-shower-east",
       "assetId": "access-shower",
       "position": [
-        6.55,
+        8.286,
         0,
-        -6.05
+        -6.099
       ],
-      "rotation": 0,
+      "rotation": -1.5707963267948966,
       "scale": [
         1,
         1,
@@ -29539,16 +29577,16 @@
         115,
         116
       ],
-      "status": "user-directed arrangement / dimensions estimated",
-      "notes": "September 21 user-directed layout correction. Component dimensions estimated."
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner: “the shower should be on the top right corner”. The plan’s corner closet (two walls) is removed for it."
     },
     {
       "id": "access-barber-chair",
       "assetId": "access-barber-chair",
       "position": [
-        6.72,
+        6.25,
         0,
-        -3.68
+        -5.54
       ],
       "rotation": 0,
       "scale": [
@@ -29565,16 +29603,16 @@
         115,
         116
       ],
-      "status": "user-directed arrangement / dimensions estimated",
-      "notes": "September 21 user-directed layout correction. Component dimensions estimated."
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner: the chair cannot stay where it was; it sits in front of the hair-wash basin, facing into the room."
     },
     {
       "id": "access-hair-wash",
       "assetId": "access-hair-wash",
       "position": [
-        6.72,
+        6.25,
         0,
-        -4.48
+        -6.499
       ],
       "rotation": 0,
       "scale": [
@@ -29591,18 +29629,18 @@
         115,
         116
       ],
-      "status": "user-directed arrangement / dimensions estimated",
-      "notes": "September 21 user-directed layout correction. Component dimensions estimated."
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner: “the hair washing sink should be against the top left corner of the wall”."
     },
     {
       "id": "access-washing-machine-1",
       "assetId": "access-laundry",
       "position": [
-        7.05,
+        7.096,
         0,
-        -9.08
+        -12.3
       ],
-      "rotation": 0,
+      "rotation": 1.5707963267948966,
       "scale": [
         1,
         1,
@@ -29610,25 +29648,25 @@
       ],
       "zoneId": "ot",
       "levelId": "ground",
-      "roomId": "rear-support-center",
+      "roomId": "rear-north",
       "layer": "furniture",
       "referencePages": [
         114,
         115,
         116
       ],
-      "status": "user-directed arrangement / dimensions estimated",
-      "notes": "September 21 user-directed layout correction. Component dimensions estimated."
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner: “immediately to the left is where the washer and dryer are, against the left wall” (receiving’s west wall)."
     },
     {
       "id": "access-washing-machine-2",
       "assetId": "access-laundry",
       "position": [
-        8.15,
+        7.096,
         0,
-        -9.08
+        -11.5
       ],
-      "rotation": 0,
+      "rotation": 1.5707963267948966,
       "scale": [
         1,
         1,
@@ -29636,23 +29674,23 @@
       ],
       "zoneId": "ot",
       "levelId": "ground",
-      "roomId": "rear-support-center",
+      "roomId": "rear-north",
       "layer": "furniture",
       "referencePages": [
         114,
         115,
         116
       ],
-      "status": "user-directed arrangement / dimensions estimated",
-      "notes": "September 21 user-directed layout correction. Component dimensions estimated."
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner: washer and dryer against receiving’s west wall."
     },
     {
       "id": "access-linen-rack-1",
       "assetId": "access-linen-rack",
       "position": [
-        0.95,
+        0.86,
         0,
-        -9.94
+        -9.967
       ],
       "rotation": 0,
       "scale": [
@@ -29669,18 +29707,18 @@
         115,
         116
       ],
-      "status": "user-directed arrangement / dimensions estimated",
-      "notes": "September 21 user-directed layout correction. Component dimensions estimated."
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner: “there are three racks instead”. Along the north wall of the west bay."
     },
     {
       "id": "access-linen-rack-2",
       "assetId": "access-linen-rack",
       "position": [
-        2.72,
+        0.34,
         0,
-        -9.94
+        -8.3
       ],
-      "rotation": 0,
+      "rotation": 1.5707963267948966,
       "scale": [
         1,
         1,
@@ -29695,16 +29733,16 @@
         115,
         116
       ],
-      "status": "user-directed arrangement / dimensions estimated",
-      "notes": "September 21 user-directed layout correction. Component dimensions estimated."
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner: three racks. Along the west wall (two do not fit along the north wall)."
     },
     {
       "id": "access-linen-rack-3",
       "assetId": "access-linen-rack",
       "position": [
-        4.38,
+        3.99,
         0,
-        -9.94
+        -9.967
       ],
       "rotation": 0,
       "scale": [
@@ -29721,34 +29759,8 @@
         115,
         116
       ],
-      "status": "user-directed arrangement / dimensions estimated",
-      "notes": "September 21 user-directed layout correction. Component dimensions estimated."
-    },
-    {
-      "id": "access-linen-rack-4",
-      "assetId": "access-linen-rack",
-      "position": [
-        2.1,
-        0,
-        -7.29
-      ],
-      "rotation": 3.141592653589793,
-      "scale": [
-        1,
-        1,
-        1
-      ],
-      "zoneId": "ot",
-      "levelId": "ground",
-      "roomId": "rear-support-west",
-      "layer": "furniture",
-      "referencePages": [
-        114,
-        115,
-        116
-      ],
-      "status": "user-directed arrangement / dimensions estimated",
-      "notes": "September 21 user-directed layout correction. Component dimensions estimated."
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner: three racks. Along the north wall of the northeast bay, clear of its walls."
     },
     {
       "id": "access-rear-stair-flight-landing",
@@ -31152,6 +31164,272 @@
       ],
       "status": "user-directed food service",
       "notes": "Prepared meal trays, fruit and drinks."
+    },
+    {
+      "id": "rehab-wc-east-stall-door-3",
+      "assetId": "photo-rehab-wc-east-stall-door-3",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -18.214643,
+        0.13,
+        12.160055
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rehab-wc-east",
+      "referencePages": [
+        105,
+        101
+      ],
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner review 2026-10: the corridor-facing toilet is now the restroom’s fourth enclosed stall; door like the other stalls’.",
+      "layer": "architecture"
+    },
+    {
+      "id": "rehab-wc-east-stall-handle-3",
+      "assetId": "photo-rehab-wc-east-stall-handle-3",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -18.163764,
+        1.03,
+        12.414
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rehab-wc-east",
+      "referencePages": [
+        105,
+        101
+      ],
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner review 2026-10: handle of the fourth stall’s door.",
+      "layer": "architecture"
+    },
+    {
+      "id": "owner-care-wash-pad",
+      "assetId": "owner-care-wash-pad",
+      "zoneId": "ot",
+      "levelId": "ground",
+      "position": [
+        13.5,
+        0,
+        -10.84
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rear-support-east",
+      "layer": "furniture",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner: “in that nook to the right, there is a wheelchair wash … like a spray gun”. Drained, kerbed pad; size estimated."
+    },
+    {
+      "id": "owner-care-wheelchair",
+      "assetId": "owner-care-wheelchair",
+      "zoneId": "ot",
+      "levelId": "ground",
+      "position": [
+        13.5,
+        0,
+        -10.84
+      ],
+      "rotation": -1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rear-support-east",
+      "layer": "furniture",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "A center wheelchair parked on the wash pad, facing the door. Illustrative."
+    },
+    {
+      "id": "owner-care-hose-reel",
+      "assetId": "owner-care-hose-reel",
+      "zoneId": "ot",
+      "levelId": "ground",
+      "position": [
+        13.5,
+        1,
+        -12.107
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rear-support-east",
+      "layer": "furniture",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Wall-mounted hose reel and spray gun on the nook’s north wall, clear of the east window. Mounting height estimated."
+    },
+    {
+      "id": "access-dryer",
+      "assetId": "owner-care-tumble-dryer",
+      "zoneId": "ot",
+      "levelId": "ground",
+      "position": [
+        7.096,
+        0,
+        -10.7
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rear-north",
+      "layer": "furniture",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner: a dryer beside the washers against receiving’s west wall. Product and dimensions estimated."
+    },
+    {
+      "id": "owner-care-janitor-sink",
+      "assetId": "owner-care-janitor-sink",
+      "zoneId": "ot",
+      "levelId": "ground",
+      "position": [
+        7.051,
+        0,
+        -9.169
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rear-support-center",
+      "layer": "furniture",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Mop sink in the former laundry room, now soiled utility (the laundry moved to receiving). Illustrative."
+    },
+    {
+      "id": "owner-care-housekeeping-cart",
+      "assetId": "owner-care-housekeeping-cart",
+      "zoneId": "ot",
+      "levelId": "ground",
+      "position": [
+        7.286,
+        0,
+        -7.75
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rear-support-center",
+      "layer": "furniture",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Housekeeping cart parked in soiled utility. Illustrative."
+    },
+    {
+      "id": "owner-care-waste-bin-1",
+      "assetId": "owner-care-waste-bin",
+      "zoneId": "ot",
+      "levelId": "ground",
+      "position": [
+        0.75,
+        0,
+        -10.85
+      ],
+      "rotation": 3.141592653589793,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rear-utility-nw",
+      "layer": "furniture",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner: “the door in the back is actually to the trash enclosure”. Wheeled bin; count and size assumed."
+    },
+    {
+      "id": "owner-care-waste-bin-2",
+      "assetId": "owner-care-waste-bin",
+      "zoneId": "ot",
+      "levelId": "ground",
+      "position": [
+        1.55,
+        0,
+        -10.85
+      ],
+      "rotation": 3.141592653589793,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rear-utility-nw",
+      "layer": "furniture",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Trash enclosure bin; count and size assumed."
+    },
+    {
+      "id": "owner-care-recycling-bin",
+      "assetId": "owner-care-recycling-bin",
+      "zoneId": "ot",
+      "levelId": "ground",
+      "position": [
+        2.35,
+        0,
+        -10.85
+      ],
+      "rotation": 3.141592653589793,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rear-utility-nw",
+      "layer": "furniture",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Recycling bin in the trash enclosure; assumed."
     }
   ],
   "materials": {
@@ -35666,7 +35944,7 @@
     },
     "communityActivityConversion": "User request: ground-floor mahjong, Wii, ping pong, pool and karaoke; upstairs offices retained.",
     "dayRoomCrossPassage": "Opening from day room through the cabinets at x=-14.65, z=17.96–19.44 to the bathroom/PT cross-hall. Removed the fictitious longitudinal corridor and blocking cabinet bay.",
-    "rearServiceActivity": "Package deliveries use the rear employee entrance; meal deliveries use the wide rear receiving opening. Routes, vehicle sizes and timing are illustrative."
+    "rearServiceActivity": "Package and meal deliveries both come in through the wide rear receiving roll-up; the rear employee door opens into the trash enclosure (owner walkthrough, October 2026). Routes, vehicle sizes and timing are illustrative."
   },
   "interiorReview": {
     "date": "2026-09-21",
@@ -41417,13 +41695,71 @@
     "date": "2026-10-10",
     "title": "Owner walkthrough corrections · October 2026",
     "accuracy": "Owner-directed room, fit-out and door corrections from a walkthrough of the model; room and fixture positions follow the owner’s description, not a survey.",
-    "items": [],
-    "changedWallIds": [],
-    "newWallIds": [],
-    "removedWallIds": [],
-    "changedPlanObjectIds": [],
-    "removedPlanObjectIds": [],
-    "newObjectIds": []
+    "items": [
+      {
+        "id": "care-rooms-7-pt-bathrooms",
+        "rooms": [
+          "rehab-wc-nw",
+          "rehab-wc-sw",
+          "rehab-wc-east",
+          "rehab-entry"
+        ],
+        "change": "New plan walls close the north side of the northwest therapy bathroom and of the multistall restroom toward the entry corridor; the restroom’s oak divider is removed so its corridor-facing toilet is a fourth enclosed stall with its own door and partition stub. The west bathrooms keep only their therapy-side doors; the restroom is entered only from the cross-hall. The wheelchair arrival that rolled through the northwest bathroom now takes the day-room cross passage and the cross-hall.",
+        "unresolved": "Wall thickness and height copied from the adjoining plan walls; the fourth stall keeps the plan’s toilet position. Stall partitions remain the photo-informed stubs."
+      },
+      {
+        "id": "care-rooms-8-back-of-house",
+        "rooms": [
+          "rear-north",
+          "rear-support-east",
+          "rear-support-center",
+          "rear-support-west",
+          "rear-utility-nw",
+          "rear-wc-east",
+          "rear-wc-west"
+        ],
+        "change": "Wheelchair wash in the east nook (new door from receiving, drained pad, hose reel and spray gun, parked chair); washer, washer and dryer against receiving’s west wall; the old laundry room is soiled utility (mop sink, cart); the linen room keeps three racks; the rear employee door opens into the trash enclosure (bins replace the plan’s counter) and packages come in through the roll-up with the food. Personal care east: hair-wash basin and chair northwest, shower northeast, toilet and basin down the east wall; personal care west mirrored.",
+        "unresolved": "“Another door leading to the linen room” is read as the existing door between the linen room’s two bays (the stair sits between the linen room and receiving). The bins are inside the rear utility room; if the enclosure is the court notch outside the employee door they belong there. Fixture sizes, the dryer and the soiled-utility fit-out are assumed."
+      }
+    ],
+    "changedWallIds": [
+      "plan-wall-177",
+      "plan-wall-179",
+      "plan-wall-068"
+    ],
+    "newWallIds": [
+      "owner-care-wall-rehab-wc-nw-north",
+      "owner-care-wall-rehab-wc-east-north",
+      "owner-care-wall-rehab-wc-east-stall-3",
+      "owner-care-wall-068-south"
+    ],
+    "removedWallIds": [
+      "plan-wall-199",
+      "plan-wall-081",
+      "plan-wall-102"
+    ],
+    "changedPlanObjectIds": [
+      "ot-toilet-0",
+      "ot-basin-0",
+      "ot-toilet-2",
+      "ot-basin-1"
+    ],
+    "removedPlanObjectIds": [
+      "reception-counter-2"
+    ],
+    "newObjectIds": [
+      "rehab-wc-east-stall-door-3",
+      "rehab-wc-east-stall-handle-3",
+      "owner-care-wash-pad",
+      "owner-care-wheelchair",
+      "owner-care-hose-reel",
+      "access-dryer",
+      "owner-care-janitor-sink",
+      "owner-care-housekeeping-cart",
+      "owner-care-waste-bin-1",
+      "owner-care-waste-bin-2",
+      "owner-care-recycling-bin"
+    ]
   },
   "publication": {
     "sourceDocuments": "not-published"
