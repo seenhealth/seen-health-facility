@@ -2,10 +2,11 @@ import * as T from 'three';
 import type { Asset } from './schema';
 
 /**
- * Commercial kitchen, serving-line and staff-kitchenette equipment from the
- * October 2026 owner walkthrough (the owner's photo of the Alhambra kitchen,
- * the dining pass-through as a heated serving line, the staff lounge's
- * kitchenette and breakfast bar). Each piece is modelled at its declared
+ * Commercial kitchen, serving-line, drink-station and staff-kitchenette
+ * equipment from the October 2026 owner walkthrough (the owner's photo of the
+ * Alhambra kitchen, the dining pass-through as a heated serving line, the
+ * dining room's drink station, the staff lounge's kitchenette). Each piece is
+ * modelled at its declared
  * dimensions around a floor-centred origin with its usable face toward local
  * +Z (doors, tray slide, screen) and nothing standing proud of the declared
  * box, so assets.ts fits it at scale 1 like every other family. Proportions
@@ -22,7 +23,11 @@ export const KITCHEN_ASSET_KINDS = [
   'wall-tv',
   'microwave',
   'pantry-cabinet',
-  'bar-partition',
+  'kitchenette-counter',
+  'coffee-machine',
+  'water-dispenser',
+  'drink-supplies',
+  'glass-door-fridge',
 ] as const;
 
 export function buildKitchenAsset(
@@ -42,7 +47,7 @@ export function buildKitchenAsset(
     bin = slot('bin', 'kitchen-bin-grey'),
     glass = slot('glass', 'glass'),
     wood = slot('wood', 'photo-white'),
-    panel = slot('panel', 'lounge-tan');
+    top = slot('top', 'photo-quartz');
   // Food, indicator lights and picture content are inline colours, like the
   // day room's props: they are not finishes a facility would swap.
   const inline = new Map<string, T.MeshStandardMaterial>();
@@ -410,19 +415,111 @@ export function buildKitchenAsset(
     box(0, nicheY + nicheH + 0.03, front - 0.01, w - 0.03, h - nicheY - nicheH - 0.06, 0.02, wood);
     for (const y of [nicheY - 0.3, nicheY + nicheH + 0.1])
       box(w / 2 - 0.06, y, front - 0.005, 0.012, 0.14, 0.01, white);
-  } else if (spec.kind === 'bar-partition') {
-    // The breakfast bar's half-height partition and support: a painted panel
-    // at the back (local +Z), a timber ledger with brackets under the slab,
-    // two slim posts and a footrail at the front. The quartz slab is its own
-    // object on top.
-    const back = d / 2;
-    box(0, 0, back - 0.04, w, h, 0.08, panel);
-    box(0, 0, back - 0.0425, w, 0.1, 0.085, paint('#6b5a43'));
-    box(0, 0.78, back - 0.13, w - 0.1, 0.06, 0.1, wood);
-    for (const x of [-w / 2 + 0.15, 0, w / 2 - 0.15])
-      box(x, 0.8, 0, 0.04, 0.04, d - 0.08, white);
-    for (const x of [-w / 2 + 0.12, w / 2 - 0.12]) cyl(x, 0, -back + 0.02, 0.02, 0.84, white);
-    tube([-w / 2 + 0.12, 0.25, -back + 0.02], [w / 2 - 0.12, 0.25, -back + 0.02], 0.014, steel);
+  } else if (spec.kind === 'kitchenette-counter') {
+    // Base cabinets under a quartz top with a small inset sink and gooseneck
+    // at the local −X end; the top sits at 0.9 m (or the declared height when
+    // lower) and the faucet reaches the declared height. Doors face +Z.
+    const rim = Math.min(0.9, h),
+      front = d / 2,
+      doors = Math.max(2, Math.round(w / 0.45)),
+      dw = w / doors;
+    box(0, 0, 0.03, w - 0.04, 0.1, d - 0.1, dark);
+    box(0, 0.1, -0.01, w, rim - 0.14, d - 0.02, wood);
+    for (let i = 0; i < doors; i++) {
+      const x = -w / 2 + (i + 0.5) * dw;
+      box(x, 0.13, front - 0.01, dw - 0.02, rim - 0.2, 0.02, wood);
+      box(x + (i % 2 ? -1 : 1) * (dw / 2 - 0.06), rim - 0.22, front - 0.004, 0.012, 0.12, 0.008, steel);
+    }
+    box(0, rim - 0.04, 0, w, 0.04, d, top);
+    const sx = -w / 2 + 0.25,
+      fz = -front + 0.08;
+    recess(sx, rim, 0.02, 0.36, d - 0.24);
+    if (h > rim + 0.05) {
+      cyl(sx, rim, fz, 0.012, h - rim - 0.012, steel);
+      ball(sx, h - 0.012, fz, 0.012, steel);
+      tube([sx, h - 0.012, fz], [sx, h - 0.012, fz + 0.18], 0.012, steel);
+      tube([sx, h - 0.012, fz + 0.18], [sx, h - 0.09, fz + 0.18], 0.01, steel);
+      box(sx + 0.08, rim, fz, 0.05, 0.035, 0.02, dark);
+    }
+  } else if (spec.kind === 'coffee-machine') {
+    // Bean-to-cup machine: dark body with a bean hopper on top, a lit display,
+    // the spout block over a drip tray and a cup waiting under it (local +Z).
+    const front = d / 2,
+      face = front - 0.1;
+    box(0, 0, -0.05, w, h - 0.12, d - 0.1, dark);
+    box(0, h - 0.12, -0.05, w - 0.06, 0.12, d - 0.16, glass);
+    box(0, h - 0.12, -0.05, w - 0.1, 0.03, d - 0.2, paint('#4a3728'));
+    box(0, h * 0.58, face + 0.004, w - 0.08, 0.06, 0.008, paint('#3a6fb0', 0.6));
+    for (let i = 0; i < 3; i++) ball(-0.06 + i * 0.06, h * 0.48, face + 0.004, 0.008, paint('#d8dde0', 0.3), 1, 1, 0.3);
+    box(0, 0.13, face + 0.015, 0.1, 0.05, 0.06, dark);
+    for (const x of [-0.02, 0.02]) cyl(x, 0.11, face + 0.04, 0.006, 0.02, dark);
+    box(0, 0, face + 0.05, w - 0.04, 0.02, 0.1, steel);
+    for (let i = 0; i < 4; i++) box(0, 0.02, face + 0.02 + i * 0.022, w - 0.08, 0.003, 0.004, dark);
+    cyl(0, 0.023, face + 0.045, 0.034, 0.075, paint('#f4f2ec'), 0.03);
+  } else if (spec.kind === 'water-dispenser') {
+    // Countertop hot-and-cold water dispenser: white body, dark lid, red and
+    // blue taps over a drip tray at the front (local +Z).
+    const front = d / 2,
+      face = front - 0.06;
+    box(0, 0, -0.03, w, h - 0.04, d - 0.06, white);
+    box(0, h - 0.04, -0.03, w - 0.02, 0.04, d - 0.08, dark);
+    box(0, h * 0.62, face + 0.004, w - 0.08, 0.05, 0.008, paint('#4a4f52'));
+    for (const [x, color] of [
+      [-0.06, '#d9534f'],
+      [0.06, '#3a7bd5'],
+    ] as [number, string][]) {
+      box(x, h * 0.42, face + 0.02, 0.03, 0.05, 0.04, paint(color));
+      box(x, h * 0.42 - 0.035, face + 0.035, 0.012, 0.035, 0.012, dark);
+    }
+    box(0, 0, face + 0.03, w - 0.06, 0.03, 0.06, steel);
+  } else if (spec.kind === 'drink-supplies') {
+    // A tray of paper cups in two stacks, three tea tins and a tall canister.
+    box(0, 0, 0, w, 0.02, d, steel);
+    for (const x of [-w / 2 + 0.07, -w / 2 + 0.16])
+      for (let i = 0; i < 6; i++) cyl(x, 0.02 + i * 0.016, 0, 0.04, 0.09, paint('#f4f2ec'), 0.034);
+    const tins: [number, string][] = [
+      [-0.03, '#b23a3a'],
+      [0.08, '#2f7d4f'],
+      [0.19, '#c9962b'],
+    ];
+    for (const [x, color] of tins) {
+      cyl(x, 0.02, -0.06, 0.045, 0.13, paint(color));
+      cyl(x, 0.15, -0.06, 0.046, 0.012, dark);
+    }
+    cyl(w / 2 - 0.06, 0.02, 0.07, 0.045, h - 0.04, paint('#e8e2d3'));
+    cyl(w / 2 - 0.06, h - 0.02, 0.07, 0.046, 0.02, dark);
+  } else if (spec.kind === 'glass-door-fridge') {
+    // Upright glass-door merchandiser: dark cabinet with a lit interior, four
+    // shelves of bottled and canned drinks behind a full-height glass door
+    // with a slim handle, lit header sign, compressor grille at the base.
+    const front = d / 2,
+      base = 0.12,
+      header = 0.2,
+      inner = h - base - header,
+      shelves = 4,
+      pitch = inner / shelves;
+    box(0, 0, 0, w, base, d - 0.02, dark);
+    for (let i = 0; i < 5; i++) box(0, 0.02 + i * 0.02, front - 0.012, w - 0.1, 0.006, 0.004, steel);
+    box(0, base, -front + 0.025, w, h - base, 0.05, dark);
+    for (const x of [-w / 2 + 0.02, w / 2 - 0.02]) box(x, base, -0.025, 0.04, h - base, d - 0.05, dark);
+    box(0, h - header, -0.025, w, header, d - 0.05, dark);
+    box(0, h - header + 0.05, front - 0.031, w - 0.12, 0.1, 0.01, paint('#eaf4ff', 0.9));
+    box(0, base, -front + 0.053, w - 0.08, inner, 0.006, paint('#dfe9ee', 0.5));
+    const colors = ['#2d7bd6', '#e0582b', '#6fb34f', '#f0c23a', '#9b59b6'];
+    for (let i = 0; i < shelves; i++) {
+      const y = base + 0.02 + i * pitch;
+      box(0, y, -0.03, w - 0.08, 0.015, d - 0.16, steel);
+      for (let k = 0; k < 5; k++)
+        for (const z of [-0.14, 0.02]) {
+          const x = -w / 2 + 0.1 + k * ((w - 0.2) / 4),
+            tall = (i + k) % 2 === 0;
+          cyl(x, y + 0.015, z, tall ? 0.03 : 0.033, tall ? 0.21 : 0.13, paint(colors[(k + i) % 5]), tall ? 0.016 : 0.033);
+        }
+    }
+    add(new T.BoxGeometry(w - 0.1, inner - 0.02, 0.012), glass, 0, base + inner / 2, front - 0.012);
+    for (const y of [base, h - header - 0.03]) box(0, y, front - 0.03, w - 0.08, 0.03, 0.03, dark);
+    for (const x of [-w / 2 + 0.055, w / 2 - 0.055]) box(x, base, front - 0.03, 0.03, inner, 0.03, dark);
+    box(w / 2 - 0.1, base + inner * 0.35, front - 0.01, 0.02, 0.35, 0.01, steel);
   }
   // Centre on the floor and fit to the declared box, as assets.ts does for
   // its own kinds (the parts are built to size, so the scale is ~1).

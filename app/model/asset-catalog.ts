@@ -801,10 +801,29 @@ export const assetCatalog: Record<string, CatalogEntry> = {
     purpose:
       'Tall kitchenette cabinet with a niche for the microwave and shelves for staff supplies.',
   },
-  'bar-partition': {
-    name: 'Breakfast bar',
+  'kitchenette-counter': {
+    name: 'Kitchenette counter',
     purpose:
-      'Counter-height bar along the lounge partition where staff eat and take breaks on stools.',
+      'Base cabinets with a quartz top and a small sink: the staff lounge’s kitchenette and the dining room’s drink station stand on one.',
+  },
+  'coffee-machine': {
+    name: 'Coffee machine',
+    purpose:
+      'Bean-to-cup coffee machine on the drink station; participants and staff help themselves to coffee between meals.',
+  },
+  'water-dispenser': {
+    name: 'Water dispenser',
+    purpose:
+      'Hot and cold water dispenser on the drink station for tea and drinking water through the day.',
+  },
+  'drink-supplies': {
+    name: 'Cups and tea',
+    purpose: 'Paper cups, tea tins and a canister set out on the drink station.',
+  },
+  'glass-door-fridge': {
+    name: 'Drinks fridge',
+    purpose:
+      'Upright glass-door refrigerator beside the drink station, its shelves of bottled water, juice and soft drinks visible through the door.',
   },
   // Owner review 2026-10 · day-admin
   'standing-desk': {
