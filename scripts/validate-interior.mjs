@@ -101,10 +101,30 @@ const within = (b, [x, z]) => {
 };
 /** How far along a walk a person may still be on the seat they left or reach. */
 const SEAT_APPROACH = 1.25;
+// A person may approach, leave or slide along the seat they sit in: a walk
+// that starts from a seated segment, or ends in one, is not kept 0.18 m off
+// the chair or bench that holds that seated point, nor off the table the
+// seat is drawn up to (any reviewed piece within 0.18 m of the seated point;
+// the owner review's banquette regulars sit down on the east banquette and
+// on tree-seat chairs, and slide along the bench to get out between its
+// tables).
+const seatsAt = (p) =>
+  boxes
+    .filter((b) => {
+      const dx = p[0] - b.x,
+        dz = p[1] - b.z;
+      return (
+        Math.abs(b.c * dx - b.s * dz) <= b.w + 0.18 &&
+        Math.abs(b.s * dx + b.c * dz) <= b.d + 0.18
+      );
+    })
+    .map((b) => b.id);
 let samples = 0;
 for (const a of loop.actors) {
   if (a.levelId !== 'ground' || a.escortFor) continue;
-  for (const s of a.segments) {
+  const n = a.segments.length;
+  for (let k = 0; k < n; k++) {
+    const s = a.segments[k];
     if (!['walk', 'roll'].includes(s.action)) continue;
     // Owner walkthrough (October 2026): a walk may start or end on a seat (a
     // recliner, a recumbent stepper, the edge of a massage bed), so the piece
@@ -121,6 +141,12 @@ for (const a of loop.actors) {
         (e) =>
           within(b, e) && Math.hypot(x - e[0], z - e[1]) <= SEAT_APPROACH,
       );
+    const before = a.segments[(k + n - 1) % n],
+      after = a.segments[(k + 1) % n],
+      ownSeats = new Set([
+        ...((before.seated ?? a.seated) ? seatsAt(s.path[0]) : []),
+        ...((after.seated ?? a.seated) ? seatsAt(s.path.at(-1)) : []),
+      ]);
     for (let i = 1; i < s.path.length; i++) {
       const p = s.path[i - 1],
         q = s.path[i],
@@ -131,11 +157,13 @@ for (const a of loop.actors) {
       for (let j = 0; j <= count; j++) {
         const x = p[0] + ((q[0] - p[0]) * j) / count,
           z = p[1] + ((q[1] - p[1]) * j) / count;
-        for (const b of boxes)
+        for (const b of boxes) {
+          if (ownSeats.has(b.id)) continue;
           assert.ok(
             !within(b, [x, z]) || allowed(b, x, z),
             `${a.id}: path overlaps ${b.id} at ${x},${z}`,
           );
+        }
         samples++;
       }
     }

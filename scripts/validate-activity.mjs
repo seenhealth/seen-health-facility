@@ -21,8 +21,10 @@ const m = JSON.parse(
   readFileSync('public/models/seen-alhambra-planning.json', 'utf8'),
 );
 // The engine plays its source as given; the viewer gives it the composed
-// Alhambra source: the 184-person loop, the fleet crew (194) and the
-// community cast (258: 23 hand-authored, 41 generated inside facility
+// Alhambra source: the 200-person loop (184 plus the October 2026 owner
+// review's recreation therapists, quiet-room players and banquette regulars,
+// scripts/apply-owner-review-day-admin.mjs), the fleet crew (210) and the
+// community cast (274: 23 hand-authored, 41 generated inside facility
 // instances, 33 in the partner day center, 6 in the Wongs' home and 2 in Mrs.
 // Lin's), with the community vehicles registered so their riders' seats
 // resolve.
@@ -36,11 +38,12 @@ const scene = new T.Scene(),
   ),
   neighborhood = buildNeighborhood(m);
 scene.add(neighborhood.root);
-// The base loop's people (owner walkthrough 2026-10: +1 karaoke duet partner,
-// +6 in the rehab wing: two therapists, an acupressure therapist and three
-// participants) and the composed scene (base + fleet crew + community layer).
-assert.equal(activity.actors.length, 265);
-assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 191);
+// The base loop's people (owner walkthrough 2026-10: 184 + the karaoke duet
+// partner, 6 in the rehab wing, and 16 in the day room and admin wing: two
+// more recreation therapists, eight quiet-room sitters and six banquette
+// regulars) and the composed scene (base + fleet crew + community layer).
+assert.equal(activity.actors.length, 281);
+assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 207);
 for (const role of [
   'doctor',
   'nurse',

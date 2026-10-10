@@ -1,13 +1,16 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
-import { roomPlacement } from '../work/validation/site-activity-data.mjs';
+import {
+  insideRoom,
+  roomPlacement,
+} from '../work/validation/site-activity-data.mjs';
 import { sampleActor } from '../work/validation/activity.mjs';
 import {
   buildCommunityAsset,
   animateCommunityProp,
 } from '../work/validation/community-assets.mjs';
 import { showcaseFrame } from '../work/validation/showcase.mjs';
-import { validateFacility } from '../work/validation/schema.mjs';
+import { polygonArea, validateFacility } from '../work/validation/schema.mjs';
 import { missingInstances } from '../work/validation/community-settings.mjs';
 // Every facility stamped on a community pad has a current generated summary.
 assert.deepEqual(
@@ -25,24 +28,82 @@ const normalized = {
 };
 const data = JSON.parse(fs.readFileSync('app/data/activity-loop.json'));
 const cast = data.actors.filter((a) => a.id.startsWith('community-'));
-// Owner walkthrough 2026-10: 184 + the karaoke duet partner + 6 in rehab.
-assert.equal(data.actors.length, 191);
+// Owner walkthrough 2026-10: 184 + the karaoke duet partner + 6 in rehab +
+// 16 in the day room and admin wing.
+assert.equal(data.actors.length, 207);
 const profiles = JSON.parse(
   fs.readFileSync('app/data/character-templates.json'),
 ).people;
-assert.equal(new Set(data.actors.map((a) => a.profileId)).size, 191);
+assert.equal(new Set(data.actors.map((a) => a.profileId)).size, 207);
 assert(data.actors.every((a) => profiles.some((p) => p.id === a.profileId)));
+// People who work between rooms (the owner review's recreation therapists,
+// the quiet-room onlooker who steps out, the banquette regulars who visit the
+// tree seat) are checked in whichever room they are in at each sample: their
+// `roomId` is the room they belong to; elsewhere the smallest room holding
+// the point applies, and a point in no room (a doorway) its zone. A seated
+// sample sits inside its seat, so that chair or bench is exempt (not only the
+// actor's own `seatId`), the seated radius follows the segment, and a walk
+// that joins or leaves a seat may come up to that seat within its last or
+// first 1.2 m (a person may approach the seat they sit in).
+const placements = new Map(),
+  placementFor = (room) => {
+    if (!placements.has(room.id))
+      placements.set(room.id, roomPlacement(normalized, room));
+    return placements.get(room.id);
+  };
+const roomFor = (actor, p) => {
+  const own = model.rooms.find((r) => r.id === actor.roomId);
+  if (own && insideRoom(p, own.polygon)) return own;
+  const inside = model.rooms
+    .filter((r) => r.levelId === actor.levelId && insideRoom(p, r.polygon))
+    .sort((a, b) => polygonArea(a.polygon) - polygonArea(b.polygon))[0];
+  if (inside) return inside;
+  const zone =
+    model.zones.find(
+      (z) => z.levelId === actor.levelId && insideRoom(p, z.polygon),
+    ) || model.zones.find((z) => z.id === actor.segments[0].zoneId);
+  return { ...zone, id: 'open-zone:' + zone.id };
+};
+const seatKinds = /chair|bench|stool|seat|sofa/;
+const seatAt = (p) =>
+  model.objects.find((o) => {
+    const spec = model.assets[o.assetId];
+    if (!seatKinds.test(spec.kind) || o.levelId !== 'ground') return false;
+    const [w, , d] = spec.dimensions.map((v, i) => v * o.scale[i]),
+      dx = p[0] - o.position[0],
+      dz = p[1] - o.position[2],
+      x = Math.cos(o.rotation) * dx - Math.sin(o.rotation) * dz,
+      z = Math.sin(o.rotation) * dx + Math.cos(o.rotation) * dz;
+    return Math.abs(x) <= w / 2 + 0.05 && Math.abs(z) <= d / 2 + 0.05;
+  })?.id;
+const near = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]) <= 1.2;
+const seatFor = (actor, p) => {
+  const at = [p.x, p.z],
+    n = actor.segments.length,
+    s = actor.segments[p.segmentIndex];
+  if (p.seated ?? actor.seated) return seatAt(at) ?? actor.seatId;
+  if (['walk', 'roll'].includes(s.action)) {
+    const before = actor.segments[(p.segmentIndex + n - 1) % n],
+      after = actor.segments[(p.segmentIndex + 1) % n];
+    if ((after.seated ?? actor.seated) && near(at, s.path.at(-1)))
+      return seatAt(s.path.at(-1)) ?? actor.seatId;
+    if ((before.seated ?? actor.seated) && near(at, s.path[0]))
+      return seatAt(s.path[0]) ?? actor.seatId;
+  }
+  return actor.seatId;
+};
 let samples = 0;
 for (const actor of cast) {
-  const room = model.rooms.find((r) => r.id === actor.roomId) || {
-    ...model.zones.find((z) => z.id === actor.segments[0].zoneId),
-    id: 'open-zone',
-  };
-  const clearance = roomPlacement(normalized, room);
   for (let time = 0; time < 720; time += 4) {
-    const p = sampleActor(actor, time);
+    const p = sampleActor(actor, time),
+      at = [p.x, p.z],
+      seated = p.seated ?? actor.seated;
     assert(
-      clearance.clear([p.x, p.z], actor.seated ? 0.19 : 0.28, actor.seatId),
+      placementFor(roomFor(actor, at)).clear(
+        at,
+        seated ? 0.19 : 0.28,
+        seatFor(actor, p),
+      ),
       `${actor.id}: furniture/wall overlap at ${time}`,
     );
     for (const other of data.actors) {

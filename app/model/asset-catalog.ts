@@ -806,6 +806,12 @@ export const assetCatalog: Record<string, CatalogEntry> = {
     purpose:
       'Counter-height bar along the lounge partition where staff eat and take breaks on stools.',
   },
+  // Owner review 2026-10 · day-admin
+  'standing-desk': {
+    name: 'Standing desk',
+    purpose:
+      'Sit-stand desk at standing height in the recreation therapy office, where the recreation therapists plan programs and chart between their rounds of the day room.',
+  },
 };
 
 /** Asset ids that say more than their kind (generic `box`, `table`, … assets). */
