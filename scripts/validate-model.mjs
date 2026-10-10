@@ -283,6 +283,9 @@ if (m.photoSurvey) {
       readFileSync('public/models/seen-alhambra-planning-base.json', 'utf8'),
     );
     const changed = new Set(m.interiorReview.changedPlanObjectIds);
+    // The owner walkthrough's reviewed changes may touch any room.
+    const owner = ownerReviewed(m);
+    for (const id of owner.objects) changed.add(id);
     if (m.designDecisions?.communityActivityConversion) {
       const converted = new Set(['admin-meeting-west', 'admin-meeting-east',
         'admin-workstations', 'admin-conference']);
@@ -299,6 +302,7 @@ if (m.photoSurvey) {
       else
         assert.ok(
           ['day', 'clinic', 'rehab', 'dining'].includes(o.zoneId) ||
+            owner.objects.has(o.id) ||
             m.layoutCorrections?.changedPlanObjectIds.includes(o.id) ||
             (m.designDecisions?.communityActivityConversion && ['admin-meeting-west',
               'admin-meeting-east', 'admin-workstations', 'admin-conference'].includes(o.roomId)),
@@ -375,10 +379,14 @@ if (m.photoSurvey) {
     baseline.zones.map((z) => z.polygon),
     'Photo finishes preserve calibrated building footprint',
   );
+  const ownerWalls = ownerReviewed(m).walls;
   assert.deepEqual(
-    m.walls.filter((w) => !w.id.startsWith('upperfit-')).map((w) => [w.a, w.b]),
+    m.walls
+      .filter((w) => !w.id.startsWith('upperfit-') && !ownerWalls.has(w.id))
+      .map((w) => [w.a, w.b]),
     baseline.walls
       .filter((w) => !m.designDecisions?.dayRoomCrossPassage || w.id !== 'plan-wall-155')
+      .filter((w) => !ownerWalls.has(w.id))
       .map((w) => {
         if (!m.designDecisions?.dayRoomCrossPassage || w.zoneId !== 'rehab') return [w.a, w.b];
         // The reviewed cross-passage replaces the old behind-shelf corridor.
@@ -424,6 +432,40 @@ if (m.photoSurvey) {
         .every((o) => o.zoneId === 'site'),
     );
   }
+}
+/**
+ * The owner walkthrough registry (`ownerReview`): the wall and object ids it
+ * admits to differ from the baseline. Every listed id must exist where the
+ * list says it does, so a stale registry is caught here.
+ */
+function ownerReviewed(m) {
+  const r = m.ownerReview;
+  if (!r) return { walls: new Set(), objects: new Set() };
+  const baseline = JSON.parse(
+    readFileSync('public/models/seen-alhambra-planning-base.json', 'utf8'),
+  );
+  const baseWalls = new Set(baseline.walls.map((w) => w.id)),
+    walls = new Set(m.walls.map((w) => w.id)),
+    baseObjects = new Set(baseline.objects.map((o) => o.id)),
+    objects = new Set(m.objects.map((o) => o.id));
+  for (const id of r.changedWallIds)
+    assert.ok(baseWalls.has(id) && walls.has(id), `ownerReview changed wall exists: ${id}`);
+  for (const id of r.newWallIds)
+    assert.ok(!baseWalls.has(id) && walls.has(id), `ownerReview new wall is new: ${id}`);
+  for (const id of r.removedWallIds)
+    assert.ok(baseWalls.has(id) && !walls.has(id), `ownerReview removed wall is gone: ${id}`);
+  for (const id of r.changedPlanObjectIds)
+    assert.ok(baseObjects.has(id) && objects.has(id), `ownerReview changed object exists: ${id}`);
+  for (const id of r.removedPlanObjectIds)
+    assert.ok(baseObjects.has(id) && !objects.has(id), `ownerReview removed object is gone: ${id}`);
+  for (const id of r.newObjectIds)
+    assert.ok(!baseObjects.has(id) && objects.has(id), `ownerReview new object is new: ${id}`);
+  for (const item of r.items)
+    assert.ok(item.id && item.rooms.length && item.change, 'ownerReview item documented');
+  return {
+    walls: new Set([...r.changedWallIds, ...r.newWallIds, ...r.removedWallIds]),
+    objects: new Set([...r.changedPlanObjectIds, ...r.removedPlanObjectIds]),
+  };
 }
 console.log(
   `Validated ${m.zones.length} zones, ${m.rooms.length} room records, ${m.walls.length} walls, ${m.objects.length} objects, ${m.referencePages.length} source pages, normalized assets and bounded activity props, specification round trips, swappable definitions and ${bads.length} invalid-input paths.`,

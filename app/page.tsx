@@ -96,6 +96,8 @@ export default function Home() {
     sidePanel = useRef<HTMLElement>(null);
   const [showcase, setShowcase] = useState(false);
   const previousView = useRef<ViewerState | null>(null);
+  // The Labels checkbox as last set, for focuses that rebuild the view state.
+  const labelsOn = useRef(false);
   const [siteId, setSiteId] = useState<SiteId>('alhambra');
   const [networkOpen, setNetworkOpen] = useState(false);
   const [clinicOption, setClinicOption] = useState(false);
@@ -129,6 +131,7 @@ export default function Home() {
     [inspected, setInspected] = useState<InspectTarget | null>(null),
     [dataTab, setDataTab] = useState<'overview' | 'assets'>('overview');
   const patch = (s: Partial<ViewerState>) => setState((p) => ({ ...p, ...s }));
+  labelsOn.current = state.labels;
   const getViewer = useCallback(() => viewer.current, []);
   // Cards share the top-right slot: an item's card closes the space card and
   // a space card closes the item's.
@@ -164,7 +167,8 @@ export default function Home() {
         roof: false,
         exterior: false,
         ceilings: false,
-        labels: false,
+        // The Labels checkbox keeps its setting across activity focuses.
+        labels: labelsOn.current,
         walls: 'cutaway',
       };
       setState(next);

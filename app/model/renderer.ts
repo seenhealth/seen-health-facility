@@ -2195,6 +2195,8 @@ export function createViewer(
     placed: boolean;
     following: boolean;
     compact: boolean;
+    /** Fade-in with the zoom, 0 to 1. */
+    opacity: number;
     size: [number, number];
     /** Anchor on screen and stem length this frame. */
     x: number;
@@ -2207,13 +2209,15 @@ export function createViewer(
     tableSlots: Highlight[] = [];
   const lowestFirst = (a: Highlight, b: Highlight) => b.y - a.y;
   /**
-   * Zone labels appear from the "Day activities" zoom (about 1.39) inward and
-   * stay hidden in the whole-building overviews (1.3 and below); hosts are
-   * named once the room is large enough to read (px/m). Table labels join
-   * from the day-program framing (zoom 2.6) inward.
+   * The day-room labels follow the Labels checkbox and the zoom: they stay
+   * off in the "Day activities" framing (zoom about 1.39) and the
+   * whole-building overviews, fade in as the camera closes past 2.0 (the
+   * day-program framing is 2.6), and the table labels follow from 3.0 inward.
+   * Hosts are named once the room is large enough to read (px/m).
    */
-  const HIGHLIGHT_MIN_ZOOM = 1.35,
-    HIGHLIGHT_TABLE_ZOOM = 2.3,
+  const HIGHLIGHT_MIN_ZOOM = 2.0,
+    HIGHLIGHT_FADE_ZOOM = 0.5,
+    HIGHLIGHT_TABLE_ZOOM = 3.0,
     HIGHLIGHT_MIN_SCALE = 8,
     HIGHLIGHT_DETAIL_SCALE = 22;
   const followHighlight = (label: Highlight) => {
@@ -2232,6 +2236,7 @@ export function createViewer(
     const scale =
       (host.clientHeight * camera.zoom) / (camera.top - camera.bottom);
     const show =
+      state.labels &&
       s.enabled &&
       !showcase &&
       !recordingSize &&
@@ -2242,6 +2247,11 @@ export function createViewer(
       scale >= HIGHLIGHT_MIN_SCALE;
     const showTables = show && camera.zoom >= HIGHLIGHT_TABLE_ZOOM;
     const compact = scale < HIGHLIGHT_DETAIL_SCALE;
+    // Fade in over the half zoom step past each threshold.
+    const fade = (from: number) =>
+      Math.min(1, Math.max(0, (camera.zoom - from) / HIGHLIGHT_FADE_ZOOM));
+    const zoneOpacity = fade(HIGHLIGHT_MIN_ZOOM),
+      tableOpacity = fade(HIGHLIGHT_TABLE_ZOOM);
     zoneSlots.length = tableSlots.length = 0;
     for (const h of activity.dayRoom.highlights()) {
       const key = h.kind + ':' + h.id;
@@ -2276,6 +2286,7 @@ export function createViewer(
           placed: false,
           following: false,
           compact: false,
+          opacity: 1,
           size: [0, 0],
           x: 0,
           y: 0,
@@ -2314,6 +2325,11 @@ export function createViewer(
         label.size = [0, 0];
       }
       if (!visible) continue;
+      const opacity = h.kind === 'table' ? tableOpacity : zoneOpacity;
+      if (opacity !== label.opacity) {
+        label.opacity = opacity;
+        label.el.style.opacity = String(opacity);
+      }
       highlightPoint.copy(h.position).project(activeCamera());
       if (highlightPoint.z > 1) {
         label.el.style.visibility = 'hidden';

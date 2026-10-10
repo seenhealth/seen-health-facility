@@ -41413,6 +41413,18 @@
     ],
     "accuracy": "User-specified orientation and uses implemented; plan-calibrated dimensions and elevations remain estimates, not a measured survey."
   },
+  "ownerReview": {
+    "date": "2026-10-10",
+    "title": "Owner walkthrough corrections · October 2026",
+    "accuracy": "Owner-directed room, fit-out and door corrections from a walkthrough of the model; room and fixture positions follow the owner’s description, not a survey.",
+    "items": [],
+    "changedWallIds": [],
+    "newWallIds": [],
+    "removedWallIds": [],
+    "changedPlanObjectIds": [],
+    "removedPlanObjectIds": [],
+    "newObjectIds": []
+  },
   "publication": {
     "sourceDocuments": "not-published"
   },
