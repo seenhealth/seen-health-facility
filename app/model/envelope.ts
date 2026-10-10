@@ -12,11 +12,15 @@ const OWN_GLAZING = new Set([
   'shell-lobby-west-opening-1',
   'ethel-corner-return-glazing',
 ]);
-/** Openings whose surround the exterior draws itself (the loading block's recessed jamb, photos 2026-10-02). */
+/**
+ * Openings whose surround the exterior draws itself: the loading block's recessed jamb (photos 2026-10-02) and the
+ * therapy wing's veranda roll-up, whose guides and hood alhambra-exterior.ts draws (`VERANDA.rollup`).
+ */
 const OWN_SURROUND = new Set([
   'shell-rear-north-opening-1',
   'shell-rear-north-opening-2',
   'shell-rear-north-opening-3',
+  'shell-therapy-north-opening-2',
 ]);
 export function buildEnvelopeWall(
   w: EnvelopeWall,

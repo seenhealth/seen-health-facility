@@ -120,9 +120,11 @@ const obstacles = [
 // as its photographs refine it.
 const TRUCK_ROOF = 3.2;
 const rearCourtSolids = (() => {
-  const { facade } = buildAlhambraExterior(m);
-  facade.updateMatrixWorld(true);
-  const court = facade.getObjectByName('rear-court-staff-entrance-and-loading'),
+  // The court's structures are the site's (they stay in view in the cutaway); the fittings on the wing's faces,
+  // which trucks never reach, are the facade's.
+  const { site } = buildAlhambraExterior(m);
+  site.updateMatrixWorld(true);
+  const court = site.getObjectByName('rear-court-staff-entrance-and-loading'),
     found = [],
     b = new Box3();
   court?.traverse((o) => {

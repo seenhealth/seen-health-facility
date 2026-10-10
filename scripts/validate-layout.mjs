@@ -164,7 +164,11 @@ assert.ok(
   Math.max(...xs) - Math.min(...xs) > 2 * (Math.max(...zs) - Math.min(...zs)),
   'Rotated conference room runs east–west',
 );
-// Furniture must not occupy the newly opened upper stairwells.
+// Furniture must not occupy the newly opened upper stairwells, and the
+// upstairs fit-out's furniture stays inside the room it is filed under (the
+// owner's walkthrough, 2026-10, moved the restroom and its fixtures, the rear
+// desks and the desk pods, and added desks along the east wall).
+let upstairsRoomed = 0;
 for (const o of m.objects.filter(
   (o) => o.levelId === 'upper' && o.layer === 'furniture',
 )) {
@@ -183,7 +187,23 @@ for (const o of m.objects.filter(
       `${o.id}: clear of ${a.id}`,
     );
   }
+  if (!o.id.startsWith('upperfit-') || !o.roomId) continue;
+  const room = m.rooms.find((r) => r.id === o.roomId);
+  for (const x of [-w / 2, w / 2])
+    for (const z of [-d / 2, d / 2])
+      assert.ok(
+        inside(
+          [o.position[0] + c * x + s * z, o.position[2] - s * x + c * z],
+          room.polygon,
+        ),
+        `${o.id}: inside ${room.id}`,
+      );
+  upstairsRoomed++;
 }
+assert.ok(
+  upstairsRoomed > 40,
+  `upstairs furniture is filed under its rooms (${upstairsRoomed})`,
+);
 console.log(
-  `Layout verified: ${treadSamples} exact-height treads, ${floorSamples} clear aperture samples, 5 aligned vertical connections, 6 exam-room footprints, station opening and upper furniture clearances.`,
+  `Layout verified: ${treadSamples} exact-height treads, ${floorSamples} clear aperture samples, 5 aligned vertical connections, 6 exam-room footprints, station opening, upper furniture clearances and ${upstairsRoomed} upstairs pieces inside their rooms.`,
 );

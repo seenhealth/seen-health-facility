@@ -402,9 +402,11 @@ for (const [name, source] of sources) {
 // (nav.ts; escorts and staff the wall clearance) from its rails and the bike
 // rack, never steps across a rail, and on the landing, the switchback's
 // runs and the turn landing walks at the surface's height (on the steps,
-// between a tread and the one above it). Between the docked van's nose and
-// the lobby wall (the passage round the nose, the switchback and the landing,
-// all single file) people outside one party keep half a metre apart.
+// between a tread and the one above it). Between the docked van's ramp foot
+// and the lobby wall (the way along the lot to the switchback, the switchback
+// and the landing, all single file) people outside one party keep half a
+// metre apart; the ramp itself, where the driver follows each rider closely,
+// lies west of that band.
 const { DROP_OFF } = exterior;
 const dropOffEdges = [
   ...Object.entries(DROP_OFF.rails).map(([id, r]) => ({ id: `${id} rail`, a: [r.x, r.z0], b: [r.x, r.z1] })),
@@ -425,8 +427,8 @@ const onSteps = ([x, z]) => {
 };
 const near = { x0: -26, x1: -13, z0: -9, z1: 11 };
 const nearDropOff = ([x, z]) => x > near.x0 && x < near.x1 && z > near.z0 && z < near.z1;
-assert.ok(Math.abs(-Math.sin(fleet.FLEET_LOT.dockHeading) - 1) < 1e-9, 'the docked van faces +x, toward the switchback');
-const pastNose = fleet.FLEET_LOT.dock[0] + fleet.FLEET_VAN.halfLength,
+assert.ok(Math.abs(Math.cos(fleet.FLEET_LOT.dockHeading) - 1) < 1e-9, "the docked van's sliding door faces +x, toward the entrance");
+const pastRamp = arrival.ARRIVAL.foot[0] + 0.3,
   SINGLE_FILE_GAP = 0.5;
 const levelElevation = (id) => model.levels.find((l) => l.id === id)?.elevation || 0;
 const dropOff = { samples: 0, onSurface: 0, people: new Set(), railGap: Infinity, railGapAt: '', spacing: Infinity, spacingAt: '' };
@@ -467,7 +469,7 @@ for (const [name, base] of [
         dropOff.onSurface++;
         dropOff.people.add(a.id);
       }
-      if (p[0] > pastNose && p[0] < arrival.ARRIVAL.door[0]) here.push({ a, p, title: f.title });
+      if (p[0] > pastRamp && p[0] < arrival.ARRIVAL.door[0]) here.push({ a, p, title: f.title });
     }
     for (let i = 0; i < here.length; i++)
       for (let k = i + 1; k < here.length; k++) {

@@ -201,6 +201,36 @@ export const DROP_OFF = (() => {
   };
 })();
 
+/**
+ * The therapy wing's veranda (the owner's walkthrough, 2026-10): the walkway
+ * behind the split-face block wall on the wing's lot side (−z of it; Street
+ * View, May 2025), level with the sills of the two doors the plan opens onto
+ * it, with two steps down to the lot at its west end and the garden on it.
+ * `buildAlhambraExterior` draws it; scripts/apply-owner-review-exterior.mjs
+ * cuts the envelope's openings in `shell-therapy-north` to `door` and `rollup`
+ * (both inside the traced plan walls' gaps).
+ */
+export const VERANDA = {
+  /** The wing's lot-side wall (the envelope's shell-therapy-north): its centre line and its lot-side face. */
+  wallZ: 8.903806,
+  face: 8.903806 - 0.12,
+  /** The awning door into the north support room: the plan's gap between plan-wall-184 and 185. */
+  door: { x0: -26.143, x1: -25.143, height: 2.2 },
+  /**
+   * The roll-up from the therapy entry corridor onto the walkway: the plan's
+   * gap between plan-wall-185 and 186. Its curtain stands `raised` m up by
+   * day.
+   */
+  rollup: { x0: -21.8, x1: -18.8, height: 2.5, raised: 2.2 },
+  /** The walkway, from the block wall's back face to the wing's face, its top at the door sills. */
+  walk: { x0: -28.88, x1: -18.1, z0: 7.15, z1: 8.9, top: 0 },
+  /** The block wall along the walkway's lot side: its centre line, thickness and top. */
+  wall: { z: 7.0, thickness: 0.3, top: 1.27 },
+  /** Off the walkway's west end down to the lot: `risers` equal risers over treads `depth` deep. */
+  steps: { risers: 2, depth: 0.35 },
+  street: -0.23,
+};
+
 /** 2022 offering brochure exterior photographs, fitted to the existing plan footprint. */
 export function buildAlhambraExterior(model: Facility) {
   if (model.exteriorAppearance !== 'alhambra-brochure') return null;
@@ -751,94 +781,296 @@ export function buildAlhambraExterior(model: Facility) {
       box(equipment, x, r.eaveHeight + h, z, w + 0.1, 0.06, d + 0.1, cap);
     });
   }
-  // Lot-side door of the two-storey wing: navy awning, three steps down to the lot
-  // and a block planter wall beside them (Street View, May 2025).
-  const lotDoor = group(facade, 'therapy-lot-door-awning-and-steps');
-  // Street View (May 2025): on the wing's lot face, a glass double door
-  // (1839 W Valley Blvd) and, west of it, the awning door. A split-face block
-  // wall stands 1.8 m clear of the face from the ramp's turn landing west to
-  // just past the awning door, with a door-level walkway behind it; at the
-  // wall's west end four steps descend toward Ethel, pipe handrail on the lot
-  // side.
-  const doorX = -31.18 + 3.25 + 0.55;
-  const brick = '#c49a6c',
-    brickJoint = '#b58a5e';
+  // The therapy wing's lot-side doors (the plan; the owner's walkthrough,
+  // 2026-10): the awning door into the north support room (the envelope's
+  // shell-therapy-north-opening-1, `VERANDA.door`) under its navy awning, and
+  // the 3 m roll-up (opening 2, `VERANDA.rollup`) that opens the therapy
+  // entry corridor onto the walkway: a grey slatted curtain in guides just
+  // inside the wall's face, rolled up into a hood over the opening by day
+  // (`therapy-veranda-rollup` stands `VERANDA.rollup.raised` m up; lowering
+  // it is its group's y, as deliveries.ts lowers the loading roll-up). Door and
+  // roll-up are on the wall, so they stay with the facade and go with the
+  // exterior in the cutaway; the walkway, its garden and the block wall are
+  // the site's (`therapy-veranda-and-garden`, below) and stay in view when
+  // the building is opened up.
+  const lotDoor = group(facade, 'therapy-lot-door-awning-and-rollup');
+  const V = VERANDA,
+    doorX = (V.door.x0 + V.door.x1) / 2;
   box(lotDoor, doorX, 2.32, 8.35, 2.7, 0.14, 1.1, '#2d4a74');
   box(lotDoor, doorX, 2.28, 8.35, 2.6, 0.05, 1.0, '#eeeee7');
-  const landTop = 0.5,
-    wallZ = 7.0,
-    wallX0 = doorX - 1.5,
-    wallX1 = -18.1,
-    // the walkway and the steps run from the block wall's back face (no gap between them) to the wing's face
-    walkZ0 = wallZ + 0.15,
-    walkZ1 = 8.9;
-  box(
-    lotDoor,
-    (wallX0 + wallX1) / 2,
-    -0.23,
-    (walkZ0 + walkZ1) / 2,
-    wallX1 - wallX0,
-    landTop + 0.23,
-    walkZ1 - walkZ0,
-    '#c5c8c2',
-  );
-  const run = 0.35,
-    riseStep = (landTop + 0.23) / 4;
-  for (let i = 0; i < 4; i++)
-    box(
-      lotDoor,
-      wallX0 - run / 2 - run * i,
-      -0.23,
-      (walkZ0 + walkZ1) / 2,
-      run,
-      landTop + 0.23 - riseStep * (i + 1),
-      walkZ1 - walkZ0,
-      '#c5c8c2',
-    );
-  const stairFoot = wallX0 - run * 4;
-  box(lotDoor, wallX0 - 0.05, landTop, walkZ0 + 0.1, 0.035, 0.95, 0.035, steel);
-  box(
-    lotDoor,
-    stairFoot + 0.05,
-    -0.23,
-    walkZ0 + 0.1,
-    0.035,
-    0.95,
-    0.035,
-    steel,
-  );
-  beam(
-    lotDoor,
-    [wallX0 - 0.05, landTop + 0.95, walkZ0 + 0.1],
-    [stairFoot + 0.05, -0.23 + 0.95, walkZ0 + 0.1],
-    0.035,
-    0.035,
-    steel,
-  );
-  box(
-    lotDoor,
-    (wallX0 + wallX1) / 2,
-    -0.23,
-    wallZ,
-    wallX1 - wallX0,
-    1.5,
-    0.3,
-    brick,
-  );
-  for (const zz of [wallZ - 0.16, wallZ + 0.16]) {
-    for (let y = 0.05; y < 1.45; y += 0.2)
+  {
+    const r = V.rollup,
+      rx = (r.x0 + r.x1) / 2,
+      rw = r.x1 - r.x0,
+      slat = '#8f8c85';
+    // the hood over the opening, proud of the face, and a guide either side
+    box(lotDoor, rx, r.height, V.face - 0.1, rw + 0.3, 0.42, 0.22, '#9c9d99');
+    for (const gx of [r.x0 - 0.04, r.x1 + 0.04])
+      box(lotDoor, gx, 0, V.face - 0.03, 0.08, r.height, 0.1, slat);
+    // the curtain, within the wall's thickness so that it rolls up out of sight above the opening
+    const curtain = group(lotDoor, 'therapy-veranda-rollup');
+    box(curtain, rx, 0, V.face + 0.08, rw - 0.1, r.height, 0.04, '#b4b1aa');
+    for (let y = 0.12; y < r.height - 0.1; y += 0.13)
+      box(curtain, rx, y, V.face + 0.055, rw - 0.1, 0.018, 0.01, slat);
+    box(curtain, rx, -0.04, V.face + 0.05, rw - 0.06, 0.08, 0.1, '#7d7a74');
+    curtain.position.y = r.raised;
+  }
+  // The veranda (the owner, 2026-10: "a garden that is accessible from inside
+  // ... participants come from the inside hallway to the outside of the
+  // veranda"): the walkway behind the split-face block wall ("a brick wall
+  // outside"), its top level with the door sills so the doors open straight
+  // onto it, two steps down to the lot at its west end with a pipe handrail,
+  // and the garden: raised timber planter boxes along the wall's back with
+  // herbs, flowers, shrubs and a small tree, two timber benches against the
+  // wing's face opposite them (0.9 m clear between), a watering can by the
+  // boxes, a potted agave past the roll-up and, on the wall's lot side, a
+  // mulched bed of agaves and grasses behind a low kerb, north of the vans'
+  // entry lane (z 4.3 ± a van's half width) by more than their clearance.
+  {
+    const veranda = group(site, 'therapy-veranda-and-garden');
+    const brick = '#c49a6c',
+      brickJoint = '#b58a5e',
+      timber = '#8c6c4a',
+      timberDark = '#6f533a',
+      soil = '#5a4635',
+      slab = '#c5c8c2';
+    const W = V.walk,
+      S = V.street,
+      walkX = (W.x0 + W.x1) / 2,
+      walkZ = (W.z0 + W.z1) / 2,
+      riser = (W.top - S) / V.steps.risers,
+      run = V.steps.depth;
+    box(veranda, walkX, S, walkZ, W.x1 - W.x0, W.top - S, W.z1 - W.z0, slab);
+    for (let i = 1; i < V.steps.risers; i++)
       box(
-        lotDoor,
-        (wallX0 + wallX1) / 2,
-        y,
-        zz,
-        wallX1 - wallX0,
-        0.012,
-        0.01,
-        brickJoint,
+        veranda,
+        W.x0 - run * (i - 0.5),
+        S,
+        walkZ,
+        run,
+        W.top - S - riser * i,
+        W.z1 - W.z0,
+        slab,
       );
-    for (let xx = wallX0 + 0.3; xx < wallX1; xx += 0.4)
-      box(lotDoor, xx, -0.23, zz, 0.01, 1.5, 0.01, brickJoint);
+    const stairFoot = W.x0 - run * (V.steps.risers - 1),
+      railZ = W.z0 + 0.1,
+      hand = 0.95;
+    box(veranda, W.x0 - 0.05, W.top, railZ, 0.035, hand, 0.035, steel);
+    box(veranda, stairFoot - 0.3, S, railZ, 0.035, hand, 0.035, steel);
+    beam(
+      veranda,
+      [W.x0 - 0.05, W.top + hand, railZ],
+      [stairFoot - 0.3, S + hand, railZ],
+      0.035,
+      0.035,
+      steel,
+    );
+    const wallZ = V.wall.z,
+      wallH = V.wall.top - S;
+    box(veranda, walkX, S, wallZ, W.x1 - W.x0, wallH, V.wall.thickness, brick);
+    for (const zz of [wallZ - 0.16, wallZ + 0.16]) {
+      for (let y = S + 0.28; y < V.wall.top - 0.05; y += 0.2)
+        box(veranda, walkX, y, zz, W.x1 - W.x0, 0.012, 0.01, brickJoint);
+      for (let xx = W.x0 + 0.3; xx < W.x1; xx += 0.4)
+        box(veranda, xx, S, zz, 0.01, wallH, 0.01, brickJoint);
+    }
+    // Garden pieces. Timber planter boxes (two board lines on every side, soil
+    // inside), plants from the streetscape's palette.
+    const planterBox = (x0: number, x1: number, z0: number, z1: number) => {
+      const h = 0.5,
+        xc = (x0 + x1) / 2,
+        zc = (z0 + z1) / 2;
+      box(veranda, xc, W.top, zc, x1 - x0, h, z1 - z0, timber);
+      for (const y of [0.16, 0.33]) {
+        for (const z of [z0 - 0.005, z1 + 0.005])
+          box(veranda, xc, W.top + y, z, x1 - x0, 0.012, 0.01, timberDark);
+        for (const x of [x0 - 0.005, x1 + 0.005])
+          box(veranda, x, W.top + y, zc, 0.01, 0.012, z1 - z0, timberDark);
+      }
+      box(
+        veranda,
+        xc,
+        W.top + h - 0.06,
+        zc,
+        x1 - x0 - 0.08,
+        0.02,
+        z1 - z0 - 0.08,
+        soil,
+      );
+      return W.top + h - 0.04;
+    };
+    const shrub = (
+      x: number,
+      z: number,
+      r: number,
+      y: number,
+      color: string,
+    ) => {
+      const m = mesh(veranda, new T.IcosahedronGeometry(r, 1), color);
+      m.position.set(x, y + r * 0.8, z);
+      m.scale.y = 0.85;
+    };
+    const bloom = (x: number, z: number, y: number, color: string) => {
+      beam(veranda, [x, y, z], [x, y + 0.26, z], 0.012, 0.012, '#6a9450');
+      mesh(veranda, new T.SphereGeometry(0.045, 8, 6), color).position.set(
+        x,
+        y + 0.28,
+        z,
+      );
+    };
+    const rosette = (x: number, z: number, y: number, r: number) => {
+      for (let i = 0; i < 12; i++) {
+        const a = i * 2.39996 + x,
+          reach = r * (0.7 + (i % 3) * 0.15);
+        beam(
+          veranda,
+          [x, y, z],
+          [
+            x + Math.cos(a) * reach,
+            y + r * (0.6 + (i % 4) * 0.15),
+            z + Math.sin(a) * reach,
+          ],
+          0.11,
+          0.035,
+          i % 2 ? '#7f9a95' : '#8ca6a0',
+        );
+      }
+    };
+    const grass = (x: number, z: number, y: number, r: number) => {
+      const t = mesh(veranda, new T.IcosahedronGeometry(r, 1), '#8ea25a');
+      t.position.set(x, y + r * 0.5, z);
+      t.scale.set(1, 0.7, 1);
+    };
+    const bz0 = W.z0 + 0.02,
+      bz1 = bz0 + 0.32,
+      bzc = (bz0 + bz1) / 2;
+    // west of the awning door: herbs and flowers
+    {
+      const top = planterBox(-28.6, -26.5, bz0, bz1);
+      for (let k = 0; k < 7; k++) {
+        const x = -28.42 + k * 0.26;
+        if (k % 3 === 2) bloom(x, bzc + 0.04, top, k % 2 ? red : yellow);
+        else shrub(x, bzc - 0.02, 0.11, top, k % 2 ? '#6a9450' : '#8ea25a');
+      }
+    }
+    // between the door and the roll-up: shrubs, flowers and a small citrus tree
+    {
+      const top = planterBox(-24.75, -22.15, bz0, bz1);
+      for (const [x, r, c] of [
+        [-24.5, 0.17, '#668257'],
+        [-24.15, 0.14, '#7f9a5f'],
+        [-22.75, 0.16, '#5d8a50'],
+        [-22.4, 0.13, '#668257'],
+      ] as [number, number, string][])
+        shrub(x, bzc, r, top, c);
+      for (const [x, c] of [
+        [-24.3, red],
+        [-22.55, yellow],
+        [-23.9, '#d4c04e'],
+      ] as [number, string][])
+        bloom(x, bz1 - 0.08, top, c);
+      const tx = -23.45;
+      mesh(
+        veranda,
+        new T.CylinderGeometry(0.04, 0.055, 1.2, 8),
+        '#7a6048',
+      ).position.set(tx, top + 0.6, bzc);
+      for (let i = 0; i < 4; i++) {
+        const m = mesh(
+          veranda,
+          new T.IcosahedronGeometry(0.4, 1),
+          ['#4f7a46', '#5d8a50', '#6b9458', '#557f49'][i],
+        );
+        m.position.set(
+          tx + Math.cos(i * 1.9) * 0.2,
+          top + 1.5 + Math.sin(i * 1.3) * 0.12,
+          bzc + Math.sin(i * 1.9) * 0.12,
+        );
+        m.scale.y = 0.9;
+      }
+      for (const [dx, dz] of [
+        [0.25, 0.1],
+        [-0.3, -0.05],
+        [0.05, 0.28],
+      ])
+        mesh(
+          veranda,
+          new T.SphereGeometry(0.045, 8, 6),
+          '#e6a53c',
+        ).position.set(tx + dx, top + 1.4, bzc + dz);
+    }
+    // past the roll-up, a tall pot with an agave
+    box(veranda, -18.42, W.top, bz0 + 0.22, 0.44, 0.55, 0.44, '#a9937a');
+    box(veranda, -18.42, W.top + 0.51, bz0 + 0.22, 0.36, 0.02, 0.36, soil);
+    rosette(-18.42, bz0 + 0.22, W.top + 0.52, 0.32);
+    // two timber benches against the wing's face, facing the boxes
+    const bench = (x0: number, x1: number) => {
+      const z1 = V.face - 0.02,
+        z0 = z1 - 0.38,
+        xc = (x0 + x1) / 2,
+        len = x1 - x0;
+      for (const x of [x0 + 0.08, x1 - 0.08])
+        for (const z of [z0 + 0.05, z1 - 0.05])
+          box(veranda, x, W.top, z, 0.05, 0.42, 0.05, timberDark);
+      for (let k = 0; k < 4; k++)
+        box(
+          veranda,
+          xc,
+          W.top + 0.42,
+          z0 + 0.04 + k * 0.095,
+          len,
+          0.04,
+          0.075,
+          timber,
+        );
+      for (const x of [x0 + 0.08, x1 - 0.08])
+        box(veranda, x, W.top + 0.42, z1 - 0.03, 0.05, 0.45, 0.04, timberDark);
+      for (const y of [0.62, 0.78])
+        box(veranda, xc, W.top + y, z1 - 0.03, len, 0.07, 0.04, timber);
+    };
+    bench(-28.6, -27.3);
+    bench(-24.3, -23.0);
+    // a watering can on the walkway by the first box
+    {
+      const cx = -26.62,
+        cz = W.z0 + 0.58,
+        can = '#4f7f73';
+      mesh(
+        veranda,
+        new T.CylinderGeometry(0.1, 0.11, 0.24, 12),
+        can,
+      ).position.set(cx, W.top + 0.12, cz);
+      beam(
+        veranda,
+        [cx + 0.06, W.top + 0.1, cz],
+        [cx + 0.26, W.top + 0.27, cz - 0.04],
+        0.02,
+        0.02,
+        can,
+      );
+      const handle = mesh(
+        veranda,
+        new T.TorusGeometry(0.07, 0.012, 6, 14),
+        can,
+      );
+      handle.position.set(cx, W.top + 0.27, cz);
+    }
+    // the bed along the wall's lot side: a low kerb, mulch, agaves, grasses and a few shrubs
+    {
+      const face = wallZ - V.wall.thickness / 2,
+        kz = face - 0.5,
+        bx0 = W.x0 + 0.3,
+        bx1 = W.x1 - 0.3,
+        bxc = (bx0 + bx1) / 2;
+      box(veranda, bxc, S, kz - 0.06, bx1 - bx0 + 0.24, 0.14, 0.12, '#d6d1c7');
+      box(veranda, bxc, S, (kz + face) / 2, bx1 - bx0, 0.05, face - kz, soil);
+      for (let x = bx0 + 0.45; x < bx1; x += 2.4)
+        rosette(x, face - 0.26, S + 0.05, 0.3);
+      for (let x = bx0 + 1.5; x < bx1; x += 2.4)
+        grass(x, face - 0.24, S + 0.05, 0.22);
+      for (let x = bx0 + 2.6; x < bx1 - 0.5; x += 4.8)
+        shrub(x, face - 0.25, 0.2, S + 0.05, '#668257');
+    }
   }
   // Beyond the drop-off steps, against the lobby wall: a low concrete pad with
   // a black serpentine bike rack, its loops running out from the wall (photo
@@ -1106,10 +1338,9 @@ export function buildAlhambraExterior(model: Facility) {
     patch(court, RAMP_PLANTER, -0.23, 0.18, '#dcd7cd');
     patch(
       court,
-      RAMP_PLANTER.map(([x, z]): Vec2 => [
-        x + (cxp - x) * 0.12,
-        z + (czp - z) * 0.12,
-      ]),
+      RAMP_PLANTER.map(
+        ([x, z]): Vec2 => [x + (cxp - x) * 0.12, z + (czp - z) * 0.12],
+      ),
       -0.05,
       0.02,
       '#a0937c',
@@ -1232,17 +1463,21 @@ export function buildAlhambraExterior(model: Facility) {
   // The palm island at the alley corner has a plain curb (no red paint beside the STOP marking).
   palm(-27.6, 29.65, 1.6, 1.0);
   palm(-19.2, 29.65, 1.6, 1.0);
-  // Fire department connection at the wing's west corner.
+  // Fire department connection on the wing's west face by its lot-side corner
+  // (the envelope's shell-therapy-west, centred on x −31.19 and 0.24 thick, so
+  // its outer face is at x −31.31): the standpipe against the face, its two
+  // Siamese inlets facing the street.
   const fdc = group(street, 'fire-department-connection');
+  const FDC_FACE = -31.188761 - 0.12;
   mesh(fdc, new T.CylinderGeometry(0.06, 0.06, 0.8, 8), red).position.set(
-    -31.0,
+    FDC_FACE - 0.08,
     0.4,
     9.4,
   );
-  for (const dx of [-0.12, 0.12])
+  for (const dz of [-0.12, 0.12])
     mesh(fdc, new T.CylinderGeometry(0.09, 0.09, 0.1, 10), red)
-      .rotateX(Math.PI / 2)
-      .position.set(-31.0 + dx, 0.82, 9.3);
+      .rotateZ(Math.PI / 2)
+      .position.set(FDC_FACE - 0.17, 0.82, 9.4 + dz);
   // Wooden utility pole with two transformers on the alley's north edge at the Ethel corner.
   const pole = group(street, 'utility-pole');
   mesh(
@@ -1294,11 +1529,18 @@ export function buildAlhambraExterior(model: Facility) {
   // the louvre and meter panel sit there (the ramp is not cut into the ground).
   // The utility pole with its yellow guard stands in front of the junction;
   // the planter curbs are painted blue.
-  const court2 = group(facade, 'rear-court-staff-entrance-and-loading');
+  // What stands in the court (the staff entrance's landing, ramp and rails, the pergola, the planters and their
+  // palms, the garage ramp with its walls, rails and gate, the electrical room's gates and screen, the utility pole)
+  // is the site's, so it stays in view when the building is opened up in the cutaway (the owner, 2026-10: "the ramp
+  // to the staff entrance is only visible from the exterior"). What is fixed to the building's faces (the door and
+  // window surrounds and glazing, the camera, keypad and wall light, the loading block's jambs, roll-up curtain,
+  // louvre and canopy, the wall above the block) goes with the facade, as it would float over the cut walls.
+  const court2 = group(site, 'rear-court-staff-entrance-and-loading');
+  const wingFace = group(facade, 'rear-court-wing-face-fittings');
   const SOUTH_Z = -22.463,
     BUMP_Z = -15.213;
   // The wing's north wall shows above the loading block's lower roof (eave 5.3 against the wing's 6.5).
-  box(court2, 8.47, 5.2, -12.465, 6.56, 1.45, 0.24, COURT_CONCRETE);
+  box(wingFace, 8.47, 5.2, -12.465, 6.56, 1.45, 0.24, COURT_CONCRETE);
   // The entrance is on the wing's EAST face (x 15.26, z −12.5 → 3.5, the long wall the dispatcher shaded), elements
   // protruding +x. Proportions from the 2026-10-02 photo: a 8.8 m steel-blue canopy of boards on edge inside a flat
   // perimeter beam, hung on three cables from plates 1.4 m up the wall, its north end 1.3 m past the aluminium glass
@@ -1310,9 +1552,10 @@ export function buildAlhambraExterior(model: Facility) {
     glassDark = '#2a3338';
   // The plan wall here is centred on x 15.31 and 0.2 m thick, so its outer face is at 15.42; overlays sit on that.
   const FACE_X = 15.42;
-  // The plan's door opening on this wall is at z −2.34 → −0.36; the canopy's north end is 1.3 m past it.
-  const doorW = 1.9,
-    doorZ = -1.35;
+  // The plan's door opening on this wall is at z −2.34 → −0.356 (the envelope's shell-east-exit-opening-1, cut to it
+  // by scripts/apply-owner-review-exterior.mjs); the canopy's north end is 1.3 m past it.
+  const doorW = 1.984,
+    doorZ = -1.348;
   const pz1 = doorZ + doorW / 2 + 1.3,
     pz0 = pz1 - 8.8,
     pzc = (pz0 + pz1) / 2,
@@ -1364,7 +1607,7 @@ export function buildAlhambraExterior(model: Facility) {
   ) => {
     for (const z of [z0 - rim / 2, z1 + rim / 2])
       box(
-        court2,
+        wingFace,
         FACE_X + proud / 2,
         sill ? y0 - rim : 0,
         z,
@@ -1374,7 +1617,7 @@ export function buildAlhambraExterior(model: Facility) {
         rearSurround,
       );
     box(
-      court2,
+      wingFace,
       FACE_X + proud / 2,
       y1,
       (z0 + z1) / 2,
@@ -1385,7 +1628,7 @@ export function buildAlhambraExterior(model: Facility) {
     );
     if (sill)
       box(
-        court2,
+        wingFace,
         FACE_X + proud / 2,
         y0 - rim,
         (z0 + z1) / 2,
@@ -1395,15 +1638,15 @@ export function buildAlhambraExterior(model: Facility) {
         rearSurround,
       );
   };
-  // Glass double door, 1.9 m wide, 1.3 m in from the canopy's north end.
+  // Glass double door in the plan's opening, 1.3 m in from the canopy's north end.
   frameAround(doorZ - doorW / 2, doorZ + doorW / 2, 0, 2.45, false);
-  box(court2, FACE_X + 0.03, 0, doorZ, 0.04, 2.45, doorW, glassDark);
-  box(court2, FACE_X + 0.06, 0, doorZ, 0.03, 2.45, 0.07, rearSurround);
+  box(wingFace, FACE_X + 0.03, 0, doorZ, 0.04, 2.45, doorW, glassDark);
+  box(wingFace, FACE_X + 0.06, 0, doorZ, 0.03, 2.45, 0.07, rearSurround);
   // D-pull handles either side of the meeting stile at hip height (photo 2026-10-05).
   for (const sz of [doorZ - 0.11, doorZ + 0.11]) {
-    box(court2, FACE_X + 0.11, 0.8, sz, 0.025, 0.28, 0.025, alu);
+    box(wingFace, FACE_X + 0.11, 0.8, sz, 0.025, 0.28, 0.025, alu);
     for (const y of [0.84, 1.04])
-      box(court2, FACE_X + 0.075, y, sz, 0.06, 0.02, 0.02, alu);
+      box(wingFace, FACE_X + 0.075, y, sz, 0.06, 0.02, 0.02, alu);
   }
   // Vinyl on the glass (photo 2026-10-05; scripts/lobby-door-decals.py): facing the door, the right-hand leaf (−z)
   // has the street number at the top, STAFF ENTRANCE ONLY / 员工入口 and a NO SOLICITING sticker; the left-hand leaf
@@ -1419,7 +1662,7 @@ export function buildAlhambraExterior(model: Facility) {
       );
       m.rotation.y = Math.PI / 2;
       m.position.set(FACE_X + 0.055, y, z);
-      court2.add(m);
+      wingFace.add(m);
     };
     vinyl(
       '/reference/photos/rear-door-right.png',
@@ -1440,26 +1683,26 @@ export function buildAlhambraExterior(model: Facility) {
   // A dome camera on a wall bracket just outside the surround's top corner on the left-hand (+z) side, and the
   // black access keypad on the wall just right of the surround at hand height.
   const camZ = doorZ + doorW / 2 + rim + 0.22;
-  box(court2, FACE_X + 0.07, 2.7, camZ, 0.14, 0.05, 0.06, '#e9ebea');
+  box(wingFace, FACE_X + 0.07, 2.7, camZ, 0.14, 0.05, 0.06, '#e9ebea');
   const camBody = mesh(
-    court2,
+    wingFace,
     new T.CylinderGeometry(0.08, 0.08, 0.06, 16),
     '#eceeed',
   );
   camBody.position.set(FACE_X + 0.15, 2.68, camZ);
   const camLens = mesh(
-    court2,
+    wingFace,
     new T.SphereGeometry(0.07, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2),
     '#2c3236',
   );
   camLens.position.set(FACE_X + 0.15, 2.65, camZ);
   camLens.rotation.x = Math.PI;
   const padZ = doorZ - doorW / 2 - rim - 0.12;
-  box(court2, FACE_X + 0.015, 0.97, padZ, 0.03, 0.18, 0.1, '#1c1e20');
+  box(wingFace, FACE_X + 0.015, 0.97, padZ, 0.03, 0.18, 0.1, '#1c1e20');
   for (let r = 0; r < 4; r++)
     for (let c = 0; c < 3; c++)
       box(
-        court2,
+        wingFace,
         FACE_X + 0.033,
         0.99 + r * 0.03,
         padZ - 0.025 + c * 0.025,
@@ -1468,12 +1711,12 @@ export function buildAlhambraExterior(model: Facility) {
         0.016,
         '#d9dad6',
       );
-  box(court2, FACE_X + 0.033, 1.12, padZ, 0.006, 0.02, 0.04, '#5b6064');
+  box(wingFace, FACE_X + 0.033, 1.12, padZ, 0.006, 0.02, 0.04, '#5b6064');
   const winZ = pz0 + 2.5 + 0.65,
     winTop = 2.45,
     winH = 1.3;
   frameAround(winZ - 0.65, winZ + 0.65, winTop - winH, winTop, true);
-  box(court2, FACE_X + 0.02, winTop - winH, winZ, 0.02, winH, 1.3, glassDark);
+  box(wingFace, FACE_X + 0.02, winTop - winH, winZ, 0.02, winH, 1.3, glassDark);
   frameAround(-11.04, -9.72, winTop - winH, winTop, true);
   // Raised concrete landing along the wall in front of the door and window, two steps up from the lot.
   // It ends at the walkway out between the two planters (z −6.8 → −5.3), which a short ramp drops into.
@@ -1686,14 +1929,14 @@ export function buildAlhambraExterior(model: Facility) {
   }
   // Wall light high on the face south of the pergola.
   beam(
-    court2,
+    wingFace,
     [FACE_X + 0.02, 3.9, -11.2],
     [FACE_X + 1.2, 4.15, -11.2],
     0.06,
     0.06,
     '#6f7577',
   );
-  box(court2, FACE_X + 1.3, 4.08, -11.2, 0.55, 0.16, 0.3, '#7d8284');
+  box(wingFace, FACE_X + 1.3, 4.08, -11.2, 0.55, 0.16, 0.3, '#7d8284');
   // Lobby entrance on the lot side (photo 2026-10-02): the automatic sliding glass door sits in a brushed-aluminium
   // portal that stands proud of the stucco, with "1839 W Valley Blvd" on the glass; two tall silver-framed windows
   // to its south; a camera dome high on the wall north of the door and a small sconce beside it. The bronze canopy,
@@ -1964,24 +2207,24 @@ export function buildAlhambraExterior(model: Facility) {
     [7.46, 0.12],
     [11.07, 0.12],
   ])
-    box(court2, x, 0, LF - 0.01, w, 3.6, 0.03, jamb);
-  box(court2, 9.265, 3.42, LF - 0.01, 3.73, 0.18, 0.03, jamb);
+    box(wingFace, x, 0, LF - 0.01, w, 3.6, 0.03, jamb);
+  box(wingFace, 9.265, 3.42, LF - 0.01, 3.73, 0.18, 0.03, jamb);
   // the curtain (opening 1 is open in the envelope; deliveries.ts raises this into the wall for the food truck)
-  const rollup = group(court2, 'rear-loading-rollup');
+  const rollup = group(wingFace, 'rear-loading-rollup');
   box(rollup, 8.89, -0.23, BUMP_Z - 0.04, 2.58, 3.61, 0.04, '#b4b1aa');
   for (let y = 0.12; y < 3.38; y += 0.13)
     box(rollup, 8.89, y, BUMP_Z - 0.065, 2.58, 0.018, 0.01, '#8f8c85');
   for (let y = 2.3; y < 3.38; y += 0.13)
-    box(court2, 10.555, y, LF - 0.005, 0.75, 0.018, 0.01, '#8f8c85');
+    box(wingFace, 10.555, y, LF - 0.005, 0.75, 0.018, 0.01, '#8f8c85');
   // the service door's notice and lever
-  box(court2, 10.62, 1.25, LF - 0.03, 0.28, 0.2, 0.01, '#f2efe4');
-  box(court2, 10.27, 0.98, LF - 0.06, 0.14, 0.03, 0.05, '#c7c9c8');
+  box(wingFace, 10.62, 1.25, LF - 0.03, 0.28, 0.2, 0.01, '#f2efe4');
+  box(wingFace, 10.27, 0.98, LF - 0.06, 0.14, 0.03, 0.05, '#c7c9c8');
   // louvre, camera dome, conduits, a no-smoking plate
-  box(court2, 6.56, 2.37, LF - 0.03, 0.56, 0.77, 0.06, '#a6a8a4');
+  box(wingFace, 6.56, 2.37, LF - 0.03, 0.56, 0.77, 0.06, '#a6a8a4');
   for (let y = 2.45; y < 3.08; y += 0.08)
-    box(court2, 6.56, y, LF - 0.065, 0.46, 0.025, 0.03, '#6e7472');
+    box(wingFace, 6.56, y, LF - 0.065, 0.46, 0.025, 0.03, '#6e7472');
   const camDome = mesh(
-    court2,
+    wingFace,
     new T.SphereGeometry(0.1, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2),
     '#eceeed',
   );
@@ -1992,18 +2235,18 @@ export function buildAlhambraExterior(model: Facility) {
     [5.45, 2.35],
   ])
     beam(
-      court2,
+      wingFace,
       [x, 0, LF - 0.05],
       [x, top, LF - 0.05],
       0.045,
       0.045,
       '#a9aba7',
     );
-  box(court2, 6.62, 1.75, LF - 0.02, 0.14, 0.2, 0.01, '#f2efe4');
+  box(wingFace, 6.62, 1.75, LF - 0.02, 0.14, 0.2, 0.01, '#f2efe4');
   // steel canopy over the face: a deep fascia in front, the soffit falling to it, ribs underneath
   const can = { x0: 5.3, x1: 11.75, wallY: 4.65, frontY: 4.3, depth: 1.95 };
   const soffit = mesh(
-    court2,
+    wingFace,
     new T.BoxGeometry(
       can.x1 - can.x0,
       0.05,
@@ -2018,7 +2261,7 @@ export function buildAlhambraExterior(model: Facility) {
   );
   soffit.rotation.x = Math.atan2(can.wallY - can.frontY, can.depth);
   box(
-    court2,
+    wingFace,
     (can.x0 + can.x1) / 2,
     can.frontY - 0.05,
     LF - can.depth,
@@ -2029,7 +2272,7 @@ export function buildAlhambraExterior(model: Facility) {
   );
   for (const sx of [can.x0, can.x1])
     box(
-      court2,
+      wingFace,
       sx,
       can.frontY - 0.05,
       LF - can.depth / 2,
@@ -2040,7 +2283,7 @@ export function buildAlhambraExterior(model: Facility) {
     );
   for (let x = can.x0 + 0.8; x < can.x1 - 0.4; x += 1.6)
     beam(
-      court2,
+      wingFace,
       [x, can.wallY - 0.08, LF],
       [x, can.frontY, LF - can.depth],
       0.06,
@@ -2150,7 +2393,7 @@ export function buildAlhambraExterior(model: Facility) {
     '#a7a49c',
   );
   // a dome light high on the wing's wall over the ramp
-  box(court2, 13.5, 4.4, R.door - 0.16, 0.34, 0.18, 0.1, '#55595a');
+  box(wingFace, 13.5, 4.4, R.door - 0.16, 0.34, 0.18, 0.1, '#55595a');
   // pipe rails: posts every ~1.6 m and five rails, on both walls and across the gate
   const pipeRail = (
     x: number,
@@ -2380,7 +2623,7 @@ export function buildAlhambraExterior(model: Facility) {
     '#a9aca8',
   );
   box(
-    court2,
+    wingFace,
     (ex0 + 7.3) / 2,
     roofY - 0.06,
     EZ - 0.08,
@@ -2390,8 +2633,8 @@ export function buildAlhambraExterior(model: Facility) {
     canopySteel,
   );
   // the clinic's wall beside it: a louvre box and a small grey cabinet
-  box(court2, 0.17, 2.0, -16.3, 0.1, 1.0, 0.42, '#a6a8a4');
-  box(court2, 0.17, 1.45, -15.75, 0.1, 0.32, 0.4, '#9a9d9b');
+  box(wingFace, 0.17, 2.0, -16.3, 0.1, 1.0, 0.42, '#a6a8a4');
+  box(wingFace, 0.17, 1.45, -15.75, 0.1, 0.32, 0.4, '#9a9d9b');
   for (const x of [3.6, 0.67]) {
     const post = mesh(
       court2,

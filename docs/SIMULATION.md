@@ -161,17 +161,20 @@ The landing along the lobby wall, its two steps and the switchback ramp
 (upper run along the wall, turn landing beside the block wall, lower run back
 down to the lot, bronze rails) are drawn from `DROP_OFF`, which also gives the
 walking surface's height anywhere on them (`surface`) and the accessible way
-up (`ascent`). A van docks nose-first 0.9 m short of the lower run
-(`FLEET_LOT.dock`), so its riders walk from the van's ramp round its nose and
-under the end of the lower run's west rail to the toe, up the lower run,
-across the turn landing and up the upper run, and turn in at the sliding
-entrance; departures walk the same way down.
+up (`ascent`). A van docks on the aisle beside the landing, parallel to the
+lobby wall with its sliding door toward the entrance (`FLEET_LOT.dock`, the
+same stop the live lot uses), so its ramp runs out toward the landing and its
+riders walk from the ramp's foot along the lot to the lower run's toe, up the
+lower run, across the turn landing and up the upper run, and turn in at the
+sliding entrance; departures walk the same way down.
 
 `scripts/apply-drop-off-route.mjs` writes these legs of the base loop's six
 van arrivals into both copies of the loop from `DROP_OFF`, the dock and the
 van's ramp. Each arrival keeps when it steps off the van's ramp and when it
 is inside, walking between at one pace; each departure keeps its boarding time
-and the 0.64 m/s escorted pace, and sets off earlier. Every other number in
+and the 0.64 m/s escorted pace, and sets off earlier or later as its walk
+needs, its way out of the lobby routed on the navigation grid round anyone
+standing there (the community cast's greeters). Every other number in
 the file keeps its text; `--check` (part of `npm run validate:fleet`) fails
 when the loop no longer matches the geometry. The mid-day riders take the same
 legs from the walking arrival, and the story's hero re-derives her departure
@@ -184,8 +187,8 @@ day (base loop and story, with the community layer): clear of the rails and
 the planter by their route clearance (`MOBILITY_CLEARANCE`, else
 `WALL_CLEARANCE`), never stepping across a rail, at the surface's height on
 the landing, steps and runs, and half a metre apart between the docked van's
-nose and the lobby wall. `npm run validate:traffic` keeps every van 0.3 m off
-the landing, the runs, the turn landing, the rails and the planter.
+ramp foot and the lobby wall. `npm run validate:traffic` keeps every van 0.3 m
+off the landing, the runs, the turn landing, the rails and the planter.
 
 ## Navigation (`app/sim/nav.ts`)
 
