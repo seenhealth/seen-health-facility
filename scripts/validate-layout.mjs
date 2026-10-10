@@ -150,6 +150,8 @@ for (const id of [
   'access-hair-wash',
   'access-washing-machine-1',
   'access-washing-machine-2',
+  // Owner review 2026-10 (care-rooms): the washers moved to receiving with a dryer.
+  'access-dryer',
 ]) {
   const o = objects.get(id),
     r = m.rooms.find((r) => r.id === o.roomId);

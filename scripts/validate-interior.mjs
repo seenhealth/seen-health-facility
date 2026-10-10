@@ -54,6 +54,8 @@ raysClear('interior-nurse-station', [
 ]);
 const reviewed = new Set(m.interiorReview.newObjectIds);
 for (const id of m.interiorReview.changedPlanObjectIds) reviewed.add(id);
+// The owner walkthrough's new and moved furniture (ownerReview, October 2026) is reviewed too.
+for (const id of [...(m.ownerReview?.newObjectIds ?? []), ...(m.ownerReview?.changedPlanObjectIds ?? [])]) reviewed.add(id);
 const removed = new Set(
   JSON.parse(readFileSync('app/data/day-program.json')).removedObjectIds,
 );
@@ -99,6 +101,9 @@ for (const a of loop.actors) {
         const x = p[0] + ((q[0] - p[0]) * j) / count,
           z = p[1] + ((q[1] - p[1]) * j) / count;
         for (const b of boxes) {
+          // A seated person stands up from (and sits back down on) their own
+          // seat (community-53 at the barber chair, owner review 2026-10).
+          if (b.id === a.seatId) continue;
           const dx = x - b.x,
             dz = z - b.z;
           assert.ok(

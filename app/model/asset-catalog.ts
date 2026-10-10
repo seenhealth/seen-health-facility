@@ -693,6 +693,43 @@ export const assetCatalog: Record<string, CatalogEntry> = {
   'timber-truss': { name: 'Truss', purpose: 'Truss.', structural: true },
   'fleet-van': { name: 'Seen van', purpose: 'Van.', structural: true },
   box: { name: 'Fitting', purpose: 'Built-in element.', structural: true },
+
+  // Owner review 2026-10 · care-rooms
+  'wash-pad': {
+    name: 'Wheelchair wash pad',
+    purpose:
+      'Kerbed, tiled pad with a floor drain where wheelchairs and walkers are hosed down and disinfected before they go back into the day center.',
+  },
+  'hose-reel': {
+    name: 'Wash-down spray gun',
+    purpose:
+      'Wall-mounted hose reel with a spray gun for washing wheelchairs and walkers over the drained pad.',
+  },
+  wheelchair: {
+    name: 'Wheelchair',
+    purpose:
+      'A center wheelchair parked on the wash pad for cleaning; chairs are washed between participants and after an accident.',
+  },
+  'waste-bin': {
+    name: 'Wheeled waste bin',
+    purpose:
+      'Lidded bin in the trash enclosure, wheeled out to the alley on collection day; a blue one takes the recycling.',
+  },
+  'tumble-dryer': {
+    name: 'Tumble dryer',
+    purpose:
+      'Dryer beside the washers in receiving, for towels, linens and participants’ clothes after a shower or an accident.',
+  },
+  'janitor-sink': {
+    name: 'Mop sink',
+    purpose:
+      'Floor-level sink in the soiled-utility room where housekeeping fills and empties mop buckets away from the clean linen.',
+  },
+  'housekeeping-cart': {
+    name: 'Housekeeping cart',
+    purpose:
+      'Cart with cleaning supplies and a bag for soiled linen, kept in the soiled-utility room between rounds.',
+  },
 };
 
 /** Asset ids that say more than their kind (generic `box`, `table`, … assets). */
