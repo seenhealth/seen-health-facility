@@ -15685,166 +15685,169 @@
     },
     {
       "id": "community-25",
-      "label": "Balance & mobility practice",
+      "label": "Recumbent stepper \u00b7 endurance",
       "role": "participant",
       "variant": 65,
       "profileId": "community-25",
-      "offset": 78,
+      "offset": 0,
       "levelId": "ground",
       "segments": [
         {
           "start": 0,
-          "end": 90,
-          "action": "exercise",
+          "end": 150,
+          "action": "cycle",
           "path": [
             [
-              -30.1,
-              17.1
+              -24.4,
+              25.84
             ],
             [
-              -30.1,
-              17.1
+              -24.4,
+              25.84
             ]
           ],
           "zoneId": "rehab",
-          "heading": 1.5707963267948966,
-          "seated": false,
-          "title": "Balance & mobility practice"
+          "heading": 0,
+          "seated": true,
+          "title": "Recumbent stepper \u00b7 endurance"
         },
         {
-          "start": 90,
+          "start": 150,
           "end": 180,
-          "action": "tai-chi",
+          "action": "seated",
           "path": [
             [
-              -30.1,
-              17.1
+              -24.4,
+              25.84
             ],
             [
-              -30.1,
-              17.1
+              -24.4,
+              25.84
             ]
           ],
           "zoneId": "rehab",
-          "heading": 1.5707963267948966,
-          "seated": false,
-          "title": "Balance & mobility practice"
+          "heading": 0,
+          "seated": true,
+          "title": "Resting on the stepper"
         },
         {
           "start": 180,
-          "end": 270,
-          "action": "exercise",
+          "end": 330,
+          "action": "cycle",
           "path": [
             [
-              -30.1,
-              17.1
+              -24.4,
+              25.84
             ],
             [
-              -30.1,
-              17.1
+              -24.4,
+              25.84
             ]
           ],
           "zoneId": "rehab",
-          "heading": 1.5707963267948966,
-          "seated": false,
-          "title": "Balance & mobility practice"
+          "heading": 0,
+          "seated": true,
+          "title": "Recumbent stepper \u00b7 endurance"
         },
         {
-          "start": 270,
+          "start": 330,
           "end": 360,
-          "action": "tai-chi",
+          "action": "seated",
           "path": [
             [
-              -30.1,
-              17.1
+              -24.4,
+              25.84
             ],
             [
-              -30.1,
-              17.1
+              -24.4,
+              25.84
             ]
           ],
           "zoneId": "rehab",
-          "heading": 1.5707963267948966,
-          "seated": false,
-          "title": "Balance & mobility practice"
+          "heading": 0,
+          "seated": true,
+          "title": "Resting on the stepper"
         },
         {
           "start": 360,
-          "end": 450,
-          "action": "exercise",
+          "end": 510,
+          "action": "cycle",
           "path": [
             [
-              -30.1,
-              17.1
+              -24.4,
+              25.84
             ],
             [
-              -30.1,
-              17.1
+              -24.4,
+              25.84
             ]
           ],
           "zoneId": "rehab",
-          "heading": 1.5707963267948966,
-          "seated": false,
-          "title": "Balance & mobility practice"
+          "heading": 0,
+          "seated": true,
+          "title": "Recumbent stepper \u00b7 endurance"
         },
         {
-          "start": 450,
+          "start": 510,
           "end": 540,
-          "action": "tai-chi",
+          "action": "seated",
           "path": [
             [
-              -30.1,
-              17.1
+              -24.4,
+              25.84
             ],
             [
-              -30.1,
-              17.1
+              -24.4,
+              25.84
             ]
           ],
           "zoneId": "rehab",
-          "heading": 1.5707963267948966,
-          "seated": false,
-          "title": "Balance & mobility practice"
+          "heading": 0,
+          "seated": true,
+          "title": "Resting on the stepper"
         },
         {
           "start": 540,
-          "end": 630,
-          "action": "exercise",
+          "end": 690,
+          "action": "cycle",
           "path": [
             [
-              -30.1,
-              17.1
+              -24.4,
+              25.84
             ],
             [
-              -30.1,
-              17.1
+              -24.4,
+              25.84
             ]
           ],
           "zoneId": "rehab",
-          "heading": 1.5707963267948966,
-          "seated": false,
-          "title": "Balance & mobility practice"
+          "heading": 0,
+          "seated": true,
+          "title": "Recumbent stepper \u00b7 endurance"
         },
         {
-          "start": 630,
+          "start": 690,
           "end": 720,
-          "action": "tai-chi",
+          "action": "seated",
           "path": [
             [
-              -30.1,
-              17.1
+              -24.4,
+              25.84
             ],
             [
-              -30.1,
-              17.1
+              -24.4,
+              25.84
             ]
           ],
           "zoneId": "rehab",
-          "heading": 1.5707963267948966,
-          "seated": false,
-          "title": "Balance & mobility practice"
+          "heading": 0,
+          "seated": true,
+          "title": "Resting on the stepper"
         }
-      ]
+      ],
+      "roomId": "rehab-open",
+      "seated": true,
+      "seatId": "rehab-recumbent-stepper-1"
     },
     {
       "id": "community-26",
@@ -32543,6 +32546,3522 @@
           "title": "Karaoke \u00b7 singer (duet)"
         }
       ]
+    },
+    {
+      "id": "rehab-rider-02",
+      "role": "participant",
+      "variant": 66,
+      "label": "Participant \u00b7 recumbent stepper",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "rehab-rider-02",
+      "segments": [
+        {
+          "start": 0,
+          "end": 22.2783,
+          "action": "seated",
+          "path": [
+            [
+              -29.05,
+              14.062
+            ],
+            [
+              -29.05,
+              14.062
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "seated": true,
+          "title": "Resting in the quiet room"
+        },
+        {
+          "start": 22.2783,
+          "end": 55,
+          "action": "walk",
+          "path": [
+            [
+              -29.05,
+              14.062
+            ],
+            [
+              -29,
+              15.2
+            ],
+            [
+              -28.8,
+              15.4
+            ],
+            [
+              -28.6,
+              15.4
+            ],
+            [
+              -28.2,
+              15.8
+            ],
+            [
+              -27.4,
+              15.8
+            ],
+            [
+              -27.2,
+              16
+            ],
+            [
+              -27.2,
+              16.4
+            ],
+            [
+              -26.6,
+              17
+            ],
+            [
+              -26.6,
+              17.6
+            ],
+            [
+              -24.4,
+              17.6
+            ],
+            [
+              -24,
+              18
+            ],
+            [
+              -23.4,
+              18
+            ],
+            [
+              -23.4,
+              18.6
+            ],
+            [
+              -22,
+              20
+            ],
+            [
+              -22,
+              22.4
+            ],
+            [
+              -21.8,
+              22.6
+            ],
+            [
+              -21.8,
+              24
+            ],
+            [
+              -21.6,
+              24.2
+            ],
+            [
+              -21.6,
+              24.6
+            ],
+            [
+              -21.2,
+              25
+            ],
+            [
+              -21.2,
+              25.8
+            ],
+            [
+              -22,
+              25.84
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Walk to the recumbent stepper"
+        },
+        {
+          "start": 55,
+          "end": 160,
+          "action": "cycle",
+          "path": [
+            [
+              -22,
+              25.84
+            ],
+            [
+              -22,
+              25.84
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "seated": true,
+          "title": "Recumbent stepper \u00b7 endurance"
+        },
+        {
+          "start": 160,
+          "end": 175,
+          "action": "seated",
+          "path": [
+            [
+              -22,
+              25.84
+            ],
+            [
+              -22,
+              25.84
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "seated": true,
+          "title": "Catching breath on the stepper"
+        },
+        {
+          "start": 175,
+          "end": 248.483,
+          "action": "cycle",
+          "path": [
+            [
+              -22,
+              25.84
+            ],
+            [
+              -22,
+              25.84
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "seated": true,
+          "title": "Recumbent stepper \u00b7 endurance"
+        },
+        {
+          "start": 248.483,
+          "end": 280,
+          "action": "walk",
+          "path": [
+            [
+              -22,
+              25.84
+            ],
+            [
+              -21.2,
+              25.8
+            ],
+            [
+              -21.2,
+              25
+            ],
+            [
+              -21.6,
+              24.6
+            ],
+            [
+              -21.6,
+              24.2
+            ],
+            [
+              -21.8,
+              24
+            ],
+            [
+              -21.8,
+              19.8
+            ],
+            [
+              -23.4,
+              18.2
+            ],
+            [
+              -23.4,
+              18
+            ],
+            [
+              -26,
+              18
+            ],
+            [
+              -26.2,
+              17.8
+            ],
+            [
+              -27.2,
+              17.8
+            ],
+            [
+              -27.2,
+              19
+            ],
+            [
+              -27.4,
+              19.2
+            ],
+            [
+              -27.4,
+              19.4
+            ],
+            [
+              -27.6,
+              19.6
+            ],
+            [
+              -27.6,
+              19.8
+            ],
+            [
+              -27.8,
+              20
+            ],
+            [
+              -27.8,
+              20.2
+            ],
+            [
+              -28,
+              20.4
+            ],
+            [
+              -28,
+              20.6
+            ],
+            [
+              -28.2,
+              20.8
+            ],
+            [
+              -28.2,
+              21
+            ],
+            [
+              -28.525,
+              21
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Walk to the acupressure room"
+        },
+        {
+          "start": 280,
+          "end": 430,
+          "action": "seated",
+          "path": [
+            [
+              -28.525,
+              21
+            ],
+            [
+              -28.525,
+              21
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 1.5707963267948966,
+          "seated": true,
+          "title": "Acupressure massage \u00b7 shoulders and back"
+        },
+        {
+          "start": 430,
+          "end": 446.3812,
+          "action": "walk",
+          "path": [
+            [
+              -28.525,
+              21
+            ],
+            [
+              -28.2,
+              21
+            ],
+            [
+              -28.2,
+              20.4
+            ],
+            [
+              -27.6,
+              19.8
+            ],
+            [
+              -27.6,
+              18.8
+            ],
+            [
+              -27.2,
+              18.4
+            ],
+            [
+              -27.2,
+              16
+            ],
+            [
+              -27.4,
+              15.8
+            ],
+            [
+              -28.2,
+              15.8
+            ],
+            [
+              -28.8,
+              15.2
+            ],
+            [
+              -29,
+              15.2
+            ],
+            [
+              -29.05,
+              14.062
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Back to the quiet room"
+        },
+        {
+          "start": 446.3812,
+          "end": 497.2783,
+          "action": "seated",
+          "path": [
+            [
+              -29.05,
+              14.062
+            ],
+            [
+              -29.05,
+              14.062
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "seated": true,
+          "title": "Resting in the quiet room"
+        },
+        {
+          "start": 497.2783,
+          "end": 530,
+          "action": "walk",
+          "path": [
+            [
+              -29.05,
+              14.062
+            ],
+            [
+              -29,
+              15.2
+            ],
+            [
+              -28.8,
+              15.4
+            ],
+            [
+              -28.6,
+              15.4
+            ],
+            [
+              -28.2,
+              15.8
+            ],
+            [
+              -27.4,
+              15.8
+            ],
+            [
+              -27.2,
+              16
+            ],
+            [
+              -27.2,
+              16.4
+            ],
+            [
+              -26.6,
+              17
+            ],
+            [
+              -26.6,
+              17.6
+            ],
+            [
+              -24.4,
+              17.6
+            ],
+            [
+              -24,
+              18
+            ],
+            [
+              -23.4,
+              18
+            ],
+            [
+              -23.4,
+              18.6
+            ],
+            [
+              -22,
+              20
+            ],
+            [
+              -22,
+              22.4
+            ],
+            [
+              -21.8,
+              22.6
+            ],
+            [
+              -21.8,
+              24
+            ],
+            [
+              -21.6,
+              24.2
+            ],
+            [
+              -21.6,
+              24.6
+            ],
+            [
+              -21.2,
+              25
+            ],
+            [
+              -21.2,
+              25.8
+            ],
+            [
+              -22,
+              25.84
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Walk to the recumbent stepper"
+        },
+        {
+          "start": 530,
+          "end": 610,
+          "action": "cycle",
+          "path": [
+            [
+              -22,
+              25.84
+            ],
+            [
+              -22,
+              25.84
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "seated": true,
+          "title": "Recumbent stepper \u00b7 endurance"
+        },
+        {
+          "start": 610,
+          "end": 625,
+          "action": "seated",
+          "path": [
+            [
+              -22,
+              25.84
+            ],
+            [
+              -22,
+              25.84
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "seated": true,
+          "title": "Catching breath on the stepper"
+        },
+        {
+          "start": 625,
+          "end": 668,
+          "action": "cycle",
+          "path": [
+            [
+              -22,
+              25.84
+            ],
+            [
+              -22,
+              25.84
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "seated": true,
+          "title": "Recumbent stepper \u00b7 endurance"
+        },
+        {
+          "start": 668,
+          "end": 700.7217,
+          "action": "walk",
+          "path": [
+            [
+              -22,
+              25.84
+            ],
+            [
+              -21.2,
+              25.8
+            ],
+            [
+              -21.2,
+              25
+            ],
+            [
+              -21.6,
+              24.6
+            ],
+            [
+              -21.6,
+              24.2
+            ],
+            [
+              -21.8,
+              24
+            ],
+            [
+              -21.8,
+              19.8
+            ],
+            [
+              -23.4,
+              18.2
+            ],
+            [
+              -23.4,
+              18
+            ],
+            [
+              -23.8,
+              17.6
+            ],
+            [
+              -26.6,
+              17.6
+            ],
+            [
+              -26.8,
+              17.4
+            ],
+            [
+              -26.8,
+              16.8
+            ],
+            [
+              -27.2,
+              16.4
+            ],
+            [
+              -27.2,
+              16
+            ],
+            [
+              -27.4,
+              15.8
+            ],
+            [
+              -27.8,
+              15.8
+            ],
+            [
+              -28,
+              15.6
+            ],
+            [
+              -28.2,
+              15.6
+            ],
+            [
+              -28.4,
+              15.4
+            ],
+            [
+              -28.8,
+              15.4
+            ],
+            [
+              -29,
+              15.2
+            ],
+            [
+              -29.05,
+              14.062
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Back to the quiet room"
+        },
+        {
+          "start": 700.7217,
+          "end": 720,
+          "action": "seated",
+          "path": [
+            [
+              -29.05,
+              14.062
+            ],
+            [
+              -29.05,
+              14.062
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "seated": true,
+          "title": "Resting in the quiet room"
+        }
+      ]
+    },
+    {
+      "id": "rehab-adl-participant",
+      "role": "participant",
+      "variant": 67,
+      "label": "Participant \u00b7 kitchen practice & acupressure",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "rehab-adl-participant",
+      "segments": [
+        {
+          "start": 0,
+          "end": 198.2821,
+          "action": "seated",
+          "path": [
+            [
+              -28.1,
+              14.062
+            ],
+            [
+              -28.1,
+              14.062
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "seated": true,
+          "title": "Resting in the quiet room"
+        },
+        {
+          "start": 198.2821,
+          "end": 215,
+          "action": "walk",
+          "path": [
+            [
+              -28.1,
+              14.062
+            ],
+            [
+              -28.2,
+              15.2
+            ],
+            [
+              -28,
+              15.2
+            ],
+            [
+              -27.2,
+              16
+            ],
+            [
+              -27.2,
+              16.4
+            ],
+            [
+              -26.8,
+              16.8
+            ],
+            [
+              -26.8,
+              17.4
+            ],
+            [
+              -26.6,
+              17.6
+            ],
+            [
+              -25.4,
+              17.6
+            ],
+            [
+              -25.4,
+              14
+            ],
+            [
+              -25.436,
+              13.937
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Walk to the practice kitchen"
+        },
+        {
+          "start": 215,
+          "end": 265,
+          "action": "serve",
+          "path": [
+            [
+              -25.436,
+              13.937
+            ],
+            [
+              -25.436,
+              13.937
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": -1.5707963267948966,
+          "title": "Practice kitchen \u00b7 washing up at the sink"
+        },
+        {
+          "start": 265,
+          "end": 267.1129,
+          "action": "walk",
+          "path": [
+            [
+              -25.436,
+              13.937
+            ],
+            [
+              -25.4,
+              14
+            ],
+            [
+              -25.4,
+              15
+            ],
+            [
+              -25.436,
+              15.082
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Along the counter to the microwave"
+        },
+        {
+          "start": 267.1129,
+          "end": 310,
+          "action": "tabletop",
+          "path": [
+            [
+              -25.436,
+              15.082
+            ],
+            [
+              -25.436,
+              15.082
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": -1.5707963267948966,
+          "title": "Practice kitchen \u00b7 heating a meal in the microwave"
+        },
+        {
+          "start": 310,
+          "end": 324.9306,
+          "action": "walk",
+          "path": [
+            [
+              -25.436,
+              15.082
+            ],
+            [
+              -25.4,
+              15
+            ],
+            [
+              -25.4,
+              17.6
+            ],
+            [
+              -26.6,
+              17.6
+            ],
+            [
+              -27.2,
+              17
+            ],
+            [
+              -27.2,
+              16
+            ],
+            [
+              -27.6,
+              15.6
+            ],
+            [
+              -27.8,
+              15.6
+            ],
+            [
+              -28.2,
+              15.2
+            ],
+            [
+              -28.1,
+              14.062
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Back to the quiet room"
+        },
+        {
+          "start": 324.9306,
+          "end": 450.0673,
+          "action": "seated",
+          "path": [
+            [
+              -28.1,
+              14.062
+            ],
+            [
+              -28.1,
+              14.062
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "seated": true,
+          "title": "Resting in the quiet room"
+        },
+        {
+          "start": 450.0673,
+          "end": 465,
+          "action": "walk",
+          "path": [
+            [
+              -28.1,
+              14.062
+            ],
+            [
+              -28.2,
+              15.2
+            ],
+            [
+              -28,
+              15.4
+            ],
+            [
+              -27.8,
+              15.4
+            ],
+            [
+              -27.2,
+              16
+            ],
+            [
+              -27.2,
+              19
+            ],
+            [
+              -27.4,
+              19.2
+            ],
+            [
+              -27.4,
+              19.4
+            ],
+            [
+              -27.6,
+              19.6
+            ],
+            [
+              -27.6,
+              19.8
+            ],
+            [
+              -27.8,
+              20
+            ],
+            [
+              -27.8,
+              20.6
+            ],
+            [
+              -28.2,
+              21
+            ],
+            [
+              -28.525,
+              21
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Walk to the acupressure room"
+        },
+        {
+          "start": 465,
+          "end": 615,
+          "action": "seated",
+          "path": [
+            [
+              -28.525,
+              21
+            ],
+            [
+              -28.525,
+              21
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 1.5707963267948966,
+          "seated": true,
+          "title": "Acupressure massage \u00b7 shoulders and back"
+        },
+        {
+          "start": 615,
+          "end": 629.9327,
+          "action": "walk",
+          "path": [
+            [
+              -28.525,
+              21
+            ],
+            [
+              -28.2,
+              21
+            ],
+            [
+              -28.2,
+              20.4
+            ],
+            [
+              -27.6,
+              19.8
+            ],
+            [
+              -27.6,
+              18.8
+            ],
+            [
+              -27.2,
+              18.4
+            ],
+            [
+              -27.2,
+              16
+            ],
+            [
+              -28,
+              15.2
+            ],
+            [
+              -28.2,
+              15.2
+            ],
+            [
+              -28.1,
+              14.062
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Back to the quiet room"
+        },
+        {
+          "start": 629.9327,
+          "end": 720,
+          "action": "seated",
+          "path": [
+            [
+              -28.1,
+              14.062
+            ],
+            [
+              -28.1,
+              14.062
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "seated": true,
+          "title": "Resting in the quiet room"
+        }
+      ]
+    },
+    {
+      "id": "rehab-stairs-participant",
+      "role": "participant",
+      "variant": 68,
+      "label": "Participant \u00b7 stair training",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "rehab-stairs-participant",
+      "segments": [
+        {
+          "start": 0,
+          "end": 59.2542,
+          "action": "seated",
+          "path": [
+            [
+              -27.15,
+              14.062
+            ],
+            [
+              -27.15,
+              14.062
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "seated": true,
+          "title": "Resting in the quiet room"
+        },
+        {
+          "start": 59.2542,
+          "end": 75,
+          "action": "walk",
+          "path": [
+            [
+              -27.15,
+              14.062
+            ],
+            [
+              -27.2,
+              15.2
+            ],
+            [
+              -27.2,
+              16.4
+            ],
+            [
+              -26.8,
+              16.8
+            ],
+            [
+              -26.8,
+              17.4
+            ],
+            [
+              -26.6,
+              17.6
+            ],
+            [
+              -25.4,
+              17.6
+            ],
+            [
+              -25.4,
+              14
+            ],
+            [
+              -25.436,
+              13.937
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Walk to the practice kitchen"
+        },
+        {
+          "start": 75,
+          "end": 130,
+          "action": "serve",
+          "path": [
+            [
+              -25.436,
+              13.937
+            ],
+            [
+              -25.436,
+              13.937
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": -1.5707963267948966,
+          "title": "Practice kitchen \u00b7 washing up at the sink"
+        },
+        {
+          "start": 130,
+          "end": 132.1129,
+          "action": "walk",
+          "path": [
+            [
+              -25.436,
+              13.937
+            ],
+            [
+              -25.4,
+              14
+            ],
+            [
+              -25.4,
+              15
+            ],
+            [
+              -25.436,
+              15.082
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Along the counter to the microwave"
+        },
+        {
+          "start": 132.1129,
+          "end": 185,
+          "action": "tabletop",
+          "path": [
+            [
+              -25.436,
+              15.082
+            ],
+            [
+              -25.436,
+              15.082
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": -1.5707963267948966,
+          "title": "Practice kitchen \u00b7 heating a meal in the microwave"
+        },
+        {
+          "start": 185,
+          "end": 198.9585,
+          "action": "walk",
+          "path": [
+            [
+              -25.436,
+              15.082
+            ],
+            [
+              -25.4,
+              15
+            ],
+            [
+              -25.4,
+              17.6
+            ],
+            [
+              -26.6,
+              17.6
+            ],
+            [
+              -26.6,
+              17
+            ],
+            [
+              -27.2,
+              16.4
+            ],
+            [
+              -27.2,
+              15.2
+            ],
+            [
+              -27.15,
+              14.062
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Back to the quiet room"
+        },
+        {
+          "start": 198.9585,
+          "end": 242.1241,
+          "action": "seated",
+          "path": [
+            [
+              -27.15,
+              14.062
+            ],
+            [
+              -27.15,
+              14.062
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "seated": true,
+          "title": "Resting in the quiet room"
+        },
+        {
+          "start": 242.1241,
+          "end": 280,
+          "action": "walk",
+          "path": [
+            [
+              -27.15,
+              14.062
+            ],
+            [
+              -27.2,
+              15.2
+            ],
+            [
+              -27.2,
+              16.4
+            ],
+            [
+              -26.8,
+              16.8
+            ],
+            [
+              -26.8,
+              17.4
+            ],
+            [
+              -26.4,
+              17.8
+            ],
+            [
+              -26.2,
+              17.8
+            ],
+            [
+              -26,
+              18
+            ],
+            [
+              -23.4,
+              18
+            ],
+            [
+              -23.4,
+              19.4
+            ],
+            [
+              -23.6,
+              19.6
+            ],
+            [
+              -23.6,
+              23.6
+            ],
+            [
+              -24,
+              24
+            ],
+            [
+              -26,
+              24
+            ],
+            [
+              -26.2,
+              24.2
+            ],
+            [
+              -26.4,
+              24.2
+            ],
+            [
+              -26.6,
+              24.4
+            ],
+            [
+              -26.8,
+              24.4
+            ],
+            [
+              -27,
+              24.6
+            ],
+            [
+              -27.2,
+              24.6
+            ],
+            [
+              -27.4,
+              24.8
+            ],
+            [
+              -27.6,
+              24.8
+            ],
+            [
+              -27.8,
+              25
+            ],
+            [
+              -28.2,
+              25
+            ],
+            [
+              -28.4,
+              25.2
+            ],
+            [
+              -30,
+              25.2
+            ],
+            [
+              -30,
+              25.8
+            ],
+            [
+              -30.2,
+              26
+            ],
+            [
+              -30.15,
+              26
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Walk to the practice stairs"
+        },
+        {
+          "start": 280,
+          "end": 292.8571,
+          "action": "walk",
+          "path": [
+            [
+              -30.15,
+              26
+            ],
+            [
+              -29.75,
+              26
+            ],
+            [
+              -29.61,
+              26
+            ],
+            [
+              -29.33,
+              26
+            ],
+            [
+              -29.05,
+              26
+            ],
+            [
+              -28.77,
+              26
+            ],
+            [
+              -28.63,
+              26
+            ],
+            [
+              -27.88,
+              26
+            ],
+            [
+              -26.05,
+              26
+            ],
+            [
+              -25.65,
+              26
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "heights": [
+            0,
+            0,
+            0.15,
+            0.3,
+            0.45,
+            0.6,
+            0.6,
+            0.6,
+            0,
+            0
+          ],
+          "title": "Practice stairs \u00b7 up the steps, over the landing, down the ramp"
+        },
+        {
+          "start": 292.8571,
+          "end": 304.5025,
+          "action": "walk",
+          "path": [
+            [
+              -25.65,
+              26
+            ],
+            [
+              -25.65,
+              25
+            ],
+            [
+              -30.05,
+              25
+            ],
+            [
+              -30.15,
+              26
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Back round to the foot of the stairs"
+        },
+        {
+          "start": 304.5025,
+          "end": 323.3333,
+          "action": "idle",
+          "path": [
+            [
+              -30.15,
+              26
+            ],
+            [
+              -30.15,
+              26
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 1.5707963267948966,
+          "title": "Catching breath at the foot of the stairs"
+        },
+        {
+          "start": 323.3333,
+          "end": 336.1904,
+          "action": "walk",
+          "path": [
+            [
+              -30.15,
+              26
+            ],
+            [
+              -29.75,
+              26
+            ],
+            [
+              -29.61,
+              26
+            ],
+            [
+              -29.33,
+              26
+            ],
+            [
+              -29.05,
+              26
+            ],
+            [
+              -28.77,
+              26
+            ],
+            [
+              -28.63,
+              26
+            ],
+            [
+              -27.88,
+              26
+            ],
+            [
+              -26.05,
+              26
+            ],
+            [
+              -25.65,
+              26
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "heights": [
+            0,
+            0,
+            0.15,
+            0.3,
+            0.45,
+            0.6,
+            0.6,
+            0.6,
+            0,
+            0
+          ],
+          "title": "Practice stairs \u00b7 up the steps, over the landing, down the ramp"
+        },
+        {
+          "start": 336.1904,
+          "end": 347.8358,
+          "action": "walk",
+          "path": [
+            [
+              -25.65,
+              26
+            ],
+            [
+              -25.65,
+              25
+            ],
+            [
+              -30.05,
+              25
+            ],
+            [
+              -30.15,
+              26
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Back round to the foot of the stairs"
+        },
+        {
+          "start": 347.8358,
+          "end": 366.6667,
+          "action": "idle",
+          "path": [
+            [
+              -30.15,
+              26
+            ],
+            [
+              -30.15,
+              26
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 1.5707963267948966,
+          "title": "Catching breath at the foot of the stairs"
+        },
+        {
+          "start": 366.6667,
+          "end": 379.5238,
+          "action": "walk",
+          "path": [
+            [
+              -30.15,
+              26
+            ],
+            [
+              -29.75,
+              26
+            ],
+            [
+              -29.61,
+              26
+            ],
+            [
+              -29.33,
+              26
+            ],
+            [
+              -29.05,
+              26
+            ],
+            [
+              -28.77,
+              26
+            ],
+            [
+              -28.63,
+              26
+            ],
+            [
+              -27.88,
+              26
+            ],
+            [
+              -26.05,
+              26
+            ],
+            [
+              -25.65,
+              26
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "heights": [
+            0,
+            0,
+            0.15,
+            0.3,
+            0.45,
+            0.6,
+            0.6,
+            0.6,
+            0,
+            0
+          ],
+          "title": "Practice stairs \u00b7 up the steps, over the landing, down the ramp"
+        },
+        {
+          "start": 379.5238,
+          "end": 391.1692,
+          "action": "walk",
+          "path": [
+            [
+              -25.65,
+              26
+            ],
+            [
+              -25.65,
+              25
+            ],
+            [
+              -30.05,
+              25
+            ],
+            [
+              -30.15,
+              26
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Back round to the foot of the stairs"
+        },
+        {
+          "start": 391.1692,
+          "end": 410,
+          "action": "idle",
+          "path": [
+            [
+              -30.15,
+              26
+            ],
+            [
+              -30.15,
+              26
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 1.5707963267948966,
+          "title": "Catching breath at the foot of the stairs"
+        },
+        {
+          "start": 410,
+          "end": 447.8759,
+          "action": "walk",
+          "path": [
+            [
+              -30.15,
+              26
+            ],
+            [
+              -30.2,
+              26
+            ],
+            [
+              -30.2,
+              25.4
+            ],
+            [
+              -29.6,
+              24.8
+            ],
+            [
+              -24.8,
+              24.8
+            ],
+            [
+              -23.6,
+              23.6
+            ],
+            [
+              -23.6,
+              19.6
+            ],
+            [
+              -23.4,
+              19.4
+            ],
+            [
+              -23.4,
+              18
+            ],
+            [
+              -23.8,
+              17.6
+            ],
+            [
+              -26.6,
+              17.6
+            ],
+            [
+              -26.6,
+              17
+            ],
+            [
+              -27.2,
+              16.4
+            ],
+            [
+              -27.2,
+              15.2
+            ],
+            [
+              -27.15,
+              14.062
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Back to the quiet room"
+        },
+        {
+          "start": 447.8759,
+          "end": 467.1241,
+          "action": "seated",
+          "path": [
+            [
+              -27.15,
+              14.062
+            ],
+            [
+              -27.15,
+              14.062
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "seated": true,
+          "title": "Resting in the quiet room"
+        },
+        {
+          "start": 467.1241,
+          "end": 505,
+          "action": "walk",
+          "path": [
+            [
+              -27.15,
+              14.062
+            ],
+            [
+              -27.2,
+              15.2
+            ],
+            [
+              -27.2,
+              16.4
+            ],
+            [
+              -26.8,
+              16.8
+            ],
+            [
+              -26.8,
+              17.4
+            ],
+            [
+              -26.4,
+              17.8
+            ],
+            [
+              -26.2,
+              17.8
+            ],
+            [
+              -26,
+              18
+            ],
+            [
+              -23.4,
+              18
+            ],
+            [
+              -23.4,
+              19.4
+            ],
+            [
+              -23.6,
+              19.6
+            ],
+            [
+              -23.6,
+              23.6
+            ],
+            [
+              -24,
+              24
+            ],
+            [
+              -26,
+              24
+            ],
+            [
+              -26.2,
+              24.2
+            ],
+            [
+              -26.4,
+              24.2
+            ],
+            [
+              -26.6,
+              24.4
+            ],
+            [
+              -26.8,
+              24.4
+            ],
+            [
+              -27,
+              24.6
+            ],
+            [
+              -27.2,
+              24.6
+            ],
+            [
+              -27.4,
+              24.8
+            ],
+            [
+              -27.6,
+              24.8
+            ],
+            [
+              -27.8,
+              25
+            ],
+            [
+              -28.2,
+              25
+            ],
+            [
+              -28.4,
+              25.2
+            ],
+            [
+              -30,
+              25.2
+            ],
+            [
+              -30,
+              25.8
+            ],
+            [
+              -30.2,
+              26
+            ],
+            [
+              -30.15,
+              26
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Walk to the practice stairs"
+        },
+        {
+          "start": 505,
+          "end": 517.8571,
+          "action": "walk",
+          "path": [
+            [
+              -30.15,
+              26
+            ],
+            [
+              -29.75,
+              26
+            ],
+            [
+              -29.61,
+              26
+            ],
+            [
+              -29.33,
+              26
+            ],
+            [
+              -29.05,
+              26
+            ],
+            [
+              -28.77,
+              26
+            ],
+            [
+              -28.63,
+              26
+            ],
+            [
+              -27.88,
+              26
+            ],
+            [
+              -26.05,
+              26
+            ],
+            [
+              -25.65,
+              26
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "heights": [
+            0,
+            0,
+            0.15,
+            0.3,
+            0.45,
+            0.6,
+            0.6,
+            0.6,
+            0,
+            0
+          ],
+          "title": "Practice stairs \u00b7 up the steps, over the landing, down the ramp"
+        },
+        {
+          "start": 517.8571,
+          "end": 529.5025,
+          "action": "walk",
+          "path": [
+            [
+              -25.65,
+              26
+            ],
+            [
+              -25.65,
+              25
+            ],
+            [
+              -30.05,
+              25
+            ],
+            [
+              -30.15,
+              26
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Back round to the foot of the stairs"
+        },
+        {
+          "start": 529.5025,
+          "end": 548.3333,
+          "action": "idle",
+          "path": [
+            [
+              -30.15,
+              26
+            ],
+            [
+              -30.15,
+              26
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 1.5707963267948966,
+          "title": "Catching breath at the foot of the stairs"
+        },
+        {
+          "start": 548.3333,
+          "end": 561.1904,
+          "action": "walk",
+          "path": [
+            [
+              -30.15,
+              26
+            ],
+            [
+              -29.75,
+              26
+            ],
+            [
+              -29.61,
+              26
+            ],
+            [
+              -29.33,
+              26
+            ],
+            [
+              -29.05,
+              26
+            ],
+            [
+              -28.77,
+              26
+            ],
+            [
+              -28.63,
+              26
+            ],
+            [
+              -27.88,
+              26
+            ],
+            [
+              -26.05,
+              26
+            ],
+            [
+              -25.65,
+              26
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "heights": [
+            0,
+            0,
+            0.15,
+            0.3,
+            0.45,
+            0.6,
+            0.6,
+            0.6,
+            0,
+            0
+          ],
+          "title": "Practice stairs \u00b7 up the steps, over the landing, down the ramp"
+        },
+        {
+          "start": 561.1904,
+          "end": 572.8358,
+          "action": "walk",
+          "path": [
+            [
+              -25.65,
+              26
+            ],
+            [
+              -25.65,
+              25
+            ],
+            [
+              -30.05,
+              25
+            ],
+            [
+              -30.15,
+              26
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Back round to the foot of the stairs"
+        },
+        {
+          "start": 572.8358,
+          "end": 591.6667,
+          "action": "idle",
+          "path": [
+            [
+              -30.15,
+              26
+            ],
+            [
+              -30.15,
+              26
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 1.5707963267948966,
+          "title": "Catching breath at the foot of the stairs"
+        },
+        {
+          "start": 591.6667,
+          "end": 604.5238,
+          "action": "walk",
+          "path": [
+            [
+              -30.15,
+              26
+            ],
+            [
+              -29.75,
+              26
+            ],
+            [
+              -29.61,
+              26
+            ],
+            [
+              -29.33,
+              26
+            ],
+            [
+              -29.05,
+              26
+            ],
+            [
+              -28.77,
+              26
+            ],
+            [
+              -28.63,
+              26
+            ],
+            [
+              -27.88,
+              26
+            ],
+            [
+              -26.05,
+              26
+            ],
+            [
+              -25.65,
+              26
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "heights": [
+            0,
+            0,
+            0.15,
+            0.3,
+            0.45,
+            0.6,
+            0.6,
+            0.6,
+            0,
+            0
+          ],
+          "title": "Practice stairs \u00b7 up the steps, over the landing, down the ramp"
+        },
+        {
+          "start": 604.5238,
+          "end": 616.1692,
+          "action": "walk",
+          "path": [
+            [
+              -25.65,
+              26
+            ],
+            [
+              -25.65,
+              25
+            ],
+            [
+              -30.05,
+              25
+            ],
+            [
+              -30.15,
+              26
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Back round to the foot of the stairs"
+        },
+        {
+          "start": 616.1692,
+          "end": 635,
+          "action": "idle",
+          "path": [
+            [
+              -30.15,
+              26
+            ],
+            [
+              -30.15,
+              26
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 1.5707963267948966,
+          "title": "Catching breath at the foot of the stairs"
+        },
+        {
+          "start": 635,
+          "end": 672.8759,
+          "action": "walk",
+          "path": [
+            [
+              -30.15,
+              26
+            ],
+            [
+              -30.2,
+              26
+            ],
+            [
+              -30.2,
+              25.4
+            ],
+            [
+              -29.6,
+              24.8
+            ],
+            [
+              -24.8,
+              24.8
+            ],
+            [
+              -23.6,
+              23.6
+            ],
+            [
+              -23.6,
+              19.6
+            ],
+            [
+              -23.4,
+              19.4
+            ],
+            [
+              -23.4,
+              18
+            ],
+            [
+              -23.8,
+              17.6
+            ],
+            [
+              -26.6,
+              17.6
+            ],
+            [
+              -26.6,
+              17
+            ],
+            [
+              -27.2,
+              16.4
+            ],
+            [
+              -27.2,
+              15.2
+            ],
+            [
+              -27.15,
+              14.062
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Back to the quiet room"
+        },
+        {
+          "start": 672.8759,
+          "end": 720,
+          "action": "seated",
+          "path": [
+            [
+              -27.15,
+              14.062
+            ],
+            [
+              -27.15,
+              14.062
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "seated": true,
+          "title": "Resting in the quiet room"
+        }
+      ]
+    },
+    {
+      "id": "rehab-pt-02",
+      "role": "pt",
+      "variant": 3,
+      "label": "Pt 2",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "rehab-pt-02",
+      "segments": [
+        {
+          "start": 0,
+          "end": 241.7501,
+          "action": "document",
+          "path": [
+            [
+              -28.9,
+              12.219
+            ],
+            [
+              -28.9,
+              12.219
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Charting at the standing desk"
+        },
+        {
+          "start": 241.7501,
+          "end": 280,
+          "action": "walk",
+          "path": [
+            [
+              -28.9,
+              12.219
+            ],
+            [
+              -28.8,
+              12.2
+            ],
+            [
+              -28.8,
+              10.8
+            ],
+            [
+              -27.8,
+              9.8
+            ],
+            [
+              -27.2,
+              9.8
+            ],
+            [
+              -26.4,
+              10.6
+            ],
+            [
+              -26,
+              10.6
+            ],
+            [
+              -26,
+              12.8
+            ],
+            [
+              -25.6,
+              13.2
+            ],
+            [
+              -25.6,
+              15
+            ],
+            [
+              -25.4,
+              15.2
+            ],
+            [
+              -25.4,
+              16
+            ],
+            [
+              -23.4,
+              18
+            ],
+            [
+              -23.4,
+              19.4
+            ],
+            [
+              -23.6,
+              19.6
+            ],
+            [
+              -23.6,
+              23.6
+            ],
+            [
+              -24,
+              24
+            ],
+            [
+              -28.6,
+              24
+            ],
+            [
+              -29.4,
+              24.8
+            ],
+            [
+              -30.6,
+              24.8
+            ],
+            [
+              -30.55,
+              24.75
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Walk to the practice stairs"
+        },
+        {
+          "start": 280,
+          "end": 304.5025,
+          "action": "treat",
+          "path": [
+            [
+              -30.55,
+              24.75
+            ],
+            [
+              -30.55,
+              24.75
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0.675,
+          "title": "Coaching the stair climb"
+        },
+        {
+          "start": 304.5025,
+          "end": 323.3333,
+          "action": "consult",
+          "path": [
+            [
+              -30.55,
+              24.75
+            ],
+            [
+              -30.55,
+              24.75
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0.675,
+          "title": "Feedback between climbs"
+        },
+        {
+          "start": 323.3333,
+          "end": 347.8358,
+          "action": "treat",
+          "path": [
+            [
+              -30.55,
+              24.75
+            ],
+            [
+              -30.55,
+              24.75
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0.675,
+          "title": "Coaching the stair climb"
+        },
+        {
+          "start": 347.8358,
+          "end": 366.6667,
+          "action": "consult",
+          "path": [
+            [
+              -30.55,
+              24.75
+            ],
+            [
+              -30.55,
+              24.75
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0.675,
+          "title": "Feedback between climbs"
+        },
+        {
+          "start": 366.6667,
+          "end": 391.1692,
+          "action": "treat",
+          "path": [
+            [
+              -30.55,
+              24.75
+            ],
+            [
+              -30.55,
+              24.75
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0.675,
+          "title": "Coaching the stair climb"
+        },
+        {
+          "start": 391.1692,
+          "end": 410,
+          "action": "consult",
+          "path": [
+            [
+              -30.55,
+              24.75
+            ],
+            [
+              -30.55,
+              24.75
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0.675,
+          "title": "Feedback between climbs"
+        },
+        {
+          "start": 410,
+          "end": 448.2499,
+          "action": "walk",
+          "path": [
+            [
+              -30.55,
+              24.75
+            ],
+            [
+              -30.6,
+              24.8
+            ],
+            [
+              -30.4,
+              24.6
+            ],
+            [
+              -30.2,
+              24.6
+            ],
+            [
+              -29.8,
+              24.2
+            ],
+            [
+              -24.6,
+              24.2
+            ],
+            [
+              -24.4,
+              24
+            ],
+            [
+              -24,
+              24
+            ],
+            [
+              -23.6,
+              23.6
+            ],
+            [
+              -23.6,
+              19.6
+            ],
+            [
+              -23.4,
+              19.4
+            ],
+            [
+              -23.4,
+              18
+            ],
+            [
+              -25.4,
+              16
+            ],
+            [
+              -25.4,
+              15.2
+            ],
+            [
+              -25.6,
+              15
+            ],
+            [
+              -25.6,
+              13.2
+            ],
+            [
+              -26,
+              12.8
+            ],
+            [
+              -26,
+              10.6
+            ],
+            [
+              -26.4,
+              10.6
+            ],
+            [
+              -27.2,
+              9.8
+            ],
+            [
+              -27.8,
+              9.8
+            ],
+            [
+              -28.6,
+              10.6
+            ],
+            [
+              -28.6,
+              11.8
+            ],
+            [
+              -28.8,
+              12
+            ],
+            [
+              -28.8,
+              12.2
+            ],
+            [
+              -28.9,
+              12.219
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Back to the workspace"
+        },
+        {
+          "start": 448.2499,
+          "end": 466.7501,
+          "action": "document",
+          "path": [
+            [
+              -28.9,
+              12.219
+            ],
+            [
+              -28.9,
+              12.219
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Charting at the standing desk"
+        },
+        {
+          "start": 466.7501,
+          "end": 505,
+          "action": "walk",
+          "path": [
+            [
+              -28.9,
+              12.219
+            ],
+            [
+              -28.8,
+              12.2
+            ],
+            [
+              -28.8,
+              10.8
+            ],
+            [
+              -27.8,
+              9.8
+            ],
+            [
+              -27.2,
+              9.8
+            ],
+            [
+              -26.4,
+              10.6
+            ],
+            [
+              -26,
+              10.6
+            ],
+            [
+              -26,
+              12.8
+            ],
+            [
+              -25.6,
+              13.2
+            ],
+            [
+              -25.6,
+              15
+            ],
+            [
+              -25.4,
+              15.2
+            ],
+            [
+              -25.4,
+              16
+            ],
+            [
+              -23.4,
+              18
+            ],
+            [
+              -23.4,
+              19.4
+            ],
+            [
+              -23.6,
+              19.6
+            ],
+            [
+              -23.6,
+              23.6
+            ],
+            [
+              -24,
+              24
+            ],
+            [
+              -28.6,
+              24
+            ],
+            [
+              -29.4,
+              24.8
+            ],
+            [
+              -30.6,
+              24.8
+            ],
+            [
+              -30.55,
+              24.75
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Walk to the practice stairs"
+        },
+        {
+          "start": 505,
+          "end": 529.5025,
+          "action": "treat",
+          "path": [
+            [
+              -30.55,
+              24.75
+            ],
+            [
+              -30.55,
+              24.75
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0.675,
+          "title": "Coaching the stair climb"
+        },
+        {
+          "start": 529.5025,
+          "end": 548.3333,
+          "action": "consult",
+          "path": [
+            [
+              -30.55,
+              24.75
+            ],
+            [
+              -30.55,
+              24.75
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0.675,
+          "title": "Feedback between climbs"
+        },
+        {
+          "start": 548.3333,
+          "end": 572.8358,
+          "action": "treat",
+          "path": [
+            [
+              -30.55,
+              24.75
+            ],
+            [
+              -30.55,
+              24.75
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0.675,
+          "title": "Coaching the stair climb"
+        },
+        {
+          "start": 572.8358,
+          "end": 591.6667,
+          "action": "consult",
+          "path": [
+            [
+              -30.55,
+              24.75
+            ],
+            [
+              -30.55,
+              24.75
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0.675,
+          "title": "Feedback between climbs"
+        },
+        {
+          "start": 591.6667,
+          "end": 616.1692,
+          "action": "treat",
+          "path": [
+            [
+              -30.55,
+              24.75
+            ],
+            [
+              -30.55,
+              24.75
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0.675,
+          "title": "Coaching the stair climb"
+        },
+        {
+          "start": 616.1692,
+          "end": 635,
+          "action": "consult",
+          "path": [
+            [
+              -30.55,
+              24.75
+            ],
+            [
+              -30.55,
+              24.75
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0.675,
+          "title": "Feedback between climbs"
+        },
+        {
+          "start": 635,
+          "end": 673.2499,
+          "action": "walk",
+          "path": [
+            [
+              -30.55,
+              24.75
+            ],
+            [
+              -30.6,
+              24.8
+            ],
+            [
+              -30.4,
+              24.6
+            ],
+            [
+              -30.2,
+              24.6
+            ],
+            [
+              -29.8,
+              24.2
+            ],
+            [
+              -24.6,
+              24.2
+            ],
+            [
+              -24.4,
+              24
+            ],
+            [
+              -24,
+              24
+            ],
+            [
+              -23.6,
+              23.6
+            ],
+            [
+              -23.6,
+              19.6
+            ],
+            [
+              -23.4,
+              19.4
+            ],
+            [
+              -23.4,
+              18
+            ],
+            [
+              -25.4,
+              16
+            ],
+            [
+              -25.4,
+              15.2
+            ],
+            [
+              -25.6,
+              15
+            ],
+            [
+              -25.6,
+              13.2
+            ],
+            [
+              -26,
+              12.8
+            ],
+            [
+              -26,
+              10.6
+            ],
+            [
+              -26.4,
+              10.6
+            ],
+            [
+              -27.2,
+              9.8
+            ],
+            [
+              -27.8,
+              9.8
+            ],
+            [
+              -28.6,
+              10.6
+            ],
+            [
+              -28.6,
+              11.8
+            ],
+            [
+              -28.8,
+              12
+            ],
+            [
+              -28.8,
+              12.2
+            ],
+            [
+              -28.9,
+              12.219
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Back to the workspace"
+        },
+        {
+          "start": 673.2499,
+          "end": 720,
+          "action": "document",
+          "path": [
+            [
+              -28.9,
+              12.219
+            ],
+            [
+              -28.9,
+              12.219
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Charting at the standing desk"
+        }
+      ]
+    },
+    {
+      "id": "rehab-ot-02",
+      "role": "ot",
+      "variant": 4,
+      "label": "Ot 2",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "rehab-ot-02",
+      "segments": [
+        {
+          "start": 0,
+          "end": 62.3648,
+          "action": "document",
+          "path": [
+            [
+              -29.899,
+              9.655
+            ],
+            [
+              -29.899,
+              9.655
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": -1.5707963267948966,
+          "title": "Charting at the standing desk"
+        },
+        {
+          "start": 62.3648,
+          "end": 75,
+          "action": "walk",
+          "path": [
+            [
+              -29.899,
+              9.655
+            ],
+            [
+              -29.8,
+              9.6
+            ],
+            [
+              -29.6,
+              9.8
+            ],
+            [
+              -27.2,
+              9.8
+            ],
+            [
+              -26.4,
+              10.6
+            ],
+            [
+              -26,
+              10.6
+            ],
+            [
+              -26,
+              12.8
+            ],
+            [
+              -25.6,
+              13.2
+            ],
+            [
+              -25.6,
+              13.4
+            ],
+            [
+              -25.4,
+              13.6
+            ],
+            [
+              -25.4,
+              13.8
+            ],
+            [
+              -25.2,
+              14
+            ],
+            [
+              -25.2,
+              14.4
+            ],
+            [
+              -25,
+              14.6
+            ],
+            [
+              -25.05,
+              14.51
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Walk to the practice kitchen"
+        },
+        {
+          "start": 75,
+          "end": 130,
+          "action": "consult",
+          "path": [
+            [
+              -25.05,
+              14.51
+            ],
+            [
+              -25.05,
+              14.51
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": -2.549,
+          "title": "ADL coaching \u00b7 washing up"
+        },
+        {
+          "start": 130,
+          "end": 185,
+          "action": "consult",
+          "path": [
+            [
+              -25.05,
+              14.51
+            ],
+            [
+              -25.05,
+              14.51
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": -0.594,
+          "title": "ADL coaching \u00b7 the microwave"
+        },
+        {
+          "start": 185,
+          "end": 215,
+          "action": "document",
+          "path": [
+            [
+              -25.05,
+              14.51
+            ],
+            [
+              -25.05,
+              14.51
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": -2.549,
+          "title": "Notes between kitchen sessions"
+        },
+        {
+          "start": 215,
+          "end": 265,
+          "action": "consult",
+          "path": [
+            [
+              -25.05,
+              14.51
+            ],
+            [
+              -25.05,
+              14.51
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": -2.549,
+          "title": "ADL coaching \u00b7 washing up"
+        },
+        {
+          "start": 265,
+          "end": 310,
+          "action": "consult",
+          "path": [
+            [
+              -25.05,
+              14.51
+            ],
+            [
+              -25.05,
+              14.51
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": -0.594,
+          "title": "ADL coaching \u00b7 the microwave"
+        },
+        {
+          "start": 310,
+          "end": 322.6352,
+          "action": "walk",
+          "path": [
+            [
+              -25.05,
+              14.51
+            ],
+            [
+              -25,
+              14.6
+            ],
+            [
+              -25.2,
+              14.4
+            ],
+            [
+              -25.2,
+              14.2
+            ],
+            [
+              -25.6,
+              13.8
+            ],
+            [
+              -25.6,
+              13.2
+            ],
+            [
+              -26,
+              12.8
+            ],
+            [
+              -26,
+              10.6
+            ],
+            [
+              -26.4,
+              10.6
+            ],
+            [
+              -27.2,
+              9.8
+            ],
+            [
+              -29.6,
+              9.8
+            ],
+            [
+              -29.8,
+              9.6
+            ],
+            [
+              -29.899,
+              9.655
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Back to the workspace"
+        },
+        {
+          "start": 322.6352,
+          "end": 720,
+          "action": "document",
+          "path": [
+            [
+              -29.899,
+              9.655
+            ],
+            [
+              -29.899,
+              9.655
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": -1.5707963267948966,
+          "title": "Charting at the standing desk"
+        }
+      ]
+    },
+    {
+      "id": "rehab-massage-therapist",
+      "role": "pt",
+      "variant": 5,
+      "label": "Acupressure therapist",
+      "offset": 0,
+      "levelId": "ground",
+      "profileId": "rehab-massage-therapist",
+      "segments": [
+        {
+          "start": 0,
+          "end": 276.7733,
+          "action": "document",
+          "path": [
+            [
+              -27.1,
+              20.3
+            ],
+            [
+              -27.1,
+              20.3
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": -1.5707963267948966,
+          "title": "Preparing the massage room"
+        },
+        {
+          "start": 276.7733,
+          "end": 280,
+          "action": "walk",
+          "path": [
+            [
+              -27.1,
+              20.3
+            ],
+            [
+              -27.2,
+              20.4
+            ],
+            [
+              -28.2,
+              21.4
+            ],
+            [
+              -28.2,
+              21.8
+            ],
+            [
+              -28.4,
+              21.8
+            ],
+            [
+              -28.3,
+              21.775
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "To the massage bed"
+        },
+        {
+          "start": 280,
+          "end": 430,
+          "action": "massage",
+          "path": [
+            [
+              -28.3,
+              21.775
+            ],
+            [
+              -28.3,
+              21.775
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": -2.859,
+          "title": "Acupressure massage \u00b7 shoulders and back"
+        },
+        {
+          "start": 430,
+          "end": 433.2267,
+          "action": "walk",
+          "path": [
+            [
+              -28.3,
+              21.775
+            ],
+            [
+              -28.4,
+              21.8
+            ],
+            [
+              -28.2,
+              21.8
+            ],
+            [
+              -27.4,
+              21
+            ],
+            [
+              -27.4,
+              20.6
+            ],
+            [
+              -27.2,
+              20.4
+            ],
+            [
+              -27.1,
+              20.3
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Notes after the appointment"
+        },
+        {
+          "start": 433.2267,
+          "end": 461.7733,
+          "action": "document",
+          "path": [
+            [
+              -27.1,
+              20.3
+            ],
+            [
+              -27.1,
+              20.3
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": -1.5707963267948966,
+          "title": "Preparing the massage room"
+        },
+        {
+          "start": 461.7733,
+          "end": 465,
+          "action": "walk",
+          "path": [
+            [
+              -27.1,
+              20.3
+            ],
+            [
+              -27.2,
+              20.4
+            ],
+            [
+              -28.2,
+              21.4
+            ],
+            [
+              -28.2,
+              21.8
+            ],
+            [
+              -28.4,
+              21.8
+            ],
+            [
+              -28.3,
+              21.775
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "To the massage bed"
+        },
+        {
+          "start": 465,
+          "end": 615,
+          "action": "massage",
+          "path": [
+            [
+              -28.3,
+              21.775
+            ],
+            [
+              -28.3,
+              21.775
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": -2.859,
+          "title": "Acupressure massage \u00b7 shoulders and back"
+        },
+        {
+          "start": 615,
+          "end": 618.2267,
+          "action": "walk",
+          "path": [
+            [
+              -28.3,
+              21.775
+            ],
+            [
+              -28.4,
+              21.8
+            ],
+            [
+              -28.2,
+              21.8
+            ],
+            [
+              -27.4,
+              21
+            ],
+            [
+              -27.4,
+              20.6
+            ],
+            [
+              -27.2,
+              20.4
+            ],
+            [
+              -27.1,
+              20.3
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": 0,
+          "title": "Notes after the appointment"
+        },
+        {
+          "start": 618.2267,
+          "end": 720,
+          "action": "document",
+          "path": [
+            [
+              -27.1,
+              20.3
+            ],
+            [
+              -27.1,
+              20.3
+            ]
+          ],
+          "zoneId": "rehab",
+          "heading": -1.5707963267948966,
+          "title": "Preparing the massage room"
+        }
+      ]
     }
   ],
   "interactions": [
@@ -32837,6 +36356,97 @@
       "end": 720,
       "zoneId": "rehab",
       "description": "Continuous composite interaction track; select a person to inspect their individual activity stages."
+    },
+    {
+      "id": "rehab-owner-steppers",
+      "label": "Recumbent steppers \u00b7 endurance",
+      "actorIds": [
+        "community-25",
+        "rehab-rider-02"
+      ],
+      "description": "Two participants pedal the recumbent steppers facing the Valley Blvd windows; one rides all morning, the other between the quiet room and an acupressure appointment.",
+      "category": "rehab",
+      "start": 55,
+      "end": 256,
+      "zoneId": "rehab"
+    },
+    {
+      "id": "rehab-owner-kitchen-1",
+      "label": "Practice kitchen \u00b7 OT session",
+      "actorIds": [
+        "rehab-ot-02",
+        "rehab-stairs-participant"
+      ],
+      "description": "Activities of daily living in the practice kitchen: washing up at the sink and heating a meal in the microwave, coached by the occupational therapist.",
+      "category": "rehab",
+      "start": 75,
+      "end": 185,
+      "zoneId": "rehab"
+    },
+    {
+      "id": "rehab-owner-kitchen-2",
+      "label": "Practice kitchen \u00b7 OT session",
+      "actorIds": [
+        "rehab-ot-02",
+        "rehab-adl-participant"
+      ],
+      "description": "Activities of daily living in the practice kitchen: washing up at the sink and heating a meal in the microwave, coached by the occupational therapist.",
+      "category": "rehab",
+      "start": 215,
+      "end": 310,
+      "zoneId": "rehab"
+    },
+    {
+      "id": "rehab-owner-stairs-1",
+      "label": "Practice stairs \u00b7 step training",
+      "actorIds": [
+        "rehab-pt-02",
+        "rehab-stairs-participant"
+      ],
+      "description": "Three climbs of the training stairs (up the steps, across the landing, down the ramp) with a rest after each, the physical therapist coaching from the foot.",
+      "category": "rehab",
+      "start": 280,
+      "end": 410,
+      "zoneId": "rehab"
+    },
+    {
+      "id": "rehab-owner-stairs-2",
+      "label": "Practice stairs \u00b7 step training",
+      "actorIds": [
+        "rehab-pt-02",
+        "rehab-stairs-participant"
+      ],
+      "description": "Three climbs of the training stairs (up the steps, across the landing, down the ramp) with a rest after each, the physical therapist coaching from the foot.",
+      "category": "rehab",
+      "start": 505,
+      "end": 635,
+      "zoneId": "rehab"
+    },
+    {
+      "id": "rehab-owner-massage-1",
+      "label": "Acupressure massage",
+      "actorIds": [
+        "rehab-massage-therapist",
+        "rehab-rider-02"
+      ],
+      "description": "An acupressure appointment in the massage room: the participant sits on the edge of the massage bed while the therapist works on stiff shoulders and back.",
+      "category": "rehab",
+      "start": 280,
+      "end": 430,
+      "zoneId": "rehab"
+    },
+    {
+      "id": "rehab-owner-massage-2",
+      "label": "Acupressure massage",
+      "actorIds": [
+        "rehab-massage-therapist",
+        "rehab-adl-participant"
+      ],
+      "description": "An acupressure appointment in the massage room: the participant sits on the edge of the massage bed while the therapist works on stiff shoulders and back.",
+      "category": "rehab",
+      "start": 465,
+      "end": 615,
+      "zoneId": "rehab"
     },
     {
       "id": "clinical-team",

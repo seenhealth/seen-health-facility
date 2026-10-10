@@ -3367,7 +3367,7 @@
     },
     {
       "id": "rehab-support-nw",
-      "name": "Therapy support NW",
+      "name": "PT & OT workspace",
       "zoneId": "rehab",
       "levelId": "ground",
       "polygon": [
@@ -3432,7 +3432,7 @@
     },
     {
       "id": "rehab-support-west",
-      "name": "Therapy west room",
+      "name": "Quiet room",
       "zoneId": "rehab",
       "levelId": "ground",
       "polygon": [
@@ -3579,7 +3579,7 @@
     },
     {
       "id": "rehab-support-mid",
-      "name": "Therapy southwest room",
+      "name": "Acupressure massage room",
       "zoneId": "rehab",
       "levelId": "ground",
       "polygon": [
@@ -15977,6 +15977,83 @@
       "parameters": {
         "bin": "recycling"
       }
+    },
+    "rehab-fridge": {
+      "kind": "rehab-fridge",
+      "dimensions": [
+        0.76,
+        1.72,
+        0.72
+      ],
+      "material": "photo-silver",
+      "materials": {
+        "handle": "photo-black"
+      }
+    },
+    "rehab-microwave": {
+      "kind": "rehab-microwave",
+      "dimensions": [
+        0.5,
+        0.3,
+        0.38
+      ],
+      "material": "photo-white",
+      "materials": {
+        "glass": "photo-black",
+        "metal": "photo-silver"
+      }
+    },
+    "rehab-kitchen-casework": {
+      "kind": "casework",
+      "dimensions": [
+        1.9,
+        2.15,
+        0.6
+      ],
+      "material": "photo-white",
+      "materials": {
+        "top": "photo-quartz",
+        "splash": "photo-teal-tile"
+      },
+      "parameters": {
+        "bays": 3
+      }
+    },
+    "rehab-recliner": {
+      "kind": "rehab-recliner",
+      "dimensions": [
+        0.8,
+        1.1,
+        1.4
+      ],
+      "material": "photo-blue-grey",
+      "materials": {
+        "wood": "oak",
+        "metal": "photo-silver"
+      }
+    },
+    "rehab-massage-bed": {
+      "kind": "therapy-bed",
+      "dimensions": [
+        0.85,
+        0.77,
+        1.95
+      ],
+      "material": "clinical-blue"
+    },
+    "rehab-standing-desk": {
+      "kind": "rehab-standing-desk",
+      "dimensions": [
+        1.2,
+        1.45,
+        0.65
+      ],
+      "material": "photo-white",
+      "materials": {
+        "metal": "photo-silver",
+        "screen": "screen",
+        "frame": "photo-black"
+      }
     }
   },
   "objects": [
@@ -16819,37 +16896,6 @@
       "status": "user-directed arrangement / dimensions estimated",
       "notes": "September 21 user correction; registered to existing plan and level elevations. Dimensions remain estimated.",
       "layer": "architecture"
-    },
-    {
-      "id": "rehab-demonstration-counter",
-      "assetId": "counter",
-      "zoneId": "rehab",
-      "levelId": "ground",
-      "position": [
-        -26.253508,
-        0,
-        14.093453
-      ],
-      "rotation": 0,
-      "scale": [
-        0.3815916873980403,
-        0.989010989010989,
-        8.007169833926092
-      ],
-      "roomId": "rehab-open",
-      "referencePages": [
-        92
-      ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        298,
-        868
-      ],
-      "sourcePixelFootprint": [
-        12,
-        96
-      ]
     },
     {
       "id": "clinic-toilet-0",
@@ -28569,9 +28615,9 @@
       "zoneId": "rehab",
       "levelId": "ground",
       "position": [
-        -25.48,
+        -27.3,
         0,
-        12.7
+        12.15
       ],
       "rotation": 0,
       "scale": [
@@ -28579,7 +28625,7 @@
         1,
         1
       ],
-      "roomId": "rehab-open",
+      "roomId": null,
       "referencePages": [
         115
       ],
@@ -28727,11 +28773,11 @@
       "zoneId": "rehab",
       "levelId": "ground",
       "position": [
-        -28.7,
+        -27.9,
         0,
-        26.2
+        26
       ],
-      "rotation": 1.5707963267948966,
+      "rotation": 1.571,
       "scale": [
         1,
         1,
@@ -28756,102 +28802,6 @@
         17
       ],
       "rotation": 0,
-      "scale": [
-        1,
-        1,
-        1
-      ],
-      "roomId": "rehab-open",
-      "referencePages": [
-        115
-      ],
-      "status": "photo appearance / plan registered / dimensions estimated",
-      "notes": "Visible component follows the photograph. Dimensions and placement require field verification.",
-      "layer": "furniture"
-    },
-    {
-      "id": "rehab-visible-chair-0",
-      "assetId": "photo-dining-chair",
-      "zoneId": "rehab",
-      "levelId": "ground",
-      "position": [
-        -30.45,
-        0,
-        23.78
-      ],
-      "rotation": 1.5707963267948966,
-      "scale": [
-        1,
-        1,
-        1
-      ],
-      "roomId": "rehab-open",
-      "referencePages": [
-        115
-      ],
-      "status": "photo appearance / plan registered / dimensions estimated",
-      "notes": "Visible component follows the photograph. Dimensions and placement require field verification.",
-      "layer": "furniture"
-    },
-    {
-      "id": "rehab-visible-chair-1",
-      "assetId": "photo-dining-chair",
-      "zoneId": "rehab",
-      "levelId": "ground",
-      "position": [
-        -30.45,
-        0,
-        24.46
-      ],
-      "rotation": 1.5707963267948966,
-      "scale": [
-        1,
-        1,
-        1
-      ],
-      "roomId": "rehab-open",
-      "referencePages": [
-        115
-      ],
-      "status": "photo appearance / plan registered / dimensions estimated",
-      "notes": "Visible component follows the photograph. Dimensions and placement require field verification.",
-      "layer": "furniture"
-    },
-    {
-      "id": "rehab-visible-chair-2",
-      "assetId": "photo-dining-chair",
-      "zoneId": "rehab",
-      "levelId": "ground",
-      "position": [
-        -30.45,
-        0,
-        25.14
-      ],
-      "rotation": 1.5707963267948966,
-      "scale": [
-        1,
-        1,
-        1
-      ],
-      "roomId": "rehab-open",
-      "referencePages": [
-        115
-      ],
-      "status": "photo appearance / plan registered / dimensions estimated",
-      "notes": "Visible component follows the photograph. Dimensions and placement require field verification.",
-      "layer": "furniture"
-    },
-    {
-      "id": "rehab-visible-chair-3",
-      "assetId": "photo-dining-chair",
-      "zoneId": "rehab",
-      "levelId": "ground",
-      "position": [
-        -30.45,
-        0,
-        25.82
-      ],
-      "rotation": 1.5707963267948966,
       "scale": [
         1,
         1,
@@ -31430,6 +31380,270 @@
       ],
       "status": "owner-walkthrough 2026-10 / described, not surveyed",
       "notes": "Recycling bin in the trash enclosure; assumed."
+    },
+    {
+      "id": "rehab-kitchen-casework",
+      "assetId": "rehab-kitchen-casework",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -26.096,
+        0,
+        14.412
+      ],
+      "rotation": 1.571,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rehab-open",
+      "referencePages": [
+        115
+      ],
+      "status": "owner walkthrough 2026-10 / dimensions estimated",
+      "notes": "ADL practice kitchen: base cabinets, counter, sink and upper cabinets against the former demonstration-counter wall, fronts to the east. Products and sizes are typical, not surveyed.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rehab-kitchen-fridge",
+      "assetId": "rehab-fridge",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -26.036,
+        0,
+        15.772
+      ],
+      "rotation": 1.571,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rehab-open",
+      "referencePages": [
+        115
+      ],
+      "status": "owner walkthrough 2026-10 / dimensions estimated",
+      "notes": "Practice kitchen refrigerator at the south end of the run, door to the east.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rehab-kitchen-microwave",
+      "assetId": "rehab-microwave",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -26.186,
+        0.841,
+        15.082
+      ],
+      "rotation": 1.571,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rehab-open",
+      "referencePages": [
+        115
+      ],
+      "status": "owner walkthrough 2026-10 / dimensions estimated",
+      "notes": "Counter-top microwave on the practice kitchen counter, under the upper cabinets.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rehab-quiet-recliner-1",
+      "assetId": "rehab-recliner",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -29.05,
+        0,
+        14.162
+      ],
+      "rotation": 3.142,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rehab-support-west",
+      "referencePages": [
+        115
+      ],
+      "status": "owner walkthrough 2026-10 / dimensions estimated",
+      "notes": "Quiet-room recliner, back to the north wall, facing the door.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rehab-quiet-recliner-2",
+      "assetId": "rehab-recliner",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -28.1,
+        0,
+        14.162
+      ],
+      "rotation": 3.142,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rehab-support-west",
+      "referencePages": [
+        115
+      ],
+      "status": "owner walkthrough 2026-10 / dimensions estimated",
+      "notes": "Quiet-room recliner, back to the north wall, facing the door.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rehab-quiet-recliner-3",
+      "assetId": "rehab-recliner",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -27.15,
+        0,
+        14.162
+      ],
+      "rotation": 3.142,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rehab-support-west",
+      "referencePages": [
+        115
+      ],
+      "status": "owner walkthrough 2026-10 / dimensions estimated",
+      "notes": "Quiet-room recliner, back to the north wall, facing the door.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rehab-massage-bed",
+      "assetId": "rehab-massage-bed",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -29,
+        0,
+        20.5
+      ],
+      "rotation": 0,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rehab-support-mid",
+      "referencePages": [
+        115
+      ],
+      "status": "owner walkthrough 2026-10 / dimensions estimated",
+      "notes": "Acupressure massage bed along the west wall, head to the north; the participant sits on its east edge.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rehab-workspace-desk-1",
+      "assetId": "rehab-standing-desk",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -30.564,
+        0,
+        9.655
+      ],
+      "rotation": 1.571,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rehab-support-nw",
+      "referencePages": [
+        115
+      ],
+      "status": "owner walkthrough 2026-10 / dimensions estimated",
+      "notes": "Standing desk with monitor in the PT & OT workspace; the therapists stand at it between sessions.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rehab-workspace-desk-2",
+      "assetId": "rehab-standing-desk",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -30.564,
+        0,
+        11
+      ],
+      "rotation": 1.571,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rehab-support-nw",
+      "referencePages": [
+        115
+      ],
+      "status": "owner walkthrough 2026-10 / dimensions estimated",
+      "notes": "Standing desk with monitor in the PT & OT workspace; the therapists stand at it between sessions.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rehab-workspace-desk-3",
+      "assetId": "rehab-standing-desk",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -30.25,
+        0,
+        12.884
+      ],
+      "rotation": 3.142,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rehab-support-nw",
+      "referencePages": [
+        115
+      ],
+      "status": "owner walkthrough 2026-10 / dimensions estimated",
+      "notes": "Standing desk with monitor in the PT & OT workspace; the therapists stand at it between sessions.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rehab-workspace-desk-4",
+      "assetId": "rehab-standing-desk",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -28.9,
+        0,
+        12.884
+      ],
+      "rotation": 3.142,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rehab-support-nw",
+      "referencePages": [
+        115
+      ],
+      "status": "owner walkthrough 2026-10 / dimensions estimated",
+      "notes": "Standing desk with monitor in the PT & OT workspace; the therapists stand at it between sessions.",
+      "layer": "furniture"
     }
   ],
   "materials": {
@@ -41720,6 +41934,63 @@
         ],
         "change": "Wheelchair wash in the east nook (new door from receiving, drained pad, hose reel and spray gun, parked chair); washer, washer and dryer against receiving’s west wall; the old laundry room is soiled utility (mop sink, cart); the linen room keeps three racks; the rear employee door opens into the trash enclosure (bins replace the plan’s counter) and packages come in through the roll-up with the food. Personal care east: hair-wash basin and chair northwest, shower northeast, toilet and basin down the east wall; personal care west mirrored.",
         "unresolved": "“Another door leading to the linen room” is read as the existing door between the linen room’s two bays (the stair sits between the linen room and receiving). The bins are inside the rear utility room; if the enclosure is the court notch outside the employee door they belong there. Fixture sizes, the dryer and the soiled-utility fit-out are assumed."
+      },
+      {
+        "id": "rehab-bikes",
+        "rooms": [
+          "rehab-open"
+        ],
+        "change": "People ride the recumbent steppers (\"the bikes\"): community-25 rides stepper 1 all day with seated breathers; a new participant (rehab-rider-02) rides stepper 2 in two sessions between the quiet room and an acupressure appointment.",
+        "unresolved": "Riders face the Valley Blvd windows as the machines are placed; how long a participant stays on a stepper (here 150–200 s of the 720 s loop per session) is illustrative."
+      },
+      {
+        "id": "rehab-practice-stairs",
+        "rooms": [
+          "rehab-open"
+        ],
+        "change": "The training stairs move from the glazed SW corner, where they shared the floor with the participant chairs, to open floor in front of the Valley Blvd glazing (risers at the west end, ≥ 0.6 m clear all round); a participant climbs them three times per session with a PT at the foot, twice a day.",
+        "unresolved": "The owner said \"put that somewhere\": the spot by the Valley glazing keeps the centre of the floor free; the stairs could equally stand along the mezzanine-stair wall. Tread heights (4 × 0.15 m), landing and ramp follow the modelled unit, not a measured one."
+      },
+      {
+        "id": "rehab-corner-exerciser",
+        "rooms": [
+          "rehab-open"
+        ],
+        "change": "The person exercising in the corner beside the stairs to the mezzanine (community-25 at −30.1, 17.1) is gone: that actor now rides stepper 1.",
+        "unresolved": ""
+      },
+      {
+        "id": "rehab-practice-kitchen",
+        "rooms": [
+          "rehab-open"
+        ],
+        "change": "The plan’s demonstration counter is replaced by an ADL practice kitchen against the same wall: 1.9 m of base cabinets with counter, sink and upper cabinets, a refrigerator at the south end and a counter-top microwave, fronts to the east with ≥ 0.9 m clear in front; participants rehearse at the sink and microwave with an OT twice a day. Mat plinth 1 (it overlapped the counter) moves into the wall-backed alcove north of the kitchen, out of the north-room doorway and the wheelchair lane from the NW bathroom.",
+        "unresolved": "The owner listed a fridge, a microwave and cabinets; the sink is assumed (a practice kitchen without one is unusual) and no range or oven is modelled. The run’s length (1.9 m) and the counter height (0.84 m, wheelchair-friendly) are assumed."
+      },
+      {
+        "id": "rehab-quiet-room",
+        "rooms": [
+          "rehab-support-west"
+        ],
+        "change": "The west support room is the quiet room: three recliners along its north wall facing the door; participants rest in them between sessions (they walk in and out through the south door).",
+        "unresolved": "Three recliners assumed for \"some recliners\"; the room fits three with a walking strip along the door wall."
+      },
+      {
+        "id": "rehab-massage-room",
+        "rooms": [
+          "rehab-support-mid"
+        ],
+        "change": "The south-west (\"bottom\") support room is the acupressure massage room: a massage bed along the west wall, an acupressure therapist in the room all day with two 150 s appointments per loop (the participant seated on the bed’s edge, the therapist working from the foot of the bed). The story’s PT base point moves out of the bed’s footprint.",
+        "unresolved": "The acupressure therapist is drawn as rehab staff (scrubs); whether acupressure is given by a PT, a TCM practitioner or a visiting therapist is not known. Participants are shown seated rather than lying."
+      },
+      {
+        "id": "rehab-workspace",
+        "rooms": [
+          "rehab-support-nw",
+          "rehab-open"
+        ],
+        "change": "The NW corner room on S Ethel Ave is the PT & OT workspace: four standing desks with monitors (two under the street windows, two on the south wall); a new PT and OT chart there between sessions, in and out through the north support room. The four participant chairs at the glazed SW corner are removed, as the owner said the workspace replaces them.",
+        "unresolved": "\"At the corner right by the street\" is read as the NW corner room (the only side room on the Ethel Ave street wall, where the window is). The alternative reading, the open SW glazed corner where the participant chairs stood (Ethel Ave / Valley Blvd), would put the desks on the open therapy floor instead; the chairs are removed under either reading."
       }
     ],
     "changedWallIds": [
@@ -41745,7 +42016,12 @@
       "ot-basin-1"
     ],
     "removedPlanObjectIds": [
-      "reception-counter-2"
+      "reception-counter-2",
+      "rehab-demonstration-counter",
+      "rehab-visible-chair-0",
+      "rehab-visible-chair-1",
+      "rehab-visible-chair-2",
+      "rehab-visible-chair-3"
     ],
     "newObjectIds": [
       "rehab-wc-east-stall-door-3",
@@ -41758,7 +42034,18 @@
       "owner-care-housekeeping-cart",
       "owner-care-waste-bin-1",
       "owner-care-waste-bin-2",
-      "owner-care-recycling-bin"
+      "owner-care-recycling-bin",
+      "rehab-kitchen-casework",
+      "rehab-kitchen-fridge",
+      "rehab-kitchen-microwave",
+      "rehab-quiet-recliner-1",
+      "rehab-quiet-recliner-2",
+      "rehab-quiet-recliner-3",
+      "rehab-massage-bed",
+      "rehab-workspace-desk-1",
+      "rehab-workspace-desk-2",
+      "rehab-workspace-desk-3",
+      "rehab-workspace-desk-4"
     ]
   },
   "publication": {
