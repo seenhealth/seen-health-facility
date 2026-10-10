@@ -16,8 +16,9 @@
 //   shell-east-exit to the gap's south end.
 // - Upstairs: the restroom flipped with the rear desk beside it (restroom
 //   north, the pair of rear desks south of it), both desk pods turned 90°
-//   about their own centres (desks facing ±z, the pods side by side with an
-//   aisle between), three white desks along the east wall, the office shell's
+//   about their own centres (desks facing ±z) and set in two rows, one
+//   behind the other down the room (pod 0 north, pod 1 south, a 1 m aisle
+//   between), three white desks along the east wall, the office shell's
 //   notch and the restroom's polygon and walls moved with it, the workstation
 //   count 21; the three seated upstairs actors moved with their chairs.
 // - Ground-level stand-ins for the PT stair's upper landing and guard rails
@@ -208,11 +209,19 @@ const WC = { x0: 0.2, x1: 2.9, z0: 14.5, z1: 17.6, door: [15.7, 16.7] };
   }
 }
 // The desk pods, each turned 90° about its own centre (+π/2: a point's offset (dx, dz) becomes (dz, −dx)) and the
-// two set side by side with an aisle between, from the layout they had: desks at pod x ∓0.4 (rot π/2 west, 3π/2
-// east), monitors ∓0.21, chairs ∓1.23 (rot 3π/2 west, 5π/2 east), rows at z 21.45, 19.87, 18.29.
+// two set in two rows, one behind the other down the room (the owner's follow-up: "two rows of the pods"), from
+// the layout they had: desks at pod x ∓0.4 (rot π/2 west, 3π/2 east), monitors ∓0.21, chairs ∓CHAIR (rot 3π/2
+// west, 5π/2 east), rows at z 21.45, 19.87, 18.29. Turned, a pod is 4.66 m along x (three 1.5 m desks at a 1.58 m
+// pitch) and 2 × (CHAIR + 0.31) deep along z, chair back to chair back. Both pods share x 8.05, centred between
+// the restroom's east face (x 2.9) and the east-wall desks' chairs (x 13.21). Along z the two rows fill the band
+// between the east stair's void (chair backs at z 15.0, 0.36 m south of its edge) and the perimeter desks (chairs
+// at z 22.77): with the chairs drawn up to 1.1 m from the spine (their front edge 15 mm off the desk; it was
+// 1.23 m) each pod is 2.82 m deep, which leaves a 1.0 m aisle between the rows and 0.82 m between the south
+// row's chair backs and the perimeter chairs' backs (at 1.23 m that last gap would have been 0.26 m).
+const CHAIR = 1.1;
 const PODS = [
-  { from: [6.2, 19.87], to: [5.8, 19.87] },
-  { from: [11.1, 19.87], to: [11.5, 19.87] },
+  { from: [6.2, 19.87], to: [8.05, 16.41] },
+  { from: [11.1, 19.87], to: [8.05, 20.23] },
 ];
 const ROWS = [21.45, 19.87, 18.29];
 const chairs = new Map();
@@ -231,8 +240,8 @@ PODS.forEach(({ from, to }, pod) => {
           side < 0 ? [from[0] - 0.21, HALF] : [from[0] + 0.21, THREE_HALF],
         chair =
           side < 0
-            ? [from[0] - 1.23, THREE_HALF]
-            : [from[0] + 1.23, THREE_HALF + Math.PI];
+            ? [from[0] - CHAIR, THREE_HALF]
+            : [from[0] + CHAIR, THREE_HALF + Math.PI];
       place(`upperfit-desk-${key}`, ...moved(desk[0], z), turn(desk[1], HALF));
       place(
         `upperfit-monitor-${key}`,
@@ -248,7 +257,7 @@ PODS.forEach(({ from, to }, pod) => {
     }
   });
 });
-// Three more desks along the east wall (the slat wall at x 14.75), north of the pods, chairs on the west side.
+// Three more desks along the east wall (the slat wall at x 14.75), east of the north pod, chairs on the west side.
 {
   const template = object('upperfit-desk-perimeter-0');
   const common = {
@@ -295,9 +304,9 @@ items.push({
   id: `${ITEM_PREFIX}upstairs`,
   rooms: ['upper-office-shell', 'upperfit-restroom'],
   change:
-    'Upstairs: the restroom flipped with the desk beside it (restroom now x 0.2..2.9, z 14.5..17.6 with its door on the east wall at z 15.7..16.7; the two rear desks together south of it at z 18.45 and 19.95); both desk pods turned 90° about their own centres so the desks face ±z, set side by side (centres x 5.8 and 11.5) with an aisle between; three white desks added along the east wall (x 14.35, z 14.1 / 15.7 / 17.3, chairs on the west side); workstationCount 21. The three seated upstairs actors moved with their chairs.',
+    'Upstairs: the restroom flipped with the desk beside it (restroom now x 0.2..2.9, z 14.5..17.6 with its door on the east wall at z 15.7..16.7; the two rear desks together south of it at z 18.45 and 19.95); both desk pods turned 90° about their own centres so the desks face ±z and set in two rows, one behind the other down the room (centres x 8.05, z 16.41 and 20.23; desks x 5.72..10.38; chair backs z 15.0..17.82 and 18.82..21.64) with a 1.0 m aisle between the rows; three white desks added along the east wall (x 14.35, z 14.1 / 15.7 / 17.3, chairs on the west side); workstationCount 21. The three seated upstairs actors moved with their chairs.',
   unresolved:
-    'The owner did not say which way the pods should turn or how far apart to set them: turned +90° and spread to leave a 1 m aisle between them and 0.9 m to the east wall. The restroom’s new place leaves a 1.3 m strip between it and the storage room. Desk pitch and the east-wall desks’ positions are estimated.',
+    'The owner asked for two rows of pods, not where: the rows are centred between the restroom and the east-wall desks (2.8 m aisles each side) and fill the depth between the east stair’s void (0.36 m) and the perimeter desks; to keep a 1.0 m aisle between the rows the chairs are drawn up to 1.1 m from each pod’s spine (0.13 m closer than before, their front edge 15 mm off the desk), which leaves 0.82 m between the south row’s chair backs and the perimeter chairs’ backs. The restroom’s new place leaves a 1.3 m strip between it and the storage room. Desk pitch and the east-wall desks’ positions are estimated.',
 });
 
 // --- (14)/(16) The PT stair's landing and guards in the cutaway ------------
@@ -400,5 +409,5 @@ for (const file of LOOPS) {
   writeFileSync(file, ascii(JSON.stringify(loop, null, 2)) + '\n');
 }
 console.log(
-  `Owner review (exterior): veranda doors cut to the plan (door ${VERANDA.door.x0}..${VERANDA.door.x1}, roll-up ${VERANDA.rollup.x0}..${VERANDA.rollup.x1}), staff entrance door to the plan's gap, upstairs restroom flipped and pods turned with ${newObjectIds.length} new objects, ${items.length} items registered; run node scripts/apply-drop-off-route.mjs next.`,
+  `Owner review (exterior): veranda doors cut to the plan (door ${VERANDA.door.x0}..${VERANDA.door.x1}, roll-up ${VERANDA.rollup.x0}..${VERANDA.rollup.x1}), staff entrance door to the plan's gap, upstairs restroom flipped and the pods turned into two rows with ${newObjectIds.length} new objects, ${items.length} items registered; run node scripts/apply-drop-off-route.mjs next.`,
 );
