@@ -54,8 +54,13 @@ raysClear('interior-nurse-station', [
 ]);
 const reviewed = new Set(m.interiorReview.newObjectIds);
 for (const id of m.interiorReview.changedPlanObjectIds) reviewed.add(id);
-// The owner walkthrough's new and moved furniture (ownerReview, October 2026) is reviewed too.
-for (const id of [...(m.ownerReview?.newObjectIds ?? []), ...(m.ownerReview?.changedPlanObjectIds ?? [])]) reviewed.add(id);
+// The owner walkthrough's furniture (ownerReview, October 2026) is reviewed
+// too: new pieces and moved plan pieces must stay out of everyone's way.
+for (const id of [
+  ...(m.ownerReview?.newObjectIds ?? []),
+  ...(m.ownerReview?.changedPlanObjectIds ?? []),
+])
+  reviewed.add(id);
 const removed = new Set(
   JSON.parse(readFileSync('app/data/day-program.json')).removedObjectIds,
 );
@@ -85,11 +90,37 @@ const boxes = m.objects
       s,
     }));
   });
+/** Whether a point lies within a box's footprint plus the walking margin. */
+const within = (b, [x, z]) => {
+  const dx = x - b.x,
+    dz = z - b.z;
+  return (
+    Math.abs(b.c * dx - b.s * dz) < b.w + 0.18 &&
+    Math.abs(b.s * dx + b.c * dz) < b.d + 0.18
+  );
+};
+/** How far along a walk a person may still be on the seat they left or reach. */
+const SEAT_APPROACH = 1.25;
 let samples = 0;
 for (const a of loop.actors) {
   if (a.levelId !== 'ground' || a.escortFor) continue;
   for (const s of a.segments) {
     if (!['walk', 'roll'].includes(s.action)) continue;
+    // Owner walkthrough (October 2026): a walk may start or end on a seat (a
+    // recliner, a recumbent stepper, the edge of a massage bed), so the piece
+    // at either end is not an obstacle within the approach to it; and a walk
+    // whose heights rise above the floor climbs practice equipment (the
+    // training stairs), so what it stands on is not an obstacle either.
+    const ends = [s.path[0], s.path.at(-1)],
+      raised = s.heights
+        ? s.path.filter((_, i) => s.heights[i] > 0.05)
+        : [];
+    const allowed = (b, x, z) =>
+      raised.some((p) => within(b, p)) ||
+      ends.some(
+        (e) =>
+          within(b, e) && Math.hypot(x - e[0], z - e[1]) <= SEAT_APPROACH,
+      );
     for (let i = 1; i < s.path.length; i++) {
       const p = s.path[i - 1],
         q = s.path[i],
@@ -100,18 +131,11 @@ for (const a of loop.actors) {
       for (let j = 0; j <= count; j++) {
         const x = p[0] + ((q[0] - p[0]) * j) / count,
           z = p[1] + ((q[1] - p[1]) * j) / count;
-        for (const b of boxes) {
-          // A seated person stands up from (and sits back down on) their own
-          // seat (community-53 at the barber chair, owner review 2026-10).
-          if (b.id === a.seatId) continue;
-          const dx = x - b.x,
-            dz = z - b.z;
+        for (const b of boxes)
           assert.ok(
-            Math.abs(b.c * dx - b.s * dz) >= b.w + 0.18 ||
-              Math.abs(b.s * dx + b.c * dz) >= b.d + 0.18,
+            !within(b, [x, z]) || allowed(b, x, z),
             `${a.id}: path overlaps ${b.id} at ${x},${z}`,
           );
-        }
         samples++;
       }
     }

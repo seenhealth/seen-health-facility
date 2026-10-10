@@ -730,6 +730,27 @@ export const assetCatalog: Record<string, CatalogEntry> = {
     purpose:
       'Cart with cleaning supplies and a bag for soiled linen, kept in the soiled-utility room between rounds.',
   },
+  // Owner review 2026-10 · rehab
+  'rehab-fridge': {
+    name: 'Practice refrigerator',
+    purpose:
+      'Refrigerator in the rehab wing’s practice kitchen, where participants rehearse reaching, opening and putting food away with the occupational therapist.',
+  },
+  'rehab-microwave': {
+    name: 'Practice microwave',
+    purpose:
+      'Counter-top microwave in the practice kitchen for rehearsing heating a meal at a safe, chest-level height.',
+  },
+  'rehab-recliner': {
+    name: 'Recliner',
+    purpose:
+      'Rise-and-recline armchair in the quiet room, where a participant rests between therapy sessions; the raised footrest eases swollen legs and the firm arms help with standing up.',
+  },
+  'rehab-standing-desk': {
+    name: 'Standing desk',
+    purpose:
+      'Height-adjustable desk raised to standing height, with a monitor, in the therapists’ workspace where the physical and occupational therapists chart between sessions.',
+  },
 };
 
 /** Asset ids that say more than their kind (generic `box`, `table`, … assets). */
@@ -977,6 +998,18 @@ export const assetEntries: Record<string, CatalogEntry> = {
   'upperfit-file-cabinet': {
     name: 'File cabinet',
     purpose: 'Locked files for records that are still kept on paper.',
+  },
+
+  // Owner review 2026-10 · rehab
+  'rehab-kitchen-casework': {
+    name: 'Practice kitchen',
+    purpose:
+      'Base cabinets, counter, sink and upper cabinets of the rehab wing’s practice kitchen, where participants rehearse activities of daily living (washing up, reaching into cupboards, preparing a snack) with the occupational therapist.',
+  },
+  'rehab-massage-bed': {
+    name: 'Massage bed',
+    purpose:
+      'Padded bed in the acupressure massage room; participants sit on its edge or lie down while the therapist works on stiff shoulders, backs and legs.',
   },
 };
 

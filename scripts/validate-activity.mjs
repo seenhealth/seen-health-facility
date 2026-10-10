@@ -36,10 +36,11 @@ const scene = new T.Scene(),
   ),
   neighborhood = buildNeighborhood(m);
 scene.add(neighborhood.root);
-// The base loop's people (owner walkthrough 2026-10: +1 karaoke duet partner)
-// and the composed scene (base + fleet crew + community layer).
-assert.equal(activity.actors.length, 259);
-assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 185);
+// The base loop's people (owner walkthrough 2026-10: +1 karaoke duet partner,
+// +6 in the rehab wing: two therapists, an acupressure therapist and three
+// participants) and the composed scene (base + fleet crew + community layer).
+assert.equal(activity.actors.length, 265);
+assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 191);
 for (const role of [
   'doctor',
   'nurse',

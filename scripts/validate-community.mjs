@@ -25,11 +25,12 @@ const normalized = {
 };
 const data = JSON.parse(fs.readFileSync('app/data/activity-loop.json'));
 const cast = data.actors.filter((a) => a.id.startsWith('community-'));
-assert.equal(data.actors.length, 185);
+// Owner walkthrough 2026-10: 184 + the karaoke duet partner + 6 in rehab.
+assert.equal(data.actors.length, 191);
 const profiles = JSON.parse(
   fs.readFileSync('app/data/character-templates.json'),
 ).people;
-assert.equal(new Set(data.actors.map((a) => a.profileId)).size, 185);
+assert.equal(new Set(data.actors.map((a) => a.profileId)).size, 191);
 assert(data.actors.every((a) => profiles.some((p) => p.id === a.profileId)));
 let samples = 0;
 for (const actor of cast) {
