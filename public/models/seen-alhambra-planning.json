@@ -3427,7 +3427,7 @@
     },
     {
       "id": "rehab-support-nw",
-      "name": "PT & OT workspace",
+      "name": "Fire pump room",
       "zoneId": "rehab",
       "levelId": "ground",
       "polygon": [
@@ -3763,7 +3763,7 @@
         92
       ],
       "status": "image-traced",
-      "notes": "Owner review 2026-10: enclosed; entered only from the therapy cross-hall by its south door.",
+      "notes": "Owner review 2026-10: enclosed; entered only from the therapy cross-hall by its south door. A roll-in shower stands to the right of the toilet (the owner, on the live build: “in the large bathroom in the rehab area, let’s add a shower to the right of the toilet”).",
       "sourcePolygonPixels": [
         [
           370,
@@ -15195,15 +15195,6 @@
       ],
       "material": "photo-silver"
     },
-    "interior-training-stairs": {
-      "kind": "rehab-training-stairs",
-      "dimensions": [
-        1.08,
-        1.48,
-        3.7
-      ],
-      "material": "oak"
-    },
     "interior-rehab-rack": {
       "kind": "rehab-rack",
       "dimensions": [
@@ -15962,6 +15953,16 @@
       ],
       "material": "photo-bronze"
     },
+    "owner-care-rehab-shower": {
+      "kind": "care-shower",
+      "dimensions": [
+        1.3,
+        2.18,
+        1.2
+      ],
+      "material": "photo-teal-tile",
+      "parameters": {}
+    },
     "owner-care-switchboard": {
       "kind": "electrical-panel",
       "dimensions": [
@@ -16161,15 +16162,28 @@
     "rehab-standing-desk": {
       "kind": "rehab-standing-desk",
       "dimensions": [
-        1.2,
+        0.9,
         1.45,
-        0.65
+        0.6
       ],
       "material": "photo-white",
       "materials": {
         "metal": "photo-silver",
         "screen": "screen",
         "frame": "photo-black"
+      }
+    },
+    "rehab-corner-stairs": {
+      "kind": "rehab-corner-stairs",
+      "dimensions": [
+        1.74,
+        1.5,
+        1.74
+      ],
+      "material": "oak",
+      "materials": {
+        "metal": "photo-silver",
+        "nosing": "photo-mustard"
       }
     },
     "kitchen-wall-panel-1": {
@@ -28957,9 +28971,9 @@
       "zoneId": "rehab",
       "levelId": "ground",
       "position": [
-        -27.3,
+        -20.647,
         0,
-        12.15
+        20.675
       ],
       "rotation": 0,
       "scale": [
@@ -28967,7 +28981,7 @@
         1,
         1
       ],
-      "roomId": null,
+      "roomId": "rehab-open",
       "referencePages": [
         115
       ],
@@ -29067,9 +29081,9 @@
       "zoneId": "rehab",
       "levelId": "ground",
       "position": [
-        -24.4,
+        -24.234,
         0,
-        26.15
+        26.194
       ],
       "rotation": 3.141592653589793,
       "scale": [
@@ -29091,9 +29105,9 @@
       "zoneId": "rehab",
       "levelId": "ground",
       "position": [
-        -22,
+        -22.904,
         0,
-        26.15
+        26.194
       ],
       "rotation": 3.141592653589793,
       "scale": [
@@ -29111,15 +29125,15 @@
     },
     {
       "id": "rehab-training-stairs",
-      "assetId": "interior-training-stairs",
+      "assetId": "rehab-corner-stairs",
       "zoneId": "rehab",
       "levelId": "ground",
       "position": [
-        -27.9,
+        -20.85,
         0,
-        26
+        24.489
       ],
-      "rotation": 1.571,
+      "rotation": 0,
       "scale": [
         1,
         1,
@@ -29129,9 +29143,23 @@
       "referencePages": [
         115
       ],
-      "status": "photo appearance / plan registered / dimensions estimated",
-      "notes": "Visible component follows the photograph. Dimensions and placement require field verification.",
-      "layer": "furniture"
+      "status": "owner walkthrough 2026-10 / dimensions estimated",
+      "notes": "Right-angle practice stair against the gym’s east wall (the south multistall restroom’s west face): a 0.9 m landing at 0.6 m in the south-east corner, one flight of three treads along the wall with its foot to the north and one running west with its foot just south of the parallel bars, handrails on both sides. The corner between the flights is open floor where the therapist spots. Products and sizes are typical, not surveyed.",
+      "layer": "furniture",
+      "navigationFootprints": [
+        [
+          0.42,
+          0,
+          0.9,
+          1.74
+        ],
+        [
+          -0.45,
+          0.42,
+          0.84,
+          0.9
+        ]
+      ]
     },
     {
       "id": "rehab-resistance-rack",
@@ -32226,6 +32254,30 @@
       "layer": "architecture"
     },
     {
+      "id": "owner-care-rehab-shower",
+      "assetId": "owner-care-rehab-shower",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -20.575,
+        0,
+        14.799
+      ],
+      "rotation": -1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rehab-wc-sw",
+      "layer": "furniture",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner (live build): “in the large bathroom in the rehab area, let’s add a shower to the right of the toilet.” Roll-in shower with a seat and grab bars in the north-east corner, beside the toilet; size from the personal-care showers, reduced to fit."
+    },
+    {
       "id": "owner-care-switchboard",
       "assetId": "owner-care-switchboard",
       "zoneId": "ot",
@@ -32735,22 +32787,22 @@
       "zoneId": "rehab",
       "levelId": "ground",
       "position": [
-        -30.564,
+        -30.589,
         0,
-        9.655
+        26.729
       ],
-      "rotation": 1.571,
+      "rotation": 3.142,
       "scale": [
         1,
         1,
         1
       ],
-      "roomId": "rehab-support-nw",
+      "roomId": "rehab-open",
       "referencePages": [
         115
       ],
       "status": "owner walkthrough 2026-10 / dimensions estimated",
-      "notes": "Standing desk with monitor in the PT & OT workspace; the therapists stand at it between sessions.",
+      "notes": "PT & OT workstation: a standing desk with monitor in the row along the Valley Blvd glazing at the S Ethel Ave corner, where the training stairs stood; the therapists chart at it between sessions, facing the glazing.",
       "layer": "furniture"
     },
     {
@@ -32759,22 +32811,22 @@
       "zoneId": "rehab",
       "levelId": "ground",
       "position": [
-        -30.564,
+        -29.679,
         0,
-        11
+        26.729
       ],
-      "rotation": 1.571,
+      "rotation": 3.142,
       "scale": [
         1,
         1,
         1
       ],
-      "roomId": "rehab-support-nw",
+      "roomId": "rehab-open",
       "referencePages": [
         115
       ],
       "status": "owner walkthrough 2026-10 / dimensions estimated",
-      "notes": "Standing desk with monitor in the PT & OT workspace; the therapists stand at it between sessions.",
+      "notes": "PT & OT workstation: a standing desk with monitor in the row along the Valley Blvd glazing at the S Ethel Ave corner, where the training stairs stood; the therapists chart at it between sessions, facing the glazing.",
       "layer": "furniture"
     },
     {
@@ -32783,9 +32835,9 @@
       "zoneId": "rehab",
       "levelId": "ground",
       "position": [
-        -30.25,
+        -28.769,
         0,
-        12.884
+        26.729
       ],
       "rotation": 3.142,
       "scale": [
@@ -32793,12 +32845,12 @@
         1,
         1
       ],
-      "roomId": "rehab-support-nw",
+      "roomId": "rehab-open",
       "referencePages": [
         115
       ],
       "status": "owner walkthrough 2026-10 / dimensions estimated",
-      "notes": "Standing desk with monitor in the PT & OT workspace; the therapists stand at it between sessions.",
+      "notes": "PT & OT workstation: a standing desk with monitor in the row along the Valley Blvd glazing at the S Ethel Ave corner, where the training stairs stood; the therapists chart at it between sessions, facing the glazing.",
       "layer": "furniture"
     },
     {
@@ -32807,9 +32859,9 @@
       "zoneId": "rehab",
       "levelId": "ground",
       "position": [
-        -28.9,
+        -27.859,
         0,
-        12.884
+        26.729
       ],
       "rotation": 3.142,
       "scale": [
@@ -32817,12 +32869,60 @@
         1,
         1
       ],
-      "roomId": "rehab-support-nw",
+      "roomId": "rehab-open",
       "referencePages": [
         115
       ],
       "status": "owner walkthrough 2026-10 / dimensions estimated",
-      "notes": "Standing desk with monitor in the PT & OT workspace; the therapists stand at it between sessions.",
+      "notes": "PT & OT workstation: a standing desk with monitor in the row along the Valley Blvd glazing at the S Ethel Ave corner, where the training stairs stood; the therapists chart at it between sessions, facing the glazing.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rehab-recumbent-stepper-4",
+      "assetId": "interior-stepper",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -26.894,
+        0,
+        26.194
+      ],
+      "rotation": 3.141592653589793,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rehab-open",
+      "referencePages": [
+        115
+      ],
+      "status": "owner walkthrough 2026-10 / dimensions estimated",
+      "notes": "Recumbent stepper added on the owner’s word (“there should be four”), in the row along the Valley Blvd glazing, seat to the north, 0.5 m from its neighbours for mounting.",
+      "layer": "furniture"
+    },
+    {
+      "id": "rehab-recumbent-stepper-3",
+      "assetId": "interior-stepper",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -25.564,
+        0,
+        26.194
+      ],
+      "rotation": 3.141592653589793,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rehab-open",
+      "referencePages": [
+        115
+      ],
+      "status": "owner walkthrough 2026-10 / dimensions estimated",
+      "notes": "Recumbent stepper added on the owner’s word (“there should be four”), in the row along the Valley Blvd glazing, seat to the north, 0.5 m from its neighbours for mounting.",
       "layer": "furniture"
     },
     {
@@ -43439,6 +43539,14 @@
         "unresolved": "“Opposite the entrance to the linen room and the washing machine room” is read as the corridor bay across from the linen room’s door; a pad in the east corridor would have blocked the food trolley’s lane. The service door’s true width is not measured: 0.9 m is the standard single leaf and the most the photographed frame allows; the exterior’s roll-up curtain is still drawn 2.58 m wide and laps the door’s west jamb by 7 cm when down. The electrical room’s size, door and panel positions are assumed."
       },
       {
+        "id": "care-rooms-7b-rehab-shower",
+        "rooms": [
+          "rehab-wc-sw"
+        ],
+        "change": "Owner on the live build: “in the large bathroom in the rehab area, let’s add a shower to the right of the toilet.” A 1.3 × 1.2 m roll-in shower (seat, grab bars, hand shower, curtain) stands in the north-east corner of the west therapy bathroom, against the east wall beside the toilet, open to the room.",
+        "unresolved": "“The large bathroom” is read as the larger of the two single therapy bathrooms (the west one, 3.9 m long), not the shared multistall restroom. “To the right of the toilet” is read as seen by someone seated on it (north); the other side has only 0.8 m before the basin. Shower size and fixtures are typical, not measured."
+      },
+      {
         "id": "care-rooms-8c-laundry-in-linen-room",
         "rooms": [
           "rear-support-west",
@@ -43452,7 +43560,7 @@
         "rooms": [
           "rehab-open"
         ],
-        "change": "People ride the recumbent steppers (\"the bikes\"): community-25 rides stepper 1 all day with seated breathers; a new participant (rehab-rider-02) rides stepper 2 in two sessions between the quiet room and an acupressure appointment.",
+        "change": "People ride the recumbent steppers (\"the bikes\"): community-25 rides stepper 1 all day with seated breathers; a new participant (rehab-rider-02) rides stepper 2 in two sessions between the quiet room and an acupressure appointment. Since round 4 the row has four steppers (see rehab-r4-layout).",
         "unresolved": "Riders face the Valley Blvd windows as the machines are placed; how long a participant stays on a stepper (here 150–200 s of the 720 s loop per session) is illustrative."
       },
       {
@@ -43460,8 +43568,8 @@
         "rooms": [
           "rehab-open"
         ],
-        "change": "The training stairs move from the glazed SW corner, where they shared the floor with the participant chairs, to open floor in front of the Valley Blvd glazing (risers at the west end, ≥ 0.6 m clear all round); a participant climbs them three times per session with a PT at the foot, twice a day.",
-        "unresolved": "The owner said \"put that somewhere\": the spot by the Valley glazing keeps the centre of the floor free; the stairs could equally stand along the mezzanine-stair wall. Tread heights (4 × 0.15 m), landing and ramp follow the modelled unit, not a measured one."
+        "change": "A participant trains on the practice stairs twice a day with a second PT, four climbs a session: up one flight, round the landing and down the other, resting at the foot they reach and climbing back the other way. Since round 4 the stairs are a right-angle stair against the gym’s east wall (see rehab-r4-layout); they first moved from the glazed SW corner to the Valley glazing.",
+        "unresolved": "Session lengths and the number of climbs are illustrative."
       },
       {
         "id": "rehab-corner-exerciser",
@@ -43476,7 +43584,7 @@
         "rooms": [
           "rehab-open"
         ],
-        "change": "The plan’s demonstration counter is replaced by an ADL practice kitchen against the same wall: 1.9 m of base cabinets with counter, sink and upper cabinets, a refrigerator at the south end and a counter-top microwave, fronts to the east with ≥ 0.9 m clear in front; participants rehearse at the sink and microwave with an OT twice a day. Mat plinth 1 (it overlapped the counter) moves into the wall-backed alcove north of the kitchen, out of the north-room doorway and the wheelchair lane from the NW bathroom.",
+        "change": "The plan’s demonstration counter is replaced by an ADL practice kitchen against the same wall: 1.9 m of base cabinets with counter, sink and upper cabinets, a refrigerator at the south end and a counter-top microwave, fronts to the east with ≥ 0.9 m clear in front; participants rehearse at the sink and microwave with an OT twice a day. Mat plinth 1, which overlapped the counter, no longer stands by the kitchen (round 4: beside the parallel bars).",
         "unresolved": "The owner listed a fridge, a microwave and cabinets; the sink is assumed (a practice kitchen without one is unusual) and no range or oven is modelled. The run’s length (1.9 m) and the counter height (0.84 m, wheelchair-friendly) are assumed."
       },
       {
@@ -43498,11 +43606,19 @@
       {
         "id": "rehab-workspace",
         "rooms": [
+          "rehab-open"
+        ],
+        "change": "Four standing desks with monitors are the PT & OT workstations, where a second PT and OT chart between sessions. The four participant chairs at the glazed SW corner are removed. Round 4 moved the desks from the NW corner room (now the fire pump room) to where the training stairs stood (see rehab-r4-layout).",
+        "unresolved": ""
+      },
+      {
+        "id": "rehab-r4-layout",
+        "rooms": [
           "rehab-support-nw",
           "rehab-open"
         ],
-        "change": "The NW corner room on S Ethel Ave is the PT & OT workspace: four standing desks with monitors (two under the street windows, two on the south wall); a new PT and OT chart there between sessions, in and out through the north support room. The four participant chairs at the glazed SW corner are removed, as the owner said the workspace replaces them.",
-        "unresolved": "\"At the corner right by the street\" is read as the NW corner room (the only side room on the Ethel Ave street wall, where the window is). The alternative reading, the open SW glazed corner where the participant chairs stood (Ethel Ave / Valley Blvd), would put the desks on the open therapy floor instead; the chairs are removed under either reading."
+        "change": "Owner on the live build: \"we move the desk to the wrong place\". (1) The NW corner room on S Ethel Ave (rehab-support-nw, x −31.19..−27.53, z 8.90..13.33) is the fire pump room and is left completely empty: the four standing desks leave it, no furniture stays and no one goes in at any time; its door gap is unchanged. (2) The four standing desks (rehab-workspace-desk-1..4, now 0.9 × 0.6 m) stand where the training stairs stood: a row along the Valley Blvd glazing from the S Ethel Ave corner (x −31.04..−27.41, z 26.43..27.03), users facing the glazing; Ot 2 works at desk 3 and Pt 2 at desk 4. (3) The straight training stairs (rehab-training-stairs, same id, new asset rehab-corner-stairs) become a right-angle stair against the gym’s east wall (the south multistall restroom’s west face, plan-wall-178), footprint x −21.72..−19.98, z 23.62..25.36: two flights of three 0.28 m treads and four 0.15 m risers to a 0.9 × 0.9 m landing at 0.6 m in the south-east corner, flights 0.9 m wide, handrails on both sides of each flight and round the landing’s outer sides; one flight along the wall with its foot to the north, the other running west with its foot just south of the parallel bars; 0.9 m of clear floor at each foot. The participant climbs one flight, turns on the landing and goes down the other, four climbs a session alternating direction, with the PT spotting from the floor in the open corner between the flights. (4) Mat plinth 1 moves from north of the practice kitchen to the same east wall north of the stair (x −21.32..−19.97, z 19.70..21.65), long side along the wall, 0.80 m from the parallel bars. (5) Four recumbent steppers (1 and 2 kept with their riders, 3 and 4 added) stand in a row along the Valley glazing between the desks and the stair (x −27.31..−22.49), 0.50 m apart. The Balance & mobility participant who stood where the stair’s west foot is now (community-24) practises on the open floor south of the massage room (−28.40, 23.10).",
+        "unresolved": "Assumptions: the room the owner calls the fire pump room is the NW corner room (the grey concrete room top-left on the drawing); no pump or riser equipment is drawn in it. \"Where the current training stairs are\" is the SW glazed corner along Valley Blvd, the desks in one row facing the glazing (the drawing showed workstations in that corner); 0.9 m-wide desks are assumed so that desks, four steppers and a walkway past the stair fit along the glazing. \"To the east against the wall\" is the gym’s east wall (the south restroom’s west face), landing at its south end; the landing reaches 0.23 m past the end of that wall so that about 0.7 m of floor stays between the bars’ south-east post and the west flight (the only way from the corridor east of the bars to the south of the gym besides the narrow aisle west of the bars). Tread depth (0.28 m), riser height, landing size and handrail height (0.88 m) are typical, not measured. \"The other empty wall\" is read as the same east wall, north of the stair, beside the parallel bars; nobody uses that plinth in the loop. The new steppers’ place (the row along the glazing) and spacing are assumed; the two new machines are unoccupied. The walkway between the last stepper and the stair, to the strip south of the restroom (where the drawing shows doors to Valley Blvd), is about 0.75 m."
       },
       {
         "id": "kitchen-relayout",
@@ -43720,6 +43836,7 @@
       "owner-care-storage-rack-1",
       "owner-care-storage-rack-2",
       "owner-care-storage-rack-3",
+      "owner-care-rehab-shower",
       "rehab-kitchen-casework",
       "rehab-kitchen-fridge",
       "rehab-kitchen-microwave",
@@ -43731,6 +43848,8 @@
       "rehab-workspace-desk-2",
       "rehab-workspace-desk-3",
       "rehab-workspace-desk-4",
+      "rehab-recumbent-stepper-4",
+      "rehab-recumbent-stepper-3",
       "kitchen-wall-panel-north",
       "kitchen-wall-panel-pass",
       "kitchen-wall-panel-middle",

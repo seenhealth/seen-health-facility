@@ -7429,7 +7429,7 @@
       "offDuty": 0.1971153846153846
      },
      "onFloorSeconds": 7515,
-     "meanWalkMeters": 63.00926705637593
+     "meanWalkMeters": 63.00926705637595
     },
     {
      "role": "nurse",
@@ -7483,22 +7483,22 @@
      "headcount": 3,
      "seconds": {
       "care": 981,
-      "walking": 158,
-      "documenting": 512,
+      "walking": 180,
+      "documenting": 490,
       "meeting": 0,
       "driving": 0,
       "offDuty": 509
      },
      "share": {
       "care": 0.5941853422168383,
-      "walking": 0.09569957601453664,
-      "documenting": 0.31011508176862507,
+      "walking": 0.10902483343428225,
+      "documenting": 0.29678982434887946,
       "meeting": 0,
       "driving": 0,
       "offDuty": 0.23564814814814813
      },
      "onFloorSeconds": 1651,
-     "meanWalkMeters": 63.04908788582048
+     "meanWalkMeters": 68.09088994387396
     },
     {
      "role": "pt",
@@ -7506,22 +7506,22 @@
      "headcount": 4,
      "seconds": {
       "care": 1352,
-      "walking": 304,
-      "documenting": 712,
+      "walking": 196,
+      "documenting": 820,
       "meeting": 0,
       "driving": 0,
       "offDuty": 512
      },
      "share": {
       "care": 0.5709459459459459,
-      "walking": 0.12837837837837837,
-      "documenting": 0.30067567567567566,
+      "walking": 0.08277027027027027,
+      "documenting": 0.34628378378378377,
       "meeting": 0,
       "driving": 0,
       "offDuty": 0.17777777777777778
      },
      "onFloorSeconds": 2368,
-     "meanWalkMeters": 61.766989966689636
+     "meanWalkMeters": 43.04618986777399
     },
     {
      "role": "social-worker",
@@ -7915,7 +7915,7 @@
       "waiting": 278,
       "offSite": 132
      },
-     "walkMeters": 142.87192713440888
+     "walkMeters": 142.9017814922166
     },
     {
      "id": "community-01",
@@ -10065,16 +10065,16 @@
      "seconds": {
       "arrivals": 0,
       "clinical": 0,
-      "rehab": 344,
+      "rehab": 346,
       "activities": 0,
       "meals": 0,
       "coordination": 0,
       "community": 0,
-      "moving": 145,
-      "waiting": 231,
+      "moving": 137,
+      "waiting": 237,
       "offSite": 0
      },
-     "walkMeters": 76.61577180539503
+     "walkMeters": 72.77442788740032
     },
     {
      "id": "rehab-adl-participant",
@@ -10099,16 +10099,16 @@
      "seconds": {
       "arrivals": 0,
       "clinical": 0,
-      "rehab": 219,
+      "rehab": 287,
       "activities": 0,
       "meals": 0,
       "coordination": 0,
       "community": 0,
-      "moving": 330,
-      "waiting": 171,
+      "moving": 210,
+      "waiting": 223,
       "offSite": 0
      },
-     "walkMeters": 161.60557748243926
+     "walkMeters": 96.57465071767365
     },
     {
      "id": "optometry-participant",
@@ -10709,13 +10709,13 @@
    "participantTotals": {
     "arrivals": 682,
     "clinical": 1302,
-    "rehab": 2516,
+    "rehab": 2586,
     "activities": 71883,
     "meals": 10080,
     "coordination": 720,
     "community": 12666,
-    "moving": 2608,
-    "waiting": 17813,
+    "moving": 2480,
+    "waiting": 17871,
     "offSite": 11490
    },
    "hero": null,
@@ -10728,8 +10728,8 @@
     "peakParticipantsOnSite": 153,
     "peakStaffOnFloor": 57,
     "staffCareShare": 0.5983425799113257,
-    "staffWalkingShare": 0.09686854383806495,
-    "meanParticipantActiveShare": 0.820939608331051
+    "staffWalkingShare": 0.09487221151837322,
+    "meanParticipantActiveShare": 0.821470877304943
    },
    "seriesStep": 4
   },
@@ -11182,7 +11182,7 @@
       6,
       6,
       6,
-      6,
+      7,
       5,
       5,
       5,
@@ -11291,10 +11291,10 @@
      ],
      "peakParticipants": 83,
      "peakStaff": 8,
-     "meanParticipants": 79.74861111111112,
-     "meanStaff": 5.780555555555556,
-     "participantMinutes": 38279.33333333333,
-     "staffMinutes": 2774.6666666666665
+     "meanParticipants": 79.75,
+     "meanStaff": 5.781944444444444,
+     "participantMinutes": 38280,
+     "staffMinutes": 2775.333333333333
     },
     {
      "zoneId": "community:partner-adc",
@@ -12042,9 +12042,9 @@
      "peakParticipants": 14,
      "peakStaff": 21,
      "meanParticipants": 13.238888888888889,
-     "meanStaff": 18.325,
+     "meanStaff": 18.32777777777778,
      "participantMinutes": 6354.666666666666,
-     "staffMinutes": 8796
+     "staffMinutes": 8797.333333333332
     },
     {
      "zoneId": "admin",
@@ -12163,7 +12163,7 @@
       22,
       22,
       22,
-      22,
+      23,
       23,
       23,
       23,
@@ -12417,9 +12417,9 @@
      "peakParticipants": 23,
      "peakStaff": 4,
      "meanParticipants": 22.168055555555554,
-     "meanStaff": 1.7083333333333333,
+     "meanStaff": 1.7097222222222221,
      "participantMinutes": 10640.666666666666,
-     "staffMinutes": 820
+     "staffMinutes": 820.6666666666666
     },
     {
      "zoneId": "dining",
@@ -12682,7 +12682,7 @@
       1,
       1,
       2,
-      3,
+      2,
       3,
       3,
       3,
@@ -12791,10 +12791,10 @@
      ],
      "peakParticipants": 17,
      "peakStaff": 3,
-     "meanParticipants": 16.052777777777777,
-     "meanStaff": 1.1083333333333334,
-     "participantMinutes": 7705.333333333333,
-     "staffMinutes": 532
+     "meanParticipants": 16.051388888888887,
+     "meanStaff": 1.1055555555555556,
+     "participantMinutes": 7704.666666666666,
+     "staffMinutes": 530.6666666666666
     },
     {
      "zoneId": "rehab",
@@ -13034,7 +13034,7 @@
       8,
       8,
       8,
-      8,
+      9,
       9,
       9,
       8,
@@ -13167,9 +13167,9 @@
      "peakParticipants": 10,
      "peakStaff": 9,
      "meanParticipants": 8.325,
-     "meanStaff": 6.293055555555555,
+     "meanStaff": 6.294444444444444,
      "participantMinutes": 3996,
-     "staffMinutes": 3020.6666666666665
+     "staffMinutes": 3021.333333333333
     },
     {
      "zoneId": "lobby",
@@ -13467,7 +13467,7 @@
       6,
       6,
       6,
-      6,
+      7,
       6,
       6,
       6,
@@ -13542,9 +13542,9 @@
      "peakParticipants": 8,
      "peakStaff": 13,
      "meanParticipants": 2.7180555555555554,
-     "meanStaff": 8.140277777777778,
+     "meanStaff": 8.141666666666667,
      "participantMinutes": 1304.6666666666665,
-     "staffMinutes": 3907.333333333333
+     "staffMinutes": 3908
     },
     {
      "zoneId": "community:specialist",
@@ -14783,7 +14783,7 @@
       2,
       2,
       2,
-      2,
+      1,
       1,
       1,
       1,
@@ -15041,9 +15041,9 @@
      ],
      "peakParticipants": 2,
      "peakStaff": 5,
-     "meanParticipants": 1.0305555555555554,
+     "meanParticipants": 1.0291666666666666,
      "meanStaff": 3.1944444444444446,
-     "participantMinutes": 494.66666666666663,
+     "participantMinutes": 494,
      "staffMinutes": 1533.3333333333333
     },
     {
@@ -16288,7 +16288,7 @@
       1,
       1,
       1,
-      1,
+      0,
       0,
       0,
       0,
@@ -16467,7 +16467,7 @@
       1,
       1,
       1,
-      1,
+      2,
       3,
       2,
       2,
@@ -16541,10 +16541,10 @@
      ],
      "peakParticipants": 1,
      "peakStaff": 3,
-     "meanParticipants": 0.06666666666666667,
-     "meanStaff": 1.0930555555555554,
-     "participantMinutes": 32,
-     "staffMinutes": 524.6666666666666
+     "meanParticipants": 0.06527777777777778,
+     "meanStaff": 1.0944444444444446,
+     "participantMinutes": 31.333333333333332,
+     "staffMinutes": 525.3333333333333
     },
     {
      "zoneId": "kitchen",
@@ -17408,7 +17408,7 @@
       0,
       0,
       0,
-      0,
+      1,
       1,
       0,
       0,
@@ -17592,7 +17592,7 @@
       0,
       0,
       2,
-      2,
+      0,
       0,
       0,
       0,
@@ -17666,10 +17666,10 @@
      ],
      "peakParticipants": 1,
      "peakStaff": 2,
-     "meanParticipants": 0.04861111111111111,
-     "meanStaff": 0.12083333333333333,
-     "participantMinutes": 23.333333333333332,
-     "staffMinutes": 58
+     "meanParticipants": 0.05138888888888889,
+     "meanStaff": 0.11805555555555555,
+     "participantMinutes": 24.666666666666664,
+     "staffMinutes": 56.666666666666664
     }
    ],
    "onSite": {
@@ -17907,7 +17907,7 @@
      52,
      52,
      52,
-     53,
+     54,
      54,
      53,
      52,
@@ -18129,53 +18129,53 @@
       "offDuty": 0.25972222222222224
      },
      "onFloorSeconds": 1599,
-     "meanWalkMeters": 17.527084878580805
+     "meanWalkMeters": 17.4379755790032
     },
     {
      "role": "aide",
      "label": "Personal care attendant",
      "headcount": 13,
      "seconds": {
-      "care": 5135,
-      "walking": 1357,
+      "care": 5140,
+      "walking": 1352,
       "documenting": 237,
       "meeting": 97,
       "driving": 790,
       "offDuty": 1744
      },
      "share": {
-      "care": 0.6742384453781513,
-      "walking": 0.17817752100840337,
+      "care": 0.6748949579831933,
+      "walking": 0.17752100840336135,
       "documenting": 0.031118697478991597,
       "meeting": 0.012736344537815126,
       "driving": 0.10372899159663866,
       "offDuty": 0.18632478632478633
      },
      "onFloorSeconds": 7616,
-     "meanWalkMeters": 83.87095306731638
+     "meanWalkMeters": 84.08014363371555
     },
     {
      "role": "nurse",
      "label": "Registered nurse",
      "headcount": 19,
      "seconds": {
-      "care": 8200,
+      "care": 8201,
       "walking": 1616,
       "documenting": 2661,
       "meeting": 97,
       "driving": 0,
-      "offDuty": 1106
+      "offDuty": 1105
      },
      "share": {
-      "care": 0.6521393351359949,
-      "walking": 0.12851916653411802,
-      "documenting": 0.21162716717035152,
-      "meeting": 0.007714331159535549,
+      "care": 0.6521669980119285,
+      "walking": 0.1285089463220676,
+      "documenting": 0.211610337972167,
+      "meeting": 0.0077137176938369785,
       "driving": 0,
-      "offDuty": 0.08084795321637427
+      "offDuty": 0.0807748538011696
      },
-     "onFloorSeconds": 12574,
-     "meanWalkMeters": 11.957113183780612
+     "onFloorSeconds": 12575,
+     "meanWalkMeters": 12.015779173200817
     },
     {
      "role": "activities",
@@ -18184,21 +18184,21 @@
      "seconds": {
       "care": 2222,
       "walking": 502,
-      "documenting": 1010,
+      "documenting": 1011,
       "meeting": 106,
       "driving": 0,
-      "offDuty": 480
+      "offDuty": 479
      },
      "share": {
-      "care": 0.5786458333333333,
-      "walking": 0.13072916666666667,
-      "documenting": 0.2630208333333333,
-      "meeting": 0.027604166666666666,
+      "care": 0.5784951835459515,
+      "walking": 0.1306951314761781,
+      "documenting": 0.26321270502473315,
+      "meeting": 0.027596979953137205,
       "driving": 0,
-      "offDuty": 0.1111111111111111
+      "offDuty": 0.11087962962962963
      },
-     "onFloorSeconds": 3840,
-     "meanWalkMeters": 53.598460475105696
+     "onFloorSeconds": 3841,
+     "meanWalkMeters": 53.57855583414861
     },
     {
      "role": "ot",
@@ -18206,22 +18206,22 @@
      "headcount": 4,
      "seconds": {
       "care": 1004,
-      "walking": 176,
-      "documenting": 512,
+      "walking": 199,
+      "documenting": 490,
       "meeting": 106,
       "driving": 0,
-      "offDuty": 1082
+      "offDuty": 1081
      },
      "share": {
-      "care": 0.5583982202447163,
-      "walking": 0.09788654060066741,
-      "documenting": 0.28476084538375973,
-      "meeting": 0.058954393770856504,
+      "care": 0.5580878265703169,
+      "walking": 0.11061700944969427,
+      "documenting": 0.2723735408560311,
+      "meeting": 0.05892162312395775,
       "driving": 0,
-      "offDuty": 0.37569444444444444
+      "offDuty": 0.3753472222222222
      },
-     "onFloorSeconds": 1798,
-     "meanWalkMeters": 51.09553666225129
+     "onFloorSeconds": 1799,
+     "meanWalkMeters": 54.87205573820234
     },
     {
      "role": "pt",
@@ -18229,22 +18229,22 @@
      "headcount": 5,
      "seconds": {
       "care": 1360,
-      "walking": 342,
-      "documenting": 712,
+      "walking": 234,
+      "documenting": 820,
       "meeting": 106,
       "driving": 0,
       "offDuty": 1080
      },
      "share": {
       "care": 0.5396825396825397,
-      "walking": 0.1357142857142857,
-      "documenting": 0.28253968253968254,
+      "walking": 0.09285714285714286,
+      "documenting": 0.3253968253968254,
       "meeting": 0.04206349206349207,
       "driving": 0,
       "offDuty": 0.3
      },
      "onFloorSeconds": 2520,
-     "meanWalkMeters": 56.00700807704396
+     "meanWalkMeters": 41.008184813674134
     },
     {
      "role": "social-worker",
@@ -18267,7 +18267,7 @@
       "offDuty": 0.25787037037037036
      },
      "onFloorSeconds": 1603,
-     "meanWalkMeters": 13.305855883367789
+     "meanWalkMeters": 13.225890073611874
     },
     {
      "role": "center-manager",
@@ -18290,7 +18290,7 @@
       "offDuty": 0.6930555555555555
      },
      "onFloorSeconds": 221,
-     "meanWalkMeters": 57.0340563933578
+     "meanWalkMeters": 56.77831195078255
     },
     {
      "role": "coordinator",
@@ -18313,7 +18313,7 @@
       "offDuty": 0.1840277777777778
      },
      "onFloorSeconds": 2350,
-     "meanWalkMeters": 16.083303996238815
+     "meanWalkMeters": 15.928025259265087
     },
     {
      "role": "driver",
@@ -18343,23 +18343,23 @@
      "label": "Dietitian",
      "headcount": 1,
      "seconds": {
-      "care": 2,
-      "walking": 113,
+      "care": 3,
+      "walking": 112,
       "documenting": 0,
       "meeting": 97,
       "driving": 0,
       "offDuty": 508
      },
      "share": {
-      "care": 0.009433962264150943,
-      "walking": 0.5330188679245284,
+      "care": 0.014150943396226415,
+      "walking": 0.5283018867924528,
       "documenting": 0,
       "meeting": 0.45754716981132076,
       "driving": 0,
       "offDuty": 0.7055555555555556
      },
      "onFloorSeconds": 212,
-     "meanWalkMeters": 103.25829477162351
+     "meanWalkMeters": 103.23516037997301
     }
    ],
    "participants": [
@@ -18667,7 +18667,7 @@
       "waiting": 278,
       "offSite": 132
      },
-     "walkMeters": 142.87192713440888
+     "walkMeters": 142.9017814922166
     },
     {
      "id": "community-01",
@@ -20749,16 +20749,16 @@
      "seconds": {
       "arrivals": 0,
       "clinical": 0,
-      "rehab": 344,
+      "rehab": 346,
       "activities": 0,
       "meals": 0,
       "coordination": 0,
       "community": 0,
-      "moving": 145,
-      "waiting": 231,
+      "moving": 137,
+      "waiting": 237,
       "offSite": 0
      },
-     "walkMeters": 76.61577180539503
+     "walkMeters": 72.77442788740032
     },
     {
      "id": "rehab-adl-participant",
@@ -20783,33 +20783,33 @@
      "seconds": {
       "arrivals": 0,
       "clinical": 0,
-      "rehab": 219,
+      "rehab": 287,
       "activities": 0,
       "meals": 0,
       "coordination": 0,
       "community": 0,
-      "moving": 330,
-      "waiting": 171,
+      "moving": 210,
+      "waiting": 223,
       "offSite": 0
      },
-     "walkMeters": 161.60557748243926
+     "walkMeters": 96.57465071767365
     },
     {
      "id": "hero-lin",
      "label": "Mrs. Lin · cane",
      "seconds": {
       "arrivals": 99,
-      "clinical": 30,
+      "clinical": 31,
       "rehab": 25,
-      "activities": 73,
-      "meals": 13,
+      "activities": 76,
+      "meals": 14,
       "coordination": 30,
       "community": 0,
-      "moving": 257,
+      "moving": 252,
       "waiting": 78,
       "offSite": 115
      },
-     "walkMeters": 434.2696775400363
+     "walkMeters": 434.91049993475843
     },
     {
      "id": "optometry-participant",
@@ -21409,14 +21409,14 @@
    ],
    "participantTotals": {
     "arrivals": 663,
-    "clinical": 1290,
-    "rehab": 2541,
-    "activities": 64718,
-    "meals": 10093,
+    "clinical": 1291,
+    "rehab": 2611,
+    "activities": 64721,
+    "meals": 10094,
     "coordination": 750,
     "community": 12666,
-    "moving": 2777,
-    "waiting": 21892,
+    "moving": 2644,
+    "waiting": 21950,
     "offSite": 11490
    },
    "hero": {
@@ -21427,17 +21427,17 @@
      "label": "Mrs. Lin · cane",
      "seconds": {
       "arrivals": 99,
-      "clinical": 30,
+      "clinical": 31,
       "rehab": 25,
-      "activities": 73,
-      "meals": 13,
+      "activities": 76,
+      "meals": 14,
       "coordination": 30,
       "community": 0,
-      "moving": 257,
+      "moving": 252,
       "waiting": 78,
       "offSite": 115
      },
-     "walkMeters": 434.2696775400363
+     "walkMeters": 434.91049993475843
     },
     "touchpoints": [
      {
@@ -21481,8 +21481,8 @@
       "short": "PT",
       "title": "Physical therapist",
       "color": "#5A7FA8",
-      "minutes": 8.666666666666666,
-      "episodes": 2,
+      "minutes": 10,
+      "episodes": 1,
       "firstAt": 191,
       "actorIds": [
        "idt-pt"
@@ -21493,9 +21493,9 @@
       "short": "OT",
       "title": "Occupational therapist",
       "color": "#7FA07A",
-      "minutes": 15.333333333333332,
+      "minutes": 16,
       "episodes": 1,
-      "firstAt": 209,
+      "firstAt": 208,
       "actorIds": [
        "occupational-therapist",
        "rehab-ot-02",
@@ -21508,11 +21508,10 @@
       "title": "Recreation therapist",
       "color": "#D4846A",
       "minutes": 56.666666666666664,
-      "episodes": 7,
+      "episodes": 5,
       "firstAt": 244,
       "actorIds": [
        "activities-lead",
-       "community-57",
        "idt-rec"
       ]
      },
@@ -21521,7 +21520,7 @@
       "short": "RD",
       "title": "Dietitian",
       "color": "#A7A04E",
-      "minutes": 9.333333333333332,
+      "minutes": 11.333333333333332,
       "episodes": 2,
       "firstAt": 305,
       "actorIds": [
@@ -21533,7 +21532,7 @@
       "short": "CM",
       "title": "Center manager",
       "color": "#1F4D3A",
-      "minutes": 24.666666666666664,
+      "minutes": 25.333333333333332,
       "episodes": 2,
       "firstAt": 121,
       "actorIds": [
@@ -21545,9 +21544,9 @@
       "short": "HCC",
       "title": "Home care coordinator",
       "color": "#8A6A93",
-      "minutes": 18.666666666666664,
+      "minutes": 18,
       "episodes": 4,
-      "firstAt": 350,
+      "firstAt": 351,
       "actorIds": [
        "community-55",
        "idt-hcc"
@@ -21566,8 +21565,7 @@
        "aide-escort",
        "community-59",
        "care-aide-03",
-       "community-54",
-       "arrival-aide-b"
+       "community-54"
       ]
      },
      {
@@ -21584,7 +21582,7 @@
      }
     ],
     "disciplinesSeen": 11,
-    "walkMeters": 434.2696775400363
+    "walkMeters": 434.91049993475843
    },
    "handoffs": {
     "total": 15,
@@ -21783,9 +21781,9 @@
     "family": 1,
     "peakParticipantsOnSite": 149,
     "peakStaffOnFloor": 63,
-    "staffCareShare": 0.5843805900867242,
-    "staffWalkingShare": 0.11194891651382378,
-    "meanParticipantActiveShare": 0.7842590030599041
+    "staffCareShare": 0.5844993886700176,
+    "staffWalkingShare": 0.10988090386269982,
+    "meanParticipantActiveShare": 0.7848483141494691
    },
    "seriesStep": 4
   }
