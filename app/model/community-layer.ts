@@ -8,6 +8,7 @@ import {
   LABEL_PLATE,
   PAD_Y,
   padBounds,
+  settingZone,
   type CareSetting,
 } from './community-settings';
 import { buildCareSetting } from './community-pads';
@@ -151,10 +152,26 @@ export function buildCommunityLayer(
   });
   // Calls between the layer's people and the center's nurses: arcs that
   // hide with the layer.
-  const calls = options.calls ? buildCallArcs(options.calls) : null;
+  const calls = options.calls
+    ? buildCallArcs({ caption: captionFor, ...options.calls })
+    : null;
   if (calls) root.add(calls.root);
-  function tick(time: number) {
-    calls?.tick(time);
+  /** "Phone call from the hospital", from the caller's setting zone. */
+  function captionFor(i: { zoneId: string; label: string }) {
+    const setting = careSettings.find((s) => settingZone(s.id) === i.zoneId);
+    const place = setting
+      ? setting.kind === 'home'
+        ? setting.name
+        : `the ${setting.short.toLowerCase()}`
+      : null;
+    return {
+      title: place ? `Phone call from ${place}` : 'Phone call',
+      detail: i.label,
+    };
+  }
+  /** Advance the layer to care-day `time`; `zoom` sizes the call captions. */
+  function tick(time: number, zoom = 1) {
+    calls?.tick(time, undefined, zoom);
     for (const b of bodies) {
       const pose = sampleCommunityVehicle(b.v.id, time);
       if (b.van)

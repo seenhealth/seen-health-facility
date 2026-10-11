@@ -693,6 +693,159 @@ export const assetCatalog: Record<string, CatalogEntry> = {
   'timber-truss': { name: 'Truss', purpose: 'Truss.', structural: true },
   'fleet-van': { name: 'Seen van', purpose: 'Van.', structural: true },
   box: { name: 'Fitting', purpose: 'Built-in element.', structural: true },
+
+  // Owner review 2026-10 · care-rooms
+  'wash-pad': {
+    name: 'Wheelchair wash pad',
+    purpose:
+      'Kerbed, tiled pad with a floor drain in the wash bay across the corridor from the linen room, where wheelchairs and walkers are hosed down and disinfected before they go back into the day center.',
+  },
+  'hose-reel': {
+    name: 'Wash-down spray gun',
+    purpose:
+      'Wall-mounted hose reel with a spray gun for washing wheelchairs and walkers over the drained pad.',
+  },
+  wheelchair: {
+    name: 'Wheelchair',
+    purpose:
+      'A center wheelchair parked on the wash pad for cleaning; chairs are washed between participants and after an accident.',
+  },
+  'waste-bin': {
+    name: 'Wheeled waste bin',
+    purpose:
+      'Lidded bin in the trash enclosure, wheeled out to the alley on collection day; a blue one takes the recycling.',
+  },
+  'tumble-dryer': {
+    name: 'Tumble dryer',
+    purpose:
+      'Dryer beside the washer in the laundry room next to the clean linen, for towels, linens and participants’ clothes after a shower or an accident.',
+  },
+  'janitor-sink': {
+    name: 'Mop sink',
+    purpose:
+      'Floor-level sink in the laundry room’s far corner where housekeeping fills and empties mop buckets away from the clean linen.',
+  },
+  'housekeeping-cart': {
+    name: 'Housekeeping cart',
+    purpose:
+      'Cart with cleaning supplies and a bag for soiled linen, kept in the laundry room between rounds.',
+  },
+  'electrical-panel': {
+    name: 'Electrical panel',
+    purpose:
+      'Switchboard and sub-panel on the wall of the electrical room behind the loading roll-up: the building’s electrical service, kept locked and clear of stored goods; the electrician reaches it by the room’s door from receiving.',
+  },
+  urinal: {
+    name: 'Urinal',
+    purpose:
+      'Wall-hung urinal beside the sinks in the south shared restroom, with a manual flush valve; a quick stop between therapy sessions that keeps the stalls free.',
+  },
+  // Owner review 2026-10 · rehab
+  'rehab-fridge': {
+    name: 'Practice refrigerator',
+    purpose:
+      'Refrigerator in the rehab wing’s practice kitchen, where participants rehearse reaching, opening and putting food away with the occupational therapist.',
+  },
+  'rehab-microwave': {
+    name: 'Practice microwave',
+    purpose:
+      'Counter-top microwave in the practice kitchen for rehearsing heating a meal at a safe, chest-level height.',
+  },
+  'rehab-recliner': {
+    name: 'Recliner',
+    purpose:
+      'Rise-and-recline armchair in the quiet room, where a participant rests between therapy sessions; the raised footrest eases swollen legs and the firm arms help with standing up.',
+  },
+  'rehab-standing-desk': {
+    name: 'Standing desk',
+    purpose:
+      'Height-adjustable desk raised to standing height, with a monitor, in the therapists’ workspace where the physical and occupational therapists chart between sessions.',
+  },
+  'rehab-corner-stairs': {
+    name: 'Practice stairs',
+    purpose:
+      'Right-angle training stair with handrails on both sides: a participant climbs one short flight, turns on the landing and steps down the other while the physical therapist spots from the floor, practising the steps and turns met at home.',
+  },
+  // Owner review 2026-10 · kitchen
+  'three-compartment-sink': {
+    name: 'Three-compartment sink',
+    purpose:
+      'Wash, rinse and sanitize sinks with a pre-rinse spray and drainboards; where the kitchen washes pans and the lunch carriers.',
+  },
+  'dish-machine': {
+    name: 'Dish machine',
+    purpose:
+      'Under-counter dish machine with its own small sink and landing; lunch plates, bowls and cups go through it after service.',
+  },
+  'hand-sink': {
+    name: 'Hand sink',
+    purpose:
+      'Hand-washing sink by the kitchen door, used before handling food.',
+  },
+  'stainless-work-table': {
+    name: 'Stainless work table',
+    purpose:
+      'Island work table where the delivered lunch is checked against the diet plans and plated; lidded bins for ingredients and waste sit beneath.',
+  },
+  'reach-in-refrigerator': {
+    name: 'Reach-in refrigerator',
+    purpose:
+      'Refrigerator for the day’s cold food, drinks and the next day’s deliveries.',
+  },
+  'warming-cabinet': {
+    name: 'Warming cabinet',
+    purpose:
+      'Heated holding cabinet that keeps plated meals and late trays hot for participants who eat after the main service.',
+  },
+  'steam-table': {
+    name: 'Heated serving line',
+    purpose:
+      'Hot-holding pans in the pass-through to the dining room with a sneeze guard and a tray slide; the kitchen serves each plate through it to the participant’s diet order.',
+  },
+  'wall-tv': {
+    name: 'Television',
+    purpose:
+      'Wall-mounted screen in the dining room for the day’s announcements, music videos and news in Chinese and Vietnamese during meals.',
+  },
+  microwave: {
+    name: 'Microwave',
+    purpose: 'Microwave in the staff kitchenette for reheating lunches.',
+  },
+  'pantry-cabinet': {
+    name: 'Tall cabinet',
+    purpose:
+      'Tall kitchenette cabinet with a niche for the microwave and shelves for staff supplies.',
+  },
+  'kitchenette-counter': {
+    name: 'Kitchenette counter',
+    purpose:
+      'Base cabinets with a quartz top and a small sink: the staff lounge’s kitchenette and the dining room’s drink station stand on one.',
+  },
+  'coffee-machine': {
+    name: 'Coffee machine',
+    purpose:
+      'Bean-to-cup coffee machine on the drink station; participants and staff help themselves to coffee between meals.',
+  },
+  'water-dispenser': {
+    name: 'Water dispenser',
+    purpose:
+      'Hot and cold water dispenser on the drink station for tea and drinking water through the day.',
+  },
+  'drink-supplies': {
+    name: 'Cups and tea',
+    purpose: 'Paper cups, tea tins and a canister set out on the drink station.',
+  },
+  'glass-door-fridge': {
+    name: 'Drinks fridge',
+    purpose:
+      'Upright glass-door refrigerator beside the drink station, its shelves of bottled water, juice and soft drinks visible through the door.',
+  },
+  // Owner review 2026-10 · day-admin
+  'standing-desk': {
+    name: 'Standing desk',
+    purpose:
+      'Sit-stand desk at standing height in the recreation therapy office, where the recreation therapists plan programs and chart between their rounds of the day room.',
+  },
 };
 
 /** Asset ids that say more than their kind (generic `box`, `table`, … assets). */
@@ -941,6 +1094,30 @@ export const assetEntries: Record<string, CatalogEntry> = {
     name: 'File cabinet',
     purpose: 'Locked files for records that are still kept on paper.',
   },
+
+  // Owner review 2026-10 · care-rooms
+  'owner-care-storage-rack': {
+    name: 'Storage rack',
+    purpose:
+      'Open shelving in the storage room off receiving (the plan’s east nook) for supplies, spare equipment and bulk deliveries that do not go to the kitchen.',
+  },
+  // Owner review 2026-10 · rehab
+  'rehab-kitchen-casework': {
+    name: 'Practice kitchen',
+    purpose:
+      'Base cabinets, counter, sink and upper cabinets of the rehab wing’s practice kitchen, where participants rehearse activities of daily living (washing up, reaching into cupboards, preparing a snack) with the occupational therapist.',
+  },
+  'rehab-massage-bed': {
+    name: 'Massage bed',
+    purpose:
+      'Padded bed in the acupressure massage room; participants sit on its edge or lie down while the therapist works on stiff shoulders, backs and legs.',
+  },
+  // Owner review 2026-10 · kitchen
+  'photo-staff-breakfast-counter': {
+    name: 'Breakfast bar top',
+    purpose:
+      'White quartz slab of the staff lounge breakfast bar, where staff eat and take breaks on the stools.',
+  },
 };
 
 /** `activity-tabletop` and `meal-cart` sets by their `parameters.activity`. */
@@ -948,7 +1125,7 @@ export const tabletopEntries: Record<string, CatalogEntry> = {
   meal: {
     name: 'Lunch place settings',
     purpose:
-      'Plates, cups and cutlery for lunch; aides help with cutting and opening and note how much each participant eats.',
+      'Rice, noodle and congee bowls, bamboo steamers and plates with chopsticks, tea and soy dishes for lunch; aides help with opening and cutting and note how much each participant eats.',
   },
   tea: {
     name: 'Tea service',

@@ -129,12 +129,15 @@ const OFFICE = (() => {
     /**
      * On across the lot to each such van's driver door (`SPOT.cabOutside` is
      * appended): diagonally over the lanes and round the bay noses to van E,
-     * and south of a docked van, wide of its driver's door, through the gap in
-     * the curb islands and over the sidewalk to van F.
+     * and round the tail of a docked van (it stands on the aisle beside the
+     * landing, nose toward the alley, so the way west passes 1.5 m behind
+     * it), through the gap in the curb islands and over the sidewalk to van F.
      */
     toVan: {
       [fleetVanId(4)]: [{ at: [-23.6, -12.9], y: GROUND }],
       [fleetVanId(5)]: [
+        { at: [-19.6, -5.1], y: GROUND },
+        { at: [-23.2, -5.3], y: GROUND },
         { at: [-30.6, -3], y: GROUND },
         { at: [-32.3, 1.2], y: GROUND },
         { at: [-32.75, 1.75], y: SIDEWALK_Y },

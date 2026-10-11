@@ -237,6 +237,28 @@ export type Facility = {
       unresolved: string;
     }[];
   };
+  /**
+   * Owner walkthrough corrections (October 2026): the reviewed set of wall,
+   * door and furniture changes to the traced plan. validate-model admits
+   * exactly these ids when it compares the model with its baseline.
+   */
+  ownerReview?: {
+    date: string;
+    title: string;
+    accuracy: string;
+    items: {
+      id: string;
+      rooms: string[];
+      change: string;
+      unresolved: string;
+    }[];
+    changedWallIds: string[];
+    newWallIds: string[];
+    removedWallIds: string[];
+    changedPlanObjectIds: string[];
+    removedPlanObjectIds: string[];
+    newObjectIds: string[];
+  };
   accuracyIssues: {
     id: string;
     title: string;

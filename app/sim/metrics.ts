@@ -109,6 +109,9 @@ const CARE_ACTIONS = new Set([
   'music',
   'escort',
   'phone',
+  'massage',
+  'audience',
+  'cycle',
 ]);
 const CATEGORY_PRIORITY: ParticipantActivity[] = [
   'clinical',

@@ -37,6 +37,7 @@ import {
 } from './model/schema';
 import { defaultState, type ViewerState } from './model/renderer';
 import type { createViewer } from './model/renderer';
+import { preloadFleetVanModel } from './model/fleet-van-model';
 import {
   COMMUNITY_VIEW,
   SETTING_ZONE_PREFIX,
@@ -96,6 +97,8 @@ export default function Home() {
     sidePanel = useRef<HTMLElement>(null);
   const [showcase, setShowcase] = useState(false);
   const previousView = useRef<ViewerState | null>(null);
+  // The Labels checkbox as last set, for focuses that rebuild the view state.
+  const labelsOn = useRef(false);
   const [siteId, setSiteId] = useState<SiteId>('alhambra');
   const [networkOpen, setNetworkOpen] = useState(false);
   const [clinicOption, setClinicOption] = useState(false);
@@ -129,6 +132,7 @@ export default function Home() {
     [inspected, setInspected] = useState<InspectTarget | null>(null),
     [dataTab, setDataTab] = useState<'overview' | 'assets'>('overview');
   const patch = (s: Partial<ViewerState>) => setState((p) => ({ ...p, ...s }));
+  labelsOn.current = state.labels;
   const getViewer = useCallback(() => viewer.current, []);
   // Cards share the top-right slot: an item's card closes the space card and
   // a space card closes the item's.
@@ -164,7 +168,8 @@ export default function Home() {
         roof: false,
         exterior: false,
         ceilings: false,
-        labels: false,
+        // The Labels checkbox keeps its setting across activity focuses.
+        labels: labelsOn.current,
         walls: 'cutaway',
       };
       setState(next);
@@ -276,7 +281,10 @@ export default function Home() {
     if (!model || !host.current) return;
     let ended = false;
     setReady(false);
-    import('./model/renderer').then(({ createViewer }) => {
+    Promise.all([
+      import('./model/renderer'),
+      preloadFleetVanModel(),
+    ]).then(([{ createViewer }]) => {
       if (ended || !host.current) return;
       try {
         viewer.current = createViewer(host.current, model, (zone, room) => {

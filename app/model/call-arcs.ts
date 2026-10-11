@@ -5,10 +5,11 @@ import type { Interaction } from './activity';
  * Phone calls between people of the played source, drawn as arcs while they
  * last: a raised curve from the caller (the interaction's first member) to
  * the far end, its apex rising with the distance, that draws on from the
- * caller when the call starts, carries soft pulses back and forth while the
- * members talk (one out, one back: a conversation) and retracts into the far
- * end when they hang up, with a breathing ring over each end that ripples as
- * a pulse reaches it. An interaction opts in with `channel: 'phone'`
+ * caller when the call starts, carries soft pulses from the caller toward
+ * the center while the call lasts (the call coming in) and retracts into the
+ * far end when they hang up, with a breathing ring over each end that ripples
+ * as a pulse arrives. A caption card at the crown says what the line is
+ * ("Phone call from the hospital") and which call it is. An interaction opts in with `channel: 'phone'`
  * (activity.ts); members in one place (the Wongs on speakerphone) share an
  * end. An arc shows while its callers are in the scene and at least one end
  * is drawn: a member only filtered out of view (an upper floor that is not
@@ -80,7 +81,15 @@ export type CallArcOptions = {
   /** Pulses, breathing and ripples; default off under prefers-reduced-motion. */
   motion?: boolean;
   style?: Partial<CallArcStyle>;
+  /**
+   * The caption card at the crown of each arc: a title such as "Phone call
+   * from the hospital" and a line naming the call. Default: the call's label
+   * under "Phone call". Returning null draws no card.
+   */
+  caption?: (interaction: Interaction) => { title: string; detail?: string } | null;
 };
+/** Caption cards: canvas pixels and the card's width in metres at zoom 1. */
+const CAPTION = { w: 640, h: 176, widthAtZoom1: 15, aboveCrown: 0.6 };
 
 /** Members this close (m, on the ground plan) share an end: one place on the line. */
 const SAME_PLACE = 8;
@@ -258,6 +267,75 @@ function ringGeometry() {
   return g;
 }
 
+/**
+ * A caption card drawn on a canvas: cream, a terracotta edge, the title and
+ * a smaller detail line. Null where there is no DOM (unit tests).
+ */
+function captionSprite(
+  title: string,
+  detail: string | undefined,
+  style: CallArcStyle,
+): T.Sprite | null {
+  if (typeof document === 'undefined') return null;
+  const canvas = document.createElement('canvas');
+  canvas.width = CAPTION.w;
+  canvas.height = CAPTION.h;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+  const w = canvas.width,
+    h = canvas.height,
+    pad = 22,
+    r = 18;
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = '#fffdf8f2';
+  ctx.strokeStyle = '#e7dccb';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.roundRect(4, 4, w - 8, h - 8, r);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = style.color;
+  ctx.beginPath();
+  ctx.roundRect(4, 4, 14, h - 8, [r, 0, 0, r]);
+  ctx.fill();
+  // A handset glyph: a small ring and a bar, in the line's colour.
+  ctx.strokeStyle = style.color;
+  ctx.lineWidth = 7;
+  ctx.beginPath();
+  ctx.arc(pad + 36, h / 2 - 2, 20, Math.PI * 0.75, Math.PI * 1.9);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(pad + 20, h / 2 + 16);
+  ctx.lineTo(pad + 52, h / 2 + 16);
+  ctx.stroke();
+  ctx.fillStyle = '#22362c';
+  ctx.textBaseline = 'middle';
+  ctx.font = '600 44px system-ui, -apple-system, "Segoe UI", sans-serif';
+  const x = pad + 76;
+  if (detail) {
+    ctx.fillText(title, x, h / 2 - 30, w - x - pad);
+    ctx.fillStyle = '#5a6b60';
+    ctx.font = '400 32px system-ui, -apple-system, "Segoe UI", sans-serif';
+    ctx.fillText(detail, x, h / 2 + 32, w - x - pad);
+  } else ctx.fillText(title, x, h / 2, w - x - pad);
+  const texture = new T.CanvasTexture(canvas);
+  texture.colorSpace = T.SRGBColorSpace;
+  const material = new T.SpriteMaterial({
+    map: texture,
+    transparent: true,
+    depthTest: false,
+    depthWrite: false,
+    name: 'seen-call-caption',
+  });
+  const sprite = new T.Sprite(material);
+  // Its own copy of the sprite quad, so dispose() can free it with the card.
+  sprite.geometry = sprite.geometry.clone();
+  sprite.name = 'call-caption';
+  sprite.renderOrder = 32;
+  sprite.visible = false;
+  sprite.raycast = () => {};
+  return sprite;
+}
 export function buildCallArcs(options: CallArcOptions) {
   const style = { ...CALL_ARC_STYLE, ...options.style },
     motion = options.motion ?? !prefersReducedMotion(),
@@ -347,11 +425,19 @@ export function buildCallArcs(options: CallArcOptions) {
       const members = interaction.actorIds
         .map((id) => byId.get(id))
         .filter((a): a is CallPerson => !!a);
+      const text = options.caption
+        ? options.caption(interaction)
+        : { title: 'Phone call', detail: interaction.label };
       return {
         interaction,
         members,
         ends: members.map(() => ({ at: new T.Vector3(), n: 0, drawn: false })),
-        arcs: members.slice(1).map(arc),
+        arcs: members.slice(1).map(() => {
+          const a = arc();
+          const caption = text ? captionSprite(text.title, text.detail, style) : null;
+          if (caption) root.add(caption);
+          return { ...a, caption };
+        }),
       };
     })
     .filter((c) => c.members.length > 1);
@@ -402,7 +488,7 @@ export function buildCallArcs(options: CallArcOptions) {
       call.ends[k].at.multiplyScalar(1 / call.ends[k].n);
     return count;
   }
-  type Arc = ReturnType<typeof arc>;
+  type Arc = ReturnType<typeof arc> & { caption: T.Sprite | null };
   /** The curve from `a` to `b`: steep rises, its crown `lift` above the higher end. */
   function place(arc: Arc, a: T.Vector3, b: T.Vector3) {
     const dx = b.x - a.x,
@@ -420,6 +506,13 @@ export function buildCallArcs(options: CallArcOptions) {
     (arc.l.uP3.value as T.Vector3).copy(b);
     (arc.r.uA.value as T.Vector3).copy(a);
     (arc.r.uB.value as T.Vector3).copy(b);
+    if (arc.caption)
+      // The crown of the cubic: (P0 + 3P1 + 3P2 + P3) / 8.
+      arc.caption.position.set(
+        (a.x + 3 * (a.x + dx * LEAN) + 3 * (b.x - dx * LEAN) + b.x) / 8,
+        (a.y + 6 * y + b.y) / 8 + CAPTION.aboveCrown,
+        (a.z + 3 * (a.z + dz * LEAN) + 3 * (b.z - dz * LEAN) + b.z) / 8,
+      );
   }
   /** Draw-on, pulses, retraction and the rings at a moment of the call. */
   function animate(
@@ -428,6 +521,7 @@ export function buildCallArcs(options: CallArcOptions) {
     i: Interaction,
     time: number,
     now: number,
+    zoom: number,
   ) {
     const l = arc.l,
       r = arc.r,
@@ -436,6 +530,12 @@ export function buildCallArcs(options: CallArcOptions) {
       scale = r.uScale.value as T.Vector2,
       alpha = r.uAlpha.value as T.Vector2,
       ripple = r.uRipple.value as T.Vector2;
+    const caption = arc.caption;
+    if (caption) {
+      // The card keeps its size on screen: metres shrink as the zoom grows.
+      const w = CAPTION.widthAtZoom1 / Math.max(0.3, zoom);
+      caption.scale.set(w, (w * CAPTION.h) / CAPTION.w, 1);
+    }
     if (!motion) {
       // The final state, held for the whole call.
       l.uHead.value = l.uOpacity.value = 1;
@@ -444,6 +544,10 @@ export function buildCallArcs(options: CallArcOptions) {
       scale.set(1, 1);
       alpha.set(first ? 1 : 0, 1);
       r.uRippleAmp.value = 0;
+      if (caption) {
+        caption.visible = true;
+        (caption.material as T.SpriteMaterial).opacity = 1;
+      }
       return;
     }
     const span = i.end - i.start,
@@ -455,21 +559,25 @@ export function buildCallArcs(options: CallArcOptions) {
     l.uHead.value = easeOut(drawn);
     l.uTail.value = easeInOut(gone);
     l.uOpacity.value = smooth(0, 0.15, drawn) * (1 - smooth(0.55, 1, gone));
-    // The conversation, once the line is drawn: a pulse out to the far end,
-    // then one back, each easing along the line; the tip glows while the
-    // line draws on.
+    // The call coming in, once the line is drawn: pulses leave the caller
+    // and travel to the far end, two of them half a period apart, each
+    // easing along the line; the tip glows while the line draws on.
     const talk = clamp01((since - on) / 1.5) * (1 - clamp01(gone * 4)),
       f = (now / style.pulsePeriod) % 1,
-      out = f < 0.5,
-      trip = (out ? f : f - 0.5) * 2,
-      along = easeInOut(trip),
-      fade = smooth(0, 0.1, trip) * (1 - smooth(0.9, 1, trip));
-    pulseAt.set(out ? along : 0, out ? 0 : 1 - along, l.uHead.value as number);
+      f2 = (f + 0.5) % 1,
+      fadeOf = (t: number) => smooth(0, 0.1, t) * (1 - smooth(0.9, 1, t));
+    pulseAt.set(easeInOut(f), easeInOut(f2), l.uHead.value as number);
     pulseAmp.set(
-      out ? talk * fade : 0,
-      out ? 0 : talk * fade,
+      talk * fadeOf(f),
+      talk * fadeOf(f2),
       (1 - drawn) * smooth(0, 0.1, drawn),
     );
+    if (caption) {
+      // The card fades in once the line is well on its way and out with it.
+      const show = smooth(0.35, 0.8, drawn) * (1 - smooth(0.2, 0.7, gone));
+      caption.visible = show > 0.002;
+      (caption.material as T.SpriteMaterial).opacity = show;
+    }
     // The caller's ring opens with the call, the far one as the line arrives;
     // both breathe out of step and fade as the line retracts.
     const openA = clamp01(since / (on * 0.6)),
@@ -484,12 +592,16 @@ export function buildCallArcs(options: CallArcOptions) {
       first ? openA * (1 - gone) : 0,
       openB * (1 - smooth(0.6, 1, gone)),
     );
-    // Each ring ripples as a pulse reaches it: the far one half-way through
-    // the exchange, the caller's as the reply comes back.
-    ripple.set(clamp01(f / 0.45), clamp01(((f + 0.5) % 1) / 0.45));
+    // The far ring ripples as each pulse arrives; the caller's as each
+    // pulse sets out.
+    ripple.set(clamp01(f2 / 0.45), clamp01(f / 0.45));
     r.uRippleAmp.value = talk;
   }
-  function tick(time: number, now = performance.now() / 1000) {
+  /**
+   * Place and animate every live call at care-day `time`; `zoom` is the
+   * camera's zoom (orthographic), which sizes the caption cards.
+   */
+  function tick(time: number, now = performance.now() / 1000, zoom = 1) {
     const live = people.root.visible;
     // Indexed loops: a frame allocates nothing.
     for (let c = 0; c < calls.length; c++) {
@@ -500,9 +612,10 @@ export function buildCallArcs(options: CallArcOptions) {
         const a = call.arcs[k],
           on = k + 1 < ends && (call.ends[0].drawn || call.ends[k + 1].drawn);
         a.line.visible = a.ring.visible = on;
+        if (a.caption && !on) a.caption.visible = false;
         if (!on) continue;
         place(a, call.ends[0].at, call.ends[k + 1].at);
-        animate(a, k === 0, i, time, now);
+        animate(a, k === 0, i, time, now, zoom);
       }
     }
   }
@@ -515,6 +628,14 @@ export function buildCallArcs(options: CallArcOptions) {
       ribbon.dispose();
       rings.dispose();
       materials.forEach((m) => m.dispose());
+      for (const c of calls)
+        for (const a of c.arcs)
+          if (a.caption) {
+            const m = a.caption.material as T.SpriteMaterial;
+            m.map?.dispose();
+            m.dispose();
+            a.caption.geometry.dispose();
+          }
     },
   };
 }

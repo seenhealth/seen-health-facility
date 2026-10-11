@@ -54,6 +54,13 @@ raysClear('interior-nurse-station', [
 ]);
 const reviewed = new Set(m.interiorReview.newObjectIds);
 for (const id of m.interiorReview.changedPlanObjectIds) reviewed.add(id);
+// The owner walkthrough's furniture (ownerReview, October 2026) is reviewed
+// too: new pieces and moved plan pieces must stay out of everyone's way.
+for (const id of [
+  ...(m.ownerReview?.newObjectIds ?? []),
+  ...(m.ownerReview?.changedPlanObjectIds ?? []),
+])
+  reviewed.add(id);
 const removed = new Set(
   JSON.parse(readFileSync('app/data/day-program.json')).removedObjectIds,
 );
@@ -83,11 +90,63 @@ const boxes = m.objects
       s,
     }));
   });
+/** Whether a point lies within a box's footprint plus the walking margin. */
+const within = (b, [x, z]) => {
+  const dx = x - b.x,
+    dz = z - b.z;
+  return (
+    Math.abs(b.c * dx - b.s * dz) < b.w + 0.18 &&
+    Math.abs(b.s * dx + b.c * dz) < b.d + 0.18
+  );
+};
+/** How far along a walk a person may still be on the seat they left or reach. */
+const SEAT_APPROACH = 1.25;
+// A person may approach, leave or slide along the seat they sit in: a walk
+// that starts from a seated segment, or ends in one, is not kept 0.18 m off
+// the chair or bench that holds that seated point, nor off the table the
+// seat is drawn up to (any reviewed piece within 0.18 m of the seated point;
+// the owner review's banquette regulars sit down on the east banquette and
+// on tree-seat chairs, and slide along the bench to get out between its
+// tables).
+const seatsAt = (p) =>
+  boxes
+    .filter((b) => {
+      const dx = p[0] - b.x,
+        dz = p[1] - b.z;
+      return (
+        Math.abs(b.c * dx - b.s * dz) <= b.w + 0.18 &&
+        Math.abs(b.s * dx + b.c * dz) <= b.d + 0.18
+      );
+    })
+    .map((b) => b.id);
 let samples = 0;
 for (const a of loop.actors) {
   if (a.levelId !== 'ground' || a.escortFor) continue;
-  for (const s of a.segments) {
+  const n = a.segments.length;
+  for (let k = 0; k < n; k++) {
+    const s = a.segments[k];
     if (!['walk', 'roll'].includes(s.action)) continue;
+    // Owner walkthrough (October 2026): a walk may start or end on a seat (a
+    // recliner, a recumbent stepper, the edge of a massage bed), so the piece
+    // at either end is not an obstacle within the approach to it; and a walk
+    // whose heights rise above the floor climbs practice equipment (the
+    // training stairs), so what it stands on is not an obstacle either.
+    const ends = [s.path[0], s.path.at(-1)],
+      raised = s.heights
+        ? s.path.filter((_, i) => s.heights[i] > 0.05)
+        : [];
+    const allowed = (b, x, z) =>
+      raised.some((p) => within(b, p)) ||
+      ends.some(
+        (e) =>
+          within(b, e) && Math.hypot(x - e[0], z - e[1]) <= SEAT_APPROACH,
+      );
+    const before = a.segments[(k + n - 1) % n],
+      after = a.segments[(k + 1) % n],
+      ownSeats = new Set([
+        ...((before.seated ?? a.seated) ? seatsAt(s.path[0]) : []),
+        ...((after.seated ?? a.seated) ? seatsAt(s.path.at(-1)) : []),
+      ]);
     for (let i = 1; i < s.path.length; i++) {
       const p = s.path[i - 1],
         q = s.path[i],
@@ -99,11 +158,9 @@ for (const a of loop.actors) {
         const x = p[0] + ((q[0] - p[0]) * j) / count,
           z = p[1] + ((q[1] - p[1]) * j) / count;
         for (const b of boxes) {
-          const dx = x - b.x,
-            dz = z - b.z;
+          if (ownSeats.has(b.id)) continue;
           assert.ok(
-            Math.abs(b.c * dx - b.s * dz) >= b.w + 0.18 ||
-              Math.abs(b.s * dx + b.c * dz) >= b.d + 0.18,
+            !within(b, [x, z]) || allowed(b, x, z),
             `${a.id}: path overlaps ${b.id} at ${x},${z}`,
           );
         }

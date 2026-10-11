@@ -83,6 +83,9 @@ const ACTIONS: Record<Action, string> = {
   cards: 'Playing cards',
   read: 'Reading',
   phone: 'On the phone',
+  cycle: 'Pedalling',
+  audience: 'Listening to a song',
+  massage: 'Giving a massage',
 };
 const MOBILITY = {
   cane: 'Walks with a cane',

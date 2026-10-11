@@ -5,14 +5,18 @@
 //
 // The food truck's morning run (`runs` in app/model/deliveries.ts) parks at
 // rear receiving at 10:48 AM. Its delivery person (`delivery-food`) wheels the
-// loaded trolley up the receiving ramp, along the corridor east of the laundry,
-// across the east hallway and into the kitchen, where `food-service-02` checks
-// the carriers against the diet plans and unloads them onto the island counter
+// loaded trolley up the receiving ramp, through the small service door east of
+// the loading roll-up (owner review 2026-10: the roll-up fronts the electrical
+// room, scripts/apply-owner-review-care-rooms.mjs), down the strip of
+// receiving east of that room, along the corridor east of the laundry, across
+// the east hallway and into the kitchen, where `food-service-02` checks the
+// carriers against the diet plans and unloads them onto the island counter
 // (`kitchen-lunch-delivery`, 11:10–11:26 AM, before lunch is served). Indoors
 // the trolley runs straight between door centres; every leg is checked on the
 // navigation grid (app/sim/nav.ts) at a clearance that keeps the person and the
-// trolley off walls and furniture. The afternoon run still stops just inside
-// the receiving door, as scripts/add-delivery-people.py wrote it.
+// trolley off walls and furniture, and the service door is checked for the
+// trolley's own width. The afternoon run still stops just inside the receiving
+// door, as scripts/add-delivery-people.py wrote it.
 //
 // Both actors' tracks and the interaction are rebuilt from the constants below,
 // so the script is repeatable, and every other number in the file keeps its
@@ -37,6 +41,7 @@ const { nav, deliveries, activity } = await loadSim(
 const DELIVERY = 'delivery-food',
   KITCHEN_STAFF = 'food-service-02',
   INTERACTION = 'kitchen-lunch-delivery';
+const r4 = (v) => Math.round(v * 1e4) / 1e4;
 /**
  * Loop seconds: the trolley stops at the island, the kitchen starts unloading
  * (when the carriers appear on the island, `KITCHEN_LUNCH` in deliveries.ts),
@@ -56,26 +61,39 @@ const RECEIVE_AT = [9.75, 2.05],
 const AISLE = [9.75, 4.55];
 /**
  * On foot from the east side of the parked truck (the package truck parks on
- * its west side), up the receiving ramp to just inside the door, with the
- * ramp heights (scripts/add-delivery-people.py).
+ * its west side), to the foot of the receiving ramp, up it and through the
+ * service door to just inside, with the ramp heights (the ramp runs from the
+ * court at −0.23 m up to the door sill; scripts/add-delivery-people.py).
  */
 const stop = deliveries.deliveryStops.find((s) => s.id === DELIVERY);
+const DOOR = [...stop.door],
+  ramp = deliveries.receivingRamp(stop),
+  rampY = (z) =>
+    z <= ramp.z0
+      ? -0.23
+      : z >= ramp.z1
+        ? 0
+        : -0.23 * ((ramp.z1 - z) / (ramp.z1 - ramp.z0));
+/** Just inside the door, centred in the strip east of the electrical room. */
+const LANE_IN = [10.6, -13.9];
 const DOCK = [stop.x + 1.45, stop.z],
   OUTSIDE = [
     DOCK,
     [stop.x + 1.5, -18.3],
-    [8.8, -16.1],
-    [...stop.door],
-    [8.8, -13.9],
+    [DOOR[0], r4(ramp.z0 - 0.04)],
+    [DOOR[0], -16.1],
+    DOOR,
+    LANE_IN,
   ],
-  OUTSIDE_HEIGHTS = [-0.23, -0.23, -0.115, 0, 0];
+  OUTSIDE_HEIGHTS = OUTSIDE.map((p) => r4(rampY(p[1])));
 /**
- * Indoors: across the receiving room to the corridor east of the laundry
- * (walls at x 9.16 and 11.75), then straight on at x 10.45 through the laundry
- * passage (z −7.02, x 9.46–11.35), the east hallway and the kitchen door
- * (z 0.36, x 9.62–11.45) to the island.
+ * Indoors: down the strip of receiving east of the electrical room (its wall
+ * at x 10.0, receiving's east wall at 11.75) past the electrical room's door,
+ * across to the corridor east of the laundry (walls at x 9.16 and 11.75), then
+ * straight on at x 10.45 through the laundry passage (z −7.02, x 9.46–11.35),
+ * the east hallway and the kitchen door (z 0.36, x 9.62–11.45) to the island.
  */
-const INSIDE = [[8.8, -13.9], [10.45, -10.8], TROLLEY_STOP];
+const INSIDE = [LANE_IN, [10.6, -10.0], [10.45, -9.0], TROLLEY_STOP];
 /**
  * Route clearance for the person pushing the trolley (the trolley is 0.55 m
  * wide), and the least gap its corners keep from walls and furniture.
@@ -92,7 +110,6 @@ const TROLLEY_CORNERS = [
 /** Walking pace of the kitchen staff member (m per loop second). */
 const STAFF_PACE = 0.7;
 
-const r4 = (v) => Math.round(v * 1e4) / 1e4;
 const face = (from, to) =>
   Math.round(Math.atan2(to[0] - from[0], to[1] - from[1]) * 1000) / 1000;
 const reversed = (list) => [...list].reverse();
@@ -148,6 +165,26 @@ for (const [x, z, heading] of samples(INSIDE)) {
   checkTrolley(x, z, heading, 'on the way in');
 }
 checkTrolley(...TROLLEY_STOP, 0, 'at the island');
+// The service door (owner review 2026-10): wide enough for the trolley with
+// its margin on each side, the lane centred in it, and the trolley's corners
+// clear of the jambs from the threshold to the lane inside.
+{
+  const wall = model.envelope.walls.find((w) => w.id === 'shell-rear-north'),
+    door = wall.openings.find((o) => o.id === 'shell-rear-north-opening-3'),
+    x0 = wall.a[0] + door.offset,
+    x1 = x0 + door.width,
+    trolley = 0.56 * scale;
+  assert.ok(
+    Math.abs(DOOR[1] - wall.a[1]) < 1e-6 && Math.abs(DOOR[0] - (x0 + x1) / 2) < 0.01,
+    `the trolley lane is centred in the service door (x ${x0.toFixed(2)}–${x1.toFixed(2)})`,
+  );
+  assert.ok(
+    door.width >= trolley + 2 * TROLLEY_MARGIN,
+    `the service door (${door.width} m) takes the ${trolley.toFixed(2)} m trolley with ${TROLLEY_MARGIN} m each side`,
+  );
+  for (const [x, z, heading] of samples([DOOR, LANE_IN]).slice(1))
+    checkTrolley(x, z, heading, 'through the service door');
+}
 assert.equal(nav.roomAt(model, 'ground', TROLLEY_STOP), 'kitchen-prep');
 assert.equal(nav.roomAt(model, 'ground', RECEIVE_AT), 'kitchen-prep');
 

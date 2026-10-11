@@ -214,9 +214,12 @@ export function traceTouchpoints(
     extra: Partial<TouchpointEvent> = {},
   ) => {
     if (!included(a.id)) return;
+    // The label follows the stored (rounded) time, so a time that rounds
+    // onto a minute boundary reads the same here and when it is re-derived.
+    const at = round(t);
     events.push({
-      t: round(t),
-      clock: clockLabel(t, source),
+      t: at,
+      clock: clockLabel(at, source),
       actorId: a.id,
       actorLabel: a.label,
       role: a.role,

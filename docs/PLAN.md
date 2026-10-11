@@ -215,7 +215,9 @@ Model details:
 - Should the community van idle at the home between runs (as now) or return to the fleet lot?
 - Keep the ambulance cameo at the hospital, and should the story page show the community layer?
 - Trim the curb island so all eight vans can use bays, or keep two spares at the curb?
-- Move the drop-off dock 3 m west so vans can leave it forward instead of backing out 3 m first?
+- ~~Move the drop-off dock 3 m west so vans can leave it forward instead of backing out 3 m first?~~ Done
+  differently (owner walkthrough, 2026-10): the van now docks on the aisle parallel to the lobby wall, sliding
+  door toward the entrance, and leaves forward down the aisle.
 - Van E backs into the northernmost bay only while van D's bay is empty, so it was given one long
   neighborhood run instead of two; now that vans A–D stay on their rounds, van D's bay is always empty.
   Should van E make two runs again?

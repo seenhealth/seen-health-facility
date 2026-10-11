@@ -125,6 +125,31 @@ void test('an arc needs its callers in the scene and one end drawn', () => {
   assert.equal(line.visible, false, 'people are off');
 });
 
+void test('pulses travel one way, from the caller toward the center', () => {
+  const { arcs, u } = setup();
+  // Well into the call, the line drawn and the talk under way.
+  let last = -1,
+    advanced = 0;
+  for (let now = 0; now < CALL_ARC_STYLE.pulsePeriod * 2; now += 0.05) {
+    arcs.tick(115, now);
+    const at = u.uPulseAt.value as T.Vector3,
+      amp = u.uPulseAmp.value as T.Vector3;
+    assert.ok(at.x >= 0 && at.x <= 1 && at.y >= 0 && at.y <= 1);
+    assert.ok(amp.x >= 0 && amp.y >= 0, 'pulses only ever go out');
+    // Each pulse moves on along the line or starts over at the caller.
+    if (last >= 0) {
+      assert.ok(at.x >= last || at.x < 0.2, `pulse never turns back (${last} → ${at.x})`);
+      if (at.x > last) advanced++;
+    }
+    last = at.x;
+  }
+  assert.ok(advanced > 20, 'the pulse travels');
+  // Two pulses half a period apart.
+  arcs.tick(115, 0);
+  const at = u.uPulseAt.value as T.Vector3;
+  assert.ok(Math.abs(at.y - 0.5) < 1e-9 || at.y > 0.45, 'second pulse half way');
+});
+
 void test('without motion the call shows its final state, still', () => {
   const { arcs, u } = setup(false);
   arcs.tick(100.1, 0);

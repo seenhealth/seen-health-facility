@@ -4,12 +4,14 @@
 //   node scripts/apply-drop-off-route.mjs --check  # fail if the loop is stale
 //
 // The base loop's six van arrivals (three riders and their two escorts on Van
-// A, two more riders on Van B) come down their van's ramp at the drop-off,
-// walk round the docked van's nose to the toe of the switchback, up its lower
-// run, across the turn landing and up the upper run to the landing, and turn
-// in at the sliding entrance; their afternoon departure walks the same way
-// back to the van. These legs are rebuilt from the exterior's geometry
-// (`DROP_OFF` in app/model/alhambra-exterior.ts), the dock (`FLEET_LOT` in
+// A, two more riders on Van B) come down their van's ramp at the drop-off (the
+// van stands on the aisle parallel to the lobby wall, its sliding door toward
+// the entrance, so the ramp runs out toward the landing), walk along the lot
+// to the toe of the switchback, up its lower run, across the turn landing and
+// up the upper run to the landing, and turn in at the sliding entrance; their
+// afternoon departure walks the same way back to the van. These legs are
+// rebuilt from the exterior's geometry (`DROP_OFF` in
+// app/model/alhambra-exterior.ts), the dock (`FLEET_LOT` in
 // app/model/alhambra-fleet.ts), the van's ramp (`FLEET_VAN_RAMP`) and the
 // sliding entrance (`ARRIVAL.door`), with the surface height at every corner.
 //
@@ -29,7 +31,8 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { loadSim } from './build-scenario.mjs';
 
 const LOOP = 'app/data/activity-loop.json',
-  PUBLISHED = 'public/models/activity-loop.json';
+  PUBLISHED = 'public/models/activity-loop.json',
+  MODEL = 'public/models/seen-alhambra-planning.json';
 const check = process.argv.includes('--check');
 const { arrival, exterior, fleet, nav } = await loadSim(
   {
@@ -66,35 +69,25 @@ const length = (path) =>
   );
 const same = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]) < 1e-6;
 
-// The docked van stands nose-first toward the switchback; the way from its
-// ramp foot to the ramp's toe passes in front of its nose, between the nose
-// and the end of the lower run's west rail, as wide as a wheelchair and its
-// escort need, then turns up the run.
+// The docked van stands on the aisle beside the lobby landing, parallel to the
+// lobby wall with its sliding door toward the entrance, so its ramp runs out
+// east to a foot on the lot short of the landing's steps. From the foot a
+// rider goes east to the lower run's line and along it, between the landing's
+// rail and the lower run's west rail, to the toe, then up the switchback.
 const [dockX, dockZ] = FLEET_LOT.dock;
 assert.ok(
-  Math.abs(-Math.sin(FLEET_LOT.dockHeading) - 1) < 1e-9,
-  'the docked van faces +x, toward the switchback',
+  Math.abs(Math.cos(FLEET_LOT.dockHeading) - 1) < 1e-9,
+  "the docked van's sliding door faces +x, toward the entrance",
 );
-const rail = DROP_OFF.rails.lowerWest,
-  { lower } = DROP_OFF,
-  nose = dockX + FLEET_VAN.halfLength,
-  passage = rail.x - nose,
+const { lower } = DROP_OFF,
   wheelchair = nav.MOBILITY_CLEARANCE.wheelchair;
-assert.ok(
-  passage >= 2 * wheelchair,
-  `the docked van's nose leaves ${passage.toFixed(2)} m to the switchback's rail (a wheelchair needs ${2 * wheelchair})`,
-);
-const passX = mm((nose + rail.x) / 2),
-  passZ = mm(rail.z0 - passage / 2);
 const { sill, foot } = ARRIVAL;
-/** Ramp foot → in front of the nose → under the rail's end → the lower run's toe. */
-const approach = [
-  foot,
-  [passX, foot[1]],
-  [passX, passZ],
-  [lower.x, passZ],
-  [lower.x, lower.z0],
-];
+assert.ok(
+  foot[0] < lower.x && foot[1] < lower.z0,
+  `the ramp's foot (${foot.join(', ')}) lies west of the lower run and short of its toe`,
+);
+/** Ramp foot → the lower run's line → its toe. */
+const approach = [foot, [lower.x, foot[1]], [lower.x, lower.z0]];
 /** Toe → landing abreast of the door, with the surface heights. */
 const ascent = DROP_OFF.ascent(ARRIVAL.door[1]).map(({ at, y }) => ({
   at: at.map(mm),
@@ -104,27 +97,56 @@ assert.deepEqual(ascent[0].at, approach.at(-1), 'the climb starts at the toe');
 const street = r4(DROP_OFF.street),
   vanFloor = ARRIVAL.vanFloorY;
 
-// Nobody on the approach brushes the docked van or the rail: every 5 cm keeps
-// a wheelchair's clearance from the van's footprint and the rail.
-const vanGap = ([x, z]) =>
-  Math.hypot(
-    Math.max(Math.abs(x - dockX) - FLEET_VAN.halfLength, 0),
-    Math.max(Math.abs(z - dockZ) - FLEET_VAN.halfWidth, 0),
+// Nobody on the approach brushes the docked van, a rail or the bike rack:
+// every 5 cm keeps a wheelchair's clearance from the van's footprint (in its
+// own frame, whichever way it faces), from every rail and from the rack's pad.
+const vanGap = ([x, z]) => {
+  const c = Math.cos(FLEET_LOT.dockHeading),
+    s = Math.sin(FLEET_LOT.dockHeading),
+    dx = x - dockX,
+    dz = z - dockZ,
+    across = dx * c - dz * s,
+    along = dx * s + dz * c;
+  return Math.hypot(
+    Math.max(Math.abs(across) - FLEET_VAN.halfWidth, 0),
+    Math.max(Math.abs(along) - FLEET_VAN.halfLength, 0),
   );
-const railGap = ([x, z]) =>
-  Math.hypot(x - rail.x, z - Math.min(Math.max(z, rail.z0), rail.z1));
+};
+const edges = [
+  ...Object.values(DROP_OFF.rails).map((r) => [
+    [r.x, r.z0],
+    [r.x, r.z1],
+  ]),
+  ...DROP_OFF.bikeRackOutline.map((a, i, all) => [
+    a,
+    all[(i + 1) % all.length],
+  ]),
+];
+const edgeGap = ([x, z], [a, b]) => {
+  const dx = b[0] - a[0],
+    dz = b[1] - a[1],
+    t = Math.max(
+      0,
+      Math.min(1, ((x - a[0]) * dx + (z - a[1]) * dz) / (dx * dx + dz * dz)),
+    );
+  return Math.hypot(a[0] + dx * t - x, a[1] + dz * t - z);
+};
 let approachGap = Infinity;
 for (let i = 1; i < approach.length; i++) {
   const [a, b] = [approach[i - 1], approach[i]],
     n = Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 0.05);
   for (let k = 0; k <= n; k++) {
     const p = [a[0] + ((b[0] - a[0]) * k) / n, a[1] + ((b[1] - a[1]) * k) / n];
-    approachGap = Math.min(approachGap, vanGap(p), railGap(p));
+    approachGap = Math.min(
+      approachGap,
+      vanGap(p),
+      ...edges.map((e) => edgeGap(p, e)),
+    );
   }
 }
 assert.ok(
   approachGap >= wheelchair,
-  `the approach passes ${approachGap.toFixed(2)} m from the docked van or the rail`,
+  `the approach passes ${approachGap.toFixed(2)} m from the docked van, a rail or the bike rack`,
 );
 
 // Non-numbers parse as usual; numbers keep their text (10.0 stays 10.0).
@@ -135,9 +157,67 @@ const loop = JSON.parse(text, (_, v, context) =>
     : v,
 );
 const value = (v) => (typeof v === 'object' ? Number(v.rawJSON) : v);
+const point = (p) => p.map(value);
 const arrivals = loop.actors.filter((a) => a.id.startsWith('arrival-'));
 assert.equal(arrivals.length, 6, 'six van arrivals in the base loop');
+
+// The way out from a wait spot to the doors threads round whoever stands in
+// the lobby then (the community cast's greeters): routed on the navigation
+// grid with each such person reserved, at the party's route clearance. The
+// loop's own lobby route cut straight through a greeter.
+const model = JSON.parse(readFileSync(MODEL, 'utf8'));
+const STANDING_RESERVE = 0.65,
+  STANDING_BAND = 1.2;
+/**
+ * Loop actors other than `party` standing still, visible, on the ground floor
+ * at any of `times`, within STANDING_BAND of the straight line from `from` to
+ * `to`. The line and the times are fixed by the loop's other actors, the wait
+ * spot and the boarding time, not by the route written here, so a second run
+ * finds the same people and writes the same route.
+ */
+function standingNear(from, to, times, party) {
+  const out = new Map();
+  for (const a of loop.actors) {
+    if (party.has(a.id) || a.levelId !== 'ground') continue;
+    for (const t of times) {
+      const s = a.segments.find((s) => value(s.start) <= t && t < value(s.end));
+      if (!s || s.visible === false) continue;
+      const p0 = point(s.path[0]),
+        p1 = point(s.path.at(-1));
+      if (Math.hypot(p1[0] - p0[0], p1[1] - p0[1]) > 1e-6) continue;
+      if (edgeGap(p0, [from, to]) > STANDING_BAND) continue;
+      out.set(a.id, {
+        id: `standing-${a.id}`,
+        position: p0,
+        halfWidth: STANDING_RESERVE,
+        halfDepth: STANDING_RESERVE,
+      });
+    }
+  }
+  return [...out.values()];
+}
+/** The lobby route from `from` to the doors round `reserved` people, for a party walking at `clearance`. */
+function lobbyRoute(from, reserved, clearance) {
+  const options = nav.dayProgramNavOptions();
+  const grid = nav.navGrid(model, {
+    ...options,
+    reservations: [...options.reservations, ...reserved],
+  });
+  const route = nav.routeBetween(grid, from, ARRIVAL.door, clearance);
+  assert.ok(
+    route.length > 2 &&
+      Math.hypot(route[0][0] - from[0], route[0][1] - from[1]) < 1e-3 &&
+      Math.hypot(
+        route.at(-1)[0] - ARRIVAL.door[0],
+        route.at(-1)[1] - ARRIVAL.door[1],
+      ) < 1e-3,
+    `the lobby route runs from the wait spot to the doors (${route[0]} → ${route.at(-1)})`,
+  );
+  // Grid corners to the millimetre; the ends are the wait spot and the door exactly.
+  return [from, ...route.slice(1, -1).map((p) => p.map(mm)), ARRIVAL.door];
+}
 const report = [];
+let rerouted = 0;
 for (const actor of arrivals) {
   const segment = (title) => {
     const found = actor.segments.filter((s) => s.title === title);
@@ -169,19 +249,45 @@ for (const actor of arrivals) {
     pace = legs.reduce((a, b) => a + b) / (to - from);
   walkIn.end = climb.start = mm(from + legs[0] / pace);
   climb.end = entrance.start = mm(value(walkIn.end) + legs[1] / pace);
-  // The departure: indoors as before as far as the door, then the same way down.
+  // The departure: indoors as before as far as the door (unless someone
+  // stands in the way, when the lobby leg is re-routed round them), then the
+  // same way down.
   const door = departure.path.findIndex((p) => same(p, ARRIVAL.door));
   assert.ok(door > 0, `${actor.id} leaves through the sliding entrance`);
   const down = [...ascent].reverse(),
-    out = [...approach].reverse().slice(1);
-  departure.path = [
-    ...departure.path.slice(0, door + 1),
-    ...down.map((p) => p.at),
-    ...out,
-    sill,
-  ];
+    out = [...approach].reverse().slice(1),
+    outdoors = [ARRIVAL.door, ...down.map((p) => p.at), ...out, sill];
+  const lead = actor.escortFor
+      ? arrivals.find((a) => a.id === actor.escortFor)
+      : actor,
+    party = new Set(
+      arrivals
+        .filter((a) => a === lead || a.escortFor === lead.id)
+        .map((a) => a.id),
+    ),
+    indoor = departure.path.slice(0, door + 1).map(point),
+    // when the party reaches the doors: the boarding time less the walk outside, both fixed
+    atDoor = value(departure.end) - length(outdoors) / DEPARTURE_PACE,
+    standing = standingNear(
+      indoor[0],
+      ARRIVAL.door,
+      [atDoor - 10, atDoor - 5, atDoor],
+      party,
+    );
+  let lobby = indoor,
+    lobbyHeights = departure.heights.slice(0, door + 1);
+  if (standing.length) {
+    lobby = lobbyRoute(
+      indoor[0],
+      standing,
+      nav.MOBILITY_CLEARANCE[lead.mobility] ?? nav.WALL_CLEARANCE,
+    );
+    lobbyHeights = lobby.map(() => 0);
+    rerouted++;
+  }
+  departure.path = [...lobby, ...outdoors.slice(1)];
   departure.heights = [
-    ...departure.heights.slice(0, door + 1),
+    ...lobbyHeights,
     ...down.map((p) => p.y),
     ...out.map(() => street),
     vanFloor,
@@ -212,7 +318,7 @@ const ascii = (s) =>
     (c) => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'),
   );
 const out = ascii(JSON.stringify(loop, null, 2)) + '\n';
-const summary = `Drop-off route: ${length(approach).toFixed(2)} m round the van's nose (≥ ${approachGap.toFixed(2)} m from the van and the rail), ${length(ascent.map((p) => p.at)).toFixed(2)} m up the switchback. ${report.join('; ')}.`;
+const summary = `Drop-off route: ${length(approach).toFixed(2)} m from the van's ramp foot to the switchback's toe (≥ ${approachGap.toFixed(2)} m from the van, the rails and the bike rack), ${length(ascent.map((p) => p.at)).toFixed(2)} m up the switchback; ${rerouted} departures routed round people standing in the lobby. ${report.join('; ')}.`;
 if (check) {
   for (const file of [LOOP, PUBLISHED])
     assert.equal(

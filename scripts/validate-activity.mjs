@@ -21,8 +21,10 @@ const m = JSON.parse(
   readFileSync('public/models/seen-alhambra-planning.json', 'utf8'),
 );
 // The engine plays its source as given; the viewer gives it the composed
-// Alhambra source: the 184-person loop, the fleet crew (194) and the
-// community cast (258: 23 hand-authored, 41 generated inside facility
+// Alhambra source: the 200-person loop (184 plus the October 2026 owner
+// review's recreation therapists, quiet-room players and banquette regulars,
+// scripts/apply-owner-review-day-admin.mjs), the fleet crew (210) and the
+// community cast (274: 23 hand-authored, 41 generated inside facility
 // instances, 33 in the partner day center, 6 in the Wongs' home and 2 in Mrs.
 // Lin's), with the community vehicles registered so their riders' seats
 // resolve.
@@ -36,8 +38,12 @@ const scene = new T.Scene(),
   ),
   neighborhood = buildNeighborhood(m);
 scene.add(neighborhood.root);
-assert.equal(activity.actors.length, 258);
-assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 184);
+// The base loop's people (owner walkthrough 2026-10: 184 + the karaoke duet
+// partner, 6 in the rehab wing, and 16 in the day room and admin wing: two
+// more recreation therapists, eight quiet-room sitters and six banquette
+// regulars) and the composed scene (base + fleet crew + community layer).
+assert.equal(activity.actors.length, 281);
+assert.equal(new Set(activityData.actors.map((a) => a.id)).size, 207);
 for (const role of [
   'doctor',
   'nurse',
@@ -298,6 +304,20 @@ for (const a of activityData.actors) {
 // The drop-off's landing, switchback ramp and rails are the exterior's; who
 // walks them, at what height and clear of which rail is checked with the
 // fleet crew in validate-fleet-crew.mjs (npm run validate:fleet).
+/**
+ * On the docked van's ramp: within 2.5 cm of the line from its sill to its
+ * foot and between them (whichever way the dock faces).
+ */
+const onVanRamp = (p) => {
+  const [sx, sz] = ARRIVAL.sill,
+    [fx, fz] = ARRIVAL.foot,
+    dx = fx - sx,
+    dz = fz - sz,
+    len = Math.hypot(dx, dz),
+    along = ((p.x - sx) * dx + (p.z - sz) * dz) / len,
+    across = Math.abs((p.x - sx) * dz - (p.z - sz) * dx) / len;
+  return across < 0.025 && along > -0.005 && along < len + 0.005;
+};
 let boardingSamples = 0,
   entranceSamples = 0;
 for (let t = 0; t < activityData.duration; t += 0.25) {
@@ -329,17 +349,18 @@ for (let t = 0; t < activityData.duration; t += 0.25) {
   )) {
     const p = sampleActor(a, t);
     if (p.visible === false) continue;
-    if (
-      Math.abs(p.x - ARRIVAL.sill[0]) < 0.025 &&
-      p.z > ARRIVAL.sill[1] - 0.005 &&
-      p.z < ARRIVAL.foot[1] + 0.005
-    ) {
+    if (onVanRamp(p)) {
       const van = sampleVan(p.vehicleId === 'van-a' ? 0 : 1, t);
       assert.ok(
         van.visible && van.ramp > 0.999 && van.door > 0.999,
         `${a.id} needs a parked van and open ramp at ${t}`,
       );
-      assert.ok(Math.abs(van.position.x - ARRIVAL.dock[0]) < 0.01);
+      assert.ok(
+        Math.hypot(
+          van.position.x - ARRIVAL.dock[0],
+          van.position.z - ARRIVAL.dock[1],
+        ) < 0.01,
+      );
       boardingSamples++;
     }
     if (Math.hypot(p.x - ARRIVAL.door[0], p.z - ARRIVAL.door[1]) < 0.35) {

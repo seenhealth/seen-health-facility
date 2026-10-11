@@ -427,7 +427,7 @@
     {
       "id": "kitchen",
       "window": [
-        289,
+        290,
         304
       ],
       "zoneId": "kitchen",
@@ -481,7 +481,7 @@
             "id": "lunch",
             "walkTitle": "Walk to lunch",
             "window": [
-              290,
+              304,
               350
             ],
             "roomId": "dining-1421",
@@ -649,6 +649,10 @@
               [
                 6.0,
                 -2.95
+              ],
+              [
+                6.2,
+                -4.4
               ]
             ],
             "title": "Supported shower and hair care",
@@ -657,8 +661,8 @@
               {
                 "id": "idt-rn",
                 "anchor": [
-                  7.6,
-                  -3.3
+                  7.1,
+                  -5.2
                 ],
                 "action": "treat",
                 "approach": [
@@ -671,8 +675,8 @@
                     -2.95
                   ],
                   [
-                    6.6,
-                    -2.72
+                    6.9,
+                    -3.6
                   ]
                 ],
                 "join": -3,
@@ -1245,8 +1249,8 @@
         "name": "Marco",
         "variant": 24,
         "home": [
-          -28.1,
-          20.1
+          -27.1,
+          19.3
         ]
       },
       {

@@ -7,13 +7,26 @@ import {
   roundedPath,
   type Piece,
 } from './vehicle-path';
+/**
+ * The small service door east of the loading roll-up in the loading block's
+ * north face (the envelope's `shell-rear-north-opening-3`, widened to 0.9 m,
+ * x 10.11–11.01): owner review 2026-10, the roll-up now fronts the electrical
+ * room, so both deliveries come in through this door and down the strip east
+ * of the electrical room (scripts/apply-owner-review-care-rooms.mjs sets the
+ * opening and the plan walls to match; `at` is the door's centre on the wall
+ * line, `width` its clear width).
+ */
+export const SERVICE_DOOR = {
+  at: [10.56, -15.212789] as const,
+  width: 0.9,
+};
 export const deliveryStops = [
   {
     id: 'delivery-food',
     kind: 'food',
     x: 9.7,
     z: -21.8,
-    door: [8.8, -15.212789],
+    door: SERVICE_DOOR.at,
     /**
      * Runs as [start, dwell] in loop seconds. The morning run brings lunch: it
      * waits while its trolley goes through receiving into the kitchen and
@@ -28,13 +41,16 @@ export const deliveryStops = [
   {
     id: 'delivery-package',
     kind: 'package',
-    // Rear receiving is the door at the back of the electrical room's notch
-    // (west of the loading block, photos 2026-10-02): the truck noses in west
-    // of the food truck, and its driver walks through the enclosure's
-    // pedestrian gate (alhambra-exterior.ts, swung open here) to the door.
+    // The truck noses in west of the food truck's bay, east of the utility
+    // pole. Owner review 2026-10: the door at the back of the electrical
+    // room's notch (photos 2026-10-02) opens into the trash enclosure, and
+    // the loading roll-up fronts the electrical room, so packages come in
+    // through the service door like the food (the same door point, whose
+    // leaf and ramp the food stop draws) and the driver walks round the
+    // truck's nose to the ramp (scripts/apply-owner-review-care-rooms.mjs).
     x: 6.75,
     z: -19.6,
-    door: [3.56, -12.465328],
+    door: SERVICE_DOOR.at,
     runs: [
       [280, 52],
       [590, 52],
@@ -66,9 +82,12 @@ const TRUCK = {
   tailgate: 2,
 };
 type Stop = (typeof deliveryStops)[number];
-/** The shallow receiving ramp from the pavement up to a stop's door (x/z extent). */
+/**
+ * The shallow receiving ramp from the pavement up to a stop's door (x/z
+ * extent): half a metre wider than the service door both stops share.
+ */
 export function receivingRamp(s: Stop) {
-  const w = s.kind === 'food' ? 2.5 : 1.15;
+  const w = SERVICE_DOOR.width + 0.5;
   return {
     x0: s.door[0] - w / 2,
     x1: s.door[0] + w / 2,
@@ -91,6 +110,12 @@ export function deliveryRuns(s: Stop) {
  * carrier's centre on the island; `from` and `to` are loop seconds, and
  * scripts/apply-kitchen-delivery.mjs starts the unloading at `from`.
  */
+/**
+ * The rear employee door into the trash enclosure (the former package door,
+ * shell-rear-court-opening-1): nobody delivers through it now, so its leaf is
+ * drawn closed here with the receiving doors.
+ */
+export const TRASH_ENCLOSURE_DOOR = [3.56, -12.465328] as const;
 export const KITCHEN_LUNCH = {
   at: [10.79, 2.95] as [number, number],
   from: 297,
@@ -270,24 +295,24 @@ export function buildDeliveries() {
     }
     return { root: g, tail };
   });
-  const doors = deliveryStops.map((s) => {
+  // One leaf and one ramp per door: stops that share a door (the package
+  // and food trucks both use the service door) share the first stop's
+  // leaf, which opens while either truck unloads.
+  const leafOf = deliveryStops.map((s) =>
+    deliveryStops.findIndex(
+      (o) => o.door[0] === s.door[0] && o.door[1] === s.door[1],
+    ),
+  );
+  const leaf = (at: readonly [number, number], width: number) => {
     const pivot = new T.Group();
-    pivot.position.set(
-      s.door[0] - (s.kind === 'food' ? 1.25 : 0.5),
-      0,
-      s.door[1],
-    );
+    pivot.position.set(at[0] - width / 2, 0, at[1]);
     root.add(pivot);
-    box(
-      pivot,
-      s.kind === 'food' ? 1.25 : 0.5,
-      1.1,
-      0,
-      s.kind === 'food' ? 2.5 : 1,
-      2.2,
-      0.065,
-      '#809b95',
-    );
+    box(pivot, width / 2, 1.1, 0, width, 2.2, 0.065, '#809b95');
+    return pivot;
+  };
+  const doors = deliveryStops.map((s, i) => {
+    if (leafOf[i] !== i) return null;
+    const pivot = leaf(s.door, SERVICE_DOOR.width);
     // A shallow receiving ramp connects the pavement to the interior datum.
     const r = receivingRamp(s);
     const ramp = box(
@@ -303,6 +328,7 @@ export function buildDeliveries() {
     ramp.rotation.x = -Math.atan2(0.23, r.z1 - r.z0);
     return pivot;
   });
+  leaf(TRASH_ENCLOSURE_DOOR, 1);
   // The trolley's carriers (characters.ts), set out in a row on the island
   // counter with their labels toward the west aisle.
   const lunch = new T.Group();
@@ -313,29 +339,24 @@ export function buildDeliveries() {
     box(lunch, 0, 0.09, i * 0.56, 0.46, 0.18, 0.52, '#a4baa5');
     box(lunch, -0.236, 0.09, i * 0.56, 0.012, 0.18, 0.055, '#e1d0aa');
   }
-  // The exterior's loading roll-up and the electrical room's pedestrian gate (alhambra-exterior.ts) open with their
-  // stops' doors: found in the scene on first use, left as they are when the deliveries are off.
-  let exterior: { rollup?: T.Object3D; gate?: T.Object3D } | null = null;
+  // The exterior's loading roll-up (alhambra-exterior.ts `rear-loading-rollup`)
+  // stays down: it fronts the electrical room now and the trucks unload
+  // through the service door beside it (owner review 2026-10). The
+  // electrical room's court-side pedestrian gate stays shut too (nobody
+  // delivers through the notch).
   function tick(time: number, enabled: boolean) {
     root.visible = enabled;
-    if (enabled && !exterior && root.parent)
-      exterior = {
-        rollup: root.parent.getObjectByName('rear-loading-rollup'),
-        gate: root.parent.getObjectByName('electrical-room-gate-leaf'),
-      };
+    const opening = deliveryStops.map(() => 0);
     vehicles.forEach((v, i) => {
       const p = sampleDelivery(i, time);
       v.root.visible = p.visible;
       v.root.position.copy(p.position);
       v.root.rotation.y = p.heading;
       v.tail.position.y = 1.4 + p.door * 0.65;
-      doors[i].rotation.y = -Math.PI * 0.47 * p.door;
-      const stop = deliveryStops[i];
-      if (!enabled || !exterior) return;
-      if (stop.kind === 'food' && exterior.rollup)
-        exterior.rollup.position.y = 3.3 * p.door;
-      if (stop.kind === 'package' && exterior.gate)
-        exterior.gate.rotation.y = 1.45 * p.door;
+      opening[leafOf[i]] = Math.max(opening[leafOf[i]], p.door);
+    });
+    doors.forEach((pivot, i) => {
+      if (pivot) pivot.rotation.y = -Math.PI * 0.47 * opening[i];
     });
     const t = ((time % 720) + 720) % 720;
     lunch.visible = t >= KITCHEN_LUNCH.from && t < KITCHEN_LUNCH.to;

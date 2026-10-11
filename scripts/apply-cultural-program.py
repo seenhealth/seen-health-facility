@@ -70,7 +70,11 @@ for id in instructors:
 OWNED = ('instructor-', 'floor-member-')
 loop['actors'] = [a for a in loop['actors'] if not a['id'].startswith(OWNED)]
 library['people'] = [p for p in library['people'] if not p['id'].startswith(OWNED)]
-loop['interactions'] = [i for i in loop['interactions'] if not i['id'].startswith(('day-', 'table-'))]
+# The owner review's quiet-room tables (`quiet-table-*`, scripts/apply-owner-review-day-admin.mjs)
+# keep their own sitters and interactions; this generator seats only the day room's `day-*` tables.
+OWNED_TABLES = [t for t in program['tables'] if t['id'].startswith('day-')]
+loop['interactions'] = [i for i in loop['interactions']
+                        if not i['id'].startswith(('day-', 'table-')) or i['id'].startswith('table-quiet-')]
 
 # ---- Seats: the arts-table head chair is the instructors'; the cleared north tables' group moves
 # to free tree-table chairs.
@@ -354,7 +358,7 @@ def players(people, k):
 
 
 tabled = {}
-for t in program['tables']:
+for t in OWNED_TABLES:
     people = seated_at(t['id'])
     assert people, f"{t['id']} has seated participants"
     for i, a in enumerate(people):
@@ -589,7 +593,7 @@ for s in program['programs']:
         id='day-' + s['id'], label=s['title'] + (' · ' + s['labelZh'] if s.get('labelZh') else ''), category='activities',
         actorIds=cast + ([s['instructorId']] if s.get('instructorId') else []), start=s['start'], end=s['end'], zoneId='day',
         description=s['culture'] + ' ' + s['access']))
-for t in program['tables']:
+for t in OWNED_TABLES:
     cast = [id for id, table_id in tabled.items() if table_id == t['id']]
     name = t['id'].replace('day-', '').replace('-table', '').replace('-', ' ')
     for k, e in enumerate(t['schedule']):

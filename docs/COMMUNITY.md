@@ -174,11 +174,11 @@ instance summary's `platforms`).
 | 11:45–13:12 | Home | Van home; the aide meets her and follows her up the ramp and in (12:07); after the clinic: toileting, the assisted shower and dressing, lunch at the dining table; the aide hands over to the OT on the porch at 13:00 and drives off at 13:12. |
 | 12:14 | Home | Home-delivered lunch handed to the aide at the front door, a wellness check with Mrs. Wong on the entry bench (meals car on the outer lane; it leaves by the inner lane's exit, round the aide's parked car; back at the center by 13:00). |
 | 13:02–14:28 | Home | OT and installer: dry-run toilet and shower transfers with Mrs. Wong, Mr. Wong's side of the bed, the swing-up grab bar fitted (13:48–14:00) while the OT checks the porch ramp, then the sign-off. |
-| 13:30–13:50 | Hospital ↔ center | The hospital's discharge nurse steps out of the ward bay and phones Seen's care-transitions nurse at her upstairs desk: medicines, the home health start, meals and the van pickup (a call); then the medication teach-back, and 14:10–14:17 she wheels Mr. Wong under the canopy to the Seen van; van leaves 14:23. |
+| 13:30–13:50 | Hospital ↔ center | The hospital's discharge nurse steps out of the ward bay and phones Seen's care-transitions nurse at the front desk: medicines, the home health start, meals and the van pickup (a call); then the medication teach-back, and 14:10–14:17 she wheels Mr. Wong under the canopy to the Seen van; van leaves 14:23. |
 | 14:39–15:25 | Lin home | Her daughter puts dinner on (14:39), then watches for the van on the porch from 14:49; the van back from the south end (on the map 14:53, apex 15:00); the driver sees Mrs. Lin down its ramp (15:05) and walks behind her along the drive; her daughter meets her at the porch-ramp foot (15:13) and follows her up; in at 15:19 and 15:21; the van leaves at 15:25. |
 | 15:08–15:52 | Home | Mr. Wong home: the driver wheels him up the porch ramp to the front door (15:28) and he rolls in beside his armchair; the home health nurse (in at 15:08 from the road end) checks his transfer, vitals and medicines and leaves at 15:52. |
 | 15:21–16:00 | Lin home | Tea together on the sofa: her daughter makes jasmine tea (15:26–15:29) and sits with her from 15:34 to the end of the day. |
-| 15:40–15:52 | Home ↔ center | 24/7 nurse line call between the upstairs RN and Mr. and Mrs. Wong on speakerphone (a call). |
+| 15:40–15:52 | Home ↔ center | 24/7 nurse line call between the RN at the clinic nurse station and Mr. and Mrs. Wong on speakerphone (a call). |
 
 ### Calls
 
@@ -194,9 +194,11 @@ callers hold the `phone` pose (a handset at the ear) for its window.
 | `hospital-discharge-call` | 495–525 | `hospital-rn`, out in front of the ward bay (`rnPhone`) → `seen-transitions-rn` |
 | `after-hours-call` | 690–708 | Mr. and Mrs. Wong in the living room, on speakerphone → `nurse-line-rn` |
 
-Seen's nurses on the phone sit at the perimeter desks of the upstairs open
-office (`SEEN_DESKS` in `community-people.ts`, in order along it): the 24/7
-nurse line at the corner desk, the care-transitions nurse at the next one.
+Seen's nurses on the phone work at the center's two ground-floor phones
+(`SEEN_PHONES` in `community-people.ts`), so a call from a home or the hospital
+lands where staff pick up: the 24/7 nurse line RN sits at the clinic nurse
+station (its telephone beside the second task chair) and the care-transitions
+nurse stands at the front desk inside the reception counter's L.
 The nurse line takes the Wongs' calls when their generated cast places them
 (`castCall`), so both ends stay in step when the cast is re-timed. The
 hospital's callers step out from under a roof first, so the arc rises clear.
@@ -209,17 +211,19 @@ and the center, 110 m apart) and its ends rising steeply, so a close shot of
 one end shows it climbing out of the frame toward the other. Members within
 8 m of each other share an end (the Wongs on speakerphone). The line draws on
 from the caller over the call's first 4 loop seconds (eased out, its tip
-glowing) and the far end's ring pops in as it arrives; while they talk a
-pulse runs out along the line and one comes back (one 3.6 s exchange), each
-ring ripples as a pulse reaches it and both breathe; over the last 3 loop
+glowing) and the far end's ring pops in as it arrives; while the call lasts
+pulses leave the caller and travel to the center, two of them half a 3.6 s
+period apart (the call coming in), the far ring ripples as each arrives and
+both breathe; a caption card at the crown ("Phone call from the hospital",
+then the call's name) keeps its size on screen as the camera zooms; over the last 3 loop
 seconds the line retracts into the far end and fades. Draw-on and retraction
 are functions of the care-day clock, so a scrubbed story shows the same frame
 at the same time; the pulses, breathing and ripples run on wall-clock time
 and stop under `prefers-reduced-motion` (`motion: false`), which holds the
 fully drawn line for the whole call. An arc shows while its callers are in
 the scene (on duty, not indoors or driving) and at least one of its ends is
-drawn, so a call to the upstairs nurses also shows when the upper floor is
-not (`level: 'ground'`: the viewer's default view, the story's cutaways), its
+drawn, so a call to the nurses also shows when their zone is filtered out
+(the viewer's default view, the story's cutaways), its
 far end marking where they sit; a wide shot that should show the nurse at her
 desk uses `level: 'all'` with the roof off. Arcs hide with the layer
 (Community sites, Street & parking context, Plan) and with the people.

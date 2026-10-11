@@ -13,10 +13,11 @@ import { vehicleGap } from './vehicle-clearance';
  * the van's centre (no spline overshoot), so turning radii are exact: 4 m in
  * the lot, 8 m for lane changes and 6.4 m at street corners, and every
  * forward arc that starts from standstill follows a straight run. Vans pull
- * nose-first out of their back-in bays. The drop-off is a nose-in pocket
- * against the entrance ramp, so a departing van backs straight out a few
- * metres before pulling away; that and backing into a bay are the only
- * reversing legs, and their phases say so.
+ * nose-first out of their back-in bays. The drop-off is a stop on the aisle
+ * beside the lobby landing, the van parallel to the entrance wall with its
+ * sliding door toward the doors, so a departing van drives straight on down
+ * the aisle; backing into a bay is the only reversing leg, and its phase says
+ * so.
  *
  * The lot plan keeps clear of parked vans by construction where it can (the
  * driveway lane passes the bay noses 1.3 m off, lane changes use 8 m arcs)
@@ -121,20 +122,28 @@ export const FLEET_LOOP = 720;
 // ---------------------------------------------------------------------------
 // Lot geometry (metres, street level)
 // ---------------------------------------------------------------------------
+/**
+ * The drop-off (the owner's walkthrough, 2026-10: "the vans should be parallel
+ * to the door"): a van stands on the aisle beside the lobby landing, parallel
+ * to the lobby's west wall (x −14.65, which runs along z), its nose toward the
+ * alley (−z; Pen direction π, scene heading 0) and its sliding door (van-local
+ * +x) toward the entrance. Its ramp runs out east (+x) to a foot 0.8 m short
+ * of the landing steps' foot and the landing's rail (`DROP_OFF` in
+ * alhambra-exterior.ts); riders walk from there along the lot to the
+ * switchback's toe. The scripted fleet (`FLEET_LOT.dock`) and the live lot
+ * (`FRONT_DOCK`, live-lot.ts) dock here alike.
+ */
+const DOCK = { at: [-21.8, -0.35] as Vec2, dir: Math.PI };
 export const FLEET_LOT = {
-  /**
-   * The docked van's centre. Its nose stops 0.9 m short of the switchback's
-   * lower run (its west rail at x −17.85, `DROP_OFF` in alhambra-exterior.ts):
-   * the way from the van's ramp to the ramp's toe passes in front of the nose,
-   * wide enough for a wheelchair and its escort.
-   */
-  dock: [-21.925, 1.5] as Vec2,
-  dockHeading: -Math.PI / 2,
+  /** The docked van's centre (`DOCK`). */
+  dock: DOCK.at,
+  /** Scene heading of the docked van (`DOCK.dir` + π): nose toward −z, sliding door toward +x, the entrance. */
+  dockHeading: 0,
   /**
    * The lot entrance: the curb cut on the west street beside the two-storey
    * wing (Street View, May 2025), with the low palm planter on its north side,
-   * so the lane runs beside the wing and an arrival drifts over to the
-   * drop-off's line before the ramp.
+   * so the lane runs beside the wing and an arrival turns down the aisle to
+   * the drop-off.
    */
   entry: 4.3,
   /** The turn in from the northbound lane is wide, so the tail does not swing into the southbound lane as a departing van passes. */
@@ -166,8 +175,14 @@ export const FLEET_LOT = {
   driftRadius: 20,
   curbRadius: 10,
   streetRadius: STREET_CORNER_RADIUS,
-  /** A departing van backs straight out of the drop-off, 3 m, to here before pulling away. */
-  dockBackTo: -24.925,
+  /**
+   * A departing van runs straight on down the aisle from the drop-off to here
+   * before drifting over to the exit lane: the drift then begins with the
+   * van's tail already past the northernmost bay (z −10.45; the bay a van
+   * parks in between runs), so it never comes within the parked-van margin
+   * of a van standing there, and it is over before the STOP bar.
+   */
+  dockDriftZ: -11,
   /** Straight run before a forward arc that starts from standstill. */
   lead: 0.6,
   /**
@@ -184,13 +199,8 @@ export const FLEET_LOT = {
   northbound: laneLine('west', 0),
   southbound: laneLine('west', 1),
 };
-/**
- * The live lot's drop-off (live-lot.ts; the scripted fleet keeps `FLEET_LOT.dock`):
- * a van stands on the aisle beside the lobby landing heading south (Pen
- * direction π, scene heading 0), its sliding doors facing the entrance. Its
- * ramp's foot lands 0.8 m short of the steps' foot and the landing's rail.
- */
-export const FRONT_DOCK = { at: [-21.8, -0.35] as Vec2, dir: Math.PI };
+/** The drop-off as the live lot names it (live-lot.ts, live-lot-traffic.ts): the same stop as `FLEET_LOT.dock`. */
+export const FRONT_DOCK = DOCK;
 /** Nominal speeds (m per loop second) and the acceleration used to blend them. */
 const SPEED = { lot: 3, street: 9, corner: 5, reverse: 1.8 },
   ACCEL = 1.5;
@@ -241,7 +251,6 @@ const L = FLEET_LOT,
   R = L.turnRadius,
   LC = L.laneChangeRadius,
   EAST = Math.PI / 2,
-  WEST = -Math.PI / 2,
   NORTH = 0,
   SOUTH = Math.PI;
 const aisleOf = (index: number) => fleetParking[index].aisleX ?? L.aisle;
@@ -260,24 +269,19 @@ const awayPose = (index: number) => ({
 });
 
 export const fleetRoutes = {
-  /** Back straight out of the drop-off (the van is nosed against the entrance ramp). */
-  dockReverse(): FleetLeg[] {
-    const pen = new Pen(L.dock[0], L.dock[1], WEST);
-    return [
-      leg(pen, 'dock-reverse', 'Reversing out of the drop-off', REVERSE, (p) =>
-        p.lineToX(L.dockBackTo),
-      ),
-    ];
-  },
-  /** From the backed-out position: straight, right toward the street, over to the exit lane and off site to the south. */
+  /**
+   * From the drop-off: straight on down the aisle (the van stands on it,
+   * nose toward the alley), over to the exit lane once its tail is past the
+   * northernmost bay, and off site to the south.
+   */
   dockToAway(): FleetLeg[] {
-    const pen = new Pen(L.dockBackTo, L.dock[1], EAST);
+    const pen = new Pen(L.dock[0], L.dock[1], SOUTH);
     return [
       leg(pen, 'dock-out', 'Leaving the drop-off', LOT, (p) =>
-        p.line(L.lead).arc(R, Math.PI / 2),
+        p.lineToZ(L.dockDriftZ),
       ),
       leg(pen, 'lane-change', 'Driving to the street', LOT, (p) =>
-        p.line(1).jog(p.x - L.exitLane, L.driftRadius),
+        p.jog(p.x - L.exitLane, L.driftRadius),
       ),
       ...drivewayToAway(pen),
     ];
@@ -296,19 +300,6 @@ export const fleetRoutes = {
         p.jog(p.x - L.exitLane, LC),
       ),
       ...drivewayToAway(pen),
-    ];
-  },
-  /** Off site → drop-off: north on the west street, in through the entrance beside the wing, over to the drop-off's line and east to the ramp. */
-  awayToDock(): FleetLeg[] {
-    const pen = new Pen(L.northbound, L.vanishSouth, NORTH);
-    return [
-      ...awayToEntry(pen),
-      leg(pen, 'dock-in', 'Arriving at drop-off', LOT, (p) =>
-        p
-          .lineToX(L.dock[0] - 1.0 - jogLength(L.entry - L.dock[1], R))
-          .jog(L.entry - L.dock[1], R)
-          .lineToX(L.dock[0]),
-      ),
     ];
   },
   /** Off site → bay: in through the entrance, right onto the bay's aisle line and south past the bay, ready to back in. */
@@ -331,9 +322,10 @@ export const fleetRoutes = {
     ];
   },
   /**
-   * The live lot's drop-off (live-lot.ts): in through the entrance, then a
-   * left turn (from the driver's seat) down the aisle, stopping beside the
-   * lobby landing heading south with the sliding doors toward the entrance.
+   * Off site → drop-off (the scripted fleet and the live lot alike): north on
+   * the west street, in through the entrance beside the wing, then a left
+   * turn (from the driver's seat) down the aisle, stopping beside the lobby
+   * landing heading south with the sliding doors toward the entrance.
    */
   awayToFrontDock(): FleetLeg[] {
     const pen = new Pen(L.northbound, L.vanishSouth, NORTH),
@@ -613,13 +605,8 @@ function withExitStop(legs: FleetLeg[]): Move[] {
 }
 function buildMoves(kind: FleetTripKind, index: number): Move[] {
   // Drop-off arrivals always come in from off site, where the riders board.
-  if (kind === 'toDock') return [drive(r.awayToDock(), false, true)];
-  if (kind === 'fromDock')
-    return [
-      drive(r.dockReverse(), true, true, true),
-      pause(0.6, 'Stopped to pull away'),
-      ...withExitStop(r.dockToAway()),
-    ];
+  if (kind === 'toDock') return [drive(r.awayToFrontDock(), false, true)];
+  if (kind === 'fromDock') return withExitStop(r.dockToAway());
   if (kind === 'out') return withExitStop(r.bayToAway(index));
   if (atCurb(index)) return [drive(r.awayToBay(index), false, true)];
   return [

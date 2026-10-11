@@ -7,6 +7,11 @@ import { buildCommunityAsset } from './community-assets';
 import { buildHomeAsset } from './home-assets';
 import { buildAdhcAsset } from './adhc-assets';
 import { buildRecreationAsset } from './recreation-assets';
+import { buildCareAsset } from './care-assets';
+import { buildRehabAsset } from './rehab-assets';
+import { buildKitchenAsset } from './kitchen-assets';
+import { buildDayAdminAsset } from './day-admin-assets';
+import { fleetVanModel } from './fleet-van-model';
 // Each asset is modeled around a local, floor-level origin. Dimensions and transforms live in JSON.
 export function buildAsset(
   spec: Asset,
@@ -18,8 +23,14 @@ export function buildAsset(
   if (adhc) return adhc;
   const community = buildCommunityAsset(spec);
   if (community) return community;
-  const clinical = buildClinicalAsset(spec, material) || buildRecreationAsset(spec, material);
+  const clinical =
+    buildClinicalAsset(spec, material) ||
+    buildRecreationAsset(spec, material) ||
+    buildRehabAsset(spec, material) ||
+    buildDayAdminAsset(spec, material);
   if (clinical) return clinical;
+  const care = buildCareAsset(spec, material); if (care) return care; // Owner review 2026-10 · care-rooms
+  const kitchen = buildKitchenAsset(spec, material); if (kitchen) return kitchen; // owner review 2026-10 · kitchen
   const g = new T.Group(),
     [w, h, d] = spec.dimensions;
   const box = (
@@ -63,7 +74,9 @@ export function buildAsset(
     for (const x of [-0.48, 0.48])
       box(x * w, h * 0.64, 0, 0.025, 0.04, d * 0.8, 'oak');
   };
-  const photoAsset = buildPhotoAsset(spec, material);
+  const photoAsset =
+    (spec.kind === 'fleet-van' ? fleetVanModel() : null) ||
+    buildPhotoAsset(spec, material);
   if (photoAsset) {
     g.add(photoAsset);
   } else if (spec.kind === 'task-chair') {

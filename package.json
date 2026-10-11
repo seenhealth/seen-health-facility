@@ -20,6 +20,7 @@
     "validate:community": "node scripts/compile-model-modules.mjs && node scripts/validate-community-traffic.mjs",
     "plan:traffic": "node scripts/compile-model-modules.mjs && node scripts/plan-street-traffic.mjs && npm run validate:traffic",
     "prebuild": "node scripts/prepare-public-models.mjs && node scripts/validate-public-assets.mjs",
+    "apply:owner-review": "node scripts/apply-owner-review.mjs",
     "build:scenario": "node scripts/build-scenario.mjs",
     "build:community": "node scripts/build-community-tracks.mjs",
     "sim:report": "node scripts/sim-report.mjs",

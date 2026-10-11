@@ -218,13 +218,22 @@ export function validateTracks(sim, model, scenario, result) {
         leg: s.legDistance,
       });
     }
-  // Van boarding: the hero is on the van ramp only with a parked van, open doors and ramp.
+  // Van boarding: the hero is on the van ramp only with a parked van, open doors and ramp (on the ramp: within
+  // 2.5 cm of the line from the docked van's sill to its foot and between them, whichever way the dock faces).
   const { sill, foot } = sim.ARRIVAL;
+  const rampLength = Math.hypot(foot[0] - sill[0], foot[1] - sill[1]);
+  const onVanRamp = (p) => {
+    const dx = foot[0] - sill[0],
+      dz = foot[1] - sill[1],
+      along = ((p.x - sill[0]) * dx + (p.z - sill[1]) * dz) / rampLength,
+      across = Math.abs((p.x - sill[0]) * dz - (p.z - sill[1]) * dx) / rampLength;
+    return across < 0.025 && along > -0.005 && along < rampLength + 0.005;
+  };
   let boarding = 0;
   for (let t = 0; t < duration; t += 0.25) {
     const p = sim.sampleActor(hero, t);
     if (p.visible === false) continue;
-    if (Math.abs(p.x - sill[0]) < 0.025 && p.z > sill[1] - 0.005 && p.z < foot[1] + 0.005) {
+    if (onVanRamp(p)) {
       const van = sim.sampleVan(p.vehicleId === 'van-b' ? 1 : 0, t);
       assert.ok(van.visible && van.ramp > 0.999 && van.door > 0.999, `Hero boards a parked van at ${t}`);
       boarding++;
