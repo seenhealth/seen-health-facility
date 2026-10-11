@@ -756,6 +756,11 @@ export const assetCatalog: Record<string, CatalogEntry> = {
     purpose:
       'Height-adjustable desk raised to standing height, with a monitor, in the therapists’ workspace where the physical and occupational therapists chart between sessions.',
   },
+  'rehab-corner-stairs': {
+    name: 'Practice stairs',
+    purpose:
+      'Right-angle training stair with handrails on both sides: a participant climbs one short flight, turns on the landing and steps down the other while the physical therapist spots from the floor, practising the steps and turns met at home.',
+  },
   // Owner review 2026-10 · kitchen
   'three-compartment-sink': {
     name: 'Three-compartment sink',

@@ -8,12 +8,14 @@ export const REHAB_ASSET_KINDS = [
   'rehab-microwave',
   'rehab-recliner',
   'rehab-standing-desk',
+  'rehab-corner-stairs',
 ];
 
 /**
  * Rehabilitation-wing furniture from the October 2026 owner walkthrough: the
  * practice (ADL) kitchen's refrigerator and microwave, the quiet room's
- * recliners and the PT/OT workspace's standing desks. Each kind is modelled at
+ * recliners, the therapists' standing desks and the right-angle practice
+ * stair. Each kind is modelled at
  * its declared W × H × D around a floor-centred origin from boxes, cylinders
  * and rounded boxes in palette materials (`material(id)`, with named
  * `materials` slots), then fitted to the declared size like the other asset
@@ -28,6 +30,13 @@ export const REHAB_ASSET_KINDS = [
  *   faces −z (heading = rotation + π).
  * - `rehab-standing-desk`: the user stands at +z; the monitor sits at the back
  *   (−z) on top of the 1.05 m worktop, and the declared height includes it.
+ * - `rehab-corner-stairs`: a right-angle practice stair. Its 0.9 m square
+ *   landing (0.6 m up) fills the +x/+z corner; one flight climbs toward +z
+ *   along the +x side and the other toward +x along the +z side, each of
+ *   three treads (depth = (size − 0.9) / 3) and four equal risers. The −x/−z
+ *   corner between the flights is open floor. Handrails run on both sides of
+ *   each flight and round the landing's two outer sides; the declared height
+ *   is the top of the landing rails.
  */
 export function buildRehabAsset(
   spec: Asset,
@@ -168,6 +177,82 @@ export function buildRehabAsset(
     box(0, top + 0.07, -0.2, 0.55, h - top - 0.07, 0.018, screen, 0.004);
     box(0, top, 0.1, 0.42, 0.012, 0.14, dark, 0.003);
     box(0.3, top, 0.11, 0.06, 0.03, 0.1, dark, 0.012);
+  } else if (spec.kind === 'rehab-corner-stairs') {
+    // Right-angle practice stair: solid timber treads and landing with a
+    // contrasting nosing strip on every step edge, and round metal handrails
+    // on posts. Flight A runs along the +x side (foot at −z), flight B along
+    // the +z side (foot at −x); both arrive at the landing in the +x/+z corner.
+    const run = 0.9,
+      deck = 0.6,
+      risers = 4,
+      rise = deck / risers,
+      treadZ = (d - run) / (risers - 1),
+      treadX = (w - run) / (risers - 1),
+      nosing = slot('nosing', 'photo-mustard'),
+      wood = spec.material,
+      r = 0.022,
+      inset = 0.04;
+    const landX = w / 2 - run, // the landing's west edge (flight B's top)
+      landZ = d / 2 - run; // the landing's north edge (flight A's top)
+    box(landX + run / 2, 0, landZ + run / 2, run, deck, run, wood);
+    for (let i = 0; i < risers - 1; i++) {
+      const top = (i + 1) * rise;
+      box(landX + run / 2, 0, -d / 2 + (i + 0.5) * treadZ, run, top, treadZ, wood);
+      box(-w / 2 + (i + 0.5) * treadX, 0, landZ + run / 2, treadX, top, run, wood);
+      box(landX + run / 2, top, -d / 2 + i * treadZ + 0.025, run - 0.04, 0.005, 0.04, nosing);
+      box(-w / 2 + i * treadX + 0.025, top, landZ + run / 2, 0.04, 0.005, run - 0.04, nosing);
+    }
+    box(landX + run / 2, deck, landZ + 0.025, run - 0.04, 0.005, 0.04, nosing);
+    box(landX + 0.025, deck, landZ + run / 2, 0.04, 0.005, run - 0.04, nosing);
+    // Rails follow the nosing line `railH` above it; the landing rails' tops
+    // are the declared height.
+    const railH = h - r - deck,
+      level = deck + railH,
+      alongA = (z: number) => Math.min(deck, rise + ((z + d / 2) * rise) / treadZ) + railH,
+      alongB = (x: number) => Math.min(deck, rise + ((x + w / 2) * rise) / treadX) + railH;
+    /** The walking surface under a point (floor, tread or landing). */
+    const surface = (x: number, z: number) => {
+      if (x >= landX && z >= landZ) return deck;
+      if (x >= landX) return rise * (Math.floor((z + d / 2) / treadZ) + 1);
+      return rise * (Math.floor((x + w / 2) / treadX) + 1);
+    };
+    const footZ = -d / 2 + inset,
+      footX = -w / 2 + inset,
+      xo = w / 2 - inset,
+      xi = landX + inset,
+      zo = d / 2 - inset,
+      zi = landZ + inset;
+    const rails: [number, number, number][][] = [
+      // Outer: up flight A along the +x edge, round the landing, down flight B.
+      [
+        [xo, alongA(footZ), footZ],
+        [xo, level, landZ],
+        [xo, level, zo],
+        [landX, level, zo],
+        [footX, alongB(footX), zo],
+      ],
+      // Inner: up flight A's open side, round the inner corner, down flight B's.
+      [
+        [xi, alongA(footZ), footZ],
+        [xi, level, landZ],
+        [xi, level, zi],
+        [landX, level, zi],
+        [footX, alongB(footX), zi],
+      ],
+    ];
+    for (const line of rails) {
+      for (let i = 1; i < line.length; i++) rod(line[i - 1], line[i], r, metal);
+      const posts: [number, number, number][] = [
+        line[0],
+        line[1],
+        line[2],
+        line[4],
+        // Mid-flight posts.
+        [line[0][0], alongA(-d / 2 + 1.5 * treadZ), -d / 2 + 1.5 * treadZ],
+        [-w / 2 + 1.5 * treadX, alongB(-w / 2 + 1.5 * treadX), line[4][2]],
+      ];
+      for (const [x, y, z] of posts) rod([x, surface(x, z), z], [x, y, z], 0.018, metal);
+    }
   }
 
   const bounds = new T.Box3().setFromObject(g),

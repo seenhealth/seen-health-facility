@@ -9,32 +9,46 @@
 //    seated breather every 150 s). A new participant, `rehab-rider-02`,
 //    rides stepper 2 in two sessions, walking in from the quiet room and out
 //    to an acupressure appointment.
-// 2. "People take the stairs up and down": the training stairs leave the
-//    glazed SW corner (where they shared the floor with the participant
-//    chairs, chair 3 overlapping the first tread) for open floor in front of
-//    the Valley Blvd glazing, risers at the west end. A new participant
-//    (`rehab-stairs-participant`) climbs them three times per session: a
-//    walk with a height at every path point up the four treads, across the
-//    landing and down the ramp at 0.35 m/s, back round the north side and a
-//    rest at the foot, with a new PT (`rehab-pt-02`) coaching from the foot.
+// 2. "People take the stairs up and down": a new participant
+//    (`rehab-stairs-participant`) trains on the practice stairs four times
+//    per session, with a new PT (`rehab-pt-02`) spotting from the floor
+//    (round 4 below says where the stairs stand and how they are climbed).
 // 3. "An entire model kitchen where the counter is": the plan's demonstration
 //    counter goes and an ADL practice kitchen stands against that wall with
 //    its fronts to the east: a 1.9 m casework run (sink, counter, upper
 //    cabinets), a refrigerator at its south end and a counter-top microwave,
-//    with ≥ 0.9 m clear in front for wheelchairs. Mat plinth 1, which
-//    overlapped the counter, moves into the wall-backed alcove north of the
-//    kitchen, clear of the north-room doorway and of the wheelchair lane out
-//    of the NW bathroom. Two participants rehearse at the sink and the
-//    microwave with a new OT (`rehab-ot-02`).
-// 4. The side rooms: the west room becomes the quiet room (three recliners),
-//    the south-west ("bottom") room the acupressure massage room (a massage
-//    bed; `rehab-massage-therapist` gives two appointments per loop, the
-//    participant seated on the bed's edge), and the NW room on the S Ethel
-//    Ave corner the PT & OT workspace (four standing desks with monitors
-//    along its walls) where the new PT and OT chart between sessions. The
-//    four participant chairs at the glazed SW corner go: the owner said the
-//    workspace replaces them. The story's `idt-pt` base moves out of the
+//    with ≥ 0.9 m clear in front for wheelchairs. Two participants rehearse
+//    at the sink and the microwave with a new OT (`rehab-ot-02`).
+// 4. The side rooms: the west room becomes the quiet room (three recliners)
+//    and the south-west ("bottom") room the acupressure massage room (a
+//    massage bed; `rehab-massage-therapist` gives two appointments per loop,
+//    the participant seated on the bed's edge). The four participant chairs
+//    at the glazed SW corner go. The story's `idt-pt` base moves out of the
 //    massage bed's footprint.
+// 5. Round 4 (the owner on the live build): "we move the desk to the wrong
+//    place". The NW corner room on S Ethel Ave is the fire pump room and
+//    stays completely empty: no furniture and nobody in it at any time (its
+//    door gap is kept). The four standing desks (the PT and OT workstations)
+//    stand where the training stairs stood, in a row facing the Valley Blvd
+//    glazing at the SW corner; Pt 2 and Ot 2 chart there. The training
+//    stairs become a right-angle practice stair (a new `rehab-corner-stairs`
+//    asset: two flights of three treads and four 0.15 m risers to a 0.9 m
+//    landing at 0.6 m) against the gym's east wall (the south multistall
+//    restroom's west face), landing at the south end (0.23 m past the end of
+//    the wall, leaving 0.7 m between the bars and the west flight), one
+//    flight along the wall with its foot to the north and one running west
+//    with its foot just south of the parallel bars. The participant climbs one flight,
+//    turns on the landing and goes down the other (a walk with a height at
+//    every path point), resting at whichever foot they reach and climbing
+//    back the other way, while the PT spots from the floor in the corner
+//    between the flights. Mat plinth 1 leaves the alcove north of the
+//    practice kitchen for the same east wall, north of the stair, long side
+//    along the wall, 0.8 m from the parallel bars. Four recumbent steppers
+//    (1 and 2 kept with their riders, 3 and 4 added) stand in a row along
+//    the Valley glazing between the desks and the stair, 0.5 m apart, and
+//    the Balance & mobility participant who stood where the stair's west
+//    foot now is (`community-24`) practises on the open floor south of the
+//    massage room instead.
 //
 // Re-runnable: it first removes everything it owns (objects, assets, actors,
 // profiles, interactions and ownerReview entries, by id) and re-adds them,
@@ -140,28 +154,49 @@ const ASSETS = {
     dimensions: [0.85, 0.77, 1.95],
     material: 'clinical-blue',
   },
+  // A compact (0.9 × 0.6 m) standing desk: four of them in a row at the SW
+  // glazing leave room for the four steppers and a walkway past the stair.
   'rehab-standing-desk': {
     kind: 'rehab-standing-desk',
-    dimensions: [1.2, 1.45, 0.65],
+    dimensions: [0.9, 1.45, 0.6],
     material: 'photo-white',
     materials: { metal: 'photo-silver', screen: 'screen', frame: 'photo-black' },
   },
+  // The right-angle practice stair (rehab-assets.ts): 0.28 m treads, 0.15 m
+  // risers, 0.9 m flights and landing, the landing rails 0.88 m above it.
+  'rehab-corner-stairs': {
+    kind: 'rehab-corner-stairs',
+    dimensions: [1.74, 1.5, 1.74],
+    material: 'oak',
+    materials: { metal: 'photo-silver', nosing: 'photo-mustard' },
+  },
 };
-const dims = (assetId) => ASSETS[assetId].dimensions;
+/** The straight training stairs' asset, unused once the stairs are the corner stair. */
+const OLD_STAIRS_ASSET = 'interior-training-stairs';
+const dims = (assetId) => (ASSETS[assetId] ?? m.assets[assetId]).dimensions;
 
 // --- Geometry: wall faces the furniture stands against ---------------------------
 // Plan walls are centred on their line; faces are half a thickness away.
 const plan172 = wall('plan-wall-172'), // the counter wall, x = −26.508, z 13.33–16.18
   plan189 = wall('plan-wall-189'), // z = 13.33: north wall of the quiet room
-  plan184 = wall('plan-wall-184'), // z = 8.80: north (street) wall of the NW room
-  plan166 = wall('plan-wall-166'); // x = −31.09: the S Ethel Ave wall
+  plan178 = wall('plan-wall-178'); // x = −19.843, z 19.28–25.13: the gym's east wall (the south multistall restroom's west wall)
+/** The envelope walls the glazing sits in (centred on the zone edge). */
+const shell = (id) => {
+  const w = m.envelope.walls.find((w) => w.id === id);
+  assert.ok(w, `envelope wall ${id}`);
+  return w;
+};
+const shellFront = shell('shell-therapy-front'), // z = 27.169: the Valley Blvd glazing
+  shellWest = shell('shell-therapy-west'); // x = −31.189: the S Ethel Ave front
 const KITCHEN_WALL = plan172.a[0] + plan172.thickness / 2, // −26.406
   KITCHEN_Z0 = plan189.a[1] + plan189.thickness / 2, // 13.432
   QUIET_NORTH = KITCHEN_Z0,
-  NW_NORTH = plan184.a[1] + plan184.thickness / 2, // 8.904
-  NW_WEST = plan166.a[0] + plan166.thickness / 2, // −30.909
-  NW_SOUTH = plan189.a[1] - plan189.thickness / 2; // 13.228
-assert.ok(Math.abs(KITCHEN_WALL + 26.406) < 0.01 && Math.abs(NW_WEST + 30.909) < 0.01);
+  GYM_EAST = plan178.a[0] - plan178.thickness / 2, // −19.970
+  GYM_EAST_SOUTH = Math.max(plan178.a[1], plan178.b[1]), // 25.134: where that wall ends
+  GLAZING_SOUTH = shellFront.a[1] - shellFront.thickness / 2, // 27.049: inner face
+  GLAZING_WEST = shellWest.a[0] + shellWest.thickness / 2; // −31.069: inner face
+assert.ok(Math.abs(KITCHEN_WALL + 26.406) < 0.01 && Math.abs(GYM_EAST + 19.97) < 0.01);
+assert.ok(plan178.a[0] === plan178.b[0] && Math.abs(GLAZING_SOUTH - 27.049) < 0.01 && Math.abs(GLAZING_WEST + 31.069) < 0.01);
 
 // The kitchen run against the counter wall, fronts (local +z) facing east:
 // casework from the north end (its sink toward the north-room door), the
@@ -197,33 +232,102 @@ const RECLINER_Z = r3(QUIET_NORTH + 0.03 + dims('rehab-recliner')[2] / 2),
 // The massage bed along the massage room's west wall, head to the north.
 const BED = [-29.0, 20.5];
 
-// Four standing desks in the L-shaped NW workspace: two under the Ethel Ave
-// windows (users face west) and two against the south wall (users face south).
-const DESK_D = dims('rehab-standing-desk')[2],
-  DESK_WEST_X = r3(NW_WEST + DESK_D / 2 + 0.02),
-  DESK_SOUTH_Z = r3(NW_SOUTH - DESK_D / 2 - 0.02),
-  desks = [
-    { id: 'rehab-workspace-desk-1', at: [DESK_WEST_X, 9.655], rotation: HALF },
-    { id: 'rehab-workspace-desk-2', at: [DESK_WEST_X, 11.0], rotation: HALF },
-    { id: 'rehab-workspace-desk-3', at: [-30.25, DESK_SOUTH_Z], rotation: PI },
-    { id: 'rehab-workspace-desk-4', at: [-28.9, DESK_SOUTH_Z], rotation: PI },
-  ],
-  /** Where a therapist stands at each desk (0.34 m off its user edge). */
-  DESK_USER = desks.map((d) => {
-    const off = DESK_D / 2 + 0.34;
-    return d.rotation === HALF
-      ? [r3(d.at[0] + off), d.at[1]]
-      : [d.at[0], r3(d.at[1] - off)];
-  });
+// The parallel bars stay where they are; the stair and the plinth are set
+// out from their footprint (x −23.475..−22.125, z 20.295..23.945).
+const barsObject = object('rehab-parallel-bars'),
+  BARS = {
+    x0: barsObject.position[0] - dims(barsObject.assetId)[0] / 2,
+    x1: barsObject.position[0] + dims(barsObject.assetId)[0] / 2,
+    z0: barsObject.position[2] - dims(barsObject.assetId)[2] / 2,
+    z1: barsObject.position[2] + dims(barsObject.assetId)[2] / 2,
+  };
+assert.equal(barsObject.rotation, 0);
 
-// The training stairs, moved to open floor in front of the Valley glazing
-// (rotation π/2: the risers climb eastward from the west end).
-const STAIRS = { at: [-27.9, 26.0], rotation: HALF };
+// Round 4: the four standing desks (the PT and OT workstations) stand where
+// the training stairs stood, in a row along the Valley Blvd glazing from the
+// S Ethel Ave corner, the users facing the glazing (south). The fire pump
+// room (the NW corner room) is left empty.
+const DESK_W = dims('rehab-standing-desk')[0],
+  DESK_D = dims('rehab-standing-desk')[2],
+  DESK_GAP = 0.01,
+  DESK_X0 = GLAZING_WEST + 0.03,
+  DESK_Z = r3(GLAZING_SOUTH - 0.02 - DESK_D / 2),
+  desks = [0, 1, 2, 3].map((i) => ({
+    id: `rehab-workspace-desk-${i + 1}`,
+    at: [r3(DESK_X0 + DESK_W / 2 + i * (DESK_W + DESK_GAP)), DESK_Z],
+    rotation: PI,
+  })),
+  DESKS_X1 = DESK_X0 + 4 * DESK_W + 3 * DESK_GAP,
+  /** Where a therapist stands at each desk (0.34 m off its user edge), facing south. */
+  DESK_USER = desks.map((d) => [d.at[0], r3(d.at[1] - DESK_D / 2 - 0.34)]);
 
-// Mat plinth 1 moves into the alcove north of the kitchen (walls on its west
-// and north, open to the floor on the east), out of the kitchen's clearance,
-// the north-room doorway and the wheelchair lane from the NW bathroom.
-const PLINTH_1 = { at: [-27.3, 12.15], rotation: 0, roomId: null };
+// Four recumbent steppers in a row along the glazing east of the desks, seats
+// to the north (rotation π; the rider faces the glazing), 0.5 m apart for
+// mounting. Steppers 1 and 2 (with their riders) take the two eastern places,
+// nearest where they stood; the new 3 and 4 the two western.
+const STEPPER = dims('interior-stepper'),
+  STEPPER_GAP = 0.5,
+  STEPPER_X0 = DESKS_X1 + 0.1,
+  STEPPER_Z = r3(GLAZING_SOUTH - 0.03 - STEPPER[2] / 2),
+  steppers = [
+    'rehab-recumbent-stepper-4',
+    'rehab-recumbent-stepper-3',
+    'rehab-recumbent-stepper-1',
+    'rehab-recumbent-stepper-2',
+  ].map((id, i) => ({ id, at: [r3(STEPPER_X0 + STEPPER[0] / 2 + i * (STEPPER[0] + STEPPER_GAP)), STEPPER_Z] })),
+  NEW_STEPPERS = ['rehab-recumbent-stepper-3', 'rehab-recumbent-stepper-4'];
+
+// The right-angle practice stair against the gym's east wall, landing at the
+// south end (rotation 0 puts the asset's landing corner at +x/+z: east and
+// south). One flight runs along the wall with its foot to the north, the
+// other runs west from the landing with its foot just south of the bars.
+// The landing's south edge sits just north of the stepper row (0.23 m past
+// the end of the wall): the west flight's 0.9 m foot zone then clears the
+// bars' south end by 0.5 m, and the floor between the bars' south-east post
+// and the west flight (0.7 m) keeps the south of the gym connected to the
+// corridor east of the bars.
+const STAIR = dims('rehab-corner-stairs'),
+  RUN = 0.9, // flight width and landing size
+  DECK = 0.6,
+  RISE = DECK / 4,
+  TREAD = (STAIR[0] - RUN) / 3, // 0.28
+  FOOT_CLEAR = 0.9,
+  STAIR_Z1 = r3(STEPPER_Z - STEPPER[2] / 2 - 0.01),
+  STAIRS = {
+    at: [r3(GYM_EAST - 0.01 - STAIR[0] / 2), r3(STAIR_Z1 - STAIR[2] / 2)],
+    rotation: 0,
+  };
+/** The flights and the landing as navigation footprints (local [x, z, w, d]): the corner between the flights stays open floor. */
+const STAIR_FOOTPRINTS = [
+  [r3(STAIR[0] / 2 - RUN / 2), 0, RUN, STAIR[2]], // the wall flight and the landing
+  [r3((-STAIR[0] / 2 + STAIR[0] / 2 - RUN) / 2), r3(STAIR[2] / 2 - RUN / 2), r3(STAIR[0] - RUN), RUN], // the west flight
+];
+const [SX, SZ] = STAIRS.at,
+  FLIGHT_A_X = r3(SX + STAIR[0] / 2 - RUN / 2), // centre line of the wall flight
+  FLIGHT_B_Z = r3(SZ + STAIR[2] / 2 - RUN / 2), // centre line of the west flight
+  STAIR_N_EDGE = r3(SZ - STAIR[2] / 2), // the wall flight's first riser
+  STAIR_W_EDGE = r3(SX - STAIR[0] / 2), // the west flight's first riser
+  LANDING_N = r3(STAIR_N_EDGE + 3 * TREAD),
+  LANDING_W = r3(STAIR_W_EDGE + 3 * TREAD),
+  /** Clear floor in front of each foot, as wide as the flight. */
+  FOOT_N_ZONE = { x0: LANDING_W, x1: SX + STAIR[0] / 2, z0: STAIR_N_EDGE - FOOT_CLEAR, z1: STAIR_N_EDGE },
+  FOOT_W_ZONE = { x0: STAIR_W_EDGE - FOOT_CLEAR, x1: STAIR_W_EDGE, z0: LANDING_N, z1: STAIR_Z1 };
+
+// Round 4: mat plinth 1 moves from the alcove north of the practice kitchen
+// to the gym's east wall, north of the stair: long side along the wall, 0.8 m
+// from the bars (room for a therapist between) and south of z 19.6, so the
+// mouth of the cross hall (z 17.96..19.44) stays clear.
+const PLINTH = dims('interior-plinth'),
+  PLINTH_Z0 = 19.7,
+  PLINTH_1 = {
+    at: [r3(GYM_EAST - 0.002 - PLINTH[0] / 2), r3(PLINTH_Z0 + PLINTH[2] / 2)],
+    rotation: 0,
+    roomId: 'rehab-open',
+  };
+
+// The Balance & mobility participant who stood where the stair's west foot
+// now is moves to the open floor south of the massage room.
+const C24_SPOT = [-28.4, 23.1];
 
 const furniture = (id, assetId, [x, z], rotation, roomId, notes, extra = {}) => ({
   id,
@@ -289,10 +393,22 @@ const OBJECTS = [
       'rehab-standing-desk',
       d.at,
       d.rotation,
-      'rehab-support-nw',
-      'Standing desk with monitor in the PT & OT workspace; the therapists stand at it between sessions.',
+      'rehab-open',
+      'PT & OT workstation: a standing desk with monitor in the row along the Valley Blvd glazing at the S Ethel Ave corner, where the training stairs stood; the therapists chart at it between sessions, facing the glazing.',
     ),
   ),
+  ...steppers
+    .filter((s) => NEW_STEPPERS.includes(s.id))
+    .map((s) =>
+      furniture(
+        s.id,
+        'interior-stepper',
+        s.at,
+        PI,
+        'rehab-open',
+        'Recumbent stepper added on the owner’s word (“there should be four”), in the row along the Valley Blvd glazing, seat to the north, 0.5 m from its neighbours for mounting.',
+      ),
+    ),
 ];
 const OBJECT_IDS = OBJECTS.map((o) => o.id);
 /** Plan (baseline) objects removed: the counter the kitchen replaces and the SW-corner chairs. */
@@ -306,7 +422,9 @@ const REMOVED_PLAN = [
 const ROOM_NAMES = {
   'rehab-support-west': 'Quiet room',
   'rehab-support-mid': 'Acupressure massage room',
-  'rehab-support-nw': 'PT & OT workspace',
+  // Round 4: "that room is actually the fire pump room, so leave that
+  // completely empty".
+  'rehab-support-nw': 'Fire pump room',
 };
 const ITEM_IDS = [
   'rehab-bikes',
@@ -316,10 +434,13 @@ const ITEM_IDS = [
   'rehab-quiet-room',
   'rehab-massage-room',
   'rehab-workspace',
+  'rehab-r4-layout',
 ];
 
 // --- Remove what this script owns, then re-add -----------------------------------
 for (const id of Object.keys(ASSETS)) delete m.assets[id];
+// Nothing else uses the straight stairs' asset once they are the corner stair.
+delete m.assets[OLD_STAIRS_ASSET];
 m.objects = m.objects.filter(
   (o) => !OBJECT_IDS.includes(o.id) && !REMOVED_PLAN.includes(o.id),
 );
@@ -329,9 +450,23 @@ const plinth1 = object('rehab-mat-plinth-1'),
   stairs = object('rehab-training-stairs');
 plinth1.position = [PLINTH_1.at[0], 0, PLINTH_1.at[1]];
 plinth1.rotation = r3(PLINTH_1.rotation);
-plinth1.roomId = PLINTH_1.roomId; // the alcove lies outside every room polygon
-stairs.position = [STAIRS.at[0], 0, STAIRS.at[1]];
-stairs.rotation = r3(STAIRS.rotation);
+plinth1.roomId = PLINTH_1.roomId;
+// The training stairs keep their id and become the right-angle stair.
+Object.assign(stairs, {
+  assetId: 'rehab-corner-stairs',
+  position: [STAIRS.at[0], 0, STAIRS.at[1]],
+  rotation: r3(STAIRS.rotation),
+  status: 'owner walkthrough 2026-10 / dimensions estimated',
+  notes:
+    'Right-angle practice stair against the gym’s east wall (the south multistall restroom’s west face): a 0.9 m landing at 0.6 m in the south-east corner, one flight of three treads along the wall with its foot to the north and one running west with its foot just south of the parallel bars, handrails on both sides. The corner between the flights is open floor where the therapist spots. Products and sizes are typical, not surveyed.',
+  navigationFootprints: STAIR_FOOTPRINTS,
+});
+for (const s of steppers) {
+  const o = object(s.id);
+  o.position = [s.at[0], 0, s.at[1]];
+  o.rotation = PI;
+}
+assert.ok(!m.objects.some((o) => o.assetId === OLD_STAIRS_ASSET), `nothing uses ${OLD_STAIRS_ASSET}`);
 for (const [id, name] of Object.entries(ROOM_NAMES)) {
   const r = m.rooms.find((r) => r.id === id);
   assert.ok(r, `room ${id}`);
@@ -344,12 +479,14 @@ review.removedPlanObjectIds = union(
   REMOVED_PLAN,
 );
 review.items = review.items.filter((i) => !ITEM_IDS.includes(i.id));
+const fmt = (v) => v.toFixed(2).replace('-', '−');
+const span = (a, b) => `${fmt(a)}..${fmt(b)}`;
 review.items.push(
   {
     id: 'rehab-bikes',
     rooms: ['rehab-open'],
     change:
-      'People ride the recumbent steppers ("the bikes"): community-25 rides stepper 1 all day with seated breathers; a new participant (rehab-rider-02) rides stepper 2 in two sessions between the quiet room and an acupressure appointment.',
+      'People ride the recumbent steppers ("the bikes"): community-25 rides stepper 1 all day with seated breathers; a new participant (rehab-rider-02) rides stepper 2 in two sessions between the quiet room and an acupressure appointment. Since round 4 the row has four steppers (see rehab-r4-layout).',
     unresolved:
       'Riders face the Valley Blvd windows as the machines are placed; how long a participant stays on a stepper (here 150–200 s of the 720 s loop per session) is illustrative.',
   },
@@ -357,9 +494,8 @@ review.items.push(
     id: 'rehab-practice-stairs',
     rooms: ['rehab-open'],
     change:
-      'The training stairs move from the glazed SW corner, where they shared the floor with the participant chairs, to open floor in front of the Valley Blvd glazing (risers at the west end, ≥ 0.6 m clear all round); a participant climbs them three times per session with a PT at the foot, twice a day.',
-    unresolved:
-      'The owner said "put that somewhere": the spot by the Valley glazing keeps the centre of the floor free; the stairs could equally stand along the mezzanine-stair wall. Tread heights (4 × 0.15 m), landing and ramp follow the modelled unit, not a measured one.',
+      'A participant trains on the practice stairs twice a day with a second PT, four climbs a session: up one flight, round the landing and down the other, resting at the foot they reach and climbing back the other way. Since round 4 the stairs are a right-angle stair against the gym’s east wall (see rehab-r4-layout); they first moved from the glazed SW corner to the Valley glazing.',
+    unresolved: 'Session lengths and the number of climbs are illustrative.',
   },
   {
     id: 'rehab-corner-exerciser',
@@ -372,7 +508,7 @@ review.items.push(
     id: 'rehab-practice-kitchen',
     rooms: ['rehab-open'],
     change:
-      'The plan’s demonstration counter is replaced by an ADL practice kitchen against the same wall: 1.9 m of base cabinets with counter, sink and upper cabinets, a refrigerator at the south end and a counter-top microwave, fronts to the east with ≥ 0.9 m clear in front; participants rehearse at the sink and microwave with an OT twice a day. Mat plinth 1 (it overlapped the counter) moves into the wall-backed alcove north of the kitchen, out of the north-room doorway and the wheelchair lane from the NW bathroom.',
+      'The plan’s demonstration counter is replaced by an ADL practice kitchen against the same wall: 1.9 m of base cabinets with counter, sink and upper cabinets, a refrigerator at the south end and a counter-top microwave, fronts to the east with ≥ 0.9 m clear in front; participants rehearse at the sink and microwave with an OT twice a day. Mat plinth 1, which overlapped the counter, no longer stands by the kitchen (round 4: beside the parallel bars).',
     unresolved:
       'The owner listed a fridge, a microwave and cabinets; the sink is assumed (a practice kitchen without one is unusual) and no range or oven is modelled. The run’s length (1.9 m) and the counter height (0.84 m, wheelchair-friendly) are assumed.',
   },
@@ -393,11 +529,22 @@ review.items.push(
   },
   {
     id: 'rehab-workspace',
+    rooms: ['rehab-open'],
+    change:
+      'Four standing desks with monitors are the PT & OT workstations, where a second PT and OT chart between sessions. The four participant chairs at the glazed SW corner are removed. Round 4 moved the desks from the NW corner room (now the fire pump room) to where the training stairs stood (see rehab-r4-layout).',
+    unresolved: '',
+  },
+  {
+    id: 'rehab-r4-layout',
     rooms: ['rehab-support-nw', 'rehab-open'],
     change:
-      'The NW corner room on S Ethel Ave is the PT & OT workspace: four standing desks with monitors (two under the street windows, two on the south wall); a new PT and OT chart there between sessions, in and out through the north support room. The four participant chairs at the glazed SW corner are removed, as the owner said the workspace replaces them.',
+      `Owner on the live build: "we move the desk to the wrong place". (1) The NW corner room on S Ethel Ave (rehab-support-nw, x ${span(-31.19, -27.53)}, z ${span(8.9, 13.33)}) is the fire pump room and is left completely empty: the four standing desks leave it, no furniture stays and no one goes in at any time; its door gap is unchanged. ` +
+      `(2) The four standing desks (rehab-workspace-desk-1..4, now 0.9 × 0.6 m) stand where the training stairs stood: a row along the Valley Blvd glazing from the S Ethel Ave corner (x ${span(DESK_X0, DESKS_X1)}, z ${span(DESK_Z - DESK_D / 2, DESK_Z + DESK_D / 2)}), users facing the glazing; Ot 2 works at desk 3 and Pt 2 at desk 4. ` +
+      `(3) The straight training stairs (rehab-training-stairs, same id, new asset rehab-corner-stairs) become a right-angle stair against the gym’s east wall (the south multistall restroom’s west face, plan-wall-178), footprint x ${span(SX - STAIR[0] / 2, SX + STAIR[0] / 2)}, z ${span(SZ - STAIR[2] / 2, SZ + STAIR[2] / 2)}: two flights of three ${fmt(TREAD)} m treads and four 0.15 m risers to a 0.9 × 0.9 m landing at 0.6 m in the south-east corner, flights 0.9 m wide, handrails on both sides of each flight and round the landing’s outer sides; one flight along the wall with its foot to the north, the other running west with its foot just south of the parallel bars; 0.9 m of clear floor at each foot. The participant climbs one flight, turns on the landing and goes down the other, four climbs a session alternating direction, with the PT spotting from the floor in the open corner between the flights. ` +
+      `(4) Mat plinth 1 moves from north of the practice kitchen to the same east wall north of the stair (x ${span(PLINTH_1.at[0] - PLINTH[0] / 2, PLINTH_1.at[0] + PLINTH[0] / 2)}, z ${span(PLINTH_1.at[1] - PLINTH[2] / 2, PLINTH_1.at[1] + PLINTH[2] / 2)}), long side along the wall, ${fmt(PLINTH_1.at[0] - PLINTH[0] / 2 - BARS.x1)} m from the parallel bars. ` +
+      `(5) Four recumbent steppers (1 and 2 kept with their riders, 3 and 4 added) stand in a row along the Valley glazing between the desks and the stair (x ${span(STEPPER_X0, STEPPER_X0 + 4 * STEPPER[0] + 3 * STEPPER_GAP)}), ${fmt(STEPPER_GAP)} m apart. The Balance & mobility participant who stood where the stair’s west foot is now (community-24) practises on the open floor south of the massage room (${fmt(C24_SPOT[0])}, ${fmt(C24_SPOT[1])}).`,
     unresolved:
-      '"At the corner right by the street" is read as the NW corner room (the only side room on the Ethel Ave street wall, where the window is). The alternative reading, the open SW glazed corner where the participant chairs stood (Ethel Ave / Valley Blvd), would put the desks on the open therapy floor instead; the chairs are removed under either reading.',
+      'Assumptions: the room the owner calls the fire pump room is the NW corner room (the grey concrete room top-left on the drawing); no pump or riser equipment is drawn in it. "Where the current training stairs are" is the SW glazed corner along Valley Blvd, the desks in one row facing the glazing (the drawing showed workstations in that corner); 0.9 m-wide desks are assumed so that desks, four steppers and a walkway past the stair fit along the glazing. "To the east against the wall" is the gym’s east wall (the south restroom’s west face), landing at its south end; the landing reaches 0.23 m past the end of that wall so that about 0.7 m of floor stays between the bars’ south-east post and the west flight (the only way from the corridor east of the bars to the south of the gym besides the narrow aisle west of the bars). Tread depth (0.28 m), riser height, landing size and handrail height (0.88 m) are typical, not measured. "The other empty wall" is read as the same east wall, north of the stair, beside the parallel bars; nobody uses that plinth in the loop. The new steppers’ place (the row along the glazing) and spacing are assumed; the two new machines are unoccupied. The walkway between the last stepper and the stair, to the strip south of the restroom (where the drawing shows doors to Valley Blvd), is about 0.75 m.',
   },
 );
 
@@ -417,8 +564,28 @@ const footprint = (o) => {
     z1: o.position[2] + ez / 2,
   };
 };
+/**
+ * The boxes an object really occupies: its navigation footprints when it has
+ * them (the corner stair's flights and landing, the bars' two rails), else
+ * its whole footprint.
+ */
+const parts = (o) => {
+  if (!o.navigationFootprints) return [footprint(o)];
+  const c = Math.cos(o.rotation),
+    s = Math.sin(o.rotation);
+  assert.ok(Math.abs(c * s) < 1e-3, `${o.id}: right-angle rotation`);
+  return o.navigationFootprints.map(([x, z, w, d]) => {
+    const cx = o.position[0] + c * x + s * z,
+      cz = o.position[2] - s * x + c * z,
+      [ex, ez] = Math.abs(s) > 0.5 ? [d, w] : [w, d];
+    return { id: o.id, x0: cx - ex / 2, x1: cx + ex / 2, z0: cz - ez / 2, z1: cz + ez / 2 };
+  });
+};
 const overlaps = (a, b, gap = 0) =>
   a.x0 < b.x1 + gap && b.x0 < a.x1 + gap && a.z0 < b.z1 + gap && b.z0 < a.z1 + gap;
+/** Shortest distance between two axis-aligned boxes (0 when they touch or overlap). */
+const boxGap = (a, b) =>
+  Math.hypot(Math.max(0, a.x0 - b.x1, b.x0 - a.x1), Math.max(0, a.z0 - b.z1, b.z0 - a.z1));
 const rehabFurniture = m.objects.filter(
   (o) =>
     o.zoneId === 'rehab' &&
@@ -426,18 +593,18 @@ const rehabFurniture = m.objects.filter(
     o.position[1] < 1.4 &&
     m.assets[o.assetId].dimensions[1] >= 0.15,
 );
-const mine = new Set([...OBJECT_IDS, plinth1.id, stairs.id]);
+const mine = new Set([...OBJECT_IDS, plinth1.id, stairs.id, ...steppers.map((s) => s.id)]);
 for (const o of rehabFurniture) {
   if (!mine.has(o.id)) continue;
-  const f = footprint(o);
   for (const other of rehabFurniture) {
     if (other.id === o.id || (other.id === 'rehab-kitchen-microwave' && o.id === 'rehab-kitchen-casework') || (o.id === 'rehab-kitchen-microwave' && other.id === 'rehab-kitchen-casework')) continue;
-    assert.ok(!overlaps(f, footprint(other)), `${o.id} overlaps ${other.id}`);
+    for (const f of parts(o))
+      for (const g of parts(other)) assert.ok(!overlaps(f, g), `${o.id} overlaps ${other.id}`);
   }
   assert.equal(
     nav.roomAt(m, 'ground', [o.position[0], o.position[2]]) ?? null,
     o.roomId ?? null,
-    `${o.id} stands in ${o.roomId ?? 'the alcove outside the rooms'}`,
+    `${o.id} stands in ${o.roomId ?? 'no room'}`,
   );
 }
 // The microwave sits on the counter, within the casework's footprint.
@@ -454,17 +621,71 @@ for (const o of rehabFurniture) {
       assert.ok(!overlaps(front, footprint(o)), `${o.id} is within ${CLEAR_IN_FRONT} m of the kitchen fronts`);
   assert.ok(front.x1 < object('rehab-ot-chair-therapist').position[0] - 0.275, 'the OT station is beyond the kitchen clearance');
 }
-// ≥ 0.6 m around the training stairs: furniture, walls and the zone edge.
+// Round 4: the fire pump room holds nothing at all (people are checked with the loop).
+const PUMP_ROOM = m.rooms.find((r) => r.id === 'rehab-support-nw');
+const inPumpRoom = (p) => nav.insidePolygon(p, PUMP_ROOM.polygon);
+for (const o of m.objects)
+  assert.ok(
+    o.levelId !== 'ground' || !inPumpRoom([o.position[0], o.position[2]]),
+    `${o.id} stands in the fire pump room`,
+  );
+// The desks: in a row along the glazing, inside the gym, clear of the PT
+// mezzanine stair's flight and of the floor under and in front of its upper
+// landing (1.2 m beyond the flight's south end).
+{
+  const ptStair = footprint(object('rehab-stair')),
+    ptStairClear = { x0: ptStair.x0, x1: ptStair.x1, z0: ptStair.z0, z1: ptStair.z1 + 1.2 };
+  for (const d of desks) {
+    const f = footprint(object(d.id));
+    assert.ok(f.x0 >= GLAZING_WEST - 1e-6 && f.z1 <= GLAZING_SOUTH - 1e-6, `${d.id} stands inside the glazing`);
+    assert.ok(boxGap(f, ptStairClear) > 0.5, `${d.id} keeps clear of the PT mezzanine stair`);
+  }
+  for (const p of DESK_USER)
+    assert.ok(boxGap({ x0: p[0], x1: p[0], z0: p[1], z1: p[1] }, ptStairClear) > 0.5, 'desk users keep clear of the PT mezzanine stair');
+}
+// The steppers: 0.5 m between machines, the desks to the west, the stair to the east.
+{
+  const f = steppers.map((s) => footprint(object(s.id)));
+  for (let i = 1; i < f.length; i++) assert.ok(f[i].x0 - f[i - 1].x1 >= STEPPER_GAP - 1e-6, 'steppers 0.5 m apart');
+  assert.ok(f[0].x0 > DESKS_X1 + 0.05 && f.every((g) => g.z1 <= GLAZING_SOUTH), 'steppers east of the desks, inside the glazing');
+}
+// The stair: against the east wall, landing at its south end, clear of every
+// wall, 0.9 m clear floor at both feet (no furniture, no wall), the west foot
+// clear of the bars and the steppers; the walkways past it (to the strip
+// south of the restroom, and between the bars' south-east post and the west
+// flight) stay open (also checked on the grid with the loop).
 {
   const f = footprint(stairs),
-    zone = m.zones.find((z) => z.id === 'rehab');
-  for (const o of rehabFurniture)
-    if (o.id !== stairs.id) assert.ok(!overlaps(f, footprint(o), 0.6), `${o.id} is within 0.6 m of the training stairs`);
-  const zmax = Math.max(...zone.polygon.map((p) => p[1]));
-  assert.ok(zmax - f.z1 >= 0.6 && f.x0 - NW_WEST >= 0.6, 'the stairs keep 0.6 m from the glazing and the Ethel wall');
-  for (const w of m.walls.filter((w) => w.levelId === 'ground'))
-    for (const corner of [[f.x0, f.z0], [f.x1, f.z0], [f.x0, f.z1], [f.x1, f.z1]])
-      assert.ok(nav.distanceToSegment(corner, w.a, w.b) - w.thickness / 2 >= 0.6 || w.height < 0.6, `the stairs keep 0.6 m from ${w.id}`);
+    wallZ0 = Math.min(plan178.a[1], plan178.b[1]);
+  assert.ok(Math.abs(f.x1 - GYM_EAST) <= 0.02 && f.z0 >= wallZ0 && Math.abs(f.z1 - GYM_EAST_SOUTH) <= 0.25, 'the stair stands against the east wall, landing at its south end');
+  for (const b of parts(stairs))
+    for (let x = b.x0; x <= b.x1 + 1e-9; x += 0.05)
+      for (let z = b.z0; z <= b.z1 + 1e-9; z += 0.05)
+        for (const w of m.walls.filter((w) => w.levelId === 'ground'))
+          assert.ok(nav.distanceToSegment([x, z], w.a, w.b) >= w.thickness / 2, `the stair cuts into ${w.id}`);
+  for (const zone of [FOOT_N_ZONE, FOOT_W_ZONE]) {
+    for (const o of rehabFurniture)
+      if (o.id !== stairs.id) assert.ok(!overlaps(zone, footprint(o)), `${o.id} stands in front of a foot of the stairs`);
+    for (let x = zone.x0; x <= zone.x1 + 1e-9; x += 0.1)
+      for (let z = zone.z0; z <= zone.z1 + 1e-9; z += 0.1) {
+        assert.equal(nav.roomAt(m, 'ground', [x, z]), 'rehab-open', 'the feet of the stairs are on the gym floor');
+        for (const w of m.walls.filter((w) => w.levelId === 'ground'))
+          assert.ok(nav.distanceToSegment([x, z], w.a, w.b) >= w.thickness / 2 - 1e-6, `${w.id} cuts into a foot of the stairs`);
+      }
+  }
+  assert.ok(FOOT_W_ZONE.z0 > BARS.z1 && FOOT_W_ZONE.x1 > BARS.x1, 'the west foot lands just south of the bars');
+  const walkway = boxGap(footprint(object('rehab-recumbent-stepper-2')), parts(stairs)[1]),
+    eastRail = parts(barsObject).sort((a, b) => b.x1 - a.x1)[0],
+    slot = boxGap(eastRail, parts(stairs)[1]);
+  assert.ok(walkway >= 0.75, `the walkway between the steppers and the stair is ${walkway.toFixed(2)} m`);
+  assert.ok(slot >= 0.7, `the walkway between the bars and the stair is ${slot.toFixed(2)} m`);
+}
+// The plinth: against the east wall, north of the stair's north foot, south
+// of the cross-hall mouth, ≥ 0.8 m from the bars for a therapist.
+{
+  const f = footprint(plinth1);
+  assert.ok(Math.abs(f.x1 - GYM_EAST) <= 0.01 && f.z0 >= 19.6 && f.z1 <= FOOT_N_ZONE.z0, 'plinth 1 along the east wall');
+  assert.ok(f.x0 - BARS.x1 >= 0.8 && f.z0 < BARS.z1 && f.z1 > BARS.z0, 'plinth 1 beside the bars, 0.8 m clear');
 }
 
 // =============================================================================
@@ -487,24 +708,45 @@ const riderPoint = (id) => {
 };
 const STEPPER_1 = riderPoint('rehab-recumbent-stepper-1'),
   STEPPER_2 = riderPoint('rehab-recumbent-stepper-2');
+
+// --- community-24: off the stair's west foot ------------------------------------
+// The Balance & mobility participant stood all day where the corner stair's
+// west foot now is; the same day, practising on the open floor south of the
+// massage room.
+{
+  const c24 = loop.actors.find((a) => a.id === 'community-24');
+  assert.ok(c24, 'community-24 in the loop');
+  for (const s of c24.segments) {
+    assert.notEqual(s.action, 'walk', 'community-24 stands in one place all day');
+    s.path = s.path.map(() => [...C24_SPOT]);
+  }
+  assert.equal(nav.roomAt(m, 'ground', C24_SPOT), 'rehab-open');
+}
 /**
  * The room's community cast stand (or, community-25, ride) in one place all
  * day; every route keeps 0.8 m from them, as validate-community wants 0.58 m
  * between them and everyone at every moment.
  */
-const STILL = JSON.parse(readFileSync(LOOP[0], 'utf8'))
+const STILL = JSON.parse(JSON.stringify(loop))
   .actors.filter(
     (a) => a.id.startsWith('community-') && a.id !== 'community-25' && a.segments.some((s) => s.zoneId === ZONE),
   )
   .map((a) => a.segments[0].path[0])
   .concat([STEPPER_1]);
-const avoid = (q) => STILL.some((p) => nav.distance(p, q) < 0.8);
+/**
+ * Floor the routes here keep out of, though the grid lets them through: the
+ * lane inside the parallel bars (a participant walks it all day).
+ */
+const NO_GO = [{ x0: BARS.x0 + 0.2, x1: BARS.x1 - 0.2, z0: BARS.z0 + 0.1, z1: BARS.z1 - 0.1 }];
+const avoid = (q) =>
+  STILL.some((p) => nav.distance(p, q) < 0.8) ||
+  NO_GO.some((b) => q[0] >= b.x0 && q[0] <= b.x1 && q[1] >= b.z0 && q[1] <= b.z1);
 /**
  * Seats joined to the grid from a chosen side: stepper 2 is mounted from the
- * east (its nearest free cell is between the two machines, which the route
- * would only reach by looping round community-24).
+ * floor north of it (its nearest free cell is on its east side, in the
+ * walkway past the stair's west foot).
  */
-const PREFERRED = [[STEPPER_2, [-21.2, 25.8]]];
+const PREFERRED = [[STEPPER_2, [r3(Math.round(STEPPER_2[0] / 0.2) * 0.2), 25.0]]];
 const RECLINER_SEAT_AT = RECLINER_X.map((x) => [x, r3(RECLINER_Z - RECLINER_SEAT)]);
 const SINK = [r3(KITCHEN_FRONT + 0.36), SINK_Z],
   MICRO = [r3(KITCHEN_FRONT + 0.36), microwave.z],
@@ -512,31 +754,41 @@ const SINK = [r3(KITCHEN_FRONT + 0.36), SINK_Z],
 const BED_EDGE = [r3(BED[0] + dims('rehab-massage-bed')[0] / 2 + 0.05), r3(BED[1] + 0.5)],
   THERAPIST_AT_BED = [-28.3, r3(BED[1] + dims('rehab-massage-bed')[2] / 2 + 0.3)],
   THERAPIST_DESK = [-27.1, 20.3];
-const STAIR_D = m.assets[stairs.assetId].dimensions[2],
-  STAIR_X0 = r3(STAIRS.at[0] - STAIR_D / 2),
-  STAIR_FOOT = [r3(STAIR_X0 - 0.4), STAIRS.at[1]],
-  STAIR_OFF = [r3(STAIR_X0 + STAIR_D + 0.4), STAIRS.at[1]],
-  PT_AT_STAIRS = [-30.55, 24.75],
-  /** Back round the north side of the stairs to the foot. */
-  STAIR_LANE = [STAIR_OFF, [STAIR_OFF[0], r3(STAIRS.at[1] - 1.0)], [r3(STAIR_X0 - 0.3), r3(STAIRS.at[1] - 1.0)], STAIR_FOOT];
-// Up the four treads (0.28 m each, rising 0.15 m), across the 0.75 m landing
-// and down the ramp, with the height at every point (clinical-assets.ts).
-const STEP_D = 0.28,
-  DECK = 0.6,
-  LANDING = 0.75;
-const CLIMB = [
-  [STAIR_FOOT, 0],
-  [[STAIR_X0, STAIRS.at[1]], 0],
-  ...[0, 1, 2, 3].map((i) => [[r3(STAIR_X0 + (i + 0.5) * STEP_D), STAIRS.at[1]], r3(((i + 1) * DECK) / 4)]),
-  [[r3(STAIR_X0 + 4 * STEP_D), STAIRS.at[1]], DECK],
-  [[r3(STAIR_X0 + 4 * STEP_D + LANDING), STAIRS.at[1]], DECK],
-  [[r3(STAIR_X0 + STAIR_D), STAIRS.at[1]], 0],
-  [STAIR_OFF, 0],
+
+// The corner stair, climbed from either foot: up one flight (a point at the
+// centre of each 0.28 m tread, rising 0.15 m), across the landing with a turn
+// at its centre, and down the other flight, with the height at every point
+// (rehab-assets.ts builds the treads to these heights).
+const STAIR_N = [FLIGHT_A_X, r3(STAIR_N_EDGE - 0.4)], // standing at the north foot
+  STAIR_W = [r3(STAIR_W_EDGE - 0.4), FLIGHT_B_Z], // standing at the west foot
+  /** The PT's spot on the floor in the open corner between the flights, beside both. */
+  PT_AT_STAIRS = [r3((STAIR_W_EDGE + LANDING_W) / 2), r3((STAIR_N_EDGE + LANDING_N) / 2)];
+const CLIMB_N_TO_W = [
+  [STAIR_N, 0],
+  [[FLIGHT_A_X, STAIR_N_EDGE], 0],
+  ...[0, 1, 2].map((i) => [[FLIGHT_A_X, r3(STAIR_N_EDGE + (i + 0.5) * TREAD)], r3((i + 1) * RISE)]),
+  [[FLIGHT_A_X, LANDING_N], DECK],
+  [[FLIGHT_A_X, FLIGHT_B_Z], DECK],
+  [[LANDING_W, FLIGHT_B_Z], DECK],
+  ...[2, 1, 0].map((i) => [[r3(STAIR_W_EDGE + (i + 0.5) * TREAD), FLIGHT_B_Z], r3((i + 1) * RISE)]),
+  [[STAIR_W_EDGE, FLIGHT_B_Z], 0],
+  [STAIR_W, 0],
 ];
-const CLIMB_PATH = CLIMB.map(([p]) => p),
-  CLIMB_HEIGHTS = CLIMB.map(([, y]) => y),
-  CLIMB_TIME = r4(nav.pathLength(CLIMB_PATH) / PACE.stairs),
-  LANE_TIME = r4(nav.pathLength(STAIR_LANE) / PACE.participant);
+const CLIMBS = {
+  down: {
+    path: CLIMB_N_TO_W.map(([p]) => p),
+    heights: CLIMB_N_TO_W.map(([, y]) => y),
+    title: 'Practice stairs · up the wall flight, round the landing, down the west flight',
+  },
+  up: {
+    path: CLIMB_N_TO_W.map(([p]) => p).reverse(),
+    heights: CLIMB_N_TO_W.map(([, y]) => y).reverse(),
+    title: 'Practice stairs · up the west flight, round the landing, down the wall flight',
+  },
+};
+const CLIMB_TIME = r4(nav.pathLength(CLIMBS.down.path) / PACE.stairs),
+  STAIR_CLIMBS = 4;
+assert.ok(Math.max(...CLIMBS.down.heights) === DECK && CLIMBS.down.heights.every((y, i) => y === CLIMBS.up.heights.at(-1 - i)));
 
 /** Every 5 cm along a polyline. */
 const samples = (path) => {
@@ -556,17 +808,26 @@ for (const [p, what] of [
   [OT_SPOT, 'the OT’s kitchen spot'],
   [THERAPIST_AT_BED, 'the therapist’s spot at the bed'],
   [THERAPIST_DESK, 'the therapist’s desk spot'],
-  [PT_AT_STAIRS, 'the PT’s spot at the stairs'],
-  [STAIR_FOOT, 'the foot of the stairs'],
-  [STAIR_OFF, 'the end of the ramp'],
+  [PT_AT_STAIRS, 'the PT’s spot between the flights'],
+  [STAIR_N, 'the north foot of the stairs'],
+  [STAIR_W, 'the west foot of the stairs'],
+  [C24_SPOT, 'community-24’s new spot'],
   ...DESK_USER.map((p, i) => [p, `desk ${i + 1}’s user spot`]),
 ])
   clearSpot(p, what);
-for (const p of samples(STAIR_LANE)) clearSpot(p, 'the lane round the stairs');
-assert.equal(nav.roomAt(m, 'ground', STAIR_FOOT), 'rehab-open');
+for (const p of [STAIR_N, STAIR_W, PT_AT_STAIRS]) assert.equal(nav.roomAt(m, 'ground', p), 'rehab-open');
 assert.equal(nav.roomAt(m, 'ground', BED_EDGE), 'rehab-support-mid');
 for (const p of RECLINER_SEAT_AT) assert.equal(nav.roomAt(m, 'ground', p), 'rehab-support-west');
-for (const p of DESK_USER) assert.equal(nav.roomAt(m, 'ground', p), 'rehab-support-nw');
+// Round 4: the workstations are on the gym floor at the SW glazing (they were
+// in rehab-support-nw, now the fire pump room).
+for (const p of DESK_USER) assert.equal(nav.roomAt(m, 'ground', p), 'rehab-open');
+// The strip south of the restroom stays reachable past the stair.
+{
+  const labels = nav.componentLabels(grid),
+    cell = (p) => (Math.round(p[0] / 0.2) - grid.ix0) * grid.nz + (Math.round(p[1] / 0.2) - grid.iz0);
+  for (const p of [[-17.0, 26.2], STAIR_W, STAIR_N, PT_AT_STAIRS])
+    assert.equal(labels[cell(nav.snap(grid, p, { connected: false }))], 0, `(${p.join(', ')}) is on the circulating floor`);
+}
 
 /**
  * A seat or a spot joins the grid at the nearest clear cell in its own room
@@ -680,14 +941,19 @@ class Track {
     this.here = [...path.at(-1)];
     return this;
   }
-  /** Three climbs of the stairs with a rest at the foot after each, `start`–`end`. */
-  stairs(start, end, cycles = 3) {
+  /**
+   * Climbs of the corner stair, `start`–`end`, from the north foot: up one
+   * flight, round the landing and down the other, a rest facing the stair at
+   * the foot reached, then back over the other way; an even number of
+   * climbs ends at the north foot again.
+   */
+  stairs(start, end, cycles = STAIR_CLIMBS) {
     assert.equal(this.clock, start);
-    assert.ok(nav.distance(this.here, STAIR_FOOT) < 1e-6, `${this.id} is at the foot of the stairs`);
+    assert.ok(cycles % 2 === 0 && nav.distance(this.here, STAIR_N) < 1e-6, `${this.id} starts and ends at the north foot of the stairs`);
     for (let i = 1; i <= cycles; i++) {
-      this.leg(CLIMB_PATH, CLIMB_TIME, 'Practice stairs · up the steps, over the landing, down the ramp', CLIMB_HEIGHTS);
-      this.leg(STAIR_LANE, LANE_TIME, 'Back round to the foot of the stairs');
-      this.stay(start + ((end - start) * i) / cycles, 'idle', 'Catching breath at the foot of the stairs', HALF);
+      const climb = i % 2 ? CLIMBS.down : CLIMBS.up;
+      this.leg(climb.path, CLIMB_TIME, climb.title, climb.heights);
+      this.stay(start + ((end - start) * i) / cycles, 'idle', 'Catching breath at the foot of the stairs', i % 2 ? HALF : 0);
     }
     return this;
   }
@@ -796,51 +1062,59 @@ const tracks = {};
     .stay(T.kitchen1[1], 'tabletop', 'Practice kitchen · heating a meal in the microwave', -HALF)
     .go(RECLINER_SEAT_AT[2], P, 'Back to the quiet room')
     .stay(T.stairs1[0], 'seated', 'Resting in the quiet room', 0, seated)
-    .walk(STAIR_FOOT, T.stairs1[0], P, 'Walk to the practice stairs')
+    .walk(STAIR_N, T.stairs1[0], P, 'Walk to the practice stairs')
     .stairs(...T.stairs1)
     .go(RECLINER_SEAT_AT[2], P, 'Back to the quiet room')
     .stay(T.stairs2[0], 'seated', 'Resting in the quiet room', 0, seated)
-    .walk(STAIR_FOOT, T.stairs2[0], P, 'Walk to the practice stairs')
+    .walk(STAIR_N, T.stairs2[0], P, 'Walk to the practice stairs')
     .stairs(...T.stairs2)
     .go(RECLINER_SEAT_AT[2], P, 'Back to the quiet room')
     .stay(loop.duration, 'seated', 'Resting in the quiet room', 0, seated);
   tracks[t.id] = t.done(loop.duration);
 }
-// PT 2: standing desk 4 ↔ the foot of the stairs, coaching each climb and
-// talking through each rest.
+// PT 2: standing desk 4 at the SW glazing ↔ the floor between the stair's
+// flights, spotting each climb (turning from the first flight to the second)
+// and talking through each rest.
 {
-  const t = new Track('rehab-pt-02', DESK_USER[3]),
-    toward = face(PT_AT_STAIRS, [r3(STAIR_X0 + 0.2), STAIRS.at[1]]);
-  const session = ([start, end], cycles = 3) => {
+  const PT_DESK = DESK_USER[3],
+    t = new Track('rehab-pt-02', PT_DESK),
+    towardWall = face(PT_AT_STAIRS, [FLIGHT_A_X, PT_AT_STAIRS[1]]),
+    towardWest = face(PT_AT_STAIRS, [PT_AT_STAIRS[0], FLIGHT_B_Z]);
+  const session = ([start, end], cycles = STAIR_CLIMBS) => {
     for (let i = 1; i <= cycles; i++) {
-      const restStart = start + ((end - start) * (i - 1)) / cycles + CLIMB_TIME + LANE_TIME;
-      t.stay(restStart, 'treat', 'Coaching the stair climb', toward).stay(start + ((end - start) * i) / cycles, 'consult', 'Feedback between climbs', toward);
+      const climbStart = start + ((end - start) * (i - 1)) / cycles,
+        [first, second, rest] = i % 2 ? [towardWall, towardWest, STAIR_W] : [towardWest, towardWall, STAIR_N];
+      t.stay(climbStart + CLIMB_TIME / 2, 'treat', 'Spotting the stair climb', first)
+        .stay(climbStart + CLIMB_TIME, 'treat', 'Spotting the stair climb', second)
+        .stay(start + ((end - start) * i) / cycles, 'consult', 'Feedback between climbs', face(PT_AT_STAIRS, rest));
     }
   };
   t.stay(T.stairs1[0], 'document', 'Charting at the standing desk', 0)
     .walk(PT_AT_STAIRS, T.stairs1[0], S, 'Walk to the practice stairs');
   session(T.stairs1);
-  t.go(DESK_USER[3], S, 'Back to the workspace')
+  t.go(PT_DESK, S, 'Back to the workstation')
     .stay(T.stairs2[0], 'document', 'Charting at the standing desk', 0)
     .walk(PT_AT_STAIRS, T.stairs2[0], S, 'Walk to the practice stairs');
   session(T.stairs2);
-  t.go(DESK_USER[3], S, 'Back to the workspace').stay(loop.duration, 'document', 'Charting at the standing desk', 0);
+  t.go(PT_DESK, S, 'Back to the workstation').stay(loop.duration, 'document', 'Charting at the standing desk', 0);
   tracks[t.id] = t.done(loop.duration);
 }
-// OT 2: standing desk 1 ↔ the practice kitchen, two sessions back to back.
+// OT 2: standing desk 3 at the SW glazing ↔ the practice kitchen, two
+// sessions back to back.
 {
-  const t = new Track('rehab-ot-02', DESK_USER[0]),
+  const OT_DESK = DESK_USER[2],
+    t = new Track('rehab-ot-02', OT_DESK),
     atSink = face(OT_SPOT, SINK),
     atMicro = face(OT_SPOT, MICRO);
-  t.stay(T.kitchen1[0], 'document', 'Charting at the standing desk', -HALF)
+  t.stay(T.kitchen1[0], 'document', 'Charting at the standing desk', 0)
     .walk(OT_SPOT, T.kitchen1[0], S, 'Walk to the practice kitchen')
     .stay(130, 'consult', 'ADL coaching · washing up', atSink)
     .stay(T.kitchen1[1], 'consult', 'ADL coaching · the microwave', atMicro)
     .stay(T.kitchen2[0], 'document', 'Notes between kitchen sessions', atSink)
     .stay(265, 'consult', 'ADL coaching · washing up', atSink)
     .stay(T.kitchen2[1], 'consult', 'ADL coaching · the microwave', atMicro)
-    .go(DESK_USER[0], S, 'Back to the workspace')
-    .stay(loop.duration, 'document', 'Charting at the standing desk', -HALF);
+    .go(OT_DESK, S, 'Back to the workstation')
+    .stay(loop.duration, 'document', 'Charting at the standing desk', 0);
   tracks[t.id] = t.done(loop.duration);
 }
 // The acupressure therapist: in the massage room all day, two appointments.
@@ -872,11 +1146,11 @@ for (const p of PEOPLE)
     segments: tracks[p.id],
   });
 const INTERACTIONS = [
-  { id: 'rehab-owner-steppers', label: 'Recumbent steppers · endurance', actorIds: ['community-25', 'rehab-rider-02'], window: T.ride1, description: 'Two participants pedal the recumbent steppers facing the Valley Blvd windows; one rides all morning, the other between the quiet room and an acupressure appointment.' },
+  { id: 'rehab-owner-steppers', label: 'Recumbent steppers · endurance', actorIds: ['community-25', 'rehab-rider-02'], window: T.ride1, description: 'Two participants pedal recumbent steppers in the row of four facing the Valley Blvd windows; one rides all morning, the other between the quiet room and an acupressure appointment.' },
   { id: 'rehab-owner-kitchen-1', label: 'Practice kitchen · OT session', actorIds: ['rehab-ot-02', 'rehab-stairs-participant'], window: T.kitchen1, description: 'Activities of daily living in the practice kitchen: washing up at the sink and heating a meal in the microwave, coached by the occupational therapist.' },
   { id: 'rehab-owner-kitchen-2', label: 'Practice kitchen · OT session', actorIds: ['rehab-ot-02', 'rehab-adl-participant'], window: T.kitchen2, description: 'Activities of daily living in the practice kitchen: washing up at the sink and heating a meal in the microwave, coached by the occupational therapist.' },
-  { id: 'rehab-owner-stairs-1', label: 'Practice stairs · step training', actorIds: ['rehab-pt-02', 'rehab-stairs-participant'], window: T.stairs1, description: 'Three climbs of the training stairs (up the steps, across the landing, down the ramp) with a rest after each, the physical therapist coaching from the foot.' },
-  { id: 'rehab-owner-stairs-2', label: 'Practice stairs · step training', actorIds: ['rehab-pt-02', 'rehab-stairs-participant'], window: T.stairs2, description: 'Three climbs of the training stairs (up the steps, across the landing, down the ramp) with a rest after each, the physical therapist coaching from the foot.' },
+  { id: 'rehab-owner-stairs-1', label: 'Practice stairs · step training', actorIds: ['rehab-pt-02', 'rehab-stairs-participant'], window: T.stairs1, description: 'Four climbs of the right-angle practice stairs (up one flight, a turn on the landing, down the other, then back the other way) with a rest at the foot after each, the physical therapist spotting from the floor between the flights.' },
+  { id: 'rehab-owner-stairs-2', label: 'Practice stairs · step training', actorIds: ['rehab-pt-02', 'rehab-stairs-participant'], window: T.stairs2, description: 'Four climbs of the right-angle practice stairs (up one flight, a turn on the landing, down the other, then back the other way) with a rest at the foot after each, the physical therapist spotting from the floor between the flights.' },
   { id: 'rehab-owner-massage-1', label: 'Acupressure massage', actorIds: ['rehab-massage-therapist', 'rehab-rider-02'], window: T.massage1, description: 'An acupressure appointment in the massage room: the participant sits on the edge of the massage bed while the therapist works on stiff shoulders and back.' },
   { id: 'rehab-owner-massage-2', label: 'Acupressure massage', actorIds: ['rehab-massage-therapist', 'rehab-adl-participant'], window: T.massage2, description: 'An acupressure appointment in the massage room: the participant sits on the edge of the massage bed while the therapist works on stiff shoulders and back.' },
 ];
@@ -901,20 +1175,30 @@ for (const id of touched)
         assert.ok(nearEnd || nav.isClear(grid, p), `${id}: "${s.title}" passes (${p.map((v) => v.toFixed(2)).join(', ')}) too close to a wall or furniture`);
         assert.ok(nav.wallClearanceAt(grid, p) >= 0.2, `${id}: "${s.title}" clips a wall at (${p.map((v) => v.toFixed(2)).join(', ')})`);
       }
-// The room's community cast keep 0.58 m from everyone (validate-community).
+// The room's community cast keep 0.58 m from everyone (validate-community):
+// from the people this script moves, and community-24 (moved here) from
+// everyone on the floor.
 const community = plain.actors.filter((a) => a.id.startsWith('community-') && a.segments.some((s) => s.zoneId === ZONE));
+const groundActors = plain.actors.filter((a) => a.levelId === 'ground');
 let nearest = { gap: Infinity };
 for (const c of community)
   for (let t = 0; t < loop.duration; t += 1) {
     const p = activity.sampleActor(c, t);
-    for (const id of touched) {
-      if (id === c.id) continue;
-      const q = activity.sampleActor(byId.get(id), t),
-        gap = Math.hypot(p.x - q.x, p.z - q.z);
-      if (gap < nearest.gap) nearest = { gap, a: c.id, b: id, t };
+    for (const other of c.id === 'community-24' ? groundActors : touched.map((id) => byId.get(id))) {
+      if (other.id === c.id) continue;
+      const q = activity.sampleActor(other, t);
+      if (q.visible === false) continue;
+      const gap = Math.hypot(p.x - q.x, p.z - q.z);
+      if (gap < nearest.gap) nearest = { gap, a: c.id, b: other.id, t };
     }
   }
 assert.ok(nearest.gap > 0.62, `${nearest.a} and ${nearest.b} come within ${nearest.gap.toFixed(2)} m at ${nearest.t} s`);
+// Round 4: nobody is ever in the fire pump room (no path point, no stay, no
+// step of a walk).
+for (const a of groundActors)
+  for (const s of a.segments)
+    for (const p of s.path.length > 1 ? samples(s.path) : s.path)
+      assert.ok(!inPumpRoom(p), `${a.id}: "${s.title}" enters the fire pump room at (${p.map((v) => v.toFixed(2)).join(', ')})`);
 
 // =============================================================================
 // Profiles and the story's PT base
@@ -939,5 +1223,5 @@ writeAscii(LOOP, loop);
 writeAscii(TEMPLATES, templates);
 writeFileSync(STORY, story);
 console.log(
-  `Rehab wing: kitchen run at x ${casework.x} (fronts at ${KITCHEN_FRONT}, sink z ${SINK_Z}), training stairs at (${STAIRS.at.join(', ')}) climbed in ${CLIMB_TIME} s + ${LANE_TIME} s back, ${PEOPLE.length} people added (${loop.actors.length} in the loop), community-25 on stepper 1; nearest community gap ${nearest.gap.toFixed(2)} m (${nearest.a}/${nearest.b} at ${nearest.t} s).`,
+  `Rehab wing: kitchen run at x ${casework.x} (fronts at ${KITCHEN_FRONT}, sink z ${SINK_Z}); fire pump room empty; desks x ${r3(DESK_X0)}..${r3(DESKS_X1)}; steppers x ${r3(STEPPER_X0)}..${r3(STEPPER_X0 + 4 * STEPPER[0] + 3 * STEPPER_GAP)}; corner stair at (${STAIRS.at.join(', ')}) climbed in ${CLIMB_TIME} s; plinth 1 at (${PLINTH_1.at.join(', ')}); ${PEOPLE.length} people added (${loop.actors.length} in the loop), community-25 on stepper 1; nearest community gap ${nearest.gap.toFixed(2)} m (${nearest.a}/${nearest.b} at ${nearest.t} s).`,
 );
