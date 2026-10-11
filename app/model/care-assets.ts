@@ -25,6 +25,7 @@ export const CARE_ASSET_KINDS = [
   'janitor-sink',
   'housekeeping-cart',
   'electrical-panel',
+  'urinal',
 ] as const;
 
 export function buildCareAsset(
@@ -230,6 +231,19 @@ export function buildCareAsset(
     }
     for (let x = -w / 2 + 0.08; x < w / 2 - 0.05; x += 0.1)
       box(x, -0.02, 0, 0.03, 0.02, d * 0.4, dark);
+  } else if (spec.kind === 'urinal') {
+    // Wall-hung urinal: a vitreous china body with its back (local -Z) on the
+    // wall, the bowl's opening on the front, and an exposed chrome flush
+    // valve rising from its top. The object is hung by its elevation (y).
+    const china = slot('china', white),
+      bowlD = d - 0.07,
+      bodyH = h * 0.62;
+    box(0, 0, -d / 2 + 0.04, w, bodyH, 0.08, china, 0.02);
+    box(0, 0.04, d / 2 - 0.01 - bowlD / 2, w * 0.86, bodyH - 0.1, bowlD, china, 0.06);
+    box(0, bodyH * 0.24, d / 2 - 0.006, w * 0.52, bodyH * 0.5, 0.012, slot('opening', 'photo-silver'), 0.004);
+    rod([0, bodyH - 0.02, -d / 2 + 0.07], [0, h - 0.08, -d / 2 + 0.07], 0.016, metal);
+    box(0, h - 0.1, -d / 2 + 0.07, 0.07, 0.1, 0.07, metal, 0.01);
+    rod([0.03, h - 0.06, -d / 2 + 0.07], [0.13, h - 0.07, -d / 2 + 0.07], 0.008, metal);
   }
   // Fitted to the declared dimensions with the base at the floor, like the
   // other asset families (clinical-assets.ts).

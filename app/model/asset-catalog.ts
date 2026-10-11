@@ -735,6 +735,11 @@ export const assetCatalog: Record<string, CatalogEntry> = {
     purpose:
       'Switchboard and sub-panel on the wall of the electrical room behind the loading roll-up: the building’s electrical service, kept locked and clear of stored goods; the electrician reaches it by the room’s door from receiving.',
   },
+  urinal: {
+    name: 'Urinal',
+    purpose:
+      'Wall-hung urinal beside the sinks in the south shared restroom, with a manual flush valve; a quick stop between therapy sessions that keeps the stalls free.',
+  },
   // Owner review 2026-10 · rehab
   'rehab-fridge': {
     name: 'Practice refrigerator',

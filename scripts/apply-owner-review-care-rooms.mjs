@@ -88,9 +88,10 @@ const REMOVED_WALLS = [
     'plan-wall-212',
     'plan-wall-213',
   ],
-  CHANGED_WALLS = ['plan-wall-177', 'plan-wall-179', 'plan-wall-068', 'plan-wall-083'],
-  CHANGED_OBJECTS = ['ot-toilet-0', 'ot-basin-0', 'ot-toilet-2', 'ot-basin-1', 'rehab-toilet-8'],
-  REMOVED_OBJECTS = ['reception-counter-2'];
+  CHANGED_WALLS = ['plan-wall-177', 'plan-wall-179', 'plan-wall-068', 'plan-wall-083', 'plan-wall-208'],
+  CHANGED_OBJECTS = ['ot-toilet-0', 'ot-basin-0', 'ot-toilet-2', 'ot-basin-1'],
+  // the south restroom's east-side toilet: the plan and the owner make it a urinal (owner-care-rehab-urinal)
+  REMOVED_OBJECTS = ['reception-counter-2', 'rehab-toilet-8'];
 const STATUS = 'owner-walkthrough 2026-10 / described, not surveyed';
 const PAGES = [92];
 
@@ -295,10 +296,47 @@ wall('plan-wall-179').a = [X_EAST, Z_NORTH];
   addWall('owner-care-wall-rehab-wc-south-south', 'plan-wall-205',
     [X_MID, Z_SOUTH_SOUTH],
     [r3(X_EAST + face('plan-wall-180')), Z_SOUTH_SOUTH]);
-  // The south restroom's accessible toilet stood 0.24 m into the chase: its back now meets it.
-  const t8 = object('rehab-toilet-8');
-  move('rehab-toilet-8', [r3(CHASE_FACE - m.assets[t8.assetId].dimensions[2] / 2 - 0.005), 0, t8.position[2]], -HALF, 'rehab-wc-south',
-    'Owner review 2026-10: the accessible toilet on the south restroom’s east side, its back against the plumbing chase (it was traced 0.24 m into it).');
+  // The fixture beside the south restroom's sinks is a urinal (the owner on
+  // the live build; the plan draws a urinal there), hung on the chase.
+  const vanity = object('rehab-wc-south-double-vanity'),
+    vanitySouth = vanity.position[2] + m.assets[vanity.assetId].dimensions[0] / 2,
+    URINAL = { w: 0.4, h: 1.0, d: 0.36, hung: 0.3 };
+  m.assets['owner-care-urinal'] = {
+    kind: 'urinal',
+    dimensions: [URINAL.w, URINAL.h, URINAL.d],
+    material: 'photo-white',
+    parameters: {},
+  };
+  place('owner-care-rehab-urinal', 'owner-care-urinal', 'rehab-wc-south',
+    [r3(CHASE_FACE - URINAL.d / 2 - 0.005), URINAL.hung, r3(vanitySouth + 0.25 + URINAL.w / 2)], -HALF,
+    'Owner (live build): “the toilet that’s right next to the sink should be a urinal.” Wall-hung urinal on the plumbing chase beside the sinks, where the plan draws one; product and mounting height typical.');
+  // The south restroom's last partition (plan-wall-208, in front of the end
+  // stall) is a board with a door, not a wall (the owner on the live build;
+  // the plan draws a thin partition with a door at its east end, beside the
+  // chase): a 5 cm oak board from the gym's wall to the door's jamb, and an
+  // oak door like the stalls' in the gap.
+  const BOARD_Z = 23.658685,
+    DOOR_X1 = CHASE_FACE,
+    DOOR_X0 = r3(DOOR_X1 - 0.86),
+    stallDoor = object('rehab-wc-south-stall-door-3'),
+    stallHandle = object('rehab-wc-south-stall-handle-3');
+  Object.assign(wall('plan-wall-208'), {
+    a: [X_MID, BOARD_Z],
+    b: [DOOR_X0, BOARD_Z],
+    thickness: 0.05,
+  });
+  m.assets['owner-care-rehab-wc-south-door'] = {
+    ...structuredClone(m.assets[stallDoor.assetId]),
+    dimensions: [0.048, 2.25, 0.8],
+  };
+  m.assets['owner-care-rehab-wc-south-door-handle'] = structuredClone(m.assets[stallHandle.assetId]);
+  place('owner-care-rehab-wc-south-door', 'owner-care-rehab-wc-south-door', 'rehab-wc-south',
+    [r3((DOOR_X0 + DOOR_X1) / 2), stallDoor.position[1], BOARD_Z], HALF,
+    'Owner (live build): the last partition in the south restroom is a board with a door. Oak door like the stalls’, hinged on the west, closed.',
+    { layer: 'architecture' });
+  place('owner-care-rehab-wc-south-door-handle', 'owner-care-rehab-wc-south-door-handle', 'rehab-wc-south',
+    [r3(DOOR_X1 - 0.12), stallHandle.position[1], r3(BOARD_Z - 0.051)], HALF,
+    'Handle on the restroom side of the partition door.', { layer: 'architecture' });
   for (const id of ['rehab-wc-east-double-vanity', 'rehab-wc-south-double-vanity']) {
     const v = object(id),
       back = v.position[0] + m.assets[v.assetId].dimensions[2] / 2;
@@ -660,7 +698,10 @@ review.newWallIds = union(
   m.walls.filter((w) => w.id.startsWith(OWN_WALL)).map((w) => w.id),
 );
 review.removedWallIds = union(review.removedWallIds, REMOVED_WALLS);
-review.changedPlanObjectIds = union(review.changedPlanObjectIds, CHANGED_OBJECTS);
+review.changedPlanObjectIds = union(
+  review.changedPlanObjectIds.filter((id) => !REMOVED_OBJECTS.includes(id)),
+  CHANGED_OBJECTS,
+);
 review.removedPlanObjectIds = union(review.removedPlanObjectIds, REMOVED_OBJECTS);
 review.newObjectIds = union(
   review.newObjectIds.filter((id) => !id.startsWith(OWN) && !OWN_OBJECTS.has(id)),
@@ -696,9 +737,17 @@ review.items.push({
   id: 'care-rooms-7c-restrooms-plan',
   rooms: ['rehab-wc-east', 'rehab-wc-south', 'rehab-entry'],
   change:
-    'Owner on the live build: “move the wall south and make the back sides solid; there shouldn’t be any gap between the back of the sinks and that wall in both of the multi-stall bathrooms; check the architectural plans.” Checked on Overall Planning.jpg: the north restroom’s north wall moves 0.35 m south to the plan’s line (z 11.49), the corridor taking the strip; both restrooms’ east sides are now solid (the plan’s plumbing chase, from the sinks’ wall at x −15.80 to the building wall), so the sinks and mirrors sit against it; the south restroom’s south wall is one continuous wall (the traced fragments left a 2.4 m opening to the gym); its accessible toilet moves 0.22 m west to stand against the chase.',
+    'Owner on the live build: “move the wall south and make the back sides solid; there shouldn’t be any gap between the back of the sinks and that wall in both of the multi-stall bathrooms; check the architectural plans.” Checked on Overall Planning.jpg: the north restroom’s north wall moves 0.35 m south to the plan’s line (z 11.49), the corridor taking the strip; both restrooms’ east sides are now solid (the plan’s plumbing chase, from the sinks’ wall at x −15.80 to the building wall), so the sinks and mirrors sit against it; the south restroom’s south wall is one continuous wall (the traced fragments left a 2.4 m opening to the gym); the fixture beside its sinks is a urinal on the chase (care-rooms-7d).',
   unresolved:
     'The plan’s back-wall face is x −15.72 (−15.81 in the south restroom’s lower half); the chase face is at −15.80 to keep the traced sinks, mirrors and tile against it. The south restroom’s south wall stays on the traced line (z 25.24), 0.18 m north of the plan’s (z 25.42), because the gym’s east wall and the practice stair are placed from it. The plan’s small closet at the chase’s north end (opening to the corridor) is drawn solid. The west therapy bathroom’s north wall is also 0.35 m north of the plan’s line but is unchanged. The plan’s structural column at the south restroom’s east wall is not modelled (no columns are).',
+});
+review.items.push({
+  id: 'care-rooms-7d-south-restroom-board-urinal',
+  rooms: ['rehab-wc-south'],
+  change:
+    'Owner on the live build: “in the south multi-stall restroom, the inner last contiguous wall should just be a board with a door instead of a wall; the toilet that’s right next to the sink should be a urinal.” The oak wall across the restroom in front of the end stall (plan-wall-208) is a 5 cm board ending 0.86 m short of the plumbing chase, with an oak door like the stalls’ in that gap (where the plan draws it); the fixture beside the sinks is a wall-hung urinal on the chase (the plan draws a urinal there).',
+  unresolved:
+    'The door’s width (0.86 m opening, 0.8 m leaf) and the board’s thickness are typical, not measured; the door is drawn closed, like the stall doors. The urinal stands 0.25 m south of the sinks (the plan’s is 0.3 m closer, with a shorter sink counter); its mounting height and the absence of a privacy screen are assumptions.',
 });
 review.items.push({
   id: 'care-rooms-7b-rehab-shower',

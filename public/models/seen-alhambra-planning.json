@@ -10852,11 +10852,11 @@
         23.658685
       ],
       "b": [
-        -14.653121,
+        -16.66,
         23.658685
       ],
       "height": 2.38,
-      "thickness": 0.20351556661228815,
+      "thickness": 0.05,
       "material": "oak",
       "status": "source-stroke-traced / height-inferred",
       "referencePages": [
@@ -15973,6 +15973,34 @@
         "activity": "buffet"
       }
     },
+    "owner-care-urinal": {
+      "kind": "urinal",
+      "dimensions": [
+        0.4,
+        1,
+        0.36
+      ],
+      "material": "photo-white",
+      "parameters": {}
+    },
+    "owner-care-rehab-wc-south-door": {
+      "kind": "box",
+      "dimensions": [
+        0.048,
+        2.25,
+        0.8
+      ],
+      "material": "oak"
+    },
+    "owner-care-rehab-wc-south-door-handle": {
+      "kind": "box",
+      "dimensions": [
+        0.04,
+        0.027,
+        0.12
+      ],
+      "material": "photo-bronze"
+    },
     "photo-rehab-wc-east-stall-door-3": {
       "kind": "box",
       "dimensions": [
@@ -18080,29 +18108,6 @@
         7.999999999999999,
         12
       ]
-    },
-    {
-      "id": "rehab-toilet-8",
-      "assetId": "toilet",
-      "zoneId": "rehab",
-      "levelId": "ground",
-      "position": [
-        -16.15,
-        0,
-        22.335833
-      ],
-      "rotation": -1.5707963267948966,
-      "scale": [
-        0.8848502896186441,
-        1,
-        0.8848502896186443
-      ],
-      "roomId": "rehab-wc-south",
-      "referencePages": [
-        92
-      ],
-      "status": "owner-walkthrough 2026-10 / described, not surveyed",
-      "notes": "Owner review 2026-10: the accessible toilet on the south restroom’s east side, its back against the plumbing chase (it was traced 0.24 m into it)."
     },
     {
       "id": "rehab-toilet-9",
@@ -32234,6 +32239,78 @@
       "layer": "furniture"
     },
     {
+      "id": "owner-care-rehab-urinal",
+      "assetId": "owner-care-urinal",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -15.985,
+        0.3,
+        21.99
+      ],
+      "rotation": -1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rehab-wc-south",
+      "layer": "furniture",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner (live build): “the toilet that’s right next to the sink should be a urinal.” Wall-hung urinal on the plumbing chase beside the sinks, where the plan draws one; product and mounting height typical."
+    },
+    {
+      "id": "owner-care-rehab-wc-south-door",
+      "assetId": "owner-care-rehab-wc-south-door",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -16.23,
+        0.13,
+        23.658685
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rehab-wc-south",
+      "layer": "architecture",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner (live build): the last partition in the south restroom is a board with a door. Oak door like the stalls’, hinged on the west, closed."
+    },
+    {
+      "id": "owner-care-rehab-wc-south-door-handle",
+      "assetId": "owner-care-rehab-wc-south-door-handle",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "position": [
+        -15.92,
+        1.03,
+        23.608
+      ],
+      "rotation": 1.5707963267948966,
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "roomId": "rehab-wc-south",
+      "layer": "architecture",
+      "referencePages": [
+        92
+      ],
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Handle on the restroom side of the partition door."
+    },
+    {
       "id": "rehab-wc-east-stall-door-3",
       "assetId": "photo-rehab-wc-east-stall-door-3",
       "zoneId": "rehab",
@@ -43575,8 +43652,16 @@
           "rehab-wc-south",
           "rehab-entry"
         ],
-        "change": "Owner on the live build: “move the wall south and make the back sides solid; there shouldn’t be any gap between the back of the sinks and that wall in both of the multi-stall bathrooms; check the architectural plans.” Checked on Overall Planning.jpg: the north restroom’s north wall moves 0.35 m south to the plan’s line (z 11.49), the corridor taking the strip; both restrooms’ east sides are now solid (the plan’s plumbing chase, from the sinks’ wall at x −15.80 to the building wall), so the sinks and mirrors sit against it; the south restroom’s south wall is one continuous wall (the traced fragments left a 2.4 m opening to the gym); its accessible toilet moves 0.22 m west to stand against the chase.",
+        "change": "Owner on the live build: “move the wall south and make the back sides solid; there shouldn’t be any gap between the back of the sinks and that wall in both of the multi-stall bathrooms; check the architectural plans.” Checked on Overall Planning.jpg: the north restroom’s north wall moves 0.35 m south to the plan’s line (z 11.49), the corridor taking the strip; both restrooms’ east sides are now solid (the plan’s plumbing chase, from the sinks’ wall at x −15.80 to the building wall), so the sinks and mirrors sit against it; the south restroom’s south wall is one continuous wall (the traced fragments left a 2.4 m opening to the gym); the fixture beside its sinks is a urinal on the chase (care-rooms-7d).",
         "unresolved": "The plan’s back-wall face is x −15.72 (−15.81 in the south restroom’s lower half); the chase face is at −15.80 to keep the traced sinks, mirrors and tile against it. The south restroom’s south wall stays on the traced line (z 25.24), 0.18 m north of the plan’s (z 25.42), because the gym’s east wall and the practice stair are placed from it. The plan’s small closet at the chase’s north end (opening to the corridor) is drawn solid. The west therapy bathroom’s north wall is also 0.35 m north of the plan’s line but is unchanged. The plan’s structural column at the south restroom’s east wall is not modelled (no columns are)."
+      },
+      {
+        "id": "care-rooms-7d-south-restroom-board-urinal",
+        "rooms": [
+          "rehab-wc-south"
+        ],
+        "change": "Owner on the live build: “in the south multi-stall restroom, the inner last contiguous wall should just be a board with a door instead of a wall; the toilet that’s right next to the sink should be a urinal.” The oak wall across the restroom in front of the end stall (plan-wall-208) is a 5 cm board ending 0.86 m short of the plumbing chase, with an oak door like the stalls’ in that gap (where the plan draws it); the fixture beside the sinks is a wall-hung urinal on the chase (the plan draws a urinal there).",
+        "unresolved": "The door’s width (0.86 m opening, 0.8 m leaf) and the board’s thickness are typical, not measured; the door is drawn closed, like the stall doors. The urinal stands 0.25 m south of the sinks (the plan’s is 0.3 m closer, with a shorter sink counter); its mounting height and the absence of a privacy screen are assumptions."
       },
       {
         "id": "care-rooms-7b-rehab-shower",
@@ -43782,7 +43867,8 @@
       "plan-wall-179",
       "plan-wall-068",
       "plan-wall-083",
-      "plan-wall-146"
+      "plan-wall-146",
+      "plan-wall-208"
     ],
     "newWallIds": [
       "owner-wall-154-north",
@@ -43821,14 +43907,14 @@
       "ot-toilet-2",
       "ot-basin-1",
       "admin-side-chair-0",
-      "admin-side-chair-1",
-      "rehab-toilet-8"
+      "admin-side-chair-1"
     ],
     "removedPlanObjectIds": [
       "reception-counter-2",
       "admin-waiting-chair-0",
       "admin-waiting-chair-1",
       "admin-waiting-chair-2",
+      "rehab-toilet-8",
       "rehab-demonstration-counter",
       "rehab-visible-chair-0",
       "rehab-visible-chair-1",
@@ -43875,6 +43961,9 @@
       "quiet-table-2-chair-2",
       "quiet-table-2-chair-3",
       "quiet-table-2-chair-4",
+      "owner-care-rehab-urinal",
+      "owner-care-rehab-wc-south-door",
+      "owner-care-rehab-wc-south-door-handle",
       "rehab-wc-east-stall-door-3",
       "rehab-wc-east-stall-handle-3",
       "owner-care-rehab-shower",
