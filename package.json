@@ -32,7 +32,7 @@
     "validate:scenario": "node scripts/build-scenario.mjs --check",
     "validate:community-tracks": "node scripts/build-community-tracks.mjs --check",
     "validate:public": "node scripts/validate-public-assets.mjs",
-    "validate": "tsc --noEmit --incremental false && npm run validate:model && npm run validate:home && npm run validate:layout && npm run validate:sites && npm run validate:day-program && npm run validate:community-tracks && npm run validate:partner-adhc && npm run validate:activity && npm run validate:traffic && npm run validate:fleet && npm run validate:community && npm run validate:scenario && npm run validate:trace && npm run validate:renderer && npm run validate:public",
+    "validate": "npm run lint && tsc --noEmit --incremental false && npm run validate:model && npm run validate:home && npm run validate:layout && npm run validate:sites && npm run validate:day-program && npm run validate:community-tracks && npm run validate:partner-adhc && npm run validate:activity && npm run validate:traffic && npm run validate:fleet && npm run validate:community && npm run validate:scenario && npm run validate:trace && npm run validate:renderer && npm run validate:public",
     "test": "npm run validate && npm run test:unit",
     "test:unit": "node scripts/test.mjs",
     "dev:story": "vite --config vite.story.config.ts",

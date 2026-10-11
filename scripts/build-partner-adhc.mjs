@@ -971,8 +971,8 @@ for (const [id, name, wallRun, gap, line, into, zone, notes] of [
 ]) {
   const width = (gap[1] - gap[0]) / 2 - 0.025;
   const leaves = [
-    door(`${id}-1`, `${name} (left leaf)`, zone, [gap[0], line], leaf([1, 0]), leaf(into), width, notes),
-    door(`${id}-2`, `${name} (right leaf)`, zone, [gap[1], line], leaf([-1, 0]), leaf(into), width, notes),
+    door(`${String(id)}-1`, `${String(name)} (left leaf)`, zone, [gap[0], line], leaf([1, 0]), leaf(into), width, notes),
+    door(`${String(id)}-2`, `${String(name)} (right leaf)`, zone, [gap[1], line], leaf([-1, 0]), leaf(into), width, notes),
   ];
   schedule(id, wallRun, gap, leaves, notes, 'double-swing');
 }

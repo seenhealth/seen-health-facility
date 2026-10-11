@@ -336,7 +336,7 @@ export function validateFacility(input: unknown): Facility {
   };
   const url = (v: unknown) =>
     typeof v === 'string' &&
-    ((v.startsWith('/') && !v.startsWith('//')) || /^https:\/\//.test(v));
+    ((v.startsWith('/') && !v.startsWith('//')) || v.startsWith('https://'));
   if (
     !str(m.id) ||
     !str(m.name) ||

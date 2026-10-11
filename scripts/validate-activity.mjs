@@ -13,7 +13,7 @@ import { alhambraSource } from '../work/validation/alhambra-source.mjs';
 import { registerCommunityVehicles } from '../work/validation/community-vehicles.mjs';
 import { COMMUNITY_SOURCE_ID } from '../work/validation/community-people.mjs';
 import { buildNeighborhood } from '../work/validation/neighborhood.mjs';
-import { sampleVan, vanWindows, ARRIVAL } from '../work/validation/arrival.mjs';
+import { sampleVan, ARRIVAL } from '../work/validation/arrival.mjs';
 import { dayProgram, programAt } from '../work/validation/day-room.mjs';
 import { floorPrograms } from '../work/validation/day-program.mjs';
 import { createCharacter } from '../work/validation/characters.mjs';

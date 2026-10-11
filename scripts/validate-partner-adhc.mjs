@@ -618,7 +618,11 @@ assert.deepEqual(
   [...CONTRACT].sort(),
   'The featured scenes are the contract interactions',
 );
-assert.deepEqual([...cast.keep.interactions].sort(), [...CONTRACT].sort(), 'keep.interactions');
+assert.deepEqual(
+  [...cast.keep.interactions].sort((a, b) => a.localeCompare(b)),
+  [...CONTRACT].sort((a, b) => a.localeCompare(b)),
+  'keep.interactions',
+);
 const peopleById = new Map(cast.people.map((p) => [p.id, p]));
 for (const id of [
   'visiting-pt',

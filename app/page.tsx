@@ -1,5 +1,13 @@
 'use client';
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+} from 'react';
 import {
   ArrowDownToLine,
   ArrowUpRight,
@@ -49,6 +57,7 @@ import { isRotationDay, setProgramRotation } from './model/day-room';
 import { ShowcaseControls } from './components/showcase-controls';
 import { SiteMap } from './components/site-map';
 import { sites, type SiteId } from './data/sites';
+type Viewer = ReturnType<typeof createViewer>;
 // Charts load only when the Measure panel opens.
 const MetricsPanel = lazy(() => import('./components/metrics-panel'));
 const download = (data: Blob, name: string) => {
@@ -89,7 +98,7 @@ const jsonDownload = (data: unknown, name: string) =>
   );
 export default function Home() {
   const host = useRef<HTMLDivElement>(null),
-    viewer = useRef<ReturnType<typeof createViewer> | null>(null),
+    viewer = useRef<Viewer | null>(null),
     upload = useRef<HTMLInputElement>(null),
     panelToggle = useRef<HTMLButtonElement>(null),
     explorerToggle = useRef<HTMLButtonElement>(null),
@@ -109,7 +118,8 @@ export default function Home() {
       exterior: false,
       labels: false,
     }),
-    [ready, setReady] = useState(false),
+    // Mirrors viewer.current once it is ready, so render never reads the ref.
+    [liveViewer, setLiveViewer] = useState<Viewer | null>(null),
     [error, setError] = useState(''),
     [view, setView] = useState('iso'),
     [collapsed, setCollapsed] = useState(true),
@@ -124,11 +134,12 @@ export default function Home() {
     [exporting, setExporting] = useState(false),
     [notice, setNotice] = useState(''),
     // The viewer builds the community layer when its source carries one.
-    [hasCommunity, setHasCommunity] = useState(false),
     // The person, piece of furniture or vehicle whose card is open.
     [inspected, setInspected] = useState<InspectTarget | null>(null),
     [dataTab, setDataTab] = useState<'overview' | 'assets'>('overview');
   const patch = (s: Partial<ViewerState>) => setState((p) => ({ ...p, ...s }));
+  const ready = liveViewer !== null;
+  const hasCommunity = !!liveViewer?.community;
   const getViewer = useCallback(() => viewer.current, []);
   // Cards share the top-right slot: an item's card closes the space card and
   // a space card closes the item's.
@@ -186,7 +197,7 @@ export default function Home() {
     viewer.current?.setShowcase(false);
     if (id !== siteId || clinicOption || !locationReady) {
       setModel(null);
-      setReady(false);
+      setLiveViewer(null);
       setError('');
     }
     setSiteId(id);
@@ -213,13 +224,15 @@ export default function Home() {
     u.searchParams.delete('view');
     window.history.replaceState(null, '', u);
   };
+  // Effect event: the mount-only URL restore must not re-run when selectSite changes.
+  const selectInitialSite = useEffectEvent((id: SiteId) => selectSite(id));
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
     const id = sites.find((s) => s.id === p.get('site'))?.id || 'alhambra';
     const program = p.get('program');
     if (isRotationDay(program)) setProgramRotation(program);
     queueMicrotask(() => {
-      selectSite(id);
+      selectInitialSite(id);
       setClinicOption(id === 'olympic' && p.get('option') === 'clinic');
       setNetworkOpen(p.get('view') === 'map');
       if (
@@ -272,13 +285,44 @@ export default function Home() {
       });
     return () => controller.abort();
   }, [siteId, clinicOption, locationReady]);
+  const applyShowcase = (v: Viewer) => {
+    previousView.current = state;
+    const next = {
+      ...defaultState,
+      level: 'ground',
+      walls: 'cutaway' as const,
+      roof: false,
+      exterior: false,
+      labels: false,
+      ceilings: false,
+    };
+    setState(next);
+    v.update(next);
+    v.setShowcase(true);
+    setPanelOpen(false);
+    setShowControls(false);
+    setCollapsed(true);
+  };
+  // Effect event: reads the latest view state once the async renderer import
+  // resolves, without recreating the viewer whenever that state changes.
+  const startViewer = useEffectEvent((v: Viewer, m: Facility) => {
+    v.update(state);
+    // Same console hook as the story (?debug=1): lets screenshot and
+    // tuning scripts drive the viewer without UI automation.
+    if (new URLSearchParams(window.location.search).get('debug') === '1')
+      (window as unknown as { __viewer: unknown }).__viewer = v;
+    if (m.contextStyle) v.focus(null, null, true);
+    else v.focus('day');
+    if (state.exterior) v.view('exterior');
+    setLiveViewer(v);
+    if (showcase) applyShowcase(v);
+  });
   useEffect(() => {
     if (!model || !host.current) return;
     let ended = false;
-    setReady(false);
-    import('./model/renderer').then(({ createViewer }) => {
-      if (ended || !host.current) return;
-      try {
+    import('./model/renderer')
+      .then(({ createViewer }) => {
+        if (ended || !host.current) return;
         viewer.current = createViewer(host.current, model, (zone, room) => {
           const selectedZone = model.zones.find((z) => z.id === zone);
           setState((s) => ({
@@ -310,29 +354,22 @@ export default function Home() {
           setInspected(target);
           if (target) setCardOpen(false);
         });
-        viewer.current.update(state);
-        // Same console hook as the story (?debug=1): lets screenshot and
-        // tuning scripts drive the viewer without UI automation.
-        if (new URLSearchParams(window.location.search).get('debug') === '1')
-          (window as unknown as { __viewer: unknown }).__viewer = viewer.current;
-        if (model.contextStyle) viewer.current.focus(null, null, true);
-        else viewer.current.focus('day');
-        if (state.exterior) viewer.current.view('exterior');
-        setHasCommunity(!!viewer.current.community);
-        setReady(true);
-      } catch (e) {
+        startViewer(viewer.current, model);
+      })
+      .catch((e: unknown) => {
         console.error(e);
-        setError('The 3D model could not start. Please reload the model.');
-      }
-    });
+        if (!ended)
+          setError('The 3D model could not start. Please reload the model.');
+      });
     return () => {
       ended = true;
       viewer.current?.dispose();
       viewer.current = null;
+      setLiveViewer(null);
       setInspected(null);
     };
   }, [model]);
-  useEffect(() => viewer.current?.update(state), [state, ready]);
+  useEffect(() => liveViewer?.update(state), [state, liveViewer]);
   useEffect(() => {
     // The weekly repertoire belongs to the Alhambra day room; site-specific
     // models play their own baked Monday program, so ?program= does not
@@ -344,35 +381,16 @@ export default function Home() {
     u.searchParams.delete('program');
     window.history.replaceState(null, '', u);
   }, [model]);
-  useEffect(() => {
-    if (!ready || !viewer.current) return;
-    if (showcase) {
-      previousView.current = state;
-      const next = {
-        ...defaultState,
-        level: 'ground',
-        walls: 'cutaway' as const,
-        roof: false,
-        exterior: false,
-        labels: false,
-        ceilings: false,
-      };
-      setState(next);
-      viewer.current.update(next);
-      viewer.current.setShowcase(true);
-      setPanelOpen(false);
-      setShowControls(false);
-      setCollapsed(true);
-    } else viewer.current.setShowcase(false);
-  }, [showcase, ready]);
   const enterShowcase = () => {
     setShowcase(true);
+    if (viewer.current) applyShowcase(viewer.current);
     const url = new URL(window.location.href);
     url.searchParams.set('view', 'tiltshift');
     window.history.replaceState(null, '', url);
   };
   const exitShowcase = () => {
     setShowcase(false);
+    viewer.current?.setShowcase(false);
     if (previousView.current) setState(previousView.current);
     viewer.current?.view('iso');
     viewer.current?.focus('day');
@@ -682,7 +700,7 @@ export default function Home() {
               onChange={(e) => {
                 const enabled = e.target.value === 'option';
                 setModel(null);
-                setReady(false);
+                setLiveViewer(null);
                 setError('');
                 setClinicOption(enabled);
                 setState((s) => ({
@@ -823,8 +841,8 @@ export default function Home() {
       </aside>
       <section className="model-workspace" aria-label="Interactive facility">
         <div className="model-canvas" ref={host} />
-        {showcase && ready && viewer.current && (
-          <ShowcaseControls viewer={viewer.current} onExit={exitShowcase} />
+        {showcase && liveViewer && (
+          <ShowcaseControls viewer={liveViewer} onExit={exitShowcase} />
         )}
         {!ready && (
           <div className="model-loading">
@@ -1002,7 +1020,7 @@ export default function Home() {
         {ready && !showcase && (
           <InspectCard
             key={model?.id}
-            viewer={viewer.current}
+            viewer={liveViewer}
             target={inspected}
             onClose={closeInspect}
           />
@@ -1033,7 +1051,7 @@ export default function Home() {
         </div>
         {!panelOpen && ready && !showcase && (
           <MiniPlayer
-            viewer={viewer.current}
+            viewer={liveViewer}
             onOpen={() => {
               setPanelTab('activity');
               setPanelOpen(true);
@@ -1320,7 +1338,7 @@ export default function Home() {
               (ready ? (
                 <ActivityPanel
                   key={model?.id || siteId}
-                  viewer={viewer.current}
+                  viewer={liveViewer}
                   onScene={focusActivity}
                 />
               ) : (
@@ -1353,8 +1371,15 @@ export default function Home() {
           </button>
         </div>
       )}
+      {/* Backdrop click is a mouse shortcut; Esc and the close button cover keyboard users. */}
       {modal && model && (
-        <div className="dialog-shade" onClick={() => setModal(null)}>
+        <div
+          className="dialog-shade"
+          role="presentation"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setModal(null);
+          }}
+        >
           <section
             className={`viewer-dialog ${modal === 'accuracy' ? 'audit-dialog' : 'files-dialog'}`}
             role="dialog"
@@ -1364,7 +1389,6 @@ export default function Home() {
                 ? 'Accuracy register'
                 : 'Portable model files'
             }
-            onClick={(e) => e.stopPropagation()}
           >
             <button
               className="dialog-close icon-button"
