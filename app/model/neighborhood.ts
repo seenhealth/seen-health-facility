@@ -466,7 +466,7 @@ export function buildNeighborhood(model: Facility) {
     g.name = `road-text-${text}`;
     root.add(g);
     const total = text.length * 1.15 - 0.25;
-    [...text].forEach((ch, k) => {
+    text.split('').forEach((ch, k) => {
       const u0 = k * 1.15 - total / 2;
       for (const [a, b, c, e] of glyphs[ch] ?? []) {
         const cu = (u0 + (a + c) / 2) * scale,

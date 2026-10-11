@@ -99,7 +99,7 @@ export function exteriorPrimitives() {
   }
   // Merge within semantic groups, preserving group names for export/review.
   function batch(root: T.Group) {
-    for (const child of [...root.children])
+    for (const child of root.children)
       if (child instanceof T.Group) batch(child);
     const buckets = new Map<T.Material, T.Mesh[]>();
     for (const child of root.children)

@@ -110,7 +110,7 @@ Exporting the specification, a GLB or a PNG of the view, opening a local specifi
 The checked-in models work without private source documents or regeneration. A fresh clone validates everything offline with one command, and CI (`.github/workflows/validate.yml`, Node 22) runs the same on every push and pull request, followed by the three builds:
 
 ```bash
-npm run validate    # type check, then every validator below, in this order
+npm run validate    # lint and type check, then every validator below, in this order
 npm test            # npm run validate, then the unit tests
 npm run build
 npm run build:story
@@ -119,7 +119,8 @@ npm run build:viewer
 
 | Command | Checks |
 | --- | --- |
-| `npx tsc --noEmit --incremental false` | Types (first step of `validate`) |
+| `npm run lint` | oxlint, including type-aware and React rules (first step of `validate`); rules that don't fit this app are switched off in `.oxlintrc.json` with a reason |
+| `npx tsc --noEmit --incremental false` | Types (after lint) |
 | `npm run validate:model` | Alhambra schema, geometry and asset builders; published JSON copies match `app/data/` |
 | `npm run validate:home` | The Wongs' home: plan, doors, furniture, turning circles and reach at wheelchair and walker clearance; home asset kinds; the frame on its pad; the ADL cast (rooms, seats, walk times) and contacts on its generated tracks |
 | `npm run validate:layout` | Alhambra stairs and apertures, fixture openings, walking clearance around photographed equipment |

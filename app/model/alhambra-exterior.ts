@@ -1295,8 +1295,7 @@ export function buildAlhambraExterior(model: Facility) {
   // The utility pole with its yellow guard stands in front of the junction;
   // the planter curbs are painted blue.
   const court2 = group(facade, 'rear-court-staff-entrance-and-loading');
-  const SOUTH_Z = -22.463,
-    BUMP_Z = -15.213;
+  const BUMP_Z = -15.213;
   // The wing's north wall shows above the loading block's lower roof (eave 5.3 against the wing's 6.5).
   box(court2, 8.47, 5.2, -12.465, 6.56, 1.45, 0.24, COURT_CONCRETE);
   // The entrance is on the wing's EAST face (x 15.26, z −12.5 → 3.5, the long wall the dispatcher shaded), elements
@@ -2689,7 +2688,7 @@ export function buildAlhambraExterior(model: Facility) {
   // B: the raised divider, north-south from the tree island's south tip (its north end runs along the island's
   // south-east edge, so the two read as one planter) toward the court, the pipe rail on its west side facing the
   // first palm; a low bed of grasses south of the palm's planter along it, rounded at the west.
-  const [bx0, bz0, bx1, bz1] = REAR_COURT_PLANTERS[4];
+  const [bx0, , bx1, bz1] = REAR_COURT_PLANTERS[4];
   const islandEdge = (x: number) =>
     -18.49 + ((x - 31.34) * (-21.73 + 18.49)) / (36.68 - 31.34);
   const B: Vec2[] = [
