@@ -77,9 +77,19 @@ const OWN = 'owner-care-',
   /** Layout-correction furnishings (not baseline) this script drops: the fourth linen rack and the second washer. */
   DROPPED_OBJECTS = ['access-linen-rack-4', 'access-washing-machine-2'];
 /** Baseline walls this script removes, moves and baseline objects it moves or removes. */
-const REMOVED_WALLS = ['plan-wall-199', 'plan-wall-081', 'plan-wall-102'],
+const REMOVED_WALLS = [
+    'plan-wall-199',
+    'plan-wall-081',
+    'plan-wall-102',
+    // the south restroom's traced south-wall fragments (one continuous wall replaces them)
+    'plan-wall-209',
+    'plan-wall-210',
+    'plan-wall-211',
+    'plan-wall-212',
+    'plan-wall-213',
+  ],
   CHANGED_WALLS = ['plan-wall-177', 'plan-wall-179', 'plan-wall-068', 'plan-wall-083'],
-  CHANGED_OBJECTS = ['ot-toilet-0', 'ot-basin-0', 'ot-toilet-2', 'ot-basin-1'],
+  CHANGED_OBJECTS = ['ot-toilet-0', 'ot-basin-0', 'ot-toilet-2', 'ot-basin-1', 'rehab-toilet-8'],
   REMOVED_OBJECTS = ['reception-counter-2'];
 const STATUS = 'owner-walkthrough 2026-10 / described, not surveyed';
 const PAGES = [92];
@@ -213,11 +223,88 @@ const Z_NORTH = 11.142477, // the bathrooms' north edge (rooms rehab-wc-nw / reh
   X_WEST = -22.590228, // rehab-wc-nw's west wall (plan-wall-175/176)
   X_MID = -19.842768, // plan-wall-177, between the west bathrooms and the multistall room
   X_EAST = -14.653121; // plan-wall-179, the multistall room's east wall
+// The multistall restrooms against the plan (the owner on the live build:
+// "move the wall south and make the back sides solid; there shouldn't be any
+// gap between the back of the sinks and that wall in both of the multi-stall
+// bathrooms; check the architectural plans"). Measured on Overall
+// Planning.jpg: the north restroom's north wall runs z 11.38–11.60 (centre
+// 11.49, 0.35 m south of the bathrooms' traced edge); both restrooms' east
+// sides are solid from their back wall (face x −15.72, −15.81 in the south
+// restroom's lower half) to the building wall: the plumbing chase. The sinks,
+// mirrors and wall tile were traced against x −15.82, so the chase's face is
+// put just behind them, at x −15.80.
+const Z_REST_NORTH = 11.49,
+  CHASE_FACE = -15.8;
 addWall('owner-care-wall-rehab-wc-nw-north', 'plan-wall-177', [X_WEST, Z_NORTH], [X_MID, Z_NORTH]);
-addWall('owner-care-wall-rehab-wc-east-north', 'plan-wall-177', [X_MID, Z_NORTH], [X_EAST, Z_NORTH]);
+addWall('owner-care-wall-rehab-wc-east-north', 'plan-wall-177', [X_MID, Z_REST_NORTH], [X_EAST, Z_REST_NORTH]);
 // The dividing walls reach the new north walls (they started 0.25 m short, at the corridor's edge).
 wall('plan-wall-177').a = [X_MID, Z_NORTH];
 wall('plan-wall-179').a = [X_EAST, Z_NORTH];
+{
+  const Z_SOUTH_EDGE = 17.960249, // plan-wall-198, the north restroom's south wall
+    Z_SOUTH_NORTH = 19.435737, // plan-wall-205, the south restroom's north wall
+    Z_SOUTH_SOUTH = 25.23593, // the south restroom's south wall line (plan-wall-209…213)
+    EAST_FACE = r3(X_EAST - face('plan-wall-179')),
+    CHASE_T = r3(EAST_FACE - CHASE_FACE),
+    northFace = (id) => face(id);
+  // The north restroom ends at its new north wall; the corridor takes the strip.
+  room('rehab-wc-east').polygon = [
+    [X_MID, Z_REST_NORTH],
+    [X_EAST, Z_REST_NORTH],
+    [X_EAST, Z_SOUTH_EDGE],
+    [X_MID, Z_SOUTH_EDGE],
+  ];
+  room('rehab-entry').polygon = [
+    [-22.895501, 8.903806],
+    [X_EAST, 8.903806],
+    [X_EAST, Z_REST_NORTH],
+    [X_MID, Z_REST_NORTH],
+    [X_MID, 11.091598],
+    [-22.895501, 11.091598],
+  ];
+  // The north restroom's wall tile and floor border start at the moved wall.
+  const tileStart = r3(Z_REST_NORTH + face('owner-care-wall-rehab-wc-east-north')),
+    tileEnd = 17.858;
+  for (const kind of ['tile-base', 'teal-band', 'floor-border'])
+    for (const k of [0, 1]) {
+      const o = object(`rehab-wc-east-${kind}-${k}`);
+      m.assets[o.assetId].dimensions[2] = r3(tileEnd - tileStart);
+      o.position[2] = r3((tileStart + tileEnd) / 2);
+    }
+  // The chase behind both restrooms: solid from the back wall to the building
+  // wall. It is built from four abutting wall strips rather than one 1 m wall:
+  // the nav grid and the validators measure a wall as its centre line less
+  // half its thickness, which would bulge a 1 m wall 0.5 m past its ends into
+  // the cross-hall; a 0.26 m strip's ends behave like any other wall's.
+  const STRIPS = Math.ceil(CHASE_T / 0.26),
+    STRIP_T = CHASE_T / STRIPS;
+  for (let i = 0; i < STRIPS; i++) {
+    const x = r3(CHASE_FACE + STRIP_T * (i + 0.5));
+    addWall(`owner-care-wall-rehab-wc-east-chase-${i}`, 'plan-wall-179',
+      [x, r3(Z_REST_NORTH + northFace('owner-care-wall-rehab-wc-east-north'))],
+      [x, r3(Z_SOUTH_EDGE - face('plan-wall-198'))]);
+    addWall(`owner-care-wall-rehab-wc-south-chase-${i}`, 'plan-wall-180',
+      [x, r3(Z_SOUTH_NORTH + face('plan-wall-205'))],
+      [x, r3(Z_SOUTH_SOUTH - face('plan-wall-205'))]);
+    wall(`owner-care-wall-rehab-wc-east-chase-${i}`).thickness = r3(STRIP_T);
+    wall(`owner-care-wall-rehab-wc-south-chase-${i}`).thickness = r3(STRIP_T);
+  }
+  // The south restroom's south wall, continuous from the gym's east wall to the
+  // building wall (from the traced line's west end, as the fragments did: the
+  // practice stair stands just west of it).
+  addWall('owner-care-wall-rehab-wc-south-south', 'plan-wall-205',
+    [X_MID, Z_SOUTH_SOUTH],
+    [r3(X_EAST + face('plan-wall-180')), Z_SOUTH_SOUTH]);
+  // The south restroom's accessible toilet stood 0.24 m into the chase: its back now meets it.
+  const t8 = object('rehab-toilet-8');
+  move('rehab-toilet-8', [r3(CHASE_FACE - m.assets[t8.assetId].dimensions[2] / 2 - 0.005), 0, t8.position[2]], -HALF, 'rehab-wc-south',
+    'Owner review 2026-10: the accessible toilet on the south restroom’s east side, its back against the plumbing chase (it was traced 0.24 m into it).');
+  for (const id of ['rehab-wc-east-double-vanity', 'rehab-wc-south-double-vanity']) {
+    const v = object(id),
+      back = v.position[0] + m.assets[v.assetId].dimensions[2] / 2;
+    assert.ok(back <= CHASE_FACE && CHASE_FACE - back < 0.08, `${id} backs onto the chase`);
+  }
+}
 // The oak divider (plan-wall-199) is gone; a partition stub like the other stalls' separates the fourth stall.
 const STALL_3_Z = 13.279391;
 addWall('owner-care-wall-rehab-wc-east-stall-3', 'plan-wall-200', [X_MID, STALL_3_Z], [-19.486616, STALL_3_Z]);
@@ -567,12 +654,16 @@ for (const [p, id] of [
 
 // The registry.
 review.changedWallIds = union(review.changedWallIds, CHANGED_WALLS);
-review.newWallIds = union(review.newWallIds, m.walls.filter((w) => w.id.startsWith(OWN_WALL)).map((w) => w.id));
+// Own ids are re-listed from what exists now, so ids this script stopped making drop out.
+review.newWallIds = union(
+  review.newWallIds.filter((id) => !id.startsWith(OWN_WALL)),
+  m.walls.filter((w) => w.id.startsWith(OWN_WALL)).map((w) => w.id),
+);
 review.removedWallIds = union(review.removedWallIds, REMOVED_WALLS);
 review.changedPlanObjectIds = union(review.changedPlanObjectIds, CHANGED_OBJECTS);
 review.removedPlanObjectIds = union(review.removedPlanObjectIds, REMOVED_OBJECTS);
 review.newObjectIds = union(
-  review.newObjectIds,
+  review.newObjectIds.filter((id) => !id.startsWith(OWN) && !OWN_OBJECTS.has(id)),
   m.objects.filter((o) => o.id.startsWith(OWN) || OWN_OBJECTS.has(o.id)).map((o) => o.id),
 );
 review.items.push(
@@ -601,6 +692,14 @@ review.items.push(
       '“Opposite the entrance to the linen room and the washing machine room” is read as the corridor bay across from the linen room’s door; a pad in the east corridor would have blocked the food trolley’s lane. The service door’s true width is not measured: 0.9 m is the standard single leaf and the most the photographed frame allows; the exterior’s roll-up curtain is still drawn 2.58 m wide and laps the door’s west jamb by 7 cm when down. The electrical room’s size, door and panel positions are assumed.',
   },
 );
+review.items.push({
+  id: 'care-rooms-7c-restrooms-plan',
+  rooms: ['rehab-wc-east', 'rehab-wc-south', 'rehab-entry'],
+  change:
+    'Owner on the live build: “move the wall south and make the back sides solid; there shouldn’t be any gap between the back of the sinks and that wall in both of the multi-stall bathrooms; check the architectural plans.” Checked on Overall Planning.jpg: the north restroom’s north wall moves 0.35 m south to the plan’s line (z 11.49), the corridor taking the strip; both restrooms’ east sides are now solid (the plan’s plumbing chase, from the sinks’ wall at x −15.80 to the building wall), so the sinks and mirrors sit against it; the south restroom’s south wall is one continuous wall (the traced fragments left a 2.4 m opening to the gym); its accessible toilet moves 0.22 m west to stand against the chase.',
+  unresolved:
+    'The plan’s back-wall face is x −15.72 (−15.81 in the south restroom’s lower half); the chase face is at −15.80 to keep the traced sinks, mirrors and tile against it. The south restroom’s south wall stays on the traced line (z 25.24), 0.18 m north of the plan’s (z 25.42), because the gym’s east wall and the practice stair are placed from it. The plan’s small closet at the chase’s north end (opening to the corridor) is drawn solid. The west therapy bathroom’s north wall is also 0.35 m north of the plan’s line but is unchanged. The plan’s structural column at the south restroom’s east wall is not modelled (no columns are).',
+});
 review.items.push({
   id: 'care-rooms-7b-rehab-shower',
   rooms: ['rehab-wc-sw'],

@@ -3604,6 +3604,14 @@
         ],
         [
           -14.653121,
+          11.49
+        ],
+        [
+          -19.842768,
+          11.49
+        ],
+        [
+          -19.842768,
           11.091598
         ],
         [
@@ -3792,11 +3800,11 @@
       "polygon": [
         [
           -19.842768,
-          11.142477
+          11.49
         ],
         [
           -14.653121,
-          11.142477
+          11.49
         ],
         [
           -14.653121,
@@ -10868,156 +10876,6 @@
       ]
     },
     {
-      "id": "plan-wall-209",
-      "zoneId": "rehab",
-      "levelId": "ground",
-      "a": [
-        -19.842768,
-        25.23593
-      ],
-      "b": [
-        -19.588373,
-        25.23593
-      ],
-      "height": 4.8,
-      "thickness": 0.20351556661228815,
-      "material": "wall",
-      "status": "source-stroke-traced / height-inferred",
-      "referencePages": [
-        92
-      ],
-      "sourcePixels": [
-        [
-          424,
-          1087
-        ],
-        [
-          429,
-          1087
-        ]
-      ]
-    },
-    {
-      "id": "plan-wall-210",
-      "zoneId": "rehab",
-      "levelId": "ground",
-      "a": [
-        -19.333979,
-        25.23593
-      ],
-      "b": [
-        -19.232221,
-        25.23593
-      ],
-      "height": 4.8,
-      "thickness": 0.20351556661228815,
-      "material": "wall",
-      "status": "source-stroke-traced / height-inferred",
-      "referencePages": [
-        92
-      ],
-      "sourcePixels": [
-        [
-          434,
-          1087
-        ],
-        [
-          436,
-          1087
-        ]
-      ]
-    },
-    {
-      "id": "plan-wall-211",
-      "zoneId": "rehab",
-      "levelId": "ground",
-      "a": [
-        -18.926948,
-        25.23593
-      ],
-      "b": [
-        -18.519917,
-        25.23593
-      ],
-      "height": 4.8,
-      "thickness": 0.20351556661228815,
-      "material": "wall",
-      "status": "source-stroke-traced / height-inferred",
-      "referencePages": [
-        92
-      ],
-      "sourcePixels": [
-        [
-          442,
-          1087
-        ],
-        [
-          450,
-          1087
-        ]
-      ]
-    },
-    {
-      "id": "plan-wall-212",
-      "zoneId": "rehab",
-      "levelId": "ground",
-      "a": [
-        -18.316401,
-        25.23593
-      ],
-      "b": [
-        -18.214643,
-        25.23593
-      ],
-      "height": 4.8,
-      "thickness": 0.20351556661228815,
-      "material": "wall",
-      "status": "source-stroke-traced / height-inferred",
-      "referencePages": [
-        92
-      ],
-      "sourcePixels": [
-        [
-          454,
-          1087
-        ],
-        [
-          456,
-          1087
-        ]
-      ]
-    },
-    {
-      "id": "plan-wall-213",
-      "zoneId": "rehab",
-      "levelId": "ground",
-      "a": [
-        -15.823335,
-        25.23593
-      ],
-      "b": [
-        -14.653121,
-        25.23593
-      ],
-      "height": 4.8,
-      "thickness": 0.20351556661228815,
-      "material": "wall",
-      "status": "source-stroke-traced / height-inferred",
-      "referencePages": [
-        92
-      ],
-      "sourcePixels": [
-        [
-          503,
-          1087
-        ],
-        [
-          526,
-          1087
-        ]
-      ]
-    },
-    {
       "id": "plan-wall-214",
       "zoneId": "rehab",
       "levelId": "ground",
@@ -12762,14 +12620,194 @@
       "levelId": "ground",
       "a": [
         -19.842768,
-        11.142477
+        11.49
       ],
       "b": [
         -14.653121,
-        11.142477
+        11.49
       ],
       "height": 4.8,
       "thickness": 0.2543944582653602,
+      "material": "wall",
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "referencePages": [
+        92
+      ]
+    },
+    {
+      "id": "owner-care-wall-rehab-wc-east-chase-0",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "a": [
+        -15.673,
+        11.617
+      ],
+      "b": [
+        -15.673,
+        17.858
+      ],
+      "height": 4.8,
+      "thickness": 0.255,
+      "material": "wall",
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "referencePages": [
+        92
+      ]
+    },
+    {
+      "id": "owner-care-wall-rehab-wc-south-chase-0",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "a": [
+        -15.673,
+        19.537
+      ],
+      "b": [
+        -15.673,
+        25.134
+      ],
+      "height": 4.8,
+      "thickness": 0.255,
+      "material": "wall",
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "referencePages": [
+        92
+      ]
+    },
+    {
+      "id": "owner-care-wall-rehab-wc-east-chase-1",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "a": [
+        -15.417,
+        11.617
+      ],
+      "b": [
+        -15.417,
+        17.858
+      ],
+      "height": 4.8,
+      "thickness": 0.255,
+      "material": "wall",
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "referencePages": [
+        92
+      ]
+    },
+    {
+      "id": "owner-care-wall-rehab-wc-south-chase-1",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "a": [
+        -15.417,
+        19.537
+      ],
+      "b": [
+        -15.417,
+        25.134
+      ],
+      "height": 4.8,
+      "thickness": 0.255,
+      "material": "wall",
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "referencePages": [
+        92
+      ]
+    },
+    {
+      "id": "owner-care-wall-rehab-wc-east-chase-2",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "a": [
+        -15.163,
+        11.617
+      ],
+      "b": [
+        -15.163,
+        17.858
+      ],
+      "height": 4.8,
+      "thickness": 0.255,
+      "material": "wall",
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "referencePages": [
+        92
+      ]
+    },
+    {
+      "id": "owner-care-wall-rehab-wc-south-chase-2",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "a": [
+        -15.163,
+        19.537
+      ],
+      "b": [
+        -15.163,
+        25.134
+      ],
+      "height": 4.8,
+      "thickness": 0.255,
+      "material": "wall",
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "referencePages": [
+        92
+      ]
+    },
+    {
+      "id": "owner-care-wall-rehab-wc-east-chase-3",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "a": [
+        -14.907,
+        11.617
+      ],
+      "b": [
+        -14.907,
+        17.858
+      ],
+      "height": 4.8,
+      "thickness": 0.255,
+      "material": "wall",
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "referencePages": [
+        92
+      ]
+    },
+    {
+      "id": "owner-care-wall-rehab-wc-south-chase-3",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "a": [
+        -14.907,
+        19.537
+      ],
+      "b": [
+        -14.907,
+        25.134
+      ],
+      "height": 4.8,
+      "thickness": 0.255,
+      "material": "wall",
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "referencePages": [
+        92
+      ]
+    },
+    {
+      "id": "owner-care-wall-rehab-wc-south-south",
+      "zoneId": "rehab",
+      "levelId": "ground",
+      "a": [
+        -19.842768,
+        25.23593
+      ],
+      "b": [
+        -14.526,
+        25.23593
+      ],
+      "height": 4.8,
+      "thickness": 0.20351556661228815,
       "material": "wall",
       "status": "owner-walkthrough 2026-10 / described, not surveyed",
       "referencePages": [
@@ -14150,7 +14188,7 @@
       "dimensions": [
         0.03,
         1.12,
-        6.614255914899365
+        6.241
       ],
       "material": "photo-white"
     },
@@ -14159,7 +14197,7 @@
       "dimensions": [
         0.035,
         0.35,
-        6.614255914899365
+        6.241
       ],
       "material": "photo-teal-tile"
     },
@@ -14168,7 +14206,7 @@
       "dimensions": [
         0.11,
         0.009,
-        6.614255914899365
+        6.241
       ],
       "material": "photo-teal-tile"
     },
@@ -14177,7 +14215,7 @@
       "dimensions": [
         0.03,
         1.12,
-        6.614255914899365
+        6.241
       ],
       "material": "photo-white"
     },
@@ -14186,7 +14224,7 @@
       "dimensions": [
         0.035,
         0.35,
-        6.614255914899365
+        6.241
       ],
       "material": "photo-teal-tile"
     },
@@ -14195,7 +14233,7 @@
       "dimensions": [
         0.11,
         0.009,
-        6.614255914899365
+        6.241
       ],
       "material": "photo-teal-tile"
     },
@@ -18049,7 +18087,7 @@
       "zoneId": "rehab",
       "levelId": "ground",
       "position": [
-        -15.925093,
+        -16.15,
         0,
         22.335833
       ],
@@ -18063,16 +18101,8 @@
       "referencePages": [
         92
       ],
-      "status": "image-traced-position-and-footprint / height-inferred",
-      "notes": "Plan location, orientation and horizontal footprint follow Overall Planning.jpg; product and height remain inferred.",
-      "sourcePixelPosition": [
-        501,
-        1030
-      ],
-      "sourcePixelFootprint": [
-        7.999999999999999,
-        12
-      ]
+      "status": "owner-walkthrough 2026-10 / described, not surveyed",
+      "notes": "Owner review 2026-10: the accessible toilet on the south restroom’s east side, its back against the plumbing chase (it was traced 0.24 m into it)."
     },
     {
       "id": "rehab-toilet-9",
@@ -20453,7 +20483,7 @@
       "position": [
         -19.74101,
         0,
-        14.551363
+        14.738
       ],
       "rotation": 0,
       "scale": [
@@ -20478,7 +20508,7 @@
       "position": [
         -19.74101,
         1.12,
-        14.551363
+        14.738
       ],
       "rotation": 0,
       "scale": [
@@ -20503,7 +20533,7 @@
       "position": [
         -19.588373,
         0.01,
-        14.551363
+        14.738
       ],
       "rotation": 0,
       "scale": [
@@ -20528,7 +20558,7 @@
       "position": [
         -15.823335,
         0,
-        14.551363
+        14.738
       ],
       "rotation": 0,
       "scale": [
@@ -20553,7 +20583,7 @@
       "position": [
         -15.823335,
         1.12,
-        14.551363
+        14.738
       ],
       "rotation": 0,
       "scale": [
@@ -20578,7 +20608,7 @@
       "position": [
         -15.975972,
         0.01,
-        14.551363
+        14.738
       ],
       "rotation": 0,
       "scale": [
@@ -43539,6 +43569,16 @@
         "unresolved": "“Opposite the entrance to the linen room and the washing machine room” is read as the corridor bay across from the linen room’s door; a pad in the east corridor would have blocked the food trolley’s lane. The service door’s true width is not measured: 0.9 m is the standard single leaf and the most the photographed frame allows; the exterior’s roll-up curtain is still drawn 2.58 m wide and laps the door’s west jamb by 7 cm when down. The electrical room’s size, door and panel positions are assumed."
       },
       {
+        "id": "care-rooms-7c-restrooms-plan",
+        "rooms": [
+          "rehab-wc-east",
+          "rehab-wc-south",
+          "rehab-entry"
+        ],
+        "change": "Owner on the live build: “move the wall south and make the back sides solid; there shouldn’t be any gap between the back of the sinks and that wall in both of the multi-stall bathrooms; check the architectural plans.” Checked on Overall Planning.jpg: the north restroom’s north wall moves 0.35 m south to the plan’s line (z 11.49), the corridor taking the strip; both restrooms’ east sides are now solid (the plan’s plumbing chase, from the sinks’ wall at x −15.80 to the building wall), so the sinks and mirrors sit against it; the south restroom’s south wall is one continuous wall (the traced fragments left a 2.4 m opening to the gym); its accessible toilet moves 0.22 m west to stand against the chase.",
+        "unresolved": "The plan’s back-wall face is x −15.72 (−15.81 in the south restroom’s lower half); the chase face is at −15.80 to keep the traced sinks, mirrors and tile against it. The south restroom’s south wall stays on the traced line (z 25.24), 0.18 m north of the plan’s (z 25.42), because the gym’s east wall and the practice stair are placed from it. The plan’s small closet at the chase’s north end (opening to the corridor) is drawn solid. The west therapy bathroom’s north wall is also 0.35 m north of the plan’s line but is unchanged. The plan’s structural column at the south restroom’s east wall is not modelled (no columns are)."
+      },
+      {
         "id": "care-rooms-7b-rehab-shower",
         "rooms": [
           "rehab-wc-sw"
@@ -43745,21 +43785,35 @@
       "plan-wall-146"
     ],
     "newWallIds": [
-      "owner-care-wall-rehab-wc-nw-north",
-      "owner-care-wall-rehab-wc-east-north",
-      "owner-care-wall-rehab-wc-east-stall-3",
-      "owner-care-wall-068-south",
       "owner-wall-154-north",
       "owner-wall-154-south",
+      "owner-care-wall-rehab-wc-nw-north",
+      "owner-care-wall-rehab-wc-east-north",
+      "owner-care-wall-rehab-wc-east-chase-0",
+      "owner-care-wall-rehab-wc-south-chase-0",
+      "owner-care-wall-rehab-wc-east-chase-1",
+      "owner-care-wall-rehab-wc-south-chase-1",
+      "owner-care-wall-rehab-wc-east-chase-2",
+      "owner-care-wall-rehab-wc-south-chase-2",
+      "owner-care-wall-rehab-wc-east-chase-3",
+      "owner-care-wall-rehab-wc-south-chase-3",
+      "owner-care-wall-rehab-wc-south-south",
+      "owner-care-wall-rehab-wc-east-stall-3",
       "owner-care-wall-electrical-east",
       "owner-care-wall-electrical-south",
+      "owner-care-wall-068-south",
       "owner-kitchen-wall-pass-closed"
     ],
     "removedWallIds": [
       "plan-wall-199",
       "plan-wall-081",
       "plan-wall-102",
-      "plan-wall-154"
+      "plan-wall-154",
+      "plan-wall-209",
+      "plan-wall-210",
+      "plan-wall-211",
+      "plan-wall-212",
+      "plan-wall-213"
     ],
     "changedPlanObjectIds": [
       "ot-toilet-0",
@@ -43767,7 +43821,8 @@
       "ot-toilet-2",
       "ot-basin-1",
       "admin-side-chair-0",
-      "admin-side-chair-1"
+      "admin-side-chair-1",
+      "rehab-toilet-8"
     ],
     "removedPlanObjectIds": [
       "reception-counter-2",
@@ -43793,17 +43848,6 @@
       "kitchen-cart-3"
     ],
     "newObjectIds": [
-      "rehab-wc-east-stall-door-3",
-      "rehab-wc-east-stall-handle-3",
-      "owner-care-wash-pad",
-      "owner-care-wheelchair",
-      "owner-care-hose-reel",
-      "access-dryer",
-      "owner-care-janitor-sink",
-      "owner-care-housekeeping-cart",
-      "owner-care-waste-bin-1",
-      "owner-care-waste-bin-2",
-      "owner-care-recycling-bin",
       "upperfit-desk-east-0",
       "upperfit-monitor-east-0",
       "upperfit-chair-east-0",
@@ -43831,12 +43875,23 @@
       "quiet-table-2-chair-2",
       "quiet-table-2-chair-3",
       "quiet-table-2-chair-4",
+      "rehab-wc-east-stall-door-3",
+      "rehab-wc-east-stall-handle-3",
+      "owner-care-rehab-shower",
       "owner-care-switchboard",
       "owner-care-sub-panel",
+      "access-dryer",
+      "owner-care-janitor-sink",
+      "owner-care-housekeeping-cart",
+      "owner-care-wash-pad",
+      "owner-care-wheelchair",
+      "owner-care-hose-reel",
       "owner-care-storage-rack-1",
       "owner-care-storage-rack-2",
       "owner-care-storage-rack-3",
-      "owner-care-rehab-shower",
+      "owner-care-waste-bin-1",
+      "owner-care-waste-bin-2",
+      "owner-care-recycling-bin",
       "rehab-kitchen-casework",
       "rehab-kitchen-fridge",
       "rehab-kitchen-microwave",
